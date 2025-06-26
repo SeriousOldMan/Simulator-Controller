@@ -5,10 +5,11 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 */
 using RF2SHMProvider.rFactor2Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Threading;
-using static RF2SHMProvider.rFactor2Constants;
 using static RF2SHMProvider.rFactor2Constants.rF2GamePhase;
 using static RF2SHMProvider.rFactor2Constants.rF2PitState;
 
@@ -93,9 +94,10 @@ namespace RF2SHMProvider {
 
 			if (forName.Contains(" ")) {
 				string[] names = forName.Split(' ');
+				int length = Math.Min(1, names[0].Length);
 
-				return names[0].Substring(0, 1) + names[1].Substring(0, 1);
-			}
+                return names[0].Substring(0, Math.Min(1, names[0].Length)) + names[1].Substring(0, Math.Min(1, names[1].Length));
+            }
 			else
 				return "";
 		}
@@ -127,22 +129,28 @@ namespace RF2SHMProvider {
         {
             carName = carName.Trim();
 
-            if (carName.Length > 0)
-            {
-                if (carName[0] == '#')
-                {
-                    char[] delims = { ' ' };
-                    string[] parts = carName.Split(delims, 2);
+			try {
+				if (carName.Length > 0)
+				{
+					if (carName[0] == '#')
+					{
+						char[] delims = { ' ' };
+						string[] parts = carName.Split(delims, 2);
 
-                    return parts[0].Split('#')[1].Trim();
-                }
-                else if (carName.Contains("#"))
-                    return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
-                else
-                    return (id + 1).ToString();
+						return parts[0].Split('#')[1].Trim();
+					}
+					else if (carName.Contains("#"))
+						return carName.Split('#')[1].Trim().Split(' ')[0].Trim();
+					else
+						return (id + 1).ToString();
+				}
+				else
+					return (id + 1).ToString();
             }
-            else
+            catch (Exception)
+            {
                 return (id + 1).ToString();
+            }
         }
 
         public void ReadStandings()
@@ -374,13 +382,23 @@ namespace RF2SHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
 				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
-			
-				Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
 
-				Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+                Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
+                Console.Write("TyreCompoundRawFront="); Console.WriteLine(compound);
+
+                compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
+                Console.Write("TyreCompoundRawRear="); Console.WriteLine(compound);
+
+                Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				Console.WriteLine("EngineDamage=0");
-			}
+
+				if (playerTelemetry.mEngineWaterTemp > 0)
+					Console.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
+
+				if (playerTelemetry.mEngineOilTemp > 0)
+                    Console.WriteLine("OilTemperature=" + playerTelemetry.mEngineOilTemp);
+            }
 
 			Console.WriteLine("[Track Data]");
 
@@ -522,13 +540,27 @@ namespace RF2SHMProvider {
 			return psi * 6.895;
 		}
 
+		private int GetFuel(string fuelChoice)
+		{
+			int fuel = 0;
+
+			// We expect the fuel choice to be in the format "+<value>" or "+<value>/<value>"
+			if (!string.IsNullOrEmpty(fuelChoice) && fuelChoice[0] == '+')
+			{
+				var parts = fuelChoice.Substring(1).Split('/');
+				int.TryParse(parts[0], out fuel);
+			}
+
+			return fuel;
+		}
+
 		private static string GetStringFromBytes(byte[] bytes) {
 			if (bytes == null)
 				return "";
 
 			var nullIdx = Array.IndexOf(bytes, (byte)0);
 
-			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
+			return nullIdx >= 0 ? Encoding.UTF8.GetString(bytes, 0, nullIdx) : Encoding.UTF8.GetString(bytes);
 		}
 
         static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
@@ -636,7 +668,8 @@ namespace RF2SHMProvider {
 			}
 		}
 
-		private void ExecuteSetRefuelCommand(string fuelArgument) {
+		private void ExecuteSetRefuelCommand(string fuelArgument)
+		{
 			Console.Write("Adjusting Refuel: "); Console.WriteLine(fuelArgument);
 
 			int targetFuel = Int16.Parse(fuelArgument);
@@ -644,15 +677,43 @@ namespace RF2SHMProvider {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
-			int deltaFuel = targetFuel - pitInfo.mPitMenu.mChoiceIndex;
+			int currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
 
-			if (deltaFuel > 0)
-				SendPitstopCommand(new string('+', deltaFuel));
-			else
-				SendPitstopCommand(new string('-', Math.Abs(deltaFuel)));
+			if (currentFuel < targetFuel)
+			{
+				while (pitInfo.mPitMenu.mChoiceIndex < pitInfo.mPitMenu.mNumChoices)
+				{
+					SendPitstopCommand("+");
+
+					pitInfoBuffer.GetMappedData(ref pitInfo);
+
+					currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+
+					if (currentFuel >= targetFuel)
+						break;
+				}
+			}
+			else if (currentFuel > targetFuel)
+                while (pitInfo.mPitMenu.mChoiceIndex > 0)
+                {
+                    SendPitstopCommand("-");
+
+                    pitInfoBuffer.GetMappedData(ref pitInfo);
+
+                    currentFuel = GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString));
+
+					if (currentFuel == targetFuel)
+						break;
+					else if (currentFuel < targetFuel)
+					{
+						SendPitstopCommand("+");
+
+						pitInfoBuffer.GetMappedData(ref pitInfo);
+					}
+                }
 		}
-		
-		private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
+
+        private void ExecuteChangeRefuelCommand(char action, string stepsArgument) {
 			if (!SelectPitstopCategory("FUEL:"))
 				return;
 
@@ -999,12 +1060,13 @@ namespace RF2SHMProvider {
 
 		public void ReadSetup() {
 			Console.WriteLine("[Setup Data]");
-			
-			if (connected) {
-				if (!SelectPitstopCategory("FUEL:"))
-					return;
 
-				Console.Write("FuelAmount="); Console.WriteLine(pitInfo.mPitMenu.mChoiceIndex);
+			if (connected) {
+				if (SelectPitstopCategory("FUEL:"))
+				{
+					Console.Write("FuelAmount=");
+					Console.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
+				}
 
 				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{

@@ -28,6 +28,28 @@ inline double normalizeKelvin(double value) {
 		return (value - 273.15);
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+std::string normalizeName(const char* name) {
+	std::string result = name;
+
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
 long getRemainingTime(SharedMemory* shm);
 
 long getRemainingLaps(SharedMemory* shm) {
@@ -180,11 +202,12 @@ int main(int argc, char* argv[]) {
 		else
 			printf("Session=Other\n");
 
-		printf("Car=%s\n", localCopy->mCarName);
-		printf("Track=%s-%s\n", localCopy->mTrackLocation, localCopy->mTrackVariation);
+		printf("Car=%s\n", normalizeName(localCopy->mCarName));
+		printf("Track=%s-%s\n", normalizeName(localCopy->mTrackLocation), normalizeName(localCopy->mTrackVariation));
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
 		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
+		printf("AdditionalLaps=%d\n", localCopy->mSessionAdditionalLaps);
 
 		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {
@@ -279,6 +302,12 @@ int main(int argc, char* argv[]) {
 			(int)round(localCopy->mBrakeDamage[TYRE_FRONT_RIGHT] * 100),
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100),
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
+
+		if ((int)round(localCopy->mWaterTempCelsius))
+			printf("WaterTemperature=%d\n", (int)round(localCopy->mWaterTempCelsius));
+
+		if ((int)round(localCopy->mOilTempCelsius))
+			printf("OilTemperature=%d\n", (int)round(localCopy->mOilTempCelsius));
 
 		printf("[Stint Data]\n");
 
@@ -396,7 +425,7 @@ int main(int argc, char* argv[]) {
 					(long)(localCopy->mCurrentSector2Times[i - 1] * 1000),
 					(long)(localCopy->mCurrentSector3Times[i - 1] * 1000));
 
-				printf("Car.%d.Car=%s\n", i, localCopy->mCarNames[i - 1]);
+				printf("Car.%d.Car=%s\n", i, normalizeName(localCopy->mCarNames[i - 1]));
 
 				char* name = (char*)vehicle.mName;
 

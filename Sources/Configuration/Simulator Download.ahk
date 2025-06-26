@@ -52,9 +52,11 @@ updateProgress(max) {
 }
 
 downloadSimulatorController() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local icon := kIconsDirectory . "Installer.ico"
+	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, ignore, url, error
+	local directory, currentDirectory, ignore, url
 
 	exitOthers() {
 		loop 20
@@ -116,11 +118,27 @@ downloadSimulatorController() {
 
 	devVersion := (cState || inList(A_Args, "-Development"))
 
-	try {
-		Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kTempDirectory . "VERSION")
-	}
-	catch Any as exception {
-		logError(exception, true)
+	deleteFile(kTempDirectory . "VERSION")
+	
+	for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
+					  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+					  , "https://" . MASTER . ":801/api/public/dl/bkguewzP"
+					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+		try {
+			error := false
+
+			Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kTempDirectory . "VERSION")
+
+			if FileExist(kTempDirectory . "VERSION")
+				break
+		}
+		catch Any as exception {
+			error := exception
+		}
+
+	if (error || !FileExist(kTempDirectory . "VERSION")) {
+		if error
+			logError(error, true)
 
 		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
@@ -139,6 +157,8 @@ downloadSimulatorController() {
 			package := getMultiMapValue(release, "Release", "Download", false)
 
 		if package {
+			package := substituteVariables(package, {master: MASTER})
+			
 			exitOthers()
 
 			for ignore, url in string2Values(";", package)
@@ -152,9 +172,9 @@ downloadSimulatorController() {
 
 					updateTask.start()
 
-					deleteFile(A_Temp . "\Simulator Controller.zip")
+					deleteFile(kTempDirectory . "InstallPackage.zip")
 
-					Download(url, A_Temp . "\Simulator Controller.zip")
+					Download(url, kTempDirectory . "InstallPackage.zip")
 
 					updateTask.stop()
 
@@ -164,15 +184,15 @@ downloadSimulatorController() {
 
 					showProgress({message: translate("Extracting installation files...")})
 
-					deleteDirectory(A_Temp . "\Simulator Controller")
+					deleteDirectory(kTempDirectory . "SC-Install")
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller.zip' -DestinationPath '" . A_Temp . "\Simulator Controller' -Force", , "Hide")
+					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "InstallPackage.zip' -DestinationPath '" . kTempDirectory . "SC-Install' -Force", , "Hide")
 
 					exitOthers()
 
-					deleteFile(A_Temp . "\Simulator Controller.zip")
+					deleteFile(kTempDirectory . "InstallPackage.zip")
 
-					directory := (A_Temp . "\Simulator Controller")
+					directory := (kTempDirectory . "SC-Install")
 
 					if FileExist(directory . "\Simulator Controller")
 						directory .= "\Simulator Controller"

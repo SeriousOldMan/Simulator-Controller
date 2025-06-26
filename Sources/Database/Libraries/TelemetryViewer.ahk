@@ -73,7 +73,7 @@ class TelemetryChart {
 		this.iChartArea := chartArea
 	}
 
-	showTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
+	showTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0) {
 		eventHandler(event, arguments*) {
 			local telemetryViewer := this.TelemetryViewer
 			local row := false
@@ -112,19 +112,23 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			this.ChartArea.document.open()
-			this.ChartArea.document.write(this.createTelemetryChart(channels, lapFileName, referenceLapFileName, distanceCorrection))
+			this.ChartArea.document.write(this.createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName, distanceCorrection))
 			this.ChartArea.document.close()
 
 			this.ChartArea.document.parentWindow.eventHandler := eventHandler
 		}
 	}
 
-	createTelemetryChart(channels, lapFileName, referenceLapFileName := false, distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+	createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false
+					   , distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+		local channelCount := choose(channels, (c) => (c != "|")).Length
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
 		local html := ""
+		local chartAreas := []
+		local chartFunctions := []
 		local width, height
-		local drawChartFunction, chartArea
+		local clusterIndex, currentCluster, clusterChannels, drawChartFunction
 		local before, after, margins
 		local entry, index, field, running
 
@@ -150,10 +154,28 @@ class TelemetryChart {
 		}
 
 		if this.ChartArea {
-			width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
-			height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale)
+			loop cluster {
+				currentCluster := 1
+				clusterIndex := A_index
 
-			chartArea:= this.createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction)
+				clusterChannels := choose(collect(channels, (c) {
+					if (c = "|")
+						currentCluster += 1
+					else if (clusterIndex = currentCluster)
+						return c
+
+					return false
+				}), (c) => c)
+
+				if (clusterChannels.Length > 0) {
+					width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
+					height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
+
+					chartAreas.Push(this.createChannelChart(width, height, A_Index, clusterChannels
+														  , lapTelemetry, referenceLapTelemetry, &drawChartFunction))
+					chartFunctions.Push(drawChartFunction)
+				}
+			}
 
 			before := "
 			(
@@ -183,36 +205,51 @@ class TelemetryChart {
 			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 										 , {margin: margin})
 
-			return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . chartArea . "</body></html>")
+			before .= "`n function drawChart() {"
+
+			loop chartFunctions.Length
+				before .= (" drawChart" . A_Index . "();")
+
+			before .= " }`n"
+
+			before .= "`n function selectTelemetry(row) {"
+
+			loop chartFunctions.Length
+				before .= (" selectTelemetry" . A_Index . "(row);")
+
+			before .= " }`n"
+
+			return ("<html>" . before . values2String(A_Space, chartFunctions*) . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . values2String("", chartAreas*) . "</body></html>")
 		}
 		else
 			return "<html></html>"
 	}
 
-	createChannelChart(width, height, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
+	createChannelChart(width, height, cluster, channels, lapTelemetry, referenceLapTelemetry, &drawChartFunction) {
 		local channelsCount := channels.Length
 		local channelsEstate := 0
 		local axisCount := 0
+		local currentCluster := 1
 		local ignore, index, offset, data, refData, axes, color, running, refRunning, values
 		local theChannel, theName, theIndex, theValue, theConverter, theMinValue, minValue, maxValue, spread
 
-		channels := collect(channels, (s) {
+		channels := collect(channels, (c) {
 			local minValues := []
 			local maxValues := []
 
-			s := s.Clone()
+			c := c.Clone()
 
-			channelsEstate += s.Size
+			channelsEstate += c.Size
 
-			s.MinValue := kUndefined
-			s.MaxValue := kUndefined
+			c.MinValue := kUndefined
+			c.MaxValue := kUndefined
 
-			axisCount += s.Indices.Length
+			axisCount += c.Indices.Length
 
-			return s
+			return c
 		})
 
-		drawChartFunction := ("function drawChart() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawChart" . cluster . "() {`nvar data = new google.visualization.DataTable();")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Distance") . "');")
 
@@ -416,16 +453,16 @@ class TelemetryChart {
 
 		axes .= " }"
 
-		drawChartFunction .= ("]);`nvar options = { " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { interpolateNulls: true, " . axes . ", legend: { position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '2%', top: '5%', right: '2%', bottom: '10%' }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); document.telemetryChart = chart;")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart" . cluster . "')); chart.draw(data, options); document.telemetryChart" . cluster . " = chart;")
 		drawChartFunction .= "`nfunction selectHandler(e) { var cSelection = chart.getSelection(); var selection = ''; for (var i = 0; i < cSelection.length; i++) { var item = cSelection[i]; if (i > 0) selection += ';'; selection += (item.row + '|' + item.column); } try { eventHandler('Select', selection); } catch(e) {} }"
 
 		drawChartFunction .= "`ngoogle.visualization.events.addListener(chart, 'select', selectHandler); }"
 
-		drawChartFunction .= ("`nfunction selectTelemetry(row) {`ndocument.telemetryChart.setSelection([{row: row, column: null}]); }")
+		drawChartFunction .= ("`nfunction selectTelemetry" . cluster . "(row) {`ndocument.telemetryChart" . cluster . ".setSelection([{row: row, column: null}]); }")
 
-		return ("<div id=`"chart`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
+		return ("<div id=`"chart" . cluster . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
 	selectRow(row) {
@@ -499,9 +536,9 @@ class TelemetryViewer {
 
 	iDistanceCorrection := 0
 
-	iCollectorTask := false
-
 	iCollect := false
+	iSynchronize := false
+	iSynchronizeTask := false
 
 	iTrackMap := false
 
@@ -609,21 +646,9 @@ class TelemetryViewer {
 		}
 	}
 
-	ReadOnly {
-		Get {
-			return !this.iCollectorTask
-		}
-	}
-
 	Window {
 		Get {
 			return this.iWindow
-		}
-	}
-
-	CollectorTask {
-		Get {
-			return this.iCollectorTask
 		}
 	}
 
@@ -715,6 +740,18 @@ class TelemetryViewer {
 		}
 	}
 
+	Synchronize {
+		Get {
+			return this.iSynchronize
+		}
+	}
+
+	SynchronizeTask {
+		Get {
+			return this.iSynchronizeTask
+		}
+	}
+
 	TrackMap {
 		Get {
 			return this.iTrackMap
@@ -743,10 +780,11 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, collect := true) {
+	__New(manager, directory, synchronize := true, collect := true) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
+		this.iSynchronize := synchronize
 		this.iCollect := collect
 
 		this.loadLayouts()
@@ -755,37 +793,50 @@ class TelemetryViewer {
 	loadLayouts() {
 		local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
 		local layouts := CaseInsenseMap()
-		local name, definition, ignore
+		local name, definition, ignore, button, clusterCount
 
 		if (configuration.Count > 0)
 			for name, definition in getMultiMapValues(configuration, "Layouts")
 				try {
+					clusterCount := 1
+
 					layouts[name] := {Name: name
 									, WidthZoom: getMultiMapValue(configuration, "Zoom", name . ".Width", 100)
 									, HeightZoom: getMultiMapValue(configuration, "Zoom", name . ".Height", 100)
 									, Channels: choose(collect(string2Values(",", definition), (name) {
-														   return choose(kTelemetryChannels, (s) => s.Name = name)[1]
+														   if (name = "|") {
+															   clusterCount += 1
+
+															   return name
+														   }
+														   else
+															   return choose(kTelemetryChannels, (c) => c.Name = name)[1]
 													   })
-													 , (s) => s.HasProp("Size"))}
+													 , (c) => ((c = "|") ? c : c.HasProp("Size")))}
+
+					layouts[name].Cluster := clusterCount
 				}
 				catch Any as exception {
 					logError(exception)
 				}
 
-		if (layouts.Count = 0) {
-			this.iLayouts := CaseInsenseMap(translate("Standard")
-										  , {Name: translate("Standard")
-										   , WidthZoom: 100, HeightZoom: 100
-										   , Channels: choose(kTelemetryChannels
-															, (s) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																			 , "Long G", "Lat G"], s.Name) && s.HasProp("Size")))})
+		if (layouts.Count = 0)
+			layouts := CaseInsenseMap(translate("Standard")
+									, {Name: translate("Standard")
+									 , WidthZoom: 100, HeightZoom: 100
+									 , Cluster: 1
+									 , Channels: choose(kTelemetryChannels
+													  , (c) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
+																	   , "Long G", "Lat G"], c.Name) && c.HasProp("Size")))})
 
-			this.iSelectedLayout := translate("Standard")
-		}
-		else {
-			this.iLayouts := layouts
-			this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout")
-		}
+		this.iLayouts := layouts
+		this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout", translate("Standard"))
+
+		if !layouts.Has(this.iSelectedLayout)
+			if layouts.Has(translate("Standard"))
+				this.iSelectedLayout := translate("Standard")
+			else
+				this.iSelectedLayout := getKeys(layouts)[1]
 	}
 
 	saveLayouts() {
@@ -793,7 +844,7 @@ class TelemetryViewer {
 		local name, layout
 
 		for name, layout in this.Layouts {
-			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (s) => s.Name)*))
+			setMultiMapValue(configuration, "Layouts", name, values2String(",", collect(layout.Channels, (c) => ((c = "|") ? c : c.Name))*))
 
 			setMultiMapValue(configuration, "Zoom", name . ".Width", layout.WidthZoom)
 			setMultiMapValue(configuration, "Zoom", name . ".Height", layout.HeightZoom)
@@ -866,7 +917,7 @@ class TelemetryViewer {
 		}
 
 		deleteLap(*) {
-			local all := (!this.ReadOnly && GetKeyState("Ctrl"))
+			local all := (this.Collect && GetKeyState("Ctrl"))
 			local msgResult
 
 			if this.SelectedLap {
@@ -970,7 +1021,42 @@ class TelemetryViewer {
 		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		viewerGui.Add("Text", "x8 yp+30 w676 W:Grow 0x10")
+		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
+		button.OnEvent("Click", (*) {
+			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+														  , "Telemetry Viewer", "Provider", "Internal")
+			local newProvider, configuration, collector
+
+			viewerGui.Block()
+
+			try {
+				newProvider := editTelemetrySettings(this, provider)
+
+				if (newProvider && (newProvider != provider)) {
+					configuration := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+					setMultiMapValue(configuration, "Telemetry Viewer", "Provider", newProvider)
+
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", configuration)
+
+					collector := this.TelemetryCollector
+
+					if collector {
+						this.shutdownCollector()
+
+						this.restart(this.TelemetryDirectory)
+
+						this.startupCollector(collector.Simulator, collector.Track, collector.TrackLength)
+					}
+				}
+			}
+			finally {
+				viewerGui.Unblock()
+			}
+		})
+		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
+
+		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 
@@ -1052,23 +1138,23 @@ class TelemetryViewer {
 
 		this.updateTelemetryChart(true)
 
-		if this.Collect {
-			if this.CollectorTask
-				this.CollectorTask.stop()
+		if this.Synchronize {
+			if this.SynchronizeTask
+				this.SynchronizeTask.stop()
 
-			this.iCollectorTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
+			this.iSynchronizeTask := PeriodicTask(ObjBindMethod(this, "loadTelemetry"), 10000, kLowPriority)
 
-			this.CollectorTask.start()
+			this.SynchronizeTask.start()
 		}
 	}
 
 	close() {
 		this.shutdownCollector()
 
-		if this.CollectorTask {
-			this.CollectorTask.stop()
+		if this.SynchronizeTask {
+			this.SynchronizeTask.stop()
 
-			this.iCollectorTask := false
+			this.iSynchronizeTask := false
 		}
 
 		this.Manager.closedTelemetryViewer()
@@ -1120,27 +1206,30 @@ class TelemetryViewer {
 	}
 
 	startupCollector(simulator, track, trackLength) {
-		if !this.TelemetryCollector {
-			this.iTelemetryCollector := TelemetryCollector(this.TelemetryDirectory, simulator, track, trackLength)
+		if this.Collect
+			if !this.TelemetryCollector {
+				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+																			  , "Telemetry Viewer", "Provider", "Internal")
+															 , this.TelemetryDirectory, simulator, track, trackLength)
 
-			this.iTelemetryCollector.startup()
-
-			this.CollectingNotifier.show()
-
-			this.CollectingNotifier.document.open()
-			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
-			this.CollectingNotifier.document.close()
-		}
-		else {
-			if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
-																  || (this.iTelemetryCollector.TrackLength != trackLength)) {
-				this.iTelemetryCollector.initialize(simulator, track, trackLength)
-
-				this.iTelemetryCollector.startup(true)
-			}
-			else
 				this.iTelemetryCollector.startup()
-		}
+
+				this.CollectingNotifier.show()
+
+				this.CollectingNotifier.document.open()
+				this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
+				this.CollectingNotifier.document.close()
+			}
+			else {
+				if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
+																	  || (this.iTelemetryCollector.TrackLength != trackLength)) {
+					this.iTelemetryCollector.initialize(simulator, track, trackLength)
+
+					this.iTelemetryCollector.startup(true)
+				}
+				else
+					this.iTelemetryCollector.startup()
+			}
 	}
 
 	shutdownCollector() {
@@ -1188,7 +1277,7 @@ class TelemetryViewer {
 			SectionInfoViewer.closeSectionInfo()
 	}
 
-	restart(directory, collect := true) {
+	restart(directory) {
 		local simulator, car, track
 
 		this.selectLap(false, true)
@@ -1639,7 +1728,7 @@ class TelemetryViewer {
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
 			if (analyzer.TrackSections.Length = 0)
-				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 					withBlockedWindows(() {
 						analyzer.requireTrackSections(telemetry)
 
@@ -1809,7 +1898,8 @@ class TelemetryViewer {
 
 	updateTelemetryChart(redraw := false) {
 		if (this.TelemetryChart && redraw) {
-			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Channels, this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
+			this.TelemetryChart.showTelemetryChart(this.Layouts[this.SelectedLayout].Cluster, this.Layouts[this.SelectedLayout].Channels
+												 , this.SelectedLap[true], this.SelectedReferenceLap[true], this.DistanceCorrection)
 
 			this.updateState()
 		}
@@ -2082,7 +2172,7 @@ class SectionInfoViewer {
 		}
 
 		if (section.Type = "Corner") {
-			if section.HasProp("Name")
+			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
 				name := ""
@@ -2137,7 +2227,7 @@ class SectionInfoViewer {
 
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time") . "</th>" . fieldCell("Time", "Exit", 2, 1000, "Seconds") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Start") . "</th>" . startCell("Exit") . "</tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Length") . "</th>" . unitFieldCell("Length", "Exit", "Length") . "</tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Acceleration Distance") . "</th>" . unitFieldCell("Length", "Exit", "Length") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Gear") . "</th>" . stdCell("AcceleratingGear") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("RPM") . "</th>" . stdCell("AcceleratingRPM") . "</tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Speed") . "</th>" . unitCell("AcceleratingSpeed", "Speed") . "</tr>")
@@ -2149,7 +2239,13 @@ class SectionInfoViewer {
 			}
 		}
 		else {
-			this.Window.Title := translate("Straight")
+
+			if (section.HasProp("Name") && section.Name)
+				name := (A_Space . section.Name)
+			else
+				name := ""
+
+			this.Window.Title := (translate("Straight") . name)
 
 			html := "<table class=`"table-std`">"
 
@@ -2419,7 +2515,7 @@ class TrackMap {
 			this.Window.Block()
 
 			try {
-				withTask(WorkingTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 					withBlockedWindows(() {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
@@ -2530,16 +2626,16 @@ class TrackMap {
 
 					if isObject(currentSection) {
 						if currentSection.HasProp("Nr") {
+							if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
+								positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+							else
+								positionInfo := ""
+
 							switch currentSection.Type, false {
 								case "Corner":
-									if (currentSection.HasProp("Name") && (Trim(currentSection.Name) != ""))
-										positionInfo := (translate(" (") . currentSection.Name . translate(")"))
-									else
-										positionInfo := ""
-
 									positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 								case "Straight":
-									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . translate(": "))
+									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . positionInfo . translate(": "))
 								default:
 									throw "Unknown section type detected in SessionDatabaseEditor.show..."
 							}
@@ -3026,19 +3122,24 @@ class TrackMap {
 	chooseTrackSectionType(section := false) {
 		local result := false
 		local sectionsMenu := Menu()
-		local label := translate("Corner")
+		local cornerLabel := translate("Corner")
+		local straightLabel := translate("Straight")
 
 		if (section && (section.Type = "Corner"))
-			label .= translate("...")
+			cornerLabel .= translate("...")
 
-		sectionsMenu.Add(label, (*) => (result := "Corner"))
-		sectionsMenu.Add(translate("Straight"), (*) => (result := "Straight"))
+		sectionsMenu.Add(cornerLabel, (*) => (result := "Corner"))
+
+		if (section && (section.Type = "Straight"))
+			straightLabel .= translate("...")
+
+		sectionsMenu.Add(straightLabel, (*) => (result := "Straight"))
 
 		if section {
 			if (section.Type = "Corner")
-				sectionsMenu.Check(label)
+				sectionsMenu.Check(cornerLabel)
 			else
-				sectionsMenu.Check(translate(section.Type))
+				sectionsMenu.Check(straightLabel)
 
 			sectionsMenu.Add()
 
@@ -3063,12 +3164,22 @@ class TrackMap {
 				if section {
 					section := section.Clone()
 
-					result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+					if ((result = "Corner") && (section.Type = "Corner")) {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
-					if (result.Result = "Ok")
-						section.Name := result.Value
+						if (result.Result = "Ok")
+							section.Name := result.Value
 
-					result := "Corner"
+						result := "Corner"
+					}
+					else if ((result = "Straight") && (section.Type = "Straight")) {
+						result := withBlockedWindows(InputBox, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+
+						if (result.Result = "Ok")
+							section.Name := result.Value
+
+						result := "Straight"
+					}
 				}
 				else
 					section := Object()
@@ -3221,7 +3332,7 @@ class TrackMap {
 ;;;-------------------------------------------------------------------------;;;
 
 editLayoutSettings(telemetryViewerOrCommand, arguments*) {
-	local name, names, x, y, ignore, channel, selected, tempLayout, checked1, checked2, inputResult
+	local name, names, x, y, ignore, channel, selected, tempLayout, checked1, checked2, inputResult, select
 
 	static layoutsGui
 
@@ -3291,13 +3402,17 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
+			if layout
+				editLayoutSettings("LayoutSave")
+
 			name := inputResult.Value
 			newName := name
 
 			while layouts.Has(newName)
 				newName := (name . translate(" (") . A_Index . translate(")"))
 
-			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100, Channels: [choose(kTelemetryChannels, (s) => s.HasProp("Size"))[1]]}
+			layouts[newName] := {Name: newName, WidthZoom: 100, HeightZoom: 100
+							   , Cluster: 1, Channels: [choose(kTelemetryChannels, (c) => c.HasProp("Size"))[1]]}
 
 			editLayoutSettings("LayoutsLoad", layouts)
 			editLayoutSettings("LayoutLoad", layouts[newName])
@@ -3320,12 +3435,16 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			while (selected := channelsListView.GetNext(selected, "C")) {
 				name := channelsListView.GetText(selected)
 
-				channels.Push(choose(kTelemetryChannels, (s) => translate(s.Name) = name)[1])
+				if (name = translate("---------------------------------------------"))
+					channels.Push("|")
+				else
+					channels.Push(choose(kTelemetryChannels, (c) => translate(c.Name) = name)[1])
 			}
 
 			layouts[layout.Name] := {Name: layout.Name
 								   , WidthZoom: layoutsGui["zoomWSlider"].Value
 								   , HeightZoom: layoutsGui["zoomHSlider"].Value
+								   , Cluster: layoutsGui["clusterEdit"].Text
 								   , Channels: channels}
 		}
 	}
@@ -3338,6 +3457,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layout := arguments[1]
 
 		layoutsGui["layoutDropDown"].Choose(inList(getKeys(layouts), layout.Name))
+		layoutsGui["clusterEdit"].Text := (layout.HasProp("Cluster") ? layout.Cluster : 1)
 
 		channelsListView.Delete()
 
@@ -3345,12 +3465,16 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			names := []
 
 			for ignore, channel in layout.Channels {
-				names.Push(channel.Name)
+				if (channel = "|")
+					channelsListView.Add("Check", translate("---------------------------------------------"))
+				else {
+					names.Push(channel.Name)
 
-				channelsListView.Add("Check", translate(channel.Name))
+					channelsListView.Add("Check", translate(channel.Name))
+				}
 			}
 
-			for ignore, channel in choose(kTelemetryChannels, (s) => s.HasProp("Size"))
+			for ignore, channel in choose(kTelemetryChannels, (c) => c.HasProp("Size"))
 				if (!inList(names, channel.Name) && (channel.Channels.Length > 0))
 					channelsListView.Add("", translate(channel.Name))
 
@@ -3361,6 +3485,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		channelsListView.ModifyCol()
 		channelsListView.ModifyCol(1, "AutoHdr")
 
+		editLayoutSettings("AdjustCluster")
 		editLayoutSettings("UpdateState")
 	}
 	else if (telemetryViewerOrCommand = "LayoutsLoad") {
@@ -3379,11 +3504,62 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		else
 			editLayoutSettings("UpdateState")
 	}
+	else if (telemetryViewerOrCommand = "AdjustCluster") {
+		select := ((arguments.Length > 0) && arguments[1])
+
+		if (Trim(layoutsGui["clusterEdit"].Text) = "")
+			layoutsGui["clusterEdit"].Text := 1
+
+		currentGroups := 1
+
+		loop channelsListView.GetCount()
+			if (channelsListView.GetText(A_Index) = translate("---------------------------------------------"))
+				currentGroups += 1
+
+		if (layoutsGui["clusterEdit"].Text > currentGroups)
+			loop Max(0, layoutsGui["clusterEdit"].Text - currentGroups) {
+				channelsListView.Add("Check", translate("---------------------------------------------"))
+
+				if select
+					channelsListView.Modify(channelsListView.GetCount(), "+Select Vis")
+			}
+
+		if (layoutsGui["clusterEdit"].Text < currentGroups)
+			loop Max(0, currentGroups - layoutsGui["clusterEdit"].Text)
+				loop channelsListView.GetCount()
+					if (channelsListView.GetText(channelsListView.GetCount() - A_Index + 1) = translate("---------------------------------------------")) {
+						channelsListView.Delete(channelsListView.GetCount() - A_Index + 1)
+
+						break
+					}
+
+		if select
+			editLayoutSettings("UpdateState")
+	}
 	else if (telemetryViewerOrCommand = "UpdateState") {
 		if ((layouts.Count <= 1) || !layout)
 			layoutsGui["deleteButton"].Enabled := false
 		else
 			layoutsGui["deleteButton"].Enabled := true
+
+		if layout {
+			layoutsGui["clusterEdit"].Enabled := true
+
+			if (Trim(layoutsGui["clusterEdit"].Text) = "") {
+				layoutsGui["clusterEdit"].Text := 1
+
+				editLayoutSettings("AdjustCluster")
+			}
+		}
+		else {
+			layoutsGui["clusterEdit"].Enabled := false
+
+			layoutsGui["clusterEdit"].Text := ""
+		}
+
+		loop channelsListView.GetCount()
+			if (channelsListView.GetText(A_Index) = translate("---------------------------------------------"))
+				channelsListView.Modify(A_Index, "Check")
 
 		selected := channelsListView.GetNext()
 
@@ -3431,12 +3607,18 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		layoutsGui.Add("Text", "x8 yp+30 w300 0x10")
 
 		layoutsGui.Add("Text", "x16 yp+10 w80", translate("Layout"))
-		layoutsGui.Add("DropDownList", "x98 yp-4 w120 vlayoutDropDown").OnEvent("Change", editLayoutSettings.Bind("LayoutSelect"))
+		layoutsGui.Add("DropDownList", "x98 yp-4 w152 vlayoutDropDown").OnEvent("Change", editLayoutSettings.Bind("LayoutSelect"))
 
-		layoutsGui.Add("Button", "x219 yp w23 h23 Center +0x200 vnewButton").OnEvent("Click", editLayoutSettings.Bind("LayoutNew"))
+		layoutsGui.Add("Button", "x252 yp w23 h23 Center +0x200 vnewButton").OnEvent("Click", editLayoutSettings.Bind("LayoutNew"))
 		setButtonIcon(layoutsGui["newButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		layoutsGui.Add("Button", "x243 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
+		layoutsGui.Add("Button", "x277 yp w23 h23 Center +0x200 Disabled vdeleteButton").OnEvent("Click", editLayoutSettings.Bind("LayoutDelete"))
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		layoutsGui.Add("Text", "x16 yp+26 w80", translate("Groups"))
+		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1)
+		layoutsGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range1-4", 1)
+
+		layoutsGui["clusterEdit"].OnEvent("Change", (*) => editLayoutSettings("AdjustCluster", true))
 
 		channelsListView := layoutsGui.Add("ListView", "x16 yp+30 w284 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(["Channel"], translate))
 		channelsListView.OnEvent("Click", editLayoutSettings.Bind("ChannelSelect"))
@@ -3488,5 +3670,92 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		}
 
 		return result
+	}
+}
+
+editTelemetrySettings(telemetryViewerOrCommand, arguments*) {
+	local settingsGui
+
+	static result := false
+
+	static providerDropDown
+	static endpointLabel
+	static endpointEdit
+
+	chooseProvider(*) {
+		editTelemetrySettings("UpdateState")
+	}
+
+	if (telemetryViewerOrCommand == kOk)
+		result := kOk
+	else if (telemetryViewerOrCommand == kCancel)
+		result := kCancel
+	else if (telemetryViewerOrCommand == "UpdateState") {
+		if (providerDropDown.Value = 1) {
+			; endpointLabel.Visible := false
+			; endpointEdit.Visible := false
+
+			endpointEdit.Enabled := false
+			endpointEdit.Text := translate("n/a")
+		}
+		else {
+			; endpointLabel.Visible := true
+			; endpointEdit.Visible := true
+
+			endpointEdit.Enabled := true
+
+			if ((Trim(endpointEdit.Text) = "") || (endpointEdit.Text = translate("n/a")))
+				endpointEdit.Text := "http://localhost:5007/api"
+		}
+	}
+	else {
+		result := false
+
+		settingsGui := Window({Options: "0x400000"}, translate("Telemetry"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Telemetry Provider"))
+		settingsGui.Add("Text", "x110 yp w160 h23 +0x200", "")
+
+		providerDropDown := settingsGui.Add("DropDownList", "x110 yp+1 w160 Choose1", collect(["Internal", "Second Monitor"], translate))
+		providerDropDown.OnEvent("Change", chooseProvider)
+
+		endpointLabel := settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Provider URL"))
+		endpointEdit := settingsGui.Add("Edit", "x110 yp+1 w160 h21")
+
+		settingsGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", editTelemetrySettings.Bind(kOk))
+		settingsGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", editTelemetrySettings.Bind(kCancel))
+
+		if (arguments[1] && (arguments[1] != "Internal")) {
+			providerDropDown.Choose(2)
+
+			endpointEdit.Text := string2Values("|", arguments[1])[2]
+
+			editTelemetrySettings("UpdateState")
+		}
+
+		settingsGui.Opt("+Owner" . telemetryViewerOrCommand.Window.Hwnd)
+
+		settingsGui.Show("AutoSize Center")
+
+		editTelemetrySettings("UpdateState")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				if (providerDropDown.Value = 1)
+					return "Internal"
+				else
+					return ("Second Monitor|" . endpointEdit.Text)
+			}
+		}
+		finally {
+			settingsGui.Destroy()
+		}
 	}
 }

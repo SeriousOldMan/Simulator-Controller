@@ -16,7 +16,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\FTP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -41,9 +43,10 @@ global kProperInstallation := true
 ;;;-------------------------------------------------------------------------;;;
 
 loadSimulatorConfiguration() {
-	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
+	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode, kDiagnosticsStartup
 
-	local packageInfo, type, pid, path, argIndex
+	local appName := StrSplit(A_ScriptName, ".")[1]
+	local packageInfo, type, pid, path, argIndex, settings, usage, diagnostics
 
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
@@ -104,7 +107,7 @@ loadSimulatorConfiguration() {
 	type := getMultiMapValue(packageInfo, "Current", "Type", false)
 
 	if type {
-		if (inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && !inList(A_Args, "-Repair"))
+		if (inList(kForegroundApps, appName) && !inList(A_Args, "-Repair"))
 			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
 				Run("`"" . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 
@@ -131,17 +134,21 @@ loadSimulatorConfiguration() {
 	if (kSimulatorConfiguration.Count == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
 
+    logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
+
 	path := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
 		kDatabaseDirectory := (normalizeDirectoryPath(path) . "\")
 
+		DirCreate(kDatabaseDirectory)
 		DirCreate(kDatabaseDirectory . "Community")
 		DirCreate(kDatabaseDirectory . "User")
 
+		if !FileExist(kDatabaseDirectory . "ID")
+			FileCopy(kUserConfigDirectory . "ID", kDatabaseDirectory . "ID")
+
 		logMessage(kLogInfo, translate("Session database path set to ") . path)
 	}
-
-    logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
 
 	path := getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {
@@ -177,24 +184,59 @@ loadSimulatorConfiguration() {
 
 	kSilentMode := getMultiMapValue(kSimulatorConfiguration, "Configuration", "Silent Mode", false)
 
-	if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Debug", kUndefined) = kUndefined)
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+	if (getMultiMapValue(settings, "Debug", "Debug", kUndefined) = kUndefined)
 		if (!A_IsCompiled || getMultiMapValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 			setDebug(true)
 
-	if (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "LogLevel", kUndefined) = kUndefined)
+	if (getMultiMapValue(settings, "Debug", "LogLevel", kUndefined) = kUndefined)
 		if !isDevelopment()
 			setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
+
+	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
+		if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
+			usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+		else {
+			usage := newMultiMap()
+
+			setMultiMapValue(usage, "General", "Created", A_Now)
+		}
+
+		setMultiMapValue(usage, "General", "Updated", A_Now)
+
+		diagnostics := getMultiMapValues(settings, "Diagnostics")
+
+		if (diagnostics.Count > 0)
+			setMultiMapValues(usage, "Diagnostics", diagnostics)
+		else
+			setMultiMapValue(usage, "Diagnostics", "Default", true)
+
+		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
+
+		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+	}
 
 	if kLogStartup
 		logMessage(kLogOff, "Common runtime started...")
 }
 
 initializeEnvironment() {
-	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation
-	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
+	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation, kTempDirectory, kProgramsDirectory
+	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult, path, settings
 
 	if kLogStartup
 		logMessage(kLogOff, "Initializing environment...")
+
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+	path := getMultiMapValue(settings, "Locations", "Temp", false)
+	if path
+		kTempDirectory := (normalizeDirectoryPath(path) . "\")
+
+	path := getMultiMapValue(settings, "Locations", "Programs", false)
+	if path
+		kProgramsDirectory := (normalizeDirectoryPath(path) . "\")
 
 	if !isDebug() {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {
@@ -247,6 +289,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Config")
 	DirCreate(kUserHomeDirectory . "Actions")
 	DirCreate(kUserHomeDirectory . "Rules")
+	DirCreate(kUserHomeDirectory . "Scripts")
 	DirCreate(kUserHomeDirectory . "Garage")
 	DirCreate(kUserHomeDirectory . "Garage\Definitions")
 	DirCreate(kUserHomeDirectory . "Garage\Rules")
@@ -254,6 +297,7 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Garage\Rules\Cars")
 	DirCreate(kUserHomeDirectory . "Validators")
 	DirCreate(kUserHomeDirectory . "Logs")
+	DirCreate(kUserHomeDirectory . "Diagnostics")
 	DirCreate(kUserHomeDirectory . "Sounds")
 	DirCreate(kUserHomeDirectory . "Splash Media")
 	DirCreate(kUserHomeDirectory . "Screen Images")
@@ -261,9 +305,11 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Translations")
 	DirCreate(kUserHomeDirectory . "Grammars")
 	DirCreate(kUserHomeDirectory . "Simulator Data")
-	DirCreate(kUserHomeDirectory . "Temp")
+	DirCreate(kDatabaseDirectory)
 	DirCreate(kDatabaseDirectory . "Community")
 	DirCreate(kDatabaseDirectory . "User")
+	DirCreate(kTempDirectory)
+	DirCreate(kProgramsDirectory)
 
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
@@ -271,6 +317,9 @@ initializeEnvironment() {
 
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
 			FileCopy(kResourcesDirectory . "Templates\Configuration Plugins.ahk", A_MyDocuments . "\Simulator Controller\Plugins")
+
+		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Simulator Providers.ahk")
+			FileCopy(kResourcesDirectory . "Templates\Simulator Providers.ahk", A_MyDocuments . "\Simulator Controller\Plugins")
 	}
 
 	newID := !FileExist(kUserConfigDirectory . "ID")

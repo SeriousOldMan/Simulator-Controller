@@ -286,7 +286,8 @@ windowsPath(path) {
 }
 
 downloadUserDatabases(directory) {
-	wDirectory := windowsPath(directory)
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+	local wDirectory := windowsPath(directory)
 
 	renameDirectory(directory, newName) {
 		loop 5 {
@@ -301,14 +302,16 @@ downloadUserDatabases(directory) {
 		}
 	}
 
-	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
+	for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads") {
 		SplitPath(fileName, , , , &idName)
 
 		idName := StrReplace(idName, "Database.", "")
 
 		updateProgress("Downloading " . idName . "...")
 
-		ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads/" . fileName, directory . fileName)
+		; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-uploads/" . fileName, directory . fileName)
+
+		ftpDownload(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Uploads/" . fileName, directory . fileName)
 
 		updateProgress("Extracting " . idName . "...")
 
@@ -445,6 +448,7 @@ createDatabases(inputDirectory, outputDirectory) {
 createSharedDatabases() {
 	global vProgressCount
 
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local command, ignore, file
 
 	vProgressCount := 0
@@ -470,13 +474,21 @@ createSharedDatabases() {
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
 
-	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads")
-	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
-	ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
+	if false {
+		ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads")
+		ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
+		ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller", "database-downloads")
+	}
+	else {
+		ftpClearDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads")
+		ftpRemoveDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
+		ftpCreateDirectory(MASTER, "SimulatorController", "Sc-1234567890-Sc", ".", "Database-Downloads")
+	}
 
-	for ignore, file in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
+	for ignore, file in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 		deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 
+/*
 		command := "
 (
 open ftpupload.net
@@ -488,8 +500,19 @@ cd database-downloads
 del %file%
 quit
 )"
+*/
 
-		command := substituteVariables(command, {file: file})
+		command := "
+(
+open %master%
+SimulatorController
+Sc-1234567890-Sc
+cd Database-Downloads
+del %file%
+quit
+)"
+
+		command := substituteVariables(command, {file: file, master: MASTER})
 
 		FileAppend(command, A_Temp . "\clearRemoteDirectory.txt")
 
@@ -510,7 +533,9 @@ quit
 
 		updateProgress("Uploading " . fileName . "...")
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "htdocs/simulator-controller/database-downloads/" . fileName)
+		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "htdocs/simulator-controller/database-downloads/" . fileName)
+
+		ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", filePath, "Database-Downloads/" . fileName)
 	}
 
 	showProgress({progress: 100, message: "Finished..."})

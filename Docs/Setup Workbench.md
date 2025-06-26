@@ -61,11 +61,11 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
-On the second tab "Temperatures" you can specify several thresholds for tyre and brake temepratures:
+On the second tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%204.JPG)
 
-The *Ideal* temperatures are the values you want to target in average over the course of a complete lap, both for the tyres as well as for the brakes. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
+The *Ideal* temperatures are the values you want to target in average over the course of a complete lap. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
 Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far.
 
@@ -117,13 +117,17 @@ Another valuable tool to improve your lap times is the integrated Telemetry View
 
 As long as the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
+#### Choosing the telemetry provider
+
+The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
-3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the window and re-open it.
 4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.
@@ -142,19 +146,20 @@ Since "Setup Workbench" has no knowledge about the concrete settings in the curr
 
 Most of the recommended setup values will be self-explanatory. The table below will show you the meanung of the positive and negative values of the more special setup options.
 
-| Setting                 | Negative values                   | Positive values                   |
-| ----------------------- | --------------------------------- | --------------------------------- |
-| Brake Balance           | More pressure to the rear brakes  | More pressure to the front brakes |
-| Brake Ducts             | Less open duct                    | More open duct                    |
-| Splitter / Wing         | Less drag / downforce             | More drag / downforce             |
-| Ride Height             | Lower ride height                 | Higher ride height                |
-| Damper                  | Less damping / resistance         | More damping / resistance         |
-| Spring / Bumpstop Rate  | Softer                            | Stiffer                           |
-| Bumpstop Range          | Shorter                           | Longer                            |
-| Differential Preload    | Less opening resistance           | More opening resistance           |
-| Anti Roll Bar           | Softer                            | Stiffer                           |
-| Toe (1)                 | Less toe out / More toe in        | More toe out / Less toe in        |
-| Camber                  | Less negative camber              | More negative camber              |
+| Setting                 | Negative values                    | Positive values                    |
+| ----------------------- | ---------------------------------- | ---------------------------------- |
+| Brake Balance           | More pressure to the rear brakes   | More pressure to the front brakes  |
+| Brake Ducts             | Less open duct                     | More open duct                     |
+| Radiator Blankets       | Less radiator cover / more cooling | More radiator cover / less cooling |
+| Splitter / Wing         | Less drag / downforce              | More drag / downforce              |
+| Ride Height             | Lower ride height                  | Higher ride height                 |
+| Damper                  | Less damping / resistance          | More damping / resistance          |
+| Spring / Bumpstop Rate  | Softer                             | Stiffer                            |
+| Bumpstop Range          | Shorter                            | Longer                             |
+| Differential Preload    | Less opening resistance            | More opening resistance            |
+| Anti Roll Bar           | Softer                             | Stiffer                            |
+| Toe (1)                 | Less toe out / More toe in         | More toe out / Less toe in         |
+| Camber                  | Less negative camber               | More negative camber               |
 
 (1) Most race cars run a little bit of toe in at the rear. The recommendations are based on that assumption. If that is not the case with your car, please reverse the recommendations.
 
@@ -338,7 +343,43 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	defines six discrete values. *No Deploy* will be mapped to **0** and *Attack* will be mapped to **5**.
 
-The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing for a given setting, the label will be "Clicks" (or a corresponding translation).
+  - **ScriptHandler(scriptFileName, arg1, arg2, ...)**
+  
+    This is a very special handler in the sense, that you can write a script in the well-known [Lua](https://lua.org) scripting language. This script has to define five global functions, that are called by the setup editor to handle a given setting. These functions are:
+
+    - *convert_to_display_value(value)*
+	
+	  This function must accept a *raw* (2) value and convert it to the corresponding *display* (1) value.
+
+    - *convert_to_raw_value(value)*
+	
+	  This function must accept a *display* (1) value and convert it to the corresponding *raw* (2) value.
+	
+    - *format_value(value)*
+	
+	  *format_value* is called with a *display* (1) value to prepare it for display in the user interface of the setup editor. An implementation may round a numerical value to a specific number of digits, for example.
+
+    - *increase_value(value)*
+	
+	  *increase_value* takes a *display* value and returns the next value *above* the given value. If there are no more values available, the *highest* allowed value must be returned.
+
+	- *decrease_value(value)*
+	
+	  *decrease_value* takes a *display* value and returns the next value *below* the given value. If there are no more values available, the *lowest* allowed value must be returned.
+	
+	Notes:
+	
+	  (1) A *display* value is the value used in the setup editor user interface.<br>
+	  (2) A *raw* value is the value, that is stored in the setup file.<br>
+	  (3) All arguments, that have been passed to the *ScriptHandler* in the car definition file, are available in the global array *Arguments*.
+	
+	You can take a look at [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Garage/Scripts/DecimalSettingHandler.script) of a handler script for decimal values for an inspiration for your own handler script. Once you have created your script, you can use it in your car definition file like this:
+	
+		Brake.Balance=ScriptHandler(%kResourcesDirectory%Scripts\DecimalSettingHandler.script, 0, 10, 52.0, 62.0, 0.5, 1)
+	
+	As you can see, the first argument is the full path to the script file (using the sample handler here), followed by a number of arguments to the script, which are 0, 10, 52.0, 62.0, 0.5, 1 in this case.
+
+The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so on allow you to supply language specific unit labels for all the settings. If an entry is missing, "Clicks" (or a corresponding translation) will be used.
 
 #### Defining car specific setup settings
 
@@ -421,6 +462,8 @@ Most of the concepts discussed above can be seen *in action* in the "Tatuus FA01
 I also recommend to take a look at this video, which covers the complete process step by step:
 
 [![](https://img.youtube.com/vi/oKq8k9VZ2jU/0.jpg)](https://www.youtube.com/watch?v=oKq8k9VZ2jU)
+
+Last, but not least, if you are want to do all this for cars of *Assetto Corsa*, I can recommend the brilliant tool of Maurice Bish (@bishman), which handles all the stuff described above automatically for the most part. The tool is free and can be [downloaded from GitHub](https://github.com/mauricebish/SimControllerCreator), where you can also find important documentation.
 
 ### Introducing new simulators
 

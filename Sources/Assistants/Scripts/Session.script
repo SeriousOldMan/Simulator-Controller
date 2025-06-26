@@ -1,0 +1,133 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Session Module                  ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                         Private Functions Section                       ---
+-------------------------------------------------------------------------------
+
+__get_data = extern("__Session_Data")
+
+function __get_session_value(table, item)
+	return __get_data("Session", item)
+end
+
+function __get_standings_value(table, item)
+	if item == "Standings" then
+		local nrs, cars, drivers, classes, classPositions, laps, times = __get_data("Standings", "Standings")
+		local positions = {}
+		
+		for position, car in ipairs(cars) do
+			table.insert(positions, {overallPosition = position, classPosition = classPositions[position],
+									 car = car, nr = nrs[position],
+									 laps = laps[position], time = times[position], driver = drivers[position]})
+		end
+		
+		return positions
+	elseif item == "OverallPosition" then
+		return __get_data("Standings", "Position")
+	elseif item == "ClassPosition" then
+		local oPos, cPos = __get_data("Standings", "Position")
+		
+		return cPos
+	else
+		return __get_data("Standings", item)
+	end
+end
+
+function __get_stint_value(table, item)
+	if item == "Car" then
+		local compounds, tyrePressures, tyreTemperatures, tyreWears, brakeTemperatures, brakeWears,
+			  fuelConsumption, remainingFuel, bodyworkDamage, suspensionDamage, engineDamage = __get_data("Stint", "Car")
+		
+		return {tyres = {front_left = {compound = compounds[1], pressure = tyrePressures[1],
+									   temperature = tyreTemperatures[1], wear = tyreWears[1]},
+						 front_right = {compound = compounds[2], pressure = tyrePressures[2],
+										temperature = tyreTemperatures[2], wear = tyreWears[2]},
+						 rear_left = {compound = compounds[3], pressure = tyrePressures[3],
+									  temperature = tyreTemperatures[3], wear = tyreWears[3]},
+						 rear_right = {compound = compounds[4], pressure = tyrePressures[4],
+									   temperature = tyreTemperatures[4], wear = tyreWears[4]}},
+				brakes = {front_left = {temperature = brakeTemperatures[1], wear = brakeWears[1]},
+						  front_right = {temperature = brakeTemperatures[2], wear = brakeWears[2]},
+						  rear_left = {temperature = brakeTemperatures[3], wear = brakeWears[3]},
+						  rear_right = {temperature = brakeTemperatures[4], wear = brakeWears[4]}},
+				fuel_consumption = fuelConsumption, remaining_fuel = remainingFuel,
+				damage = {bodywork = bodyworkDamage,
+						  suspension = suspensionDamage,
+						  engine = engineDamage}}
+	elseif item == "Conditions" then
+		local weather, airT, trackT, grip, weather10Min, weather30Min = __get_data("Stint", "Conditions")
+	
+		return {weather = weather, air_temperature = airT, track_temperature = trackT, grip = grip,
+				weather_10_min = weather10Min, weather_30_min = weather30Min}
+	else
+		return __get_data("Standings", item)
+	end
+end
+
+
+-------------------------------------------------------------------------------
+---                        Public Topics Section                            ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                              Session                                    ---
+-------------------------------------------------------------------------------
+
+Session = setmetatable({}, {__index = __get_session_value})
+
+-------------------------------------------------------------------------------
+---                             Properties                                  ---
+-------------------------------------------------------------------------------
+
+-- Session.Active
+-- Session.Simulator
+-- Session.Track
+-- Session.Car
+-- Session.Type
+-- Session.Format
+-- Session.Laps
+-- Session.RemainingLaps
+-- Session.RemainingTime
+-- Session.Data
+-- Session.Knowledge
+
+
+-------------------------------------------------------------------------------
+---                             Standings                                   ---
+-------------------------------------------------------------------------------
+
+Standings = setmetatable({}, {__index = __get_standings_value})
+
+-------------------------------------------------------------------------------
+---                             Properties                                  ---
+-------------------------------------------------------------------------------
+
+-- Standings.Position
+-- Standings.Standings
+
+
+-------------------------------------------------------------------------------
+---                               Stint                                     ---
+-------------------------------------------------------------------------------
+
+Stint = setmetatable({}, {__index = __get_stint_value})
+
+-------------------------------------------------------------------------------
+---                             Properties                                  ---
+-------------------------------------------------------------------------------
+
+-- Stint.Driver
+-- Stint.Car
+-- Stint.Conditions
+-- Stint.Lap
+-- Stint.Sector
+-- Stint.LastTime
+-- Stint.BestTime
+-- Stint.Laps
+-- Stint.RemainingLaps
+-- Stint.RemainingTime

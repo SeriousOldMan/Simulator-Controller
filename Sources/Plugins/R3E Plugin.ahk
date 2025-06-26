@@ -51,9 +51,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopOptions := []
 	iPitstopOptionStates := []
 
-	static sCarDB := false
-	static sClassDB := false
-
 	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -105,13 +102,15 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off")) {
+				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
-			this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
-			this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
-			this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
-			this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
-			this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
+				this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
+				this.iNextOptionHotkey := this.getArgumentValue("nextOption", "S")
+				this.iPreviousChoiceHotkey := this.getArgumentValue("previousChoice", "A")
+				this.iNextChoiceHotkey := this.getArgumentValue("nextChoice", "D")
+				this.iAcceptChoiceHotkey := this.getArgumentValue("acceptChoice", "{Enter}")
+			}
 		}
 	}
 
@@ -125,20 +124,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	static loadDatabase() {
-		local data
-
-		if !R3EPlugin.sCarDB {
-			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json", "UTF-8"))
-
-			R3EPlugin.sClassDB := data["classes"]
-			R3EPlugin.sCarDB := data["cars"]
-		}
-	}
-
 	simulatorStartup(simulator) {
 		if (simulator = kR3EApplication)
-			Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
+			Task.startTask(ObjBindMethod(R3EProvider, "loadDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
 	}
@@ -202,23 +190,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		static reported := false
-
 		if this.activateWindow()
 			if this.pitstopMFDIsOpen() {
 				if this.ClosePitstopMFDHotkey {
 					this.sendCommand(this.ClosePitstopMFDHotkey)
 
 					Sleep(50)
-				}
-				else if !reported {
-					reported := true
-
-					logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-					if !kSilentMode
-						showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
 	}
@@ -309,7 +286,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				}
 			}
 			else {
-				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State=true")
+				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
 
 				if (pitMenuState["Strategy"] != "Unavailable") {
 					this.iPitstopOptions.Push("Strategy")
@@ -545,14 +522,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
 	startPitstopSetup(pitstopNumber) {
 		super.startPitstopSetup(pitstopNumber)
 
@@ -591,42 +560,37 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		local changed
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
+		local index, axle
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
-			if this.optionAvailable("Change Front Tyres")
-				if compound {
-					changed := false
+		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
+			}
+			else {
+				compound := [compound, compound]
+				compoundColor := [compoundColor, compoundColor]
+			}
 
-					if !this.optionChosen("Change Front Tyres") {
-						this.toggleActivity("Change Front Tyres", false, true)
+			for index, axle in ["Front", "Rear"]
+				if this.optionAvailable("Change " . axle . " Tyres")
+					if compound[index] {
+						if !this.optionChosen("Change " . axle . " Tyres") {
+							this.toggleActivity("Change " . axle . " Tyres", false, true)
 
-						changed := true
+							this.analyzePitstopMFD()
+						}
+
+						this.changeTyreCompound("Decrease", 10, false)
+
+						this.changeTyreCompound("Increase", this.tyreCompoundIndex(compound[index], compoundColor[index]), false)
 					}
-
-					if !this.optionChosen("Change Rear Tyres") {
-						this.toggleActivity("Change Rear Tyres", false, true)
-
-						changed := true
-					}
-
-					if changed
-						this.analyzePitstopMFD()
-
-					this.changeTyreCompound("Decrease", 10, false)
-
-					this.changeTyreCompound("Increase", this.tyreCompoundIndex(compound, compoundColor), false)
-				}
-				else {
-					if this.optionChosen("Change Front Tyres")
-						this.toggleActivity("Change Front Tyres", false, true)
-
-					if this.optionChosen("Change Rear Tyres")
-						this.toggleActivity("Change Rear Tyres", false, true)
-				}
+					else if this.optionChosen("Change " . axle . " Tyres")
+						this.toggleActivity("Change " . axle . " Tyres", false, true)
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -649,67 +613,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.optionAvailable("Repair Rear Aero") && (repairBodywork != this.optionChosen("Repair Rear Aero")))
 				this.toggleActivity("Repair Rear Aero", false, true)
 		}
-	}
-
-	getCarName(carID) {
-		local carDB
-
-		static lastCarID := false
-		static lastCarName := false
-
-		if !R3EPlugin.sCarDB
-			R3EPlugin.loadDatabase()
-
-		if (carID != lastCarID) {
-			carDB := R3EPlugin.sCarDB
-
-			lastCarID := carID
-			lastCarName := (carDB.Has(carID) ? carDB[carID]["Name"] : "Unknown")
-		}
-
-		return lastCarName
-	}
-
-	getClassName(classID) {
-		local classDB
-
-		static lastClassID := false
-		static lastClassName := false
-
-		if !R3EPlugin.sClassDB
-			R3EPlugin.loadDatabase()
-
-		if (classID != lastClassID) {
-			classDB := R3EPlugin.sClassDB
-
-			lastClassID := classID
-			lastClassName := (classDB.Has(classID) ? classDB[classID]["Name"] : "Unknown")
-		}
-
-		return lastClassName
-	}
-
-	updatePositionsData(data) {
-		local carID
-
-		super.updatePositionsData(data)
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-			if (carID != kUndefined) {
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
-
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class"
-									 , this.getClassName(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")))
-			}
-		}
-	}
-
-	updateTelemetryData(data) {
-		setMultiMapValue(data, "Session Data", "Car", this.getCarName(getMultiMapValue(data, "Session Data", "Car", "")))
-
-		super.updateTelemetryData(data)
 	}
 
 	getImageFileNames(imageNames*) {
@@ -808,38 +711,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			setMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.Service.Tyres", "Change")
 
 		return settings
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
-
-		static tyres := ["Front", "Rear"]
-
-		for ignore, section in ["Car Data", "Setup Data"]
-			for ignore, postfix in tyres {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
-
-					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-						if tyreCompound {
-							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
-						}
-					}
-				}
-			}
-
-		return data
 	}
 }
 

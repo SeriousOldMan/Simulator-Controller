@@ -35,6 +35,133 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 6.3.8
+
+New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "energy_low" event and the "report_low_energy" action, if necessary.
+
+Additionaly, the LLM "GPT 4o mini" will get deprecated by OpenAI soon. If you are using it, you may consider switching to "GPT 4.1 mini".
+
+***
+
+## Release 6.3.7
+
+Nothing to do.
+
+***
+
+## Release 6.3.6
+
+New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "tyre_wear" and "brake_wear" events and the "report_tyre_wear" and "report_brake_wear" actions, if necessary.
+
+***
+
+## Release 6.3.5
+
+Nothing to do.
+
+***
+
+## Release 6.3.4
+
+Everything handled automatically.
+
+***
+
+## Release 6.3.3
+
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+
+***
+
+## Release 6.3.2
+
+Nothing to do.
+
+***
+
+## Release 6.3.1
+
+Nothing to do.
+
+***
+
+## Release 6.3.0
+
+To install the added VC++ 2013 runtime library, open "Simulator Setup" and go to the Basic configuration page. The runtime will be installed automatically.
+
+And you may want to give the new Google GPT integration a try.
+
+***
+
+## Release 6.2.9
+
+Everything handled automatically.
+
+***
+
+## Release 6.2.8
+
+Nothing to do.
+
+***
+
+## Release 6.2.7
+
+A filter has been integrated which removes characters from car names and track names, before these are stored in the session database. This can make exsiting database entries inaccessible. In fact the foloowing characters are now removed from car and track names: "/" , ":", "*", "?", "<", ">", "|"
+
+If you already have collected data for cars or tracks, which have a character from this list in their names, for example: "McLaren Cosworth MP4/8", you may envounter problems to access the data. You can do the following:
+
+1. Go to [Documents]\Simulator Controller\Database\User\[sim] with [sim] the code for the simulator you are using.
+2. Look for the directory with the data for the car. There may be two now. Combine all the data into the directory which fulfills the filter rule.
+3. Open the file [Documents]\Simulator Controller\Simulator Data\\[sim]\Car Data.ini with a double-byte capable text editor like Notepad++ and correct the entries in question.
+4. Do the same for [Documents]\Simulator Controller\Simulator Data\\[sim]\Track Data.ini, if necessary.
+
+If the original name contained a "/", things are even more complex, since Windows may have created a subfolder for the second part of the name after the "/". You must move the contents of this folder one level up so that they can be accessed again. If in doubt, or if you need support, contact me in our Discord.
+
+***
+
+## Release 6.2.6
+
+Nothing to do.
+
+***
+
+## Release 6.2.5
+
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+
+***
+
+## Release 6.2.4
+
+Everything handled automatically.
+
+***
+
+## Release 6.2.3
+
+The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
+
+***
+
+## Release 6.2.2
+
+The *Rephrasing* booster instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again.
+
+***
+
+## Release 6.2.1
+
+This release comes with a new version of the Team Server with some minor changes. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
+
+***
+
+## Release 6.2.0
+
+Nothing to do.
+
+***
+
 ## Release 6.1.6
 
 The Driving Coach instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again. Take a look especially at the "Coaching" instruction, which has changed for corner name handling.
@@ -57,7 +184,7 @@ Nothing to do.
 
 1. Initial support for *Assetto Corsa EVO* has been added. The plugin has been added in "Simulator Configuration", but it is deactivated. You can activate it manually and add the required application in "Simulator Configuration", but I strongly recommend to use "Simulator Setup" to do it for you. Go to the "Basic" page and *Assetto Corsa EVO* will normally be detected automatically. Then create a new configuration.
 
-2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" to make it automatic again.
+2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to make it automatic again.
 
 ***
 
@@ -338,7 +465,7 @@ Nothing to do this time.
 
 ## Release 5.6.1
 
-This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know. Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Therefore, please follow the [special instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory. Once the data integration has been activated, you can configure the actions of ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to control *Le Mans Ultimate* from you hardware controller, if you like. All actions are also available in "Simulator Setup" for configuration.
+This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know. Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Therefore, please follow the [special instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory. Once the data integration has been activated, you can configure the actions of ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to control *Le Mans Ultimate* from you hardware controller, if you like. All actions are also available in "Simulator Setup" for configuration.
 
 ***
 
@@ -444,7 +571,7 @@ No manual updates necessary.
 
 ## Release 5.4.2
 
-If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
+If you have used the "Threshold" choice for repair settings either in the "Race Settings" or as default value in the "Session Database", you may have to change this value. The "Threshold" is now labeled as seconds need to repair the given damage. The calculation uses [conversion factors](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) to derive the repair time needed from the internal damage value of the given simulator. For *Assetto Corsa Competizione*, the conversion factor are already known, for the other simulators they will be added with the next releases. If, you derive a conversion factor on your own, let me know, so that I can add them to the defaults.
 
 You can, however, use your old threshold values, if you set the conversion factor to **1** for each damage type (bodywork, suspension, engine). However, in this case, the unit of the threshold is not "Seconds", which does no harm in the repair calculations, but will result in wrong values for pitstop duration calaculations in "System Monitor" and "Team Center".
 
@@ -557,7 +684,7 @@ A bug has been fixed in the Team Server for handling strategies und setups. The 
 
 ## Release 5.0.8
 
-A duplicate setting named "Strategy: Pitstop Window" has been removed from the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings. You may have to remove remaining artefacts (a setting named "0") from your settings in the "Session Database".
+A duplicate setting named "Strategy: Pitstop Window" has been removed from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings. You may have to remove remaining artefacts (a setting named "0") from your settings in the "Session Database".
 
 ***
 

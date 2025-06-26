@@ -1,5 +1,4 @@
 ## Introduction
-
 The "Strategy Workbench" is a very valuable tool, which can be used either stand-alone or together with Cato, the AI Race Strategist. With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past races, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as this has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
@@ -35,11 +34,11 @@ Loading of settings is supported for:
      This is the most complete method for initialization of the Rules & Settings. It is most useful, after you restarted "Simulator Workbench" and want to continue your work on a Strategy. Simply load it using the "Strategy" menu and than choose this command. The following fields are loaded from the strategy:
 	 
 	 - Rules & Settings
-	   - Race Duration
+	   - Race Duration (format "Time" or "Laps" and also whether an additional lap has to be driven)
 	   - Stint Limit
 	   - Formation Lap
 	   - Post Race Lap
-	   - All Pitstop Rules incl. Tyre Sets
+	   - All Pitstop Rules incl. data for Tyre Sets that are already configured in "Strategy Workbench"
 	 - Pitstop & Service
 	   - Pitstop Delta
 	   - Tyre Service Time
@@ -67,15 +66,14 @@ Loading of settings is supported for:
      The content of the current *Race.settings* file is used to initialize some fields. If the Control key is pressed, when this command is selected, the file chooser dialog is opened in the directory of the settings for the current simulator / car / track combination, but you may navigate to a totally different location if desired. The following fields are loaded from the settings file:
 	 
 	 - Rules & Settings
-	   - Race Duration
 	   - Formation Lap
 	   - Post Race Lap
-	   - Pitstop rules (if active)
+	   - Race rules (if active)
 	     - Pitstop Rule
 		 - Pitstop Window (Regular)
 		 - Refuel Rule
 		 - Tyre Change Rule
-		 - Available Tyre Sets
+		 - Tyre Sets (only for those that are already configured in "Strategy Workbench")
 		 - Stint Limit
 	 - Pitstop & Service
 	   - Pitstop Delta
@@ -114,16 +112,26 @@ Loading of settings is supported for:
 	   - Tyre Compound
 	   - Tyre Compound Color
 
+If you enable "Auto Initialize" in the "Settings" menu, settings will be initialized automatically when a strategy is loaded. And whenever you switch between simulators, cars and/or tracks, the settings will be loaded from the database as described above. Your choice of "Auto Initialize" will be remembered between runs of "Strategy Workbench".
+
 Notes:
 
   1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
   2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
   3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
-  4. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
+  4. Using the list labeled "Tyre Sets" you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used to determine the best tyre set for each pitstop in the derived strategy. Typically all tyre compound mixtures, which are generally available for a given car are listed here. If a given compound mixture is not available for a particular race or should not be used in the resulting strategy, set the number of available tyre sets to **0**.
+  5. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
+  6. Be aware, that only *Automobilista 2* and *Project CARS 2* support sessions with one additional lap after the *normal* end of the session, which can be simulated with "Time + 1" or "Laps + 1" session lengths. 
   
 #### Scenario validation
 
-Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports a rule based validation of strategy scenarios created during the simulation. These rules use the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, only the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language. Let's begin with an easy example:
+Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports two different methods of extended validation of strategy scenarios created during the simulation. The first one uses the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) and the second method uses a scipting engine base on the well-know [Lua](https://lua.org) scripting language, which is used in many commercial applications as well.
+
+Note: The rule-based validation in general requires less coding for complex validations, but it requires a good understanding of logical programming. If you are unexperienced with this, I strongly recommend to use script-based validation.
+
+##### Rule-based validation
+
+The rules for scenario validation uses the same technology used by the different AI Race Assistants, a [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine), which supports forward and backward logic resolution. For the scenario validation rules, mostly the backward chaining part is used, which is more or less similar to the *Prolog* logic programming language, although you can also define forward chaining rules and trigger them from a reduction rule. Let's begin with an easy example:
 
 	validScenario() <= pitstopFuel(?, ?refuels), ?refuels > 0
 
@@ -146,7 +154,7 @@ The previous examples are of course very simple. Therefore, before presenting th
 
 This validation script implements pitstop rules used in Formula 1 races at some time. In such a race, you are not allowed to refuel the car and you have to use at least two different dry tyre compounds, unless you have used a wet or an intermediate tyre set during the race.
 
-##### Builtin Predicates
+###### Builtin Predicates
 
 Although the logical predicates in *Prolog* look like function calls, the semantics are very different. First, as you can see in the "Formula 1" example above, an unlimited set of alternatives can be defined for a give predicate. These alternatives are called rules. And variables, which are identified by a leading question mark, can be used bi-directional. This is called unification, where a variable is bound to the value, which must be used to satisfy the logical constraints imposed by a given rule. If you want to learn rule programming, please read the documentation about the [rule engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
@@ -186,11 +194,11 @@ That said, let's take a look at the builtin predicates:
 
   9. *tyreCompounds(?tyreCompounds)*
   
-     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session.
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
 
   10. *tyreSets(?tyreSets)*
   
-      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session.
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
   
   11. *tyreCompounds(?tyreCompounds, ?tyreCompound, ?tyreCompoundColors)*
   
@@ -264,13 +272,89 @@ Beside these predicates, which access the data of the current scenario, you have
   
     *?resultList* is unified with a list which contains all elements of *?list* except all occurences of *?value*.
 
-##### Editing validation rules
+##### Script-based validation
 
-To take a look at the predefined validation rules or to create your own ones, you can use a special rule editor, which can be opened by selecting the "Rules:" item in the "Session" menu.
+The other method uses the well-known [Lua](https://lua.org) scripting language, which is certainly more accessible than rule-based programming. Here is a simple example:
+
+	return (pitstops() > 1)
+
+This means that the current scenario is considered valid, if at least two pitstops are planned. The previous example is of course very simple. Therefore, before presenting the available functions, let's take a look at a more complex example.
+
+	valid = true
+
+	for i, tc in ipairs(tyreCompounds()) do
+		if tc.color ~= "S" then
+			valid = false
+
+			break
+		end
+	end
+
+	return valid
+
+In this case, the current scenario is considered valid, when only soft tyre compounds have been used throughout the whole scenario.
+
+###### Builtin Functions
+
+  1. *totalFuel() => fuelAmount :: \<number\>, numRefuels :: \<integer\>*
+  
+     The first value returned by *totalFuel* represents the total amount of fuel which will be used for the session and the second value is the number of refuels at the pitstops during the session.
+  
+  2. *startFuel() => startFuel :: \<number\>*
+  
+     Returns the amount of fuel in the car at the start of the session.
+
+  3. *pitstopFuel() => refuelAmount :: \<number\>, numRefuels :: \<integer\>*
+	 
+	 The first value returned by *pitstopFuel* represents the amount of fuel which will be refilled at the pitstops and the second value is the number of refuels at the pitstops.
+  
+  4. *startTyreCompound() => { compound :: \<string\>, color :: \<string\> }*
+  
+     Returns an object, which describes the tyre compound for the tyres mounted at the start of the session. Please note, that for *simple* "Wet", "Intermediate" and "Dry" compounds the color will always be "Black".
+	 
+  5. *startTyreSet() => tyreSet :: \<integer\>*
+  
+     Same as the previous one, but the number of the mounted tyre set is returned.
+
+  6. *pitstopTyreCompounds() => tyreCompounds :: \<array\> of { compound :: \<string\>, color :: \<string\> }*
+  
+     Returns a list of tyre compounds mounted in the various pitstops of the session. This list contains of objects, each of which represents a tyre compound for tyres mounted at a planned pitstop.
+
+  7. *pitstopTyreSets() => tyreSets :: \<array\> of \<integer\>*
+  
+     ame as the previous one, but the number of the mounted tyre sets are returned in the list.
+  
+  8. *refuels() => refuels :: \<integer\>*
+  
+     Convenience function for: "local ignore, numRefuels = totalFuel()"
+
+  9. *tyreCompounds() => tyreCompounds :: \<array\> of { compound :: \<string\>, color :: \<string\> }*
+  
+     Similar to *pitstopTyreCompounds*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
+
+  10. *tyreSets() => tyreSets :: \<array\> of \<integer\>*
+  
+      Similar to *pitstopTyreSets*, but also include the info for the tyres mounted at the start of the session as the first value in the list.
+
+The above functions will give you summarized information about all pitstops, which will be sufficient in most cases. But you can also acquire informations about each individual pitstop.
+
+  1. *pitstops() => count :: \<integer\>*
+
+     Returns the overall number of pitstops.
+	 
+  2. *pitstop(nr) => pitstop :: { lap :: \<integer\>, time :: \<integer\>, fuel :: \<number\>,
+					 tyreCompound :: false or \<string\>, tyreCompoundColor = false or \<string\>,
+					 tyreSet :: false or \<string\>}
+  
+     This function returns an object which fully describes a planned pitstop. Notes: Tyre information will be *false*, if no tyre change is planned. The time represents the number of minutes into the race. 
+
+##### Editing validation rules and scripts
+
+To take a look at the predefined validation rules and scripts or to create your own ones, you can use a special editor, which can be opened by selecting the "Validation:" item in the "Session" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Validation%20Rules.JPG)
 
-You can create new rules by clicking on the "+" button or you can copy one of the existing rules as a starting point. The predefined validation rules cannot be changed, of course.
+You can create new rules by clicking on the "+" button or you can copy one of the existing rules or scripts as a starting point. The predefined validation rules and scripts cannot be changed, of course.
 
 ### Pitstop & Service
 
@@ -328,7 +412,7 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
 	
   - Tyre Usage
   
-	Here you have a range from 0 to 100% to enable some kind of *over-* or *underuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life is at the beginning 40 laps was set. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
+	Here you have a range from 0 to 100% to enable some kind of *over-* or *underuse* of tyres. If you set the "Tyre Usage" slider to 30%, for example, this means that the tyres can be used for 54 laps, even if the optimum tyre life for the given tyre compound mixture has been defined as 40 laps. This might be useful to skip the tyre change in the last shorter stint of an endurance race. The number of possible laps will be varied on a stint by stint base, not only for the whole race.
 	
   - Tyre Compound
   
@@ -358,7 +442,9 @@ For every slider not at the zero position, different variations of the underlyin
 
 You can use the commands in the *Simulation* menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
 
-Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. The telemetry data is stored lap by lap in the CSV files "Electronics.CSV" and "Tyres.CSV", which are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. Another approach is to use the "Cleanup Data" command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value. Only the values for the currently selected driver (or in case "All" are selected, your own driver) will be considered during the cleanup process, and if you have configured a data replication to the Team Server, the entries will be deleted there as well.
+Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. You can either use the [*Laps* editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#browsing-laps-data) in the "Administration" tab of the "Session Database". Or you can use the a text editor to work directly with the database files. The telemetry data is stored lap by lap in the files "Electronics.CSV" and "Tyres.CSV" which follow standard CSV format conventions. These files are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. A third approach is to use the "Cleanup..." command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value. Only the values for the currently selected driver (or in case "All" are selected, your own driver) will be considered during the cleanup process, and if you have configured a data replication to the Team Server, the entries will be deleted there as well.
+
+Attention: Depending on the given data constellation, the command "Cleanup..." can remove quite a lot of data. So be careful and have a backup at hand, if the result is not as desired.
 
 ### Strategy
 

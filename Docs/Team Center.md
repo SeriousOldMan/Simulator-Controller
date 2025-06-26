@@ -162,16 +162,18 @@ A valuable tool to analyze your lap times and those of your team mates is the in
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled "Telemetry" in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
-
-When looking for areas of improvement take a close look to the application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled the "Telemetry" setting in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 
+#### Choosing the telemetry provider
+
+The telemetry system supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You have to choose, which telemetry provider to use when enabling the "Telemetry" option in the "Session" menu. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
 5. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once. This is done only locally, it does NOT delete any laps on the Team Server.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.
@@ -280,9 +282,11 @@ Using the elements on the "Pitstops" tab, any team member can prepare the next p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%206.JPG)
 
-Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will select the next driver according to the stint plam (make sure, that your plan is correct), and then it will use the values, that are currently recommended by Jona, the AI Race Engineer, for tyre pressures and correct them for the next driver as described below. The recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan or from the strategy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions.
+Especially before selecting the tyre pressures, you might want to analyze the data as described above. But you may also use the "Initialize from Session" command from the "Pitstop" menu, which will select the next driver according to the stint plam (make sure, that your plan is correct), and then it will use the values, that are currently recommended by Jona, the AI Race Engineer, for tyre pressures and correct them for the next driver as described below. The recommended pitstop lap and the amount of fuel to be added, will be taken from the stint plan or from the strategy, in that order. In situations, where the conditions change dramatically, for example an upcoming thunderstorm, you can also load the tyre data from the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) using the "Load from Database..." command, when you think that you might have cold pressure information available from previous sessions in comparable conditions. Both variants will select the same tyre compound for each wheel, but for simulators, which can handle multiple tyre compounds as described below, you can modify the selected defaults afterwards.
 
-Some simulators not only provide different tyre compounds for a given car, but also manage a number of available tyre sets for each compound, where this number might differ between different events or sessions. When initializing a pitstop, the next unused tyre set number for the given compound will be automatically calculated in most cases and will be entered in the "Tyre Set" field (you can enable or disable the automatic tyre set selection in the "Pitstop" menu). Always double check the value here, or you might end up with worn tyres on the wheels. Please note, that *Assetto Corsa Competizione* provide a kind of automatic selection, which only works reliable, when using the same compound as in the last stint. Set "Tyre Set" to **0** in this case.
+Some simulators provide the possibility to change tyres individually and even select different tyre compounds for each wheel or for each axle. Although this is not done automatically based on the strategy or other settings at the time of this writing, you can choose individual settings before sending the pitstop plan to the Engineer. Although its own understanding is quite limited yet, he will accept your choices and will send the individual compound settings to the simulator. Depending on the support for individual tyre compounds and tyre changes, only one or up to all tyre menus are enabled. Disabled tyre menus will be initialized according to the capabilities of the given simulator.
+
+Additionaly, some simulators manage a number of available tyre sets for each compound, and this number may differ between different events or sessions. When initializing a pitstop, the next unused tyre set number for the given compound will be automatically calculated in most cases and will be entered in the "Tyre Set" field (you can enable or disable the automatic tyre set selection in the "Pitstop" menu). Always double check the value here, or you might end up with worn tyres on the wheels. Please note, that *Assetto Corsa Competizione* provide a kind of automatic selection, which only works reliable, when using the same compound as in the last stint. Set "Tyre Set" to **Auto** in this case.
 
 You can also choose between two different methods to further adjust tyre pressures, when swapping drivers, as described in the previous section:
 
@@ -296,7 +300,7 @@ You can also choose between two different methods to further adjust tyre pressur
 
 The choices will be remembered between different runs of "Team Center".
 
-Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
+Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
 
 Furthermore, it is possible to enable a compensation for pressure losses as reported by the Race Engineer, like slow punctures or sudden pressure losses cause of collisions with curbs. But be sure, that it is really a loss of pressure due to a puncture or running over curbs. If not, you will end up with even worse pressures in those tyres.
 
@@ -307,6 +311,8 @@ Of course, you can calculate and enter all values here on your own. For your con
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2022.JPG)
 
 A menu appears, which let you choose one of the tyre pressure setups from the "Setups" tab or one of the settings for a past pitstop, which will then be entered together with the corresponding driver into the tyre pressure fields, where you can edit them afterwards, if desired.
+
+Lastly a note about brake changes: You have to decide on your own, when to change brakes. There may be a warning given by the Engineer for worn brake pads, but when it comes to planning and preparing a pitstop in the "Team Center", you are in charge. So take a look at the data, and plan for the best opportunity to change brakes, if necessary. 
 
 #### Automatically select the next driver
 
@@ -337,13 +343,13 @@ This floating window, which can be left open all the time, will be updated once 
 
 2. *rFactor 2* and *Le Mans Ultimate*
 
-   Refuel amount, the chosen tyre compound and pressures, as well as the repair settings are exact.
+   Refuel amount, the chosen tyre compound(s) and pressures, as well as the repair settings are exact.
 
 3. *iRacing*
 
    Only chosen cold tyre pressures are available here.
 
-Additional information will be available most of the time for the duration of the normal pitstop service (refueling and tyre change), the time needed for the repairs (whether this value will be correct, depends on correct values in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database" for conversion between internal damage values of the simulator and the corresponding repair duration), and also the pitlane delta, which is the time difference between a drive-by and a drive-thorugh the pitlane. This value is also taken from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database".
+Additional information will be available most of the time for the duration of the normal pitstop service (refueling and tyre change), the time needed for the repairs (whether this value will be correct, depends on correct values in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" for conversion between internal damage values of the simulator and the corresponding repair duration), and also the pitlane delta, which is the time difference between a drive-by and a drive-thorugh the pitlane. This value is also taken from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
 #### Planning and preparing pitstops in a team race using the Race Assistants
 

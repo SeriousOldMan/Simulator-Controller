@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRacing IBT Reader", "iRacing IBT Reader\iRacing IBT Reader.csproj", "{C930B8D2-D244-4347-916A-07B79F9EE699}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C930B8D2-D244-4347-916A-07B79F9EE699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C930B8D2-D244-4347-916A-07B79F9EE699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C930B8D2-D244-4347-916A-07B79F9EE699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C930B8D2-D244-4347-916A-07B79F9EE699}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF47450D-8E7D-4E32-94BF-AE1C2EFD1046}
+	EndGlobalSection
+EndGlobal

@@ -13,6 +13,7 @@
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"
+#Include "Libraries\LMUProvider.ahk"
 #Include "RF2 Plugin.ahk"
 
 
@@ -30,45 +31,32 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
-	iTrackData := false
-	iTeamData := false
-	iGridData := false
+	iSelectedDriver := false
 
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
-
-	iFuelRatio := 1
 
 	iFuelLevels := []
 	iVirtualEnergyLevels := []
 
 	iAdjustRefuelAmount := false
 
-	TeamData {
-		Get {
-			if !this.iTeamData
-				this.iTeamData := LMURESTProvider.TeamData()
+	class LMUProvider extends LMUProvider {
+		iPlugin := false
 
-			return this.iTeamData
+		__New(plugin, car, track) {
+			this.iPlugin := plugin
+
+			super.__New(car, track)
+		}
+
+		getRefuelAmount(setupData) {
+			return this.iPlugin.getOptionHandler("Refuel").Call("Get", , setupData)
 		}
 	}
 
-	TrackData {
-		Get {
-			if !this.iTrackData
-				this.iTrackData := LMURESTProvider.TrackData()
-
-			return this.iTrackData
-		}
-	}
-
-	GridData {
-		Get {
-			if !this.iGridData
-				this.iGridData := LMURESTProvider.GridData()
-
-			return this.iGridData
-		}
+	createSimulatorProvider() {
+		return LMUPlugin.LMUProvider(this, this.Car, this.Track)
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
@@ -114,10 +102,14 @@ class LMUPlugin extends Sector397Plugin {
 				case "Refuel":
 					switch operation, false {
 						case "Get":
-							return (pitstop.getRefuelLevel() - this.iRemainingFuelAmount)
+							return (pitstop.getRefuelLevel() - (this.iRemainingFuelAmount ? this.iRemainingFuelAmount
+																						  : this.iLastFuelAmount))
 						case "Set":
 							if initial
 								this.iRemainingFuelAmount := this.iLastFuelAmount
+
+							if isDebug()
+								logMessage(kLogDebug, (initial ? "Initial" : "Updated") . " fuel plan - Remaining: " . Round(this.iLastFuelAmount, 1) . "; Refuel: " . Round(value, 1))
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":
@@ -288,6 +280,38 @@ class LMUPlugin extends Sector397Plugin {
 						splitCompound(compound, &compound, &compoundColor)
 
 					return [compound, compoundColor]
+				case "Tyre Compound Front Left", "TyreCompoundFrontLeft":
+					compound := this.getOptionHandler("Tyre Compound Front Left").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Front Right", "TyreCompoundFrontRight":
+					compound := this.getOptionHandler("Tyre Compound Front Right").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Rear Left", "TyreCompoundRearLeft":
+					compound := this.getOptionHandler("Tyre Compound Rear Left").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
+				case "Tyre Compound Rear Right", "TyreCompoundRearRight":
+					compound := this.getOptionHandler("Tyre Compound Rear Right").Call("Get")
+					compoundColor := false
+
+					if compound
+						splitCompound(compound, &compound, &compoundColor)
+
+					return [compound, compoundColor]
 				case "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					return [this.getOptionHandler(option).Call("Get")]
 				case "Change Brakes":
@@ -419,6 +443,9 @@ class LMUPlugin extends Sector397Plugin {
 	performPitstop(lapNumber, options) {
 		super.performPitstop(lapNumber, options)
 
+		this.iSelectedDriver := false
+
+		this.iRemainingFuelAmount := 0
 		this.iLastFuelAmount := 0
 
 		this.iFuelLevels := []
@@ -438,11 +465,22 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
-	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
+		local index, tyre
+
+		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
-			this.setPitstopOption("Tyre Compound", compound ? compound(tyreCompound, tyreCompoundColor) : false)
+			if InStr(tyreCompound, ",") {
+				tyreCompound := string2Values(",", tyreCompound)
+				tyreCompoundColor := string2Values(",", tyreCompoundColor)
+
+				for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+					this.setPitstopOption("Tyre Compound " . tyre
+										, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+			}
+			else
+				this.setPitstopOption("Tyre Compound", tyreCompound ? compound(tyreCompound, tyreCompoundColor) : false)
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
@@ -458,6 +496,13 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		super.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
+
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.setPitstopOption("Change Brakes", change)
+	}
+
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
@@ -469,8 +514,24 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
-		if (this.OpenPitstopMFDHotkey != "Off")
-			this.setPitstopOption("Driver", driver)
+		local nextDriver, currentDriver, delta
+
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			driver := string2Values("|", driver)
+
+			nextDriver := string2Values(":", driver[2])
+			currentDriver := string2Values(":", driver[1])
+
+			if !this.iSelectedDriver
+				this.iSelectedDriver := currentDriver[2]
+
+			delta := (nextDriver[2] - this.iSelectedDriver)
+
+			loop Abs(delta)
+				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
+
+			this.iSelectedDriver := nextDriver[2]
+		}
 	}
 
 	finishPitstopSetup(pitstopNumber) {
@@ -480,222 +541,18 @@ class LMUPlugin extends Sector397Plugin {
 			this.changePitstopOption("RequestPitstop")
 	}
 
-	parseCategory(candidate, &rest) {
-		super.parseCategory(candidate, &rest)
-
-		return false
-	}
-
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
-		local gridData := this.GridData
-
-		model := gridData.Car[carName]
-		team := gridData.Team[carName]
-
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1)))
-			nr := this.parseNr(carName, &carName)
-		else
-			super.parseCarName(carName, , &nr)
-
-		try {
-			category := gridData.Drivers[carName][1].Category
-		}
-		catch Any {
-			category := false
-		}
-	}
-
-	parseDriverName(carName, forName, surName, nickName) {
-		local driver
-
-		try {
-			driver := this.GridData.Drivers[carName][1]
-		}
-		catch Any {
-			driver := false
-		}
-
-		return (driver ? driver.Name : super.parseDriverName(carName, forName, surName, nickName))
-	}
-
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 
 		if (session == kSessionFinished) {
-			this.iTrackData := false
-			this.iTeamData := false
-			this.iGridData := false
-
 			this.iLastFuelAmount := 0
 			this.iRemainingFuelAmount := 0
 
 			this.iFuelLevels := []
 			this.iVirtualEnergyLevels := []
-			this.iFuelRatio := 1
 
 			this.iAdjustRefuelAmount := false
 		}
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local weatherData, lap, weather, time, session, remainingTime
-
-		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
-									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
-
-		static lastLap := 0
-		static duration := 0
-		static lastWeather := false
-		static lastWeather10Min := false
-		static lastWeather30Min := false
-
-		if InStr(options, "Setup=true") {
-			car := this.Car
-			track := this.Track
-
-			setupData := LMURESTProvider.PitstopData(simulator, car, track)
-			data := newMultiMap()
-
-			setMultiMapValue(data, "Setup Data", "FuelAmount", this.getOptionHandler("Refuel").Call("Get", , setupData))
-
-			for key, postFix in keys {
-				tyreCompound := setupData.TyreCompound[key]
-
-				if tyreCompound {
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-					if tyreCompound {
-						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-						setMultiMapValue(data, "Setup Data", "TyreCompound" . postFix, tyreCompound)
-						setMultiMapValue(data, "Setup Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
-					}
-				}
-				else {
-					setMultiMapValue(data, "Setup Data", "TyreCompound" . postFix, false)
-					setMultiMapValue(data, "Setup Data", "TyreCompoundColor" . postFix, false)
-				}
-			}
-
-			setMultiMapValue(data, "Setup Data", "TyrePressureFL", setupData.TyrePressure["Front Left"])
-			setMultiMapValue(data, "Setup Data", "TyrePressureFR", setupData.TyrePressure["Front Right"])
-			setMultiMapValue(data, "Setup Data", "TyrePressureRL", setupData.TyrePressure["Rear Left"])
-			setMultiMapValue(data, "Setup Data", "TyrePressureRR", setupData.TyrePressure["Rear Right"])
-
-			setMultiMapValue(data, "Setup Data", "RepairBodywork", setupData.RepairBodywork)
-			setMultiMapValue(data, "Setup Data", "RepairSuspension", setupData.RepairSuspension)
-			setMultiMapValue(data, "Setup Data", "RepairEngine", setupData.RepairEngine)
-
-			this.iFuelRatio := setupData.FuelRatio
-
-			setMultiMapValue(data, "Setup Data", "ServiceTime", LMURESTProvider.ServiceData().ServiceTime)
-		}
-		else {
-			data := super.readSessionData(options, protocol?)
-
-			car := this.TeamData.Car
-			track := this.TrackData.Track
-
-			if data.Has("Weather Data") {
-				lap := getMultiMapValue(data, "Stint Data", "Laps", 0)
-
-				if ((lap < lastLap) || (lap = 0) || (lap > (lastLap + 1)) || (duration = 0)) {
-					lastLap := 0
-
-					lastWeather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
-					lastWeather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
-					lastWeather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
-
-					duration := (LMURESTProvider.SessionData().Duration[getMultiMapValue(data, "Session Data"
-																							 , "Session", "Race")] * 1000)
-				}
-
-				if (lap != lastLap) {
-					lastLap := lap
-
-					session := getMultiMapValue(data, "Session Data", "Session", "Race")
-					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
-					weatherData := LMURestProvider.WeatherData()
-
-					time := Round(100 - (remainingTime / duration * 100))
-					weather := weatherData.Weather["Now"]
-
-					if weather
-						lastWeather := weather
-
-					time := Round(100 - (Max(0, remainingTime - 600000) / duration * 100))
-					weather := weatherData.Weather[session, time]
-
-					if weather
-						lastWeather10Min := weather
-
-					time := Round(100 - (Max(0, remainingTime - 1800000) / duration * 100))
-					weather := weatherData.Weather[session, time]
-
-					if weather
-						lastWeather30Min := weather
-				}
-
-				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
-				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)
-				setMultiMapValue(data, "Weather Data", "Weather30Min", lastWeather30Min)
-			}
-
-			if car
-				setMultiMapValue(data, "Session Data", "Car", car)
-			else
-				car := this.Car
-
-			if track
-				setMultiMapValue(data, "Session Data", "Track", track)
-			else
-				track := this.Track
-
-			if data.Has("Car Data") {
-				fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
-
-				if (fuelAmount && this.iFuelRatio)
-					setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
-				else if !fuelAmount
-					setMultiMapValue(data, "Session Data", "FuelAmount", LMURESTProvider.EnergyData(simulator, car, track).MaxFuelAmount)
-			}
-
-			for key, postFix in keys {
-				tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, kUndefined)
-
-					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-						if tyreCompound {
-							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-							setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
-							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
-
-							if (postfix = "Front") {
-								setMultiMapValue(data, "Car Data", "TyreCompoundFrontLeft" . postFix, tyreCompound)
-								setMultiMapValue(data, "Car Data", "TyreCompoundColorFrontLeft" . postFix, tyreCompoundColor)
-								setMultiMapValue(data, "Car Data", "TyreCompoundFrontRight" . postFix, tyreCompound)
-								setMultiMapValue(data, "Car Data", "TyreCompoundColorFrontRight" . postFix, tyreCompoundColor)
-							}
-							else if (postfix = "Rear") {
-								setMultiMapValue(data, "Car Data", "TyreCompoundRearLeft" . postFix, tyreCompound)
-								setMultiMapValue(data, "Car Data", "TyreCompoundColorRearLeft" . postFix, tyreCompoundColor)
-								setMultiMapValue(data, "Car Data", "TyreCompoundRearRight" . postFix, tyreCompound)
-								setMultiMapValue(data, "Car Data", "TyreCompoundColorRearRight" . postFix, tyreCompoundColor)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return data
 	}
 }
 

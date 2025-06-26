@@ -10,7 +10,22 @@ The two applications on the lower left and on the lower right side of the launch
 
 If you want to download and install a new version of Simulator Controller, it is important that none of the applications of the suite is running during the update. Please use the button "Close All..." in the lower right corner just before running the update.
 
+For your convinience, you can click on the version number to open the release notes, that describe the fixes and changes included in the current version of Simulator Controller.
+ 
 If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
+
+## Managing your *privacy*
+
+Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile.JPG)
+
+- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
+
+### Notes
+
+- If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
+- No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 
 ## Startup Process & Settings
 
@@ -117,8 +132,8 @@ And you can choose furthermore, which Assistants will be available and whether t
 
 | Setting  | Description |
 | -------- | ----------- |
-| Default  | The Assistant will be configured as defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"). |
-| Disabled | The Assistant is fully disabled (i.e. will not be started when you enter a session). But: This also disables all their services like collecting telemetry data, calculating ideal cold tyre pressures or handling track automation events. Therefore, this is not recommended, with the exception of the Driving Coach, which does not participate in this stuff.
+| Default  | The Assistant will be configured as defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"). |
+| Disabled | The Assistant is fully disabled (i.e. will not be started when you enter a session). But: This also disables all services like collecting telemetry data, calculating ideal cold tyre pressures or handling track automation events. Therefore, this is not recommended, with the exception of the Driving Coach, which does not participate in this stuff.
 | Silent   | Using "Silent" disables the voice interaction of the given Assistant completely. The Assistant will perform its actions normally, as long as no permission must be granted by the driver (unless fully autonomous mode is enabled). |
 | Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is started by the driver.<br><br>Note: A "muted" Assistant can be fully or partially unmuted using a voice command. This is described in the individual documentation for each Assistant. |
 | Active   | This is the normal operation mode of the Assistant with all voice capabilities enabled. |
@@ -137,7 +152,7 @@ On the last tab you can select or deselect several functions provided by the dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%203.JPG)
 
-The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database"). See the following list for a description of each function:
+The checkbox for each function has three states - selected, deselected and indeterminated. The later means that the setting for this function will be used that has been defined elsewhere in your configuration (for example, in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"). See the following list for a description of each function:
 
 | Module           | Function                              | Type              | Description |
 |------------------|---------------------------------------|-------------------|-------------|
@@ -146,10 +161,14 @@ The checkbox for each function has three states - selected, deselected and indet
 |                  | On-track Coaching                     | Controller Action | If enabled, on-track coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
 | Race Spotter     | Track Mapping                         | Controller Action | Enables or disables track mapping for the given session. This can be especially useful when mapping non-circuit tracks that require a roll-forward to the start line. |
 |                  | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
-| Race Strategist  | Telemetry Collection                  | Setting           | If enabled, general telemetry data is collected by the Strategist during the given session. |
+|                  | Private Practice                      | Setting           | Enables or disables a private practice session, i.e. information about ghosted cars are not provided by the Spotter. |
+|                  | Private Qualifying                    | Setting           | Enables or disables a private qualifying session, i.e. information about ghosted cars are not provided by the Spotter. |
+| Race Strategist  | Data Collection                       | Setting           | If enabled, general data, like lap times, consumption, tyre wear and so on is collected by the Strategist during the given session. |
 |                  | Traffic Analysis                      | Setting           | If this setting is enabled, the Strategist will use a Monte Carlo simulation model to create a probability distribution for the further race development, thereby finding the best possible lap for the next pitstop (see this [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_method) entry for an introduction to Monte Carlo methods). WARNING: This will consume lots of CPU cycles and can take quite some time. It is strongly advised, to let this setting disabled, unless you own a really powerful PC. In team races, it is possible to run the Monte Carlo simulation in the "Team Center", thereby offloading the computational load from the drivers PC. |
 | Race Engineer    | Pressure Collection                   | Setting           | If enabled, pressures (hot and cold) are collected by the Engineer during the given session. |
 |                  | Fuel Warning                          | Setting           | If enabled, the Engineer will issue fuel warnings during the given session. |
+|                  | Tyre Warning                          | Setting           | If enabled, the Engineer will issue tyre wear warnings during the given session. |
+|                  | Brake Warning                         | Setting           | If enabled, the Engineer will issue brake pad wear warnings during the given session. |
 |                  | Damage Warning                        | Setting           | If enabled, the Engineer will issue damage warnings during the given session. |
 |                  | Pressure Warning                      | Setting           |If enabled, the Engineer will issue pressure loss warnings during the given session. |
 |                  | Pressure Correction by Temperature    | Setting           | If enabled, the trend of the air temperature will be considered to apply a small correction to the setup pressures at the next pitstop. |
@@ -195,7 +214,12 @@ In many cases all drivers in a given team want to share the same configuration. 
 
 4. *Exports from the "Session Database"*
 
-   You can prepare any number of exports from your session database you want to share with your team mates. Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included. You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database". Put all the export folders into the folder of the team package.
+   You can prepare any number of exports from your session database you want to share with your team mates.
+   
+   - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings). Hint: Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
+   - You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database".
+   
+   Put all the export folders into the folder of the team package.
    
 The content of a typical folder of common team settings should look like this:
 
@@ -213,7 +237,7 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 Before version 5.5.8 of Simulator Controller, it was necessary to press the *Push-To-Talk* button twice (like a double click with the mouse) to initiate an activation command. This is no longer necessary in most cases, but there is an exception. If you have configured the AI Driving Coach and you are using the voice recognition which comes with the Windows operating system (not "Azure" or "Google"), you will have to use the following method to activate another dialog partenr, once you are talking with the Driving Coach:
 
-You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" behaviour as described below.
+You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button to activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" method as described below.
 
 Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
@@ -221,9 +245,9 @@ As said, this way to initiate an activation command is *only* required for the v
 
 #### Push-To-Talk Behaviour
 
-Beside the behaviour of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished and that the command should be executed. This alternative mode can be enabled [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+Beside the behaviour of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 	
-Please don't forget to press the *Push-To-Talk* button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
+Please don't forget to press the *Push-To-Talk* button at the end of your speech, even if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
 
 #### Testing voice configuration and voice commands
 
@@ -267,7 +291,7 @@ Normally you will use a standard configuration for voice control, which means, t
 
   4. Confirmation behaviour
   
-     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
+     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
 	 
 	 | Setting Value | Description |
 	 |---------------|-------------|
@@ -285,7 +309,7 @@ Using the technology developed for Jona, Release 3.1 introduced an additional Ra
 
 #### Elisa, the AI Race Spotter
 
-The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist) for more information.
+The third Assistant, Elisa, is not so much of a dialog partner, but gives you crucial information about the traffic, your opponents and the current race situation. See the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) for more information.
 
 #### Aiden, the AI Driving Coach
 
@@ -390,7 +414,7 @@ Simulator Controller is a complex system with lots of different processes and ev
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%201.JPG)
 
-This tool, which either can be startet on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
+This tool, which either can be started on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
 
 | Color                                                                                           | Meaning                                                                                                                              |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
@@ -443,6 +467,10 @@ The "System Monitor" is divided into several pages of information:
 	 - Brakes
 	 
 	   Shows the current brake temperatures, and brake wear, if available.
+	   
+	 - Engine
+	 
+	   If available by the sim, the current water and oil temperatures are displayed.
 	   
 	 - Standings
 	 

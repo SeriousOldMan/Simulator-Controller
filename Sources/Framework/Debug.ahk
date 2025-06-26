@@ -9,10 +9,9 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global gDebug := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-								, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
-global gLogLevel := kLogLevels[getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-											  , "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
+global gDebug := false
+global gLogLevel := kLogWarn
+global gDiagnosticsCritical := true
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -103,9 +102,15 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
+	global gDebug, gLogLevel, gDiagnosticsCritical
+
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
 						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
+
+	gDebug := getMultiMapValue(settings, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)
+	gLogLevel := kLogLevels[getMultiMapValue(settings, "Debug", "LogLevel", ((kBuildConfiguration = "Development") && !A_IsCompiled) ? "Debug" : "Warn")]
+	gDiagnosticsCritical := getMultiMapValue(settings, "Diagnostics", "Critical", true)
 
 	if kLogStartup {
 		logMessage(kLogOff, "-----------------------------------------------------------------")
@@ -165,7 +170,7 @@ getLogLevel() {
 	return gLogLevel
 }
 
-logMessage(logLevel, message, monitor := true) {
+logMessage(logLevel, message, monitor := true, error := false, header := true) {
 	global gLogLevel
 
 	local script := StrSplit(A_ScriptName, ".")[1]
@@ -194,11 +199,10 @@ logMessage(logLevel, message, monitor := true) {
 
 		logTime := FormatTime(time, "dd.MM.yy HH:mm:ss")
 
-		fileName := kLogsDirectory . script . " Logs.txt"
+		fileName := kLogsDirectory . script . ".log"
 		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
-		SplitPath(fileName, , &directory)
-		DirCreate(directory)
+		DirCreate(kLogsDirectory)
 
 		tries := 5
 
@@ -231,11 +235,36 @@ logMessage(logLevel, message, monitor := true) {
 				}
 			}
 		}
+
+		if (gDiagnosticsCritical && (error || (logLevel = kLogCritical))) {
+			DirCreate(kUserHomeDirectory . "Diagnostics")
+
+			tries := 5
+
+			while (tries > 0)
+				try {
+					if header
+						logLine := ("---------------------------------------------------------------------`n"
+								  . "      Error in " . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ")`n"
+								  . "---------------------------------------------------------------------`n"
+								  . logLine)
+
+					FileAppend(logLine, kUserHomeDirectory . "Diagnostics\Critical.log", "UTF-16")
+
+					break
+				}
+				catch Any as exception {
+					Sleep(1)
+
+					tries -= 1
+				}
+		}
 	}
 }
 
 logError(exception, unexpected := false, report := true) {
 	local debug := (isDevelopment() && isDebug())
+	local critical := (unexpected || isDevelopment())
 	local handle, message, settings
 
 	static verbose := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Verbose", debug && !A_IsCompiled)
@@ -243,17 +272,20 @@ logError(exception, unexpected := false, report := true) {
 	if isObject(exception) {
 		message := exception.Message
 
-		logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug
+		logMessage(critical ? kLogCritical : kLogDebug
 				 , translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
-				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message
+				 , true, unexpected)
 
 
 		if exception.HasProp("Stack")
-			logMessage((unexpected || isDevelopment()) ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
+			logMessage(critical ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack
+					 , false, unexpected, false)
 	}
 	else
-		logMessage(((unexpected || isDevelopment()) || isDevelopment()) ? kLogCritical : kLogDebug
-				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
+		logMessage(critical ? kLogCritical : kLogDebug
+				 , translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception
+				 , true, unexpected)
 
 	if (verbose && (unexpected || report))
 		if isObject(exception)
@@ -273,18 +305,19 @@ getMemoryUsage(pid) {
 	local size := (8 + A_PtrSize * 9)
 	local PMC_EX := Buffer(size, 0)
 	local hProcess := DllCall("OpenProcess", "uint", 0x1000, "int", 0, "uint", pid)
-	local sucess := false
+	local success := false
 
 	if hProcess {
 		NumPut("uint", size, PMC_EX)
 
 		try
 			if DllCall("GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
-				sucess := true
-
-		try
-			if DllCall("psapi\GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
 				success := true
+
+		if !success
+			try
+				if DllCall("psapi\GetProcessMemoryInfo", "ptr", hProcess, "ptr", PMC_EX, "uint", size)
+					success := true
 
 		DllCall("CloseHandle", "ptr", hProcess)
 

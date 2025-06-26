@@ -346,7 +346,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	enableTrackMapping(label := false, force := false) {
-		local simulator, car, track, trackType, telemetryData, positionsData
+		local simulator, car, track, trackType, telemetryData, standingsData
 
 		if (!this.TrackMappingEnabled || force) {
 			if !label
@@ -374,9 +374,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 																   , "Track.Type", "Circuit")
 
 					if (trackType != "Circuit") {
-						simulator.acquireSessionData(&telemetryData, &positionsData)
+						simulator.acquireSessionData(&telemetryData, &standingsData)
 
-						this.startupTrackMapper(trackType, getMultiMapValue(positionsData, "Track Data", "Length"
+						this.startupTrackMapper(trackType, getMultiMapValue(standingsData, "Track Data", "Length"
 																		  , getMultiMapValue(telemetryData, "Track Data", "Length", 0)))
 					}
 				}
@@ -720,7 +720,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false
 
-		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
+		if ((force || this.iMapperPID) && (this.iMapperPhase = "Collect")) {
 			pid := this.iMapperPID
 
 			if pid {

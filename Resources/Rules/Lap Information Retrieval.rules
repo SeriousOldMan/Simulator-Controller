@@ -51,10 +51,15 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Center, ?damage)
 ;										Set(Lap, ?lap, Damage.Bodywork, ?damage)
 lapDamage(?lap, Engine, ?damage) <= Get(Lap, ?lap, Damage.Engine, ?damage)
 									  
-lapAvgConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
-lapAvgConsumption(?lap, !Session.Settings.Fuel.AvgConsumption)
+lapAvgFuelConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
+lapAvgFuelConsumption(?lap, !Session.Settings.Fuel.AvgConsumption)
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
+
+lapAvgEnergyConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Energy.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
+lapAvgEnergyConsumption(?lap, 0)
+
+lapRemainingEnergy(?lap, ?remainingEnergy) <= Get(Lap, ?lap, Energy.Remaining, ?remainingEnergy)
 
 lapTime(?lap, ?time) <= Get(Lap, ?lap, Time, ?time)
 
@@ -158,8 +163,17 @@ recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=
 
 clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, Driver.Category,
-								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Tyre.Set, Valid, Position.Overall, Position.Class,
-								  Time, Time.Average, Time.Start, Time.End, Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption,
+								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Tyre.Set,
+								  Tyre.Compound.Front, Tyre.Compound.Color.Front,
+								  Tyre.Compound.Rear, Tyre.Compound.Color.Rear,
+								  Tyre.Compound.Front.Left, Tyre.Compound.Color.Front.Left,
+								  Tyre.Compound.Front.Right, Tyre.Compound.Color.Front.Right,
+								  Tyre.Compound.Rear.Left, Tyre.Compound.Color.Rear.Left,
+								  Tyre.Compound.Rear.Right, Tyre.Compound.Color.Rear.Right,
+								  Valid, Position.Overall, Position.Class,
+								  Time, Time.Average, Time.Start, Time.End,
+								  Fuel.Remaining, Fuel.Consumption, Fuel.AvgConsumption,
+								  Energy.Remaining, Energy.Consumption, Energy.AvgConsumption,
 								  Tyre.Pressure.FL, Tyre.Pressure.FR, Tyre.Pressure.RL, Tyre.Pressure.RR,
 								  Tyre.Temperature.FL, Tyre.Temperature.FR, Tyre.Temperature.RL, Tyre.Temperature.RR, Tyre.Temperature,
 								  Tyre.Wear.FL, Tyre.Wear.FR, Tyre.Wear.RL, Tyre.Wear.RR, Tyre.Wear,
@@ -169,7 +183,8 @@ clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 								  Damage.Bodywork, Damage.Bodywork.Center, Damage.Bodywork.Front, Damage.Bodywork.Rear,
 								  Damage.Bodywork.Left, Damage.Bodywork.Right,
 								  Damage.Suspension, Damage.Suspension.FL, Damage.Suspension.FR, Damage.Suspension.RL, Damage.Suspension.RR,
-								  Damage.Engine, Penalty, Warnings])
+								  Damage.Engine, Penalty, Warnings,
+								  Engine.Temperature.Water, Engine.Temperature.Oil])
 clearLap(?)
 
 clearLap(?, []) <= !

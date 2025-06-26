@@ -18,3 +18,4 @@ TeamServer.db
 Sources/*/*.exe
 Binaries
 Releases
+.vscode

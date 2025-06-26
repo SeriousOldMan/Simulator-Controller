@@ -14,6 +14,7 @@
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\ACCUDPProvider.ahk"
+#Include "Libraries\ACCProvider.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
@@ -81,9 +82,42 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	iSelectedDriver := false
 
-	iPositionsDataFuture := false
+	iStandingsDataFuture := false
 
 	static sCarData := false
+
+	class ACCProvider extends ACCProvider {
+		iPlugin := false
+
+		__New(plugin, car, track) {
+			this.iPlugin := plugin
+
+			super.__New(car, track, plugin.UDPProvider)
+		}
+
+		acquireTelemetryData() {
+			local telemetryData := super.acquireTelemetryData()
+
+			if (getMultiMapValues(telemetryData, "Setup Data", false)
+			 && (this.iPlugin.iLastTyreCompound && this.iPlugin.iPSChangeTyres)) {
+				setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iPlugin.iLastTyreCompound)
+				setMultiMapValue(telemetryData, "Setup Data", "TyreCompoundColor", "Black")
+			}
+
+			return telemetryData
+		}
+
+		acquireStandingsData(telemetryData, finished := false) {
+			return this.iPlugin.acquireStandingsData(telemetryData, finished)
+		}
+
+		acquireSessionData(&telemetryData, &standingsData, finished := false) {
+			if !this.iPlugin.iStandingsDataFuture
+				this.iPlugin.iStandingsDataFuture := this.iPlugin.UDPProvider.getStandingsDataFuture()
+
+			super.acquireSessionData(&telemetryData, &standingsData, finished)
+		}
+	}
 
 	class ChatMode extends ControllerMode {
 		Mode {
@@ -177,7 +211,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off"))
+				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))
 
@@ -204,6 +239,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 		}
+	}
+
+	createSimulatorProvider() {
+		return ACCPlugin.ACCProvider(this, this.Car, this.Track)
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
@@ -266,222 +305,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 
 			if (session != kSessionPaused)
-				this.UDPProvider.shutdown(true)
-		}
-	}
-
-	acquireTelemetryData() {
-		local telemetryData := super.acquireTelemetryData()
-
-		if (getMultiMapValues(telemetryData, "Setup Data", false) && (this.iLastTyreCompound && this.iPSChangeTyres)) {
-			setMultiMapValue(telemetryData, "Setup Data", "TyreCompound", this.iLastTyreCompound)
-			setMultiMapValue(telemetryData, "Setup Data", "TyreCompoundColor", "Black")
-		}
-
-		return telemetryData
-	}
-
-	acquireSessionData(&telemetryData, &positionsData, finished := false) {
-		if !this.iPositionsDataFuture
-			this.iPositionsDataFuture := this.UDPProvider.getPositionsDataFuture()
-
-		super.acquireSessionData(&telemetryData, &positionsData, finished)
-	}
-
-	acquirePositionsData(telemetryData, finished := false) {
-		local positionsData, session
-		local lap, restart, fileName, tries
-		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
-
-		static carIDs := false
-		static lastDriverCar := false
-		static lastRead := false
-		static sessionID := 0
-		static lastLap := 0
-
-		if !carIDs {
-			ACCPlugin.requireCarDatabase()
-
-			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
-		}
-
-		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
-
-		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
-			sessionID += 1
-
-			restart := true
-		}
-		else
-			restart := false
-
-		this.iSessionID := sessionID
-
-		lastLap := lap
-
-		if (restart || !this.iPositionsDataFuture)
-			this.iPositionsDataFuture := this.UDPProvider.getPositionsDataFuture(restart)
-
-		try {
-			positionsData := this.iPositionsDataFuture.PositionsData
-		}
-		finally {
-			this.iPositionsDataFuture := false
-		}
-
-		if positionsData {
-			session := getMultiMapValue(positionsData, "Session Data", "Session", kUndefined)
-
-			if (session != kUndefined) {
-				removeMultiMapValues(positionsData, "Session Data")
-
-				setMultiMapValue(telemetryData, "Session Data", "Session", session)
-			}
-
-			if ((lap <= 1) || restart)
-				lastDriverCar := false
-
-			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
-			driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
-			driverID := getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)
-
-			lapTime := getMultiMapValue(telemetryData, "Stint Data", "LapLastTime", 0)
-
-			driverCar := false
-			driverCarCandidate := false
-
-			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-				if (carID != kUndefined) {
-					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
-
-					if ((car = ACCPlugin.kUnknown) && isDebug())
-						showMessage("Unknown car with ID " . carID . " detected...")
-
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
-
-					if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
-						driverCar := A_Index
-
-						lastDriverCar := driverCar
-					}
-					else if !driverCar
-						if ((getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
-							driverCar := A_Index
-
-							lastDriverCar := driverCar
-						}
-				}
-			}
-
-			if !driverCar
-				loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-					carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-					if (carID != kUndefined)
-						if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position")
-						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
-						driverCar := A_Index
-
-						lastDriverCar := driverCar
-
-						break
-					}
-					else if (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-						driverCarCandidate := A_Index
-				}
-
-			if !driverCar
-				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
-
-			setMultiMapValue(positionsData, "Position Data", "Driver.Car", driverCar)
-
-			return (finished ? positionsData : this.correctPositionsData(positionsData))
-		}
-		else {
-			this.UDPProvider.shutdown(true)
-
-			return newMultiMap()
-		}
-	}
-
-	computeBrakePadWear(location, compound, thickness) {
-		if (location = "Front") {
-			switch compound {
-				case 1, 4:
-					return Max(0, Min(100, 100 - ((thickness - 15) / 14 * 100)))
-				case 2:
-					return Max(0, Min(100, 100 - ((thickness - 13) / 16 * 100)))
-				case 3:
-					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
-				default:
-					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
-			}
-		}
-		else
-			switch compound {
-				case 1, 4:
-					return Max(0, Min(100, 100 - ((thickness - 15.5) / 13.5 * 100)))
-				case 2:
-					return Max(0, Min(100, 100 - ((thickness - 12.5) / 16.5 * 100)))
-				case 3:
-					return Max(0, Min(100, 100 - ((thickness - 12) / 17 * 100)))
-				default:
-					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
-			}
-	}
-
-	updatePositionsData(data) {
-		local car, carCategory, cupCategory
-
-		static carCategories := false
-
-		super.updatePositionsData(data)
-
-		if !carCategories {
-			ACCPlugin.requireCarDatabase()
-
-			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
-		}
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			car := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
-
-			if (car != kUndefined)
-				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.Has(car) ? carCategories[car] : ACCPlugin.kUnknown)
-		}
-	}
-
-	updateTelemetryData(data) {
-		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
-
-		super.updateTelemetryData(data)
-
-		if !getMultiMapValue(data, "Stint Data", "InPit", false)
-			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setMultiMapValue(data, "Session Data", "Paused", true)
-
-		if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
-			brakePadThickness := string2Values(",", getMultiMapValue(data, "Car Data", "BrakePadLifeRaw"))
-			frontBrakePadCompound := getMultiMapValue(data, "Car Data", "FrontBrakePadCompoundRaw")
-			rearBrakePadCompound := getMultiMapValue(data, "Car Data", "RearBrakePadCompoundRaw")
-
-			brakePadWear := [this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[1])
-						   , this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[2])
-						   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[3])
-						   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[4])]
-
-			setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakePadWear*))
-
-			if !isDebug() {
-				removeMultiMapValue(data, "Car Data", "BrakePadLifeRaw")
-				removeMultiMapValue(data, "Car Data", "BrakeDiscLifeRaw")
-				removeMultiMapValue(data, "Car Data", "FrontBrakePadCompoundRaw")
-				removeMultiMapValue(data, "Car Data", "RearBrakePadCompoundRaw")
-			}
+				if this.UDPProvider
+					this.UDPProvider.shutdown(true)
 		}
 	}
 
@@ -573,8 +398,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		static reported := false
-
 		if this.ClosePitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off") {
 				if this.activateWindow() {
@@ -583,15 +406,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					this.iPSIsOpen := false
 				}
 			}
-		}
-		else if !reported {
-			reported := true
-
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-			if !kSilentMode
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 
@@ -1008,9 +822,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
 							this.changeTyrePressure(option, action, steps)
 						case "Front Brake", "Rear Brake":
-							this.changeBrakeType(option, action)
+							loop steps
+								this.changeBrakeType(option, action)
 						case "Driver":
-							this.changeDriver(action)
+							loop steps
+								this.changeDriver(action)
 						default:
 							super.updatePitstopOption(option, action, steps)
 					}
@@ -1808,18 +1624,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.openPitstopMFD(false, update)
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
 	restoreSessionState(&sessionSettings, &sessionState) {
 		super.restoreSessionState(&sessionSettings, &sessionState)
 
@@ -1857,6 +1661,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						return (inList(this.iPSOptions, "Tyre Set") ? ["Dry", "Black"] : ["Wet", "Black"])
 					else
 						return [false, false]
+				case "Brake Change":
+					return [this.iPSChangeBrakes]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":
@@ -1943,6 +1749,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 												   , "Service.Driver.Previous", currentDriver
 												   , "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
 												   , "Service.Refuel", pitstopState["fuelToAdd"]
+												   , "Service.Brake.Change", pitstopState["changeBrakeDiscs"]
 												   , "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
 												   , "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
 												   , "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))
@@ -2046,10 +1853,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local tyreSetIncrement, finished
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD()
 			if compound {
@@ -2125,6 +1932,30 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		super.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
+
+		if this.requirePitstopMFD()
+			if (this.iPSChangeBrakes && !change)
+				this.toggleActivity("Change Brakes")
+			else if change {
+				if !this.iPSChangeBrakes
+					this.toggleActivity("Change Brakes")
+
+				if frontBrakePads {
+					this.changePitstopOption("Front Brake", "Previous", 4)
+
+					this.changePitstopOption("Front Brake", "Next", frontBrakePads - 1)
+				}
+
+				if rearBrakePads {
+					this.changePitstopOption("Rear Brake", "Previous", 4)
+
+					this.changePitstopOption("Rear Brake", "Next", rearBrakePads - 1)
+				}
+			}
+	}
+
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
@@ -2166,6 +1997,132 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.iSelectedDriver := nextDriver[2]
 			}
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		local standingsData, session
+		local lap, restart, fileName, tries
+		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
+
+		static carIDs := false
+		static carCategories := false
+
+		static lastDriverCar := false
+		static sessionID := 0
+		static lastLap := 0
+
+		if !carIDs {
+			ACCPlugin.requireCarDatabase()
+
+			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
+			carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
+		}
+
+		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
+
+		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
+			sessionID += 1
+
+			restart := true
+		}
+		else
+			restart := false
+
+		this.iSessionID := sessionID
+
+		lastLap := lap
+
+		if (restart || !this.iStandingsDataFuture)
+			this.iStandingsDataFuture := this.UDPProvider.getStandingsDataFuture(restart)
+
+		try {
+			standingsData := this.iStandingsDataFuture.StandingsData
+		}
+		finally {
+			this.iStandingsDataFuture := false
+		}
+
+		if standingsData {
+			session := getMultiMapValue(standingsData, "Session Data", "Session", kUndefined)
+
+			if (session != kUndefined) {
+				removeMultiMapValues(standingsData, "Session Data")
+
+				setMultiMapValue(telemetryData, "Session Data", "Session", session)
+			}
+
+			if ((lap <= 1) || restart)
+				lastDriverCar := false
+
+			driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
+			driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+			driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
+			driverID := getMultiMapValue(telemetryData, "Session Data", "ID", kUndefined)
+
+			lapTime := getMultiMapValue(telemetryData, "Stint Data", "LapLastTime", 0)
+
+			driverCar := false
+			driverCarCandidate := false
+
+			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+
+				if (carID != kUndefined) {
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+								   , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
+
+					car := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
+
+					if ((car = ACCPlugin.kUnknown) && isDebug())
+						showMessage("Unknown car with ID " . carID . " detected...")
+
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", car)
+
+					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
+						driverCar := A_Index
+
+						lastDriverCar := driverCar
+					}
+					else if !driverCar
+						if ((getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+							driverCar := A_Index
+
+							lastDriverCar := driverCar
+						}
+				}
+			}
+
+			if !driverCar
+				loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+					carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+
+					if (carID != kUndefined)
+						if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position")
+						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
+						driverCar := A_Index
+
+						lastDriverCar := driverCar
+
+						break
+					}
+					else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						driverCarCandidate := A_Index
+				}
+
+			if !driverCar
+				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
+
+			setMultiMapValue(standingsData, "Position Data", "Driver.Car", driverCar)
+
+			return (finished ? standingsData : this.correctStandingsData(standingsData))
+		}
+		else {
+			if this.UDPProvider
+				this.UDPProvider.shutdown(true)
+
+			return newMultiMap()
+		}
 	}
 }
 

@@ -45,6 +45,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static sSimulator := false
 
+	static sCollectData := CaseInsenseMap()
+
 	iEnabled := false
 	iName := false
 	iLogo := false
@@ -751,6 +753,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	static CollectData[type] {
+		Get {
+			return RaceAssistantPlugin.sCollectData[type]
+		}
+
+		Set {
+			return (RaceAssistantPlugin.sCollectData[type] := value)
+		}
+	}
+
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
@@ -758,6 +770,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local assistantSpeaker, assistantListener, first, index
 
 		super.__New(controller, name, configuration, register)
+
+		RaceAssistantPlugin.sCollectData.Default := true
 
 		if (RaceAssistantPlugin.sTeamServer = kUndefined) {
 			for ignore, assistant in kRaceAssistants {
@@ -1267,19 +1281,19 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 	}
 
-	static acquireSessionData(&telemetryData, &positionsData, finished := false) {
+	static acquireSessionData(&telemetryData, &standingsData, finished := false) {
 		if RaceAssistantPlugin.Simulator {
-			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &positionsData, finished)
+			RaceAssistantPlugin.Simulator.acquireSessionData(&telemetryData, &standingsData, finished)
 
 			data := newMultiMap()
 
 			setMultiMapValue(data, "System", "Time", A_TickCount)
 
 			RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
-			RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
+			RaceAssistantPlugin.updateAssistantsStandingsData(standingsData)
 
+			addMultiMapValues(data, standingsData)
 			addMultiMapValues(data, telemetryData)
-			addMultiMapValues(data, positionsData)
 
 			return data
 		}
@@ -1287,7 +1301,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return newMultiMap()
 	}
 
-	static readSessionData(fileName, &telemetryData, &positionsData) {
+	static readSessionData(fileName, &telemetryData, &standingsData) {
 		local data := readMultiMap(fileName)
 
 		setMultiMapValue(data, "System", "Time", A_TickCount)
@@ -1296,14 +1310,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		removeMultiMapValues(telemetryData, "Position Data")
 
-		positionsData := newMultiMap()
+		standingsData := newMultiMap()
 
-		setMultiMapValues(positionsData, "Position Data", getMultiMapValues(data, "Position Data"))
+		setMultiMapValues(standingsData, "Position Data", getMultiMapValues(data, "Position Data"))
 
 		data := newMultiMap()
 
 		addMultiMapValues(data, telemetryData)
-		addMultiMapValues(data, positionsData)
+		addMultiMapValues(data, standingsData)
 
 		return data
 	}
@@ -1321,7 +1335,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.CollectorTask.Sleep
 					:= Max(RaceAssistantPlugin.CollectorTask.Sleep
 						 , (getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-																   , "Team Server", "Update Frequency", 10) * 1000))
+										   , "Team Server", "Update Frequency", 10) * 1000))
 		}
 
 		if RaceAssistantPlugin.Simulator {
@@ -1350,6 +1364,17 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			if first
 				startOther()
+
+			Task.startTask(() {
+				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				local simulator := RaceAssistantPlugin.Simulator.Simulator[true]
+				local session := (simulator . "." . getMultiMapValue(data, "Session Data", "Session", "Other"))
+
+				setMultiMapValue(usage, "Simulators", simulator, getMultiMapValue(usage, "Simulators", simulator, 0) + 1)
+				setMultiMapValue(usage, "Sessions", session, getMultiMapValue(usage, "Sessions", session, 0) + 1)
+
+				writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+			}, 10000, kLowPriority)
 		}
 	}
 
@@ -1396,7 +1421,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	static addAssistantsLap(data, telemetryData, positionsData) {
+	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.sStintStartTime {
@@ -1408,14 +1433,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.Simulator.addLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
-			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
+			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, standingsData)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.addLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 	}
 
-	static updateAssistantsLap(data, telemetryData, positionsData) {
+	static updateAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.sStintStartTime {
@@ -1427,7 +1452,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.Simulator.updateLap(RaceAssistantPlugin.LastLap, data)
 
 		if RaceAssistantPlugin.TeamSessionActive
-			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, positionsData)
+			RaceAssistantPlugin.TeamServer.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data, telemetryData, standingsData)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
@@ -1532,15 +1557,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				assistant.updateTelemetryData(data)
 	}
 
-	static updateAssistantsPositionsData(data) {
+	static updateAssistantsStandingsData(data) {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.Simulator
-			RaceAssistantPlugin.Simulator.updatePositionsData(data)
+			RaceAssistantPlugin.Simulator.updateStandingsData(data)
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Enabled
-				assistant.updatePositionsData(data)
+				assistant.updateStandingsData(data)
 	}
 
 	static getSession(data := false) {
@@ -1620,10 +1645,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static finalLap(data, &state) {
+		local additionalLaps := getMultiMapValue(data, "Session Data", "AdditionalLaps", 0)
+		local driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 		local leader, driver, sessionTimeRemaining, driverCar, time, leaderRunning, driverRunning
 
 		if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
-			driverCar := getMultiMapValue(data, "Position Data", "Driver.Car")
 			sessionTimeRemaining := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 
 			if (sessionTimeRemaining < (getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Time", 0) * 2)) {
@@ -1641,13 +1667,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							if ((leaderRunning < 0.1) || (driverRunning < 0.1))
 								return false
 
-							leader := {Car: A_Index, Finish: getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps") + 1}
+							leader := {Car: A_Index, Finish: getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Laps") + 1 + additionalLaps}
 
 							if (driverCar != A_Index)
 								if (driverRunning > leaderRunning)
-									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 2}
+									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 2 + additionalLaps}
 								else
-									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
+									driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}
 						}
 
 						break
@@ -1658,7 +1684,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						logMessage(kLogDebug, "Time is up...")
 
 					leader := false
-					driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1}
+					driver := {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}
 				}
 
 				if (leader || driver) {
@@ -1679,6 +1705,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 			else
 				return false
+		}
+		else if ((additionalLaps > 0) && driverCar && (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) = 1)) {
+			state := [false, {Car: driverCar, Finish: getMultiMapValue(data, "Position Data", "Car." . driverCar . ".Laps") + 1 + additionalLaps}]
+
+			return true
 		}
 		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0) {
 			state := [true, true]
@@ -1899,7 +1930,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					logMessage(kLogCritical, translate("Cannot start " . this.Plugin . " (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
-						showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%Race Assistant.exe) - please rebuild the applications..."))
+						showMessage(substituteVariables(translate("Cannot start " . this.Plugin . " (%kBinariesDirectory%" . this.Plugin . ".exe) - please rebuild the applications..."))
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 					return false
@@ -2095,7 +2126,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			data := newMultiMap()
 
-			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures"
+			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Compound Front", "Tyre Compound Rear"
+							  , "Tyre Compound Front Left", "Tyre Compound Front Right"
+							  , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
+							  , "Tyre Set", "Tyre Pressures", "Change Brakes"
 							  , "Repair Suspension", "Repair Bodywork", "Repair Engine"]
 				if options.Has(key) {
 					value := options[key]
@@ -2105,6 +2139,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							case "Tyre Compound":
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound", value[1])
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color", value[2])
+							case "Tyre Compound Front":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Front", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.Front", value[2])
+							case "Tyre Compound Rear":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Rear", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.Rear", value[2])
+							case "Tyre Compound Front Left":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.FrontLeft", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.FrontLeft", value[2])
+							case "Tyre Compound Front Right":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.FrontRight", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.FrontRight", value[2])
+							case "Tyre Compound Rear Left":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.RearLeft", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.RearLeft", value[2])
+							case "Tyre Compound Rear Right":
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.RearRight", value[1])
+								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color.RearRight", value[2])
 							case "Tyre Pressures":
 								setMultiMapValue(data, "Pitstop", "Tyre.Pressures", values2String(";", value*))
 							default:
@@ -2159,7 +2211,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateTelemetryData(data) {
 	}
 
-	updatePositionsData(data) {
+	updateStandingsData(data) {
 	}
 
 	updateSession(session) {
@@ -2343,7 +2395,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local splitTime := startTime
 		local lastLap := RaceAssistantPlugin.LastLap
 		local skippedLap := false
-		local telemetryData, positionsData, data, dataLastLap
+		local telemetryData, standingsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
 		local simulator, car, track, weather
@@ -2392,7 +2444,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.Simulator {
 			telemetryData := true
-			positionsData := true
+			standingsData := true
 
 			if RaceAssistantPlugin.ReplayDirectory {
 				replayIndex += 1
@@ -2411,10 +2463,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 
 				data := RaceAssistantPlugin.readSessionData(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data"
-														  , &telemetryData, &positionsData)
+														  , &telemetryData, &standingsData)
 			}
 			else
-				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData)
+				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &standingsData)
 
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
@@ -2585,6 +2637,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							else if (lastLap < (dataLastLap - 1)) {
 								; Regained the car after a driver swap, stint
 
+								if !RaceAssistantPlugin.TeamSessionActive
+									return
+
 								RaceAssistantPlugin.sStintStartTime := false
 
 								if !RaceAssistantPlugin.driverActive(data) {
@@ -2635,7 +2690,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								finished := true
 
 							if (finished && !RaceAssistantPlugin.ReplayDirectory)
-								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &positionsData, true)
+								data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &standingsData, true)
 						}
 
 						if joinedSession {
@@ -2693,9 +2748,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						RaceAssistantPlugin.sLapRunning := (RaceAssistantPlugin.LapRunning + 1)
 
 						if newLap
-							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, positionsData)
+							RaceAssistantPlugin.addAssistantsLap(data, telemetryData, standingsData)
 						else
-							RaceAssistantPlugin.updateAssistantsLap(data, telemetryData, positionsData)
+							RaceAssistantPlugin.updateAssistantsLap(data, telemetryData, standingsData)
 
 						if isDebug() {
 							logMessage(kLogInfo, "Collect session data (Process):" . (A_TickCount - splitTime) . " ms...")
@@ -2878,7 +2933,7 @@ openRaceSettings(import := false, silent := false, plugin := false, fileName := 
 			RunWait("`"" . exePath . "`" " . options, kBinariesDirectory)
 		}
 		else {
-			options := "-File `"" . fileName . "`" " . getSimulatorOptions(plugin)
+			options := ("-File `"" . fileName . "`" " . getSimulatorOptions(plugin))
 
 			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 
@@ -3045,4 +3100,12 @@ disableRaceAssistant(name) {
 	finally {
 		protectionOff()
 	}
+}
+
+enableDataCollection(type) {
+	RaceAssistantPlugin.CollectData[type] := true
+}
+
+disableDataCollection(type) {
+	RaceAssistantPlugin.CollectData[type] := false
 }

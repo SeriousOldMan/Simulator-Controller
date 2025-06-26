@@ -566,14 +566,12 @@ class LLMConnector {
 
 		LoadModels() {
 			try {
-				answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
-
 				if this.Certificate {
 					try {
 						answer := WinHttpRequest({Certificate: this.Certificate}).GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
 					catch Any as exception {
-						logError(exception, true)
+						logError(exception)
 
 						answer := WinHttpRequest().GET(this.CreateModelsURL(this.Server), "", this.CreateHeaders(), {Encoding: "UTF-8"})
 					}
@@ -591,7 +589,7 @@ class LLMConnector {
 				}
 			}
 			catch Any as exception {
-				logError(exception, true)
+				logError(exception)
 
 				return []
 			}
@@ -617,7 +615,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://api.openai.com/v1/chat/completions"
 			serviceKey := ""
-			model := "GPT 3.5 turbo"
+			model := "GPT 4.1 mini"
 		}
 	}
 
@@ -646,11 +644,11 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 			serviceKey := ""
-			model := "GPT 3.5 turbo"
+			model := "GPT 4.1 mini"
 		}
 
 		CreateServiceURL(server) {
-			return substituteVariables(server, {model: this.Model})
+			return substituteVariables(server, {model: this.iModel})
 		}
 
 		CreateHeaders(headers) {
@@ -673,6 +671,37 @@ class LLMConnector {
 			serviceKey := ""
 			model := "Open Mixtral 8x22b"
 		}
+	}
+
+	class GoogleConnector extends LLMConnector.APIConnector {
+		static Models {
+			Get {
+				return ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-pro"]
+			}
+		}
+
+		Models {
+			Get {
+				return choose(super.Models, (m) => (InStr(m, "gemini") = 1))
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+			serviceKey := ""
+			model := "gemini-2.0-flash-lite"
+		}
+
+		ParseModels(response) {
+			local result := []
+
+			for ignore, element in response["data"]
+				result.Push(StrReplace(element["id"], "models/", ""))
+
+			return result
+		}
+
+
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
@@ -754,7 +783,7 @@ class LLMConnector {
 				if llmRuntime
 					this.iLLMRuntime := llmRuntime
 				else {
-					exePath := (kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
+					exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
 
 					if FileExist(exePath) {
 						deleteFile(kTempDirectory . "LLMRuntime.cmd")
@@ -883,7 +912,7 @@ class LLMConnector {
 							Sleep(10)
 					}
 
-				loop (isDebug() ? (60 * 60 * 24) : 120)
+				loop (isDebug() ? 240 : 120)
 					try
 						if FileExist(kTempDirectory . "LLMRuntime.out") {
 							Sleep(500)
@@ -961,10 +990,10 @@ class LLMConnector {
 
 	static Providers {
 		Get {
-			if FileExist(kUserHomeDirectory . "Programs\LLM Runtime\LLM Runtime.exe")
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "OpenRouter", "Ollama", "GPT4All"]
+				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

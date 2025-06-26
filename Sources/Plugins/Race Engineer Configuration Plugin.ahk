@@ -166,16 +166,23 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 			simulatorConfiguration["LoadSettings"] := getMultiMapValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "SettingsDatabase"))
 
-			simulatorConfiguration["LoadTyrePressures"] := getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Setup")
+			if (getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", kUndefined) == kUndefined) {
+				if inList(["Assetto Corsa Competizione", "rFactor 2", "Le Mans Ultimate", "iRacing"], simulator)
+					simulatorConfiguration["LoadTyrePressures"] := "Import"
+				else
+					simulatorConfiguration["LoadTyrePressures"] := "Setup"
+			}
+			else
+				simulatorConfiguration["LoadTyrePressures"] := getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures")
 
 			simulatorConfiguration["SaveSettings"] := getMultiMapValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getMultiMapValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Always"))
 			simulatorConfiguration["SaveTyrePressures"] := getMultiMapValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
 
-			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
+			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 2)
 			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".ConsideredHistoryLaps", 5)
 			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".HistoryLapsDamping", 0.2)
 			simulatorConfiguration["AdjustLapTime"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".AdjustLapTime", true)
-			simulatorConfiguration["DamageAnalysisLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".DamageAnalysisLaps", 1)
+			simulatorConfiguration["DamageAnalysisLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".DamageAnalysisLaps", 2)
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -296,13 +303,15 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		this.saveSimulatorConfiguration()
 
-		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+		if this.iCurrentSimulator {
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
-			if (simulator != this.iCurrentSimulator)
-				for ignore, key in ["LoadSettings", "SaveSettings", "LoadTyrePressures", "SaveTyrePressures"
-								  , "LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
-					simulatorConfiguration[key] := configuration[key]
+			for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+				if (simulator != this.iCurrentSimulator)
+					for ignore, key in ["LoadSettings", "SaveSettings", "LoadTyrePressures", "SaveTyrePressures"
+									  , "LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
+						simulatorConfiguration[key] := configuration[key]
+		}
 	}
 }
 

@@ -145,9 +145,9 @@ Syntax: condition **=>** action1, ..., actionN
 	
 The left hand side of the rule therefore is an expression which repreusents a condition, followed by a "=>" and the a comma-seperated list of actions. Example:
 
-	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready, true)
+	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready = true)
 
-#### Referencing facts in production rules
+#### Referencing facts in Production Rules
 
 Facts are referenced in conditions and actions of a production rule by either the **?fact** notation or by the **!fact** notation. There is a subtle difference between using a variable, for example **?Lap**, or a direct reference, for example **!Lap**.
 
@@ -208,6 +208,14 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 	Example: {Prove: unbound?(!Driver.Name)}
 	
 	This is a special one. The condition is matched by invoking the given target in the reduction rule engine. Ultimately, this allows to define new types of conditions and even call the host programming language, as you will see below.
+	
+  - Is Quantor
+  
+	Syntax: {Is: expression}
+  
+	Example: {Is: ?Pressure = ?BasePressure * ?TempFactor}
+	
+	This is another special one. It allows general expressions to be used, that also can be used in the tail of reduction rules. The Quantor is matched, if the expression succeeds. If variables are involved, these variables are changed as a side effect.
 
 #### Actions
 
@@ -224,7 +232,7 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
-  - Produce
+  - Prove
   
     Syntax / Example: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
 	
@@ -233,10 +241,22 @@ Once the condition of a production rule is matched, all actions on the right-han
 	Normally, only the first alternative is calculated (see the documentation for reduction rules below for more information on that). If you need to follow all paths of the reduction, you can use the following action syntax.
 	
 	Syntax / Example: (ProveAll: preparePitstop(?Lap))
+	
+  - Let
+  
+    Syntax / Example: (Let: !Increment = !Increment + 1)
+	
+	This action allows general expressions to be used as an action. Variables can be used in these expressions and can be altered as a side effect.
+	
+  - Execute
+  
+    Syntax / Example: (Execute: "C:\Users\Cheater\Documents\Scripts\StartMyGripCheat.cmd", "/Grip", "Max", "/TyreWear", "0")
+	
+	Executes the executable or script identified by the first argument, which must be the a file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
   
   - Set
   
-    Syntax / Example: (Set: Session.Laps, ?Lap)
+    Syntax / Example: (Set: Session.Laps, ?Lap) or (Set: Session.Laps = ?Lap)
 	
 	Using this action, you can create a fact in the knowledge base or alter the value of an existing one. If you omit the value, the fact is set to *true*.
   
@@ -515,6 +535,14 @@ The rule engine has some builtin predicates which can be used when formulating r
     Syntax: produce()
 	
 	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments.
+	
+  - execute
+  
+    Syntax: execute(executable, arg1, ..., argN)
+  
+    Executes the executable or script identified by the first argument, which must be file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
+	
+	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
   
 ### Event-based programming
 
@@ -537,3 +565,49 @@ If you only want to add some rules, there is a much better way. You can create a
 You can place any number of "*.rules" files in this folder and they will be loaded typically in alphapbetical order.
 
 Last but not lest, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+
+## Execution of Scripts by the Rule Engine
+
+When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua]() scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
+
+When this script is executed, the following global variables and functions are available:
+
+   - Arguments :: \<table\>
+   
+     This table represents an array with all arguments passed to the script.
+
+   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+	 
+   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
+	 
+   - Assistant.Ask(question :: \<string\>)
+   
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+	 
+   - Function.Call(function :: \<string\>, p1, p2, ...)
+   
+     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+
+   - Rules.SetValue(fact :: \<string\>, value :: \<string\>)
+   
+     Changes the value for the given fact in the knowledgebase of the Assistant.
+
+   - Rules.GetValue(fact :: \<string\> [, default)
+   
+     Returns the value for the given fact in the knowledgebase of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
+
+   - Rules.Execute()
+   
+     Runs a full production cycle of the Rule Engine of the Assistant.
+
+Additionally, the script can load any number of additional modules by using the builtin "require" function, either from external sources like the [LuaRocks](https://luarocks.org/) package maneger, or by using one of the predefined modules of Simulator Controller, that allow you to interface with the currently running simulation. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for an introduction and reference for these modules.
+
+The script must return a single boolean value, which indicates success or failure, if the script is used as a predicate.

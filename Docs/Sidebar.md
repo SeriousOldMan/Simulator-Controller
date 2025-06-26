@@ -34,6 +34,7 @@
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------
+  - [Data privacy settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy)
   - [Startup Process & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings)
     - [Customizing Startup Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration)
 	- [Customizing Controller Notifications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications)
@@ -106,14 +107,14 @@
 [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database)
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#introduction)
-  - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#race-settings)
-    - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings)
+  - [Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings)
+    - [Settings Overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings)
   - [Track & Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation)
   - [Sessions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sessions)
-  - [Laps](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#laps)
+  - [Telemetries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries)
   - [Strategies](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies)
   - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups)
-  - [Tyre Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyre-pressures)
+  - [Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures)
   - [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration)
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration)
   
@@ -199,7 +200,8 @@
 	- [Extending capabilities with an LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#extending-conversation-and-reasoning-capabilities-using-an-llm)
     - [Managing Announcements and Warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements)
   - [Racing with Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#racing-with-jona)
-    - [Race Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session)
+    - [Session Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session)
+    - [Race Rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules)
     - [Pitstop Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop)
     - [Strategy Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-strategy)
 	- [Team Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-team)

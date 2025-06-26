@@ -286,9 +286,11 @@ namespace ACSHMSpotter {
 
         const double PI = 3.14159265;
 
-		long cycle = 0;
+        long cycle = 0;
+        long nextSpeedUpdate = 0;
+		bool enabled = true;
 
-		const double nearByXYDistance = 10.0;
+        const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
 		double longitudinalRearDistance = 5;
@@ -772,7 +774,8 @@ namespace ACSHMSpotter {
 		int completedLaps = 0;
 		int numAccidents = 0;
 
-		string semFileName = "";
+        string semFileName = "";
+        int thresholdSpeed = 60;
 
         bool checkAccident()
         {
@@ -1841,6 +1844,9 @@ namespace ACSHMSpotter {
 
             if (args.Length > 4)
                 semFileName = args[4];
+
+            if (args.Length > 5)
+                thresholdSpeed = int.Parse(args[5]);
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry, string telemetryFolder = "")
@@ -1917,14 +1923,33 @@ namespace ACSHMSpotter {
 							{
 								updateTopSpeed();
 
+								if (cycle > nextSpeedUpdate)
+								{
+									nextSpeedUpdate = cycle + 50;
+
+									if ((physics.SpeedKmh >= thresholdSpeed) && !enabled)
+									{
+										enabled = true;
+
+                                        SendSpotterMessage("enableSpotter");
+                                    }
+									else if ((physics.SpeedKmh < thresholdSpeed) && enabled)
+                                    {
+                                        enabled = false;
+
+                                        SendSpotterMessage("disableSpotter");
+                                    }
+                                }
+
 								cycle += 1;
 
-								if (checkAccident())
-									wait = false;
-								else if (checkFlagState() || checkPositions())
-									wait = false;
-								else
-									wait = !checkPitWindow();
+								if (enabled)
+									if (checkAccident())
+										wait = false;
+									else if (checkFlagState() || checkPositions())
+										wait = false;
+									else
+										wait = !checkPitWindow();
 							}
 							else
 							{

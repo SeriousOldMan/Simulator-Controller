@@ -187,7 +187,7 @@ Beside these customizable rules, a *special* rule exists, which integrates the *
 
 	dotNET Applications && DLLs=Special
 
-To use this, you must also set the path to the *MSBuild Bin* directory using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). If this path is set, *Simulator Tools* searches the *Sources\Foreign* folder for "*.sln" files and runs *MSBuild* on them.
+To use this, you must also set the path to the *MSBuild Bin* directory using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). If this path is set, *Simulator Tools* searches the *Sources\Special* folder for "*.sln" files and runs *MSBuild* on them.
 
 Normally you will never need to change the build rules when developing your own plugins, as long as they will reside in the standard *Plugins* folders. But, if you decide to put them elsewhere, you might want to add an dependency to this place. To do this, copy *Simulator Tools.targets* to the *Simulator Controller\Config* folder, which is located in the *Documents* folder in your user home folder.
 
@@ -285,7 +285,7 @@ When you want substitute your own translations, you don't have to copy the whole
 	Yes=>Aber natürlich
 	No=>Auf keinen Fall
 
-As you can see, you have to provide the "[Locale]" header and the two line for the translations of "Yes" and "No". Store this file as "Translations.de" in the *Simulator Controller\Translations* folder in your user *Documents* folder, where it will be found during loading. You can also use the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor) for small changes to a given language translation, but I do not recommend to use this tool to introduce a full new language. It will be way faster to use a Unicode-capable text editor like notepadd++ for this purpose.
+As you can see, you have to provide the "[Locale]" header and the two line for the translations of "Yes" and "No". Store this file as "Translations.de" in the *Simulator Controller\Translations* folder in your user *Documents* folder, where it will be found during loading. You can also use the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor) for small changes to a given language translation, but I do not recommend to use this tool to introduce a full new language. It will be way faster to use a Unicode-capable text editor like notepad++ for this purpose.
 
 Good to know: You can enable the [*Debug* mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-configuration-tool) in "Simulator Configuration" to create a file "Translations.report" in the *Temp* directory. This file contains information about missing or duplicate translations.
 
@@ -312,7 +312,7 @@ Also a special case and maybe a candidate to keep the original English terms, si
 
 #### Settings in the "Session Database"
 
-Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar with the "Race Settings" area in the "Session Database" and read the documentation about the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings). The original translation files are named "Settings.LC", where *LC* again is the language code. 
+Another special case, the translations for the (race) settings available in the "Session Database". Before you translate this stuff, make yourself familar with the "Race Settings" area in the "Session Database" and read the documentation about the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings). The original translation files are named "Settings.LC", where *LC* again is the language code. 
 
 ### Translation of Assistant grammars
 

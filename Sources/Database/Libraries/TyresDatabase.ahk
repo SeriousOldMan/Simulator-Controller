@@ -185,8 +185,8 @@ class TyresDatabase extends SessionDatabase {
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
-			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			for ignore, condition in database.query("Tyres.Pressures.Distribution"
+												  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
 										    , condition["Compound"], condition["Compound.Color"])] := true
 		}
@@ -423,7 +423,7 @@ class TyresDatabase extends SessionDatabase {
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
 				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false, retry := 100) {
-		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure
+		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure, compounds, compoundColors
 
 		if !driver
 			driver := this.ID
@@ -450,10 +450,28 @@ class TyresDatabase extends SessionDatabase {
 			tyres := ["FL", "FR", "RL", "RR"]
 			types := ["Cold", "Hot"]
 
-			for typeIndex, tPressures in [coldPressures, hotPressures]
-				for tyreIndex, pressure in tPressures
-					this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
+			if InStr(compound, ",") {
+				compounds := string2Values(",", compound)
+				compoundColors := string2Values(",", compoundColor)
+
+				if (compounds.Length = 2) {
+					compounds.InsertAt(1, compounds[1])
+					compoundColors.InsertAt(1, compoundColors[1])
+					compounds.Push(compounds[3])
+					compoundColors.Push(compoundColors[3])
+				}
+
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature)
+										  , compounds[tyreIndex], compoundColors[tyreIndex]
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
+			}
+			else
+				for typeIndex, tPressures in [coldPressures, hotPressures]
+					for tyreIndex, pressure in tPressures
+						this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
+										  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver, retry)
 		}
 		catch Any as exception {
 			if retry
@@ -759,9 +777,6 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 											wasNull := false
 										}
 
-										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . StrLower(identifier) . "'") = 0)
-											identifier := false
-
 										properties := substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																		. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																		. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
@@ -774,10 +789,10 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																		 , Type: pressures["Type"], Tyre: pressures["Tyre"]
 																		 , Pressure: pressures["Pressure"], Count: pressures["Count"]})
 
-										if identifier
-											connector.UpdateData("TyresPressuresDistribution", identifier, properties)
-										else
+										if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . StrLower(identifier) . "'") = 0)
 											connector.CreateData("TyresPressuresDistribution", properties)
+										else
+											connector.UpdateData("TyresPressuresDistribution", identifier, properties)
 
 										counter += 1
 

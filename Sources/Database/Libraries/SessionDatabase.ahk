@@ -80,6 +80,23 @@ class SessionDatabase extends ConfigurationItem {
 
 	iUseCommunity := false
 
+	class TrackScanningImportTask extends ProgressTask {
+		iOptionsCallback := false
+
+		__New(title, optionsCallback) {
+			this.iOptionsCallback := optionsCallback
+
+			super.__New(title)
+		}
+
+		updateProgress() {
+			if this.iOptionsCallback
+				super.updateProgress(this.iOptionsCallback.Call())
+			else
+				super.updateProgress()
+		}
+	}
+
 	static ID {
 		Get {
 			return SessionDatabase.sID
@@ -1116,9 +1133,11 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getCarName(simulator, car) {
 		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Names", car, car)
+									 , "Car Names", car, kUndefined)
 
-		if (!name || (name = ""))
+		if (name == kUndefined)
+			name := normalizeFileName(car)
+		else if (!name || (name = ""))
 			name := car
 
 		return name
@@ -1130,10 +1149,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getCarCode(simulator, car) {
 		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Codes", car, car)
+									 , "Car Codes", car, kUndefined)
 
-		if (!code || (code = ""))
-			code := car
+		if (code == kUndefined)
+			code := normalizeFileName(car)
+		else if (!code || (code = ""))
+			code := normalizeFileName(car)
 
 		return code
 	}
@@ -1198,12 +1219,18 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getTrackName(simulator, track, long := true) {
 		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , long ? "Track Names Long" : "Track Names Short", track, track)
+									 , long ? "Track Names Long" : "Track Names Short", track, kUndefined)
 
-		if (!name || (name = ""))
+		if ((name != kUndefined) && (StrLen(name) < 5))
+			name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+									 , "Track Names Long", track, name)
+
+		if (name == kUndefined)
+			name := normalizeFileName(track)
+		else if (!name || (name = ""))
 			name := track
 
-		return name
+		return StrTitle(name)
 	}
 
 	getTrackName(simulator, track, long := true) {
@@ -1212,10 +1239,12 @@ class SessionDatabase extends ConfigurationItem {
 
 	static getTrackCode(simulator, track) {
 		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Codes", track, track)
+									 , "Track Codes", track, kUndefined)
 
-		if (!code || (code = ""))
-			code := track
+		if (code == kUndefined)
+			code := normalizeFileName(track)
+		else if (!code || (code = ""))
+			code := normalizeFileName(track)
 
 		return code
 	}
@@ -1518,6 +1547,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
+		local running := 0
 		local name, infoFileName
 
 		importFromSecondMonitor(&info) {
@@ -1548,97 +1578,188 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 		}
 
+		scanningProgress() {
+			return {progress: Round(running * 100), message: translate("Scanning track..."), color: "Green"}
+		}
+
 		importFromMoTeC(&info) {
 			local steerLock := this.getCarSteerLock(simulator, car, track)
 			local channels := false
 			local skipNext := false
 			local time := 0
+			local trackMap := this.getTrackMap(simulator, track)
+			local trackLength := 0
+			local points := []
+			local firstPass := true
 			local entry, ignore, channel, importFileName, infoFileName
 
 			static motecChannels := ["Distance", "THROTTLE", "BRAKE"
 								   , "STEERANGLE", "GEAR", "RPMS", "SPEED"
 								   , "TC", "ABS", "G_LON", "G_LAT", "UNKNOWN (PosX)", "UNKNOWN (PosY)", "TIME"]
 
-			try {
-				importFileName := temporaryFileName("Import", "telemetry")
+			if trackMap {
+				loop getMultiMapValue(trackMap, "Map", "Points")
+					points.Push([getMultiMapValue(trackMap, "Points", A_Index . ".X"), getMultiMapValue(trackMap, "Points", A_Index . ".Y")])
 
-				deleteFile(importFileName)
+				try {
+					importFileName := temporaryFileName("Import", "telemetry")
 
-				info := newMultiMap()
+					deleteFile(importFileName)
 
-				loop Read, fileName {
-					if ((A_Index = 1) && !InStr(A_LoopReadLine, "MoTeC CSV File"))
-						return false
+					info := newMultiMap()
 
-					if skipNext {
-						skipNext := false
+					loop 2 {
+						if (A_Index = 2) {
+							channels := false
+							skipNext := false
+							time := 0
+							running := 0
 
-						continue
-					}
+							firstPass := false
+						}
 
-					if (Trim(A_LoopReadLine) != "") {
-						entry := collect(string2Values(",", A_LoopReadLine), (f) => StrReplace(f, "`"", ""))
+						loop Read, fileName {
+							if ((A_Index = 1) && !InStr(A_LoopReadLine, "MoTeC CSV File"))
+								return false
 
-						if (entry[1] = "Venue")
-							setMultiMapValue(info, "Info", "Track", entry[2])
-						else if (entry[1] = "Duration")
-							setMultiMapValue(info, "Info", "LapTime", entry[2])
-						else if ((entry[1] = "Driver") && (Trim(entry[2]) != ""))
-							setMultiMapValue(info, "Info", "Driver", Trim(entry[2]))
-						else if (entry[1] = "Range")
-							setMultiMapValue(info, "Info", "Lap", Trim(StrReplace(entry[2], "Lap", "")))
-						else if !channels {
-							if inList(motecChannels, entry[1]) {
-								channels := []
+							if skipNext {
+								skipNext := false
 
-								for ignore, channel in motecChannels
-									channels.Push([channel, inList(entry, channel)])
+								continue
+							}
 
-								skipNext := true
+							if (Trim(A_LoopReadLine) != "") {
+								entry := collect(string2Values(",", A_LoopReadLine), (f) => StrReplace(f, "`"", ""))
+
+								if (entry[1] = "Venue")
+									setMultiMapValue(info, "Info", "Track", entry[2])
+								else if (entry[1] = "Duration")
+									setMultiMapValue(info, "Info", "LapTime", entry[2])
+								else if ((entry[1] = "Driver") && (Trim(entry[2]) != ""))
+									setMultiMapValue(info, "Info", "Driver", Trim(entry[2]))
+								else if (entry[1] = "Range")
+									setMultiMapValue(info, "Info", "Lap", Trim(StrReplace(entry[2], "Lap", "")))
+								else if !channels {
+									if inList(motecChannels, entry[1]) {
+										channels := []
+
+										for ignore, channel in motecChannels
+											channels.Push([channel, inList(entry, channel)])
+
+										skipNext := true
+									}
+								}
+								else {
+									line := []
+
+									for ignore, channel in channels {
+										if channel[2] {
+											value := entry[channel[2]]
+
+											if isNumber(value) {
+												switch channel[1], false {
+													case "Distance":
+														if firstPass {
+															running += 0.0001
+
+															if (running > 1)
+																running := 0
+														}
+														else
+															running := (value / trackLength)
+													case "THROTTLE", "BRAKE":
+														value := (value / 100)
+													case "STEERANGLE":
+														if steerLock
+															value := (- value / steerLock)
+														else
+															value := (- value)
+													case "TIME":
+														time := Max(time, value)
+
+														value *= 1000
+												}
+
+												line.Push(value)
+											}
+											else
+												line.Push(kNull)
+										}
+										else if !firstPass
+											if (channel[1] = "UNKNOWN (PosX)")
+												line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][1])
+											else if (channel[1] = "UNKNOWN (PosY)")
+												line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][2])
+											else
+												line.Push("n/a")
+
+										if firstPass
+											trackLength := Max(trackLength, line[1])
+									}
+
+									if !firstPass
+										FileAppend(values2String(";", line*) . "`n", importFileName)
+								}
 							}
 						}
-						else {
-							line := []
 
-							for ignore, channel in channels
-								if channel[2] {
-									value := entry[channel[2]]
+						if !getMultiMapValue(info, "Info", "Driver", false)
+							setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
 
-									if isNumber(value) {
-										switch channel[1], false {
-											case "THROTTLE", "BRAKE":
-												value := (value / 100)
-											case "STEERANGLE":
-												if steerLock
-													value := (- value / steerLock)
-												else
-													value := (- value)
-											case "TIME":
-												time := Max(time, value)
+						setMultiMapValue(info, "Info", "LapTime", Round(time, 2))
 
-												value *= 1000
-										}
+						if FileExist(importFileName) {
+							infoFileName := temporaryFileName("Import", "info")
 
-										line.Push(value)
-									}
-									else
-										line.Push(kNull)
-								}
-								else
-									line.Push("n/a")
+							writeMultiMap(infoFileName, info)
 
-							FileAppend(values2String(";", line*) . "`n", importFileName)
+							info := infoFileName
+
+							return importFileName
 						}
 					}
 				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
 
-				if !getMultiMapValue(info, "Info", "Driver", false)
-					setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+			return false
+		}
 
-				setMultiMapValue(info, "Info", "LapTime", Round(time, 2))
+		importFromIRacing(&info) {
+			local trackData := []
+			local trackFile := this.getTrackData(simulator, track)
+			local directory, name, importFileName, infoFileName
 
-				if FileExist(importFileName) {
+			if trackFile {
+				loop Read, trackFile
+					trackData.Push(string2Values(A_Space, A_LoopReadLine))
+
+				SplitPath(fileName, , &directory, , &name)
+
+				info := readMultiMap(directory . "\" . name . ".info")
+
+				setMultiMapValue(info, "Info", "Track", track)
+				setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+
+				try {
+					importFileName := temporaryFileName("Import", "telemetry")
 					infoFileName := temporaryFileName("Import", "info")
+
+					deleteFile(importFileName)
+
+					loop Read, fileName
+						if (Trim(A_LoopReadLine) != "") {
+							line := string2Values(";", A_LoopReadLine)
+
+							running := (Max(1, Min(1000, Round(line[12] * 1000))) / 1000)
+
+							line[12] := trackData[running][1]
+							line.Push(trackData[running][2])
+
+							FileAppend(values2String(";", line*) . "`n", importFileName)
+						}
 
 					writeMultiMap(infoFileName, info)
 
@@ -1646,10 +1767,12 @@ class SessionDatabase extends ConfigurationItem {
 
 					return importFileName
 				}
+				catch Any as exception {
+					logError(exception)
+				}
 			}
-			catch Any as exception {
-				logError(exception)
-			}
+
+			info := false
 
 			return false
 		}
@@ -1658,7 +1781,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if InStr(fileName, ".json") {
 			if verbose
-				withTask(WorkingTask(translate("Extracting ") . name), () {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
 					fileName := importFromSecondMonitor(&info)
 				})
 			else
@@ -1668,11 +1791,21 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".CSV") {
 			if verbose
-				withTask(WorkingTask(translate("Extracting ") . name), () {
+				withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
 					fileName := importFromMoTec(&info)
 				})
 			else
 				fileName := importFromMoTec(&info)
+
+			return fileName
+		}
+		else if InStr(fileName, ".irc") {
+			if verbose
+				withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
+					fileName := importFromIRacing(&info)
+				})
+			else
+				fileName := importFromIRacing(&info)
 
 			return fileName
 		}
@@ -2711,7 +2844,107 @@ normalizeCompound(qualifiedCompound) {
 	return compound(tyreCompound, tyreCompoundColor)
 }
 
-parseDriverName(fullName, &forName, &surName, &nickName) {
+equalCompounds(compounds1, compounds2) {
+	if (compounds1.Length != compounds2.Length)
+		return false
+	else
+		loop compounds1.Length
+			if (compounds1[A_Index] != compounds2[A_Index])
+				return false
+
+	return true
+}
+
+compounds(tyreCompounds, tyreCompoundColors := false) {
+	local compounds := []
+	local theCompound
+
+	loop tyreCompounds.Length {
+		theCompound := tyreCompounds[A_Index]
+
+		if (theCompound && (theCompound != "-"))
+			compounds.Push(compound(theCompound, (tyreCompoundColors ? tyreCompoundColors[A_Index] : false)))
+		else
+			compounds.Push("-")
+	}
+
+	return compounds
+}
+
+compoundColors(tyreCompounds) {
+	local compounds := []
+
+	loop tyreCompounds.Length {
+		theCompound := tyreCompounds[A_Index]
+
+		if (theCompound && (theCompound != "-"))
+			compounds.Push(compoundColor(theCompound))
+		else
+			compounds.Push("-")
+	}
+
+	return compounds
+}
+
+normalizeCompounds(compounds) {
+	if !isObject(compounds)
+		compounds := string2Values(",", compounds)
+
+	loop compounds.Length {
+		compound := compounds[A_Index]
+
+		if (!compound || (compound = "-"))
+			compounds[A_Index] := "-"
+		else
+			compounds[A_Index] := normalizeCompound(compound)
+	}
+
+	return compounds
+}
+
+splitCompounds(compounds, &tyreCompounds, &tyreCompoundColors) {
+	tyreCompounds := []
+	tyreCompoundColors := []
+
+	do(compounds, (compound) {
+		local color
+
+		if (compound = "-") {
+			tyreCompounds.Push("-")
+			tyreCompoundColors.Push("-")
+		}
+		else {
+			splitCompound(compound, &compound, &color)
+
+			tyreCompounds.Push(compound)
+			tyreCompoundColors.Push(color)
+		}
+	})
+}
+
+combineCompounds(&compounds, &compoundColors := false) {
+	local newCompounds, newCompoundColors
+
+	if (compounds.Length = 1)
+		return
+	else {
+		newCompounds := removeDuplicates(compounds)
+
+		if (newCompounds.Length = 1)
+			if !compoundColors
+				compounds := newCompounds
+			else {
+				newCompoundColors := removeDuplicates(compoundColors)
+
+				if (newCompoundColors.Length = 1) {
+					compounds := newCompounds
+					compoundColors := newCompoundColors
+				}
+			}
+	}
+}
+
+parseDriverName(fullName, &forName, &surName, &nickName?) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)
 
@@ -2733,7 +2966,7 @@ parseDriverName(fullName, &forName, &surName, &nickName) {
 	}
 }
 
-driverName(forName, surName, nickName) {
+driverName(forName, surName, nickName := false) {
 	local name := ""
 
 	if (forName != "")
@@ -2741,6 +2974,9 @@ driverName(forName, surName, nickName) {
 
 	if (surName != "")
 		name .= (surName . A_Space)
+
+	if !nickName
+		nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
 
 	if (nickName != "")
 		name .= (translate("(") . nickName . translate(")"))
@@ -2857,7 +3093,7 @@ parseData(properties) {
 }
 
 synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
-	local ignore, simulator, db, modified, identifier, driver, drivers, wasNull
+	local ignore, simulator, db, modified, identifier, driver, drivers, wasNull, properties
 
 	for ignore, simulator in simulators {
 		simulator := sessionDB.getSimulatorCode(simulator)
@@ -2900,16 +3136,18 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 						else
 							wasNull := false
 
-						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0) {
-							connector.CreateData("License"
-											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
-																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-																   , {Identifier: StrLower(driver["Identifier"]), Simulator: simulator
-																	, Driver: driver["ID"], Forname: driver["Forname"]
-																	, Surname: driver["Surname"], Nickname: driver["Nickname"]}))
+						properties := substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
+													    . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+														, {Identifier: StrLower(driver["Identifier"]), Simulator: simulator
+														 , Driver: driver["ID"], Forname: driver["Forname"]
+														 , Surname: driver["Surname"], Nickname: driver["Nickname"]})
 
-							counter += 1
-						}
+						if (connector.CountData("License", "Identifier = '" . StrLower(driver["Identifier"]) . "'") = 0)
+							connector.CreateData("License", properties)
+						else
+							connector.UpdateData("License", driver["Identifier"], properties)
+
+						counter += 1
 
 						driver["Synchronized"] := timestamp
 

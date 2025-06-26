@@ -156,6 +156,26 @@ inline void printData2(ostringstream* output, const string name, const T(&v)[S][
 	(*output) << endl;
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+std::string normalizeName(string result) {
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
 inline const string getGrip(ACC_TRACK_GRIP_STATUS gripStatus) {
 
 	switch (gripStatus) {
@@ -346,6 +366,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "BrakeDiscLifeRaw", pf->discLife);
 		printData(&output, "FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData(&output, "RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
+
+		if (pf->waterTemp)
+			printData(&output, "WaterTemperature", pf->waterTemp);
 	
 		output << "[Stint Data]" << endl;
 		
@@ -406,8 +429,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData(&output, "Session", getSession(gf->session));
 		output << "ID=" << gf->playerCarID << endl;
-		output << "Car=" << getString(sf->carModel) << endl;
-		output << "Track=" << getString(sf->track) << endl;
+		output << "Car=" << normalizeName(getString(sf->carModel)) << endl;
+		output << "Track=" << normalizeName(getString(sf->track)) << endl;
 		output << "SessionFormat=Time" << endl;
 		printData(&output, "FuelAmount", sf->maxFuel);
 

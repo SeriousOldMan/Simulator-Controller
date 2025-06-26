@@ -152,7 +152,7 @@ killZombies() {
 
 startupProcessManager() {
 	local icon := kIconsDirectory . "Observer.ico"
-
+	
 	TraySetIcon(icon, "1")
 	A_IconTip := "Process Manager"
 
@@ -161,6 +161,28 @@ startupProcessManager() {
 	PeriodicTask(killZombies, 500).start()
 
 	startupProcess()
+
+	if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
+		FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+
+	if (DateAdd(FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M"), 1, "Days") < A_Now) {
+		try {
+			deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
+
+			FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
+		}
+
+		Task.startTask(() {
+			local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+			local ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
+			local fileName := (ID . "." . A_Now . ".log")
+
+			if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Critical.log", "Diagnostics-Uploads/" . fileName)
+				deleteFile(kUserHomeDirectory . "Diagnostics\Critical.log")
+
+			ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
+		}, 1000, kLowPriority)
+	}
 }
 
 

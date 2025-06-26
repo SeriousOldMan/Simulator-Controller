@@ -114,6 +114,8 @@ void sendAnalyzerMessage(const char* message) {
 #define PI 3.14159265
 
 long cycle = 0;
+long nextSpeedUpdate = 0;
+bool enabled = true;
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
@@ -575,6 +577,8 @@ int completedLaps = 0;
 int numAccidents = 0;
 
 std::string semFileName = "";
+
+int thresholdSpeed = 60;
 
 bool fileExists(std::string name) {
 	FILE* file;
@@ -1649,6 +1653,9 @@ int main(int argc, char* argv[]) {
 
 			if (argc > 5)
 				semFileName = argv[5];
+
+			if (argc > 6)
+				thresholdSpeed = atoi(argv[6]);
 		}
 	}
 
@@ -1732,15 +1739,34 @@ int main(int argc, char* argv[]) {
 						if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
 							updateTopSpeed(localCopy);
 
+							if (cycle > nextSpeedUpdate)
+							{
+								nextSpeedUpdate = cycle + 50;
+
+								if (((localCopy->mSpeed * 3.6) >= thresholdSpeed) && !enabled)
+								{
+									enabled = TRUE;
+
+									sendSpotterMessage("enableSpotter");
+								}
+								else if (((localCopy->mSpeed * 3.6) < thresholdSpeed) && enabled)
+								{
+									enabled = FALSE;
+
+									sendSpotterMessage("disableSpotter");
+								}
+							}
+
 							cycle += 1;
 
 							if (!startGo || !greenFlag(localCopy))
-								if (checkAccident(localCopy))
-									wait = false;
-								else if (checkFlagState(localCopy) || checkPositions(localCopy))
-									wait = false;
-								else
-									wait = !checkPitWindow(localCopy);
+								if (enabled)
+									if (checkAccident(localCopy))
+										wait = false;
+									else if (checkFlagState(localCopy) || checkPositions(localCopy))
+										wait = false;
+									else
+										wait = !checkPitWindow(localCopy);
 						}
 						else {
 							longitudinalRearDistance = 5;

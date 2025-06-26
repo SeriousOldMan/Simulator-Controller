@@ -246,7 +246,7 @@ class Database {
 		else {
 			result := true
 
-			for name, ignore in getKeys(this.Schemas)
+			for ignore, name in getKeys(this.Schemas)
 				if this.lock(name, wait)
 					locked.Push(name)
 				else {
@@ -280,7 +280,7 @@ class Database {
 				throw "Trying to unlock a file that is not locked in Database.unlock..."
 		}
 		else
-			for name, ignore in getKeys(this.Schemas)
+			for ignore, name in getKeys(this.Schemas)
 				this.unlock(name, backup)
 	}
 
@@ -470,7 +470,7 @@ class Database {
 						try {
 							file.Pos := 0
 
-							bakFile := FileOpen(fileName . ".bak", "w")
+							bakFile := FileOpen(fileName . ".bak", "w", "UTF-8")
 
 							bakFile.Write(file.Read())
 						}
@@ -485,7 +485,13 @@ class Database {
 								bakFile.Close()
 						}
 
-					file.Length := 0
+					if false
+						file.Length := 0
+					else {
+						file.Close()
+
+						file := FileOpen(fileName, "w", "UTF-8")
+					}
 
 					schema := this.Schemas[name]
 

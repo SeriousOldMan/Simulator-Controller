@@ -20,6 +20,17 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+normalizeFileName(fileName) {
+	local ignore, character
+
+	static disallowedCharacters := ["/" , ":", "*", "?", "<", ">", "|"]
+
+	for ignore, character in disallowedCharacters
+		fileName := StrReplace(fileName, character, "")
+
+	return fileName
+}
+
 getFileName(fileName, directories*) {
 	local driveName, ignore, directory
 
@@ -78,6 +89,35 @@ normalizeFilePath(filePath) {
 		}
 		else
 			return filePath
+	}
+}
+
+directoryContains(directory, fileOrDirectory) {
+	local curWorkingDir := A_WorkingDir
+	local folder, container
+
+	try {
+		SetWorkingDir(directory)
+
+		container := A_WorkingDir
+
+		if InStr(FileExist(fileOrDirectory), "D") {
+			SetWorkingDir(fileOrDirectory)
+
+			return InStr(A_WorkingDir, container)
+		}
+		else if InStr(FileExist(fileOrDirectory), "F") {
+			SplitPath(fileOrDirectory, , &folder)
+
+			SetWorkingDir(folder)
+
+			return InStr(A_WorkingDir, container)
+		}
+		else
+			return InStr(fileOrDirectory, directory)
+	}
+	finally {
+		SetWorkingDir(curWorkingDir)
 	}
 }
 

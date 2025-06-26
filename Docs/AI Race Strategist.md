@@ -82,6 +82,8 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 5. [Italian version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(IT))
 
+6. [Portuguese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(PT))
+
 I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
 #### Extending conversation and reasoning capabilities using an LLM
@@ -128,7 +130,7 @@ Important: In the default configuration, Cato will be activated in the first lap
 
 ### Multi-class support
 
-Cato *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", in what way Cato uses the information about the car classes and cup categories to partition the grid.
+Cato *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", in what way Cato uses the information about the car classes and cup categories to partition the grid.
 
 ### Race Settings
 
@@ -141,6 +143,8 @@ Normally, Cato will use a predefined strategy which can be created using the ["S
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/race%20settings%205.JPG)
 
 To prepare for a race with this kind of strategy handling, set *Active* to "Yes" and enter the race rules using the entry fields below. This settings have more than less the same meaning as in the [tab *Rules & Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in the "Strategy Workbench". Most important is the number of required pitstops and whether refueling and tyre changes are required. You can also define a pitstop window here. And if the session has a restricted number of tyre sets, you can specify them as well. Please note, that additional information from the other tabs will also be used when the resulting strategy is calculated, for example the session configuration with formation lap and post race lap or the pitstop service times.
+
+Using the list in the lower part you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used by Cato to determine the best tyre set for each pitstop in the derived strategy. If a given compound mixture is not available in a particular race, set the number of available tyre sets to **0**.
 
 #### Tab *Strategy*
 
@@ -156,6 +160,8 @@ Using the fields at the end of the first group, you can customize the projection
 With the second field, *Overtake Delta*, you specify the number of seconds as time discount for each overtake for the passing and for the passed car, whereas you specify the percentage of track length in front of the car, which will be taken into account for traffic density analysis.
 
 The second group of fields specify the time required for several pitstop activities, as well as the pitstop window, in which the best pitstop lap will be derived. With the value of *Pitstop Delta*, you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service time minus the time to pass the pit area on the track, i.e. Drive through vs. Drive by), The fields below specify the time required for the various pit services, like changing tyres, refueling, and so on, as well as these times are combined into an overall pitstop service time.
+
+Additionally worth to be mentioned is the field *Pitlane Delta*, with which you supply the difference time needed for a normal pitstop (time for pit in and pit out but without any service minus the time to pass the pit area on the track). This information is used by the Assistants to decide, whether an early pitstop for a tyre change or damage repair might be worthwhile.
 
 ### Pitstop Recommendation
 
@@ -269,7 +275,7 @@ Cato uses the same AI kernel as Jona. In fact, large parts of the basic rule set
 
 The complete position information is requested from the simulation gane every 10 seconds (this is the default, you can lower that in the settings, if your PC is fast enough). For each car, the data contains the current position, the last lap time and the fraction of the track which has been driven since the car last crossed the S/F line. The data acquisition is controlled by the "Race Strategist" plugin. For *Assetto Corsa*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2* and *Project CARS 2* the data is requested from shared memory using the same data providers, which are used by Jona as well, whereas a special UDP client is used for *Assetto Corsa Competizione* (due to the asynchronous nature of the UDP interface for *Assetto Corsa Competizione*, the provided data is not always exact).
 
-After the data has been gathered, it is then transfered to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
+After the data has been gathered, it is then transferred to the *Race Strategist* process and loaded into the knowledge base, where the statistical models create several projections for future position development. Beside that, a historical copy is created for each lap. 
 
 	[Position Data]
 	Driver.Car=1

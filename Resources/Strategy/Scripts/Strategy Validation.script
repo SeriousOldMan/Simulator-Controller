@@ -1,0 +1,115 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Strategy Validation Script      ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                          Public Functions Section                       ---
+-------------------------------------------------------------------------------
+
+function totalFuel()
+	return startFuel(), pitstopFuel()
+end
+
+function startFuel()
+	return __Setup[1]
+end
+
+function pitstopFuel()
+	local nf = 0
+	local f = 0
+	
+	for i, pf in ipairs(__PitstopRefuels) do
+		f = f + pf
+		
+		if pf > 0 then
+			nf = nf + 1
+		end
+	end
+		
+	return f, nf
+end
+
+function startTyreCompound()
+	return {compound = __Setup[2], color = __Setup[3]}
+end
+
+function startTyreSet()
+	return __Setup[4]
+end
+
+function pitstopTyreCompounds()
+	local tcs = {}
+	
+	for i=1, #__PitstopTyreCompounds do
+		local tc = __PitstopTyreCompounds[i]
+		
+		if tc ~= nil and tc ~= false and tc ~= 0 then
+			table.insert(tcs, {compound = tc, color = __PitstopTyreCompoundColors[i]})
+		end
+	end
+		
+	return tcs
+end
+
+function pitstopTyreSets()
+	local tss = {}
+	
+	for i, ts in ipairs(__PitstopTyreSets) do
+		if ts ~= nil and ts ~= false and ts ~= 0 then
+			table.insert(tss, ts)
+		end
+	end
+	
+	return tss
+end
+
+function refuels()
+	local f, nf = pitstopFuel()
+	
+	return nf
+end
+
+function tyreCompounds()
+	local tcs = { startTyreCompound() }
+	
+	for i, tc in ipairs(pitstopTyreCompounds()) do
+		table.insert(tcs, tc)
+	end
+	
+	return tcs
+end
+
+function tyreSets()
+	local tss = { startTyreSet() }
+	
+	for i, ts in ipairs(pitstopTyreSets()) do
+		table.insert(tss, ts)
+	end
+	
+	return tss
+end
+
+function pitstops()
+	return #__PitstopRefuels
+end
+
+function pitstop(nr)
+	local tc = __PitstopTyreCompounds[nr]
+	local tcc = __PitstopTyreCompoundColors[nr]
+	local tc, tcc, ts
+	
+	if tc == nil or tc == false or tc == 0 then
+		tcc = false
+		ts = false
+	end
+		
+	return {lap = __PitstopLaps[nr],
+			time = __PitstopTimes[nr],
+			fuel = __PitstopRefuels[nr],
+			tyreCompound = tc,
+			tyreCompoundColor = tcc,
+			tyreSet = ts}
+end

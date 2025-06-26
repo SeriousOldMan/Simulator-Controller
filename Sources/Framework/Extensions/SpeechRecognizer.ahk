@@ -206,7 +206,7 @@ class SpeechRecognizer {
 	iGoogleMode := "HTTP"
 	iGoogleAPIKey := false
 
-	iWhisperServer := false
+	iWhisperServerURL := false
 
 	iCapturedAudioFile := false
 
@@ -218,6 +218,81 @@ class SpeechRecognizer {
 	_grammars := CaseInsenseMap()
 
 	_recognitionHandlers := []
+
+	class AudioCapture {
+		iCtrlFileName := temporaryFileName("audioCapture", "ctrl")
+		iAudioCaptureFileName := false
+		iAudioCapturePID := false
+
+		__New() {
+			OnExit((*) {
+				this.StopRecognizer()
+
+				return false
+			})
+		}
+
+		OkCheck() {
+			return "Ok"
+		}
+
+		StartRecognizer(captureFileName) {
+			local pid := false
+			local message
+
+			static first := true
+
+			deleteFile(this.iCtrlFileName)
+
+			this.iAudioCapturePID := false
+
+			try {
+				Run(kBinariesDirectory . "Audio Capture\Audio Capture.exe `"" . this.iCtrlFileName . "`" `"" . captureFileName . "`""
+				  , kBinariesDirectory . "Audio Capture", "Hide", &pid)
+
+				if pid
+					this.iAudioCapturePID := pid
+				else
+					throw "Cannot start audio capture process..."
+
+				return true
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				message := substituteVariables(translate("Cannot start %application% (%exePath%) - please check the configuration...")
+											 , {application: "Audio Capture.exe", exePath: kBinariesDirectory . "Audio Capture\Audio Capture.exe"})
+
+				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))
+
+				if first {
+					showMessage(message, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+					first := false
+				}
+
+				return false
+			}
+		}
+
+		StopRecognizer() {
+			tries := 5
+
+			if this.iAudioCapturePID {
+				FileAppend("Stop", this.iCtrlFileName)
+
+				while ((tries-- > 0) && ProcessExist(this.iAudioCapturePID))
+					Sleep(100)
+
+				if ProcessExist(this.iAudioCapturePID)
+					ProcessClose(this.iAudioCapturePID)
+
+				this.iAudioCapturePID := false
+			}
+
+			return true
+		}
+	}
 
 	Routing {
 		Get {
@@ -302,11 +377,7 @@ class SpeechRecognizer {
 		if (engine = "Whisper")
 			engine := "Whisper Local"
 
-		if (InStr(engine, "Whisper") = 1) {
-			dllName := "Audio Recorder.dll"
-			dllFile := (kBinariesDirectory . "Audio Recorder\" . dllName)
-		}
-		else {
+		if (InStr(engine, "Whisper") != 1) {
 			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
 			dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
 		}
@@ -322,7 +393,7 @@ class SpeechRecognizer {
 		this.iLanguage := language
 
 		try {
-			if (!FileExist(dllFile)) {
+			if (!InStr(engine, "Whisper") && !FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
@@ -359,10 +430,10 @@ class SpeechRecognizer {
 
 				this.Instance := instance
 
-				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine)[1])
+				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine, 2)[1])
 
 				if (engine != "Compiler") {
-					engine := string2Values("|", engine)
+					engine := string2Values("|", engine, 3)
 
 					if !instance.Connect(engine[2], engine[3], ObjBindMethod(this, "_onTextCallback")) {
 						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -393,7 +464,7 @@ class SpeechRecognizer {
 
 				this.iEngine := "Google"
 
-				engine := string2Values("|", engine)
+				engine := string2Values("|", engine, 2)
 
 				if (this.iGoogleMode = "RPC")
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])
@@ -432,19 +503,16 @@ class SpeechRecognizer {
 				if (InStr(engine, "Whisper Server|") = 1) {
 					engine := string2Values("|", engine)
 
-					this.iWhisperServer := engine[2]
+					this.iWhisperServerURL := engine[2]
 					engine := engine[1]
 				}
 
-				if !isDebug()
-					if ((engine = "Whisper Local") && !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe"))
-						throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
-					else if ((engine = "Whisper Server") && !FileExist(kUserHomeDirectory . "Programs\Whisper Server\Whisper Connector.dll"))
-						throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
+				if (!isDebug() && (engine = "Whisper Local") && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
+					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 				this.iEngine := engine
 
-				this.Instance := {AudioRecorder: CLR_LoadLibrary(dllFile).CreateInstance("Speech.AudioRecorder")}
+				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
 				if (engine = "Whisper Server")
 					this.Instance.Connector := CLR_LoadLibrary(kUserHomeDirectory . "Programs\Whisper Server\Whisper Connector.dll").CreateInstance("WhisperConnector.WhisperConnector")
@@ -613,6 +681,8 @@ class SpeechRecognizer {
 	initialize(id) {
 		local recognizer
 
+		; MsgBox id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)
+
 		if this.Instance
 			if ((this.Engine = "Azure") || (this.Engine = "Compiler"))
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
@@ -627,31 +697,40 @@ class SpeechRecognizer {
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
-				return this.Instance.Initialize(id)
+				try {
+					return this.Instance.Initialize(id)
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+				}
 	}
 
 	startRecognizer() {
 		global kNirCmd
 
-		local audioDevice := SpeechRecognizer.sRecognizerAudioDevice
-
-		if (audioDevice && kNirCmd) {
-			try {
-				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				kNirCmd := false
-
-				if !kSilentMode
-					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
-		}
+		local audioDevice
 
 		if this.Instance {
-			if ((this.Engine = "Google") || (InStr(this.Engine, "Whisper") = 1)) {
+			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
+
+			if (audioDevice && kNirCmd) {
+				try {
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					kNirCmd := false
+
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+
+			if ((this.Engine = "Google") || ((InStr(this.Engine, "Whisper") = 1) && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
@@ -718,7 +797,7 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		local request, result, name
+		local request, result, name, install, progress, pid
 
 		if (this.Engine = "Google") {
 			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
@@ -748,7 +827,29 @@ class SpeechRecognizer {
 			if (this.Engine = "Whisper Local") {
 				DirCreate(kTempDirectory . "Whisper")
 
-				RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
+				install := !FileExist(kProgramsDirectory . "Whisper Runtime\_models\faster-whisper-" . this.Model)
+
+				if (install && !kSilentMode)
+					showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
+
+				try {
+					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
+
+					while ProcessExist(pid) {
+						if (install && !kSilentMode) {
+							showProgress({progress: progress++})
+
+							if (progress >= 100)
+								progress := 0
+						}
+
+						Sleep(200)
+					}
+				}
+				finally {
+					if (install && !kSilentMode)
+						hideProgress()
+				}
 
 				deleteFile(audioFile)
 
@@ -769,7 +870,7 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "Whisper Server") {
 				try {
-					this.Instance.Connector.Initialize(this.iWhisperServer, this.Language, this.Model)
+					this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
 
 					result := this.Instance.Connector.Recognize(audioFile)
 

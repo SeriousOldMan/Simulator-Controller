@@ -30,7 +30,10 @@ class BasicStepWizard extends StepWizard {
 
 	Pages {
 		Get {
-			return (1 + (this.BasicSetup ? 1 : 0))
+			if this.SetupWizard.Initialize
+				return (1 + (this.BasicSetup ? 1 : 0))
+			else
+				return 1
 		}
 	}
 
@@ -416,6 +419,9 @@ class BasicStepWizard extends StepWizard {
 
 		static installed := false
 
+		if !this.SetupWizard.Initialize
+			page := 2
+
 		if (page = 2) {
 			fullInstall := (!installed && (!isDevelopment() || (GetKeyState("Ctrl") && GetKeyState("Shift"))))
 
@@ -455,7 +461,7 @@ class BasicStepWizard extends StepWizard {
 
 			this.loadSetup(!fullInstall)
 
-			this.BasicSetup := false
+			this.BasicSetup := false ; this.SetupWizard.Initialize
 		}
 
 		super.showPage(page)
@@ -482,13 +488,24 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
-		if (page = 2) {
-			this.updateSelectedSimulators()
-
-			this.saveSetup()
-		}
+		if !this.SetupWizard.Initialize
+			page := 2
 
 		return super.hidePage(page)
+	}
+
+	savePage(page) {
+		if super.savePage(page) {
+			if (page = 2) {
+				this.updateSelectedSimulators()
+
+				this.saveSetup()
+			}
+
+			return true
+		}
+		else
+			return false
 	}
 
 	updateState() {
@@ -514,6 +531,10 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	testPushToTalk() {
+		this.updateSelectedSimulators()
+
+		this.saveSetup()
+
 		testAssistants(this.SetupWizard, , GetKeyState("Ctrl"))
 	}
 
@@ -811,19 +832,19 @@ class BasicStepWizard extends StepWizard {
 		local key := this.Keys[assistant]
 		local choices := []
 		local languages := []
+		local allLanguages := availableLanguages()
 		local assistantLanguage, code, language, ignore, grammarFile
-
-		for code, language in availableLanguages() {
-			choices.Push(language)
-			languages.Push(code)
-		}
 
 		for ignore, assistant in this.Definition
 			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 				SplitPath(grammarFile, , , &code)
 
 				if !inList(languages, code) {
-					choices.Push(code)
+					if allLanguages.Has(code)
+						choices.Push(allLanguages[code])
+					else
+						choices.Push(code)
+
 					languages.Push(code)
 				}
 			}

@@ -247,7 +247,7 @@ class SpeechSynthesizer {
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
-				synthesizer := string2Values("|", synthesizer)
+				synthesizer := string2Values("|", synthesizer, 3)
 
 				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
@@ -288,7 +288,7 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile)
 				this.iSpeechSynthesizer := this.iSpeechSynthesizer.CreateInstance("Speech.GoogleSpeechSynthesizer")
 
-				synthesizer := string2Values("|", synthesizer)
+				synthesizer := string2Values("|", synthesizer, 2)
 
 				if (this.iGoogleMode = "RPC")
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", synthesizer[2])
@@ -788,6 +788,8 @@ class SpeechSynthesizer {
 					throw "Error while speech synthesizing..."
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				if (this.Synthesizer = "Azure")
 					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
 				else if (this.Synthesizer = "Google")
@@ -806,6 +808,8 @@ class SpeechSynthesizer {
 				this.speak("Portez ce vieux whisky au juge blond qui fume")
 			case "IT":
 				this.speak("Che tempi brevi zio, quando solfeggi")
+			case "PT":
+				this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
 			default:
 				this.speak("The quick brown fox jumps over the lazy dog")
 		}

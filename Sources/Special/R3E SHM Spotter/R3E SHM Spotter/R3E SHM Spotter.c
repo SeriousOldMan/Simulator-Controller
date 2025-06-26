@@ -161,6 +161,8 @@ void sendAnalyzerMessage(char* message) {
 #define PI 3.14159265
 
 long cycle = 0;
+long nextSpeedUpdate = 0;
+BOOL enabled = TRUE;
 
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
@@ -620,6 +622,8 @@ int completedLaps = 0;
 int numAccidents = 0;
 
 char* semFileName = "";
+
+int thresholdSpeed = 60;
 
 BOOL fileExists(char* name) {
 	FILE* file;
@@ -1885,6 +1889,9 @@ int main(int argc, char* argv[])
 
 			if (argc > 5)
 				semFileName = argv[5];
+
+			if (argc > 6)
+				thresholdSpeed = atoi(argv[6]);
 		}
 	}
 
@@ -1937,15 +1944,34 @@ int main(int argc, char* argv[])
 						else {
 							updateTopSpeed();
 
+							if (cycle > nextSpeedUpdate)
+							{
+								nextSpeedUpdate = cycle + 50;
+
+								if (((map_buffer->car_speed * 3.6f) >= thresholdSpeed) && !enabled)
+								{
+									enabled = TRUE;
+
+									sendSpotterMessage("enableSpotter");
+								}
+								else if (((map_buffer->car_speed * 3.6f) < thresholdSpeed) && enabled)
+								{
+									enabled = FALSE;
+
+									sendSpotterMessage("disableSpotter");
+								}
+							}
+
 							cycle += 1;
 
 							if (!startGo || !greenFlag())
-								if (checkAccident())
-									wait = FALSE;
-								else if (checkFlagState() || checkPositions(playerID))
-									wait = FALSE;
-								else
-									wait = !checkPitWindow();
+								if (enabled)
+									if (checkAccident())
+										wait = FALSE;
+									else if (checkFlagState() || checkPositions(playerID))
+										wait = FALSE;
+									else
+										wait = !checkPitWindow();
 						}
 					}
 					else {

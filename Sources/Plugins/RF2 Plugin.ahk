@@ -20,6 +20,7 @@
 global kRF2Application := "rFactor 2"
 
 global kRF2Plugin := "RF2"
+global kChatMode := "Chat"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +31,50 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 	iRequestPitstopHotkey := false
+
+	iOpenChatHotkey := false
+
+	iPitstopMode := false
+	iChatMode := false
+
+	class ChatMode extends ControllerMode {
+		Mode {
+			Get {
+				return kChatMode
+			}
+		}
+
+		updateActions(session) {
+		}
+	}
+
+	class ChatAction extends ControllerAction {
+		iMessage := ""
+
+		Message {
+			Get {
+				return this.iMessage
+			}
+		}
+
+		__New(function, label, message) {
+			this.iMessage := message
+
+			super.__New(function, label)
+		}
+
+		fireAction(function, trigger) {
+			local message := this.Message
+
+			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
+				Send("{Enter}")
+				Sleep(100)
+				Send(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
+		}
+	}
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -49,16 +94,32 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	OpenChatHotkey {
+		Get {
+			return this.iOpenChatHotkey
+		}
+	}
+
 	__New(controller, name, simulator, configuration := false) {
 		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
+			this.iPitstopMode := this.findMode(kPitstopMode)
+
+			this.iOpenChatHotkey := this.getArgumentValue("openChat", false)
+
+			if (this.iChatMode && this.OpenChatHotkey && (Trim(this.OpenChatHotkey) != ""))
+				this.registerMode(this.iChatMode)
+			else
+				this.iChatMode := false
+
 			if !inList(A_Args, "-Replay")
 				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off"))
+				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iRequestPitstopHotkey := this.getArgumentValue("requestPitstop", false)
 
@@ -69,6 +130,42 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 					this.iRequestPitstopHotkey := false
 			}
 		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local function, descriptor, message
+
+		super.loadFromConfiguration(configuration)
+
+		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
+			function := this.Controller.findFunction(descriptor)
+
+			if (function != false) {
+				message := string2Values("|", message)
+
+				if !this.iChatMode
+					this.iChatMode := RF2Plugin.ChatMode(this)
+
+				this.iChatMode.registerAction(RF2Plugin.ChatAction(function, message[1], message[2]))
+			}
+			else
+				this.logFunctionNotFound(descriptor)
+		}
+	}
+
+	updateSession(session, force := false) {
+		local lastSession := this.Session
+		local activeModes
+
+		super.updateSession(session, force)
+
+		activeModes := this.Controller.ActiveModes
+
+		if (inList(activeModes, this.iChatMode))
+			this.iChatMode.updateActions(session)
+
+		if (inList(activeModes, this.iPitstopMode))
+			this.iPitstopMode.updateActions(session)
 	}
 
 	openPitstopMFD(descriptor := false) {
@@ -101,26 +198,26 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		static reported := false
-
 		if this.ClosePitstopMFDHotkey {
 			if (this.OpenPitstopMFDHotkey != "Off")
 				if this.activateWindow()
 					this.sendCommand(this.ClosePitstopMFDHotkey)
 		}
-		else if !reported {
-			reported := true
-
-			logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
-
-			if !kSilentMode
-				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
 	}
 
 	requirePitstopMFD() {
-		return true
+		static nextRequest := 0
+
+		if (A_TickCount > nextRequest) {
+			nextRequest := (A_TickCount + 20000)
+
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
+				return this.openPitstopMFD()
+			else
+				return true
+		}
+		else
+			return true
 	}
 
 	selectPitstopOption(option) {
@@ -136,255 +233,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		return false
 	}
-
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
-	parseNr(candidate, &rest) {
-		local temp, char
-
-		candidate := Trim(candidate)
-
-		if isNumber(candidate) {
-			rest := ""
-
-			return candidate
-		}
-		else {
-			temp := ""
-
-			loop StrLen(candidate) {
-				char := SubStr(candidate, A_Index, 1)
-
-				if isNumber(char)
-					temp .= char
-				else if (char != A_Space) {
-					rest := SubStr(candidate, A_Index)
-
-					return temp
-				}
-			}
-
-			rest := ""
-
-			return ((temp != "") ? temp : false)
-		}
-	}
-
-	parseCategory(candidate, &rest) {
-		local temp := ""
-		local char
-
-		loop StrLen(candidate) {
-			char := SubStr(candidate, A_Index, 1)
-
-			if (char != A_Space)
-				temp .= char
-			else {
-				rest := SubStr(candidate, A_Index)
-
-				return temp
-			}
-		}
-
-		rest := ""
-
-		return ((temp != "") ? temp : false)
-	}
-
-	parseCarName(carName, &model?, &nr?, &category?, &team?) {
-		local index
-
-		model := false
-		team := false
-		nr := false
-		category := false
-
-		carName := Trim(carName)
-		index := InStr(carName, "#")
-
-		if (index = 1) {
-			nr := this.parseNr(SubStr(carName, 2), &carName)
-
-			if (InStr(carName, ":") = 1)
-				category := this.parseCategory(SubStr(carName, 2), &carName)
-
-			model := carName
-		}
-		else if index {
-			carName := StrSplit(carName, "#", , 2)
-
-			model := Trim(carName[1])
-
-			if (model = "")
-				model := false
-
-			nr := this.parseNr(carName[2], &carName)
-
-			if (InStr(carName, ":") = 1) {
-				category := this.parseCategory(SubStr(carName, 2), &carName)
-
-				if (category = "")
-					category := false
-			}
-		}
-		else if (carName != "")
-			model := carName
-
-		if (InStr(model, ":") && !category) {
-			carName := StrSplit(model, ":", , 2)
-
-			model := Trim(carName[1])
-			category := Trim(carName[2])
-		}
-	}
-
-	parseDriverName(carName, forName, surName, nickName) {
-		return driverName(forName, surName, nickName)
-	}
-
-	acquirePositionsData(telemetryData, finished := false) {
-		local positionsData := super.acquirePositionsData(telemetryData, finished)
-		local driver := getMultiMapValue(positionsData, "Position Data", "Driver.Car", 0)
-		local numbers := Map()
-		local duplicateNrs := false
-		local carRaw, carID, model, category, nr, forName, surName, nickName
-
-		loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-			carRaw := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
-
-			if (carRaw != kUndefined) {
-				this.parseCarName(carRaw, &model, &nr, &category)
-
-				if model
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Car", model)
-
-				if (A_Index != driver) {
-					parseDriverName(this.parseDriverName(carRaw, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
-															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-															   , getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", ""))
-								  , &forName, &surName, &nickName)
-
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
-				}
-
-				nr := Integer(nr ? nr : getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID"))
-
-				setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", nr)
-
-				if category
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Category", category)
-
-				if numbers.Has(nr)
-					duplicateNrs := true
-				else
-					numbers[nr] := true
-			}
-		}
-
-		if duplicateNrs
-			loop getMultiMapValue(positionsData, "Position Data", "Car.Count", 0) {
-				carID := getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".ID", kUndefined)
-
-				if (carID != kUndefined)
-					setMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Nr", carID)
-			}
-
-		return positionsData
-	}
-
-	acquireTelemetryData() {
-		local telemetryData := super.acquireTelemetryData()
-		local model, forName, surName, nickName
-
-		static lastSimulator := false
-		static lastCar := false
-		static lastTrack := false
-
-		static loadSetup := false
-		static nextSetupUpdate := false
-
-		if ((this.Simulator[true] != lastSimulator) || (this.Car != lastCar) || (this.Track != lastTrack)) {
-			lastSimulator := this.Simulator[true]
-			lastCar := this.Car
-			lastTrack := this.Track
-
-			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*"
-														   , "Simulator." . this.Simulator[true], "Session.Data.Setup"
-														   , (lastSimulator = "rFactor 2") ? 60 : 20)
-		}
-
-		this.parseCarName(getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
-
-		if model
-			setMultiMapValue(telemetryData, "Session Data", "Car", model)
-
-		if (loadSetup == true)
-			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
-		else if (loadSetup && (A_TickCount > nextSetupUpdate)) {
-			addMultiMapValues(telemetryData, this.readSessionData("Setup=true"))
-
-			nextSetupUpdate := (A_TickCount + (loadSetup * 1000))
-		}
-
-		return telemetryData
-	}
-
-	updateTelemetryData(data) {
-		super.updateTelemetryData(data)
-
-		if !getMultiMapValue(data, "Stint Data", "InPit", false)
-			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setMultiMapValue(data, "Session Data", "Paused", true)
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
-
-		static tyres := ["Front", "Rear"]
-
-		for ignore, section in ["Car Data", "Setup Data"]
-			for ignore, postfix in tyres {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
-
-					if (tyreCompound != kUndefined)
-						if tyreCompound {
-							tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-							if tyreCompound {
-								splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-								setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-								setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
-							}
-						}
-						else {
-							setMultiMapValue(data, section, "TyreCompound" . postFix, false)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, false)
-						}
-				}
-			}
-
-		return data
-	}
 }
 
 class RF2Plugin extends Sector397Plugin {
@@ -395,7 +243,8 @@ class RF2Plugin extends Sector397Plugin {
 								   , "TyreCompound", "Tyre Compound"
 								   , "TyreCompoundFront", "Tyre Compound Front", "TyreCompoundRear", "Tyre Compound Rear"
 								   , "TyreAllAround", "All Around"
-								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right"
+								   , "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "DriverSelect", "Driver", "RepairRequest", "Repair", "PitstopRequest", "RequestPitstop")
 
 		selectActions := []
@@ -488,6 +337,12 @@ class RF2Plugin extends Sector397Plugin {
 				case "Tyre Compound", "TyreCompound":
 					return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
 						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
+				case "Tyre Compound Front", "TyreCompoundFront":
+					return [getMultiMapValue(data, "Setup Data", "TyreCompoundFront", false)
+						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFront", false)]
+				case "Tyre Compound Rear", "TyreCompoundRear":
+					return [getMultiMapValue(data, "Setup Data", "TyreCompoundRear", false)
+						  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRear", false)]
 				case "Repair Suspension":
 					return [getMultiMapValue(data, "Setup Data", "RepairSuspension", false)]
 				case "Repair Bodywork":
@@ -507,31 +362,46 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters, fillUp) {
+		this.requirePitstopMFD()
+
 		super.setPitstopRefuelAmount(pitstopNumber, liters, fillUp)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
+		local index, axle, tyreCompound
 
-		if (this.OpenPitstopMFDHotkey != "Off")
-			if compound {
-				compound := this.tyreCompoundCode(compound, compoundColor)
+		this.requirePitstopMFD()
 
-				if compound {
-					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
-					if set
-						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
-				}
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
 			}
-			else
-				this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", "None")
+			else {
+				compound := [compound, compound]
+				compoundColor := [compoundColor, compoundColor]
+			}
+
+			for index, axle in ["Front", "Rear"]
+				if compound[index] {
+					tyreCompound := this.tyreCompoundCode(compound[index], compoundColor[index])
+
+					if tyreCompound
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound " . axle, tyreCompound)
+				}
+				else
+					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound " . axle, "None")
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		this.requirePitstopMFD()
+
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -540,6 +410,8 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
+		this.requirePitstopMFD()
+
 		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
@@ -555,6 +427,8 @@ class RF2Plugin extends Sector397Plugin {
 
 	requestPitstopDriver(pitstopNumber, driver) {
 		local delta, currentDriver, nextDriver
+
+		this.requirePitstopMFD()
 
 		super.requestPitstopDriver(pitstopNumber, driver)
 
@@ -580,8 +454,14 @@ class RF2Plugin extends Sector397Plugin {
 	finishPitstopSetup(pitstopNumber) {
 		super.finishPitstopSetup(pitstopNumber)
 
-		if getMultiMapValue(this.Settings, "Simulator.rFactor 2", "Pitstop.Request", false)
+		if getMultiMapValue(this.Settings, "Simulator.rFactor 2", "Pitstop.Request", false) {
+			this.requirePitstopMFD()
+
 			this.changePitstopOption("RequestPitstop")
+		}
+
+		if this.ClosePitstopMFDHotkey
+			this.closePitstopMFD()
 	}
 }
 

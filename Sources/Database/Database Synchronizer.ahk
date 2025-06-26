@@ -39,7 +39,7 @@
 #Include "..\Framework\Extensions\FTP.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "Libraries\SessionDatabase.ahk"
-#Include "Libraries\TelemetryDatabase.ahk"
+#Include "Libraries\LapsDatabase.ahk"
 #Include "Libraries\TyresDatabase.ahk"
 
 
@@ -55,6 +55,7 @@ global gSynchronizing := false
 ;;;-------------------------------------------------------------------------;;;
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploadTelemetries) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
@@ -63,6 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
+	local name, extension, files
 
 	updateState() {
 		if (++step > 20) {
@@ -154,27 +156,44 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Car Setups"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Car Setups")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Car Setups\"
 
-											for ignore, type in kSetupTypes
-												loop Files, directory . type . "\*.info", "F" {
-													updateState()
+											files := []
 
+											for ignore, type in kSetupTypes
+												loop Files, directory . type . "\*.*", "F" {
+													SplitPath(A_LoopFileName, , , &extension, &name)
+
+													if (extension = "info") {
+														updateState()
+
+														info := sessionDB.readSetupInfo(simulator, car, track, type, name)
+
+														if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+														 || !getMultiMapValue(info, "Access", "Share", false))
+															deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
+														else
+															files.Push([type, getMultiMapValue(info, "Setup", "Name")])
+
+														deleteFile(A_LoopFilePath)
+
+														Sleep(1)
+													}
+												}
+
+											for ignore, type in kSetupTypes
+												loop Files, directory . type . "\*.*", "F" {
 													SplitPath(A_LoopFileName, , , , &name)
 
-													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
-
-													if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
-													 || !getMultiMapValue(info, "Access", "Share", false))
-														deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
-
-													deleteFile(A_LoopFilePath)
+													if (choose(files, (c) => ((c[1] = type) && c[2] = name)).Length = 0)
+														deleteFile(A_LoopFilePath)
 
 													Sleep(1)
 												}
+										}
 									}
 									catch Any as exception {
 										logError(exception)
@@ -185,7 +204,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies\"
@@ -205,6 +224,20 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												Sleep(1)
 											}
+
+											loop Files, directory . "*.*", "FD" {
+												if InStr(FileExist(A_LoopFileName), "D")
+													deleteDirectory(A_LoopFileName)
+												else {
+													SplitPath(A_LoopFileName, , , &extension)
+
+													if ((extension != "info") && (extension != "strategy"))
+														deleteFile(A_LoopFileName)
+												}
+
+												Sleep(1)
+											}
+										}
 									}
 									catch Any as exception {
 										logError(exception)
@@ -215,7 +248,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									try {
 										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries"
 
-										if FileExist(directory)
+										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\"
@@ -235,6 +268,20 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												Sleep(1)
 											}
+
+											loop Files, directory . "*.*", "FD" {
+												if InStr(FileExist(A_LoopFileName), "D")
+													deleteDirectory(A_LoopFileName)
+												else {
+													SplitPath(A_LoopFileName, , , &extension)
+
+													if ((extension != "info") && (extension != "telemetry"))
+														deleteFile(A_LoopFileName)
+												}
+
+												Sleep(1)
+											}
+										}
 									}
 									catch Any as exception {
 										logError(exception)
@@ -254,7 +301,9 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 			logError(exception)
 		}
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
+		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
+
+		ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . "Shared Database\Database." . id . ".zip", "Database-Uploads/Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -276,6 +325,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local configuration := newMultiMap()
@@ -309,14 +359,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		updateState()
 
-		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
+		for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if (type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) {
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+					; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
+
+					ftpDownload(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, kTempDirectory . fileName)
 
 					updateState()
 
@@ -370,6 +422,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
 	global gSynchronizing
+	
+	local oldCritical := Task.Critical
 
 	if gSynchronizing
 		return Task.CurrentTask
@@ -378,14 +432,14 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 	synchronizeDatabase("Stop")
 
-	Task.CurrentTask.Critical := true
+	Task.Critical := true
 
 	try {
 		uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 		downloadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 	}
 	finally {
-		Task.CurrentTask.Critical := false
+		Task.Critical := oldCritical
 
 		synchronizeDatabase("Start")
 
@@ -399,13 +453,15 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 synchronizeSessionDatabase(minutes) {
 	global gSynchronizing
+	
+	local oldCritical := Task.Critical
 
 	if gSynchronizing
 		return Task.CurrentTask
 	else
 		gSynchronizing := true
 
-	Task.CurrentTask.Critical := true
+	Task.Critical := true
 
 	try {
 		synchronizeDatabase()
@@ -414,7 +470,7 @@ synchronizeSessionDatabase(minutes) {
 		logError(exception, true)
 	}
 	finally {
-		Task.CurrentTask.Critical := false
+		Task.Critical := oldCritical
 
 		gSynchronizing := false
 	}

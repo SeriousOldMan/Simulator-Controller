@@ -2041,11 +2041,23 @@ class WebView2Viewer extends HTMLViewer {
 	}
 
 	Write(html, force := false) {
-		local file
+		local file, isFile
 
 		if (force || (html != this.iHTML)) {
 			if this.WebView2 {
-				if !FileExist(this.iHTMLFile)
+				try {
+					isFile := ((StrLen(html) <= 255) && FileExist(html))
+				}
+				catch Any {
+					isFile := false
+				}
+
+				if isFile {
+					this.iHTMLFile := html
+
+					this.iHTML := FileRead(html)
+				}
+				else if !FileExist(this.iHTMLFile)
 					FileAppend(html, this.iHTMLFile, "UTF-8")
 				else
 					loop {
@@ -2287,13 +2299,16 @@ initializeHTMLViewer() {
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 
+	deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+	DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+	Window.DefineCustomControl("WebView2Viewer", createWebView2Viewer)
+	Window.DefineCustomControl("IE11Viewer", createIEViewer)
+
 	if ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11") = "WebView2") ||
 		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 						, "General", "HTML Viewer", "IE11") = "WebView2")) {
-		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-
-		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
 	}
 	else

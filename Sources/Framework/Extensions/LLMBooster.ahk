@@ -89,7 +89,7 @@ class LLMBooster extends ConfigurationItem {
 		options["Model"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".Model", false)
 		options["MaxTokens"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".MaxTokens", 2048)
 
-		if (string2Values("|", options["Service"])[1] = "LLM Runtime")
+		if (string2Values("|", options["Service"], 2)[1] = "LLM Runtime")
 			options["GPULayers"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".GPULayers", 0)
 	}
 
@@ -98,7 +98,7 @@ class LLMBooster extends ConfigurationItem {
 		local ignore, instruction
 
 		if service {
-			service := string2Values("|", service)
+			service := string2Values("|", service, 3)
 
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in LLMBooster.startBooster..."
@@ -265,7 +265,12 @@ class ConversationBooster extends LLMBooster {
 	}
 
 	normalizeAnswer(answer) {
-		return Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+		answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+
+		while InStr(answer, "\n", , -2)
+			answer := SubStr(answer, 1, StrLen(answer) - 2)
+
+		return answer
 	}
 }
 
@@ -342,11 +347,11 @@ class SpeechBooster extends ConversationBooster {
 					if (answer && (answer != "")) {
 						Task.startTask(() {
 							local directory
-							
+
 							SplitPath(this.Transcript, , &directory)
-							
+
 							DirCreate(directory)
-							
+
 							FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Rephrasing") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 						}, 0, kLowPriority)
 
@@ -511,11 +516,11 @@ class RecognitionBooster extends ConversationBooster {
 
 						Task.startTask(() {
 							local directory
-							
+
 							SplitPath(this.Transcript, , &directory)
-							
+
 							DirCreate(directory)
-							
+
 							FileAppend(translate("-- User --------") . "`n`n" . text . "`n`n" . translate("-- " . translate("Understanding") . " ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 						}, 0, kLowPriority)
 
@@ -640,11 +645,11 @@ class ChatBooster extends ConversationBooster {
 					if (answer && (answer != "")) {
 						Task.startTask(() {
 							local directory
-							
+
 							SplitPath(this.Transcript, , &directory)
-							
+
 							DirCreate(directory)
-							
+
 							if (answer = true)
 								FileAppend(translate("-- User --------") . "`n`n" . question . "`n`n" . translate("-- " . translate("Conversation") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
 							else

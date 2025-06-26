@@ -27,6 +27,7 @@ global kBuildConfiguration := "Production"
 #Include "..\Framework\Startup.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\Assistants\Libraries\RaceStrategist.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
@@ -34,6 +35,30 @@ global kBuildConfiguration := "Production"
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class UnknownProvider extends SimulatorProvider {
+	Simulator {
+		Get {
+			return "Unknown"
+		}
+	}
+
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		brakeService := true
+		repairService := ["Bodywork", "Suspension", "Engine"]
+
+		return true
+	}
+
+	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
+		mixedCompounds := "All"
+		tyreSets := true
+
+		return true
+	}
+}
 
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined
@@ -306,12 +331,12 @@ class PitstopRecommendation extends Assert {
 				strategist.KnowledgeBase.produce()
 
 				this.AssertEqual(7, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 2...")
-				this.AssertEqual(18, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Position"), "Unexpected position detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Traffic"), "Unexpected cars ahead detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual(14, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Position"), "Unexpected position detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[18]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Traffic"), "Unexpected cars ahead detected after pitstop recommmendation in lap 2...")
 
 				this.AssertEqual("[3, 4, 5, 6, 7]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Laps"), "Unexpected evaluated laps detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[19, 19, 19, 19, 18]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions"), "Unexpected evaluated positions detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[[11, 7, 5], [11, 7], [11], [], []]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[19, 19, 19, 17, 14]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions"), "Unexpected evaluated positions detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[[], [], [14], [17], [18]]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
 			}
 
 			if strategist.Debug[kDebugKnowledgeBase]
@@ -508,6 +533,9 @@ else {
 
 		loop {
 			lap := A_Index
+
+			if (lap = 6)
+				strategist.recommendPitstop(17)
 
 			loop {
 				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")

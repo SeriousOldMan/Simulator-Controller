@@ -1,8 +1,8 @@
 #include Position.events
 #include Weather.events
-[Agent.Events]
+[Agent.LLM.Events]
 Active=pitstop_upcoming,weather_forecast
-[Agent.Events.Builtin]
+[Agent.LLM.Events.Builtin]
 pitstop_upcoming=Assistant.Class|PitstopUpcomingEvent|PitstopUpcoming||1|This event is triggered when the next pitstop according to the currently active strategy is upcoming.
-[Agent.Events.Parameters]
+[Agent.LLM.Events.Parameters]
 pitstop_upcoming.1=plannedLap|Integer||true|The lap, when the pitstop is planned according to the strategy.

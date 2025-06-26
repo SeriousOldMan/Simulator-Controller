@@ -61,6 +61,8 @@ class VoiceManager extends ConfigurationItem {
 	iListener := false
 	iListenerBooster := false
 
+	iListenerActive := true
+
 	iBooster := false
 
 	iRecognizerMode := "Grammar"
@@ -142,8 +144,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		beginTalk(force := false) {
-			if (force || this.UseTalking)
-				this.iIsTalking := true
+			this.iIsTalking := true
 		}
 
 		endTalk(options := false) {
@@ -172,9 +173,15 @@ class VoiceManager extends ConfigurationItem {
 				if options
 					throw "Options are not supported while talking..."
 			}
-			else
+			else {
+				if options
+					options.UseTalking := this.UseTalking
+				else
+					options := {UseTalking: this.UseTalking}
+
 				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus, options ? map2String("|", "->", toMap(options)) : false)
 										, this.VoiceManager.VoiceServer)
+			}
 		}
 
 		getPhrase(phrase, variables := false, cache := false) {
@@ -299,8 +306,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		beginTalk(options := false) {
-			if ((options && options.HasProp("Talking") && options.Talking) || this.UseTalking)
-				this.iIsTalking := true
+			this.iIsTalking := true
 		}
 
 		endTalk(options := false) {
@@ -320,7 +326,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local booster, stopped
+			local booster, stopped, ignore, part
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -350,7 +356,11 @@ class VoiceManager extends ConfigurationItem {
 					this.Speaking := true
 
 					try {
-						super.speak(text, !this.Awaitable, cache, options)
+						if this.UseTalking
+							super.speak(text, !this.Awaitable, cache, options)
+						else
+							for ignore, part in string2Values(". ", text)
+								super.speak(part . ".", !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -446,11 +456,11 @@ class VoiceManager extends ConfigurationItem {
 			this.VoiceManager.raiseTextRecognized("Text", text)
 		}
 
-		parseText(&text, rephrase := false) {
+		parseText(&text, recognize := false) {
 			local booster := this.Booster
 			local alternateText
 
-			if (booster && rephrase && (booster.Mode = "Always")) {
+			if (booster && recognize && (booster.Mode = "Always")) {
 				alternateText := booster.recognize(text)
 
 				if (alternateText && (alternateText != ""))
@@ -460,11 +470,11 @@ class VoiceManager extends ConfigurationItem {
 			return super.parseText(&text)
 		}
 
-		unknownRecognized(&text, rephrase := false) {
+		unknownRecognized(&text, recognize := false) {
 			local booster := this.Booster
 			local alternateText
 
-			if (booster && rephrase && (booster.Mode = "Unknown")) {
+			if (booster && recognize && (booster.Mode = "Unknown")) {
 				alternateText := booster.recognize(text)
 
 				if (alternateText && (alternateText != "") && (alternateText != text)) {
@@ -652,6 +662,12 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
+	ListenerActive {
+		Get {
+			return this.iListenerActive
+		}
+	}
+
 	ListenerBooster {
 		Get {
 			return this.iListenerBooster
@@ -742,6 +758,8 @@ class VoiceManager extends ConfigurationItem {
 
 		super.__New(configuration)
 
+		deleteFile(kTempDirectory . "Voice.cmd")
+
 		this.initialize(options)
 
 		if !this.Speaker
@@ -827,6 +845,9 @@ class VoiceManager extends ConfigurationItem {
 
 		if options.Has("VoiceServer")
 			this.iVoiceServer := options["VoiceServer"]
+
+		if this.PushToTalk
+			this.iPushToTalk := string2Values(InStr(this.PushToTalk, ";") ? ";" : "|", this.PushToTalk)
 	}
 
 	hasPushtoTalk() {
@@ -835,17 +856,22 @@ class VoiceManager extends ConfigurationItem {
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
+		local ignore, key
 
 		switch this.PushToTalkMode, false {
 			case "Press":
-				if p2THotkey
-					Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
+				if p2tHotkey
+					for ignore, key in p2tHotkey
+						Hotkey(key, ObjBindMethod(this, "listen", true), "On")
 			case "Hold":
 				if p2THotkey
 					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
 			case "Custom":
 				PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 50, kInterruptPriority).start()
 		}
+
+		if (this.PushToTalkMode != "Custom")
+			PeriodicTask(ObjBindMethod(this, "processExternalCommand"), 1000).start()
 	}
 
 	processExternalCommand() {
@@ -869,12 +895,21 @@ class VoiceManager extends ConfigurationItem {
 
 				file.Close()
 
-				deleteFile(fileName)
+				if ((command != "Disable") && (command != "Enable")) {
+					deleteFile(fileName)
+
+					if !this.ListenerActive
+						return
+				}
 
 				if ((command = "Activation") || (command = "Listen"))
 					this.startListening(false)
 				else if (command = "Stop")
 					this.stopListening()
+				else if (command = "Disable")
+					this.disableListening()
+				else if (command = "Enable")
+					this.enableListening()
 			}
 		}
 		catch Any {
@@ -884,6 +919,8 @@ class VoiceManager extends ConfigurationItem {
 	listen(toggle, down := true) {
 		local listen := false
 		local pressed := false
+		local clicked := false
+		local ignore, key
 
 		static isPressed := false
 		static lastDown := 0
@@ -897,8 +934,31 @@ class VoiceManager extends ConfigurationItem {
 		static speed := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									   , "Voice", "Activation Speed", DllCall("GetDoubleClickTime"))
 
-		try
-			pressed := toggle ? down : GetKeyState(this.PushToTalk)
+		if !this.ListenerActive {
+			isPressed := false
+			lastDown := 0
+			lastUp := 0
+			clicks := 0
+			activation := false
+			listening := false
+
+			if listenTask {
+				listenTask.stop()
+
+				listenTask := false
+			}
+
+			this.stopListening()
+
+			return
+		}
+
+		try {
+			for ignore, key in this.PushToTalk
+				clicked := (clicked || GetKeyState(key))
+
+			pressed := (toggle ? down : clicked)
+		}
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -1086,11 +1146,19 @@ class VoiceManager extends ConfigurationItem {
 		this.startListening(retry)
 	}
 
+	enableListening() {
+		this.iListenerActive := true
+	}
+
+	disableListening() {
+		this.iListenerActive := false
+	}
+
 	startListening(retry := true) {
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
-		if (this.iSpeechRecognizer && !this.Listening)
+		if (this.iSpeechRecognizer && !this.Listening && this.ListenerActive) {
 			if !this.iSpeechRecognizer.startRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "startListening", true), 200)
@@ -1107,14 +1175,17 @@ class VoiceManager extends ConfigurationItem {
 
 				return true
 			}
+		}
+		else
+			return false
 	}
 
 	stopActivationListener(retry := false) {
-		this.stopListening(retry)
+		return this.stopListening(retry)
 	}
 
 	stopListening(retry := false) {
-		if (this.iSpeechRecognizer && this.Listening)
+		if (this.iSpeechRecognizer && this.Listening) {
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
 					Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
@@ -1126,6 +1197,9 @@ class VoiceManager extends ConfigurationItem {
 
 				return true
 			}
+		}
+		else
+			return false
 	}
 
 	interrupt(all := false) {

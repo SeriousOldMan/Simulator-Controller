@@ -435,7 +435,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iVoiceControlConfigurator.hideWidgets()
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
-			configuration := this.SetupWizard.getSimulatorConfiguration()
+			configuration := this.SetupWizard.getSimulatorConfiguration(false)
 
 			if (this.SetupWizard.Initialize || !first) {
 				voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
@@ -485,10 +485,25 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		if super.hidePage(page) {
 			GeneralStepWizard.sCurrentGeneralStep := false
 
-			wizard := this.SetupWizard
+			this.iPendingApplicationRegistration := false
+			this.iPendingFunctionRegistration := false
 
-			languageCode := "en"
+			return true
+		}
+		else {
+			this.iVoiceControlConfigurator.showWidgets()
 
+			return false
+		}
+	}
+
+	savePage(page) {
+		local wizard := this.SetupWizard
+		local languageCode := "en"
+		local code, language, configuration, voiceControlConfiguration, subConfiguration
+		local ignore, section
+
+		if super.savePage(page) {
 			for code, language in availableLanguages()
 				if (language = this.Control["uiLanguageDropDown"].Text) {
 					languageCode := code
@@ -521,16 +536,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
 			}
 
-			this.iPendingApplicationRegistration := false
-			this.iPendingFunctionRegistration := false
-
 			return true
 		}
-		else {
-			this.iVoiceControlConfigurator.showWidgets()
-
+		else
 			return false
-		}
 	}
 
 	loadApplications(load := false) {

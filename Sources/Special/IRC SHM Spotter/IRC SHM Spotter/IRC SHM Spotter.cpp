@@ -282,6 +282,8 @@ void sendAnalyzerMessage(const char* message) {
 #define PI 3.14159265
 
 long cycle = 0;
+long nextSpeedUpdate = 0;
+bool enabled = true;
 
 const float nearByDistance = 8.0;
 const float longitudinalDistance = 5;
@@ -683,6 +685,8 @@ int completedLaps = 0;
 int numAccidents = 0;
 
 std::string semFileName = "";
+
+int thresholdSpeed = 60;
 
 bool fileExists(std::string name) {
 	FILE* file;
@@ -1970,7 +1974,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				gear = *(int*)rawValue;
 
 			if (getRawDataValue(rawValue, header, data, "RPM"))
-				rpms = *(int*)rawValue;
+				rpms = (int)*(float*)rawValue;
 
 			if (getRawDataValue(rawValue, header, data, "LongAccel"))
 				longG = (*(float*)rawValue) / 9.807;
@@ -2208,15 +2212,18 @@ int main(int argc, char* argv[])
 			if (argc > 5)
 				semFileName = std::string(argv[5]);
 
-			if (argc > 6) {
-				traceFileName = std::string(argv[6]);
+			if (argc > 6)
+				thresholdSpeed = atoi(argv[6]);
+
+			if (argc > 7) {
+				traceFileName = std::string(argv[7]);
 
 				if (traceFileName == "-")
 					traceFileName = "";
 			}
 
-			if (argc > 7)
-				loadTrackCoordinates(argv[7]);
+			if (argc > 8)
+				loadTrackCoordinates(argv[8]);
 		}
 	}
 
@@ -2371,14 +2378,39 @@ int main(int argc, char* argv[])
 
 									cycle += 1;
 
+									if (cycle > nextSpeedUpdate)
+									{
+										char* rawValue;
+
+										getRawDataValue(rawValue, pHeader, g_data, "Speed");
+
+										float speed = *((float*)rawValue) * 3.6;
+
+										nextSpeedUpdate = cycle + 50;
+
+										if ((speed >= thresholdSpeed) && !enabled)
+										{
+											enabled = true;
+
+											sendSpotterMessage("enableSpotter");
+										}
+										else if ((speed < thresholdSpeed) && enabled)
+										{
+											enabled = false;
+
+											sendSpotterMessage("disableSpotter");
+										}
+									}
+
 									if (greenFlag(pHeader, g_data))
 										wait = false;
-									else if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
-										wait = false;
-									else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
-										wait = false;
-									else
-										wait = !checkPitWindow(pHeader, g_data);
+									else if (enabled)
+										if (checkAccident(pHeader, g_data, playerCarIndex, trackLength))
+											wait = false;
+										else if (checkFlagState(pHeader, g_data) || checkPositions(pHeader, g_data, playerCarIndex, trackLength))
+											wait = false;
+										else
+											wait = !checkPitWindow(pHeader, g_data);
 
 									continue;
 								}

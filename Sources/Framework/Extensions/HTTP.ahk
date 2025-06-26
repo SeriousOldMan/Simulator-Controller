@@ -29,7 +29,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
     static _doc := ""
 
     __New(options := "") {
-        if (!isObject(options))
+        if !isObject(options)
             options := {}
 
         this.whr := ComObject("WinHttp.WinHttpRequest.5.1")
@@ -168,6 +168,9 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         for key, value in (isInstance(headers, Map) ? headers : headers.OwnProps())
             this.whr.SetRequestHeader(key, value)
 
+        if options.HasProp("Content")
+            this.whr.SetRequestHeader("Content-Type", options.Content)
+
         this.whr.Send(body)
         this.whr.WaitForResponse()
 
@@ -213,7 +216,8 @@ class WinHTTPRequest extends WinHttpRequest._Call {
                                     , "jpg", "image/jpeg"
                                     , "json", "application/json"
                                     , "png", "image/png"
-                                    , "zip", "application/zip")
+                                    , "zip", "application/zip"
+                                    , "txt", "text/plain")
 
         return (mime.Has(extension) ? mime[Extension] : "application/octet-stream")
     }
@@ -393,4 +397,12 @@ HTTPRequest(options := false) {
         instance := WinHTTPRequest(options)
 
     return instance
+}
+
+httpGet(url, options := "", encoding := "UTF-8", content := "text/plain") {
+    return WinHttpRequest(options).GET(url, "", false, {Encoding: encoding, Content: content}).Text
+}
+
+httpPost(url, data, options := "", encoding := "UTF-8", content := "text/plain") {
+    WinHttpRequest(options).POST(url, data, false, {Encoding: encoding})
 }

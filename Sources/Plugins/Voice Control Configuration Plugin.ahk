@@ -272,19 +272,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		chosen := 0
 
-		for code, language in languages {
-			choices.Push(language)
-
-			if (code = "en")
-				enIndex := A_Index
-		}
-
 		for ignore, raceAssistant in kRaceAssistants
 			for ignore, grammarFile in getFileNames(raceAssistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 				SplitPath(grammarFile, , , &code)
 
-				if (!languages.Has(code) && !inList(choices, code)) {
-					choices.Push(code)
+				if !inList(choices, languages.Has(code) ? languages[code] : code) {
+					if languages.Has(code)
+						choices.Push(languages[code])
+					else
+						choices.Push(code)
+
+					if (code == this.Value["voiceLanguage"])
+						chosen := A_Index
 
 					if (code = "en")
 						enIndex := choices.Length
@@ -361,7 +360,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "Whisper Server"]
 		chosen := 0
 
-		if (isDebug() || FileExist(kUserHomeDirectory . "Programs\Whisper Runtime"))
+		if (isDebug() || FileExist(Whisper Server Part 2))
 			choices.Push("Whisper Local")
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
@@ -505,7 +504,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				recognizer := "Whisper Local"
 
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
-			this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server", "Whisper Local"], recognizer) || 2)
+
+			if FileExist(kProgramsDirectory . "Whisper Runtime")
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server", "Whisper Local"], recognizer) || 2)
+			else
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server"], recognizer) || 2)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
@@ -656,32 +659,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.loadFromConfiguration(configuration, true)
 
-		for code, language in languages {
-			choices.Push(language)
-
-			if (language == this.Value["voiceLanguage"]) {
-				chosen := A_Index
-				languageCode := code
-			}
-
-			if (code = "en")
-				enIndex := A_Index
-		}
-
 		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
 			SplitPath(grammarFile, , , &code)
 
-			if !languages.Has(code) {
-				choices.Push(code)
+			if !choices.Has(languages.Has(code) ? languages[code] : code)
+				if languages.Has(code)
+					choices.Push(languages[code])
+				else
+					choices.Push(code)
 
-				if (code == this.Value["voiceLanguage"]) {
+				if ((languages.Has(code) ? languages[code] : code) == this.Value["voiceLanguage"]) {
 					chosen := choices.Length
 					languageCode := code
 				}
 
-				if (code = "en")
-					enIndex := choices.Length
-			}
+			if (code = "en")
+				enIndex := choices.Length
 		}
 
 		this.Control["voiceLanguageDropDown"].Choose(chosen)
@@ -753,7 +746,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := inList(recognizers, listener)
 
 		if (chosen == 0)
-			chosen := "1"
+			chosen := 1
 
 		this.Control["listenerDropDown"].Delete()
 		this.Control["listenerDropDown"].Add(recognizers)

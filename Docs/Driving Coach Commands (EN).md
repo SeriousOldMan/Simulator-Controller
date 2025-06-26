@@ -18,14 +18,13 @@ Below you will find a complete list of all voice commands recognized by Aiden, t
 		
    The first example is a simple phrase. The second one allows for choices as defined by the variable *TellMe* (see below), and the third example uses a local choice and stands for "What is the time?" and "What is the current time?".
 
-
 3. Choices
 
    Using this syntax alternative parts of a phrase can be defined. Alternative (sub-)phrases must be enclosed by **{** and **}** and must be seperated by commas. Each (sub-)phrase may contain only simple words. Example:
    
 		{ pressures, tyre pressures }
 
-   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.en) and look like this:
+   If a given list of choices is used in several phrases, a variable may be defined for it and a variable reference (the name of the choices list enclosed by **(** and **)**) may be used instead of explicit syntax. All predefined choices are listed in the section "[Choices]" of the [grammar file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.en) and look like this:
 
 		TellMe=Can you tell me, Please tell me, Tell me, Can you give me, Please give me, Give me
 
@@ -73,7 +72,7 @@ Information=session information, stint information, handling information
 
 	[Okay you can talk, I can listen {now, again}, You can talk {now, again}, Keep me {informed, updated, up to date}]
 
-	[{Please do, Do} not {pay attention, investigate} (Information) anymore, {Please ignore, Ignore} (Information), Ignore (Information) please]
+	[{Please do, Do} not {pay attention, investigate} to (Information) anymore, {Please ignore, Ignore} (Information), Ignore (Information) please]
 
 	[{Please pay attention to, Pay attention to, Please investigate, Investigate} (Information) again, {Please take, Take} (Information) into {account, account please}]
 

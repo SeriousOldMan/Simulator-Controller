@@ -143,6 +143,8 @@ void sendAnalyzerMessage(string message) {
 #define PI 3.14159265
 
 long cycle = 0;
+long nextSpeedUpdate = 0;
+bool enabled = true;
 
 int sessionDuration = 0;
 
@@ -972,6 +974,8 @@ int completedLaps = 0;
 int numAccidents = 0;
 
 string semFileName = "";
+
+int thresholdSpeed = 60;
 
 bool fileExists(std::string name) {
 	FILE* file;
@@ -2286,8 +2290,11 @@ int main(int argc, char* argv[])
 			if (argc > 5)
 				semFileName = argv[5];
 
-			if (argc > 6) {
-				traceFileName = argv[6];
+			if (argc > 6)
+				thresholdSpeed = atoi(argv[6]);
+
+			if (argc > 7) {
+				traceFileName = argv[7];
 
 				if (traceFileName == "-")
 					traceFileName = "";
@@ -2357,15 +2364,34 @@ int main(int argc, char* argv[])
 					if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
 						updateTopSpeed();
 
+						if (cycle > nextSpeedUpdate)
+						{
+							nextSpeedUpdate = cycle + 50;
+
+							if ((pf->speedKmh >= thresholdSpeed) && !enabled)
+							{
+								enabled = TRUE;
+
+								sendSpotterMessage("enableSpotter");
+							}
+							else if ((pf->speedKmh < thresholdSpeed) && enabled)
+							{
+								enabled = FALSE;
+
+								sendSpotterMessage("disableSpotter");
+							}
+						}
+
 						cycle += 1;
 
 						if (!startGo || !greenFlag())
-							if (checkAccident())
-								wait = false;
-							else if (checkFlagState() || checkPositions())
-								wait = false;
-							else
-								wait = !checkPitWindow();
+							if (enabled)
+								if (checkAccident())
+									wait = false;
+								else if (checkFlagState() || checkPositions())
+									wait = false;
+								else
+									wait = !checkPitWindow();
 					}
 					else {
 						longitudinalRearDistance = 5;

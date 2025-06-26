@@ -147,7 +147,32 @@ inline void printData2(const string name, const T(&v)[S][S2])
     }
 
 	wcout << endl;
+}
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+string normalizeName(string result) {
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
+inline string getString(wchar_t* str) {
+	wstring s(str);
+
+	return string(s.begin(), s.end());
 }
 
 inline const string getGrip(ACC_TRACK_GRIP_STATUS gripStatus) {
@@ -314,6 +339,9 @@ int main(int argc, char* argv[])
 		printData("FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
 		printData("RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 
+		if (pf->waterTemp)
+			printData("WaterTemperature", pf->waterTemp);
+
 		wcout << "[Stint Data]" << endl;
 		
 		wcout << "DriverForname=" << sf->playerName << endl;
@@ -390,8 +418,8 @@ int main(int argc, char* argv[])
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Session", getSession(gf->session));
 		wcout << "ID=" << gf->playerCarID << endl;
-		wcout << "Car=" << sf->carModel << endl;
-		wcout << "Track=" << sf->track << endl;
+		wcout << "Car=" << normalizeName(getString(sf->carModel)).c_str() << endl;
+		wcout << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 

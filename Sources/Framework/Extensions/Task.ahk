@@ -45,7 +45,8 @@ class Task {
 
 	static sCurrentTask := false
 
-	static sCriticalHandler := () => (Task.CurrentTask && Task.CurrentTask.Critical)
+	static sCritical := false
+	static sCriticalHandler := () => ((Task.CurrentTask && Task.CurrentTask.Critical) || Task.sCritical)
 
 	iPreviousTask := false
 
@@ -120,6 +121,13 @@ class Task {
 	static Critical {
 		Get {
 			return Task.CriticalHandler.Call()
+		}
+
+		Set {
+			if Task.CurrentTask
+				return (Task.CurrentTask.Critical := value)
+			else
+				return (Task.sCritical := value)
 		}
 	}
 
@@ -199,7 +207,7 @@ class Task {
 
 	Critical {
 		Get {
-			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical))
+			return (this.iCritical || (this.iPreviousTask && this.iPreviousTask.Critical) || Task.sCritical)
 		}
 
 		Set {
@@ -517,15 +525,22 @@ class PeriodicTask extends Task {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                           WorkingTask                             ;;;
+;;; Class                         ProgressTask                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class WorkingTask extends PeriodicTask {
+class ProgressTask extends PeriodicTask {
 	iTitle := ""
+
 	iProgressWindow := false
 
 	iStart := A_TickCount
 	iProgress := false
+
+	ProgressWindow {
+		Get {
+			return this.iProgressWindow
+		}
+	}
 
 	__New(title := "") {
 		this.iTitle := title
@@ -534,24 +549,39 @@ class WorkingTask extends PeriodicTask {
 	}
 
 	run() {
-		if (A_TickCount > (this.iStart + 250))
-			if !this.iProgress
-				this.iProgressWindow := ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
-			else if (this.iProgress != "Stop") {
-				if (this.iProgress > 100)
-					this.iProgress := 0
-
-				this.iProgressWindow.updateProgress({progress: this.iProgress++})
-			}
+		if (A_TickCount > (this.iStart + 500))
+			if !this.ProgressWindow
+				this.iProgressWindow := this.showProgress()
+			else if (this.iProgress != "Stop")
+				this.updateProgress()
 	}
 
 	stop() {
-		this.iProgress := "Stop"
-
-		if this.iProgressWindow
-			this.iProgressWindow.hideProgress()
+		this.hideProgress()
 
 		super.stop()
+	}
+
+	showProgress() {
+		return ProgressWindow.showProgress({progress: this.iProgress++, color: "Blue", title: this.iTitle})
+	}
+
+	updateProgress(options := {}) {
+		if !options.HasProp("progress") {
+			options.progress := this.iProgress++
+
+			if (this.iProgress > 100)
+				this.iProgress := 0
+		}
+
+		this.ProgressWindow.updateProgress(options)
+	}
+
+	hideProgress() {
+		this.iProgress := "Stop"
+
+		if this.ProgressWindow
+			this.ProgressWindow.hideProgress()
 	}
 }
 

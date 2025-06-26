@@ -309,7 +309,7 @@ class RaceReportReader {
 			for ignore, lap in this.getLaps(raceData)
 				if times.Has(lap) {
 					time := (times[lap].Has(car) ? times[lap][car] : 0)
-					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					time := (isNull(time) ? 0 : Round(time / 1000, 1))
 
 					if (time > 0) {
 						if ((time > avg) && (Abs(time - avg) > (stdDev / 2)))

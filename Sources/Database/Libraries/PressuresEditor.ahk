@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\HTMLViewer.ahk"
 #Include "TyresDatabase.ahk"
 
@@ -220,42 +221,51 @@ class PressuresEditor {
 		local database := this.PressuresDatabase
 		local ignore, update, entry, row, connector, properties
 
-		database.reload("Tyres.Pressures.Distribution", false)
+		this.Window.Block()
 
-		if database.lock("Tyres.Pressures.Distribution", false)
-			try {
-				for ignore, update in this.iModifications
-					switch update[1], false {
-						case "Update":
-							entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+		try {
+			withTask(ProgressTask(translate("Saving")), () {
+				database.reload("Tyres.Pressures.Distribution", false)
 
-							if (entry.Length > 0) {
-								entry := entry[1]
+				if database.lock("Tyres.Pressures.Distribution", false)
+					try {
+						for ignore, update in this.iModifications
+							switch update[1], false {
+								case "Update":
+									entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
 
-								entry["Count"] := update[3]
-								entry["Synchronized"] := kNull
+									if (entry.Length > 0) {
+										entry := entry[1]
 
-								database.changed("Tyres.Pressures.Distribution")
+										entry["Count"] := update[3]
+										entry["Synchronized"] := kNull
+
+										database.changed("Tyres.Pressures.Distribution")
+									}
+								case "Add":
+									database.add(update[2])
+								case "Remove":
+									for ignore, connector in connectors
+										try {
+											for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+												if (row["Identifier"] != kNull)
+													connector.DeleteData("TyresPressuresDistribution", row["Identifier"])
+										}
+										catch Any as exception {
+											logError(exception, true)
+										}
+
+									database.remove("Tyres.Pressures.Distribution", update[2], always.Bind(true))
 							}
-						case "Add":
-							database.add(update[2])
-						case "Remove":
-							for ignore, connector in connectors
-								try {
-									for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
-										if (row["Identifier"] != kNull)
-											connector.DeleteData("TyresPressuresDistribution", row["Identifier"])
-								}
-								catch Any as exception {
-									logError(exception, true)
-								}
-
-							database.remove("Tyres.Pressures.Distribution", update[2], always.Bind(true))
 					}
-			}
-			finally {
-				database.unlock("Tyres.Pressures.Distribution")
-			}
+					finally {
+						database.unlock("Tyres.Pressures.Distribution")
+					}
+			})
+		}
+		finally {
+			this.Window.Unblock()
+		}
 	}
 
 	editPressures() {

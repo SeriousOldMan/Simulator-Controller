@@ -301,7 +301,12 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}
 									  , OnTrackCoaching: false})
 
-		DirCreate(this.Options["Driving Coach.Archive"])
+		try {
+			DirCreate(this.Options["Driving Coach.Archive"])
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 
 		OnExit(ObjBindMethod(this, "stopIssueCollector"))
 		OnExit((*) {
@@ -320,7 +325,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		options["Driving Coach.Archive"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", kTempDirectory . "Conversations")
 
-		if (!options["Driving Coach.Archive"] || (options["Driving Coach.Archive"] = ""))
+		if (!options["Driving Coach.Archive"] || (Trim(options["Driving Coach.Archive"]) = ""))
 			options["Driving Coach.Archive"] := (kTempDirectory . "Conversations")
 
 		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach Service", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
@@ -328,7 +333,7 @@ class DrivingCoach extends GridRaceAssistant {
 		options["Driving Coach.MaxTokens"] := getMultiMapValue(configuration, "Driving Coach Service", "MaxTokens", 2048)
 		options["Driving Coach.Temperature"] := getMultiMapValue(configuration, "Driving Coach Personality", "Temperature", 0.5)
 
-		if (string2Values("|", options["Driving Coach.Service"])[1] = "LLM Runtime")
+		if (string2Values("|", options["Driving Coach.Service"], 2)[1] = "LLM Runtime")
 			options["Driving Coach.GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", "GPULayers", 0)
 
 		options["Driving Coach.MaxHistory"] := getMultiMapValue(configuration, "Driving Coach Personality", "MaxHistory", 3)
@@ -435,7 +440,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static sessions := false
 
 		if !sessions {
-			sessions := ["Other", "Practice", "Qualifying", "Race"]
+			sessions := ["Other", "Practice", "Qualifying", "Race", "Time Trial"]
 
 			sessions.Default := "Other"
 		}
@@ -572,7 +577,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if telemetry {
 							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-														 , {name: this.VoiceManager.Name, telemetry: telemetry.JSON})
+														 , {telemetry: telemetry.JSON})
 
 							if reference
 								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
@@ -593,10 +598,6 @@ class DrivingCoach extends GridRaceAssistant {
 					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
 
-	getTools() {
-		return []
-	}
-
 	startConversation() {
 		local service := this.Options["Driving Coach.Service"]
 		local ignore, instruction
@@ -604,7 +605,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTranscript := (normalizeDirectoryPath(this.Options["Driving Coach.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
 
 		if service {
-			service := string2Values("|", service)
+			service := string2Values("|", service, 3)
 
 			if !inList(this.Providers, service[1])
 				throw "Unsupported service detected in DrivingCoach.startConversation..."
@@ -877,14 +878,26 @@ class DrivingCoach extends GridRaceAssistant {
 		static report := true
 		static conversationNr := 1
 
+		normalizeAnswer(answer) {
+			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+
+			while InStr(answer, "\n", , -2)
+				answer := SubStr(answer, 1, StrLen(answer) - 2)
+
+			return answer
+		}
+
 		try {
-			if (this.Speaker && this.Options["Driving Coach.Confirmation"] && (this.ConnectionState = "Active"))
+			if (this.Speaker && this.Options["Driving Coach.Confirmation"]
+							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
 				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
 
 			if (this.Connector || this.startConversation()) {
 				answer := this.Connector.Ask(text)
 
 				if answer {
+					answer := normalizeAnswer(answer)
+
 					report := true
 
 					if (this.CoachingActive && !InStr(kVersion, "-release")) {
@@ -955,7 +968,12 @@ class DrivingCoach extends GridRaceAssistant {
 						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 
 			if (this.Transcript && (this.Mode != "Coaching"))
-				FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				try {
+					FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 		}
 	}
 
@@ -1408,7 +1426,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTelemetryCollector() {
-		local loadedLaps
+		local loadedLaps, provider
 
 		updateTelemetry() {
 			local knowledgeBase := this.KnowledgeBase
@@ -1466,8 +1484,13 @@ class DrivingCoach extends GridRaceAssistant {
 				DirCreate(kTempDirectory . "Driving Coach\Telemetry")
 			}
 
+			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Internal")
+
+			if (provider != "Internal")
+				provider .= ("|" . getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider.URL", ""))
+
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
-			this.iTelemetryCollector := TelemetryCollector(kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
+			this.iTelemetryCollector := TelemetryCollector(provider, kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)
 
 			this.iTelemetryCollector.startup()
 
@@ -1614,7 +1637,9 @@ class DrivingCoach extends GridRaceAssistant {
 		if !prepared {
 			if formationLap {
 				this.updateDynamicValues({KnowledgeBase: false
-										, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+										, OverallTime: 0, BestLapTime: 0
+										, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+										, EnoughData: false})
 				this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
 			}
 
@@ -1624,7 +1649,7 @@ class DrivingCoach extends GridRaceAssistant {
 		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if (!prepared && settings) {
-			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", true)})
+			this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Coach", "Voice.UseTalking", false)})
 
 			if (this.Session = kSessionPractice) {
 				announcements := {SessionInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Session", true)
@@ -1675,8 +1700,9 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateConfigurationValues({LearningLaps: 1, AdjustLapTime: true, SaveSettings: false})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0
-								, InitialFuelAmount: 0, EnoughData: false})
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 
 		this.updateSessionValues({Standings: [], Laps: Map()})
 
@@ -1916,7 +1942,8 @@ class DrivingCoach extends GridRaceAssistant {
 								if inList(this.FocusedCorners, String(cornerNr)) {
 									this.iTelemetryFuture := this.TelemetryCollector.collectTelemetry()
 
-									this.iTelemetryFuture.Section := sectionNr
+									if this.iTelemetryFuture
+										this.iTelemetryFuture.Section := sectionNr
 								}
 
 								this.Mode := "Coaching"

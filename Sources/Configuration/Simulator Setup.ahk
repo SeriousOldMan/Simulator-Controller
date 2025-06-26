@@ -670,11 +670,11 @@ class SetupWizard extends ConfiguratorPanel {
 
 		wizardGui.SetFont("s10 Bold", "Arial")
 
-		wizardGui.Add("Text", "w684 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(wizardGui, "Simulator Setup"))
+		wizardGui.Add("Text", "w654 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(wizardGui, "Simulator Setup"))
 
 		wizardGui.SetFont("s9 Norm", "Arial")
 
-		wizardGui.Add("Documentation", "x248 YP+20 w204 H:Center Center", translate("Setup && Configuration")
+		wizardGui.Add("Documentation", "x208 YP+20 w204 H:Center Center", translate("Setup && Configuration")
 					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup")
 
 		wizardGui.Add("Text", "x8 yp+20 w700 0x10 W:Grow")
@@ -708,7 +708,7 @@ class SetupWizard extends ConfiguratorPanel {
 		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
 		wizardGui.Add("DropDownList", "x105 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
 
-		wizardGui.Add("DropDownList", "x238 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
+		wizardGui.Add("DropDownList", "x228 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 
 		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
 		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
@@ -1076,13 +1076,17 @@ class SetupWizard extends ConfiguratorPanel {
 			return false
 	}
 
-	getSimulatorConfiguration() {
+	getSimulatorConfiguration(save := true) {
 		local configuration := (this.Initialize ? newMultiMap()
 												: readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini"))
 
-		this.saveToConfiguration(configuration)
+		if (!save || this.savePage(this.Step, this.Page)) {
+			this.saveToConfiguration(configuration)
 
-		return configuration
+			return configuration
+		}
+		else
+			return newMultiMap()
 	}
 
 	getFirstPage(&step, &page) {
@@ -1225,6 +1229,23 @@ class SetupWizard extends ConfiguratorPanel {
 	hidePage(step, page) {
 		try {
 			if step.hidePage(page) {
+				this.saveKnowledgeBase()
+
+				return true
+			}
+			else
+				return false
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
+	}
+
+	savePage(step, page) {
+		try {
+			if step.savePage(page) {
 				this.saveKnowledgeBase()
 
 				return true
@@ -2531,16 +2552,24 @@ class StepWizard extends ConfiguratorPanel {
 	hidePage(page) {
 		local ignore, widget
 
-		if this.iWidgets.Has(page)
-			for ignore, widget in this.iWidgets[page] {
-				widget.Enabled := false
+		if this.savePage(page) {
+			if this.iWidgets.Has(page)
+				for ignore, widget in this.iWidgets[page] {
+					widget.Enabled := false
 
-				if widget.HasProp("Hide")
-					widget.Hide()
-				else
-					widget.Visible := false
-			}
+					if widget.HasProp("Hide")
+						widget.Hide()
+					else
+						widget.Visible := false
+				}
 
+			return true
+		}
+		else
+			return false
+	}
+
+	savePage(page) {
 		return true
 	}
 
@@ -2696,11 +2725,11 @@ class StartStepWizard extends StepWizard {
 
 			widget3 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden")
 
-			x := x + Round((width - 260) / 2)
+			x := (x + Round((width - 260) / 2))
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget4 := window.Add("Button", "x" . x . " yp+380 w260 h30 Y:Move H:Center Hidden", translate("Unblock Applications and DLLs..."))
+			widget4 := window.Add("Button", "x" . x . " yp+380 w260 h30 Y:Move X:Move(0.5) Hidden", translate("Unblock Applications and DLLs..."))
 			widget4.OnEvent("Click", elevateAndRestart)
 
 			html := "<html><body style='background-color: #" . window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style>div, p { color: #" . window.Theme.TextColor . "}</style>" . info . "</body></html>"
@@ -3168,13 +3197,13 @@ installZIP(path, application) {
 	deleteDirectory(A_Temp . "\Simulator Controller\Temp")
 
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
-	DirCreate(kUserHomeDirectory . "Programs")
+	DirCreate(normalizeDirectoryPath(kProgramsDirectory))
 
 	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
 
-	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, kUserHomeDirectory . "Programs", 1)
+	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, normalizeDirectoryPath(kProgramsDirectory), 1)
 
-	return (kUserHomeDirectory . "Programs\" . application)
+	return (kProgramsDirectory . application)
 }
 
 installEXE(command) {

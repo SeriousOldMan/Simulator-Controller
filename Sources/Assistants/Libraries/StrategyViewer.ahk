@@ -62,11 +62,11 @@ class StrategyViewer {
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . sessionDB.getTrackName(simulator, track) . "</td></tr>")
 
 		if (strategy.SessionType = "Duration") {
-			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("(") . Round(strategy.getSessionDuration() / 60, 1) . translate(")") . A_Space . translate("Minutes") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . displayValue("Float", strategy.getSessionLaps(), 1) . A_Space . translate("Laps") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("(") . Round(strategy.getSessionDuration() / 60, 1) . translate(")") . A_Space . translate("Minutes") . ((strategy.AdditionalLaps > 0) ? (translate(" + ") . strategy.AdditionalLaps . A_Space . translate("Lap")) : "") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . displayValue("Float", strategy.getSessionLaps(), (strategy.AdditionalLaps > 0) ? 0 : 1) . A_Space . translate("Laps") . "</td></tr>")
 		}
 		else {
-			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . ((strategy.AdditionalLaps > 0) ? (translate(" + ") . strategy.AdditionalLaps . A_Space . translate("Lap")) : "") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . Round(strategy.getSessionDuration() / 60, 1) . A_Space . translate("Minutes") . "</td></tr>")
 		}
 
@@ -157,7 +157,7 @@ class StrategyViewer {
 				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
-				lapSeries.Push(pitstop.Lap + 1)
+				lapSeries.Push(pitstop.Lap)
 				fuelSeries.Push(pitstop.RemainingFuel - pitstop.RefuelAmount)
 				tyreSeries.Push(lastTyreLaps - (pitstop.Lap - lastLap))
 
@@ -168,12 +168,12 @@ class StrategyViewer {
 				lastLapTime := pitstop.AvgLapTime
 				lastWeather := (translate(pitstop.Weather) . translate(" (") . displayValue("Float", convertUnit("Temperature", pitstop.AirTemperature)) . translate(" / ") . displayValue("Float", convertUnit("Temperature", pitstop.TrackTemperature), 1) . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
-				lastPitstopInfo := (Format("{1:3}", pitstop.Lap + 1) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
+				lastPitstopInfo := (Format("{1:3}", pitstop.Lap) . translate(" - ") . displayValue("Time", pitstop.Time, true, false, false))
 				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) . (pitstop.TyreSet ? (translate(" [") . pitstop.TyreSet . translate("]")) : "") : translate("No"))
 				lastTyreLaps := pitstop.RemainingTyreLaps
 
 				timeSeries.Push((pitstop.Time + pitStop.Duration) / 60)
-				lapSeries.Push(pitstop.Lap + 1)
+				lapSeries.Push(pitstop.Lap)
 				fuelSeries.Push(pitstop.RemainingFuel)
 				tyreSeries.Push(lastTyreLaps)
 			}

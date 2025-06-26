@@ -12,7 +12,7 @@ Simply start the "Solo Center" **before** starting the session in your simulator
 
 When you start a new session or when you close the window, the "Solo Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export", "Auto Save" or even "Auto Clear" in the "Session" menu according to your preferences. "Auto Export" will, as the name suggests, export the telemetry data from valid laps to the session database and "Auto Save" will save the complete session state to the session database. This sessin state can be retrieved later using the "Load session..." command from the "Session" menu.
 
-Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will loose your valuable practice data, since it will be send to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
+Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will lose your valuable practice data, since it will be sent to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
 Note: If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Solo Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Team Center" to control your race in this case anyway.
 
@@ -24,7 +24,7 @@ The default value for the data update frequency is 10 seconds, but you can can t
 
 ### Saving and loading sessions
 
-The "Solo Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the telemetry data to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
+The "Solo Center" allows you to save the complete session data for later inspection by using the "Save Session..." command from the "Session" menu. You can use the "Load Session..." command to retrieve such a session later on and all information will be restored. Saving a session this way does **not** export the detailed data about lap times, cosumables, tyre state and so on to the session database, which is a completely different thing and must be triggered seperately. However, the full session information can also be stored in the session database, if needed, to have all information in a central location.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
 
@@ -32,13 +32,20 @@ IMPORTANT: The data format of saved sessions has changed over time. To load a se
 
 The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
+#### Difference between saving a session and exporting data
+
+It is important that you understand the difference between saving the current state of a session and [exporting data to the session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#exporting-data-to-the-session-database). Both will typically be done at the end of a session, but the purpose is very different.
+
+- **Saving** a session means storing the complete state of the session in a file, pretty much like saving a text document. This data is kind of passive, it is a simple document. But it is useful for the records.
+- **Exporting** a session will write important data from the session, like pressures, temperatures, consumables, lap times and so on in a structured format to the session database, so that this data can be used by the Assistants and other applications like the "Strategy Workbench".
+
 ### Data Analysis
 
-"Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.
+"Solo Center" supplies you with a couple of reports, which you can use to analyse your performance and dig deeper into the state of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Solo Center" window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%201.JPG)
 
-The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the telemetry data. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
+The reports at the top of the list are the well known reports, which are also available after a session using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. They are mostly useful to analyze the standings and the performance of the various drivers and cars. The other reports will give you an insight into the datailed data like pressures, temperatures and so on. You can select the data to be shown using the selector menus on the right of the report list. You can also choose the type of visualization using the "Plot" menu on top of the report area. Use the "Stint" menu to restrict the visualized data to a specific stint or use the "Driver" menu to restrict the data of the various charts to one the drivers who has already driven some laps in the session (normally only you). Only data of the selected driver will be shown then.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%202.JPG)
 
@@ -104,15 +111,19 @@ A valuable tool to improve your lap times is the integrated Telemetry Viewer, wh
 
 While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
+#### Choosing the telemetry provider
+
+The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
+
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
 Important: Session that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
 
 ##### Notes
 
-1. It can take a few laps before the first telemetry data gets recorded.
-2. A special method is used for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
-3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the browser and re-open it.
+1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
+2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
+3. The telemetry recorder is only running, while the Telemetry Viewer is open. Therefore, you can restart the learning process for *Assetto Corsa Competizione*, if necessary, by closing the window and re-open it.
 4. The currently selected lap can be deleted by using the "-" button to the right of the drop down menu of all laps. If you hold down the Control key, all laps can be deleted at once.
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.
@@ -165,8 +176,8 @@ The choices (except tyre compounds) will be remembered between different runs of
 
 ### Exporting data to the session database
 
-At the end of your session, you can decide which data should be transfered to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu.
+At the end of your session, you can decide which data should be transferred to the session database by clicking the small check marks for each lap in the list of driven laps. "Solo Center" will already have selected by default all valid laps for your convenience. Then choose the command "Export to Database" from the "Session" menu. This will transfer the data for the selected laps (lap times, consumption, tyre wear and pressures, brake wear, and so on) to the session database.
 
 Please note, that this export is possible only once, to prevent duplicate data entries in your database, and cannot be undone. Therefore check your selection carefully beforehand.
 
-You can also store your session for later inspection in any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export can also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.
+As already mentioned, you can also store your session for later inspection in the "Session Database" or at any location on your PC using the "Save Session..." command from the "Session" menu. The mentioned data export may also be initiated from a saved copy - very helpful, if you are exhausted after your session and want to defer the data inspection for later.

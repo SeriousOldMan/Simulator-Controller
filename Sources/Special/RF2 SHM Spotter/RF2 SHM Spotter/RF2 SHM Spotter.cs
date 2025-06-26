@@ -180,6 +180,8 @@ namespace RF2SHMSpotter {
 		const double PI = 3.14159265;
 
 		long cycle = 0;
+		long nextSpeedUpdate = 0;
+		bool enabled = true;
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
@@ -718,6 +720,8 @@ namespace RF2SHMSpotter {
 
 		string semFileName = "";
 
+		int thresholdSpeed = 60;
+
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
 			bool accident = false;
@@ -1244,7 +1248,7 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.y);
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
             double wheelBaseMeter = (float)wheelbase / 100;
@@ -1281,10 +1285,14 @@ namespace RF2SHMSpotter {
 					if (steerAngle > 0) {
 						if (angularVelocity > 0)
                         {
-                            if (calibrate)
-                                slip *= -1;
-                            else
-                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							/*
+							if (calibrate)
+								slip *= -1;
+							else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							*/
+
+							slip *= -1;
                         }
                         else if (angularVelocity < idealAngularVelocity)
 							slip *= -1;
@@ -1292,41 +1300,51 @@ namespace RF2SHMSpotter {
 					else {
 						if (angularVelocity < 0)
                         {
-                            if (calibrate)
-                                slip *= -1;
+							/*
+							if (calibrate)
+								slip *= -1;
                             else
-                                slip = (oversteerHeavyThreshold - 1) / 57.2989;
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							*/
+							
+							slip *= -1;
                         }
                         else if (angularVelocity > idealAngularVelocity)
 							slip *= -1;
 					}
 
-                    cd.Usos = slip * 57.2989 * 1;
+					if (slip != 0)
+					{
+						cd.Usos = slip * 57.2989 * 1;
 
-                    if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
-                        if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
-                            lastSound = Environment.TickCount;
+						if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
+							if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
+								lastSound = Environment.TickCount;
 
-                    if (false)
-                    {
-                        StreamWriter output = new StreamWriter(dataFile + ".trace", true);
+						if (false)
+						{
+							StreamWriter output = new StreamWriter(dataFile + ".trace", true);
 
-						output.Write(steerAngle + "  ");
-						output.Write(steeredAngleDegs + "  ");
-						output.Write(steerAngleRadians + "  ");
-						output.Write(lastSpeed + "  ");
-						output.Write(idealAngularVelocity + "  ");
-						output.Write(angularVelocity + "  ");
-						output.Write(slip + "  ");
-                        output.WriteLine(cd.Usos);
+							output.Write(steerAngle + "  ");
+							output.Write(steeredAngleDegs + "  ");
+							output.Write(steerAngleRadians + "  ");
+							output.Write(lastSpeed + "  ");
+							output.Write(idealAngularVelocity + "  ");
+							output.Write(angularVelocity + "  ");
+							output.Write(slip + "  ");
+							output.WriteLine(cd.Usos);
 
-                        output.Close();
-						
-						Thread.Sleep(200);
-                    }
+							output.Close();
+
+							Thread.Sleep(200);
+						}
+					}
+                    else
+						cd = null;
                 }
 
-				cornerDynamicsList.Add(cd);
+				if (cd != null)
+					cornerDynamicsList.Add(cd);
 
 				int completedLaps = playerScoring.mTotalLaps;
 
@@ -1334,7 +1352,7 @@ namespace RF2SHMSpotter {
 					lastCompletedLaps = completedLaps;
 					
 					while (true)
-						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
@@ -1755,15 +1773,18 @@ namespace RF2SHMSpotter {
 					lastRunning = -1;
                 }
 
-				if (playerScoring.mLapDist > lastRunning) {
-					lastRunning = playerScoring.mLapDist;
+				if (playerScoring.mLapDist > lastRunning)
+                {
+                    ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+
+                    lastRunning = playerScoring.mLapDist;
 					
 					telemetryFile.Write(playerScoring.mLapDist + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-					telemetryFile.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");
+					telemetryFile.Write((float)vehicle.mFilteredBrake + ";");
+					telemetryFile.Write((float)vehicle.mFilteredSteering + ";");
+					telemetryFile.Write((float)vehicle.mGear + ";");
+					telemetryFile.Write((float)vehicle.mEngineRPM + ";");
 					telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
 
 					telemetryFile.Write("n/a;");
@@ -1775,8 +1796,6 @@ namespace RF2SHMSpotter {
 					telemetryFile.Write(playerScoring.mPos.x + ";");
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
-					ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
-
 					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
@@ -1785,11 +1804,11 @@ namespace RF2SHMSpotter {
                             StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 
                             file.Write(playerScoring.mLapDist + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredThrottle + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredBrake + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mFilteredSteering + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mGear + ";");
-                            file.Write((float)telemetry.mVehicles[playerID].mEngineRPM + ";");
+                            file.Write((float)vehicle.mFilteredThrottle + ";");
+                            file.Write((float)vehicle.mFilteredBrake + ";");
+                            file.Write((float)vehicle.mFilteredSteering + ";");
+                            file.Write((float)vehicle.mGear + ";");
+                            file.Write((float)vehicle.mEngineRPM + ";");
                             file.Write(vehicleSpeed(ref playerScoring) + ";");
 
                             file.Write("n/a;");
@@ -1892,6 +1911,9 @@ namespace RF2SHMSpotter {
 
             if (args.Length > 4)
                 semFileName = args[4];
+
+            if (args.Length > 5)
+                thresholdSpeed = int.Parse(args[5]);
         }
 
         bool started = false;
@@ -1986,15 +2008,36 @@ namespace RF2SHMSpotter {
 									{
 										updateTopSpeed(ref playerScoring);
 
-										cycle += 1;
+                                        if (cycle > nextSpeedUpdate)
+                                        {
+											float speed = (float)vehicleSpeed(ref playerScoring);
+
+                                            nextSpeedUpdate = cycle + 50;
+
+                                            if ((speed >= thresholdSpeed) && !enabled)
+                                            {
+                                                enabled = true;
+
+                                                SendSpotterMessage("enableSpotter");
+                                            }
+                                            else if ((speed < thresholdSpeed) && enabled)
+                                            {
+                                                enabled = false;
+
+                                                SendSpotterMessage("disableSpotter");
+                                            }
+                                        }
+
+                                        cycle += 1;
 
 										if (!startGo || !greenFlag())
-											if (checkAccident(ref playerScoring))
-												wait = false;
-											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-												wait = false;
-											else
-												wait = !checkPitWindow(ref playerScoring);
+											if (enabled)
+												if (checkAccident(ref playerScoring))
+													wait = false;
+												else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+													wait = false;
+												else
+													wait = !checkPitWindow(ref playerScoring);
 									}
 									else
 									{

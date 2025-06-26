@@ -160,6 +160,28 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+std::string normalizeName(const char* name) {
+	std::string result = name;
+
+	replace(result, "/", "");
+	replace(result, ":", "");
+	replace(result, "*", "");
+	replace(result, "?", "");
+	replace(result, "<", "");
+	replace(result, ">", "");
+	replace(result, "|", "");
+
+	return result;
+}
+
 HANDLE fileHandle = NULL;
 const SharedMemory* sharedData = NULL;
 SharedMemory* localCopy = NULL;
@@ -260,11 +282,12 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		else
 			printLine(&output, "Session=Other");
 
-		printLine(&output, "Car=", localCopy->mCarName);
-		print(&output, "Track=", localCopy->mTrackLocation); print(&output, "-");  printLine(&output, localCopy->mTrackVariation);
+		printLine(&output, "Car=", normalizeName(localCopy->mCarName));
+		print(&output, "Track=", normalizeName(localCopy->mTrackLocation)); print(&output, "-");  printLine(&output, normalizeName(localCopy->mTrackVariation));
 		printLine(&output, "FuelAmount=", (int)localCopy->mFuelCapacity);
 
 		printLine(&output, "SessionFormat=", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
+		printLine(&output, "AdditionalLaps=", localCopy->mSessionAdditionalLaps);
 
 		printLine(&output, "SessionTimeRemaining=", getRemainingTime(localCopy));
 		printLine(&output, "SessionLapsRemaining=", getRemainingLaps(localCopy));
@@ -350,6 +373,12 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		print(&output, ",", (int)round(localCopy->mBrakeDamage[TYRE_FRONT_RIGHT] * 100));
 		print(&output, ",", (int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100));
 		printLine(&output, ",", (int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
+
+		if ((int)round(localCopy->mWaterTempCelsius))
+			printLine(&output, "WaterTemperature=", (int)round(localCopy->mWaterTempCelsius));
+
+		if ((int)round(localCopy->mOilTempCelsius))
+			printLine(&output, "OilTemperature=", (int)round(localCopy->mOilTempCelsius));
 
 		printLine(&output, "[Stint Data]");
 
@@ -462,7 +491,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				print(&output, (long)(localCopy->mCurrentSector2Times[i - 1] * 1000)); print(&output, ",");
 				print(&output, (long)(localCopy->mCurrentSector3Times[i - 1] * 1000)); printLine(&output);
 
-				print(&output, "Car.", i); printLine(&output, ".Car=", localCopy->mCarNames[i - 1]);
+				print(&output, "Car.", i); printLine(&output, ".Car=", normalizeName(localCopy->mCarNames[i - 1]));
 
 				char* name = (char*)vehicle.mName;
 

@@ -277,8 +277,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		this.Control["simulatorDropDown"].Choose(chosen)
 	}
 
-	hidePage(page) {
-		if super.hidePage(page) {
+	savePage(page) {
+		if super.savePage(page) {
 			this.saveSimulatorMFDKeys(this.iCurrentSimulator)
 
 			return true

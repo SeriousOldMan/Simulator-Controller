@@ -248,7 +248,12 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		reloadRaceReports(*) {
-			reports.loadTrack(reports.SelectedTrack, true)
+			local car := reports.SelectedCar
+			local track := reports.SelectedTrack
+
+			reports.loadSimulator(reports.SelectedSimulator, true)
+			reports.loadCar(car, true)
+			reports.loadTrack(track, true)
 		}
 
 		deleteRaceReport(*) {
@@ -311,8 +316,8 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 Y:Move +0x200", translate("Info"))
 		raceReportsGui.Add("HTMLViewer", "x90 yp-2 w180 h170 Y:Move W:Grow(0.25) Border vinfoViewer")
 
-		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200 X:Move(0.25)", translate("Report"))
-		raceReportsGui.Add("DropDownList", "x334 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
+		raceReportsGui.Add("Text", "x290 ys w70 h23 +0x200 X:Move(0.25)", translate("Report"))
+		raceReportsGui.Add("DropDownList", "x364 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
 
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
@@ -805,7 +810,29 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadReport(report, force := false) {
-		local reportDirectory, raceData, drivers, simulator, car, track
+		local reportDirectory, simulator, car, track
+
+		getDrivers() {
+			local drivers := []
+			local hasDriver := false
+			local driver, raceData, ignore
+
+			this.ReportViewer.loadReportData(false, &raceData := true, &ignore := false, &ignore := false, &ignore := false)
+
+			driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
+
+			loop Min(5, getMultiMapValue(raceData, "Cars", "Count")) {
+				if (A_Index = driver)
+					hasDriver := true
+
+				drivers.Push(A_Index)
+			}
+
+			if (!hasDriver && driver)
+				drivers.Push(driver)
+
+			return drivers
+		}
 
 		if (force || (report != this.SelectedReport)) {
 			if report {
@@ -826,19 +853,8 @@ class RaceReports extends ConfigurationItem {
 					case "Car":
 						this.showCarReport(reportDirectory)
 					case "Drivers":
-						if !this.ReportViewer.Settings.Has("Drivers") {
-							raceData := true
-							ignore := false
-
-							this.ReportViewer.loadReportData(false, &raceData, &ignore, &ignore, &ignore)
-
-							drivers := []
-
-							loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
-								drivers.Push(A_Index)
-
-							this.ReportViewer.Settings["Drivers"] := drivers
-						}
+						if !this.ReportViewer.Settings.Has("Drivers")
+							this.ReportViewer.Settings["Drivers"] := getDrivers()
 
 						this.showDriverReport(reportDirectory)
 					case "Positions":
@@ -846,19 +862,8 @@ class RaceReports extends ConfigurationItem {
 					case "Lap Times":
 						this.showLapTimesReport(reportDirectory)
 					case "Consistency":
-						if !this.ReportViewer.Settings.Has("Drivers") {
-							raceData := true
-							ignore := false
-
-							this.ReportViewer.loadReportData(false, &raceData, &ignore, &ignore, &ignore)
-
-							drivers := []
-
-							loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
-								drivers.Push(A_Index)
-
-							this.ReportViewer.Settings["Drivers"] := drivers
-						}
+						if !this.ReportViewer.Settings.Has("Drivers")
+							this.ReportViewer.Settings["Drivers"] := getDrivers()
 
 						this.showConsistencyReport(reportDirectory)
 					case "Pace":

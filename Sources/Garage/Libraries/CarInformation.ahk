@@ -33,6 +33,6 @@ getCarSteerLock(simulator, car) {
 			return steerLock
 	}
 
-	return getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Telemetry Collector"
+	return getMultiMapValue(readMultiMap(kUserConfigDirectory . "Issue Collector.ini"), "Settings"
 						  , (simulator . "." . car . ".*.") . "SteerLock", false)
 }

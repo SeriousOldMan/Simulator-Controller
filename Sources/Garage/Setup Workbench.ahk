@@ -40,9 +40,11 @@
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
-#Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
+; #Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -422,33 +424,33 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
-		loadSetup(*) {
+		loadIssues(*) {
 			local fileName
 
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, "", translate("Load Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Load Issues..."), "Issues (*.issues)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
 				workbench.restoreState(fileName, false)
 		}
 
-		saveSetup(*) {
+		saveIssues(*) {
 			local fileName
 
 			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
-			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Save Issues..."), "Issues (*.setup)")
+			fileName := withBlockedWindows(FileSelect, "S17", "", translate("Save Issues..."), "Issues (*.issues)")
 			OnMessage(0x44, translateSaveCancelButtons, 0)
 
 			if (fileName != "") {
-				if !InStr(fileName, ".setup")
-					fileName := (fileName . ".setup")
+				if !InStr(fileName, ".issues")
+					fileName := (fileName . ".issues")
 
-				workbench.saveState(fileName)
+				workbench.saveIssues(fileName)
 			}
 		}
 
@@ -537,10 +539,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Button", "x280 yp w70 h23 vcharacteristicsButton", translate("Issue...")).OnEvent("Click", chooseCharacteristic)
 		button := workbenchGui.Add("Button", "x352 yp w23 h23")
-		button.OnEvent("Click", loadSetup)
+		button.OnEvent("Click", loadIssues)
 		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
 		button := workbenchGui.Add("Button", "x376 yp w23 h23")
-		button.OnEvent("Click", saveSetup)
+		button.OnEvent("Click", saveIssues)
 		setButtonIcon(button, kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		workbenchGui.SetFont("Norm")
@@ -560,8 +562,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
 
-		workbenchGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
-		workbenchGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
+		workbenchGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadIssues)
+		workbenchGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveIssues)
 
 		workbenchGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupWorkbench)
 		*/
@@ -582,11 +584,11 @@ class SetupWorkbench extends ConfigurationItem {
 			window.Resize("Initialize", w, h)
 	}
 
-	saveState(fileName := false) {
+	saveIssues(fileName := false) {
 		local state, ignore, characteristic, widgets, value1, value2
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.issues")
 
 		state := this.SimulatorDefinition.Clone()
 
@@ -620,7 +622,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local ignore, characteristic
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.issues")
 
 		if FileExist(fileName) {
 			state := readMultiMap(fileName)
@@ -1530,15 +1532,19 @@ class SetupWorkbench extends ConfigurationItem {
 						if ((lastActiveSimulator != simulator) || (lastActiveTrack != track))
 							deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
 
-						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry", true)
+						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
 					}
 
+					trackLength := getMultiMapValue(readSimulator(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
+
+					/*
 					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 
 					if (simulatorCode = "ACC")
 						trackLength := getMultiMapValue(ACCUDPProvider().acquire(), "Track Data", "Length", 0)
 					else
 						trackLength := getMultiMapValue(callSimulator(simulatorCode), "Track Data", "Length", 0)
+					*/
 
 					if (trackLength > 0) {
 						lastSimulator := simulator
@@ -1584,7 +1590,7 @@ class SetupWorkbench extends ConfigurationItem {
 				DirCreate(kTempDirectory . "Garage\Telemetry")
 			}
 
-			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry", true)
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry")
 
 			this.TelemetryViewer.show()
 
@@ -1809,11 +1815,15 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.startIssueAnalyzer())
 
+		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+			characteristicsMenu.Disable(label)
+
 		label := translate("Telemetry...")
 
 		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())
 
-		if (this.SelectedSimulator[false] == true)
+		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
 			characteristicsMenu.Disable(label)
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
@@ -2129,6 +2139,8 @@ class NumberHandler extends SettingHandler {
 class DiscreteValuesHandler extends NumberHandler {
 	iZero := false
 	iIncrement := false
+	iStep := false
+
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
 
@@ -2143,6 +2155,12 @@ class DiscreteValuesHandler extends NumberHandler {
 	Increment {
 		Get {
 			return this.iIncrement
+		}
+	}
+
+	Step {
+		Get {
+			return this.iStep
 		}
 	}
 
@@ -2169,21 +2187,19 @@ class DiscreteValuesHandler extends NumberHandler {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
-		this.iIncrement := Abs(increment)
+		this.iIncrement := increment
+		this.iStep := Abs(increment)
 	}
 
 	convertToDisplayValue(rawValue) {
-		if this.Reverse
-			return this.formatValue(this.Zero - (rawValue * this.Increment))
-		else
-			return this.formatValue(this.Zero + (rawValue * this.Increment))
+		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
 	convertToRawValue(displayValue) {
 		if this.Reverse
-			return Round((this.Zero - displayValue) / this.Increment)
+			return Round((this.Zero - displayValue) / this.Step)
 		else
-			return Round((displayValue - this.Zero) / this.Increment)
+			return Round((displayValue - this.Zero) / this.Step)
 	}
 
 	increaseValue(displayValue) {
@@ -2361,6 +2377,98 @@ class EnumerationHandler extends SettingHandler {
 			return this.Values[1]
 		else
 			return "-"
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ScriptHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ScriptHandler extends SettingHandler {
+	iScript := false
+	iArguments := []
+
+	Script {
+		Get {
+			return this.iScript
+		}
+	}
+
+	Arguments {
+		Get {
+			return this.iArguments
+		}
+	}
+
+	__New(script, arguments*) {
+		this.iScript := substituteVariables(script)
+		this.iArguments := arguments
+	}
+
+	runScript(command, value) {
+		local context := scriptOpenContext()
+		local script, scriptFileName
+
+		try {
+			script := FileRead(this.Script)
+
+			script .= ("`n`n" . FileRead(getFileName("SettingHandlerExecutor.script"
+												   , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\")))
+
+			scriptFileName := temporaryFileName("Setting Handler", "script")
+
+			try {
+				FileAppend(script, scriptFileName)
+
+				if !scriptLoadScript(context, scriptFileName, &message)
+					throw message
+			}
+			finally {
+				if !isDebug()
+					deleteFile(scriptFileName)
+			}
+
+			scriptPushArray(context, this.Arguments)
+			scriptSetGlobal(context, "Arguments")
+
+			scriptPushValue(context, command)
+			scriptSetGlobal(context, "__COMMAND")
+			scriptPushValue(context, value)
+			scriptSetGlobal(context, "__VALUE")
+
+			scriptPushValue(context, (c) {
+				return scriptExternHandler(c)
+			})
+			scriptSetGlobal(context, "extern")
+
+			if scriptExecute(context, &message)
+				return scriptGetValue(context)
+			else
+				throw message
+		}
+		finally {
+			scriptCloseContext(context)
+		}
+	}
+
+	formatValue(value) {
+		return this.runScript("FORMAT", value)
+	}
+
+	convertToDisplayValue(value) {
+		return this.runScript("TO_DISPLAY", value)
+	}
+
+	convertToRawValue(value) {
+		return this.runScript("TO_RAW", value)
+	}
+
+	increaseValue(value) {
+		return this.runScript("INCREASE", value)
+	}
+
+	decreaseValue(value) {
+		return this.runScript("DECREASE", value)
 	}
 }
 
@@ -2619,7 +2727,8 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	editableSetup(car) {
-		return FileExist(kResourcesDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini")
+		return (FileExist(kResourcesDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini")
+			 || FileExist(kUserHomeDirectory . "Garage\Definitions\Cars\" . this.Workbench.SelectedSimulator . "." . this.Workbench.SelectedCar . ".ini"))
 	}
 
 	editSetup(setup := false) {
@@ -3736,7 +3845,7 @@ class FileSetupComparator extends SetupComparator {
 
 closeSetupWorkbench(*) {
 	if GetKeyState("Ctrl")
-		SetupWorkbench.Instance.saveState()
+		SetupWorkbench.Instance.saveIssues()
 
 	ExitApp(0)
 }
@@ -3845,6 +3954,16 @@ startupSetupWorkbench() {
 		ExitApp(1)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

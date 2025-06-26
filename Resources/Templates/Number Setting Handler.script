@@ -1,0 +1,48 @@
+local BASE = Arguments[1]
+local SCALE = Arguments[2]
+local MIN = Arguments[3]
+local MAX = Arguments[4]
+local INCREMENT = Arguments[5]
+local PRECISION = Arguments[6]
+
+math.round = function(value, places)
+	local mult = 10 ^ (places or 0)
+	
+    return math.floor(value * mult + 0.5) / mult
+end
+
+function validValue(value)
+	return value >= MIN and value <= MAX
+end
+
+function formatValue(value)
+	return math.round(value, PRECISION)
+end
+
+function convertToDisplayValue(value)
+	return formatValue(BASE + (value / SCALE))
+end
+
+function convertToRawValue(value)
+	return math.tointeger(math.round((value * SCALE) - BASE))
+end
+
+function increaseValue(value)
+	local incValue = (value + INCREMENT)
+
+	if not validValue(incValue) then
+		incValue = math.min(MAX, math.max(MIN, value))
+	end
+	
+	return incValue
+end
+
+function decreaseValue(value)
+	local decValue = (value - INCREMENT)
+
+	if not validValue(decValue) then
+		decValue = math.max(MIN, math.min(MAX, value))
+	end
+	
+	return decValue
+end

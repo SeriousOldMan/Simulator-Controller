@@ -1,4 +1,4 @@
-A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Cat, el observador AI de carreras, junto con una breve introducción a la sintaxis de las gramáticas de frases.
+A continuación encontrará una lista completa de todos los comandos de voz reconocidos por Elisa, el observador AI de carreras, junto con una breve introducción a la sintaxis de las gramáticas de frases.
 
 ## Sintaxis
 
@@ -24,7 +24,7 @@ A continuación encontrará una lista completa de todos los comandos de voz reco
    
 		{ presiones, presiones de neumáticos }
 
-   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática] (https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.es) y se ve así:
+   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática] (https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.es) y se ve así:
 
 		TellMe=Puedes decirme, Por favor dime, Puedes darme, Por favor dame, Dame
 
@@ -54,7 +54,7 @@ CanYou=Puedes, por favor
 
 CanWe=Puedes, podemos, por favor
 
-Announcements=información delta, consejos tácticos, alertas laterales, alertas traseras, avisos de bandera azul, avisos de bandera amarilla, avisos de atajo, información de penalización, alertas de coche lento, alertas de accidentes por delante, alertas de accidentes detrás
+Announcements=información delta, consejos tácticos, alertas laterales, alertas traseras, avisos de bandera azul, avisos de bandera amarilla, avisos de límites de pista, información de penalización, alertas de coche lento, alertas de accidentes por delante, alertas de accidentes detrás
 
 #### Comandos
 

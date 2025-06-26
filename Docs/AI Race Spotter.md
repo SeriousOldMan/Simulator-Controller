@@ -22,6 +22,8 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 5. [Italian version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(IT))
 
+6. [Portuguese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(PT))
+
 I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
 
 #### Extending conversation and reasoning capabilities using an LLM
@@ -50,7 +52,7 @@ These commands are also available as "Mute" and "Unmute" plugin actions, which c
 
 ### Multi-class support
 
-Elisa *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database", in what way Elisa uses the information about the car classes and cup categories to partition the grid.
+Elisa *understands* multi-class and multi-category races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid. You can configure in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", in what way Elisa uses the information about the car classes and cup categories to partition the grid.
 
 ## Alerts & Information
 
@@ -148,7 +150,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". See the table below for the thresholds and their default values.
+Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |
@@ -201,7 +203,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (6) No detailed information for the concrete penalty available.
 
-(7) The distance ahead or behind, for which this is checked and reported can be defined in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
+(7) The distance ahead or behind, for which this is checked and reported can be defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
 
 (8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
 
@@ -323,7 +325,7 @@ And a final warning: This kind of automation might be considered illegal accordi
 
 ### Enabling and disabling Track Automations
 
-For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations.
+For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) available.
 
 ### Choosing between different Track Automations
 

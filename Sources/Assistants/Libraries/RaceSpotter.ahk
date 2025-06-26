@@ -850,6 +850,7 @@ class PositionInfo {
 class RaceSpotter extends GridRaceAssistant {
 	iSpotterPID := false
 	iRunning := false
+	iEnabled := true
 
 	iSessionDataActive := false
 
@@ -867,6 +868,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iFocusedCar := kUndefined
 
+	iFinalLap := false
+
 	iPendingAlerts := []
 	iAlertProcessing := false
 
@@ -874,6 +877,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iBestTopSpeed := false
 	iLastTopSpeed := false
+
+	iPrivateSession := false
 
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
@@ -1002,6 +1007,12 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	Enabled {
+		Get {
+			return this.iEnabled
+		}
+	}
+
 	SessionDataActive {
 		Get {
 			return this.iSessionDataActive
@@ -1101,6 +1112,18 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	FinalLap {
+		Get {
+			return this.iFinalLap
+		}
+	}
+
+	PrivateSession {
+		Get {
+			return this.iPrivateSession
+		}
+	}
+
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -1149,6 +1172,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if values.HasProp("DriverUpdateTime")
 			this.iDriverUpdateTime := values.DriverUpdateTime
+
+		if values.HasProp("PrivateSession")
+			this.iPrivateSession := values.PrivateSession
 	}
 
 	updateSessionValues(values) {
@@ -1159,6 +1185,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iRunning := false
+			this.iFinalLap := false
+			this.iEnabled := true
 
 			this.initializeHistory()
 		}
@@ -1168,6 +1196,9 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasProp("BaseLap") && (values.BaseLap != this.BaseLap))
 			if this.SessionInfos.Has("AirTemperature")
 				this.SessionInfos.Delete("AirTemperature")
+
+		if values.HasProp("Enabled")
+			this.iEnabled := values.Enabled
 
 		super.updateDynamicValues(values)
 	}
@@ -1451,31 +1482,49 @@ class RaceSpotter extends GridRaceAssistant {
 
 	finalLap() {
 		local knowledgeBase := this.KnowledgeBase
+		local additionalLaps := knowledgeBase.getValue("Session.AdditionalLaps")
+		local sessionLapsRemaining := knowledgeBase.getValue("Session.Lap.Remaining")
+		local driverCar := knowledgeBase.getValue("Driver.Car")
+		local finalLap := this.FinalLap
 		local sessionTimeRemaining, driverCar, running, time
 
-		if (knowledgeBase.getValue("Session.Format") = "Time") {
-			sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
-			driverCar := knowledgeBase.getValue("Driver.Car")
+		if finalLap
+			return (knowledgeBase.getValue("Car." . finalLap[1] . ".Laps") >= finalLap[2])
+		else {
+			if (knowledgeBase.getValue("Session.Format") = "Time") {
+				sessionTimeRemaining := knowledgeBase.getValue("Session.Time.Remaining")
 
-			if (sessionTimeRemaining < (knowledgeBase.getValue("Car." . driverCar . ".Time", 0) * 2)) {
-				loop knowledgeBase.getValue("Car.Count", 0)
-					if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
-						time := knowledgeBase.getValue("Car." . A_Index . ".Time")
-						running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
+				if (sessionTimeRemaining < (knowledgeBase.getValue("Car." . driverCar . ".Time", 0) * 2)) {
+					loop knowledgeBase.getValue("Car.Count", 0)
+						if (knowledgeBase.getValue("Car." . A_Index . ".Position") = 1) {
+							time := knowledgeBase.getValue("Car." . A_Index . ".Time")
+							running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running")
 
-						if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
-							return true
+							if ((sessionTimeRemaining - ((1 - running) * time)) <= 0)
+								if (additionalLaps > 0) {
+									this.iFinalLap := [A_Index, knowledgeBase.getValue("Car." . A_Index . ".Laps") + additionalLaps]
 
-						break
-					}
+									return false
+								}
+								else
+									return true
 
-				return (sessionTimeRemaining <= 0)
+							break
+						}
+
+					return (sessionTimeRemaining <= 0)
+				}
+				else
+					return false
+			}
+			else if ((additionalLaps > 0) && driverCar && (sessionLapsRemaining = 1)) {
+				this.iFinalLap := [driverCar, knowledgeBase.getValue("Car." . driverCar . ".Laps") + 1 + additionalLaps]
+
+				return false
 			}
 			else
-				return false
+				return (sessionLapsRemaining <= 0)
 		}
-		else
-			return (knowledgeBase.getValue("Session.Lap.Remaining") <= 0)
 	}
 
 	reviewRaceStart(lastLap, sector, positions) {
@@ -1545,8 +1594,8 @@ class RaceSpotter extends GridRaceAssistant {
 			knowledgeBase := this.KnowledgeBase
 			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", 0)
 			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", 0)
-			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
-			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
+			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 60000)
+			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0) / 60000)
 
 			if (remainingSessionLaps > 0) {
 				speaker.beginTalk()
@@ -1556,7 +1605,7 @@ class RaceSpotter extends GridRaceAssistant {
 														, laps: remainingSessionLaps
 														, position: Round(positions["Position.Class"])})
 
-					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0))
 
 					if (remainingStintTime < remainingSessionTime) {
 						speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
@@ -1984,7 +2033,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
-		if (this.Session = kSessionQualification) {
+		if ((this.Session = kSessionQualification) && !this.PrivateSession) {
 			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
 			if (trackAhead && trackAhead.inRange(sector, true)) {
@@ -2912,7 +2961,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if ((lastLap > 1) || (this.Session = kSessionQualification))
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if (this.DriverCar && !this.DriverCar.InPit && update) {
+			if (this.DriverCar && !this.DriverCar.InPit && update && this.Enabled) {
 				if isDebug()
 					logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
@@ -2976,7 +3025,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	skipAlert(alert) {
-		if this.pendingAlerts(["AccidentAhead", "SlowCarAhead"], true)
+		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
+							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
 		else {
 			switch alert, false {
@@ -3083,7 +3133,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	proximityAlert(alert) {
-		if (this.Speaker[false] && this.Running
+		if (this.Speaker[false] && this.Running && !this.PrivateSession
 		 && ((!InStr(alert, "Behind") && this.Announcements["SideProximity"]) || (InStr(alert, "Behind") && this.Announcements["RearProximity"])))
 			this.pushAlert(alert, false, false, alert)
 	}
@@ -3091,7 +3141,7 @@ class RaceSpotter extends GridRaceAssistant {
 	slowCarAlert(arguments*) {
 		local distance, side, speaker
 
-		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
+		if (this.Announcements["SlowCars"] && this.Speaker[false] && this.Running && !this.PrivateSession && this.hasEnoughData(false)) {
 			if (arguments.Length = 0)
 				this.pushAlert("SlowCarAhead", false, false, "SlowCarAhead")
 			else {
@@ -3126,7 +3176,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local distance := false
 		local speaker
 
-		if ((type = "Ahead") || (this.Session = kSessionRace))
+		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 				speaker := this.getSpeaker(true)
 
@@ -3145,14 +3195,15 @@ class RaceSpotter extends GridRaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
+		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running
+		 && !this.PrivateSession && (!this.KnowledgeBase || this.KnowledgeBase.getValue("Lap", 0) <= 1))
 			this.pushAlert("Green", false, false, "Green")
 	}
 
 	yellowFlag(alert, arguments*) {
 		local sectors
 
-		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running) {
+		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running && !this.PrivateSession) {
 			sectors := string2Values(",", this.getSpeaker(true).Fragments["Sectors"])
 
 			switch alert, false {
@@ -3176,7 +3227,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running && !this.PrivateSession) {
 			if ((this.Session = kSessionRace) && positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 				delta := Abs(positions[positions["StandingsBehind"]][10])
 
@@ -3205,6 +3256,14 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iLastTopSpeed := Round(lastSpeed, 1)
 			this.iBestTopSpeed := Max(this.LastTopSpeed, this.BestTopSpeed)
 		}
+	}
+
+	disableSpotter() {
+		this.updateDynamicValues({Enabled: false})
+	}
+
+	enableSpotter() {
+		this.updateDynamicValues({Enabled: true})
 	}
 
 	internalError(arguments*) {
@@ -3241,6 +3300,7 @@ class RaceSpotter extends GridRaceAssistant {
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
 											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
 											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
 											   . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
@@ -3363,13 +3423,22 @@ class RaceSpotter extends GridRaceAssistant {
 		local prepared := this.Prepared
 		local speaker, fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
-		local position, length, facts
+		local position, length, facts, private
 
 		facts := super.prepareSession(&settings, &data, formationLap)
 
 		if !prepared {
-			if settings
-				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", true)})
+			if settings {
+				if (this.Session = kSessionQualification)
+					private := getMultiMapValue(settings, "Assistant.Spotter", "Qualification.Private", false)
+				else if (this.Session = kSessionPractice)
+					private := getMultiMapValue(settings, "Assistant.Spotter", "Practice.Private", false)
+				else
+					private := false
+
+				this.updateConfigurationValues({UseTalking: getMultiMapValue(settings, "Assistant.Spotter", "Voice.UseTalking", false)
+											  , PrivateSession: private})
+			}
 
 			this.initializeAnnouncements()
 
@@ -3484,7 +3553,8 @@ class RaceSpotter extends GridRaceAssistant {
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
 		this.initializeHistory()
@@ -3528,7 +3598,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 

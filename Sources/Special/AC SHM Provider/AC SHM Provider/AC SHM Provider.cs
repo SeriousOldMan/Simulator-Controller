@@ -219,6 +219,19 @@ namespace ACSHMProvider
             return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
         }
 
+        string normalizeName(string result)
+        {
+            result = result.Replace("/", "");
+            result = result.Replace(":", "");
+            result = result.Replace("*", "");
+            result = result.Replace("?", "");
+            result = result.Replace("<", "");
+            result = result.Replace(">", "");
+            result = result.Replace("|", "");
+
+            return result;
+        }
+
         public string GetForname(string name)
         {
             if (name.Contains(" "))
@@ -284,7 +297,7 @@ namespace ACSHMProvider
 
                     string carModel = GetStringFromBytes(car.carModel);
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(normalizeName(carModel));
 
                     string driverName = GetStringFromBytes(car.driverName);
 
@@ -339,8 +352,8 @@ namespace ACSHMProvider
 
                 Console.Write("Session="); Console.WriteLine(session);
 
-                Console.Write("Car="); Console.WriteLine(staticInfo.CarModel);
-                Console.Write("Track="); Console.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
+                Console.Write("Car="); Console.WriteLine(normalizeName(staticInfo.CarModel));
+                Console.Write("Track="); Console.WriteLine(normalizeName(staticInfo.Track) + "-" + normalizeName(staticInfo.TrackConfiguration));
                 Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 

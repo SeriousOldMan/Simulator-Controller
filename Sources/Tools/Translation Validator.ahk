@@ -175,7 +175,7 @@ class AbstractTranslations {
 						if ((trans.Original = candidate.Original) && (Trim(trans.Translation) != "")) {
 							translations.Push(AbstractTranslations.Translation(candidate.Original
 																			 , candidate.adjustTranslation(trans.Translation
-																										 , this.Code != "EN")))
+																										 , translated.Code != "EN")))
 
 							found := true
 
@@ -309,4 +309,4 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("IT", "Italiano", "C:\Users\olive\Desktop\Translation")
+runValidator("PT", "Português", "C:\Users\juwig\Documents\Development\Simulator-Controller\Sources\Configuration\Translations")

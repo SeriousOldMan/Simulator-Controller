@@ -131,14 +131,32 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "InputInfo":
+                        goto case "inputData";
+                    case "inputData":
                         readDriverInput(reader);
                         break;
                     case "PlayerData":
                         readData(reader);
                         break;
+                    case "carData":
+                        readCarData(reader);
+                        break;
                     case "LapTimeSeconds":
+                        goto case "lapTimeSeconds";
+                    case "lapTimeSeconds":
                         reader.Read();
                         time = (int)Math.Round(float.Parse(reader.Value.ToString()) * 1000);
+                        break;
+                    case "lapDistance":
+                        reader.Read();
+                        running = float.Parse(reader.Value.ToString());
+                        break;
+                    case "worldPosition":
+                        readPosition2(reader);
+                        break;
+                    case "speedKph":
+                        reader.Read();
+                        speed = float.Parse(reader.Value.ToString());
                         break;
                 }
         }
@@ -156,8 +174,8 @@ static class Program
             outStream.Write(abs + ";");
             outStream.Write(longG + ";");
             outStream.Write(latG + ";");
-            outStream.Write("n/a" + ";");
-            outStream.Write("n/a" + ";");
+            outStream.Write(posX + ";");
+            outStream.Write(posY + ";");
             outStream.WriteLine(time);
 
             lastRunning = running;
@@ -175,14 +193,20 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "BrakePedalPosition":
+                        goto case "brake";
+                    case "brake":
                         reader.Read();
                         brake = float.Parse(reader.Value.ToString());
                         break;
                     case "ThrottlePedalPosition":
+                        goto case "throttle";
+                    case "throttle":
                         reader.Read();
                         throttle = float.Parse(reader.Value.ToString());
                         break;
                     case "SteeringInput":
+                        goto case "steeringInput";
+                    case "steeringInput":
                         reader.Read();
                         steering = float.Parse(reader.Value.ToString());
                         break;
@@ -234,10 +258,11 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "CurrentGear":
+                        goto case "currentGear";
+                    case "currentGear":
                         reader.Read();
 
                         string value = reader.Value.ToString();
-
                         
                         if (String.Compare(value, "N", comparisonType: StringComparison.OrdinalIgnoreCase) == 0)
                             value = "0";
@@ -248,16 +273,24 @@ static class Program
                         gear = int.Parse(value);
                         break;
                     case "EngineRpm":
+                        goto case "engineRpm";
+                    case "engineRpm":
                         reader.Read();
                         rpms = int.Parse(reader.Value.ToString());
                         break;
                     case "Acceleration":
+                        goto case "accelerationData";
+                    case "accelerationData":
                         readAcceleration(reader);
                         break;
                     case "AbsInfo":
+                        goto case "absInfo";
+                    case "absInfo":
                         readABS(reader);
                         break;
                     case "TcInfo":
+                        goto case "tcInfo";
+                    case "tcInfo":
                         readTC(reader);
                         break;
                 }
@@ -311,6 +344,27 @@ static class Program
                 }
     }
 
+    static void readPosition2(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+                    case "xinM":
+                        reader.Read();
+                        posX = float.Parse(reader.Value.ToString());
+                        break;
+                    case "zinM":
+                        reader.Read();
+                        posY = float.Parse(reader.Value.ToString());
+                        break;
+                }
+    }
+
     static void readAcceleration(JsonTextReader reader)
     {
         reader.Read();
@@ -325,9 +379,17 @@ static class Program
                         reader.Read();
                         latG = float.Parse(reader.Value.ToString()) / 9.807f;
                         break;
+                    case "xinG":
+                        reader.Read();
+                        latG = float.Parse(reader.Value.ToString());
+                        break;
                     case "ZinMs":
                         reader.Read();
                         longG = float.Parse(reader.Value.ToString()) / 9.807f;
+                        break;
+                    case "zinG":
+                        reader.Read();
+                        longG = float.Parse(reader.Value.ToString());
                         break;
                 }
     }
@@ -343,6 +405,8 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "IsActive":
+                        goto case "isActive";
+                    case "isActive":
                         reader.Read();
                         abs = (String.Compare(reader.Value.ToString(), "true", comparisonType: StringComparison.OrdinalIgnoreCase) == 0 ? 1 : 0);
                         break;
@@ -360,6 +424,8 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "IsActive":
+                        goto case "isActive";
+                    case "isActive":
                         reader.Read();
                         tc = (String.Compare(reader.Value.ToString(), "true", comparisonType: StringComparison.OrdinalIgnoreCase) == 0 ? 1 : 0);
                         break;
@@ -397,6 +463,9 @@ static class Program
                 switch (reader.Value.ToString())
                 {
                     case "DataPoints":
+                        readPoints(reader);
+                        break;
+                    case "timedTelemetryData":
                         readPoints(reader);
                         break;
                     case "LapSummary":

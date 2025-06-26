@@ -22,6 +22,8 @@ global kOne := "One:"
 global kNone := "None:"
 global kPredicate := "Predicate:"
 global kProve := "Prove:"
+global kExpression := "Is:"
+global kLet := "Let:"
 
 global kEqual := "="
 global kNotEqual := "!="
@@ -37,10 +39,11 @@ global kProve := "Prove:"
 global kProveAll := "ProveAll:"
 global kSet := "Set:"
 global kClear := "Clear:"
+global kExecute := "Execute:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute"]
+global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -449,13 +452,89 @@ class Goal extends Condition {
 	}
 
 	toString(facts := kNotInitialized) {
-		return ("{" . kProve . A_Space . this.Goal.toString() . "}")
+		return ("{" . kProve . A_Space . this.Goal.toString(facts) . "}")
 	}
 
 	toObject(facts := kNotInitialized) {
 		local predicate := Object()
 
-		predicate[kProve] := [this.Goal.toObject()]
+		predicate[kProve] := [this.Goal.toObject(facts)]
+
+		return predicate
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    Expression                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class Expression extends Condition {
+	iRule := false
+
+	Type {
+		Get {
+			return kExpression
+		}
+	}
+
+	Rule {
+		Get {
+			return this.iRule
+		}
+	}
+
+	__New(rule) {
+		this.iRule := rule
+	}
+
+	getFacts(facts) {
+		local ignore, term
+
+		for ignore, term in this.Rule.Head.Arguments
+			if isInstance(term, Variable)
+				facts.Push(term.Variable[true])
+			else if isInstance(term, Fact)
+				facts.Push(term.Fact)
+	}
+
+	match(knowledgeBase, variables) {
+		local arguments := []
+		local engine := RuleEngine([], [this.Rule], Map())
+		local resultSet, arguments, ignore, argument, goal
+
+		for ignore, argument in this.Rule.Head.Arguments
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
+			else
+				arguments.Push(argument.substituteVariables(variables))
+
+		goal := Struct(this.Rule.Head.Functor, arguments)
+
+		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
+
+		if resultSet {
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+
+			resultSet.dispose()
+
+			return true
+		}
+		else
+			return false
+	}
+
+	toString(facts := kNotInitialized) {
+		return ("{" . kExpression . A_Space . this.Rule.Tail[1].toString(facts) . "}")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local predicate := Object()
+
+		predicate[kExpression] := [this.Rule.Tail[1].toObject(facts)]
 
 		return predicate
 	}
@@ -631,6 +710,8 @@ class Fact extends Primary {
 	getValue(factsOrResultSet, default := kNotInitialized) {
 		if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
+		else if (default != kNotInitialized)
+			return default
 		else
 			return this
 	}
@@ -646,7 +727,7 @@ class Fact extends Primary {
 
 	toString(factsOrResultSet := kNotInitialized) {
 		if (factsOrResultSet = kNotInitialized)
-			return false
+			return ("!" . this.Fact)
 		else if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact)
 		else if isInstance(factsOrResultSet, ResultSet)
@@ -835,6 +916,111 @@ class CallAction extends Action {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    ExecuteAction                                  ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ExecuteAction extends Action {
+	iExecutable := kNotInitialized
+	iArguments := []
+
+	Action {
+		Get {
+			return kExecute
+		}
+	}
+
+	Executable[variablesOrFacts := kNotInitialized] {
+		Get {
+			if (variablesOrFacts = kNotInitialized)
+				return this.iExecutable
+			else
+				return this.iExecutable.getValue(variablesOrFacts)
+		}
+	}
+
+	Arguments[variablesOrFacts := kNotInitialized] {
+		Get {
+			if isNumber(variablesOrFacts)
+				return this.iArguments[variablesOrFacts]
+			else if (variablesOrFacts = kNotInitialized)
+				return this.iArguments
+			else
+				this.getValues(variablesOrFacts)
+		}
+	}
+
+	__New(executable, arguments) {
+		this.iExecutable := executable
+		this.iArguments := arguments
+	}
+
+	execute(knowledgeBase, variables) {
+		local executable
+		local facts := knowledgeBase.Facts
+		local arguments, argument, ignore
+
+		if isInstance(this.Executable, Variable)
+			executable := this.Executable[variables]
+		else
+			executable := this.Executable[facts]
+
+		arguments := []
+
+		for ignore, argument in this.Arguments
+			if isInstance(argument, Variable)
+				arguments.Push(argument.toString(variables))
+			else
+				arguments.Push(argument.toString(facts))
+
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
+			knowledgeBase.RuleEngine.trace(kTraceMedium, "Execute " . executable . A_Space
+													   . values2String(", ", collect(arguments, (a) => ("`"" . a . "`""))*))
+
+		try {
+			knowledgeBase.execute(executable, arguments)
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, "Error while executing " . executable . "...")
+
+			logError(exception, true)
+		}
+	}
+
+	getValues(facts) {
+		local values := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			values.Push(argument.getValue(facts, argument))
+
+		return values
+	}
+
+	toString(facts := kNotInitialized) {
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toString(facts))
+
+		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local action := Object()
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toObject(facts))
+
+		action[this.Action] := Array(this.Function.toObject(facts), arguments*)
+
+		return action
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Class                    ProveAction                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -894,6 +1080,78 @@ class ProveAction extends CallAction {
 
 			resultSet.dispose()
 		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Class                    LetAction                                      ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LetAction extends Action {
+	iRule := false
+
+	Action {
+		Get {
+			return kLet
+		}
+	}
+
+	Rule {
+		Get {
+			return this.iRule
+		}
+	}
+
+	__New(rule) {
+		this.iRule := rule
+	}
+
+	execute(knowledgeBase, variables) {
+		local arguments := []
+		local engine := RuleEngine([], [this.Rule], Map())
+		local resultSet, arguments, ignore, argument, goal
+
+		for ignore, argument in this.Rule.Head.Arguments
+			if isInstance(argument, Variable) {
+				if (argument.getValue(variables) != kNotInitialized)
+					arguments.Push(Literal(argument.toString(variables)))
+				else
+					arguments.Push(argument)
+			}
+			else
+				arguments.Push(argument.substituteVariables(variables))
+
+		goal := Struct(this.Rule.Head.Functor, arguments)
+
+		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
+
+		if resultSet {
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+
+			resultSet.dispose()
+		}
+	}
+
+	getValues(facts) {
+		local values := []
+		local ignore, argument
+
+		for ignore, argument in this.Rule.Head.Arguments
+			values.Push(argument.getValue(facts, argument))
+
+		return values
+	}
+
+	toString(facts := kNotInitialized) {
+		return ("(" . kLet . A_Space . this.Rule.Tail[1].toString(facts) . ")")
+	}
+
+	toObject(facts := kNotInitialized) {
+		local action := Object()
+
+		action[kLet] := [this.Rule.Tail[1].toObject(facts)]
+
+		return action
 	}
 }
 
@@ -2865,6 +3123,14 @@ class KnowledgeBase {
 			return false
 	}
 
+	execute(executable, arguments) {
+		local directory
+
+		SplitPath(executable, , &directory)
+
+		return (RunWait("`"" . executable . "`" " . collect(arguments, (a) => ("`"" . a . "`"")), directory) == 0)
+	}
+
 	enableOccurCheck() {
 		this.iOccurCheck := true
 	}
@@ -3033,17 +3299,22 @@ class Facts {
 	dumpFacts(name := false) {
 		local key, value, text, fileName
 
-		if !name
-			name := StrSplit(A_ScriptName, ".")[1]
+		try {
+			if !name
+				name := StrSplit(A_ScriptName, ".")[1]
 
-		fileName := (kTempDirectory . name . ".knowledge")
+			fileName := (kTempDirectory . name . ".knowledge")
 
-		deleteFile(fileName)
+			deleteFile(fileName)
 
-		for key, value in this.Facts {
-			text := (key . " = " . String(value) . "`n")
+			for key, value in this.Facts {
+				text := (key . " = " . String(value) . "`n")
 
-			FileAppend(text, fileName)
+				FileAppend(text, fileName)
+			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 }
@@ -3897,6 +4168,8 @@ class RuleCompiler {
 
 				if (keyword = kProve)
 					conditions.Push(Array(keyword, this.readStruct(&text, &nextCharIndex)))
+				else if (keyword = kExpression)
+					conditions.Push(Array(keyword, this.readTailTerm(&text, &nextCharIndex)))
 				else
 					conditions.Push(Array(keyword, this.readConditions(&text, &nextCharIndex)*))
 
@@ -3932,7 +4205,7 @@ class RuleCompiler {
 
 	readActions(&text, &nextCharIndex) {
 		local actions := []
-		local action, arguments
+		local action, arguments, delimiter
 
 		loop {
 			this.skipDelimiter("(", &text, &nextCharIndex)
@@ -3941,11 +4214,22 @@ class RuleCompiler {
 
 			if inList([kCall, kProve, kProveAll], action)
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
+			else if (action = kLet)
+				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
 			else {
 				arguments := Array(action)
 
 				loop {
-					if ((A_Index > 1) && !this.skipDelimiter(",", &text, &nextCharIndex, false))
+					delimiter := ","
+
+					if (action = kSet) {
+						this.skipWhiteSpace(&text, &nextCharIndex)
+
+						if (SubStr(text, nextCharIndex, 1) = "=")
+							delimiter := "="
+					}
+
+					if ((A_Index > 1) && !this.skipDelimiter(delimiter, &text, &nextCharIndex, false))
 						break
 
 					arguments.Push(this.readLiteral(&text, &nextCharIndex))
@@ -4308,6 +4592,8 @@ class ConditionParser extends Parser {
 				return NotExistQuantor(this.parseArguments(expressions, 2))
 			case kProve:
 				return Goal(this.parseStruct(expressions, 2))
+			case kExpression:
+				return Expression(this.parseExpressionRule(expressions, 2))
 			default:
 				return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
 		}
@@ -4326,6 +4612,13 @@ class ConditionParser extends Parser {
 
 	parseStruct(conditions, start) {
 		return this.Compiler.createStructParser(conditions[2], this.Variables).parse(conditions[2])
+	}
+
+	parseExpressionRule(conditions, start) {
+		local variables := CaseInsenseMap()
+		local term := this.Compiler.createTermParser(conditions[2], variables).parse(conditions[2])
+
+		return ReductionRule(Struct("expression", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 
@@ -4383,6 +4676,13 @@ class ActionParser extends Parser {
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
 				return ProveAction(Literal(struct.Functor), struct.Arguments, true)
+			case kLet:
+				return LetAction(this.parseLetRule(expressions))
+			case kExecute:
+				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
+				arguments := this.parseArguments(expressions, 3)
+
+				return ExecuteAction(argument, arguments)
 			default:
 				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 
@@ -4418,6 +4718,13 @@ class ActionParser extends Parser {
 				result.Push(this.Compiler.createPrimaryParser(expression, this.Variables).parse(expression))
 
 		return result
+	}
+
+	parseLetRule(expressions) {
+		local variables := CaseInsenseMap()
+		local term := this.Compiler.createTermParser(expressions[2], variables).parse(expressions[2])
+
+		return ReductionRule(Struct("expression", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 
@@ -5120,5 +5427,21 @@ get(choicePoint, arguments*) {
 			return false
 		else
 			return (operand1.toString(resultSet) = operand2.toString(resultSet))
+	}
+}
+
+execute(choicePoint, arguments*) {
+	local resultSet, executable
+
+	if (arguments.Length <= 1)
+		return false
+	else {
+		resultSet := choicePoint.ResultSet
+
+		operand1 := arguments.RemoveAt(1)
+		operand1 := operand1.getValue(resultSet, operand1)
+
+		return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
+											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
 	}
 }

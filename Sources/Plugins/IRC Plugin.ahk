@@ -211,18 +211,6 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
-	supportsSetupImport() {
-		return true
-	}
-
 	prepareSettings(settings, data) {
 		settings := super.prepareSettings(settings, data)
 
@@ -260,6 +248,26 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 				return [getMultiMapValue(data, "Setup Data", "TyreCompound", false)
 					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false)]
+			case "Tyre Compound Front Left", "TyreCompoundFrontLeft":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundFrontLeft", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFrontLeft", false)]
+			case "Tyre Compound Front Right", "TyreCompoundFrontRight":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundFrontRight", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorFrontRight", false)]
+			case "Tyre Compound Rear Left", "TyreCompoundRearLeft":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundRearLeft", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRearLeft", false)]
+			case "Tyre Compound Rear Right", "TyreCompoundRearRight":
+				data := this.readSessionData("Setup=true")
+
+				return [getMultiMapValue(data, "Setup Data", "TyreCompoundRearRight", false)
+					  , getMultiMapValue(data, "Setup Data", "TyreCompoundColorRearRight", false)]
 			default:
 				return super.getPitstopOptionValues(option)
 		}
@@ -300,20 +308,36 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
+		local targetCompound := false
+		local index, tyre, tyreCompound
+
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		if this.requirePitstopMFD("Tyre") {
-			this.sendPitstopCommand("Pitstop", "Set", "Tyre Change", compound ? "true" : "false")
+			if InStr(compound, ",") {
+				compound := string2Values(",", compound)
+				compoundColor := string2Values(",", compoundColor)
+			}
+			else {
+				compound := [compound, compound, compound, compound]
+				compoundColor := [compoundColor, compoundColor, compoundColor, compoundColor]
+			}
 
-			if compound {
-				compound := this.tyreCompoundCode(compound, compoundColor)
+			for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
+				this.sendPitstopCommand("Pitstop", "Set", "Tyre Change " . tyre, compound[index] ? "true" : "false")
 
-				if compound {
-					this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", compound)
+				if compound[index] {
+					tyreCompound := this.tyreCompoundCode(compound[index], compoundColor[index])
 
-					if set
-						this.sendPitstopCommand("Pitstop", "Set", "Tyre Set", Round(set))
+					if tyreCompound {
+						if (targetCompound && (targetCompound != tyreCompound))
+							throw "Invalid tyre compound detected in IRCPlugin.setPitstopTyreCompound..."
+
+						targetCompound := tyreCompound
+
+						this.sendPitstopCommand("Pitstop", "Set", "Tyre Compound", tyreCompound)
+					}
 				}
 			}
 		}
@@ -333,71 +357,6 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		if this.requirePitstopMFD("Fuel")
 			this.sendPitstopCommand("Pitstop", "Set", "Repair"
 								  , (repairBodywork || repairSuspension || repairEngine) ? "true" : "false")
-	}
-
-	updateTelemetryData(data) {
-		super.updateTelemetryData(data)
-
-		if (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0) {
-			setMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
-			setMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
-		}
-	}
-
-	updatePositionsData(data) {
-		local carClass
-
-		super.updatePositionsData(data)
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			carClass := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
-
-			if (carClass != kUndefined) {
-				carClass := Trim(carClass)
-
-				if (carClass != "")
-					setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", carClass)
-				else
-					removeMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")
-			}
-		}
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
-
-		static tyres := ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-
-		for ignore, section in ["Car Data", "Setup Data"]
-			for ignore, postfix in tyres {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
-
-					if (tyreCompound != kUndefined)
-						if tyreCompound {
-							tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-							if tyreCompound {
-								splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-								setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-								setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
-							}
-						}
-						else {
-							setMultiMapValue(data, section, "TyreCompound" . postFix, false)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, false)
-						}
-				}
-			}
-
-		return data
 	}
 }
 

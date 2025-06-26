@@ -562,8 +562,9 @@ class DarkTheme extends Theme {
 			if this.Enabled {
 				this.Value := !this.Value
 
-				for ignore, handler in this.iClickHandlers
-					handler(arguments*)
+				if this.HasProp("iClickHandlers")
+					for ignore, handler in this.iClickHandlers
+						handler(arguments*)
 			}
 		}
 
@@ -1406,14 +1407,16 @@ class Window extends Gui {
 
 	Block() {
 		if (this.iBlockLevel++ = 0)
-			this.Opt("+Disabled")
+			try
+				this.Opt("+Disabled")
 	}
 
 	Unblock() {
 		if (--this.iBlockLevel <= 0) {
 			this.iBlockLevel := 0
 
-			this.Opt("-Disabled")
+			try
+				this.Opt("-Disabled")
 		}
 	}
 

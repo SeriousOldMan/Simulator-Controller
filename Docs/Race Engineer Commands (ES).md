@@ -24,7 +24,7 @@ A continuación encontrará una lista completa de todos los comandos de voz reco
    
 		{ presiones, presiones de neumáticos }
 
-   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Race%20Engineer.grammars.es) y se ve así:
+   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.es) y se ve así:
 
 		TellMe=Puedes decirme, Por favor dime, Puedes darme, Por favor dame, Dame
 
@@ -54,7 +54,7 @@ CanYou=Puedes, por favor
 
 CanWe=Puedes, podemos, por favor
 
-Announcements=advertencias de combustible, advertencias de daños, análisis de daños, advertencias meteorológicas, advertencias de presión
+Announcements=advertencias de combustible, avisos de desgaste de neumáticos, aviso de desgaste de frenos, advertencias de daños, análisis de daños, advertencias meteorológicas, advertencias de presión
 
 #### Comandos
 
@@ -90,6 +90,8 @@ Announcements=advertencias de combustible, advertencias de daños, análisis de 
 	
 	[{Revisa, Comprueba} {el desgaste de los frenos, el desgaste de los frenos en este momento}, (TellMe) {el desgaste de los frenos, el desgaste de los frenos en este momento}]
 	
+	[(WhatAre) la temperatura {del motor, actual del motor}, (TellMe) darme la temperatura del motor]
+	
 	[(TellMe) las vueltas que faltan, Cuantas vueltas quedan, Cuántas vueltas faltan]
 	
 	[Cuanto {deposito, gasolina} queda, cuanto {deposito, gasolina} queda en el tanque, (TellMe) {el deposito que, cuanta gasolina} queda,]
@@ -104,9 +106,9 @@ Announcements=advertencias de combustible, advertencias de daños, análisis de 
 	
 	(CanWe) {preparar la parada, configurar la parada}
 	
-	[(CanWe) repostar (Number) {Litros, Galones}, Necesitor repostar (Number) {Litros, Galones}, (CanWe) recargar hasta 10 {Litros, Galones}]
+	[(CanWe) repostar (Number) {Litros, Galones}, Necesito repostar (Number) {Litros, Galones}, (CanWe) recargar hasta 10 {Litros, Galones}]
 	
-	[(CanWe) {usar, cambiar a} neumaticos secos, Podemos {usar, cambiar a} neumaticos de lluvia, Podemos {usar, cambiar a} neumaticos intermedio]
+	[(CanWe) {usar, cambiar a} neumáticos secos, Podemos {usar, cambiar a} neumáticos de lluvia, Podemos {usar, cambiar a} neumáticos intermedios]
 	
 	[(CanWe) incrementa {en la rueda delantera izquierda, en la rueda delantera derecha, en la rueda trasera izquierda, en la rueda trasera derecha, en todas las ruedas} con (Digit) {punto, coma} (Digit), (Digit) {punto, coma} (Digit) más de presión {en la rueda delantera izquierda, en la rueda delantera derecha, en la rueda trasera izquierda, en la rueda trasera derecha, en todas las ruedas}]
 	
@@ -116,12 +118,12 @@ Announcements=advertencias de combustible, advertencias de daños, análisis de 
 	
 	[(CanWe) {dejar, mantener} los neumáticos en el coche, no cambiar los neumáticos, (CanWe) {dejar, mantener} los neumáticos]
 	
-	[(CanWe) repare la suspensión, no reparar la suspensión]
+	[(CanWe) reparar la suspensión, no reparar la suspensión]
 	
 	[(CanWe) reparar el chasis, no reparar el chasis]
 	
-	[(CanWe) repare el motor, no reparar el motor]
+	[(CanWe) reparar el motor, no reparar el motor]
 	
-	[(CanWe) compensar la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}, Compense la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}, {Tenga, Tener} en cuenta la pérdida de {presión, presión de los neumáticos}]
+	[(CanWe) compensar la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}, Compense la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}, {Tenga, Ten} en cuenta la pérdida de {presión, presión de los neumáticos}]
 	
 	[{Por favor no, No} compensar la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}, No más compensación por la pérdida de {presión, presión de los neumáticos, presión por favor, presión de los neumáticos por favor}]

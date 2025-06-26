@@ -40,7 +40,6 @@
 #Include "..\Framework\Extensions\GIFViewer.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
-#Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2445,8 +2444,8 @@ initializeSimulatorController()
 if kLogStartup
 	logMessage(kLogOff, "Loading plugins...")
 
+#Include "..\Plugins\Simulator Providers.ahk"
 #Include "..\Plugins\Controller Plugins.ahk"
-#Include "%A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Global Application Library      ;;;
+;;;   Modular Simulator Controller System - Global Application Framework    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -24,7 +24,6 @@
 
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
-#Include "..\Framework\Extensions\HTMLViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -184,50 +183,6 @@ requestShareSessionDatabaseConsent() {
 	}
 }
 
-checkForNews() {
-	local check, lastModified, news, nr, html
-
-	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
-		check := !FileExist(kUserConfigDirectory . "NEWS")
-
-		if !check {
-			lastModified := FileGetTime(kUserConfigDirectory "NEWS", "M")
-
-			lastModified := DateAdd(lastModified, 1, "Days")
-
-			check := (lastModified < A_Now)
-		}
-
-		if check {
-			try {
-				Download("https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1", kTempDirectory . "NEWS")
-			}
-			catch Any as exception {
-				check := false
-			}
-		}
-
-		if check {
-			news := readMultiMap(kUserConfigDirectory . "NEWS")
-
-			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
-				if !getMultiMapValue(news, "News", nr, false)
-					try {
-						Download(html, kTempDirectory . "NEWS.htm")
-
-						setMultiMapValue(news, "News", nr, true)
-
-						writeMultiMap(kUserConfigDirectory . "NEWS", news)
-
-						viewHTML(kTempDirectory . "NEWS.htm")
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-		}
-	}
-}
-
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID
 	local shareTyrePressures, shareCarSetups, shareRaceStrategies, shareLapTelemetries, options, consent
@@ -237,55 +192,58 @@ startDatabaseSynchronizer() {
 
 		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-		dbIDFileName := kDatabaseDirectory . "ID"
+		dbIDFileName := (kDatabaseDirectory . "ID")
 
-		try {
-			dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
-		}
-		catch Any as exception {
-			logError(exception, true)
-
-			dbID := false
-		}
-
-		if (ID = dbID) {
-			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
-
-			shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
-			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
-			shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
-
-			options := ("-ID `"" . ID . "`" -Synchronize " . true)
-
-			if shareTyrePressures
-				options .= " -Pressures"
-
-			if shareCarSetups
-				options .= " -Setups"
-
-			if shareRaceStrategies
-				options .= " -Strategies"
-
-			if shareLapTelemetries
-				options .= " -Telemetries"
-
+		if FileExist(dbIDFileName) {
 			try {
-				Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
+				dbID := StrSplit(FileRead(dbIDFileName), "`n", "`r")[1]
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+				logError(exception, true)
 
-				if !kSilentMode
-					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				dbID := false
+			}
+
+			if (ID = dbID) {
+				consent := readMultiMap(kUserConfigDirectory . "CONSENT")
+
+				shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+				shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+				shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+				shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
+
+				options := ("-ID `"" . ID . "`" -Synchronize " . true)
+
+				if shareTyrePressures
+					options .= " -Pressures"
+
+				if shareCarSetups
+					options .= " -Setups"
+
+				if shareRaceStrategies
+					options .= " -Strategies"
+
+				if shareLapTelemetries
+					options .= " -Telemetries"
+
+				try {
+					Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
+				}
+				catch Any as exception {
+					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+
+					if !kSilentMode
+						showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 	}
 }
 
 checkForUpdates() {
-	local check, lastModified, release, version, current, releasePostFix, currentPostFix, automaticUpdates
+	local release := false
+	local check, lastModified, version, current, releasePostFix, currentPostFix, automaticUpdates, ignore, url
 	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix, msgResult
 
 	if isDetachedInstallation()
@@ -303,19 +261,37 @@ checkForUpdates() {
 		}
 
 		if check {
-			try {
-				Download("https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION", kUserConfigDirectory . "VERSION")
-			}
-			catch Any as exception {
+			deleteFile(kUserConfigDirectory . "VERSION")
+
+			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
+							  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+							  , "https://" . StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1] . ":801/api/public/dl/bkguewzP"
+							  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+				try {
+					Download(url, kUserConfigDirectory . "VERSION")
+
+					release := readMultiMap(kUserConfigDirectory . "VERSION")
+
+					if (release.Count > 0)
+						break
+					else
+						release := false
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+			if !release
 				check := false
-			}
 		}
 
 		if check {
 			if FileExist(kUserConfigDirectory . "VERSION")
 				FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
 
-			release := readMultiMap(kUserConfigDirectory . "VERSION")
+			if !release
+				release := readMultiMap(kUserConfigDirectory . "VERSION")
+
 			version := getMultiMapValue(release, "Release", "Version", getMultiMapValue(release, "Version", "Release", false))
 
 			if version {
@@ -380,84 +356,6 @@ checkForUpdates() {
 				break
 			}
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
-	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
-
-	static htmlGui
-	static htmlViewer
-
-	if !title
-		title := translate("News && Updates")
-
-	if !fileName {
-		htmlGui.Destroy()
-
-		return
-	}
-
-	html := FileRead(fileName)
-
-	innerWidth := width - 16
-
-	htmlGui := Window({Descriptor: "HTML Viewer", Options: "0x400000"}, translate("News && Updates"))
-
-	htmlGui.SetFont("s10 Bold")
-
-	htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
-
-	htmlGui.SetFont()
-
-	htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
-
-	editHeight := height - 102
-
-	htmlViewer := htmlGui.Add("HTMLViewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
-
-	htmlViewer.document.open()
-	htmlViewer.document.write(html)
-	htmlViewer.document.close()
-
-	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
-
-	if !getWindowPosition("HTML Viewer", &x, &y) {
-		x := kUndefined
-		y := kUndefined
-	}
-
-	if (x = kUndefined)
-		switch x, false {
-			case "Left":
-				x := 25
-			case "Right":
-				x := mainScreenRight - width - 25
-			default:
-				x := "Center"
-		}
-
-	if (y = kUndefined)
-		switch y, false {
-			case "Top":
-				y := 25
-			case "Bottom":
-				y := mainScreenBottom - height - 25
-			default:
-				y := "Center"
-		}
-
-	buttonX := Round(width / 2) - 40
-
-	htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
-
-	htmlGui.Opt("+AlwaysOnTop")
-	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
 }
 
 
@@ -541,13 +439,6 @@ if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit
 		logMessage(kLogOff, "Ensuring database consent...")
 
 	requestShareSessionDatabaseConsent()
-
-	/*
-	if kLogStartup
-		logMessage(kLogOff, "Checking for news...")
-
-	checkForNews()
-	*/
 
 	if kLogStartup
 		logMessage(kLogOff, "Starting database synchronizer...")

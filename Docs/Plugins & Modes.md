@@ -18,7 +18,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | ACE | Simple integration for Assetto Corsa EVO. No functionality beside starting and stopping from a hardware controller. |
 | [AMS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-AMS2) | Integration for *Automobilista 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Automobilista 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [IRC](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-irc) | This plugin integrates the *iRacing* simulation game with Simulator Controller. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist and also with Elisa, the AI Race Spotter is available as well. The Driving Coach Aiden also is integrated with *iRacing*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
-| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, and with Cato, the AI Race Strategist is available as well. The Race Spotter Elisa and the Driving Coach are also integrated with *rFactor 2*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
+| [RF2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2) | Similar to the ACC and IRC plugin provides this plugin start and stop support for *rFactor 2*. The mode "Chat", which is available when *rFactor 2* is currently running, handle automated chat messages for the multiplayer ingame chat system, where the chat messages can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, and with Cato, the AI Race Strategist is available as well. The Race Spotter Elisa and the Driving Coach are also integrated with *rFactor 2*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller and the "Chat" mode lets you send predefined messages to your opponents using a button press on your controller similar to the functionality in the plugin "ACC". |
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist and also with Elisa, the AI Race Spotter is available as well. The Driving Coach Aiden also is integrated with *RaceRoom Racing Experience*. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Project CARS 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
@@ -360,6 +360,7 @@ Please see the following table for available information commands.
 | TyreWear | This command will give you the current tyre wear in percentage of total wear for the inidividual tyres. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 | BrakeTemperatures | This command will give you the current temperatures for the individual brakes in Degrees Celsius. |
 | BrakeWear | This command will give you the current tyre wear in percentage of total wear for the brakes. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
+| EngineTemperatures | This command will give you the current water and oil temperatures, if they are available. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
@@ -761,7 +762,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *Assetto Corsa* data interface
 
-For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Assetto Corsa*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special requirements when using the Pitstop automation
 
@@ -883,7 +884,13 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
+
+### Mode *Chat*
+
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "rFactor 2" activates the chat system only there.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
 ### Mode *Pitstop*
 
@@ -917,11 +924,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFactor 2*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *rFactor 2*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
+	openChat: *openChatHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own. In all other cases, it is strongly recommended to supply at least the key code for opening the Pitstop MFD. Although it is technically possible to leave the MFD closed, while changes are applied to the pitstop settings, it has been reported that this can lead to errors.
+
+If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -978,7 +988,7 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *rFactor 2* data interface
 
-For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *rFactor 2*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *rFactor 2*
 
@@ -1299,11 +1309,15 @@ It is very important, that you do not use the *Project CARS 2* ICM on your own, 
 
 This plugin handles the *Le Mans Ultimate* simulation game. An application with the name "Le Mans Ultimate" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startLMU" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Disclaimer
 
 The *Le Mans Ultimate* game is under heavy development by the studio at the time of this writing. It is marketed as early access and many things are still not working. This also affects the data API and the integration with Simulator Controller. For example, pitstop settings handling is not supported yet and there are problems with driver names and car model names. I will continiously improve on that as far as there are improvements on the side of the *Le Mans Ultimate* data API.
+
+### Mode *Chat*
+
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Le Mans Ultimate" activates the chat system only there.
 
 ### Mode *Pitstop*
 
@@ -1313,7 +1327,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: p; closePitstopMFD: p;
+	openPitstopMFD: p; closePitstopMFD: p; openChat: t;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
@@ -1337,11 +1351,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
+	openChat: *openChatHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
 As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+
+If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -1403,13 +1420,13 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Installation of the *Le Mans Ultimate* data interface
 
-For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#installation-of-telemetry-providers) for installation instructions.
+For *Le Mans Ultimate*, you need to install a plugin into a special location for everything to work. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Special notes for *Le Mans Ultimate*
 
 1. The *Le Mans Ultimate* shared memory API (inherited from *rFactor 2*) does not provide a car model field and also no dedicated race number for each car. There is only one field that provides a combination of car model, team name, race number and other information. Not all components are there all the time and the format of the field content is not consistent. The "LMU" plugin parses this field and extracts as much information as possible. But it can happen, that several cars with the same race number are on the grid. In this case, the plugin generates synthetical race numbers starting from **1** to keep things working. Please blame the developers of *rFactor 2* and *Le Mans Ultimate* for this mess.
 
-2. *Le Mans Ultimate* currently does not support drivers swaps, although it has already been announced for an upcoming release. The "DriverSelect" action therefore does nothing.
+2. *Le Mans Ultimate* currently does not support driver swaps, although it has already been announced for an upcoming release. The "DriverSelect" action therefore does nothing.
 
 3. It sometimes happens that driver names contain corrupt characters. Looks like a different interpretation of character codings inherited by the *rFactor 2* data API.
 
@@ -1423,15 +1440,15 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
    
        - The fuel ratio normally contain a certain amount of safety fuel, that assure that you will not run out of fuel with 100% energy consumption. But make sure you pit before dropping virtual energy to 0%. You can recalibrate the fuel ratio once you have driven a few laps using the "FuelRatioOptimize" action or the corresponding voice command of the Race Engineer. This will use your current fuel consumption for every 1% virtual energy plus the safety fuel specified in the settings to compute an optimal fuel ratio.
 	 
-	   - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be agianst the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
+	   - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be against the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
 
      Another important aspect of the virtual energy system is that the setting in the pitstop menu of *Le Mans Ultimate* does not define how much energy has to be added at the next pitstop, but instead specifies the energy amount that will be available, when you leave the pit. This will be taken automatically into account when the refuel amount is calculated, but this is only correct at the current lap. So don't wait too long before you go to the pit or let the Engineer create a new pitstop plan, just before coming to the pit.
    
      When running on a pre-defined strategy, refueling calculation works a bit different. The Strategist and the Engineer will tell you the lap you have to come in. The calculation of the virtual energy will be exact for this particular lap. Of course you can come in later, if you have still some virtual energy left, but then you may have to correct the virtual energy level by this number of laps, at least if the next stint will be your last one.
 	 
-	 Said all that, please take a look at the [setting "Engineer: Adjust refuel amount after prepare"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database". Using this setting will allow you to auto-correct the refuel amount in those situations, but this might have other drawbacks.
+	 Said all that, please take a look at the [setting "Engineer: Adjust refuel amount after prepare"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database". Using this setting will allow you to auto-correct the refuel amount in those situations, but this might have other drawbacks.
 
-   - LMP2 and GTE cars have a *classical* fuel capacity, so virtual energy and fuel ratio does not apply here. Nevertheless, the way the refueling calculation works, is the same as for Hypercars and LMGT3s. This means, that the calculation made by the Engineer is based on the amount of fuel to be added, whereas the pitstop menu specifies the amount of fuel in the tank, when the car leaves the pit. Conversion between these two models are automatic, but you may also want to take a look at the [setting "Engineer: Adjust refuel amount after prepare"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Settings) of the "Session Database", as discussed above.
+   - LMP2 and GTE cars have a *classical* fuel capacity, so virtual energy and fuel ratio does not apply here. Nevertheless, the way the refueling calculation works, is the same as for Hypercars and LMGT3s. This means, that the calculation made by the Engineer is based on the amount of fuel to be added, whereas the pitstop menu specifies the amount of fuel in the tank, when the car leaves the pit. Conversion between these two models are automatic, but you may also want to take a look at the [setting "Engineer: Adjust refuel amount after prepare"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database", as discussed above.
 
 5. Additionally, the Race Engineer can only handle identical tyre compounds for all four tyres and can only change all four tyres together. You may, however adjust this manually once the Engineer has prepared the pitstop. This may change with a future release.
 
@@ -1507,6 +1524,10 @@ The content of the JSON file looks like this (depending on the current situation
 				3
 			]
 		},
+		"Engine": {
+			"WaterTemperature": 92.7,
+			"OilTemperature": 85.2
+		},
 		"Conditions": {
 			"AirTemperature": 24.9,
 			"Grip": "Optimum",
@@ -1541,21 +1562,25 @@ The content of the JSON file looks like this (depending on the current situation
 			"StintTimeLeft": "54:53,0"
 		},
 		"Fuel": {
-			"AvgConsumption": 4.1,
-			"LastConsumption": 4.1,
+			"AvgFuelConsumption": 4.1,
+			"LastFuelConsumption": 4.1,
 			"RemainingFuel": 36.9,
-			"RemainingLaps": 9
+			"RemainingFuelLaps": 9
+			"AvgEnergyConsumption": 3.2,
+			"LastEnergyConsumption": 3.0,
+			"RemainingEnergy": 26.7,
+			"RemainingEnergyLaps": 8
 		},
 		"Pitstop": {
 			"State": "Planned",
 			"Fuel": 68.0,
 			"Lap": null,
+			"Driver": "Oliver Juwig",
 			"ServiceTime": 30,
 			"RepairTime": 7,
 			"PitlaneDelta": 23,
 			"Number": 1,
 			"Prepared": 0,
-			"Repairs": "-",
 			"TyreCompound": "Dry (Black)",
 			"TyrePressures": [
 				25.2,
@@ -1564,7 +1589,9 @@ The content of the JSON file looks like this (depending on the current situation
 				24.3
 			],
 			"TyrePressureIncrements": [0.2, 0.1, -0.3, -0.2],
-			"TyreSet": 2
+			"TyreSet": 2,
+			"Brakes": false,
+			"Repairs": "-"
 		},
 		"Session": {
 			"Car": "McLaren 720S GT3",
@@ -1646,6 +1673,12 @@ The content of the JSON file looks like this (depending on the current situation
 				25.1,
 				24.5
 			],
+			"PressureLosses": [
+				0.0,
+				- 0.1,
+				0.0,
+				- 0.2
+			],
 			"Temperatures": [
 				80.6,
 				80.6,
@@ -1659,6 +1692,10 @@ The content of the JSON file looks like this (depending on the current situation
 				null
 			],
 			"TyreCompound": "Dry (M)"
+			"TyreCompoundFrontLeft": "Dry (M)"
+			"TyreCompoundFrontRight": "Dry (S)"
+			"TyreCompoundRearLeft": "Dry (M)"
+			"TyreCompoundRearRight": "Dry (M)"
 			"TyreSet": 3
 		},
 		"Instructions": {

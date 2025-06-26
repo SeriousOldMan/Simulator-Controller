@@ -26,6 +26,7 @@ global kBuildConfiguration := "Production"
 
 #Include "..\Framework\Startup.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\Assistants\Libraries\RaceEngineer.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
@@ -59,6 +60,30 @@ global vPitstopRepairEngine := kNotInitialized
 ;;;                         Private Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class UnknownProvider extends SimulatorProvider {
+	Simulator {
+		Get {
+			return "Unknown"
+		}
+	}
+
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
+		refuelService := true
+		tyreService := "All"
+		brakeService := true
+		repairService := ["Bodywork", "Suspension", "Engine"]
+
+		return true
+	}
+
+	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
+		mixedCompounds := "All"
+		tyreSets := true
+
+		return true
+	}
+}
+
 class TestRaceEngineer extends RaceEngineer {
 	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -82,7 +107,7 @@ class TestRaceEngineer extends RaceEngineer {
 		return knowledgeBase
 	}
 
-	supportsPitstop() {
+	supportsPitstop(*) {
 		return true
 	}
 
@@ -196,13 +221,13 @@ class TestPitstopHandler {
 		vPitstopFuel := Round(liters)
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set := false) {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
 
-		this.showAction("setPitstopTyreSet", pitstopNumber, compound, set)
+		this.showAction("setPitstopTyreCompound", pitstopNumber, compound, set)
 
-		vCompletedActions["setPitstopTyreSet"] := pitstopNumber
+		vCompletedActions["setPitstopTyreCompound"] := pitstopNumber
 
 		vPitstopTyreCompound := compound
 		vPitstopTyreCompoundColor := compoundColor
@@ -218,6 +243,15 @@ class TestPitstopHandler {
 		vCompletedActions["setPitstopTyrePressures"] := pitstopNumber
 
 		vPitstopTyrePressures := [pressureFL, pressureFR, pressureRL, pressureRR]
+	}
+
+	setPitstopBrakeChange(pitstopNumber, change) {
+		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
+		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
+
+		this.showAction("setPitstopBrakeChange", pitstopNumber, change)
+
+		vCompletedActions["setPitstopBrakeChange"] := pitstopNumber
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
@@ -650,7 +684,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -700,7 +734,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -753,7 +787,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(false, vCompletedActions.Has("startPitstopSetup"), "Unexpected pitstop action startPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("finishPitstopSetup"), "Unexpected pitstop action finishPitstopSetup reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopRefuelAmount"), "Unexpected pitstop action setPitstopRefuelAmount reported...")
-		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreSet"), "Unexpected pitstop action setPitstopTyreSet reported...")
+		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyreCompound"), "Unexpected pitstop action setPitstopTyreCompound reported...")
 		this.AssertEqual(false, vCompletedActions.Has("setPitstopTyrePressures"), "Unexpected pitstop action setPitstopTyrePressures reported...")
 		this.AssertEqual(false, vCompletedActions.Has("requestPitstopRepairs"), "Unexpected pitstop action requestPitstopRepairs reported...")
 
@@ -810,7 +844,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.Has("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
-		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreCompound"), "Pitstop action setPitstopTyreCompound not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 
@@ -877,7 +911,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.Has("startPitstopSetup"), "Pitstop action startPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("finishPitstopSetup"), "Pitstop action finishPitstopSetup not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopRefuelAmount"), "Pitstop action setPitstopRefuelAmount not reported...")
-		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreSet"), "Pitstop action setPitstopTyreSet not reported...")
+		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyreCompound"), "Pitstop action setPitstopTyreCompound not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.Has("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 
@@ -991,11 +1025,24 @@ class PitstopHandling extends Assert {
 
 				if (A_Index = 3) {
 					engineer.planPitstop()
+
+					; if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 					engineer.preparePitstop()
+
+					; if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				if (A_Index = 4) {
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 					engineer.performPitstop()
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
 					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
@@ -1010,7 +1057,8 @@ class PitstopHandling extends Assert {
 				if (A_Index = 7) {
 					engineer.planPitstop()
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
@@ -1018,6 +1066,9 @@ class PitstopHandling extends Assert {
 
 					engineer.preparePitstop()
 					engineer.performPitstop()
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
 					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
@@ -1028,6 +1079,10 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
 					this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
+					this.AssertEqual(27.1, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
+					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
+					this.AssertEqual(27.0, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
+					this.AssertEqual(27.2, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
 				}
 			}
 
@@ -1047,6 +1102,7 @@ class PitstopHandling extends Assert {
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
 setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
+setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".LearningLaps", 1)
 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
@@ -1087,6 +1143,7 @@ else {
 				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if (A_Index = 3) {
+					msgbox 1
 					engineer.planPitstop()
 					engineer.preparePitstop()
 				}
@@ -1284,6 +1341,42 @@ else {
 
 						if engineer.Debug[kDebugKnowledgeBase]
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+						withBlockedWindows(MsgBox, "Pitstop")
+					}
+
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+			}
+		}
+		until done
+	}
+	else if (raceNr == 20) {
+		done := false
+
+		loop {
+			lap := A_Index
+
+			loop {
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 20\Race Engineer Lap " . lap . "." . A_Index . ".data")
+
+				if (data.Count == 0) {
+					if (A_Index == 1)
+						done := true
+
+					break
+				}
+				else {
+					if (A_Index == 1)
+						engineer.addLap(lap, &data)
+					else
+						engineer.updateLap(lap, &data)
+
+					if (lap = 37) {
+						engineer.planPitstop()
+
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 						withBlockedWindows(MsgBox, "Pitstop")
 					}

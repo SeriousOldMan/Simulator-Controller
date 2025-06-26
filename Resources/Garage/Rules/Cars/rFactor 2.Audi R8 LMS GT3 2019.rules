@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Audi R8 LMS GT3 2019", [Electronics.ABS])),
+[?Initialize] => (Prove: addSettings("rFactor 2", "Audi R8 LMS GT3 2019", [Electronics.ABS, Radiator.Blanket.Water])),
 				 (Prove: removeSettings("rFactor 2", "Audi R8 LMS GT3 2019",
 										[Aero.Splitter.Front,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,

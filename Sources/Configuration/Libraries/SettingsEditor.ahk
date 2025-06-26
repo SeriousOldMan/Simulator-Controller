@@ -172,16 +172,16 @@ editModes(&settingsOrCommand, arguments*) {
 		for simulator, options in getMultiMapValues(configuration, "Simulators")
 			simulators.Push(simulator)
 
-		modesEditorGui.Add("Text", "x8 y60 w86 h23 +0x200", translate("Simulator"))
-		modeSimulatorDropDown := modesEditorGui.Add("DropDownList", "x100 y60 w240 Choose1", concatenate([translate("Inactive")], simulators))
+		modesEditorGui.Add("Text", "x8 y60 w77 h23 +0x200", translate("Simulator"))
+		modeSimulatorDropDown := modesEditorGui.Add("DropDownList", "x85 y60 w255 Choose1", concatenate([translate("Inactive")], simulators))
 		modeSimulatorDropDown.OnEvent("Change", editModes.Bind(&kUpdate))
 
-		modesEditorGui.Add("Text", "x8 y84 w86 h23 +0x200", translate("Session"))
-		modeSessionDropDown := modesEditorGui.Add("DropDownList", "x100 y84 w100 Choose1", [translate("Inactive")])
+		modesEditorGui.Add("Text", "x8 y84 w77 h23 +0x200", translate("Session"))
+		modeSessionDropDown := modesEditorGui.Add("DropDownList", "x85 y84 w100 Choose1", [translate("Inactive")])
 		modeSessionDropDown.OnEvent("Change", editModes.Bind(&kUpdate))
 
-		modesEditorGui.Add("Text", "x8 y108 w80 h23 +0x200", translate("Modes"))
-		modesListView := modesEditorGui.Add("ListView", "x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
+		modesEditorGui.Add("Text", "x8 y108 w77 h23 +0x200", translate("Modes"))
+		modesListView := modesEditorGui.Add("ListView", "x85 y108 w255 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
 		modesListView.OnEvent("Click", noSelect)
 		modesListView.OnEvent("DoubleClick", noSelect)
 
@@ -250,7 +250,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	static result
 	static restart
 	static newSettings
-	static origSettings
+	static origSettings := newMultiMap()
 
 	static settingsEditorGui
 	static voiceRecognition

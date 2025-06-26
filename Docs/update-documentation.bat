@@ -21,6 +21,7 @@ copy "AI Race Engineer.md" ..\..\Controller.Wiki\AI-Race-Engineer.md
 copy "AI Race Strategist.md" ..\..\Controller.Wiki\AI-Race-Strategist.md
 copy "AI Race Spotter.md" ..\..\Controller.Wiki\AI-Race-Spotter.md
 copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
+copy "Script Modules.md" ..\..\Controller.Wiki\Script-Modules.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Solo Center.md" ..\..\Controller.Wiki\Solo-Center.md
@@ -48,6 +49,10 @@ copy "Driving Coach Commands (IT).md" ..\..\Controller.Wiki\Driving-Coach-Comman
 copy "Race Engineer Commands (IT).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(IT).md
 copy "Race Strategist Commands (IT).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(IT).md
 copy "Race Spotter Commands (IT).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(IT).md
-copy "Race Settings.md" ..\..\Controller.Wiki\Race-Settings.md
+copy "Driving Coach Commands (PT).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(PT).md
+copy "Race Engineer Commands (PT).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(PT).md
+copy "Race Strategist Commands (PT).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(PT).md
+copy "Race Spotter Commands (PT).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(PT).md
+copy "Session Settings.md" ..\..\Controller.Wiki\Session-Settings.md
 copy "Keyboard Modifiers.md" ..\..\Controller.Wiki\Keyboard-Modifiers.md
 copy "Core Configuration.md" ..\..\Controller.Wiki\Core-Configuration.md

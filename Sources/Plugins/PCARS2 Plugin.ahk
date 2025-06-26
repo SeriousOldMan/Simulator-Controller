@@ -91,14 +91,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		selectActions := []
 	}
 
-	supportsPitstop() {
-		return true
-	}
-
-	supportsTrackMap() {
-		return true
-	}
-
 	openPitstopMFD(descriptor := false) {
 		static reported := false
 
@@ -279,10 +271,10 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+	setPitstopTyreCompound(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreCompound(pitstopNumber, compound, compoundColor, set)
 
 		delta := this.tyreCompoundIndex(compound, compoundColor)
 
@@ -330,38 +322,6 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}
-	}
-
-	readSessionData(options := "", protocol?) {
-		local simulator := this.Simulator[true]
-		local car := this.Car
-		local track := this.Track
-		local data := super.readSessionData(options, protocol?)
-		local tyreCompound, tyreCompoundColor, ignore, postFix
-
-		static tyres := ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-
-		for ignore, section in ["Car Data", "Setup Data"]
-			for ignore, postfix in tyres {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
-
-				if (tyreCompound = kUndefined) {
-					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
-
-					if ((tyreCompound != kUndefined) && tyreCompound) {
-						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-						if tyreCompound {
-							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
-							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
-						}
-					}
-				}
-			}
-
-		return data
 	}
 }
 

@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("rFactor 2", "Callaway Corvette C7 GT3-R", [Electronics.ABS])),
+[?Initialize] => (Prove: addSettings("rFactor 2", "Callaway Corvette C7 GT3-R", [Electronics.ABS, Radiator.Blanket.Water, Radiator.Blanket.Oil])),
 				 (Prove: removeSettings("rFactor 2", "Callaway Corvette C7 GT3-R", [Aero.Splitter.Front,
 																					Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
 																					Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,

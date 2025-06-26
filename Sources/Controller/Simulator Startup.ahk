@@ -30,6 +30,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Application.ahk"
+#Include "..\Framework\Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,6 +39,7 @@
 
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
+#Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
@@ -99,6 +101,58 @@ class StartupWindow extends Window {
 class TeamManagerWindow extends Window {
 	Close(*) {
 		manageTeams(kClose)
+	}
+}
+
+class NewsWindow extends Window {
+	Close(*) {
+		viewNews(false)
+	}
+}
+
+class NewsResizer extends Window.Resizer {
+	iHTMLViewer := false
+	iRedraw := true
+	iHTML := false
+
+	__New(htmlViewer, html, arguments*) {
+		this.iHTMLViewer := htmlViewer
+		this.iHTML := html
+
+		super.__New(arguments*)
+
+		Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 500, kHighPriority)
+	}
+
+	Resize(deltaWidth, deltaHeight) {
+		this.iRedraw := true
+	}
+
+	RedrawHTMLViewer() {
+		if this.iRedraw
+			try {
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iHTMLViewer.Resized()
+
+				this.iHTMLViewer.document.open()
+				this.iHTMLViewer.document.write(this.iHTML)
+				this.iHTMLViewer.document.close()
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				this.iRedraw := false
+			}
+
+		return Task.CurrentTask
 	}
 }
 
@@ -230,11 +284,11 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
-			if FileExist(kUserHomeDirectory . "Programs\Startup.bat")
-				Run(kUserHomeDirectory . "Programs\Startup.bat")
+			if FileExist(kProgramsDirectory . "Startup.bat")
+				Run(kProgramsDirectory . "Startup.bat")
 
-			if FileExist(kUserHomeDirectory . "Programs\Startup.cmd")
-				Run(kUserHomeDirectory . "Programs\Startup.cmd")
+			if FileExist(kProgramsDirectory . "Startup.cmd")
+				Run(kProgramsDirectory . "Startup.cmd")
 
 			exePath := (kBinariesDirectory . "Process Manager.exe")
 
@@ -473,6 +527,221 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+viewNews(fileName, title := false, readCallback := false) {
+	local curWorkingDir := A_WorkingDir
+	local html, innerWidth, editHeight, buttonX, x, y, w, h, directory, newsViewer
+
+	static newsGui := false
+	static callback := false
+
+	if !title
+		title := translate("News, tips and tricks")
+
+	if readCallback
+		callback := readCallback
+
+	if !fileName {
+		if newsGui {
+			if callback
+				callback.Call(!newsGui["readCheck"].Value)
+
+			callback := false
+
+			newsGui.Destroy()
+
+			newsGui := false
+		}
+
+		return
+	}
+	else if newsGui
+		throw "Multiple active news viewer not supported in viewNews..."
+
+	SplitPath(fileName, , &directory)
+
+	SetWorkingDir(directory)
+
+	try {
+		innerWidth := (800 - 16)
+		editHeight := (400 - 102)
+
+		newsGui := NewsWindow({Descriptor: "News Reader", Moveable: true, Resizeable: true, Options: "0x400000"}, title)
+
+		newsGui.SetFont("s10 Bold")
+
+		newsGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 H:Center BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(newsGui, "News Reader"))
+
+		newsGui.SetFont()
+
+		newsGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 H:Center BackgroundTrans", title)
+
+		newsGui.Add("Text", "x8 yp+26 w" . innerWidth . " 0x10 W:Grow")
+
+		newsViewer := newsGui.Add("WebView2Viewer", "X8 YP+10 W:Grow H:Grow W" . innerWidth . " H" . editHeight)
+
+		newsViewer.document.open()
+		newsViewer.document.write(fileName)
+		newsViewer.document.close()
+
+		newsGui.Add(NewsResizer(newsViewer, fileName, newsGui))
+
+		buttonX := Round(800 / 2) - 40
+
+		newsGui.Add("Text", "x8 yp+" . (editHeight + 10) . " Y:Move W:Grow w" . innerWidth . " 0x10")
+
+		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move vreadCheck", translate("Do not show again"))
+
+		newsGui.Add("Button", "Default X" . buttonX . " yp w80 Y:Move X:Move(0.5)", translate("Close")).OnEvent("Click", (*) => viewNews(false))
+
+		if getWindowPosition("News Reader", &x, &y)
+			newsGui.Show("AutoSize x" . x . " y" . y . " w800")
+		else
+			newsGui.Show("AutoSize Center")
+
+		if getWindowSize("News Reader", &w, &h)
+			newsGui.Resize("Initialize", w, h)
+	}
+	finally {
+		SetWorkingDir(curWorkingDir)
+	}
+}
+
+checkForNews() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+	local check := !FileExist(kUserConfigDirectory . "NEWS")
+	local lastModified, ignore, url
+
+	if !check {
+		lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
+
+		lastModified := DateAdd(lastModified, 1, "Days")
+
+		check := ((lastModified < A_Now) || isDebug())
+	}
+
+	if check {
+		try {
+			deleteFile(kTempDirectory . "NEWS.ini")
+
+			if FileExist(kConfigDirectory . "NEWS")
+				FileCopy(kConfigDirectory . "NEWS", kTempDirectory . "NEWS.ini")
+			else {
+				check := false
+
+				for ignore, url in ["https://" . MASTER . ":801/api/public/dl/jipSYNLz"
+								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
+					try
+						Download(url, kTempDirectory . "NEWS.ini")
+
+					if FileExist(kTempDirectory . "NEWS.ini") {
+						check := true
+
+						break
+					}
+				}
+			}
+		}
+		catch Any as exception {
+			check := false
+		}
+	}
+
+	if check {
+		Task.startTask(() {
+			local newsNr := false
+			local newsUrls := false
+			local availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
+			local news := readMultiMap(kUserConfigDirectory . "NEWS")
+			local availableNews, nr, rule, ignore, html, shown, candidates
+
+			for nr, url in getMultiMapValues(availableNews, "News")
+				if isNumber(nr) {
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+					if InStr(rule, "Timed") {
+						rule := string2Values(":", rule)
+
+						if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+						 && !getMultiMapValue(news, "News", nr, false)) {
+							newsNr := nr
+							newsUrls := url
+
+							break
+						}
+					}
+				}
+
+			if !newsNr
+				for nr, url in getMultiMapValues(availableNews, "News") {
+					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+					if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "News", nr, false)) {
+						newsNr := nr
+						newsUrls := url
+
+						break
+					}
+				}
+
+			if !newsNr {
+				candidates := []
+
+				for nr, url in getMultiMapValues(availableNews, "News")
+					if isNumber(nr) {
+						shown := getMultiMapValue(news, "News", nr, false)
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
+							candidates.Push([nr, url])
+					}
+
+				if (candidates.Length > 0) {
+					candidates := candidates[Round(Random(1, candidates.Length))]
+
+					newsNr := candidates[1]
+					newsUrls := candidates[2]
+				}
+			}
+
+			if (newsNr && !SimulatorStartup.Instance) {
+				deleteFile(A_Temp . "\News.zip")
+
+				for ignore, url in string2Values(";", newsUrls)
+					try {
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
+
+						try {
+							if InStr(FileExist(kTempDirectory . "News"), "F")
+								deleteFile(kTempDirectory . "News")
+
+							if InStr(FileExist(kTempDirectory . "News"), "D")
+								deleteDirectory(kTempDirectory . "News")
+						}
+
+						DirCreate(kTempDirectory . "News")
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+						if FileExist(kTempDirectory . "News\News.htm") {
+							viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+								setMultiMapValue(news, "News", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
+
+								writeMultiMap(kUserConfigDirectory . "NEWS", news)
+							})
+
+							break
+						}
+						else
+							writeMultiMap(kUserConfigDirectory . "NEWS", news)
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+			}
+		}, 10000)
+	}
+}
+
 closeApplication(application) {
 	local pid := ProcessExist(application ".exe")
 
@@ -483,8 +752,8 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, application, startupConfig, x, y, infoButton, settingsButton
-	local name, options, lastModified, hasTeamServer, restart
+	local ignore, theApplication, startupConfig, x, y, infoButton, profileButton, settingsButton
+	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
 
@@ -781,19 +1050,32 @@ launchPad(command := false, arguments*) {
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 	}
-	else if (command = "Launch") {
-		application := arguments[1]
+	else if (command = "EditProfile") {
+		launchPadGui.Block()
 
-		if ProcessExist(application)
-			WinActivate("ahk_exe " . application)
+		try {
+			editProfile(launchPadGui)
+		}
+		finally {
+			launchPadGui.Unblock()
+		}
+	}
+	else if (command = "Launch") {
+		theApplication := arguments[1]
+
+		if ProcessExist(theApplication) {
+			try
+				WinActivate("ahk_exe " . theApplication)
+		}
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], application)
+			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], theApplication)
 
-			if (getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined)
-				application .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
-							  . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
-							  . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
+			if ((getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined) &&
+				Application(SessionDatabase.getSimulatorName(getMultiMapValue(startupConfig, "Simulator", "Simulator")), kSimulatorConfiguration).isRunning())
+				theApplication .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
+								 . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
+								 . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
 
 			if restart {
 				launchPadGui.Block()
@@ -801,9 +1083,9 @@ launchPad(command := false, arguments*) {
 				try {
 					lastModified := FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")
 
-					Run(kBinariesDirectory . application)
+					Run(kBinariesDirectory . theApplication)
 
-					while ProcessExist(application)
+					while ProcessExist(theApplication)
 						Sleep(1000)
 
 					if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")) {
@@ -817,7 +1099,7 @@ launchPad(command := false, arguments*) {
 				}
 			}
 			else
-				Run(kBinariesDirectory . application)
+				Run(kBinariesDirectory . theApplication)
 		}
 
 		if ((arguments.Length > 1) && arguments[2])
@@ -858,7 +1140,7 @@ launchPad(command := false, arguments*) {
 			toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 
 		toolTips["SimulatorSetup"] := "Setup & Configuration: Describe and generate the configuration of Simulator Controller using a simple point and click wizard. Suitable for beginners."
-		toolTips["SimulatorConfiguration"] := "Configuration: Directly edit the configuration of Simulator Controller. Requires profund knowledge of the internals of the various plugins."
+		toolTips["SimulatorConfiguration"] := "Configuration: Directly edit the configuration of Simulator Controller. Requires profound knowledge of the internals of the various plugins."
 		toolTips["SimulatorDownload"] := "Update: Downloads and installs the latest version of Simulator Controller. Not needed, unless you disabled automatic updates during the initial installation."
 		toolTips["SimulatorSettings"] := "Settings: Change the behaviour of Simulator Controller during startup and in a running simulation."
 		toolTips["RaceSettings"] := "Race Settings: Manage the settings for the AI Race Assistants and also the connection to the Team Server for team races."
@@ -907,17 +1189,20 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s10 Bold", "Arial")
 
-		launchPadGui.Add("Text", "w580 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(launchPadGui, "Simulator Startup"))
+		launchPadGui.Add("Text", "x58 w480 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(launchPadGui, "Simulator Startup"))
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x544 YP w30 Section Right", string2Values("-", kVersion)[1])
+		version := string2Values("-", kVersion)
+
+		launchPadGui.Add("Documentation", "x544 YP w30 Section Right", version[1]
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#" . StrReplace(version[1], ".", ""))
 
 		launchPadGui.SetFont("s6")
 
 		try {
-			if (string2Values("-", kVersion)[2] != "release")
-				launchPadGui.Add("Text", "x546 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(string2Values("-", kVersion)[2]))
+			if (version[2] != "release")
+				launchPadGui.Add("Text", "x546 YP+12 w30 BackgroundTrans Right c" . launchPadGui.Theme.TextColor["Disabled"], StrUpper(version[2]))
 		}
 
 		launchPadGui.SetFont("s9 Norm", "Arial")
@@ -930,6 +1215,10 @@ launchPad(command := false, arguments*) {
 		infoButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
 		infoButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits"))
 		setButtonIcon(infoButton, kIconsDirectory . "Team.ico", 1)
+
+		profileButton := launchPadGui.Add("Button", "x532 yp w23 h23")
+		profileButton.OnEvent("Click", (*) => launchPad("EditProfile"))
+		setButtonIcon(profileButton, kIconsDirectory . "Profile.ico", 1)
 
 		settingsButton := launchPadGui.Add("Button", "x556 yp w23 h23")
 		settingsButton.OnEvent("Click", modifySettings.Bind(launchPadGui))
@@ -1106,16 +1395,20 @@ availableFunctions(configuration, &hasTeamServer := false
 	if hasRaceSpotter {
 		functions.Push(Array("Race Spotter", "Track Mapping"))
 		functions.Push(Array("Race Spotter", "Track Automation"))
+		functions.Push(Array("Race Spotter", "Private Practice"))
+		functions.Push(Array("Race Spotter", "Private Qualifying"))
 	}
 
 	if hasRaceStrategist {
-		functions.Push(Array("Race Strategist", "Telemetry Collection"))
+		functions.Push(Array("Race Strategist", "Data Collection"))
 		functions.Push(Array("Race Strategist", "Traffic Analysis"))
 	}
 
 	if hasRaceEngineer {
 		functions.Push(Array("Race Engineer", "Pressure Collection"))
 		functions.Push(Array("Race Engineer", "Fuel Warning"))
+		functions.Push(Array("Race Engineer", "Tyre Warning"))
+		functions.Push(Array("Race Engineer", "Brake Warning"))
 		functions.Push(Array("Race Engineer", "Damage Warning"))
 		functions.Push(Array("Race Engineer", "Pressure Warning"))
 		functions.Push(Array("Race Engineer", "Pressure Correction by Temperature"))
@@ -1257,6 +1550,116 @@ loadStartupProfiles(target, fileName := false) {
 	}
 
 	return settings
+}
+
+editProfile(launchPadOrCommand := false, *) {
+	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, sessionDataDropDown, x, y
+
+	static result := false
+
+	if (launchPadOrCommand == kOk)
+		result := kOk
+	else if (launchPadOrCommand == kCancel)
+		result := kCancel
+	else {
+		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+		result := false
+
+		profileGui := Window({Options: "0x400000"})
+
+		profileGui.SetFont("Bold", "Arial")
+
+		profileGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(profileGui, "Simulator Startup.Profile"))
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Profile")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy")
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x8 yp+25 w342 0x10")
+
+		profileGui.Add("Text", "x16 yp+10 w90 +0x200", translate("Driver"))
+		profileGui.Add("Text", "x110 yp w240", SessionDatabase.getUserName())
+
+		profileGui.SetFont("Italic", "Arial")
+
+		profileGui.Add("GroupBox", "x8 yp+30 w342 h9 Section", translate("Database"))
+		profileGui.Add("Text", "x100 yp+7 w250 0x10")
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x16 yp+18 w90 h23 +0x200", translate("Identification Key"))
+		profileGui.Add("Edit", "x110 yp w240 h23 -VScroll ReadOnly", StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1])
+
+		profileGui.Add("Button", "x230 yp+30 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
+			profileGui.Block()
+
+			try {
+				showConsentDialog()
+			}
+			finally {
+				profileGui.Unblock()
+			}
+		})
+
+		profileGui.SetFont("Norm", "Arial")
+		profileGui.SetFont("Italic", "Arial")
+
+		profileGui.Add("GroupBox", "x8 yp+30 w342 h9 Section", translate("Diagnostics"))
+		profileGui.Add("Text", "x100 yp+7 w250 0x10")
+
+		profileGui.SetFont("Norm", "Arial")
+
+		profileGui.Add("Text", "x16 yp+18 w326 h65", translate("Please choose, which information will be supplied to the development team for further improvement of Simulator Controller. No personal information is involved."))
+
+		profileGui.Add("Text", "x16 yp+70 w90 h23", translate("Error Logs"))
+		errorLogsDropDown := profileGui.Add("DropDownList", "x110 yp-2 w80", collect(["Yes", "No"], translate))
+		errorLogsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Critical", true) == false))
+
+		profileGui.Add("Text", "x16 yp+29 w90 h23", translate("Usage Statistics"))
+		usageStatsDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
+		usageStatsDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Usage", true) == false))
+
+		profileGui.Add("Text", "x16 yp+29 w90 h23", translate("Session Data"))
+		sessionDataDropDown := profileGui.Add("DropDownList", "x110 yp-3 w80", collect(["Yes", "No"], translate))
+		sessionDataDropDown.Choose(1 + (getMultiMapValue(settings, "Diagnostics", "Session", false) == false))
+		profileGui.Add("Text", "x195 yp+3 w160 h23", translate("(for model training)"))
+
+		profileGui.Add("Text", "x8 yp+30 w342 0x10")
+
+		profileGui.Add("Button", "x100 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editProfile.Bind(kOk))
+		profileGui.Add("Button", "x186 yp w80 h23", translate("&Cancel")).OnEvent("Click", editProfile.Bind(kCancel))
+
+		profileGui.Opt("+Owner" . launchPadOrCommand.Hwnd)
+
+		if getWindowPosition("Simulator Startup.Profile", &x, &y)
+			profileGui.Show("x" . x . " y" . y)
+		else
+			profileGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kOk) {
+				setMultiMapValue(settings, "Diagnostics", "Critical", (errorLogsDropDown.Value = 1))
+				setMultiMapValue(settings, "Diagnostics", "Usage", (usageStatsDropDown.Value = 1))
+				setMultiMapValue(settings, "Diagnostics", "Session", (sessionDataDropDown.Value = 1))
+
+				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
+
+				return true
+			}
+			else
+				return false
+		}
+		finally {
+			profileGui.Destroy()
+		}
+	}
 }
 
 editStartupProfiles(launchPadOrCommand, arguments*) {
@@ -1705,14 +2108,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			if (line > 1)
 				editStartupProfiles(kEvent, "ProfileLoad", line)
-			else if (line = 1) {
-				profilesListView.Modify(1, "-Select")
+			else {
+				if (line = 1)
+					profilesListView.Modify(1, "-Select")
 
-				if selectedProfile
-					profilesListView.Modify(selectedProfile, "Select")
-			}
-			else
 				selectedProfile := false
+			}
 		}
 
 		editStartupProfiles("Update State")
@@ -2772,6 +3173,8 @@ startSimulator() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
 
+	SimulatorStartup.Instance := false
+
 	if (inList(A_Args, "-Unblock") || (GetKeyState("Ctrl") && GetKeyState("Alt")))
 		unblockExecutables()
 
@@ -2781,16 +3184,24 @@ startSimulator() {
 		gStartupProfile := A_Args[startup + 1]
 
 	try {
+		noLaunch := inList(A_Args, "-NoLaunchPad")
+		noLaunch := ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
+
+		if !noLaunch {
+			if kLogStartup
+				logMessage(kLogOff, "Checking for news...")
+
+			checkForNews()
+		}
+
 		startupApplication()
 
-		noLaunch := inList(A_Args, "-NoLaunchPad")
-
-		if ((noLaunch && !GetKeyState("Shift")) || (!noLaunch && GetKeyState("Shift")))
+		if noLaunch
 			startupSimulator()
 		else {
 			showSplashScreen("Logo")
 
-			Task.startTask(hideSplashScreen, 2000)
+			Task.startTask(hideSplashScreen, 4000)
 
 			while launchPad()
 				ignore := 1

@@ -26,13 +26,13 @@ Said this, it is clear, that the interaction with the grammar-based Assistants, 
 
 Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the *Reasoning* booster, which requires strong reasoning skills, but no conversational skills at all. This might be helpful to select the best possible model for each task.
 
-Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here. Please note, that the local *LLM Runtime* does not support the so called function calling of LLMs at the time of this writing. It therefore cannot be used for the *Conversation* booster with activated actions and absolutely not for the *Resoning* booster. This may change in the future.
+Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here. Please note, that *GPT4All* and also the local *LLM Runtime* do not support the so called function or tool calling of LLMs at the time of this writing. They therefore cannot be used for the *Conversation* booster with activated actions and absolutely not for the *Resoning* booster. This may change in the future.
 
 As said, the Driving Coach is a bit different in the sense, that it allows free conversation with an LLM using a GPT service. But it also uses several pattern-based grammars for pre-defined commands like the other Assistants, therefore the Driving Coach is a kind of a hybrid, when it comes to voice interaction. For the pattern-based voice commands, the Driving Coach also supports the *Rephrasing* booster and the *Understanding* booster described a described below.
 
 IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Additionally, using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
-Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 3.5 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
+Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4.1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
 ## Overview of the different Assistant Boosters
 
@@ -71,7 +71,7 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 
 (1) Depending on the availabilty of the data by the current simulator.
 
-Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like GPT 3.5, Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
+Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
 
 Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 
@@ -382,14 +382,15 @@ As already mentioned, you can choose a different LLM for this booster, because h
 	 
 Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the used large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
-As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Generic" provider, but do not enter additional information like URL, Model and such. In this case, only *Events* can be configured. You can enter as many event rules as you want, but they must execute their corresponding action on its own.
+As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Rules" provider. In this case, you must write rules for each event to be handled. These rules then can either handle the event directly or you can define actions and trigger them from the event rule by calling the "Assistant.Trigger" function / predicate as described below.
 
 ### Using Actions & Events
 
 The *Reasoning* booster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
 
-  - GPT 3.5 and above from *OpenAI*
+  - GPT 4.1 mini and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
+  - Gemini 2 Flash and above from *Google*
   - Claude3 and above by *Anthropic* (via *OpenRouter*)
   - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
   - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
@@ -470,6 +471,8 @@ To open this editor, click on the small button with the "Pencil" icon on the rig
 
 You can enable or disable individual predefined actions using the checkbox on the left of the action name. And you can define your own actions with a click on the "+" button (or you can copy an existing event by clicking on the button with the "Copy" icon). But this requires a very detailed understanding of the architecture and inner workings of Simulator Controller and the Assistants as well as an excellent understanding of LLMs and how they call tools and functions. This is far beyond the scope of this documentation, but I try to give a brief introduction.
 
+Additionally you can export and import actions here to build a library for you and your team mates or you can share them with the community, for example.
+
 1. When an LLM is activated, it is possible to provide a list of function descriptions to the LLM. *OpenAI* has defined the quasi-standard for the function description in JSON format as part of their API:
 
 	   {
@@ -507,18 +510,19 @@ You can enable or disable individual predefined actions using the checkbox on th
    |-------------|-------------|
    | Assistant Method | A method of the object which represents the given Race Assistant is called. The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *requestInformation("Position")*, which will let the Strategist give you information about your current position in the race). You can also name several methods to be called located on multiple lines.<br><br>If only the method name is supplied, all arguments as defined by the action will be supplied to the method call. If a function call format is used, you can reference arguments by using the parameter name enclosed in percent signs, like "%refuelAmount%, Example:<br><br>planPitstopAction(null, %refuelAmount%, true, "Dry (S)", true, false)<br><br>Important: The usage of the character "\|" is strictly forbidden in a call definition, since it is used internally as a separator. |
    | Assistant Rule | The supplied rules are loaded into the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>All arguments supplied by the LLM are created as facts in the knowledge base for the time of the execution. Please use enclosing percentage signs to reference the arguments. Example: %location%<br><br>A special fact named %activation% will be set as well, which can be used to trigger rules, when no other fact is suitable. |
+   | Assistant Script | Similar to "Assistant Rule", but uses [Lua](https://www.lua.org) as scripting language.<br><br>All arguments supplied by the LLM are created as global variables for the time of execution. Please use enclosing percentage signs to reference those arguments. Example: %location% |
    | Controller Method | A method of the single instance of the *SimulatorController* class is called in the process "Simulator Controller.exe". The *method* can either simply be the name of the method or it can have the format of a function call with a fixed number of predefined arguments (Example: *setMode("Launch")*, which activates the *Launch* mode on one of the connected Button Boxes). Additional arguments may be supplied like described above for *Assistant Method*. You can also name several methods to be called located on multiple lines. |
    | Controller Function | A global function is called in the process "Simulator Controller.exe". The *function* can either simply be the name of the function to be called or it can have the format of a function call with a fixed number of predefined arguments (Example: *trigger("!w")*, which sends the keyboard command "Alt w" to the current simulator). Additional arguments may be supplied like described above for *Assistant Method*. You can also name several functions to be called located on multiple lines.<br><br>Good candidates are the controller action functions, which are provided by the different plugins. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for a complete overview. Using the "invoke" controller action function you can even call a method for one of the active plugins installed in Simulator Controller. |
 
 3. The most versatile *Action Type* is obviously the "Assistant Rule", since it allows you to do almost anything, but it requires very good programming skills in the area of logical programming languages like Prolog and forward chaining production rule systems. Simulator Controller comes with a builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine), which has been created exclusivly with the requirements of intelligent agents in mind. The Race Assistants have been implemented using this rule engine, but other applications of Simulator Controller are using it as well. You will find an extensive, developer-oriented documentation for the rule engine [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-engine) and you can take a look at the rule sets of the Race Assistants to learn the language. They can be found in the *Resources\Rules* folder in the program folder of Simulator Controller. Start with "Race Engineer.rules".
 
-   When defining the rules for a custom action, you can use the following predicates to connect to the given Assistant or even the "Simulator Controller.exe" process:
+   When defining the rules for a custom action, you can use the following predicates and functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
    - Assistant.Call(method, p1, p2, ...)
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase, [force])
+   - Assistant.Speak(phrase [, force])
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
@@ -538,7 +542,7 @@ You can enable or disable individual predefined actions using the checkbox on th
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 
-   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, *function*, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
+   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, function, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
 	   
    In forward chaining rules, the syntax is a bit different:
    
@@ -546,13 +550,59 @@ You can enable or disable individual predefined actions using the checkbox on th
 
    Here you can use (Call: *Assistant.Call*(function, p1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
    
-As you can see, defining individual actions is really an expert topic and therefore nothing for the casual user. If you want use this feature, I can offer a personal introduction and coaching as part of the Patreon membership.
+   Good to know: During the execution of a rule you can use the *execute* action / predicate not only to call batch files and executable, but you can also run any script defined in the *Lua* scripting language. The arguments passed to the script will be available in the global array *Arguments*. Since the script is run in the host process it will have access to the same global functions as defined for "Assistant Script" *Action Type* below.
 
-Here is a very simple example:
+4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
+   
+   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+	 
+   - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
+   
+	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
+	 
+   - Assistant.Ask(question :: \<string\>)
+   
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   
+     Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+	 
+   - Function.Call(function :: \<string\>, p1, p2, ...)
+   
+     Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
+
+   - Rules.SetValue(fact :: \<string\>, value :: \<string\>)
+   
+     Changes the value for the given fact in the knowledgebase of the Assistant.
+
+   - Rules.GetValue(fact :: \<string\> [, default)
+   
+     Returns the value for the given fact in the knowledgebase of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
+
+   - Rules.Execute()
+   
+     Runs a full production cycle of the Rule Engine of the Assistant.
+	 
+   Here is an example that demonstrates several of the above functions:
+   
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition%202.JPG)
+   
+   For this example it is assumed, that two keyboard commands are defined in the current simulator: 1. "i" increases the brake balance and "k" decreases the brake balance.
+   
+   - extern(name :: \<string\>)
+   
+   During the execution of a script you can use the *extern* function to call any global *AutoHotkey* object in the current process. Example: extern("showMessage")("Hello World!"). Beside calling functions, *extern* can also be used to access any global variable in that process.
+   
+   Beside the *builtin* functions described above, additional modules are available, which can be loaded on demand. They can be used to interface with the current simulation and session. Please see the [reference cards for these modules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) and several examples how to use them.
+   
+As you can see, defining individual actions is really an expert topic and requires some programming skills when using rules and/or scripts. Therefore it may be no option for the casual user, and even for the experienced programmer it will require some knowledge about the inner workings. If you want to use this feature, I can offer a personal introduction and coaching as part of the Patreon membership. However, when using the *Action Type* "Controller Function", even the technically non-experienced users can achieve impressive results. Here is a corresponding example:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
-This action calls the [controller acton]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions)) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
+This action calls the [controller aciton](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 
@@ -578,17 +628,25 @@ As you can see, this editor looks very similar to the actions editor discussed a
    | Event Rule | The supplied rules are loaded into the rule engine of the given Race Assistant. These rules have full access to the knowledge base and all other rules of this Assistant.<br><br>The event rules can use the full knowledge to derive whether the event in question should be raised. They then raise the event by *calling* the "Assistant.Raise* predicate, optionally supplying additional arguments to the event, which can be referenced in the event phrase.<br><br>Note: Actually, you don't have to raise an event in the event rules, if you are able to handle the situation directly using the rules. In this case, the LLM is not activated. |
    | Event Disabled | This is a special one, inidcated by a "-" in the "Active" column in the list of events. It declares that the event is consumed, so that the rule engine does not do the default processing for this event. But the event is also processed by the LLM effectively disabling this type of event at all. This makes sense in combination with very smart LLMs, which will trigger actions simply by looking at the data (see the discussion [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events--actions). This makes only sense for the builtin events, of course. |
 
-3. When defining the rules for a custom event, you can use all the predicates introduced above for actions. Additionally, you can use:
+3. When defining the rules for a custom event, you can use all the predicates and functions introduced above for actions. Additionally, you can use:
    
    - Assistant.Raise(signal, p1, p2, ...)
    
      Raises the given *signal*, thereby identifying the event to be processed by the LLM.
 	 
-   *Assistant.Raise* also comes in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant.
+   - Assistant.Trigger(action, p1, p2, ...)
+   
+     Activates a defined action without going through the LLM processing. The action is located by its name and is invoked directly with the supplied arguments.
+	 
+   *Assistant.Raise* and *Assistant.Trigger* also come in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant. This can be used for communication between the different Assistants.
    
    - Assistant.Raise(assistant, signal, p1, p2, ...)
    
      Raises the given *signal* for the given *assistant*, thereby identifying the event to be processed by the LLM.
+	 
+   - Assistant.Trigger(assistant, action, p1, p2, ...)
+   
+     Activates a defined *action* for the given *assistant*. The action is located by its name and is invoked directly with the supplied arguments.
 
 Here is an example of a few rules that together detect that it just started raining. Then the event "RainStart" is signalled to the LLM, which then can react and switch on the wiper, for example.
 
@@ -609,7 +667,7 @@ Another example, this time using arguments:
 
 This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behaviour.
  
-Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you canuse in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
+Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
 Good to know: When an event handler is located for a given event signal, custom events are checked before all predefined events. This allows for customization of the predefined events.
 
@@ -630,6 +688,10 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pitstop Planning            | 1. [Optional] targetLap<br>2. [Optional] refuelAmount<br>3. [Optional] changeTyres<br>4. [Optional] tyreCompound<br>5. [Optional] repairDamage<br>6. [Optional] swapDriver | Yes | Yes | "We must pit for repairs. Can you create a plan without refueling and without tyre change?"<br>*changeTyres*, *repairDamage* and *swapDriver* all indicate using a *Boolean* whether the repsective service will be provided during pitstop. A tyre compound for the new tyres can be supplied with *tyreCompound*, if a tyre change is requested. |
 | Pitstop Clearance           | -                 | Yes | Yes | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
+| Low Fuel Reporting          | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that fuel is getting low and the pitstop will be needed. |
+| Low Energy Reporting        | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that virtual energy is getting low and the pitstop will be needed. Only used in *Le Mans Ultimate* at the time of this writing. |
+| Tyre Wear Reporting         | 1. [Required] tyre<br>2. [Required] wear | No | Yes | Informs the driver that the tread of at least one of the tyres may be worn out and a tyre change should be planned. *tyre* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
+| Brake Wear Reporting        | 1. [Required] wheel<br>2. [Required] wear | No | Yes | Informs the driver that at least one of the brake pads may be worn out and a change of brake pads should be planned. *wheel* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
 | Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | This action informs the driver that some damage has been collected in the last accident. |
 | Time Loss Reporting         | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | No | Yes | Typically activated when it has been detected that the time lost per lap is too high for the remaining laps of the current stint. There is an event available, that signals time loss. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |
 | No Time Loss Reporting      | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | No | Yes | Typically activated when the driver has recovered its pace after an accident later on and repairs are no longer needed. There is an event available, that signals this fact. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |
@@ -645,6 +707,9 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Event                       | Parameter(s)      | Description |
 |-----------------------------|-------------------|-------------|
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
+| Energy Low                  | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | When the car is running low on virtual energy, this event is signalled. Only used in *Le Mans Ultimate* at the time of this writing. |
+| Tyre Wear                   | 1. [Required] tyre<br>2. [Required] wear | When a tyre is almost worn out, this event is signalled. *tyre* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of the tread of this tyre in percentage. |
+| Brake Wear                   | 1. [Required] wheel<br>2. [Required] wear | When one of the brake pads is almost worn out, this event is signalled. *wheel* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of this brake pad in percentage. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |
 | Time Loss                   | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | This event is signalled, if an analysis has shown, that the time lost per lap after an incident is too high for the remaining laps of the current stint. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |
 | No Time Loss                | 1. [Required] lapsToDrive<br>2. [Required] timeLoss | This event is signalled, if an analysis has shown, that the driver has recovered his pace and an additional pitstop is no longer beneficial. *lapsToDrive* is the number of remaining laps in the current stint, *timeLoss* the time lost per lap in seconds. |

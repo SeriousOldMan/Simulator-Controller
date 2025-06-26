@@ -55,14 +55,22 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseRaceReportsPath(*) {
-			local directory
+			local directory, ignore, configuration
 
 			OnMessage(0x44, translateSelectCancelButtons)
 			directory := withBlockedWindows(FileSelect, "D1", window["raceReportsPathEdit"].Text, translate("Select Race Reports Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
-			if (directory != "")
+			if (directory != "") {
 				window["raceReportsPathEdit"].Text := directory
+
+				if (window["rsSaveRaceReportDropDown"].Value = 3)
+					window["rsSaveRaceReportDropDown"].Choose(2)
+
+				for ignore, configuration in this.iSimulatorConfigurations
+					if (configuration["SaveRaceReport"] = "Never")
+						configuration["SaveRaceReport"] := "Always"
+			}
 		}
 
 		chooseRaceStrategistSimulator(*) {
@@ -286,12 +294,14 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		this.saveSimulatorConfiguration()
 
-		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+		if this.iCurrentSimulator {
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
-			if (simulator != this.iCurrentSimulator)
-				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
-					simulatorConfiguration[key] := configuration[key]
+			for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+				if (simulator != this.iCurrentSimulator)
+					for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
+						simulatorConfiguration[key] := configuration[key]
+		}
 	}
 }
 

@@ -40,7 +40,7 @@
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
+#Include "..\Database\Libraries\LapsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -57,7 +57,7 @@ global kUpdateMessages := CaseInsenseMap("updateTranslations", "Updating transla
 									   , "updatePhraseGrammars", "Updating phrase grammars to ")
 
 global kDevelopmentCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
-global kProductionCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
+global kProductionCompiler := kDevelopmentCompiler ; (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
 
 global kSave := "save"
 global kRevert := "revert"
@@ -191,7 +191,7 @@ installOptions(options, *) {
 
 		if (empty && valid)
 			result := kOk
-		else if !empty {
+		else if (!empty && !update) {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -343,6 +343,7 @@ uninstallOptions(options, *) {
 checkInstallation() {
 	global gProgressCount
 
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local installLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
@@ -351,6 +352,7 @@ checkInstallation() {
 	installComponents(packageLocation, installLocation, temporary := false) {
 		global gProgressCount
 
+		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
 		local installInfo := readMultiMap(installLocation . "\VERSION")
 		local installedComponents := string2Map(",", "->", getMultiMapValue(installInfo
@@ -375,11 +377,11 @@ checkInstallation() {
 							showProgress({progress: (gProgressCount += 2)
 										, message: translate("Downloading ") . component . translate(" files...")})
 
-							deleteFile(A_Temp . "\Temp.zip")
+							deleteFile(kTempDirectory . "ComponentPackage.zip")
 
-							Download(url, A_Temp . "\Temp.zip")
+							Download(substituteVariables(url, {master: MASTER}), kTempDirectory . "ComponentPackage.zip")
 
-							if !FileExist(A_Temp . "\Temp.zip")
+							if !FileExist(kTempDirectory . "ComponentPackage.zip")
 								urlError := "Package URL not defined..."
 							else {
 								showProgress({progress: (gProgressCount += 2)
@@ -393,7 +395,7 @@ checkInstallation() {
 									path := packageLocation
 
 								if temporary {
-									destination := (A_Temp . "\SC-Component" . componentNr)
+									destination := (kTempDirectory . "SC-Component" . componentNr)
 
 									deleteFile(destination)
 									deleteDirectory(destination)
@@ -404,7 +406,7 @@ checkInstallation() {
 								else
 									destination := path
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Temp.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "ComponentPackage.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
 
 								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
 									throw "Archive does not contain a valid component package..."
@@ -466,7 +468,7 @@ checkInstallation() {
 	}
 
 	try {
-		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
+		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", false)
 	}
 	catch Any as exception {
 		logError(exception, false, false)
@@ -808,7 +810,7 @@ checkInstallation() {
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
 
-						if InStr(packageLocation, A_Temp)
+						if directoryContains(kTempDirectory, packageLocation)
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
@@ -855,18 +857,17 @@ checkInstallation() {
 						Run(A_Args[index + 1])
 				}
 			}
-			else {
-				if (isNew || (options.InstallLocation != packageLocation))
-					if InStr(packageLocation, A_Temp)
-						removeDirectory(packageLocation)
-					else {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+			else if (isNew || (options.InstallLocation != packageLocation)) {
+				if directoryContains(kTempDirectory, packageLocation)
+					removeDirectory(packageLocation)
+				else {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
 
-						if (msgResult = "Yes")
-							removeDirectory(packageLocation)
-					}
+					if (msgResult = "Yes")
+						removeDirectory(packageLocation)
+				}
 			}
 
 			ExitApp(0)
@@ -1770,6 +1771,89 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV627() {
+	local ignore, assistant, extension, type, fileName, configuration, name, definition
+
+	for ignore, assistant in ["Race Engineer", "Race Strategist", "Race Spotter", "Driving Coach"]
+		for ignore, extension in [".events", ".actions"] {
+			fileName := (kUserHomeDirectory . "Actions\" . assistant . extension)
+
+			if FileExist(fileName) {
+				text := FileRead(fileName)
+
+				text := StrReplace(text, "Agent.Events", "Agent.LLM.Events")
+				text := StrReplace(text, "Agent.Actions", "Agent.LLM.Actions")
+
+				deleteFile(fileName)
+
+				FileAppend(text, fileName, "UTF-16")
+			}
+		}
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			text := FileRead(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			text := StrReplace(text, "﻿", "")
+
+			deleteFile(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			FileAppend(text, kDatabaseDirectory . "User\" . code . "\Drivers.CSV", "UTF-8")
+		}
+}
+
+updateConfigurationForV626() {
+	local sessionDB, ignore, code, entry
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			sessionDB := Database(kDatabaseDirectory . "User\" . code . "\", kSessionSchemas)
+
+			sessionDB.lock()
+
+			try {
+				for ignore, entry in sessionDB.Table["Drivers"]
+					entry["Synchronized"] := kNull
+
+				sessionDB.changed("Drivers")
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+			finally {
+				sessionDB.unlock()
+			}
+		}
+}
+
+updateConfigurationForV622() {
+	local appSettings, issueSettings, text
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		issueSettings := newMultiMap()
+
+		setMultiMapValues(issueSettings, "Settings", getMultiMapValues(appSettings, "Telemetry Collector"))
+
+		removeMultiMapValues(appSettings, "Telemetry Collector")
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", appSettings)
+		writeMultiMap(kUserConfigDirectory . "Issue Collector.ini", issueSettings)
+	}
+
+	if FileExist(kUserConfigDirectory . "Startup.settings") {
+		text := FileRead(kUserConfigDirectory . "Startup.settings")
+
+		if InStr(text, "Telemetry Collection") {
+			text := StrReplace(text, "Telemetry Collection", "Data Collection")
+
+			deleteFile(kUserConfigDirectory . "Startup.settings")
+
+			FileAppend(text, kUserConfigDirectory . "Startup.settings")
+		}
+	}
+}
+
 updateConfigurationForV610() {
 	local configuration, subtitle
 
@@ -2595,13 +2679,13 @@ updateConfigurationForV424() {
 
 					sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
 
-					sourceDB := Database(sourceDirectory, kTelemetrySchemas)
-					targetDB := TelemetryDatabase(simulator, car, track).Database
+					sourceDB := Database(sourceDirectory, kLapsSchemas)
+					targetDB := LapsDatabase(simulator, car, track).Database
 
 					for ignore, row in sourceDB.Tables["Electronics"] {
 						data := Database.Row()
 
-						for ignore, field in kTelemetrySchemas["Electronics"]
+						for ignore, field in kLapsSchemas["Electronics"]
 							data[field] := row[field]
 
 						targetDB.add("Electronics", data, true)
@@ -2610,7 +2694,7 @@ updateConfigurationForV424() {
 					for ignore, row in sourceDB.Tables["Tyres"] {
 						data := Database.Row()
 
-						for ignore, field in kTelemetrySchemas["Tyres"]
+						for ignore, field in kLapsSchemas["Tyres"]
 							data[field] := row[field]
 
 						targetDB.add("Tyres", data, true)
@@ -2782,7 +2866,7 @@ updateConfigurationForV422() {
 			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
 				track := A_LoopFileName
 
-				db := TelemetryDatabase(simulator, car, track).Database
+				db := LapsDatabase(simulator, car, track).Database
 
 				addOwnerField(db, "Electronics", id)
 				clearWearFields(db, "Tyres", id)
@@ -3023,7 +3107,7 @@ updatePluginsForV402() {
 
 updateToV400() {
 	OnMessage(0x44, translateOkButton)
-	withBlockedWindows(MsgBox, translate("Your installed version is to old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
+	withBlockedWindows(MsgBox, translate("Your installed version is too old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
 	OnMessage(0x44, translateOkButton, 0)
 
 	ExitApp(0)
@@ -3107,10 +3191,16 @@ runSpecialTargets(&buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 					try {
-						if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
-							result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
-						else
-							result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `"" . kTempDirectory . "Special Build.out`"`"", , "Hide")
+						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" -t:Restore -p:RestorePackagesConfig=true > `""
+													. kTempDirectory . "Special Build.out`"`"", , "Hide")
+
+						if !result
+							if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
+								result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `""
+															. kTempDirectory . "Special Build.out`"`"", , "Hide")
+							else
+								result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `""
+															. kTempDirectory . "Special Build.out`"`"", , "Hide")
 
 						if result {
 							success := false
@@ -3526,15 +3616,6 @@ prepareTargets(&buildProgress, updateOnly) {
 	local updateTargets := getMultiMapValues(targets, "Update")
 	local target, arguments, update, cleanupTargets, targetName, cleanup, copyTargets, copy, buildTargets, build, rule
 
-	compareUpdateTargets(t1, t2) {
-		if inList(t2[3], t1[1])
-			return false
-		else if inList(t1[3], t2[1])
-			return true
-		else
-			return (t1[1] >= t2[1])
-	}
-
 	for target, arguments in updateTargets {
 		buildProgress += (A_Index / updateTargets.Count)
 
@@ -3556,7 +3637,14 @@ prepareTargets(&buildProgress, updateOnly) {
 		Sleep(50)
 	}
 
-	bubbleSort(&gUpdateTargets, compareUpdateTargets)
+	bubbleSort(&gUpdateTargets, (t1, t2) {
+		if inList(t2[3], t1[1])
+			return false
+		else if inList(t1[3], t2[1])
+			return true
+		else
+			return (StrCompare(t1[1], t2[1]) >= 0)
+	})
 
 	if !updateOnly {
 		cleanupTargets := getMultiMapValues(targets, "Cleanup")

@@ -500,6 +500,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(recognizer, "Google") == 1)
 				recognizer := "Google"
 
+			if (InStr(recognizer, "Whisper Server") == 1)
+				recognizer := "Whisper Server"
+
 			if (recognizer = "Whisper")
 				recognizer := "Whisper Local"
 

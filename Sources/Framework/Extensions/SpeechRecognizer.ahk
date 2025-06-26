@@ -245,7 +245,10 @@ class SpeechRecognizer {
 
 	Method {
 		Get {
-			return (inList(["Azure", "Google", "Whisper"], this.Engine) ? "Text" : "Pattern")
+			if (InStr(this.Engine, "Whisper") = 1)
+				return "Text"
+			else
+				return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -269,7 +272,7 @@ class SpeechRecognizer {
 		Get {
 			local result, ignore, recognizer
 
-			if (InStr(engine, "Whisper") = 1) {
+			if (InStr(this.Engine, "Whisper") = 1) {
 				if (language = "en")
 					return kWhisperModels
 				else
@@ -295,6 +298,9 @@ class SpeechRecognizer {
 		global kNirCmd
 
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
+
+		if (engine = "Whisper")
+			engine := "Whisper Local"
 
 		if (InStr(engine, "Whisper") = 1) {
 			dllName := "Audio Recorder.dll"
@@ -423,25 +429,25 @@ class SpeechRecognizer {
 				instance.SetEngine(engine)
 			}
 			else if (InStr(engine, "Whisper") = 1) {
-				if (InStr(engine, "Whisper Remote|") = 1) {
+				if (InStr(engine, "Whisper Server|") = 1) {
 					engine := string2Values("|", engine)
 
-					this.iWhisperServer = engine[2]
+					this.iWhisperServer := engine[2]
 					engine := engine[1]
 				}
 
-				if !iDebug()
-					if ((engine = "Whisper") && !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe"))
+				if !isDebug()
+					if ((engine = "Whisper Local") && !FileExist(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe"))
 						throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
-					else if ((engine = "Whisper Remote") && !FileExist(kUserHomeDirectory . "Programs\Whisper Remote\Whisper Connector.dll"))
+					else if ((engine = "Whisper Server") && !FileExist(kUserHomeDirectory . "Programs\Whisper Server\Whisper Connector.dll"))
 						throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 				this.iEngine := engine
 
 				this.Instance := {AudioRecorder: CLR_LoadLibrary(dllFile).CreateInstance("Speech.AudioRecorder")}
 
-				if (engine = "Whisper Remote")
-					this.Instance.Connector := CLR_LoadLibrary(kUserHomeDirectory . "Programs\Whisper Remote\Whisper Connector.dll").CreateInstance("WhisperConnector.WhisperConnector")
+				if (engine = "Whisper Server")
+					this.Instance.Connector := CLR_LoadLibrary(kUserHomeDirectory . "Programs\Whisper Server\Whisper Connector.dll").CreateInstance("WhisperConnector.WhisperConnector")
 
 				choices := []
 
@@ -739,7 +745,7 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Model {
-			if (this.Engine = "Whisper") {
+			if (this.Engine = "Whisper Local") {
 				DirCreate(kTempDirectory . "Whisper")
 
 				RunWait(kUserHomeDirectory . "Programs\Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide")
@@ -761,7 +767,7 @@ class SpeechRecognizer {
 					deleteFile(kTempDirectory . "Whisper\" . name . ".JSON")
 				}
 			}
-			else if (this.Engine = "Whisper Remote") {
+			else if (this.Engine = "Whisper Server") {
 				try {
 					this.Instance.Connector.Initialize(this.iWhisperServer, this.Language, this.Model)
 
@@ -797,7 +803,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if inList(["Azure", "Google", "Compiler", "Whisper", "Whisper Remote"], this.Engine)
+			else if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -827,7 +833,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler", "Whisper", "Whisper Remote":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -842,7 +848,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler", "Whisper", "Whisper Remote":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -853,7 +859,7 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google", "Whisper", "Whisper Remote"], this.Engine)
+		if inList(["Azure", "Google", "Whisper Local", "Whisper Server"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -879,7 +885,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if inList(["Azure", "Google", "Compiler", "Whisper", "Whisper Remote"], this.Engine) {
+		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

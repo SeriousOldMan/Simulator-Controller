@@ -537,7 +537,7 @@ class SpeechRecognizer {
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if (!InStr(engine, "Whisper") && (this.Instance.OkCheck() != "OK")) {
+				if (!InStr(this.Engine, "Whisper") && (this.Instance.OkCheck() != "OK")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 

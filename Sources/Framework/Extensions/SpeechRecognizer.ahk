@@ -320,7 +320,7 @@ class SpeechRecognizer {
 
 	Method {
 		Get {
-			if (InStr(this.Engine, "Whisper") = 1)
+			if InStr(this.Engine, "Whisper")
 				return "Text"
 			else
 				return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
@@ -347,7 +347,7 @@ class SpeechRecognizer {
 		Get {
 			local result, ignore, recognizer
 
-			if (InStr(this.Engine, "Whisper") = 1) {
+			if InStr(this.Engine, "Whisper") {
 				if (language = "en")
 					return kWhisperModels
 				else
@@ -377,7 +377,7 @@ class SpeechRecognizer {
 		if (engine = "Whisper")
 			engine := "Whisper Local"
 
-		if (InStr(engine, "Whisper") != 1) {
+		if !InStr(engine, "Whisper") {
 			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
 			dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
 		}
@@ -499,7 +499,7 @@ class SpeechRecognizer {
 
 				instance.SetEngine(engine)
 			}
-			else if (InStr(engine, "Whisper") = 1) {
+			else if InStr(engine, "Whisper") {
 				if (InStr(engine, "Whisper Server|") = 1) {
 					engine := string2Values("|", engine)
 
@@ -537,7 +537,7 @@ class SpeechRecognizer {
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if ((InStr(engine, "Whisper") != 1) && (this.Instance.OkCheck() != "OK")) {
+				if (!InStr(engine, "Whisper") && (this.Instance.OkCheck() != "OK")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -556,7 +556,7 @@ class SpeechRecognizer {
 
 				found := false
 
-				if (InStr(this.Engine, "Whisper") = 1) {
+				if InStr(this.Engine, "Whisper") {
 					found := true
 
 					if ((recognizer == true) && (language = "en"))
@@ -587,7 +587,7 @@ class SpeechRecognizer {
 						}
 
 				if !found
-					recognizer := ((InStr(this.Engine, "Whisper") = 1) ? "medium" : 0)
+					recognizer := (InStr(this.Engine, "Whisper") ? "medium" : 0)
 
 				this.initialize(recognizer)
 			}
@@ -658,7 +658,7 @@ class SpeechRecognizer {
 					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
 				}
 		}
-		else if (InStr(this.Engine, "Whisper") = 1)
+		else if InStr(this.Engine, "Whisper")
 			recognizerList := kWhisperModels
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
@@ -692,7 +692,7 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
-			else if (InStr(this.Engine, "Whisper") = 1)
+			else if InStr(this.Engine, "Whisper")
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -730,11 +730,11 @@ class SpeechRecognizer {
 				}
 			}
 
-			if ((this.Engine = "Google") || ((InStr(this.Engine, "Whisper") = 1) && this.Model)) {
+			if ((this.Engine = "Google") || (InStr(this.Engine, "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
-					if (InStr(this.Engine, "Whisper") = 1)
+					if InStr(this.Engine, "Whisper")
 						return this.Instance.AudioRecorder.StartRecognizer(this.iCapturedAudioFile)
 					else
 						return this.Instance.StartRecognizer(this.iCapturedAudioFile)
@@ -759,7 +759,7 @@ class SpeechRecognizer {
 
 		try {
 			if (this.Instance ? this.Instance.StopRecognizer() : false) {
-				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || (InStr(this.Engine, "Whisper") = 1)) && this.iCapturedAudioFile)
+				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")) && this.iCapturedAudioFile)
 					try {
 						this.processAudio(this.iCapturedAudioFile)
 					}

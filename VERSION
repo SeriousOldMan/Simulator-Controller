@@ -6,10 +6,10 @@ Download=
 Changes=New voice recognition support using a remote Whisper server
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
-Version=6.3.7.0-release
-Date=06/20/2025
-Download=https://cutt.ly/2rWDRbda;https://%master%:801/api/public/dl/BmmMdMzM;https://www.dropbox.com/scl/fi/ptgybqw8bkkptogcoc9h9/Simulator-Controller-6.3.7.0-release.zip?rlkey=7vl9fhp787j8gyiwu7agzeza2&st=4xe8yeh9&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.7.0-release.zip
-Changes=Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate, Calculations in production rules, Fixed outdated configuration for voice test mode
+Version=6.3.8.0-release
+Date=06/27/2025
+Download=https://cutt.ly/mrRhRdMC;https://%master%:801/api/public/dl/ChO5gHGx;https://www.dropbox.com/scl/fi/h9qwuvlq6bgt36a4hfwd0/Simulator-Controller-6.3.8.0-release.zip?rlkey=igowi8ymn9uw5uua0e7voi1vv&st=ako37nly&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.8.0-release.zip
+Changes=Last pitstop for all opponents in Strategist Knowledge, Fixed multiple bugs in traffic simulation for pitstop prediction, Changed OpenAI model default to GPT 4.1 mini, Low energy reporting by the Engineer, New energy related events and and actions for the *Reasoning* booster, Renamed fields in "Integration" Plugin, Energy information in "Integration" plugin, Energy information on "System Monitor", Fixed session loading in "Solo Center", Support for arguments in "execute" controller action function
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
@@ -25,4 +25,4 @@ Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Ut
 Type=Development
 [Version]
 Development=6.3.9.0-dev
-Release=6.3.7.0-release
+Release=6.3.8.0-release

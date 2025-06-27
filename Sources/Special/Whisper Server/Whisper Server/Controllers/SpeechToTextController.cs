@@ -63,7 +63,6 @@ namespace WhisperServer.Controllers
             }
             finally
             {
-                // Clean up the audio file if necessary
                 if (System.IO.File.Exists(audioFilePath))
                     System.IO.File.Delete(audioFilePath);
             }

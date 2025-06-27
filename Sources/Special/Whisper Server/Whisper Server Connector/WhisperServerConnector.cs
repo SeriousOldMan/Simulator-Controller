@@ -204,7 +204,7 @@ namespace WhisperServer
             {
                 string audio = Convert.ToBase64String(File.ReadAllBytes(audioFileName));
 
-                result = Post("recognize", new Parameters() { { "Language", Language }, { "Model", Model } }, body: audio);
+                result = Post("speechtotext/recognize", new Parameters() { { "Language", Language }, { "Model", Model } }, body: audio);
             }
             catch (Exception e)
             {

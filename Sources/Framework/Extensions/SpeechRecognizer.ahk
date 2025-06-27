@@ -593,17 +593,6 @@ class SpeechRecognizer {
 					recognizer := (InStr(this.Engine, "Whisper") ? "medium" : 0)
 
 				this.initialize(recognizer)
-
-				if (this.Engine = "Whisper Server") {
-					try {
-						this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
-
-						MsgBox this.Instance.Connector.Recognize("C:\Users\juwig\Desktop\harvard.wav")
-					}
-					catch Any as exception {
-						logError(exception, true)
-					}
-				}
 			}
 		}
 		catch Any as exception {

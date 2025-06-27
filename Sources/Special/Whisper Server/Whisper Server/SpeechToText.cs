@@ -23,8 +23,9 @@ namespace WhisperServer
 
             Process process = new Process();
 
-            process.StartInfo.FileName = Path.Combine(Environment.CurrentDirectory, "faster-whisper-xxl.exe");
-            process.StartInfo.Arguments = "'" + audioFilePath + "' -o '.' --language " + Language.ToLower() +
+            process.StartInfo.FileName = Path.Combine(WhisperPath, "faster-whisper-xxl.exe");
+            process.StartInfo.Arguments = "\"" + audioFilePath + "\" -o \"" + WhisperPath +
+                                          "\" --language " + Language.ToLower() +
                                           " -f json -m " + Model.ToLower() + " --beep_off";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = false;

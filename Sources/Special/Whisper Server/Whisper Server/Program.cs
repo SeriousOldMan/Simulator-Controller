@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace WhisperServer
 {
     public class Program

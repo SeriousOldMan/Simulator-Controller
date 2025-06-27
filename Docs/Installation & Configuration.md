@@ -387,12 +387,20 @@ IMPORTANT: It is necessary to use one of the cloud based speech recognition serv
 
 ###### Whisper Runtime
 
-Whisper is a very capable neural speech recognition system developed by OpenAI. Whisper is open source and executes locally on your PC. Therefore it requires a powerful machine and a GPU with at least 6GB of free memory beside the requirements of the current simulator, if you want to run the neural network on your graphics card, which I strongly recommend for performance. To make Whisper available, do the following:
+Whisper is a very capable neural speech recognition system developed by OpenAI. Whisper is open source and executes locally on your PC. Therefore it requires a powerful machine and a GPU with at least 6GB of free memory. The integration for Simulator Controller supports the execution of Whisper either on the same PC as Simulator Controller and of course also the simulator, which means that this machine must really high end, or you can Whisper on a different machine and connect to this machine using HTTP.
 
-1. [Recommended] Install CUDA libraries for your GPU. These can be typically found on on the website of the graphics card manufacturer. Here is the [link](https://developer.nvidia.com/cuda-downloads) for Nvidia GPU support. A solution for AMD GPUs is described [here](https://www.xda-developers.com/nvidia-cuda-amd-zluda/).
-2. Install the [preset "Local runtime for Whisper speech recognition"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) using "Simulator Setup". Please note that the Whisper runtime itself is a download package of around 2.5 GB, so be patient. Additionally, the chosen model will be downloaded on first execution, which will consume another 3 - 15 GB of precious space on your drive (depending on the actual model) and will take some time as well to download and install.
+To make Whisper available, do the following:
 
-After everything is installed, Whisper Runtime will be available as speech recognition engine (a restart of "Simulator Setup" may be necessary, though). When using Whisper Runtime, you can choose between models of different sizes - I recommend to start with the "medium" model, which supports different languages, shows a good recognition quality and consumes *only* around 6 GB of graphics card memory.
+1. Install the [preset "Local runtime for Whisper speech recognition"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#presets--special-configurations) using "Simulator Setup". Please note that the Whisper runtime itself is a download package of around 2.5 GB, so be patient. Additionally, the chosen model will be downloaded on first execution, which will consume another 3 - 15 GB of precious space on your drive (depending on the actual model) and will take some time as well to download and install.
+2. [Recommended] Install CUDA libraries for your GPU on the machine where Whisper should be running. These can be typically found on on the website of the graphics card manufacturer. Here is the [link](https://developer.nvidia.com/cuda-downloads) for Nvidia GPU support. A solution for AMD GPUs is described [here](https://www.xda-developers.com/nvidia-cuda-amd-zluda/).
+
+If you want to run Whisper on a second PC and connect to this machine remotely follow these [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server) to install and configure the required *Whisper Server*.
+
+After everything is installed, Whisper will be available as speech recognition engine (a restart of "Simulator Setup" may be necessary, though) and you can choose "Whisper Local" or "Whisper Server" as voice recognition method. In case you choose "Whisper Server" you must additionally supply the URL and port number of the remote Whisper Server you have configured as described in the [separate instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server).
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Whisper%20Server.JPG)
+
+In either case, when using Whisper Runtime, you can choose between models of different sizes - I recommend to start with the "medium" model, which supports different languages, shows a good recognition quality and consumes *only* around 6 GB of graphics card memory.
 
 |  Size  | Parameters | English-only model | Multilingual model | Required VRAM | Relative speed |
 |:------:|:----------:|:------------------:|:------------------:|:-------------:|:--------------:|
@@ -405,8 +413,8 @@ After everything is installed, Whisper Runtime will be available as speech recog
 
 If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
-IMPORTANT: When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading, so be sure to not do this while driving.
-
+IMPORTANT: When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
+ 
 ###### Notes
 
 1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and subscription key will appear.

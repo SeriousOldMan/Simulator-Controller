@@ -10,7 +10,7 @@ namespace WhisperServer.Controllers
     }
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class SpeechToTextController : ControllerBase
     {
         static readonly string WhisperPath;
@@ -36,17 +36,20 @@ namespace WhisperServer.Controllers
             _logger = logger;
         }
 
+        [HttpGet("status")]
+        public string Get()
+        {
+            return "Running...";
+        }
+
         [HttpPost("recognize")]
         public string Post([FromQuery(Name = "language")] string language, [FromQuery(Name = "model")] string model, [FromBody] string audio)
         {
-            string audioFilePath = "speech.wav";
+            string audioFilePath = Path.Combine(Environment.CurrentDirectory, "speech.wav");
 
             try
             {
-                byte[] audioBytes = Convert.FromBase64String(audio);
-
-                // Correct the method call to use System.IO.File instead of ControllerBase.File
-                System.IO.File.WriteAllBytes(audioFilePath, audioBytes);
+                System.IO.File.WriteAllBytes(audioFilePath, Convert.FromBase64String(audio));
 
                 return new Whisper(WhisperPath, language, model).Recognize(audioFilePath);
             }

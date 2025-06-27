@@ -1,7 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 
-namespace WhisperServerConnector
+namespace WhisperServer
 {
     public class WhisperServerConnector
     {
@@ -36,7 +41,7 @@ namespace WhisperServerConnector
 
         public void Initialize(string url, string language, string model)
         {
-            ServerURL = url + ((url[url.Length - 1] == '/') ? "Whisper/" : "/Whisper/");
+            ServerURL = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
             Language = language.ToLower();
             Model = model.ToLower();
         }
@@ -205,8 +210,6 @@ namespace WhisperServerConnector
             {
                 result = "Error: " + "Error reading audio file: " + e.Message;
             }
-            
-            ValidateResult(result);
 
             return result;
         }

@@ -1,27 +1,23 @@
-namespace WhisperServer
-{
-    public class Program
-    {
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+using System.Globalization;
 
-            // Add services to the container.
+Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            builder.Services.AddControllers();
+CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
 
-            var app = builder.Build();
+var builder = WebApplication.CreateBuilder(args);
 
-            // Configure the HTTP request pipeline.
+// Add services to the container.
 
-            app.UseHttpsRedirection();
+builder.Services.AddControllers();
 
-            app.UseAuthorization();
+var app = builder.Build();
 
-            app.MapControllers();
+// Configure the HTTP request pipeline.
 
-            app.Run();
-        }
-    }
-}
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();

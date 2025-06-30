@@ -20,8 +20,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMURESTProvider {
-	static sTyreTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
-									  , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
+	static sWheelTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
+									   , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
 	static sBrakeTypes := CaseInsenseMap("FL", "frontLeft", "FR", "frontRight", "RL", "rearLeft", "RR", "rearRight"
 									   , "Front Left", "frontLeft", "Front Right", "frontRight"
 									   , "Rear Left", "rearLeft", "Rear Right", "rearRight")
@@ -399,7 +399,7 @@ class LMURESTProvider {
 		}
 
 		getTyreCompound(tyre) {
-			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+			tyre := this.lookup((tyre = "All") ? "TIRES:" : (LMURESTProvider.WheelTypes[tyre] . " TIRE:"))
 
 			if tyre
 				return ((tyre["currentSetting"] > 0) ? tyre["settings"][tyre["currentSetting"] + 1]["type"] : false)
@@ -426,7 +426,7 @@ class LMURESTProvider {
 				tyre := this.lookup("TIRES:")
 			}
 			else
-				tyre := this.lookup(LMURESTProvider.TyreTypes[tyre] . " TIRE:")
+				tyre := this.lookup(LMURESTProvider.WheelTypes[tyre] . " TIRE:")
 
 			if tyre {
 				if !isInteger(code) {
@@ -460,7 +460,7 @@ class LMURESTProvider {
 			local all := (tyre = "All")
 			local index, candidate
 
-			tyre := this.lookup(all ? "TIRES:" : (LMURESTProvider.TyreTypes[tyre] . " TIRE:"))
+			tyre := this.lookup(all ? "TIRES:" : (LMURESTProvider.WheelTypes[tyre] . " TIRE:"))
 
 			if tyre {
 				tyre["currentSetting"] := Min(tyre["settings"].Length - 1
@@ -477,7 +477,7 @@ class LMURESTProvider {
 		}
 
 		getTyrePressure(tyre) {
-			local pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
+			local pressure := this.lookup(LMURESTProvider.WheelTypes[tyre] . " PRESS:")
 
 			if pressure {
 				pressure := string2Values(A_Space, pressure["settings"][pressure["currentSetting"] + 1]["text"])[1]
@@ -493,7 +493,7 @@ class LMURESTProvider {
 
 			value := Round((value < 50) ? (value * 6.894757) : value)
 
-			pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
+			pressure := this.lookup(LMURESTProvider.WheelTypes[tyre] . " PRESS:")
 
 			if pressure {
 				for index, candidate in pressure["settings"] {
@@ -522,7 +522,7 @@ class LMURESTProvider {
 		}
 
 		changeTyrePressure(tyre, steps := 1) {
-			local pressure := this.lookup(LMURESTProvider.TyreTypes[tyre] . " PRESS:")
+			local pressure := this.lookup(LMURESTProvider.WheelTypes[tyre] . " PRESS:")
 
 			pressure["currentSetting"] := Min(pressure["settings"].Length, Max(0, pressure["currentSetting"] + Round(steps)))
 		}
@@ -753,7 +753,7 @@ class LMURESTProvider {
 
 					return SessionDatabase.getTyreCompounds(this.Simulator
 														  , this.Car
-														  , this.Track, true)[carSetup["WM_COMPOUND-W_" . LMURESTProvider.TyreTypes[tyre]]["value"] + 1]
+														  , this.Track, true)[carSetup["WM_COMPOUND-W_" . LMURESTProvider.WheelTypes[tyre]]["value"] + 1]
 				}
 				catch Any as exception {
 					logError(exception)
@@ -772,7 +772,7 @@ class LMURESTProvider {
 
 			if this.Data
 				try {
-					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . LMURESTProvider.TyreTypes[tyre]]["stringValue"]
+					pressure := this.Data["carSetup"]["garageValues"]["WM_PRESSURE-W_" . LMURESTProvider.WheelTypes[tyre]]["stringValue"]
 
 					if InStr(pressure, "kPa")
 						return Round(string2Values(A_Space, pressure)[1] / 6.894757, 2)
@@ -789,24 +789,121 @@ class LMURESTProvider {
 		}
 	}
 
-	class BrakeData extends LMURESTProvider.RESTData {
+	class CarData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/garage/getVehicleCondition"
+			}
+		}
+
+		Fuel {
+			Get {
+				return this.getFuel()
+			}
+		}
+
+		FuelAmount {
+			Get {
+				return this.getFuelAmount()
+			}
+		}
+
+		BrakePadWear[wheel] {
+			Get {
+				return this.getBrakeBrakePadWear(wheel)
+			}
+		}
+
+		TyreWear[wheel] {
+			Get {
+				return this.getTyreWear(wheel)
+			}
+		}
+
+		SuspensionDamage[wheel] {
+			Get {
+				return this.getSuspensionDamage(wheel)
+			}
+		}
+
+		VehicleDamage {
+			Get {
+				return this.getVehicleDamage()
+			}
+		}
+
+		getFuel() {
+			return (this.Data ? this.Data["fuel"] : false)
+		}
+
+		getFuelAmount() {
+			return (this.Data ? this.Data["fuelCapacity"] : false)
+		}
+
+		getBrakeBrakePadWear(wheel) {
+			try {
+				return (100 * (1 - this.Data["brakeCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
+
+		getTyreWear(wheel) {
+			try {
+				return (100 * (1 - this.Data["tireCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
+
+		getSuspensionDamage(wheel) {
+			try {
+				return this.Data["suspensionDamage"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
+
+		getVehicleDamage() {
+			try {
+				return this.Data["vehicleDamage"]
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
+
+	}
+
+	class BrakeDiscData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/garage/brakeinfo"
 			}
 		}
 
-		BrakePadThickness[tyre] {
+		BrakeDiscThickness[tyre] {
 			Get {
-				return this.getBrakePadThickness(tyre)
+				return this.getBrakeDiscThickness(tyre)
 			}
 		}
 
-		getBrakepadThickness(tyre) {
+		getBrakeDiscThickness(tyre) {
 			local thickness
 			if this.Data
 				try {
-					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[tyre])]
 
 					if (thickness > 0)
 						return thickness
@@ -842,16 +939,16 @@ class LMURESTProvider {
 			}
 		}
 
-		BrakePadThickness[tyre] {
+		BrakeDiscThickness[tyre] {
 			Get {
-				return this.getBrakePadThickness(tyre)
+				return this.getBrakeDiscThickness(tyre)
 			}
 		}
 
 		getTyreCompound(tyre) {
 			if this.Data
 				try {
-					tyre := this.Data["wheelInfo"]["wheelLocs"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]["compound"]
+					tyre := this.Data["wheelInfo"]["wheelLocs"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[tyre])]["compound"]
 
 					return this.Data["optimalCompoundConditions"]["compounds"][tyre + 1]["type"]
 				}
@@ -867,7 +964,7 @@ class LMURESTProvider {
 		getTyreWear(tyre) {
 			if this.Data
 				try {
-					return (100 * (1 - this.Data["wearables"]["tires"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]))
+					return (100 * (1 - this.Data["wearables"]["tires"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[tyre])]))
 				}
 				catch Any as exception {
 					logError(exception)
@@ -878,12 +975,12 @@ class LMURESTProvider {
 			return false
 		}
 
-		getBrakepadThickness(tyre) {
+		getBrakeDiscThickness(tyre) {
 			local thickness
 
 			if this.Data
 				try {
-					thickness := this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.TyreTypes[tyre])]
+					thickness := this.Data["wearables"]["brakes"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[tyre])]
 
 					if (thickness > 0)
 						return thickness
@@ -1124,10 +1221,12 @@ class LMURESTProvider {
 		getCarDescriptor(carDesc) {
 			local ignore, candidate
 
+			carDesc := Trim(carDesc)
+
 			if this.iCachedCars.Has(carDesc)
 				return this.iCachedCars[carDesc]
 			else if this.Data
-				if (Trim(carDesc) != "")
+				if (carDesc != "")
 					for ignore, candidate in this.Data
 						if (InStr(candidate["desc"], carDesc) = 1) {
 							this.iCachedCars[carDesc] := candidate
@@ -1138,26 +1237,54 @@ class LMURESTProvider {
 			return false
 		}
 
+		findCarDescriptor(car) {
+			local ignore, candidate
+
+			carDesc := Trim(car)
+
+			if this.iCachedCars.Has(car)
+				return this.iCachedCars[car]
+			else if this.Data
+				if (car != "")
+					for ignore, candidate in this.Data
+						if (candidate["fullPathTree"][3] = car) {
+							this.iCachedCars[car] := candidate
+
+							return candidate
+						}
+
+			return false
+		}
+
 		getCar(carDesc) {
-			local car := this.getCarDescriptor(carDesc)
+			local index := InStr(carDesc, "Custom Team")
+			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
 
 			return (car ? string2Values(",", car["fullPathTree"])[3] : false)
 		}
 
 		getClass(carDesc) {
-			local car := this.getCarDescriptor(carDesc)
+			local index := InStr(carDesc, "Custom Team")
+			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
 
 			return (car ? string2Values(",", car["fullPathTree"])[2] : false)
 		}
 
 		getTeam(carDesc) {
-			local car := this.getCarDescriptor(carDesc)
+			local car
 
-			return (car ? car["team"] : false)
+			if InStr(carDesc, "Custom Team")
+				return "Custom Team"
+			else {
+				car := this.getCarDescriptor(carDesc)
+
+				return (car ? car["team"] : false)
+			}
 		}
 
 		getDrivers(carDesc) {
-			local car := this.getCarDescriptor(carDesc)
+			local index := InStr(carDesc, "Custom Team")
+			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
 			local result := []
 			local ignore, driver
 
@@ -1439,9 +1566,9 @@ class LMURESTProvider {
 		}
 	}
 
-	static TyreTypes {
+	static WheelTypes {
 		Get {
-			return LMURestProvider.sTyreTypes
+			return LMURestProvider.sWheelTypes
 		}
 	}
 

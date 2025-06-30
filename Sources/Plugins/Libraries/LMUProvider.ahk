@@ -234,7 +234,7 @@ class LMUProvider extends Sector397Provider {
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
+		local carData, weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
@@ -387,15 +387,27 @@ class LMUProvider extends Sector397Provider {
 					track := this.Track
 
 				if getMultiMapValue(data, "Session Data", "Active", false) {
+					wheelData := LMURestProvider.WheelData()
+					carData := LMURestProvider.CarData()
+					brakeData := this.BrakeData
+
 					if data.Has("Car Data") {
 						energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
 						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+						
+						if !fuelAmount {
+							fuelAmount := carData.FuelAmount
+							
+							if !fuelAmount
+								fuelAmount := energyData.MaxFuelAmount
+								
+							if fuelAmount
+								setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
+						}
 
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
-						else if !fuelAmount
-							setMultiMapValue(data, "Session Data", "FuelAmount", energyData.MaxFuelAmount)
 
 						virtualEnergy := energyData.RemainingVirtualEnergy
 
@@ -403,9 +415,6 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)
 
 					}
-
-					wheelData := LMURestProvider.WheelData()
-					brakeData := this.BrakeData
 
 					tyreWear := []
 					brakeWear := []
@@ -421,8 +430,8 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
 						}
 
-						tyreWear.Push(Round(wheelData.TyreWear[key], 1))
-						brakeWear.Push(Min(100, 100 - Round(((wheelData.BrakePadThickness[key] / brakeData.BrakePadThickness[key]) * 100), 2)))
+						tyreWear.Push(Round(carData.TyreWear[key], 1))
+						brakeWear.Push(Round(carData.BrakePadWear[key], 1))
 					}
 
 					if exist(tyreWear, (w) => (w != false))

@@ -26,12 +26,12 @@ Here you must define the path to the "Whisper Runtime" directory. The "Whisper R
 
 You can start the *Whisper Server* by running "Whisper Server.exe" (with the required options) from the corresponding directory. The server will open a sheel window, where diagnostic information for the server process itself and also for each request is available. If a model is used for the first time, additional information about the download progress will be shown here as well.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Whisper%20Model%20Download.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Whisper%20Model%20Download.jpg)
 
 ## Connecting to the Whisper Server
 
-To use the Whisper Server for voice recognition, you have to configure "Whisper Server" in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) as the voice recognition method.
+To use the *Whisper Server* for voice recognition, you have to configure "Whisper Server" in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) as the voice recognition method.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Whisper%20Server.JPG)
 
-As "Server URL" use one of the URLs to which the server listens.
+As "Server URL" use one of the URLs to which the server listens, as configured above.

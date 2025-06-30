@@ -21,7 +21,6 @@ class LMUProvider extends Sector397Provider {
 	iTeamData := false
 	iTrackData := false
 	iGridData := false
-	iBrakeData := false
 
 	iCarInfos := false
 	iCarInfosRefresh := 0
@@ -135,15 +134,6 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
-	BrakeData {
-		Get {
-			if !this.iBrakeData
-				this.iBrakeData := LMURESTProvider.BrakeData()
-
-			return this.iBrakeData
-		}
-	}
-
 	CarInfos {
 		Get {
 			return this.iCarInfos
@@ -234,7 +224,7 @@ class LMUProvider extends Sector397Provider {
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local carData, weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
+		local carData, weatherData, wheelData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
@@ -389,7 +379,6 @@ class LMUProvider extends Sector397Provider {
 				if getMultiMapValue(data, "Session Data", "Active", false) {
 					wheelData := LMURestProvider.WheelData()
 					carData := LMURestProvider.CarData()
-					brakeData := this.BrakeData
 
 					if data.Has("Car Data") {
 						energyData := LMURESTProvider.EnergyData(simulator, car, track)
@@ -429,7 +418,7 @@ class LMUProvider extends Sector397Provider {
 					}
 
 					tyreWear := carData.TyreWear["All"]
-					brakeWear := carData.BrakeWear["All"]
+					brakeWear := carData.BrakePadWear["All"]
 					suspensionDamage := carData.SuspensionDamage["All"]
 
 					if exist(tyreWear, (w) => (w != false))

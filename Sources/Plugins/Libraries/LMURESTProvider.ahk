@@ -843,9 +843,9 @@ class LMURESTProvider {
 		getBrakeBrakePadWear(wheel) {
 			try {
 				if (wheel = "All")
-					return collect(this.Data["brakeCondition"], (bc) => Round(100 * (1 - bc), 1))
+					return collect(this.Data["brakeCondition"], (bc) => Round(100 * (1 - bc), 2))
 				else
-					return Round(100 * (1 - this.Data["brakeCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]), 1)
+					return Round(100 * (1 - this.Data["brakeCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]), 2)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -1249,14 +1249,14 @@ class LMURESTProvider {
 		findCarDescriptor(car) {
 			local ignore, candidate
 
-			carDesc := Trim(car)
+			car := Trim(car)
 
 			if this.iCachedCars.Has(car)
 				return this.iCachedCars[car]
 			else if this.Data
 				if (car != "")
 					for ignore, candidate in this.Data
-						if (candidate["fullPathTree"][3] = car) {
+						if (Trim(string2Values(",", candidate["fullPathTree"])[3]) = car) {
 							this.iCachedCars[car] := candidate
 
 							return candidate

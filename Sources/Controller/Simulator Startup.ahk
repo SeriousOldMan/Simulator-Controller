@@ -628,7 +628,7 @@ checkForNews() {
 			else {
 				check := false
 
-				for ignore, url in ["https://" . MASTER . ":801/api/public/dl/jipSYNLz"
+				for ignore, url in ["http://" . MASTER . ":800/api/public/dl/jipSYNLz"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")

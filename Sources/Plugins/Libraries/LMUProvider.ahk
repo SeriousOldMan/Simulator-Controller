@@ -235,7 +235,7 @@ class LMUProvider extends Sector397Provider {
 		local simulator := this.Simulator
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local carData, weatherData, wheelData, brakeData, lap, weather, time, session, remainingTime, fuelRatio
-		local newPositions, position, energyData, virtualEnergy
+		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -395,13 +395,13 @@ class LMUProvider extends Sector397Provider {
 						energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
 						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
-						
+
 						if !fuelAmount {
 							fuelAmount := carData.FuelAmount
-							
+
 							if !fuelAmount
 								fuelAmount := energyData.MaxFuelAmount
-								
+
 							if fuelAmount
 								setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
 						}
@@ -416,9 +416,6 @@ class LMUProvider extends Sector397Provider {
 
 					}
 
-					tyreWear := []
-					brakeWear := []
-
 					for key, postFix in wheels {
 						tyreCompound := wheelData.TyreCompound[key]
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
@@ -429,16 +426,20 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Car Data", "TyreCompound" . postFix, tyreCompound)
 							setMultiMapValue(data, "Car Data", "TyreCompoundColor" . postFix, tyreCompoundColor)
 						}
-
-						tyreWear.Push(Round(carData.TyreWear[key], 1))
-						brakeWear.Push(Round(carData.BrakePadWear[key], 1))
 					}
+
+					tyreWear := carData.TyreWear["All"]
+					brakeWear := carData.BrakeWear["All"]
+					suspensionDamage := carData.SuspensionDamage["All"]
 
 					if exist(tyreWear, (w) => (w != false))
 						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
 
 					if exist(brakeWear, (w) => (w != false))
 						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakeWear*))
+
+					if exist(suspensionDamage, (d) => (d != false))
+						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
 				}
 			}
 		}

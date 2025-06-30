@@ -24,7 +24,21 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.3.9.0
+
+#### Date: 07/04/25 (planned)
+
+#### Fixes
+
+  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. This could lead to wrond entries in the session database. See also the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you want to remove the wrond entries.
+  - Brake pad wear is now reported correctly for *Le Mans Ultimate*.
+  
+#### Changes
+
+  - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer consider this information when preparing a pitstop.
+  - Whisper voice recognition can now be run on a second PC to offload GPU computations from the simulation system. Please take a look at the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for the Whisper voice recognition and see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server) for the Whisper Server for information how to install and configure the server backend.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
 
 # Release history
 

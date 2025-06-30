@@ -1,9 +1,9 @@
 [Development]
 Version=6.3.9.0-dev
 Target=6.3.9.0-release
-Date=06/27/2025
+Date=06/30/2025
 Download=
-Changes=New voice recognition support using a remote Whisper server
+Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.8.0-release

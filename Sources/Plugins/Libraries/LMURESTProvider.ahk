@@ -842,7 +842,10 @@ class LMURESTProvider {
 
 		getBrakeBrakePadWear(wheel) {
 			try {
-				return (100 * (1 - this.Data["brakeCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]))
+				if (wheel = "All")
+					return collect(this.Data["brakeCondition"], (bc) => Round(100 * (1 - bc), 1))
+				else
+					return Round(100 * (1 - this.Data["brakeCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]), 1)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -853,7 +856,10 @@ class LMURESTProvider {
 
 		getTyreWear(wheel) {
 			try {
-				return (100 * (1 - this.Data["tireCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]))
+				if (wheel = "All")
+					return collect(this.Data["tireCondition"], (tc) => Round(100 * (1 - tc), 1))
+				else
+					return Round(100 * (1 - this.Data["tireCondition"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]), 1)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -864,7 +870,10 @@ class LMURESTProvider {
 
 		getSuspensionDamage(wheel) {
 			try {
-				return this.Data["suspensionDamage"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]
+				if (wheel = "All")
+					return this.Data["suspensionDamage"]
+				else
+					return this.Data["suspensionDamage"][inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[wheel])]
 			}
 			catch Any as exception {
 				logError(exception)

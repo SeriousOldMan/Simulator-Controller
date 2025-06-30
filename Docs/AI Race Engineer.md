@@ -324,12 +324,11 @@ The following table shows, which simulator supports which damage type:
 | Project CARS 2             | Yes      | Yes        | Yes    |
 | RaceRoom Racing Experience | Yes      | Yes        | Yes    |
 | rFactor 2                  | Yes      | No         | No     |
-| Le Mans Ultimate           | Yes      | No (2)     | No     |
+| Le Mans Ultimate           | Yes      | Yes        | No     |
 
 ##### Notes
 
 (1) Supported but not reported in the data API.
-(2) Supported but not reported in the API. However, when it comes to pitstop planning, it is detected, that suspension damage must be repaired and that option is chosen.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered around 85 Celsius and for wet tyres something around 50 Celsius. These values can be specified in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"
 
@@ -474,7 +473,7 @@ The following statistical models are currently implemented:
      | Projects CARS 2            | Yes                     | Yes                  | Yes    |
      | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
-     | Le Mans Ultimate           | Yes (1)                 | No (1)               | No (1) |
+     | Le Mans Ultimate           | Yes                     | Yes                  | No     |
 	 
 	 Notes:
 	 
@@ -506,9 +505,13 @@ The following statistical models are currently implemented:
 	   
 	   Repair recommendations will be given for all damage types.
 	 
-	 - *rFactor 2* and *Le Mans Ultimate*
+	 - *rFactor 2*
 	 
 	   Since the damage types are not distinguishable in the API, only bodywork & aerodynamics damage will be recommended. Handle other damage types manually.
+	   
+	 - *Le Mans Ultimate*
+	 
+	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
 	 
   6. Tyre pressure gambling
   

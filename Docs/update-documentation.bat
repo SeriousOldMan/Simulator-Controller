@@ -23,6 +23,7 @@ copy "AI Race Spotter.md" ..\..\Controller.Wiki\AI-Race-Spotter.md
 copy "Customizing Assistants.md" ..\..\Controller.Wiki\Customizing-Assistants.md
 copy "Script Modules.md" ..\..\Controller.Wiki\Script-Modules.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
+copy "Whisper Server.md" ..\..\Controller.Wiki\Whisper-Server.md
 copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Solo Center.md" ..\..\Controller.Wiki\Solo-Center.md
 copy "Strategy Workbench.md" ..\..\Controller.Wiki\Strategy-Workbench.md

@@ -748,8 +748,10 @@ class SpeechRecognizer {
 					return false
 				}
 			}
-			else
+			else if !InStr(this.Engine, "Whisper")
 				return this.Instance.StartRecognizer()
+			else
+				return false
 		}
 		else
 			return false
@@ -761,7 +763,9 @@ class SpeechRecognizer {
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
-			if (this.Instance ? this.Instance.StopRecognizer() : false) {
+			if (this.Instance ? (InStr(this.Engine, "Whisper") ? this.Instance.AudioRecorder.StopRecognizer()
+															   : this.Instance.StopRecognizer())
+							  : false) {
 				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")) && this.iCapturedAudioFile)
 					try {
 						this.processAudio(this.iCapturedAudioFile)

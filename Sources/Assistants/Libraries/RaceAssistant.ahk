@@ -3364,7 +3364,8 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 							 , "NumPitstops", numPitstops
 							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)
-							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse
+							 , "FuelRemaining", Round(knowledgeBase.getValue("Car." . car . ".FuelRemaining", 1), 2))
 
 				if isSet(type)
 					carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")

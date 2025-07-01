@@ -8,9 +8,9 @@ Whisper can be run on the same PC as Simulator Controller itself and therefore a
 
 The *Whisper Server* requires you to run a Web API server process, which has been developed using .NET 8.0. Applications developed using this multi-plattform server framework from Micorsoft can be hosted on Windows, Linux and even macOS operating systems. You can find the *Whisper Server* in the *Binaries* folder - please copy this directory to your favorite hosting environment or to a location outside the Windows program folders for a local test environment. If you want to set up your own host or if you want to test the *Whisper Server* on your local PC, you probably will have to install the .NET 8.0 Runtime (Hosting Bundle) - depending on your installed Windows version. All required resources can be found on this [dedicated website](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) from Microsoft.
 
-After you have installed .NET Runtime 8.0 and the Team Server, you have to configure the URL, where the server listens. Default is "https://localhost:7001" or "http://localhost:7000". But, when you want to setup a server which is available on the network, you have to setup a different URL. Information about this can be found in this [short article](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/). The easiest way will be to supply the URL using a command line argument, for example:
+After you have installed .NET Runtime 8.0 and the *Whisper Server*, you have to configure the URL, where the server listens. Default is "https://localhost:7001" or "http://localhost:7000". But, when you want to setup a server which is available on the network, you have to setup a different URL. Information about this can be found in this [short article](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/). The easiest way will be to supply the URL using a command line argument, for example:
 
-	"Team Server.exe" --urls "http://yourip:7100;https://yourip:7101"
+	"Whisper Server.exe" --urls "http://yourip:7100;https://yourip:7101"
 
 with *yourip* substituted with the IP, where your server should be available. And you have to make sure that this IP is visible to the public, of course.
 

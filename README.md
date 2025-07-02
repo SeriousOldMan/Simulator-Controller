@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.3.9.0-dev](http://simulator-controller.selfhost.co:800/api/public/dl/urf4NklZ) (Early build for 6.3.9. Changes: New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate.)
+[6.3.9.0-beta](http://simulator-controller.selfhost.co:800/api/public/dl/AVDRXbgm) (Test build for 6.3.9. Changes: New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1,8 +1,8 @@
 [Development]
-Version=6.3.9.0-dev
+Version=6.3.9.0-beta
 Target=6.3.9.0-release
-Date=07/01/2025
-Download=http://simulator-controller.selfhost.co:800/api/public/dl/urf4NklZ
+Date=07/02/2025
+Download=http://simulator-controller.selfhost.co:800/api/public/dl/AVDRXbgm
 Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
@@ -24,5 +24,5 @@ Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Ut
 [Current]
 Type=Development
 [Version]
-Development=6.3.9.0-dev
+Development=6.3.9.0-beta
 Release=6.3.8.0-release

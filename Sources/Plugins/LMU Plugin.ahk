@@ -199,7 +199,7 @@ class LMUPlugin extends Sector397Plugin {
 							else if (value < 0)
 								pitstop.setRepairs(true, pitstop.RepairSuspension, pitstop.RepairEngine)
 					}
-				case "Repair Bodywork":
+				case "Repair Suspension":
 					switch operation, false {
 						case "Get":
 							pitstop.getRepairs(&ignore, &value, &ignore)

@@ -3344,7 +3344,7 @@ class GridRaceAssistant extends RaceAssistant {
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
 		local keys, ignore, car, carData, sectorTimes
-		local positions, position, classPosition, car, numPitstops
+		local positions, position, classPosition, car, numPitstops, fuelRemaining
 
 		getCar(car, type?) {
 			local carData
@@ -3365,6 +3365,11 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "NumPitstops", numPitstops
 							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)
 							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+
+				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", 0)
+
+				if (fuelRemaining > 0)
+					carData["RemainingFuel"] := Round(fuelRemaining, 1)
 
 				if isSet(type)
 					carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")

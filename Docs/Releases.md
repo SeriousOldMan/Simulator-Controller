@@ -32,6 +32,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. This could lead to wrong entries in the session database. See also the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you want to remove the wrong entries.
   - Brake pad wear is now reported differently - possibly more correct - for *Le Mans Ultimate*.
+  - Fixed suspension repair request by a controller action for *Le Mans Ultimate*.
   
 #### Changes
 

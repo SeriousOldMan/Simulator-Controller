@@ -1238,7 +1238,7 @@ class LMURESTProvider {
 			else if this.Data
 				if (car != "")
 					for ignore, candidate in this.Data
-						if (Trim(string2Values(",", candidate["fullPathTree"])[3]) = car) {
+						if (Trim(string2Values(",", candidate["fullPathTree"])[candidate["fullPathTree"].Length]) = car) {
 							this.iCachedCars[car] := candidate
 
 							return candidate
@@ -1282,16 +1282,19 @@ class LMURESTProvider {
 			}
 
 			getCar(carId) {
-				local ignore, candidate
+				local ignore, candidate, path
 
-				if this.iCachedCars.Has(carId)
-					return this.iCachedCars[carId]["displayProperties"]["displayName"]
+				if this.iCachedCars.Has(carId) {
+					path := string2Values(",", this.iCachedCars[carId]["fullPathTree"])
+
+					return Trim(path[path.Length])
+				}
 				else if this.Data
 					for ignore, candidate in this.Data
 						if (InStr(candidate["id"], carId) = 1) {
 							this.iCachedCars[carId] := candidate
 
-							return candidate["displayProperties"]["displayName"]
+							return this.getCar(carId)
 						}
 
 				return false
@@ -1307,7 +1310,7 @@ class LMURESTProvider {
 		CarData {
 			Get {
 				if !this.iCarData
-					this.ivData := LMURESTProvider.GridData.CarData()
+					this.iCarData := LMURESTProvider.GridData.CarData()
 
 				return this.iCarData
 			}

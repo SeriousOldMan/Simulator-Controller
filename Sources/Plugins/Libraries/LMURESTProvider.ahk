@@ -1194,30 +1194,12 @@ class LMURESTProvider {
 		}
 	}
 
-	class GridData extends LMURESTProvider.RESTData {
+	class DriversData extends LMURESTProvider.RESTData {
 		iCachedCars := CaseInsenseMap()
 
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/sessions/getAllVehicles"
-			}
-		}
-
-		Car[carDesc] {
-			Get {
-				return this.getCar(carDesc)
-			}
-		}
-
-		Class[carDesc] {
-			Get {
-				return this.getClass(carDesc)
-			}
-		}
-
-		Team[carDesc] {
-			Get {
-				return this.getTeam(carDesc)
 			}
 		}
 
@@ -1265,32 +1247,6 @@ class LMURESTProvider {
 			return false
 		}
 
-		getCar(carDesc) {
-			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
-
-			return (car ? string2Values(",", car["fullPathTree"])[3] : false)
-		}
-
-		getClass(carDesc) {
-			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
-
-			return (car ? string2Values(",", car["fullPathTree"])[2] : false)
-		}
-
-		getTeam(carDesc) {
-			local car
-
-			if InStr(carDesc, "Custom Team")
-				return "Custom Team"
-			else {
-				car := this.getCarDescriptor(carDesc)
-
-				return (car ? car["team"] : false)
-			}
-		}
-
 		getDrivers(carDesc) {
 			local index := InStr(carDesc, "Custom Team")
 			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
@@ -1303,6 +1259,137 @@ class LMURESTProvider {
 						result.Push({Name: driver["name"], Category: driver["skill"]})
 
 			return result
+		}
+	}
+
+	class GridData extends LMURESTProvider.RESTData {
+		iCarData := false
+		iCachedCars := CaseInsenseMap()
+
+		class CarData extends LMURESTProvider.RESTData {
+			iCachedCars := CaseInsenseMap()
+
+			GETURL {
+				Get {
+					return "http://localhost:6397/rest/race/car"
+				}
+			}
+
+			Car[carID] {
+				Get {
+					return this.getCar(carID)
+				}
+			}
+
+			getCar(carId) {
+				local ignore, candidate
+
+				if this.iCachedCars.Has(carId)
+					return this.iCachedCars[carId]["displayProperties"]["displayName"]
+				else if this.Data
+					for ignore, candidate in this.Data
+						if (InStr(candidate["id"], carId) = 1) {
+							this.iCachedCars[carId] := candidate
+
+							return candidate["displayProperties"]["displayName"]
+						}
+
+				return false
+			}
+		}
+
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/watch/standings"
+			}
+		}
+
+		CarData {
+			Get {
+				if !this.iCarData
+					this.ivData := LMURESTProvider.GridData.CarData()
+
+				return this.iCarData
+			}
+		}
+
+		Nr[carDesc] {
+			Get {
+				return this.getNr(carDesc)
+			}
+		}
+
+		Car[carDesc] {
+			Get {
+				return this.getCar(carDesc)
+			}
+		}
+
+		Class[carDesc] {
+			Get {
+				return this.getClass(carDesc)
+			}
+		}
+
+		Driver[carDesc] {
+			Get {
+				return this.getDriver(carDesc)
+			}
+		}
+
+		Team[carDesc] {
+			Get {
+				return this.getTeam(carDesc)
+			}
+		}
+
+		getCarDescriptor(carDesc) {
+			local ignore, candidate
+
+			carDesc := Trim(carDesc)
+
+			if this.iCachedCars.Has(carDesc)
+				return this.iCachedCars[carDesc]
+			else if this.Data
+				if (carDesc != "")
+					for ignore, candidate in this.Data
+						if (InStr(candidate["vehicleName"], carDesc) = 1) {
+							this.iCachedCars[carDesc] := candidate
+
+							return candidate
+						}
+
+			return false
+		}
+
+		getNr(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carNumber"] : false)
+		}
+
+		getCar(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? this.CarData.Car[car["carId"]] : false)
+		}
+
+		getClass(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carClass"] : false)
+		}
+
+		getDriver(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["driverName"] : false)
+		}
+
+		getTeam(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["fullTeamName"] : false)
 		}
 	}
 

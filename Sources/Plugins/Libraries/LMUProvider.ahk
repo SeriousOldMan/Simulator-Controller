@@ -20,6 +20,7 @@
 class LMUProvider extends Sector397Provider {
 	iTeamData := false
 	iTrackData := false
+	iDriversData := false
 	iGridData := false
 
 	iCarInfos := false
@@ -116,6 +117,15 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
+	DriversData {
+		Get {
+			if !this.iDriversData
+				this.iDriversData := LMURESTProvider.DriversData()
+
+			return this.iDriversData
+		}
+	}
+
 	TeamData {
 		Get {
 			if !this.iTeamData
@@ -196,7 +206,7 @@ class LMUProvider extends Sector397Provider {
 
 		if isSet(category)
 			try {
-				drivers := this.GridData.Drivers[carName]
+				drivers := this.DriversData.Drivers[carName]
 				carInfos := (carID ? this.CarInfos : false)
 
 				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)

@@ -28,13 +28,13 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    Here we have to install:
    
-   - Runtimes from Microsoft - Most likely already installed on your computer, but it does not harm to run those installer again.
+   - Runtimes from Microsoft - Most likely already installed on your computer, but it does not harm to run those installers again.
    
-   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* or *Le Mans Ultimate* are your only games. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2* ür *Le Mans Ultimate*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
+   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* or *Le Mans Ultimate* are part of your game collection. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2* and *Le Mans Ultimate*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
    
-   - SoX - Although optional, I strongly recommend installing SoX for an immersive sound experience.
+   - SoX - Although technically optional, I strongly recommend installing SoX for an immersive sound experience and also optimized audio routing.
    
-   - NirCmd - Also optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
+   - NirCmd - Also technically optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
    
    - Speech Runtime and libraries - Runtime and at least the English library should be installed.
    

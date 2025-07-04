@@ -445,7 +445,7 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-Improving and extending the Assistants using an LLM requires quite some dedication and knowledge, therefore I recmmend to start without it. Once everything is running as expected and you think you are ready for this, take a look at the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
+Improving and extending the Assistants using an LLM requires quite some dedication and knowledge, therefore I recommend to start without it. Once everything is running as expected and you think you are ready for this, take a look at the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
 
 #### Tab *Plugins*
 

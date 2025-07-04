@@ -1,15 +1,15 @@
 [Development]
-Version=6.3.9.0-beta
+Version=6.3.9.0-release
 Target=6.3.9.0-release
-Date=07/02/2025
-Download=http://simulator-controller.selfhost.co:800/api/public/dl/AVDRXbgm
+Date=07/04/2025
+Download=https://cutt.ly/3rTMGzzx;http://simulator-controller.selfhost.co:800/api/public/dl/ULZ5qq9i;https://www.dropbox.com/scl/fi/ordeaqfff9o2p0vsw37yj/Simulator-Controller-6.3.9.0-release.zip?rlkey=ogi6jlq22a50gr01u0ieqkhlq&st=nag654c8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.0-release.zip
 Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
-Version=6.3.8.0-release
-Date=06/27/2025
-Download=https://cutt.ly/mrRhRdMC;http://%master%:800/api/public/dl/ChO5gHGx;https://www.dropbox.com/scl/fi/h9qwuvlq6bgt36a4hfwd0/Simulator-Controller-6.3.8.0-release.zip?rlkey=igowi8ymn9uw5uua0e7voi1vv&st=ako37nly&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.8.0-release.zip
-Changes=Last pitstop for all opponents in Strategist Knowledge, Fixed multiple bugs in traffic simulation for pitstop prediction, Changed OpenAI model default to GPT 4.1 mini, Low energy reporting by the Engineer, New energy related events and and actions for the *Reasoning* booster, Renamed fields in "Integration" Plugin, Energy information in "Integration" plugin, Energy information on "System Monitor", Fixed session loading in "Solo Center", Support for arguments in "execute" controller action function
+Version=6.3.9.0-release
+Date=07/04/2025
+Download=
+Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
 Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.3.9.0-beta
-Release=6.3.8.0-release
+Development=6.3.9.0-release
+Release=6.3.9.0-release

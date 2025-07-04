@@ -1,5 +1,28 @@
 # Latest stable release
 
+## 6.3.9.0
+
+#### Date: 07/04/25
+
+#### Fixes
+
+  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. This could lead to wrong entries in the session database. See also the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you want to remove the wrong entries.
+  - Brake pad wear is now reported differently - possibly more correct - for *Le Mans Ultimate*.
+  - Fixed suspension repair request by a controller action for *Le Mans Ultimate*.
+  
+#### Changes
+
+  - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
+  - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.8.0
 
 #### Date: 06/27/25
@@ -21,27 +44,6 @@
   - [Developer] All fuel releated fields in the "Session State.json" file have changed their name to be aligned with the new energy related fields. The old fields are still available for compatibility reasons.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638), especially if you have configured a *Reasoning* booster for the Race Engineer.
-
-# Upcoming release
-
-## 6.3.9.0
-
-#### Date: 07/04/25 (planned)
-
-#### Fixes
-
-  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. This could lead to wrong entries in the session database. See also the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you want to remove the wrong entries.
-  - Brake pad wear is now reported differently - possibly more correct - for *Le Mans Ultimate*.
-  - Fixed suspension repair request by a controller action for *Le Mans Ultimate*.
-  
-#### Changes
-
-  - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
-  - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
-
-# Release history
 
 ## 6.3.7.0
 

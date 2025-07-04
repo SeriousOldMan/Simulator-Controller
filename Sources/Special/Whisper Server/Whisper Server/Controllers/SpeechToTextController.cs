@@ -15,6 +15,8 @@ namespace WhisperServer.Controllers
     {
         static readonly string WhisperPath;
 
+        private static readonly object _lock = new object();
+
         static SpeechToTextController()
         {
             // Ensure null safety by validating the deserialization result  
@@ -51,7 +53,8 @@ namespace WhisperServer.Controllers
             {
                 System.IO.File.WriteAllBytes(audioFilePath, Convert.FromBase64String(audio));
 
-                return new Whisper(WhisperPath, language, model).Recognize(audioFilePath);
+                lock (_lock)
+                    return new Whisper(WhisperPath, language, model).Recognize(audioFilePath);
             }
             catch (AggregateException exception)
             {

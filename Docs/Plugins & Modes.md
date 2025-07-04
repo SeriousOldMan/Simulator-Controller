@@ -27,6 +27,10 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
+### Actions & Modes
+
+One purpose of a plugin is to define actions, which can be configured for buttons and other controls on a Button Box, a Stream Deck or any other controller. Actions can be defined as plugin actions, which means that these actions are global and available all the time. On the other hand, actions can be groupd into so-called *modes*, which can be made available together. This allows the plugin to provide a set of actions which are available based on context, for example only while you are in a session. A control like a button or rotary knob on your hardware controller therefore can have multiple meanings, depending on the *mode*, which is currently active. Only one mode can be active at the same time for a given controller, but each controller can have its own active *mode*.
+
 ## Plugin *System*
 
 The "System" plugin is a required part of the core Simulator Controller framework and therefore cannot be deactivated or deleted in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). This plugin handles all the applications during the [startup process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and provides a controller action to switch between the different modes using your hardware controller.

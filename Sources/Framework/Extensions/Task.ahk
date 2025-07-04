@@ -410,7 +410,7 @@ class Task {
 	}
 
 	static schedule(priority := 2) {
-		local next, worked, oldScheduling, visited, schedule
+		local next, executed, oldScheduling, visited, schedule
 		local unprotect := true
 
 		static timings := [Task.sLow, Task.sNormal, Task.sHigh, Task.sInterrupt]
@@ -436,7 +436,7 @@ class Task {
 					visited := Map()
 
 					loop {
-						worked := false
+						executed := false
 
 						next := Task.getNextTask(priority, true)
 
@@ -444,14 +444,14 @@ class Task {
 							if !visited.Has(next) {
 								visited[next] := true
 
-								worked := true
+								executed := true
 
 								Task.launch(next)
 							}
 							else
 								Task.addTask(next)
 					}
-					until !worked
+					until !executed
 				}
 				finally {
 					scheduling := oldScheduling

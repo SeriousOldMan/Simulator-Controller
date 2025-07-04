@@ -14922,12 +14922,13 @@ setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPres
 	local tyreSet
 
 	if (tCenter.iPressuresRequest = "Pitstop")
-		tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor
-																						, &tyreSet := false
-																						, &flPressure, &frPressure
-																						, &rlPressure, &rrPressure, false, false))
+		tCenter.withExceptionhandler(() => tCenter.initializePitstopTyreSetup(&tyreCompound, &tyreCompoundColor
+																			, &tyreSet := false
+																			, &flPressure, &frPressure
+																			, &rlPressure, &rrPressure, false, false))
 	else if (tCenter.SetupsListView.GetNext(0) = tCenter.iPressuresRequest)
-		tCenter.withExceptionhandler(ObjBindMethod(tCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
+		tCenter.withExceptionhandler(() => tCenter.initializeSetup(tyreCompound, tyreCompoundColor
+																 , flPressure, frPressure, rlPressure, rrPressure))
 
 	return false
 }

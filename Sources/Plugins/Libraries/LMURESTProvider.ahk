@@ -1334,12 +1334,6 @@ class LMURESTProvider {
 			}
 		}
 
-		Driver[carDesc] {
-			Get {
-				return this.getDriver(carDesc)
-			}
-		}
-
 		Team[carDesc] {
 			Get {
 				return this.getTeam(carDesc)
@@ -1381,12 +1375,6 @@ class LMURESTProvider {
 			local car := this.getCarDescriptor(carDesc)
 
 			return (car ? car["carClass"] : false)
-		}
-
-		getDriver(carDesc) {
-			local car := this.getCarDescriptor(carDesc)
-
-			return (car ? car["driverName"] : false)
 		}
 
 		getTeam(carDesc) {

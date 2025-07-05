@@ -1249,9 +1249,13 @@ class LMURESTProvider {
 
 		getDrivers(carDesc) {
 			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
 			local result := []
-			local ignore, driver
+			local ignore, car, driver
+
+			if index
+				car := (this.getCarDescriptor(carDesc) || this.findCarDescriptor(SubStr(carDesc, 1, index - 1)))
+			else
+				car := this.getCarDescriptor(carDesc)
 
 			if car
 				for ignore, driver in car["drivers"]

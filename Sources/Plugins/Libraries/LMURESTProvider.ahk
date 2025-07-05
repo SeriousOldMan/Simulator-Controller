@@ -1316,6 +1316,12 @@ class LMURESTProvider {
 			}
 		}
 
+		Id[carDesc] {
+			Get {
+				return this.getId(carDesc)
+			}
+		}
+
 		Nr[carDesc] {
 			Get {
 				return this.getNr(carDesc)
@@ -1357,6 +1363,12 @@ class LMURESTProvider {
 						}
 
 			return false
+		}
+
+		getId(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carId"] : false)
 		}
 
 		getNr(carDesc) {

@@ -9430,7 +9430,7 @@ class TeamCenter extends ConfigurationItem {
 		if (this.Mode = "Normal") {
 			if this.HasData {
 				if !this.SelectedReport
-					this.selectReport("Overview")
+					this.selectReport(this.getSelectedReport("Overview"))
 
 				this.showReport(this.SelectedReport, true)
 			}
@@ -11012,18 +11012,30 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
-	selectReport(report) {
-		if report {
-			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+	getSelectedReport(default := "Running") {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			this.iSelectedReport := report
-		}
-		else {
+		return (getMultiMapValue(settings, "Team Center", "SelectedReport", default) || default)
+	}
+
+	setSelectedReport(report) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		setMultiMapValue(settings, "Team Center", "SelectedReport", report)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+
+	selectReport(report) {
+		if report
+			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+		else
 			loop this.ReportsListView.GetCount()
 				this.ReportsListView.Modify(A_Index, "-Select")
 
-			this.iSelectedReport := false
-		}
+		this.iSelectedReport := report
+
+		this.pushTask(ObjBindMethod(this, "setSelectedReport", report))
 	}
 
 	showOverviewReport() {

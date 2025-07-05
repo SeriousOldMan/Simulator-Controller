@@ -4375,7 +4375,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if this.HasData {
 			if !this.SelectedReport
-				this.selectReport("Running")
+				this.selectReport(this.getSelectedReport("Running"))
 
 			this.showReport(this.SelectedReport, true)
 		}
@@ -5434,7 +5434,7 @@ class SoloCenter extends ConfigurationItem {
 
 							this.analyzeTelemetry()
 
-							this.showOverviewReport()
+							this.showReport(this.getSelectedReport("Overview"))
 
 							this.updateState()
 
@@ -5809,18 +5809,30 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	selectReport(report) {
-		if report {
-			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+	getSelectedReport(default := "Running") {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			this.iSelectedReport := report
-		}
-		else {
+		return (getMultiMapValue(settings, "Solo Center", "SelectedReport", default) || default)
+	}
+
+	setSelectedReport(report) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		setMultiMapValue(settings, "Solo Center", "SelectedReport", report)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+
+	selectReport(report) {
+		if report
+			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+		else
 			loop this.ReportsListView.GetCount()
 				this.ReportsListView.Modify(A_Index, "-Select")
 
-			this.iSelectedReport := false
-		}
+		this.iSelectedReport := report
+
+		this.pushTask(ObjBindMethod(this, "setSelectedReport", report))
 	}
 
 	showOverviewReport() {

@@ -1,14 +1,14 @@
 [Development]
-Version=6.3.9.0-release
-Target=6.3.9.0-release
-Date=07/04/2025
-Download=https://cutt.ly/3rTMGzzx;http://simulator-controller.selfhost.co:800/api/public/dl/ULZ5qq9i;https://www.dropbox.com/scl/fi/ordeaqfff9o2p0vsw37yj/Simulator-Controller-6.3.9.0-release.zip?rlkey=ogi6jlq22a50gr01u0ieqkhlq&st=nag654c8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.0-release.zip
+Version=6.3.9.1-release
+Target=6.3.9.1-release
+Date=07/06/2025
+Download=https://cutt.ly/2rYAcU3a;http://%master%:800/api/public/dl/4bjyzHDO;https://www.dropbox.com/scl/fi/5oe4c953oytrhuy4dp7wv/Simulator-Controller-6.3.9.1-release.zip?rlkey=i65thqfevyryw50uq0445jnym&st=a97z6f97&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.1-release.zip
 Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
-Version=6.3.9.0-release
-Date=07/04/2025
-Download=https://cutt.ly/3rTMGzzx;http://simulator-controller.selfhost.co:800/api/public/dl/ULZ5qq9i;https://www.dropbox.com/scl/fi/ordeaqfff9o2p0vsw37yj/Simulator-Controller-6.3.9.0-release.zip?rlkey=ogi6jlq22a50gr01u0ieqkhlq&st=nag654c8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.0-release.zip
+Version=6.3.9.1-release
+Date=07/06/2025
+Download=https://cutt.ly/2rYAcU3a;http://%master%:800/api/public/dl/4bjyzHDO;https://www.dropbox.com/scl/fi/5oe4c953oytrhuy4dp7wv/Simulator-Controller-6.3.9.1-release.zip?rlkey=i65thqfevyryw50uq0445jnym&st=a97z6f97&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.1-release.zip
 Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Components]
@@ -24,5 +24,5 @@ Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Ut
 [Current]
 Type=Release
 [Version]
-Development=6.3.9.0-release
-Release=6.3.9.0-release
+Development=6.3.9.1-release
+Release=6.3.9.1-release

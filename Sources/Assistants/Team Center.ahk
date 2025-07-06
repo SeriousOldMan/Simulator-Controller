@@ -8212,10 +8212,10 @@ class TeamCenter extends ConfigurationItem {
 					if (!lapPressures || (lapPressures == ""))
 						throw "No data..."
 					else {
-						this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
+						this.showMessage(translate("Updating pressure data (Lap: ") . lap . translate(")"))
 
 						if isLogLevel(kLogInfo)
-							logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
+							logMessage(kLogInfo, translate("Updating pressure data (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
 
 						fails := 0
 					}

@@ -85,6 +85,9 @@ class LMURESTProvider {
 
 			if lmuApplication.isRunning() {
 				try {
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST GET: " . url)
+
 					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if !isObject(data)
@@ -115,6 +118,9 @@ class LMURESTProvider {
 				data := JSON.print(data, "  ")
 
 				try {
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST POST: " . url)
+
 					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {

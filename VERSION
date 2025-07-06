@@ -3,7 +3,7 @@ Version=6.4.0.0-dev
 Target=6.4.0.0-release
 Date=07/05/2025
 Download=
-Changes=More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center
+Changes=More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center, Fixed reading session data for LMU
 Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Release]
 Version=6.3.9.0-release

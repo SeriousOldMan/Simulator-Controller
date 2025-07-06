@@ -350,9 +350,9 @@ class LMUProvider extends Sector397Provider {
 						break
 				}
 
-				if (lastPositions && (lastPositions.Length = newPositions.Length)) {
-					paused := true
+				paused := true
 
+				if (lastPositions && (lastPositions.Length = newPositions.Length)) {
 					loop lastPositions.Length
 						if (lastPositions[A_Index] != newPositions[A_Index]) {
 							paused := false
@@ -376,7 +376,7 @@ class LMUProvider extends Sector397Provider {
 				else
 					track := this.Track
 
-				if getMultiMapValue(data, "Session Data", "Active", false) {
+				if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
 					wheelData := LMURestProvider.WheelData()
 					carData := LMURestProvider.CarData()
 

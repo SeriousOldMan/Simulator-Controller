@@ -17,6 +17,7 @@ Simulator Controller today supports multiple different languages for the user in
 - @SlatMars for the French translation
 - Diego Falcone (@Diego Falcone Dev_Dk HawkOne) for the Italien translation
 - @Hudson Alves for the Portuguese translation
+- @rysimabd for the Chinese translation
 
 Also very important are several contributions to the code base of Simulator Controller by @alejandrocq. And I want to thank Jordan Moss (@Mossi) for his great plugin, which provides most of the Simulator Controller state information to SimHub to support building dashboards and overlays.
 

@@ -28,7 +28,7 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 In this dialog you can initialize the analyzer for your car and your targeted driving style. Let's start withe first tab "Handling":
 
-  1. It is absolutely cruicial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
+  1. It is absolutely crucial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   
      If you don't know the steering lock of your car, you can activate the steering wheel on screen, count full and fractional rotation from full left to full right and multiply this by 360. So, if have two and a half rounds from left to right, the steering lock is 900. The steering ratio on the other hand determines the amount of truning of your front wheels, when you turn your steering wheels. Higher number means less turning, so a lower number creates a more direct steering. It is equally important, that this number is correct, or the analayzer will report a lot of understeer events, that are simply not there. A typical number for the steering ratio of GT cars is 12, for open wheelers or even carts, the number is much smaller.
   
@@ -38,7 +38,7 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 	 
 	 Good to know: What the calculation really needs is the range in degrees how much the steering wheels can turn from full left to full right. This range is calculated by
 	 
-		Steering Range = Steering Lock / Steering Reatio
+		Steering Range = Steering Lock / Steering Ratio
      
 	 Therefore, if you have this value and not the other ones, you can derive them by using the above simple relationship. For example, it can be found in the extended setup screen of *Automobilista 2*.
 

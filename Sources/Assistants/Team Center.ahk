@@ -14868,7 +14868,8 @@ startupTeamCenter() {
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")
 	local load := (inList(A_Args, "-Load") ? A_Args[inList(A_Args, "-Load") + 1] : false)
-	local tCenter, startupSettings, ignore, property
+	local startupSettings := false
+	local tCenter, ignore, property
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Team Center"
@@ -14877,9 +14878,12 @@ startupTeamCenter() {
 		mode := "Simple"
 
 	try {
-		if index {
+		if !index && FileExist(kUserConfigDirectory . "Startup.settings")
+			startupSettings := readMultiMap(kUserConfigDirectory . "Startup.settings")
+		else if index
 			startupSettings := readMultiMap(A_Args[index + 1])
 
+		if startupSettings {
 			for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
 								   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 				setMultiMapValue(raceSettings, "Team Settings", property

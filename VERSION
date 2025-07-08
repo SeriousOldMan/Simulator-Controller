@@ -1,10 +1,10 @@
 [Development]
-Version=6.3.9.1-release
-Target=6.3.9.1-release
-Date=07/06/2025
-Download=https://cutt.ly/2rYAcU3a;http://%master%:800/api/public/dl/4bjyzHDO;https://www.dropbox.com/scl/fi/5oe4c953oytrhuy4dp7wv/Simulator-Controller-6.3.9.1-release.zip?rlkey=i65thqfevyryw50uq0445jnym&st=a97z6f97&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.3.9.1-release.zip
-Changes=New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate
-Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
+Version=6.4.0.0-dev
+Target=6.4.0.0-release
+Date=07/08/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Vxg3M8mK
+Changes=More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center, Fixed reading session data for LMU, Initial part of the Chinese translation, Fixed Italian translation for "Simulator Setup", Installation of Chinese voice recognition, Default use of Startup Profiles in "Team Center"
+Components=Media->5.6.1,Configuration->6.4.0,Utilities->6.4.0
 [Release]
 Version=6.3.9.1-release
 Date=07/06/2025
@@ -14,15 +14,21 @@ Components=Media->5.6.1,Configuration->6.3.6,Utilities->6.3.0
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
+Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.6.3.6.Path=Resources
 Configuration.6.3.6.Content=Setup
-Configuration.6.3.6.Download=https://www.dropbox.com/scl/fi/j72tjzf0b2dn2sfzj0lqq/Configuration-6.3.6.zip?rlkey=nbl0uyq7odm3wpumdoidnz33j&st=f2zfgkih&dl=1;http://%master%:800/api/public/dl/uIxKRbv0;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.6.zip
+Configuration.6.3.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/i9fYyX20;https://www.dropbox.com/scl/fi/j72tjzf0b2dn2sfzj0lqq/Configuration-6.3.6.zip?rlkey=nbl0uyq7odm3wpumdoidnz33j&st=f2zfgkih&dl=1;http://%master%:800/api/public/dl/uIxKRbv0;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.3.6.zip
+Configuration.6.4.0.Path=Resources
+Configuration.6.4.0.Content=Setup
+Configuration.6.4.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/laEh1oLW;https://www.dropbox.com/scl/fi/9gnhcldwd78430mtdz908/Configuration-6.4.0.zip?rlkey=cfw4hg263xkwbgpdm6unvfr2m&st=0hx62otj&dl=1;http://%master%:800/api/public/dl/qiMhieBn;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.0.zip
 Utilities.6.3.0.Path=.
 Utilities.6.3.0.Content=Utilities
-Utilities.6.3.0.Download=https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
+Utilities.6.3.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BCbe0uKY;https://www.dropbox.com/scl/fi/uauxhuyecnwmgft3w6roj/Utilities-6.3.0.zip?rlkey=1luua85df5q5w88hcxxza0lsr&st=e8f4bqgz&dl=1;http://%master%:800/api/public/dl/cAzNQ6G_;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.3.0.zip
+Utilities.6.4.0.Path=.
+Utilities.6.4.0.Content=Utilities
+Utilities.6.4.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ZeSbqe0t;https://www.dropbox.com/scl/fi/u2hkdbgb6kxixu8q1wxpt/Utilities-6.4.0.zip?rlkey=1cl2mupiw6ycd6iu6psmfryh8&st=nx47u80y&dl=1;http://%master%:800/api/public/dl/rB8MUn8Q;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.0.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.3.9.1-release
+Development=6.4.0.0-dev
 Release=6.3.9.1-release

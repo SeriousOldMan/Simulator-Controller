@@ -8212,10 +8212,10 @@ class TeamCenter extends ConfigurationItem {
 					if (!lapPressures || (lapPressures == ""))
 						throw "No data..."
 					else {
-						this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
+						this.showMessage(translate("Updating pressure data (Lap: ") . lap . translate(")"))
 
 						if isLogLevel(kLogInfo)
-							logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
+							logMessage(kLogInfo, translate("Updating pressure data (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
 
 						fails := 0
 					}
@@ -9430,7 +9430,7 @@ class TeamCenter extends ConfigurationItem {
 		if (this.Mode = "Normal") {
 			if this.HasData {
 				if !this.SelectedReport
-					this.selectReport("Overview")
+					this.selectReport(this.getSelectedReport("Overview"))
 
 				this.showReport(this.SelectedReport, true)
 			}
@@ -11012,18 +11012,30 @@ class TeamCenter extends ConfigurationItem {
 		}
 	}
 
-	selectReport(report) {
-		if report {
-			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+	getSelectedReport(default := "Running") {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			this.iSelectedReport := report
-		}
-		else {
+		return (getMultiMapValue(settings, "Team Center", "SelectedReport", default) || default)
+	}
+
+	setSelectedReport(report) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		setMultiMapValue(settings, "Team Center", "SelectedReport", report)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+
+	selectReport(report) {
+		if report
+			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+		else
 			loop this.ReportsListView.GetCount()
 				this.ReportsListView.Modify(A_Index, "-Select")
 
-			this.iSelectedReport := false
-		}
+		this.iSelectedReport := report
+
+		this.pushTask(ObjBindMethod(this, "setSelectedReport", report))
 	}
 
 	showOverviewReport() {
@@ -14856,7 +14868,8 @@ startupTeamCenter() {
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")
 	local load := (inList(A_Args, "-Load") ? A_Args[inList(A_Args, "-Load") + 1] : false)
-	local tCenter, startupSettings, ignore, property
+	local startupSettings := false
+	local tCenter, ignore, property
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Team Center"
@@ -14865,9 +14878,12 @@ startupTeamCenter() {
 		mode := "Simple"
 
 	try {
-		if index {
+		if !index && FileExist(kUserConfigDirectory . "Startup.settings")
+			startupSettings := readMultiMap(kUserConfigDirectory . "Startup.settings")
+		else if index
 			startupSettings := readMultiMap(A_Args[index + 1])
 
+		if startupSettings {
 			for ignore, property in ["Server.URL", "Team.Name", "Team.Identifier"
 								   , "Driver.Name", "Driver.Identifier", "Session.Name", "Session.Identifier"]
 				setMultiMapValue(raceSettings, "Team Settings", property

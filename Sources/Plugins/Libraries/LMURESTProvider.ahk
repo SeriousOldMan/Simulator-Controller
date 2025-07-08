@@ -85,6 +85,9 @@ class LMURESTProvider {
 
 			if lmuApplication.isRunning() {
 				try {
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST GET: " . url)
+
 					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if !isObject(data)
@@ -115,6 +118,9 @@ class LMURESTProvider {
 				data := JSON.print(data, "  ")
 
 				try {
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST POST: " . url)
+
 					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 				}
 				catch Any as exception {
@@ -1194,30 +1200,12 @@ class LMURESTProvider {
 		}
 	}
 
-	class GridData extends LMURESTProvider.RESTData {
+	class DriversData extends LMURESTProvider.RESTData {
 		iCachedCars := CaseInsenseMap()
 
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/sessions/getAllVehicles"
-			}
-		}
-
-		Car[carDesc] {
-			Get {
-				return this.getCar(carDesc)
-			}
-		}
-
-		Class[carDesc] {
-			Get {
-				return this.getClass(carDesc)
-			}
-		}
-
-		Team[carDesc] {
-			Get {
-				return this.getTeam(carDesc)
 			}
 		}
 
@@ -1256,7 +1244,7 @@ class LMURESTProvider {
 			else if this.Data
 				if (car != "")
 					for ignore, candidate in this.Data
-						if (Trim(string2Values(",", candidate["fullPathTree"])[3]) = car) {
+						if (Trim(string2Values(",", candidate["fullPathTree"])[candidate["fullPathTree"].Length]) = car) {
 							this.iCachedCars[car] := candidate
 
 							return candidate
@@ -1265,37 +1253,15 @@ class LMURESTProvider {
 			return false
 		}
 
-		getCar(carDesc) {
-			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
-
-			return (car ? string2Values(",", car["fullPathTree"])[3] : false)
-		}
-
-		getClass(carDesc) {
-			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
-
-			return (car ? string2Values(",", car["fullPathTree"])[2] : false)
-		}
-
-		getTeam(carDesc) {
-			local car
-
-			if InStr(carDesc, "Custom Team")
-				return "Custom Team"
-			else {
-				car := this.getCarDescriptor(carDesc)
-
-				return (car ? car["team"] : false)
-			}
-		}
-
 		getDrivers(carDesc) {
 			local index := InStr(carDesc, "Custom Team")
-			local car := (index ? this.findCarDescriptor(SubStr(carDesc, 1, index - 1)) : this.getCarDescriptor(carDesc))
 			local result := []
-			local ignore, driver
+			local ignore, car, driver
+
+			if index
+				car := (this.getCarDescriptor(carDesc) || this.findCarDescriptor(SubStr(carDesc, 1, index - 1)))
+			else
+				car := this.getCarDescriptor(carDesc)
 
 			if car
 				for ignore, driver in car["drivers"]
@@ -1303,6 +1269,140 @@ class LMURESTProvider {
 						result.Push({Name: driver["name"], Category: driver["skill"]})
 
 			return result
+		}
+	}
+
+	class GridData extends LMURESTProvider.RESTData {
+		iCarData := false
+		iCachedCars := CaseInsenseMap()
+
+		class CarData extends LMURESTProvider.RESTData {
+			iCachedCars := CaseInsenseMap()
+
+			GETURL {
+				Get {
+					return "http://localhost:6397/rest/race/car"
+				}
+			}
+
+			Car[carID] {
+				Get {
+					return this.getCar(carID)
+				}
+			}
+
+			getCar(carId) {
+				local ignore, candidate, path
+
+				if this.iCachedCars.Has(carId) {
+					path := string2Values(",", this.iCachedCars[carId]["fullPathTree"])
+
+					return Trim(path[path.Length])
+				}
+				else if this.Data
+					for ignore, candidate in this.Data
+						if (InStr(candidate["id"], carId) = 1) {
+							this.iCachedCars[carId] := candidate
+
+							return this.getCar(carId)
+						}
+
+				return false
+			}
+		}
+
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/watch/standings"
+			}
+		}
+
+		CarData {
+			Get {
+				if !this.iCarData
+					this.iCarData := LMURESTProvider.GridData.CarData()
+
+				return this.iCarData
+			}
+		}
+
+		Id[carDesc] {
+			Get {
+				return this.getId(carDesc)
+			}
+		}
+
+		Nr[carDesc] {
+			Get {
+				return this.getNr(carDesc)
+			}
+		}
+
+		Car[carDesc] {
+			Get {
+				return this.getCar(carDesc)
+			}
+		}
+
+		Class[carDesc] {
+			Get {
+				return this.getClass(carDesc)
+			}
+		}
+
+		Team[carDesc] {
+			Get {
+				return this.getTeam(carDesc)
+			}
+		}
+
+		getCarDescriptor(carDesc) {
+			local ignore, candidate
+
+			carDesc := Trim(carDesc)
+
+			if this.iCachedCars.Has(carDesc)
+				return this.iCachedCars[carDesc]
+			else if this.Data
+				if (carDesc != "")
+					for ignore, candidate in this.Data
+						if (InStr(candidate["vehicleName"], carDesc) = 1) {
+							this.iCachedCars[carDesc] := candidate
+
+							return candidate
+						}
+
+			return false
+		}
+
+		getId(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carId"] : false)
+		}
+
+		getNr(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carNumber"] : false)
+		}
+
+		getCar(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? this.CarData.Car[car["carId"]] : false)
+		}
+
+		getClass(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["carClass"] : false)
+		}
+
+		getTeam(carDesc) {
+			local car := this.getCarDescriptor(carDesc)
+
+			return (car ? car["fullTeamName"] : false)
 		}
 	}
 

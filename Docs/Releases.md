@@ -29,7 +29,24 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.4.0.0
+
+#### Date: 07/11/25 (planned)
+
+#### Fixes
+
+  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. See [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638) of last release for information how to handle wrong database entries.
+  - Fixed an additional rare bug for *Le Mans Ultimate*, which caused instabilities when reading session data, while the session has not been fully initialized yet.
+  - Fixed a couple of translation errors for the Italian language in "Simulator Setup".
+  - Fixed the availability of voice recognition libraries for Portuguese in "Simulator Setup".
+  
+#### Changes
+
+  - Additional preparation for driver swaps in LMU. Still not tested yet.
+  - The selected report category is now remembered for both "Team Center" and "Solo Center".
+  - Thanks to the marvelous work of @rysimabd, we have a translation of all applications to the Chinese language. Support for voice interaction with the Assistants in Chinese will be provided with one of the next release.
+  - Support for installation of Chinese voice recognition libraries is already provided.
+  - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as in almost all cases as before. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems. 
 
 # Release history
 

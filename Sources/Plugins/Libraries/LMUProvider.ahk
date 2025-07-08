@@ -20,6 +20,7 @@
 class LMUProvider extends Sector397Provider {
 	iTeamData := false
 	iTrackData := false
+	iDriversData := false
 	iGridData := false
 
 	iCarInfos := false
@@ -116,6 +117,15 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
+	DriversData {
+		Get {
+			if !this.iDriversData
+				this.iDriversData := LMURESTProvider.DriversData()
+
+			return this.iDriversData
+		}
+	}
+
 	TeamData {
 		Get {
 			if !this.iTeamData
@@ -196,7 +206,7 @@ class LMUProvider extends Sector397Provider {
 
 		if isSet(category)
 			try {
-				drivers := this.GridData.Drivers[carName]
+				drivers := this.DriversData.Drivers[carName]
 				carInfos := (carID ? this.CarInfos : false)
 
 				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
@@ -421,13 +431,13 @@ class LMUProvider extends Sector397Provider {
 					brakeWear := carData.BrakePadWear["All"]
 					suspensionDamage := carData.SuspensionDamage["All"]
 
-					if exist(tyreWear, (w) => (w != false))
+					if (tyreWear && exist(tyreWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
 
-					if exist(brakeWear, (w) => (w != false))
+					if (brakeWear && exist(brakeWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakeWear*))
 
-					if exist(suspensionDamage, (d) => (d != false))
+					if (suspensionDamage && exist(suspensionDamage, (d) => (d != false)))
 						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
 				}
 			}

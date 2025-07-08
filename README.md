@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the momemnt...
+[6.4.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Vxg3M8mK) (Early build for 6.4.0. Changes: More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center, Fixed reading session data for LMU, Initial part of the Chinese translation, Fixed Italian translation for "Simulator Setup", Installation of Chinese voice recognition, Default use of Startup Profiles in "Team Center".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-640) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

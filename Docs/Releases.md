@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.3.9.1
+
+#### Date: 07/06/25
+
+#### Fixes
+
+  - Fixed a rare crash when joining an online lobby in *Le Mans Ultimate* with activated practice session while Simulator Controller is already running.
+
 ## 6.3.9.0
 
 #### Date: 07/04/25

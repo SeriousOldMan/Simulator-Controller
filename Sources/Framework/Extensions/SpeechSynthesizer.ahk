@@ -810,6 +810,8 @@ class SpeechSynthesizer {
 				this.speak("Che tempi brevi zio, quando solfeggi")
 			case "PT":
 				this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
+			case "ZH":
+				this.speak("潮水冲淡了他们留在沙滩上的脚印")
 			default:
 				this.speak("The quick brown fox jumps over the lazy dog")
 		}

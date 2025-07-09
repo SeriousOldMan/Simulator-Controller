@@ -431,13 +431,13 @@ class LMUProvider extends Sector397Provider {
 					brakeWear := carData.BrakePadWear["All"]
 					suspensionDamage := carData.SuspensionDamage["All"]
 
-					if (tyreWear && exist(tyreWear, (w) => (w != false)))
+					if (isObject(tyreWear) && exist(tyreWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
 
-					if (brakeWear && exist(brakeWear, (w) => (w != false)))
+					if (isObject(brakeWear) && exist(brakeWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakeWear*))
 
-					if (suspensionDamage && exist(suspensionDamage, (d) => (d != false)))
+					if (isObject(suspensionDamage) && exist(suspensionDamage, (d) => (d != false)))
 						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
 				}
 			}

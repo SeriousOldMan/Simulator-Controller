@@ -42,12 +42,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - Additional preparation for driver swaps in LMU. Still not tested yet.
-  - The selected report category is now remembered for both "Team Center" and "Solo Center".
   - Thanks to the marvelous work of @rysimabd, we have a full translation for the Chinese language.
     - The user interface of all applications has been fully translated.
     - Support for voice interaction with the Assistants using Chinese language output and recognition is included.
-    - An installer for Chinese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommend. Especially Whisper works very well.
+    - An installer for Chinese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended. Especially Whisper works very well.
+  - Additional preparation for driver swaps in LMU. Still not tested yet.
+  - The selected report category is now remembered for both "Team Center" and "Solo Center".
   - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as before in almost all cases. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems. 
 
 # Release history

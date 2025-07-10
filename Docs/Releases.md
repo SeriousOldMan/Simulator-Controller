@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 6.4.0.0
+
+#### Date: 07/11/25
+
+#### Fixes
+
+  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. See [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638) of last release for information how to handle wrong database entries.
+  - Fixed an additional rare bug for *Le Mans Ultimate*, which caused instabilities when reading session data, while the session has not been fully initialized yet.
+  - Fixed a couple of translation errors for the Italian language in "Simulator Setup".
+  - Fixed the availability of voice recognition libraries for Portuguese in "Simulator Setup".
+  
+#### Changes
+
+  - Thanks to the marvelous work of @rysimabd, we have a full translation for the Chinese language.
+    - The user interface of all applications has been fully translated.
+    - Support for voice interaction with the Assistants using Chinese language output and recognition is included.
+    - An installer for Chinese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended. Especially Whisper works very well.
+  - Additional preparation for driver swaps in LMU. Still not tested yet.
+  - The selected report category is now remembered for both "Team Center" and "Solo Center".
+  - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as before in almost all cases. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.3.9.1
 
 #### Date: 07/06/25
@@ -25,32 +52,7 @@
   - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
   - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
-
-# Upcoming release
-
-## 6.4.0.0
-
-#### Date: 07/11/25 (planned)
-
-#### Fixes
-
-  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. See [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638) of last release for information how to handle wrong database entries.
-  - Fixed an additional rare bug for *Le Mans Ultimate*, which caused instabilities when reading session data, while the session has not been fully initialized yet.
-  - Fixed a couple of translation errors for the Italian language in "Simulator Setup".
-  - Fixed the availability of voice recognition libraries for Portuguese in "Simulator Setup".
-  
-#### Changes
-
-  - Thanks to the marvelous work of @rysimabd, we have a full translation for the Chinese language.
-    - The user interface of all applications has been fully translated.
-    - Support for voice interaction with the Assistants using Chinese language output and recognition is included.
-    - An installer for Chinese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended. Especially Whisper works very well.
-  - Additional preparation for driver swaps in LMU. Still not tested yet.
-  - The selected report category is now remembered for both "Team Center" and "Solo Center".
-  - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as before in almost all cases. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems. 
-
-# Release history
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*
 
 ## 6.3.8.0
 

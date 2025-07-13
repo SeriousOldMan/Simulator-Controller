@@ -28,7 +28,7 @@ Time=時間
 Announcements=デルタ情報, 戦術的アドバイス, 側面警告, 後方警告, 青旗警告, 黄旗警告, コースカット警告, ペナルティ情報, 低速車警告, 前方のアクシデント警告, 後方のアクシデント情報
 [Listener Grammars]
 // Information //
-FocusCar=[(Number)番の{マシン, 車番, 番号}を{注視して, 観察して}, (Number)番の{マシン, 車番, 番号}について{もっと, }情報を教えて]
+FocusCar=[(Number)番の{マシン, 車番, 番号}を{注視して, 観察して}, (Number)番の{マシン, 車番, 番号}について{もっと}情報を教えて]
 NoFocusCar=[(Number)番の{マシン, 車番, 番号}に関する情報はもういりません, (Number)番の{マシン, 車番, 番号}に関する報告はやめてください]
 [Speaker Phrases]
 // Conversation //

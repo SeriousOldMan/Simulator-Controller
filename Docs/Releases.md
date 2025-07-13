@@ -23,7 +23,24 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.4.1.0
+
+#### Date: 07/18/25 (planned)
+
+#### Fixes
+
+  - The installer for the Chinese voice recognition in "Simulator Setup" has been fixed/updated.
+  - Chinese and Japanese languages are now available as UI language in "Simulator Setup".
+  - A couple of missing translations have been added for all languages.
+  
+#### Changes
+
+  - The startup sequence of session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
+  - And we have another translations. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
+    - The user interface of all applications has been fully translated.
+    - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
+    - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
+  - Command reference sheets has been added to the documentation for Chinese and Japanese.
 
 # Release history
 

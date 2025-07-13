@@ -111,6 +111,7 @@ Setup Configuration.7=%kResourcesDirectory%Setup\Translations\ <- %kSourcesDirec
 Setup Configuration.8=%kResourcesDirectory%Setup\Translations\ <- %kSourcesDirectory%Configuration\Translations\*Step.it
 Setup Configuration.9=%kResourcesDirectory%Setup\Translations\ <- %kSourcesDirectory%Configuration\Translations\*Step.pt
 Setup Configuration.10=%kResourcesDirectory%Setup\Translations\ <- %kSourcesDirectory%Configuration\Translations\*Step.zh
+Setup Configuration.10=%kResourcesDirectory%Setup\Translations\ <- %kSourcesDirectory%Configuration\Translations\*Step.ja
 Setup Configuration.11=%kResourcesDirectory%Setup\Presets\Button Box 2x3 Configuration.ini <- %kSourcesDirectory%Plugins\Presets\Button Box 2x3 Configuration.ini
 Setup Configuration.12=%kResourcesDirectory%Setup\Presets\Button Box 3x4 Configuration.ini <- %kSourcesDirectory%Plugins\Presets\Button Box 3x4 Configuration.ini
 Setup Configuration.13=%kResourcesDirectory%Setup\Presets\Button Box 3x5 Configuration.ini <- %kSourcesDirectory%Plugins\Presets\Button Box 3x5 Configuration.ini

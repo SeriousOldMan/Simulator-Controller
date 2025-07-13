@@ -309,4 +309,4 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("zh", "简体中文", "C:\Users\olive\Documents\Simulator Controller\Translations")
+runValidator("ja", "Japanese", "D:\Controller\Sources\Configuration\Translations")

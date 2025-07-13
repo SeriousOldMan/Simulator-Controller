@@ -3,7 +3,7 @@ Version=6.4.1.0-dev
 Target=6.4.1.0-release
 Date=07/13/2025
 Download=
-Changes=Optimized LMU session data, First part of Japanase translation, Fixed installer for Chinese voice recognition library
+Changes=Optimized LMU session data, First part of Japanase translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup"
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.0.0-release

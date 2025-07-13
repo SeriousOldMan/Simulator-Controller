@@ -1266,6 +1266,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return (RaceAssistantPlugin.Settings[key] := assistant.prepareSettings(data))
 	}
 
+	static prepareAssistantsSimulation(data) {
+		RaceAssistantPlugin.Simulator.prepareSimulation(data)
+
+		do(RaceAssistantPlugin.Assistants, (a) => a.prepareSimulation(data))
+	}
+
 	static prepareAssistantsSession(data, count) {
 		local ignore, assistant, settings
 
@@ -2023,6 +2029,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return settings
 	}
 
+	prepareSimulation(data) {
+		if this.Simulator
+			this.Simulator.prepareSimulation(data)
+	}
+
 	prepareSession(settings, data) {
 		local dataFile, settingsFile, ignore
 
@@ -2485,8 +2496,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				splitTime := A_TickCount
 			}
 
-			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0) && (dataLastLap == 1))
-				prepareSessionDatabase(data)
+			if RaceAssistantPlugin.runningSession(data) {
+				if ((lastLap == 0) && (dataLastLap == 1))
+					prepareSessionDatabase(data)
+			}
+			else if (getMultiMapValue(data, "Session Data", "Car", false)
+				  && getMultiMapValue(data, "Session Data", "Track", false))
+				RaceAssistantPlugin.prepareAssistantsSimulation(data)
 
 			if (false && isDebug()) {
 				testData := getMultiMapValues(data, "Test Data")

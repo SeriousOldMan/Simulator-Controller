@@ -736,7 +736,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (this.supportsTyreManagement( , &tyreSet) && tyreSet)
 					options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
 			}
-			
+
 			if brakeService
 				options["Change Brakes"] := this.getPitstopOptionValues("Change Brakes")
 
@@ -1096,6 +1096,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return (this.sessionActive(data)
 			 && (getMultiMapValue(data, "Stint Data", "DriverForname") = driverForName)
 			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
+	}
+
+	prepareSimulation(data) {
+		local car := getMultiMapValue(data, "Session Data", "Car", false)
+		local track := getMultiMapValue(data, "Session Data", "Track", false)
+
+		if (car && track) {
+			this.Car := car
+			this.Track := track
+
+			this.Provider.prepareProvider(data)
+		}
 	}
 
 	hasPrepared(settings, data, count) {

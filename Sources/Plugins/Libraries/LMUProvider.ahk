@@ -166,6 +166,15 @@ class LMUProvider extends Sector397Provider {
 		return true
 	}
 
+	prepareProvider(data) {
+		super.prepareProvider(data)
+
+		this.TeamData
+		this.TrackData
+		this.CarData
+		this.DriversData
+	}
+
 	getRefuelAmount(setupData) {
 		return setupData.getRefuelLevel()
 	}

@@ -116,6 +116,9 @@ class SimulatorProvider {
 		return false
 	}
 
+	prepareProvider(data) {
+	}
+
 	correctStandingsData(standingsData, needCorrection := false) {
 		local positions := Map()
 		local cars := []

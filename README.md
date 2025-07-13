@@ -51,7 +51,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None at the moment...
+[6.4.1.0-dev]() (Early build for 6.4.1. Changes: Optimized LMU session startup, First part of Japanase translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-641) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

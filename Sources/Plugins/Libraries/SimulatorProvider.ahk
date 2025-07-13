@@ -117,6 +117,8 @@ class SimulatorProvider {
 	}
 
 	prepareProvider(data) {
+		if isDebug()
+			logMessage(kLogDebug, "Preparing simulation...")
 	}
 
 	correctStandingsData(standingsData, needCorrection := false) {

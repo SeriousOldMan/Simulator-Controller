@@ -2499,6 +2499,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if RaceAssistantPlugin.runningSession(data) {
 				if ((lastLap == 0) && (dataLastLap == 1))
 					prepareSessionDatabase(data)
+
+				if (getMultiMapValue(data, "Session Data", "Paused", false) && ((lastLap == 0) && (dataLastLap == 0)))
+					if (getMultiMapValue(data, "Session Data", "Car", false)
+					 && getMultiMapValue(data, "Session Data", "Track", false))
+					RaceAssistantPlugin.prepareAssistantsSimulation(data)
 			}
 			else if (getMultiMapValue(data, "Session Data", "Car", false)
 				  && getMultiMapValue(data, "Session Data", "Track", false))

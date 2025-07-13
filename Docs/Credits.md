@@ -11,13 +11,14 @@ Therefore, I would like to thank everyone who made this project possible and I w
 
 ### Contributions
 
-Simulator Controller today supports multiple different languages for the user interface and also for the Assistants. This would not have been possible without the great effort of community members, which provided the corresponding translations, namely:
+Simulator Controller today supports multiple different languages for the user interface and also for the Assistants. This would not have been possible without the great effort of several community members, which provided the corresponding translations, namely:
 
 - Jose Krilin (@jkrilin) and @alejandrocq for the Spanish translation
 - @SlatMars for the French translation
 - Diego Falcone (@Diego Falcone Dev_Dk HawkOne) for the Italien translation
 - @Hudson Alves for the Portuguese translation
 - @rysimabd for the Chinese translation
+- @PAL2000 for the Japanese translation
 
 Also very important are several contributions to the code base of Simulator Controller by @alejandrocq. And I want to thank Jordan Moss (@Mossi) for his great plugin, which provides most of the Simulator Controller state information to SimHub to support building dashboards and overlays.
 

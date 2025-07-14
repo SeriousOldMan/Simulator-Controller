@@ -2,8 +2,8 @@
 Version=6.4.1.0-dev
 Target=6.4.1.0-release
 Date=07/13/2025
-Download=
-Changes=Optimized LMU session startup, First part of Japanese translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YrgSG1As
+Changes=Optimized LMU session startup, First part of Japanese translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.0.0-release
@@ -20,13 +20,13 @@ Configuration.6.4.0.Content=Setup
 Configuration.6.4.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/laEh1oLW;https://www.dropbox.com/scl/fi/9gnhcldwd78430mtdz908/Configuration-6.4.0.zip?rlkey=cfw4hg263xkwbgpdm6unvfr2m&st=0hx62otj&dl=1;http://%master%:800/api/public/dl/qiMhieBn;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.0.zip
 Configuration.6.4.1.Path=Resources
 Configuration.6.4.1.Content=Setup
-Configuration.6.4.1.Download=
+Configuration.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VLlEf6UQ;https://www.dropbox.com/scl/fi/tj45xz722f0lv3rtf48sb/Configuration-6.4.1.zip?rlkey=29v5ormd744ocg834ry101bly&st=9faxbrsh&dl=1;http://%master%:800/api/public/dl/TMIhOl7f;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.1.zip
 Utilities.6.4.0.Path=.
 Utilities.6.4.0.Content=Utilities
 Utilities.6.4.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ZeSbqe0t;https://www.dropbox.com/scl/fi/u2hkdbgb6kxixu8q1wxpt/Utilities-6.4.0.zip?rlkey=1cl2mupiw6ycd6iu6psmfryh8&st=nx47u80y&dl=1;http://%master%:800/api/public/dl/rB8MUn8Q;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.0.zip
 Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
-Utilities.6.4.1.Download=
+Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%:800/api/public/dl/1LvxfUlm;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
 Type=Development
 [Version]

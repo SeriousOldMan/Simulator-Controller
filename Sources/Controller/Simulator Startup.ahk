@@ -752,7 +752,8 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, theApplication, startupConfig, x, y, infoButton, profileButton, settingsButton
+	local ignore, theApplication, startupConfig, x, y
+	local infoButton, profileButton, settingsButton, docsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
@@ -1212,7 +1213,11 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		infoButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
+		docsButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
+		docsButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview"))
+		setButtonIcon(docsButton, kIconsDirectory . "Book.ico", 1)
+
+		infoButton := launchPadGui.Add("Button", "xp+24 yp w23 h23")
 		infoButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits"))
 		setButtonIcon(infoButton, kIconsDirectory . "Team.ico", 1)
 

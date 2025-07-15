@@ -41,6 +41,7 @@
     - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
     - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
   - Command reference sheets has been added to the documentation for Chinese.
+  - Added a button to "Simulator Startup", which opens the documentation entry page.
 
 # Release history
 

@@ -36,11 +36,11 @@
 #### Changes
 
   - The startup sequence of session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
-  - And we have another translations. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
+  - And we have another translation. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
     - The user interface of all applications has been fully translated.
     - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
     - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
-  - Command reference sheets has been added to the documentation for Chinese.
+  - Command reference sheets have been added to the documentation for Chinese.
   - A new button in "Simulator Startup" allows you to open the documentation for Simulator Controller in a browser of, if the Control key is held down, lets you access all available news articles.
 
 # Release history

@@ -14,6 +14,10 @@ For your convinience, you can click on the version number to open the release no
  
 If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
 
+## Accessing documentation
+
+You can open the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, in case you want to re-visit one of those articles.
+
 ## Managing your *privacy*
 
 Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.

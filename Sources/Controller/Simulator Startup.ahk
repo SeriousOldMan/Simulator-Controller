@@ -1295,7 +1295,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
 		docsButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
-		docsButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview"))
+		docsButton.OnEvent("Click", (*) => (GetKeyState("Ctrl") ? showNews() : Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview")))
 		setButtonIcon(docsButton, kIconsDirectory . "Book.ico", 1)
 
 		infoButton := launchPadGui.Add("Button", "xp+24 yp w23 h23")

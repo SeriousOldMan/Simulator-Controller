@@ -309,4 +309,4 @@ runValidator(code, language, folder) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runValidator("ja", "Japanese", "D:\Controller\Sources\Configuration\Translations")
+runValidator("ja", "日本語", "D:\Controller\Sources\Configuration\Translations")

@@ -147,9 +147,9 @@ Simulator Controller comes with a set of AI Assistants to guide you throughout y
 
 #### AI powered Race Assistants
 
-Simulator Controller offers your personal pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
+Simulator Controller offers you a personal pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
 
-You can communicate with the crew members using voice and natural language. Voice commands are pattern-based but you can connect each pit crew member (called Race Assistant in Simulator Controller) optionally to a GPT service and use the natural language capabilities of an LLM (aka large language model) to boost the conversational expertise of the crew members.
+You can communicate with your crew members using voice and natural language. Voice commands are pattern-based but you can additionally connect each pit crew member (called Race Assistant in Simulator Controller) to a GPT service and use the natural language capabilities of an LLM (aka large language model) to boost the conversational expertise of the crew members.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
 

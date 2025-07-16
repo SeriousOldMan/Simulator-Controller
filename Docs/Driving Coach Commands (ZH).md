@@ -55,7 +55,7 @@ CanYou=你可以, 我们可以, 请
 
 CanWe=你能, 我们可以, 请
 
-Announcements=赛事信息,驾驶时段信息,操控反馈信息
+Information=赛事信息,驾驶时段信息,操控反馈信息
 
 #### 命令
 
@@ -73,9 +73,9 @@ Announcements=赛事信息,驾驶时段信息,操控反馈信息
 	
 	[好了你可以说话了, 我现在可以听了, 你可以说了, 随时向我汇报] 
 	
-	[{不要,不再}{关注,分析} (Announcements), {请忽略,忽略} (Announcements), 忽略 (Announcements)]
+	[{不要,不再}{关注,分析} (Information), {请忽略,忽略} (Information), 忽略 (Information)]
 	
-	[{请重新关注,请分析} (Announcements), {请考虑,纳入} (Announcements) {因素}]
+	[{请重新关注,请分析} (Information), {请考虑,纳入} (Information) {因素}]
 
 2.  信息
 

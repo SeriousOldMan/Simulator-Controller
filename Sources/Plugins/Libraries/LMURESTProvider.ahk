@@ -1201,11 +1201,22 @@ class LMURESTProvider {
 	}
 
 	class DriversData extends LMURESTProvider.RESTData {
+		static sCachedData := false
+
 		iCachedCars := CaseInsenseMap()
 
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/sessions/getAllVehicles"
+			}
+		}
+
+		Data {
+			Get {
+				if DriversData.sCachedData
+					return DriversData.sCachedData
+				else
+					return (DriversData.sCachedData := super.Data)
 			}
 		}
 
@@ -1215,7 +1226,13 @@ class LMURESTProvider {
 			}
 		}
 
-		getCarDescriptor(carDesc) {
+		reload() {
+			DriversData.sCachedData := false
+
+			super.reload()
+		}
+
+		getCarDescriptor(carDesc, retry := true) {
 			local ignore, candidate
 
 			carDesc := Trim(carDesc)
@@ -1231,10 +1248,16 @@ class LMURESTProvider {
 							return candidate
 						}
 
-			return false
+			if retry {
+				this.reload()
+
+				return getCarDescriptor(carDesc, false)
+			}
+			else
+				return false
 		}
 
-		findCarDescriptor(car) {
+		findCarDescriptor(car, retry := true) {
 			local ignore, candidate
 
 			car := Trim(car)
@@ -1250,7 +1273,13 @@ class LMURESTProvider {
 							return candidate
 						}
 
-			return false
+			if retry {
+				this.reload()
+
+				return findCarDescriptor(car, false)
+			}
+			else
+				return false
 		}
 
 		getDrivers(carDesc) {

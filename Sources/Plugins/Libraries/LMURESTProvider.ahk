@@ -1288,7 +1288,7 @@ class LMURESTProvider {
 			local ignore, car, driver
 
 			if index
-				car := (this.getCarDescriptor(carDesc) || this.findCarDescriptor(SubStr(carDesc, 1, index - 1)))
+				car := (this.getCarDescriptor(carDesc, false) || this.findCarDescriptor(SubStr(carDesc, 1, index - 1), false))
 			else
 				car := this.getCarDescriptor(carDesc)
 

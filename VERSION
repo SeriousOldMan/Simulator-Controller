@@ -1,9 +1,9 @@
 [Development]
 Version=6.4.1.0-dev
 Target=6.4.1.0-release
-Date=07/13/2025
+Date=07/16/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YrgSG1As
-Changes=Optimized LMU session startup, First part of Japanese translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected
+Changes=Optimized LMU session startup, First part of Japanese translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.0.0-release

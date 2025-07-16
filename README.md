@@ -37,23 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.4.0.0-release](https://cutt.ly/VrUT1Nul) (Changes: More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center, Fixed reading session data for LMU, Initial part of the Chinese translation, Fixed Italian translation for "Simulator Setup", Installation of Chinese voice recognition, Default use of Startup Profiles in "Team Center".)
+[6.4.1.0-release](https://cutt.ly/9rI5NShw) (Changes: Optimized LMU session startup, First part of Japanase translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-640) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-641) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
+[6.4.0.0-release](https://cutt.ly/VrUT1Nul) (Changes: More preparation for driver swaps in LMU, Fix for car model in solo livery races in LMU, Remember selected report in Solo Center, Remember selected report in Team Center, Fixed reading session data for LMU, Initial part of the Chinese translation, Fixed Italian translation for "Simulator Setup", Installation of Chinese voice recognition, Default use of Startup Profiles in "Team Center".)
+
 [6.3.9.1-release](https://cutt.ly/2rYAcU3a) (Changes: New voice recognition support using a remote Whisper server, Correct brake pad wear for Le Mans Ultimate, Correct suspension damage for Le Mans Ultimate, Fixed suspension repair in Le Mans Ultimate.)
-
-[6.3.8.0-release](https://cutt.ly/mrRhRdMC) (Changes: Last pitstop for all opponents in Strategist Knowledge, Fixed multiple bugs in traffic simulation for pitstop prediction, Changed OpenAI model default to GPT 4.1 mini, Low energy reporting by the Engineer, New energy related events and and actions for the *Reasoning* booster, Renamed fields in "Integration" Plugin, Energy information in "Integration" plugin, Energy information on "System Monitor", Fixed session loading in "Solo Center", Support for arguments in "execute" controller.)
-
-[6.3.7.0-release](https://cutt.ly/2rWDRbda) (Changes: Engineer handles brake change, Setting for brake service, Setting for brake service duration, Fixed pitstop history building for the Strategist, Show brake change in "System Monitor", Include brake change in "Session State.json", Engineer reacts to post-prepare brake change setting, Information about brake changes in lists and reports in "Team Center", Engineer announces a brake change during pitstop planning, Driver selection for Le Mans Ultimate, Live update of selected driver in Le Mans Ultimate, Calculations in production rules, Fixed outdated configuration for voice test mode.)
 
 #### Latest development build
 
-[6.4.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YrgSG1As) (Early build for 6.4.1. Changes: Optimized LMU session startup, First part of Japanase translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-641) of this version and all the versions you might have skipped, before installing and using this version.
+None for moment...
 
 ### Documentation
 

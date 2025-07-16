@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 6.4.1.0
+
+#### Date: 07/18/25
+
+#### Fixes
+
+  - The installer for the Chinese voice recognition in "Simulator Setup" has been fixed/updated.
+  - Chinese and Japanese languages are now available as UI language in "Simulator Setup".
+  - A couple of missing translations have been added for all languages.
+  
+#### Changes
+
+  - The startup sequence of session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
+  - And we have another translation. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
+    - The user interface of all applications has been fully translated.
+    - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
+    - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
+  - Command reference sheets have been added to the documentation for Chinese and Japanese.
+  - A new button in "Simulator Startup" allows you to [open the documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#accessing-documentation) for Simulator Controller in a browser or, if the Control key is held down, lets you access all available news articles, even those that already have been marked as read.
+  - Added several new articles in the tips & tricks section this week.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.4.0.0
 
 #### Date: 07/11/25
@@ -20,32 +47,7 @@
   - Additional preparation for driver swaps in LMU. Still not tested yet.
   - The selected report category is now remembered for both "Team Center" and "Solo Center".
   - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as before in almost all cases. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems.
-
-# Upcoming release
-
-## 6.4.1.0
-
-#### Date: 07/18/25 (planned)
-
-#### Fixes
-
-  - The installer for the Chinese voice recognition in "Simulator Setup" has been fixed/updated.
-  - Chinese and Japanese languages are now available as UI language in "Simulator Setup".
-  - A couple of missing translations have been added for all languages.
   
-#### Changes
-
-  - The startup sequence of session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
-  - And we have another translation. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
-    - The user interface of all applications has been fully translated.
-    - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
-    - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
-  - Command reference sheets have been added to the documentation for Chinese and Japanese.
-  - A new button in "Simulator Startup" allows you to [open the documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#accessing-documentation) for Simulator Controller in a browser or, if the Control key is held down, lets you access all available news articles, even those that already have been marked as read.
-  - Added several new articles in the tips & tricks section this week.
-
-# Release history
-
 ## 6.3.9.1
 
 #### Date: 07/06/25

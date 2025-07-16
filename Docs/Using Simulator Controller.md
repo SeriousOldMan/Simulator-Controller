@@ -16,7 +16,7 @@ If you don't want to use the launch window and want "Simulator Startup" to run t
 
 ## Accessing documentation
 
-You can open the entry page of the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, in case you want to re-visit one of those articles.
+You can open the entry page of the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, incl. those, that already have been marked as read, in case you want to re-visit one of those articles.
 
 Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
 

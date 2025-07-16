@@ -41,7 +41,8 @@
     - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
     - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
   - Command reference sheets have been added to the documentation for Chinese.
-  - A new button in "Simulator Startup" allows you to open the documentation for Simulator Controller in a browser of, if the Control key is held down, lets you access all available news articles.
+  - A new button in "Simulator Startup" allows you to [open the documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#accessing-documentation) for Simulator Controller in a browser or, if the Control key is held down, lets you access all available news articles, even those that already have been marked as read.
+  - Added several new articles in the tips & tricks section this week.
 
 # Release history
 

@@ -555,7 +555,7 @@ viewNews(fileName, title := false, readCallback := false) {
 		return
 	}
 	else if newsGui
-		throw "Multiple active news viewer not supported in viewNews..."
+		viewNews(false)
 
 	SplitPath(fileName, , &directory)
 

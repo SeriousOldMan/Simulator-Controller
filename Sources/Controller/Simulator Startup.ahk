@@ -671,7 +671,7 @@ showNews() {
 	for name, urls in getMultiMapValues(news, "News") {
 		urls := string2Values("|", urls, 2)
 
-		newsMenu.Add(name, showNews.Bind(urls[1], urls[2]))
+		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], urls[2]))
 	}
 
 	newsMenu.Add()
@@ -3278,7 +3278,7 @@ startSimulator() {
 				logMessage(kLogOff, "Checking for news...")
 
 			if (!FileExist(kUserConfigDirectory . "NEWS")
-			 || (getMultiMapValues(readMultiMap(kUserConfigDirectory . "Visited"), "News").Count = 0))
+			 || (getMultiMapValues(readMultiMap(kUserConfigDirectory . "NEWS"), "Visited").Count = 0))
 				updateNews()
 
 			checkForNews()

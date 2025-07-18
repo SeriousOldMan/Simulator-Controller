@@ -1,6 +1,7 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Voice Control Configuration     ;;;
-;;;                                         Plugin                          ;;;;;;                                                                         ;;;
+;;;                                         Plugin                          ;;;
+;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -407,7 +408,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
 							  , window["activationCommandEdit"]]]
 
-		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("API Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 

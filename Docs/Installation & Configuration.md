@@ -345,11 +345,11 @@ You can define the spoken language you want to use for speech generation with th
 
 ###### Azure Cognitive Services
 
-If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure subscription key and the endpoint for your region.
+If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure API key for the Speech Service and the endpoint for your region.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Azure%20Service.JPG)
 
-You must been registered for the Azure Cloud Services (see https://azure.microsoft.com/ for more details), and you must have configured a resource for the "Microsoft Cognitive Services Speech" API. Both is really easy and free of charge. After you have configured the resource, you will get access to the subscription key and the token issuer endpoint information. Depending on your Windows installation, you might have to install the latest .NET Runtime as well (version 4.7.2 and 4.8 are used by Simulator Controller).
+You must been registered for the Azure Cloud Services (see https://azure.microsoft.com/ for more details), and you must have configured a resource for the "Microsoft Cognitive Services Speech" API. Both is really easy and free of charge. After you have configured the resource, you will get access to the API key and the token issuer endpoint information. Depending on your Windows installation, you might have to install the latest .NET Runtime as well (version 4.7.2 and 4.8 are used by Simulator Controller).
 
 Important: Sometimes Azure shows only the main URL for the endpoint in the "Keys and Endpoint" area of the Azure Portal. It will then look like this:
 
@@ -417,7 +417,7 @@ IMPORTANT: When you are using a given model for the first time, it will be downl
  
 ###### Notes
 
-1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and subscription key will appear.
+1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and API key will appear.
 2. Regardles of what you have configured as listener for each Assistant (see below), a separate listener with the chosen language from this configuration will be used for the activation commands, with or without *Push-To-Talk*. Either the Desktop recognition engine will be used here or you can configure the Server recognition engine (when you have installed the required libraries) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This applies always, also when you are not using cloud based recognition services.
 3. As mentioned above, using the cloud-based recognition engines or Whisper without *Push-To-Talk* is not a very good idea. It is not only because of the costs but even more, because the recognition will try to react to each and every thing you say. You will get a lot of "Sorry, can you repeat that, please", while you try to talk to your other Assistants while one is listening using the cloud-based recognition engine.
 

@@ -851,25 +851,28 @@ class VoiceServer extends ConfigurationItem {
 
 	SpeechRecognizer[create := false] {
 		Get {
-			local settings
+			local settings, engine
 
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(settings, "Voice", "Activation Recognizer"
-																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Desktop"))
-																					   , true, this.Language, true)
+						engine := getMultiMapValue(settings, "Voice", "Activation Recognizer"
+														   , getMultiMapValue(settings, "Voice", "ActivationRecognizer", "*"))
+						
+						if (Trim(engine) = "*")
+							engine := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Recognizer", "Desktop")
+							
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine, true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
-							throw "Server speech recognizer engine not installed..."
+							throw "Activation Recognizer engine not installed..."
 					}
 					catch Any as exception {
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
-							throw "Desktop speech recognizer engine not installed..."
+							throw "Activation Recognizer engine not installed..."
 					}
 				}
 				catch Any as exception {

@@ -12,7 +12,7 @@
   
 #### Changes
 
-  - The startup sequence of session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
+  - The startup sequence of a session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
   - And we have another translation. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
     - The user interface of all applications has been fully translated.
     - Support for voice interaction with the Assistants using Japanese language output and recognition is included.

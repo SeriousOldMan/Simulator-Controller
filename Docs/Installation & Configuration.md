@@ -417,7 +417,7 @@ IMPORTANT: When you are using a given model for the first time, it will be downl
  
 ###### Notes
 
-1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and API key will appear.
+1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and the API key will appear.
 2. Regardles of what you have configured as listener for each Assistant (see below), a separate listener with the chosen language from this configuration will be used for the activation commands, with or without *Push-To-Talk*. Either the Desktop recognition engine will be used here or you can configure the Server recognition engine (when you have installed the required libraries) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration). This applies always, also when you are not using cloud based recognition services.
 3. As mentioned above, using the cloud-based recognition engines or Whisper without *Push-To-Talk* is not a very good idea. It is not only because of the costs but even more, because the recognition will try to react to each and every thing you say. You will get a lot of "Sorry, can you repeat that, please", while you try to talk to your other Assistants while one is listening using the cloud-based recognition engine.
 

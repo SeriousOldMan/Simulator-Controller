@@ -729,6 +729,16 @@ class VoiceServer extends ConfigurationItem {
 				return "Activation"
 			}
 		}
+
+		_onTextCallback(text) {
+			text := StrReplace(text, ".", "")
+			text := StrReplace(text, ",", "")
+			text := StrReplace(text, ";", "")
+			text := StrReplace(text, "?", "")
+			text := StrReplace(text, "-", "")
+
+			super._onTextCallBack(text)
+		}
 	}
 
 	Debug[option] {
@@ -859,10 +869,10 @@ class VoiceServer extends ConfigurationItem {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 						engine := getMultiMapValue(settings, "Voice", "Activation Recognizer"
 														   , getMultiMapValue(settings, "Voice", "ActivationRecognizer", "*"))
-						
+
 						if (Trim(engine) = "*")
 							engine := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Recognizer", "Desktop")
-							
+
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine, true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)

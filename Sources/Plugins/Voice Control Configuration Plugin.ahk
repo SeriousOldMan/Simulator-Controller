@@ -408,7 +408,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
 							  , window["activationCommandEdit"]]]
 
-		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("API Key"))
+		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Service Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 
@@ -431,7 +431,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
-		widget35 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key"))
+		widget35 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("Service Key"))
 		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VgoogleAPIKeyFileEdit Hidden")
 		widget36.OnEvent("Change", updateGoogleVoices)
 

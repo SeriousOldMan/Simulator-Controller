@@ -6,6 +6,7 @@
   2. Support automatic language translation when using Whisper voice recognition
   3. New GPT booster that supports automatic translation to a different language for voice generation
   4. Support a combination of activation phrase and a first command in one voice interaction
+  5. Support for ElevenLabs API
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

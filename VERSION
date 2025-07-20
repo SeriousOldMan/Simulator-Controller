@@ -1,9 +1,9 @@
 [Development]
-Version=6.4.1.0-release
-Target=6.4.1.0-release
-Date=07/18/2025
-Download=https://cutt.ly/9rI5NShw;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/afKeAfgz;https://www.dropbox.com/scl/fi/4mgo3also1m2t2al3qnii/Simulator-Controller-6.4.1.0-release.zip?rlkey=t0rm1hebhxdw6by47wf9wrynq&st=zbmg56qs&dl=1;http://%master%:800/api/public/dl/QMim6SUf;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.1.0-release.zip
-Changes=Optimized LMU session startup, First part of Japanese translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected
+Version=6.4.2.0-dev
+Target=6.4.2.0-release
+Date=07/19/2025
+Download=
+Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.1.0-release
@@ -22,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%:800/api/public/dl/1LvxfUlm;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.4.1.0-release
+Development=6.4.2.0-dev
 Release=6.4.1.0-release

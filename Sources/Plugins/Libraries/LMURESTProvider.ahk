@@ -1213,10 +1213,10 @@ class LMURESTProvider {
 
 		Data {
 			Get {
-				if DriversData.sCachedData
-					return DriversData.sCachedData
+				if LMURestProvider.DriversData.sCachedData
+					return LMURestProvider.DriversData.sCachedData
 				else
-					return (DriversData.sCachedData := super.Data)
+					return (LMURestProvider.DriversData.sCachedData := super.Data)
 			}
 		}
 
@@ -1227,7 +1227,7 @@ class LMURESTProvider {
 		}
 
 		reload() {
-			DriversData.sCachedData := false
+			LMURestProvider.DriversData.sCachedData := false
 
 			super.reload()
 		}
@@ -1251,7 +1251,7 @@ class LMURESTProvider {
 			if retry {
 				this.reload()
 
-				return getCarDescriptor(carDesc, false)
+				return this.getCarDescriptor(carDesc, false)
 			}
 			else
 				return false
@@ -1276,7 +1276,7 @@ class LMURESTProvider {
 			if retry {
 				this.reload()
 
-				return findCarDescriptor(car, false)
+				return this.findCarDescriptor(car, false)
 			}
 			else
 				return false

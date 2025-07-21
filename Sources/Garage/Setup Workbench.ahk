@@ -2192,6 +2192,9 @@ class DiscreteValuesHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
+		if (rawValue = 10)
+			a := 1
+
 		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
@@ -2207,10 +2210,10 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if !this.Reverse
-			return Min(this.MaxValue, Max(this.MinValue, displayValue))
-		else
+		else if this.Reverse
 			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 	}
 
 	decreaseValue(displayValue) {
@@ -2218,8 +2221,8 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if !this.Reverse
-			return Max(this.MinValue, Min(this.MaxValue, displayValue))
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
 		else
 			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 	}

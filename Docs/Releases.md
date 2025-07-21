@@ -23,7 +23,20 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.4.2.0
+
+#### Date: 07/25/25 (planned)
+
+#### Fixes
+
+  - Fixed handling of optional voice recognition libraries in "Simulator Setup". The recently added languages had been set to required by mistake.
+  - Fixed several UI translation errors.
+  - Fixed Japanase translation codings for the grammar files. This error prevented the Spotter from working.
+  
+#### Changes
+
+  - Further optimization of the session startup process for *Le Mans Ultimate*.
+  - [Important] The voice recognition system of Simulator Controller is using a special recognizer for the activation phrases. In the past, this recognizer was running the "Windows (Desktop)" recognizer engine as default. This can be changed using the "Activation Recognizer" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings). From now on, the default for this activation recognizer is to use the recognition engine, which has been configured in general. If you want to change it back to the previous setting, add the corresponding value in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
 
 # Release history
 

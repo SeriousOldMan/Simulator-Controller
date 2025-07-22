@@ -3025,6 +3025,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	skipAlert(alert) {
+		static nextCarBehind := 0
+
 		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
 							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
@@ -3042,8 +3044,17 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 				return true
-			else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
-				return true
+			else if InStr(alert, "Behind") {
+				if this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true)
+					return true
+				else if (A_TickCount < nextCarBehind)
+					return true
+				else {
+					nextCarBehind := (A_TickCount + 5000)
+
+					return false
+				}
+			}
 			else if (InStr(alert, "Yellow") && this.pendingAlert("Yellow", true))
 				return true
 

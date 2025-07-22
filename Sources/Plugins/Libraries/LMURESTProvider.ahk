@@ -1088,7 +1088,7 @@ class LMURESTProvider {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if (data && data.Has("MultiStintState"))
-				return (this.Data["MultiStintState"] != "DRIVING")
+				return (data["MultiStintState"] != "DRIVING")
 			else
 				return true
 		}

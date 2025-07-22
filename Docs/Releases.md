@@ -37,7 +37,8 @@
 #### Changes
 
   - Further optimization of the session startup process for *Le Mans Ultimate*.
-  - [Important] Updated the weather information retrieval for *Le Mans Ultimate* to work around a bug in the API of the game. Unfortunately the information now does not reflect the current weather precisely anymore.
+  - Tweaked the priority of the different Spotter phrases a bit to get more up 2 date proximity alerts.
+  - [Important] Updated the weather information retrieval for *Le Mans Ultimate* to work around a bug in the API of the game. Unfortunately the information now does not reflect the **current** weather precisely anymore.
   - [Important] The voice recognition system of Simulator Controller is using a special recognizer for the activation phrases. In the past, this recognizer was running the "Windows (Desktop)" recognizer engine as default. This can be changed using the "Activation Recognizer" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings). From now on, the default for this activation recognizer is to use the recognition engine, which has been configured in general. If you want to change it back to the previous setting, add the corresponding value in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
 
 # Release history

@@ -2450,7 +2450,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	informSectorDifference(otherCar, mode) {
-		local speaker := this.getSpeaker(true)
+		local speaker := this.getSpeaker()
 		local sectors := string2Values(",", speaker.Fragments["Sectors"])
 		local driverCar := this.DriverCar
 		local betterSectors := []
@@ -2484,7 +2484,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker(true)
+		local speaker := this.getSpeaker()
 		local spoken := false
 		local informed := false
 		local standingsAhead := false

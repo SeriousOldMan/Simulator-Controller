@@ -188,12 +188,6 @@ Penalty.1=Droga, recebemos uma penalidade de %penalty%.
 Penalty.2=Droga, penalidade de %penalty%. Isso nos atrasa.
 Disqualified.1=Fomos desclassificados. Que pena.
 Disqualified.2=Droga, fomos desclassificados.
-[Spotter Phrases]
-// Race Start //
-Green.1=Verde, vai.
-Green.2=Vai, está verde.
-Green.3=Verde, acelera.
-Green.4=Verde, mostre do que você é feito.
 // Delta Information //
 GainedFront.1=Você está alcançando o carro à frente, ganhou %gained% segundos em %deltaLaps% %laps%. A diferença ainda é de %delta% segundos, mas você é %lapTime% segundos mais rápido.
 GainedFront.2=Você ganhou %gained% segundos em %deltaLaps% %laps% em relação ao carro à frente, mas ainda faltam %delta% segundos.
@@ -248,12 +242,12 @@ LostFocusBehind.3=O carro %indicator% está se aproximando. Você perdeu %lost% 
 GainedFocusBehind.1=O carro %indicator% perdeu %gained% segundos em %deltaLaps% %laps% e é %lapTime% segundos mais lento. Acelera.
 GainedFocusBehind.2=Você ganhou %gained% segundos em %deltaLaps% %laps% em relação ao carro %indicator%. A diferença já é de %delta% segundos e você é %lapTime% segundos mais rápido.
 GainedFocusBehind.3=O carro %indicator% está ficando para trás. Você ganhou %gained% segundos em %deltaLaps% %laps%.
-LessPitstops.1=%conjunction% você já parou.
-LessPitstops.2=%conjunction% você tem %pitstops% paradas a mais.
-LessPitstops.3=%conjunction% acho que ele ainda precisa parar.
-MorePitstops.1=%conjunction% ele já parou.
-MorePitstops.2=%conjunction% você tem %pitstops% paradas a menos.
-MorePitstops.3=%conjunction% ele tem mais paradas do que você.
+[Spotter Phrases]
+// Race Start //
+Green.1=Verde, vai.
+Green.2=Vai, está verde.
+Green.3=Verde, acelera.
+Green.4=Verde, mostre do que você é feito.
 // Spotting //
 Right.1=Atenção à direita.
 Right.2=Carro à direita.

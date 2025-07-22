@@ -1066,6 +1066,12 @@ class LMURESTProvider {
 			}
 		}
 
+		Paused {
+			Get {
+				return this.isPaused()
+			}
+		}
+
 		Duration[session] {
 			Get {
 				return this.getDuration(session)
@@ -1076,6 +1082,15 @@ class LMURESTProvider {
 			Get {
 				return this.getRainChance(session)
 			}
+		}
+
+		isPaused() {
+			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+			if (data && data.Has("MultiStintState"))
+				return (this.Data["MultiStintState"] != "DRIVING")
+			else
+				return true
 		}
 
 		getDuration(session) {
@@ -1505,27 +1520,6 @@ class LMURESTProvider {
 			local car := this.getCarDescriptor(position)
 
 			return (car ? car["totalLaps"] : false)
-		}
-	}
-
-	class GameData extends LMURESTProvider.RESTData {
-		GETURL {
-			Get {
-				return "http://localhost:6397/rest/sessions/GetGameState"
-			}
-		}
-
-		Paused {
-			Get {
-				return this.isPaused()
-			}
-		}
-
-		isPaused() {
-			if this.Data
-				return (this.Data["MultiStintState"] != "DRIVING")
-			else
-				return true
 		}
 	}
 

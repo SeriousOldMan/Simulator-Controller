@@ -247,6 +247,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local carData, weatherData, wheelData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
+		local sessionData
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -313,6 +314,8 @@ class LMUProvider extends Sector397Provider {
 		else {
 			data := super.readSessionData(options, protocol?)
 
+			sessionData := LMURESTProvider.SessionData()
+
 			car := (this.Car || this.TeamData.Car)
 			track := (this.Track || this.TrackData.Track)
 
@@ -326,8 +329,8 @@ class LMUProvider extends Sector397Provider {
 					lastWeather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
 					lastWeather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
 
-					duration := (LMURESTProvider.SessionData().Duration[getMultiMapValue(data, "Session Data"
-																							 , "Session", "Race")] * 1000)
+					duration := (sessionData.Duration[getMultiMapValue(data, "Session Data"
+																		   , "Session", "Race")] * 1000)
 				}
 
 				if (lap != lastLap) {
@@ -366,32 +369,36 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if !InStr(options, "Standings=true") {
-				newPositions := []
+				if false {
+					newPositions := []
 
-				loop {
-					position := getMultiMapValue(data, "Track Data", "Car." . A_Index . ".Position", false)
+					loop {
+						position := getMultiMapValue(data, "Track Data", "Car." . A_Index . ".Position", false)
 
-					if position
-						newPositions.Push(position)
-					else
-						break
-				}
-
-				paused := true
-
-				if (lastPositions && (lastPositions.Length = newPositions.Length)) {
-					loop lastPositions.Length
-						if (lastPositions[A_Index] != newPositions[A_Index]) {
-							paused := false
-
+						if position
+							newPositions.Push(position)
+						else
 							break
-						}
+					}
 
-					if paused
-						setMultiMapValue(data, "Session Data", "Paused", true)
+					paused := true
+
+					if (lastPositions && (lastPositions.Length = newPositions.Length)) {
+						loop lastPositions.Length
+							if (lastPositions[A_Index] != newPositions[A_Index]) {
+								paused := false
+
+								break
+							}
+
+						if paused
+							setMultiMapValue(data, "Session Data", "Paused", true)
+					}
+
+					lastPositions := newPositions
 				}
-
-				lastPositions := newPositions
+				else if (!getMultiMapValue(data, "Session Data", "Paused", false) && sessionData.Paused)
+					setMultiMapValue(data, "Session Data", "Paused", true)
 
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)

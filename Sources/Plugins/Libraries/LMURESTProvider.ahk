@@ -1508,6 +1508,27 @@ class LMURESTProvider {
 		}
 	}
 
+	class GameData extends LMURESTProvider.RESTData {
+		GETURL {
+			Get {
+				return "http://localhost:6397/rest/sessions/GetGameState"
+			}
+		}
+
+		Paused {
+			Get {
+				return this.isPaused()
+			}
+		}
+
+		isPaused() {
+			if this.Data
+				return (this.Data["MultiStintState"] != "DRIVING")
+			else
+				return true
+		}
+	}
+
 	class WeatherData extends LMURESTProvider.RESTData {
 		GETURL {
 			Get {

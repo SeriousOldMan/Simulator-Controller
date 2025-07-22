@@ -336,7 +336,13 @@ class LMUProvider extends Sector397Provider {
 					session := getMultiMapValue(data, "Session Data", "Session", "Race")
 					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 					weatherData := LMURestProvider.WeatherData()
-					weather := weatherData.Weather["Now"]
+
+					if false
+						weather := weatherData.Weather["Now"]
+					else {
+						time := ((duration > 0) ? Round(100 - (Max(0, remainingTime) / duration * 100)) : 0)
+						weather := weatherData.Weather[session, time]
+					}
 
 					if weather
 						lastWeather := weather

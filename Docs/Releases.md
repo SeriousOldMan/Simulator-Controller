@@ -32,7 +32,8 @@
   - Fixed handling of optional voice recognition libraries in "Simulator Setup". The recently added languages had been set to required by mistake.
   - Fixed several UI translation errors.
   - Fixed Japanase translation codings for the grammar files. This error prevented the Spotter from working.
-  - Fixed display of *Brake Balance* and other *inverse* settings for the Setup Editor in the "Setup Workbench" for *Le Mans Ultimate*.
+  - Fixed display of *Brake Balance* and other *inverse* settings for the Setup Editor in the "Setup Workbench" for *Le Mans Ultimate* and *rFactor 2*.
+  - Fixed ABS setting in "Setup Workbench" for many cars in *Le Mans Ultimate*.
   
 #### Changes
 

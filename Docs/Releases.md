@@ -36,6 +36,7 @@
   
 #### Changes
 
+  - Multiple successive car behind alerts are no longer given by the Spotter.
   - Further optimization of the session startup process for *Le Mans Ultimate*.
   - Tweaked the priority of the different Spotter phrases a bit to get more up 2 date proximity alerts.
   - [Important] Updated the weather information retrieval for *Le Mans Ultimate* to work around a bug in the API of the game. Unfortunately the information now does not reflect the **current** weather precisely anymore.

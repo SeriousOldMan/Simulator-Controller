@@ -2,8 +2,8 @@
 Version=6.4.2.0-dev
 Target=6.4.2.0-release
 Date=07/19/2025
-Download=
-Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed Spotter phrase priorities
+Download=http://simulator-controller.selfhost.co:800/api/public/dl/Xr0hMlfQ
+Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.1.0-release

@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.4.2.0-dev](http://simulator-controller.selfhost.co:800/api/public/dl/Xr0hMlfQ) (Early build for 6.4.2. Changes: Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter.)
+[6.4.2.0-beta]() (Test build for 6.4.2. Changes: Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-642) of this version and all the versions you might have skipped, before installing and using this version.
 

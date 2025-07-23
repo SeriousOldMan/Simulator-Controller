@@ -931,20 +931,13 @@ class RaceSpotter extends GridRaceAssistant {
 			speakPhrase(phrase, arguments*) {
 				local assistant := this.VoiceManager.RaceAssistant
 
+				if this.Awaitable
+					this.wait()
+
 				if assistant.skipAlert(phrase) {
 					assistant.cleanupAlerts(phrase)
 
 					return
-				}
-
-				if this.Awaitable {
-					this.wait()
-
-					if assistant.skipAlert(phrase) {
-						assistant.cleanupAlerts(phrase)
-
-						return
-					}
 				}
 
 				super.speakPhrase(phrase, arguments*)

@@ -465,6 +465,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.hideControls(this.iWindowsSynthesizerWidgets)
 		this.hideControls(this.iAzureSynthesizerWidgets)
 		this.hideControls(this.iGoogleSynthesizerWidgets)
+		this.hideControls(this.iAzureRecognizerWidgets)
+		this.hideControls(this.iGoogleRecognizerWidgets)
 		this.hideControls(this.iWhisperRecognizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
@@ -851,12 +853,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideWhisperServerRecognizerEditor()
 		else if (this.iRecognizerMode = "Whisper Local")
 			this.hideWhisperLocalRecognizerEditor()
+		else {
+			this.hideControls(this.iAzureRecognizerWidgets)
+			this.hideControls(this.iGoogleRecognizerWidgets)
+			this.hideControls(this.iWhisperRecognizerWidgets)
+		}
 
 		this.iTopAzureCredentialsVisible := false
 		this.iBottomAzureCredentialsVisible := false
 
 		this.iTopGoogleCredentialsVisible := false
 		this.iBottomGoogleCredentialsVisible := false
+
 		this.iBottomWhisperCredentialsVisible := false
 	}
 

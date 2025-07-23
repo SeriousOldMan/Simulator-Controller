@@ -765,18 +765,31 @@ checkForNews() {
 				if isNumber(nr) {
 					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-					if InStr(rule, "Timed") {
-						rule := string2Values(":", rule)
+					if (InStr(rule, "Welcome") && !getMultiMapValue(news, "Visited", nr, false)) {
+						newsNr := nr
+						newsUrls := url
 
-						if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
-						 && !getMultiMapValue(news, "Visited", nr, false)) {
-							newsNr := nr
-							newsUrls := url
-
-							break
-						}
+						break
 					}
 				}
+
+			if !newsNr
+				for nr, url in getMultiMapValues(availableNews, "News")
+					if isNumber(nr) {
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if InStr(rule, "Timed") {
+							rule := string2Values(":", rule)
+
+							if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+							 && !getMultiMapValue(news, "Visited", nr, false)) {
+								newsNr := nr
+								newsUrls := url
+
+								break
+							}
+						}
+					}
 
 			if !newsNr
 				for nr, url in getMultiMapValues(availableNews, "News") {

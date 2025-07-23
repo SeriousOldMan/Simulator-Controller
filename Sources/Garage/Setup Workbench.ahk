@@ -3495,11 +3495,13 @@ class SetupComparator extends ConfigurationItem {
 
 				if (isNumber(valueB) && isNumber(valueA)) {
 					targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
-					valueAB := ((valueA < valueB) ? valueA : valueB)
+					valueAB := (!handler.Reverse ? ((valueA < valueB) ? valueA : valueB)
+											     : ((valueA < valueB) ? valueB: valueA))
 					lastValueAB := kUndefined
 
 					loop {
-						if (valueAB >= targetAB) {
+						if ((!handler.Reverse && (valueAB >= targetAB))
+						 || (handler.Reverse && (valueAB < targetAB))) {
 							if (lastValueAB != kUndefined) {
 								delta := (valueAB - lastValueAB)
 

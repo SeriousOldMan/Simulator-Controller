@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.4.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YAR51hMN) (Test build for 6.4.2. Changes: Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench".)
+[6.4.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YAR51hMN) (Test build for 6.4.2. Changes: Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench", Fixed setup comparison tool for inverse settings.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-642) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -33,6 +33,7 @@
   - Fixed several UI translation errors.
   - Fixed Japanase translation codings for the grammar files. This error prevented the Spotter from working.
   - Fixed display of *Brake Balance* and other *inverse* settings for the Setup Editor in the "Setup Workbench" for *Le Mans Ultimate* and *rFactor 2*.
+  - Fixed setup merge calculation in the setup comparison tool of the "Setup Workbench" for *inverse* settings.
   - Fixed ABS setting in "Setup Workbench" for many cars in *Le Mans Ultimate*.
   
 #### Changes

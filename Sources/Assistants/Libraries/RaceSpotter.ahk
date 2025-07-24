@@ -3178,18 +3178,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	accidentAlert(type, arguments*) {
 		local distance := false
-		local speaker
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
-				speaker := this.getSpeaker(true)
-
 				if ((arguments.Length > 0) && (type = "Ahead")) {
 					distance := (Round(arguments[1] / 50) * 50)
 
 					if (distance > 0)
 						this.pushAlert("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																	  , unit: speaker.Fragments[getUnit("Length")]})
+																	  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]})
 				}
 				else
 					this.pushAlert("Accident" . type, false, false, "Accident" . type)

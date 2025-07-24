@@ -2215,7 +2215,7 @@ class RaceSpotter extends GridRaceAssistant {
 							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
 								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"]
 																   , pitstops: driverPitstops - carPitstops})
-							else if !trackBehind.isFaster(sector, 0.75)
+							else if !trackBehind.isFaster(sector, 0.5)
 								speaker.speakPhrase("Slipstream")
 						}
 						finally {

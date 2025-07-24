@@ -47,6 +47,7 @@
     - Le Mans Ultimate
 	  - Aston Martin Valkyrie
       - Mercedes-AMG LMGT3
+	  - McLaren 720s LMGT3 Evo (fixed)
 
 # Release history
 

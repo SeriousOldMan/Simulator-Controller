@@ -12,6 +12,7 @@
   - Fixed display of *Brake Balance* and other *inverse* settings for the Setup Editor in the "Setup Workbench" for *Le Mans Ultimate* and *rFactor 2*.
   - Fixed setup merge calculation in the setup comparison tool of the "Setup Workbench" for *inverse* settings.
   - Fixed ABS setting in "Setup Workbench" for many cars in *Le Mans Ultimate*.
+  - Workaround for a critical bug introduced in the API of *Le Mans Ultimate* by version 1.0. This bug causes the tyre compound choice during pitstop preparation to malfunction, if the same tyre compound is chosen for all tyres (which is quite common, of course).
   
 #### Changes
 

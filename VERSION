@@ -3,7 +3,7 @@ Version=6.4.2.0-release
 Target=6.4.2.0-release
 Date=07/25/2025
 Download=https://cutt.ly/hrPBQT4k;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BDTvF6wX;https://www.dropbox.com/scl/fi/dpjgjdfi397r8y59xzdax/Simulator-Controller-6.4.2.0-release.zip?rlkey=ovv92egc46hfi3vxs70ixdjqt&st=e3cpoyjb&dl=1;http://%master%:800/api/public/dl/M1u-RBJf;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.2.0-release.zip
-Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench", Fixed setup comparison tool for inverse settings
+Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench", Fixed setup comparison tool for inverse settings, Fixed tyre compound selection for LMU pitstop
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.2.0-release

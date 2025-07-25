@@ -93,10 +93,13 @@ class LMUPlugin extends Sector397Plugin {
 			local simulator := this.Simulator[true]
 			local car := this.Car
 			local track := this.Track
+			local write := true
 			local code, tyre, found, tyreCompound, tyreCompoundColor, cTyreCompound, cTyreCompoundColor
 
 			if !pitstop
 				pitstop := LMURESTProvider.PitstopData(simulator, car, track)
+			else
+				write := false
 
 			switch option, false {
 				case "Refuel":
@@ -257,7 +260,7 @@ class LMUPlugin extends Sector397Plugin {
 						return SessionDatabase.getDriverName(this.Simulator[true], SessionDatabase.ID)
 			}
 
-			if (operation != "Get")
+			if ((operation != "Get") && write)
 				pitstop.write()
 		}
 	}
@@ -340,9 +343,9 @@ class LMUPlugin extends Sector397Plugin {
 				throw "Unsupported change operation `"" . action . "`" detected in LMUPlugin.dialPitstopOption..."
 	}
 
-	setPitstopOption(option, value) {
+	setPitstopOption(option, value, pitstop := false) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			this.getOptionHandler(option).Call("Set", value)
+			this.getOptionHandler(option).Call("Set", value, pitstop)
 	}
 
 	changePitstopOption(option, action := "Increase", steps := 1) {
@@ -466,33 +469,52 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
-		local index, tyre
+		local index, tyre, pitstop, compounds, compoundColors
 
 		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
-		if (this.OpenPitstopMFDHotkey != "Off")
+		if (this.OpenPitstopMFDHotkey != "Off") {
+			this.setPitstopOption("Tyre Compound", false)
+
 			if InStr(tyreCompound, ",") {
 				tyreCompound := string2Values(",", tyreCompound)
 				tyreCompoundColor := string2Values(",", tyreCompoundColor)
 
-				for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
-					this.setPitstopOption("Tyre Compound " . tyre
-										, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+				compounds := tyreCompound
+				compoundColors := tyreCompoundColor
+
+				combineCompounds(&compounds, &compoundColors)
+
+				if (compounds.Length = 1)
+					this.setPitstopOption("Tyre Compound", compounds[1] ? compound(compounds[1], compoundColors[1]) : false)
+				else {
+					this.setPitstopOption("Tyre Compound", false)
+
+					for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+						this.setPitstopOption("Tyre Compound " . tyre
+											, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+				}
 			}
 			else
 				this.setPitstopOption("Tyre Compound", tyreCompound ? compound(tyreCompound, tyreCompoundColor) : false)
+		}
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		local pressures, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement, finished
+		local pitstop
 
 		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			this.setPitstopOption("Front Left", pressureFL)
-			this.setPitstopOption("Front Right", pressureFR)
-			this.setPitstopOption("Rear Left", pressureRL)
-			this.setPitstopOption("Rear Right", pressureRR)
+			pitstop := LMURESTProvider.PitstopData(this.Simulator[true], this.Car, this.Track)
+
+			this.setPitstopOption("Front Left", pressureFL, pitstop)
+			this.setPitstopOption("Front Right", pressureFR, pitstop)
+			this.setPitstopOption("Rear Left", pressureRL, pitstop)
+			this.setPitstopOption("Rear Right", pressureRR, pitstop)
+
+			pitstop.write()
 		}
 	}
 

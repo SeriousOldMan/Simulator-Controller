@@ -655,8 +655,15 @@ class LMURESTProvider {
 		getDriver() {
 			local driver := this.lookup("DRIVER:")
 
-			return (driver ? driver["settings"][driver["currentSetting"] + 1]["text"]
-						   : SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID))
+			try {
+				return (driver ? driver["settings"][driver["currentSetting"] + 1]["text"]
+							   : SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return SessionDatabase.getDriverName(this.Simulator, SessionDatabase.ID)
+			}
 		}
 
 		setDriver(name) {

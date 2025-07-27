@@ -664,32 +664,46 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getDriverNames(simulator, id, sessionDB := false) {
+		local key := (simulator . "." . id)
 		local drivers, ignore, driver
 
-		try {
-			if (simulator && id) {
-				if !sessionDB
-					sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+		static cache := CaseInsenseMap()
 
+		if cache.Has(key)
+			return cache[key]
+		else
+			try {
 				drivers := []
 
-				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-					drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
-
-				return ((drivers.Length = 0) ? ["John Doe (JD)"] : drivers)
-			}
-			else if id {
-				for ignore, simulator in SessionDatabase.getSimulators() {
-					sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				if (simulator && id) {
+					if !sessionDB
+						sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 					for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
-						return Array(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+						drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+				}
+				else if id
+					for ignore, simulator in SessionDatabase.getSimulators() {
+						sessionDB := Database(kDatabaseDirectory . "User\" . SessionDatabase.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+						for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
+							drivers.Push(driverName(driver["Forname"], driver["Surname"], driver["Nickname"]))
+
+						if (drivers.Length > 0)
+							break
+					}
+
+				if (drivers.Length = 0)
+					return ["John Doe (JD)"]
+				else {
+					cache[key] := drivers
+
+					return drivers
 				}
 			}
-		}
-		catch Any as exception {
-			logError(exception, true)
-		}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 		return ["John Doe (JD)"]
 	}

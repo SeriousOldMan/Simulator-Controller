@@ -1,9 +1,9 @@
 [Development]
 Version=6.4.3.0-dev
 Target=6.4.3.0-release
-Date=07/26/2025
+Date=07/27/2025
 Download=
-Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data
+Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.2.0-release

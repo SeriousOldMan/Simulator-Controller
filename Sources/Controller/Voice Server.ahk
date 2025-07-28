@@ -206,6 +206,25 @@ class VoiceServer extends ConfigurationItem {
 				super.__New(arguments*)
 			}
 
+			_onTextCallback(text) {
+				local words := this.parseText(&text, false)
+				local voiceClient, recognizer
+
+				if (words.Length > 0) {
+					voiceClient := this.VoiceClient.VoiceServer.activate(this.VoiceClient, words[1])
+
+					if voiceClient {
+						words.RemoveAt(1)
+
+						voiceClient.SpeechRecognizer[true]._onTextCallback(values2String(A_Space, words*))
+
+						return
+					}
+				}
+
+				super._onTextCallBack(values2String(A_Space, words*))
+			}
+
 			textRecognized(text) {
 				this.VoiceClient.VoiceServer.recognizeText(this.VoiceClient, text)
 			}
@@ -701,8 +720,9 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				if (words.Length = 0)
+				if (words.Length = 0) {
 					messageSend(kFileMessage, "Voice", this.ActivationCallback, this.PID)
+				}
 				else
 					messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
@@ -731,13 +751,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		_onTextCallback(text) {
-			text := StrReplace(text, ".", "")
-			text := StrReplace(text, ",", "")
-			text := StrReplace(text, ";", "")
-			text := StrReplace(text, "?", "")
-			text := StrReplace(text, "-", "")
-
-			super._onTextCallBack(text)
+			super._onTextCallBack(values2String(A_Space, this.parseText(&text, false)*))
 		}
 	}
 
@@ -1172,6 +1186,24 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
+	activate(voiceClient, descriptor) {
+		local candidate := false
+
+		try
+			candidate := this.VoiceClients[descriptor]
+
+		if (candidate && (candidate != voiceClient) && candidate.Listener) {
+			if this.Debug[kDebugRecognitions]
+				showMessage("Activation phrase recognized: " . descriptor)
+
+			this.activateVoiceClient(descriptor, [])
+
+			return candidate
+		}
+
+		return false
+	}
+
 	activateVoiceClient(descriptor, words := false) {
 		local activeVoiceClient
 
@@ -1191,11 +1223,7 @@ class VoiceServer extends ConfigurationItem {
 				if !this.hasPushToTalk()
 					this.startListening()
 			}
-			else
-				return true
 		}
-
-		return true
 	}
 
 	deactivateVoiceClient(descriptor) {
@@ -1657,7 +1685,7 @@ class VoiceServer extends ConfigurationItem {
 
 	activationCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Activation phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Activation phrase recognized: " . ((words.Length > 0) ? values2String(A_Space, words*) : voiceClient.Descriptor))
 
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}

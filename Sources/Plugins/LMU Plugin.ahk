@@ -469,7 +469,7 @@ class LMUPlugin extends Sector397Plugin {
 	}
 
 	setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
-		local index, tyre, pitstop, compounds, compoundColors
+		local index, tyre, pitstop
 
 		super.setPitstopTyreCompound(pitstopNumber, tyreCompound, tyreCompoundColor, set)
 
@@ -480,19 +480,18 @@ class LMUPlugin extends Sector397Plugin {
 				tyreCompound := string2Values(",", tyreCompound)
 				tyreCompoundColor := string2Values(",", tyreCompoundColor)
 
-				compounds := tyreCompound
-				compoundColors := tyreCompoundColor
+				combineCompounds(&tyreCompound, &tyreCompoundColor)
 
-				combineCompounds(&compounds, &compoundColors)
-
-				if (compounds.Length = 1)
-					this.setPitstopOption("Tyre Compound", compounds[1] ? compound(compounds[1], compoundColors[1]) : false)
+				if (tyreCompound.Length = 1)
+					this.setPitstopOption("Tyre Compound"
+										, tyreCompound[1] ? compound(tyreCompound[1], tyreCompoundColor[1]) : false)
 				else {
 					this.setPitstopOption("Tyre Compound", false)
 
 					for index, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
 						this.setPitstopOption("Tyre Compound " . tyre
-											, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index]) : false)
+											, tyreCompound[index] ? compound(tyreCompound[index], tyreCompoundColor[index])
+																  : false)
 				}
 			}
 			else

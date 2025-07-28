@@ -767,8 +767,13 @@ class VoiceManager extends ConfigurationItem {
 
 		registerMessageHandler("Voice", methodMessageHandler, this)
 
-		if (!this.VoiceServer && this.PushToTalk)
+		if (!this.VoiceServer && this.PushToTalk) {
 			this.initializePushToTalk()
+
+			if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+							  , "Voice", "Keyboard Hook", false)
+				InstallKeybdHook(true, true)
+		}
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -955,7 +960,7 @@ class VoiceManager extends ConfigurationItem {
 
 		try {
 			for ignore, key in this.PushToTalk
-				clicked := (clicked || GetKeyState(key))
+				clicked := (clicked || GetKeyState(key, "P"))
 
 			pressed := (toggle ? down : clicked)
 		}

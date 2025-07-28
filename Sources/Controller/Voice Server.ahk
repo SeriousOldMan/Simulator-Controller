@@ -1047,7 +1047,7 @@ class VoiceServer extends ConfigurationItem {
 
 		try {
 			for ignore, key in this.PushToTalk
-				clicked := (clicked || GetKeyState(key))
+				clicked := (clicked || GetKeyState(key, "P"))
 
 			pressed := (toggle ? down : clicked)
 		}
@@ -1751,6 +1751,10 @@ startupVoiceServer() {
 			SupportMenu.Check(label)
 
 		registerMessageHandler("Voice", handleVoiceMessage)
+
+		if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						  , "Voice", "Keyboard Hook", false)
+			InstallKeybdHook(true, true)
 
 		startupProcess()
 	}

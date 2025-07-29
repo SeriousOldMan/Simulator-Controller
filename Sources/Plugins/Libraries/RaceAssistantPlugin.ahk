@@ -957,7 +957,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.sReplayDirectory := false
 
 			RaceAssistantPlugin.sCollectorTask
-				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
+				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 20000, kHighPriority)
 
 			RaceAssistantPlugin.CollectorTask.start()
 		}
@@ -1729,11 +1729,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {

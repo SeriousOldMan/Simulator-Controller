@@ -206,6 +206,27 @@ class VoiceServer extends ConfigurationItem {
 				super.__New(arguments*)
 			}
 
+			_onTextCallback(text) {
+				local words := this.parseText(&text, false)
+				local target
+
+				if (words.Length > 0) {
+					target := this.VoiceClient.VoiceServer.targetVoiceClient(words[1])
+
+					if target {
+						words.RemoveAt(1)
+
+						if isInstance(target, VoiceServer.VoiceClient) {
+							target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
+
+							return
+						}
+					}
+				}
+
+				super._onTextCallBack(values2String(A_Space, words*))
+			}
+
 			textRecognized(text) {
 				this.VoiceClient.VoiceServer.recognizeText(this.VoiceClient, text)
 			}
@@ -701,8 +722,9 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				if (words.Length = 0)
+				if (words.Length = 0) {
 					messageSend(kFileMessage, "Voice", this.ActivationCallback, this.PID)
+				}
 				else
 					messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
@@ -731,13 +753,7 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		_onTextCallback(text) {
-			text := StrReplace(text, ".", "")
-			text := StrReplace(text, ",", "")
-			text := StrReplace(text, ";", "")
-			text := StrReplace(text, "?", "")
-			text := StrReplace(text, "-", "")
-
-			super._onTextCallBack(text)
+			super._onTextCallBack(values2String(A_Space, this.parseText(&text, false)*))
 		}
 	}
 
@@ -1172,14 +1188,34 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	activateVoiceClient(descriptor, words := false) {
+	targetVoiceClient(word) {
+		local candidate := false
+
+		try
+			candidate := this.VoiceClients[word]
+
+		if (candidate && (candidate = this.ActiveVoiceClient))
+			return true
+		else if (candidate && (candidate != this.ActiveVoiceClient) && candidate.Listener) {
+			if this.Debug[kDebugRecognitions]
+				showMessage("Activation phrase recognized: " . word)
+
+			this.activateVoiceClient(word, [], false)
+
+			return candidate
+		}
+
+		return false
+	}
+
+	activateVoiceClient(descriptor, words := false, stop := true) {
 		local activeVoiceClient
 
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
 			this.ActiveVoiceClient.activate(words)
 		else {
 			if this.ActiveVoiceClient
-				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
+				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor, stop)
 
 			if this.VoiceClients.Has(descriptor) {
 				activeVoiceClient := this.VoiceClients[descriptor]
@@ -1191,18 +1227,16 @@ class VoiceServer extends ConfigurationItem {
 				if !this.hasPushToTalk()
 					this.startListening()
 			}
-			else
-				return true
 		}
-
-		return true
 	}
 
-	deactivateVoiceClient(descriptor) {
+	deactivateVoiceClient(descriptor, stop := true) {
 		local activeVoiceClient := this.ActiveVoiceClient
 
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
-			activeVoiceClient.stopListening()
+
+			if stop
+				activeVoiceClient.stopListening()
 
 			this.iActiveVoiceClient := false
 
@@ -1657,7 +1691,7 @@ class VoiceServer extends ConfigurationItem {
 
 	activationCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Activation phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Activation phrase recognized: " . ((words.Length > 0) ? values2String(A_Space, words*) : voiceClient.Descriptor))
 
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}

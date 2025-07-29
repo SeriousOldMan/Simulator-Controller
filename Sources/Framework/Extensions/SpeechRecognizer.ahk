@@ -1073,8 +1073,12 @@ class SpeechRecognizer {
 		local index, literal
 
 		for index, literal in words {
-			literal := StrReplace(literal, ".", "")
-			literal := StrReplace(literal, ",", "")
+			if !isNumber(literal)
+				literal := StrReplace(literal, ".", "")
+
+			if !isNumber(StrReplace(literal, ",", "."))
+				literal := StrReplace(literal, ",", "")
+
 			literal := StrReplace(literal, ";", "")
 			literal := StrReplace(literal, "?", "")
 			literal := StrReplace(literal, "-", "")

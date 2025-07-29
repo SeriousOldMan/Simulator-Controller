@@ -1225,6 +1225,27 @@ class RaceEngineer extends RaceAssistant {
 						knowledge["Damage"]["Engine"] := (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine") . percent)
 					}
 
+					if ((!knowledge.Has("Damage") || !knowledge["Damage"].Has("Bodywork")) && (knowledgeBase.getValue("Damage.Bodywork", 0) != 0)) {
+						if !knowledge.Has("Damage")
+							knowledge["Damage"] := Map()
+
+						knowledge["Damage"]["Bodywork"] := knowledgeBase.getValue("Damage.Bodywork")
+					}
+
+					if ((!knowledge.Has("Damage") || !knowledge["Damage"].Has("Suspension")) && (knowledgeBase.getValue("Damage.Suspension", 0) != 0)) {
+						if !knowledge.Has("Damage")
+							knowledge["Damage"] := Map()
+
+						knowledge["Damage"]["Suspension"] := knowledgeBase.getValue("Damage.Suspension")
+					}
+
+					if ((!knowledge.Has("Damage") || !knowledge["Damage"].Has("Engine")) && (knowledgeBase.getValue("Damage.Engine", 0) != 0)) {
+						if !knowledge.Has("Damage")
+							knowledge["Damage"] := Map()
+
+						knowledge["Damage"]["Engine"] := knowledgeBase.getValue("Damage.Engine")
+					}
+
 					if knowledge.Has("Damage") {
 						knowledge["Damage"]["LapTimeLoss"] := (Round(Max(knowledgeBase.getValue("Damage.Bodywork.Lap.Delta", 0)
 																	   , knowledgeBase.getValue("Damage.Suspension.Lap.Delta", 0)

@@ -379,7 +379,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		this.iSimulator := Application(simulator, SimulatorController.Instance.Configuration)
 
-		super.__New(controller, name, configuration, register)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
@@ -395,7 +395,8 @@ class SimulatorPlugin extends ControllerPlugin {
 					this.createPitstopAction(controller, arguments*)
 			}
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 
@@ -942,10 +943,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	__New(controller, name, simulator, configuration := false) {
+	__New(controller, name, simulator, configuration := false, register := true) {
 		local ignore, theAction
 
-		super.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration, false)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iActionMode := kAssistantMode
@@ -953,7 +954,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 

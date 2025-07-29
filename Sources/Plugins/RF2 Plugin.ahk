@@ -100,8 +100,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	__New(controller, name, simulator, configuration := false) {
-		super.__New(controller, name, simulator, configuration)
+	__New(controller, name, simulator, configuration := false, register := true) {
+		super.__New(controller, name, simulator, configuration, true)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iPitstopMode := this.findMode(kPitstopMode)

@@ -769,7 +769,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local openSoloCenter, openTeamCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first, index
 
-		super.__New(controller, name, configuration, register)
+		super.__New(controller, name, configuration, false)
 
 		RaceAssistantPlugin.sCollectData.Default := true
 
@@ -937,7 +937,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			deleteDirectory(kTempDirectory . "Race Assistant")
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 
 			registerMessageHandler(this.Plugin, methodMessageHandler, this)
 

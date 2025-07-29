@@ -3,7 +3,7 @@ Version=6.4.3.0-dev
 Target=6.4.3.0-release
 Date=07/29/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/o_c21pQ-
-Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation
+Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Release]
 Version=6.4.2.0-release

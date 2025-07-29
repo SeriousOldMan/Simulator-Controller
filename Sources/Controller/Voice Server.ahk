@@ -208,17 +208,19 @@ class VoiceServer extends ConfigurationItem {
 
 			_onTextCallback(text) {
 				local words := this.parseText(&text, false)
-				local voiceClient, recognizer
+				local target
 
 				if (words.Length > 0) {
-					voiceClient := this.VoiceClient.VoiceServer.activate(this.VoiceClient, words[1])
+					target := this.VoiceClient.VoiceServer.targetVoiceClient(words[1])
 
-					if voiceClient {
+					if target {
 						words.RemoveAt(1)
 
-						voiceClient.SpeechRecognizer[true]._onTextCallback(values2String(A_Space, words*))
+						if isInstance(target, VoiceServer.VoiceClient) {
+							target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
 
-						return
+							return
+						}
 					}
 				}
 
@@ -1186,17 +1188,19 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	activate(voiceClient, descriptor) {
+	targetVoiceClient(word) {
 		local candidate := false
 
 		try
-			candidate := this.VoiceClients[descriptor]
+			candidate := this.VoiceClients[word]
 
-		if (candidate && (candidate != voiceClient) && candidate.Listener) {
+		if (candidate && (candidate = this.ActiveVoiceClient))
+			return true
+		else if (candidate && (candidate != this.ActiveVoiceClient) && candidate.Listener) {
 			if this.Debug[kDebugRecognitions]
-				showMessage("Activation phrase recognized: " . descriptor)
+				showMessage("Activation phrase recognized: " . word)
 
-			this.activateVoiceClient(descriptor, [])
+			this.activateVoiceClient(word, [], false)
 
 			return candidate
 		}
@@ -1204,14 +1208,14 @@ class VoiceServer extends ConfigurationItem {
 		return false
 	}
 
-	activateVoiceClient(descriptor, words := false) {
+	activateVoiceClient(descriptor, words := false, stop := true) {
 		local activeVoiceClient
 
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
 			this.ActiveVoiceClient.activate(words)
 		else {
 			if this.ActiveVoiceClient
-				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
+				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor, stop)
 
 			if this.VoiceClients.Has(descriptor) {
 				activeVoiceClient := this.VoiceClients[descriptor]
@@ -1226,11 +1230,13 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	deactivateVoiceClient(descriptor) {
+	deactivateVoiceClient(descriptor, stop := true) {
 		local activeVoiceClient := this.ActiveVoiceClient
 
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
-			activeVoiceClient.stopListening()
+
+			if stop
+				activeVoiceClient.stopListening()
 
 			this.iActiveVoiceClient := false
 

@@ -216,11 +216,9 @@ class VoiceServer extends ConfigurationItem {
 					if target {
 						words.RemoveAt(1)
 
-						if isInstance(target, VoiceServer.VoiceClient) {
-							target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
+						target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
 
-							return
-						}
+						return
 					}
 				}
 
@@ -753,7 +751,22 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		_onTextCallback(text) {
-			super._onTextCallBack(values2String(A_Space, this.parseText(&text, false)*))
+			local words := this.parseText(&text, false)
+			local target
+
+			if (words.Length > 0) {
+				target := VoiceServer.Instance.targetVoiceClient(words[1])
+
+				if target {
+					words.RemoveAt(1)
+
+					target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
+
+					return
+				}
+			}
+
+			super._onTextCallBack(values2String(A_Space, words*))
 		}
 	}
 
@@ -1194,13 +1207,12 @@ class VoiceServer extends ConfigurationItem {
 		try
 			candidate := this.VoiceClients[word]
 
-		if (candidate && (candidate = this.ActiveVoiceClient))
-			return true
-		else if (candidate && (candidate != this.ActiveVoiceClient) && candidate.Listener) {
+		if (candidate && candidate.Listener) {
 			if this.Debug[kDebugRecognitions]
 				showMessage("Activation phrase recognized: " . word)
 
-			this.activateVoiceClient(word, [], false)
+			if (candidate != this.ActiveVoiceClient)
+				this.activateVoiceClient(word, [], false)
 
 			return candidate
 		}

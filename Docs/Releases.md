@@ -37,6 +37,7 @@
 
   - Fixed a critical bug for team races, where all pitstop setups by the "Team Center" after the first one failed.
   - Increased resilience against incomplete driver data returned by the *Le Mans Ultimate* API.
+  - Fixed handling of fractional numbers with "." or "," in voice commands. This had been broken since a couple releases.
   
 #### Changes
 

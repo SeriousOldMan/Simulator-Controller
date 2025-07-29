@@ -257,6 +257,8 @@ Example: "Jona, can you plan a pitstop?"
 
 This activates Jona, the Race Engineer, and immediately asks Jona to plan a pitstop.
 
+[Listen to a conversation](https://www.dropbox.com/scl/fi/0o8i8vzaxj5o6h31hu8se/Activation_and_Command.mp3?rlkey=3ak6dwanpzwdndbd1zi45igb8&st=lv0w51aq&dl=1)
+
 ###### Notes
 
 1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").

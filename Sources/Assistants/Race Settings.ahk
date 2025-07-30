@@ -1850,7 +1850,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Deviation Threshold"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 VtyrePressureDeviationEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureDeviationEdit"))
-		settingsGui.Add("Text", "x184 yp+2 w70 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x184 yp+2 w70 h20", getUnit("Pressure", true))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
 
@@ -1872,7 +1872,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Edit", "x292 yp-1 w50 h20 vtyrePressureLossThresholdEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Loss.Threshold", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureLossThresholdEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w60 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w60 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
@@ -1884,22 +1884,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
@@ -1911,22 +1911,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit"
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsTab.UseTab(1)
 
@@ -2048,19 +2048,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnEvent("Change", validateNumber.Bind("spDryFrontLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnEvent("Change", validateNumber.Bind("spDryFrontRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnEvent("Change", validateNumber.Bind("spDryRearLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnEvent("Change", validateNumber.Bind("spDryRearRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
@@ -2071,19 +2071,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnEvent("Change", validateNumber.Bind("spWetFrontLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnEvent("Change", validateNumber.Bind("spWetFrontRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnEvent("Change", validateNumber.Bind("spWetRearLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnEvent("Change", validateNumber.Bind("spWetRearRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsTab.UseTab(4)
 

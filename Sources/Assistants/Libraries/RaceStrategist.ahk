@@ -1072,9 +1072,17 @@ class RaceStrategist extends GridRaceAssistant {
 	getKnowledge(type, options := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(type, options)
+		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local strategy, nextPitstop, pitstop, pitstops
 		local fuelService, tyreService, tyreCompound, tyreCompoundColor, tcCandidate
 		local availableTyreSets, tyreSets, tyreSet, ignore
+
+		convert(unit, value, arguments*) {
+			if (type != "Agent")
+				return convertUnit(unit, value, arguments*)
+			else
+				return value
+		}
 
 		if knowledgeBase {
 			this.Provider.supportsPitstop(&fuelService, &tyreService)
@@ -1113,7 +1121,7 @@ class RaceStrategist extends GridRaceAssistant {
 									 , "Lap", (knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")))
 
 						if fuelService
-							pitstop["Refuel"] := (Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"), 1) . " Liters")
+							pitstop["Refuel"] := (convert("Volume", knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount")) . volumeUnit)
 
 						if knowledgeBase.getValue("Strategy.Pitstop.Position", false)
 							pitstop["Position"] := knowledgeBase.getValue("Strategy.Pitstop.Position")

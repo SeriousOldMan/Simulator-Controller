@@ -1776,7 +1776,7 @@ class SoloCenter extends ConfigurationItem {
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
-		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
+		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure", true) . translate(")"))
 
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
 		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
@@ -1851,7 +1851,7 @@ class SoloCenter extends ConfigurationItem {
 		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 		loop columns.Length
-			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
+			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume", true), 1, 1))
 
 		this.iFuelDataListView := centerGui.Add("ListView", "x134 ys+33 w467 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
@@ -4227,7 +4227,7 @@ class SoloCenter extends ConfigurationItem {
 					else
 						data[A_Index] := displayValue("Time", data[A_Index])
 
-				this.TyreDataListView.Add("", displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1), data*)
+				this.TyreDataListView.Add("", displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume", true), 1, 1), data*)
 			}
 
 			this.FuelDataListView.ModifyCol()
@@ -6950,7 +6950,7 @@ class SoloCenter extends ConfigurationItem {
 						columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 						loop columns.Length
-							html .= ("<th class=`"th-std`">" . (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</th>")
+							html .= ("<th class=`"th-std`">" . (columns[A_Index] . A_Space . SubStr(getUnit("Volume", true), 1, 1)) . "</th>")
 
 						html .= "</tr>"
 
@@ -6969,7 +6969,7 @@ class SoloCenter extends ConfigurationItem {
 							else
 								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
 
-						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</td>", data*))
+						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume", true), 1, 1)) . "</td>", data*))
 					}
 
 					if (rows.Length > 0) {
@@ -8250,12 +8250,12 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
-											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume", true)})
 
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("3. Go to the track and run clean laps in race speed until your fuel level reaches %fuel% %unit%.")
-											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume", true)})
 
 					if isNumber(listView.GetText(line, 1)) {
 						text .= "`n`n"
@@ -8273,7 +8273,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
-											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume", true)})
 
 					text .= "`n`n"
 

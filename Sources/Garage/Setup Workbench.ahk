@@ -2922,7 +2922,7 @@ class SetupEditor extends ConfigurationItem {
 						unit := getUnit("Pressure")
 
 					this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
-											, categoriesLabels[category], label, value, unit)
+											, categoriesLabels[category], label, value, translate(unit))
 
 					this.Settings[setting] := label
 					this.Settings[label] := setting
@@ -3599,7 +3599,7 @@ class SetupComparator extends ConfigurationItem {
 					unit := getUnit("Pressure")
 
 				this.SettingsListView.Add("", categoriesLabels[category]
-											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, unit)
+											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, translate(unit))
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting

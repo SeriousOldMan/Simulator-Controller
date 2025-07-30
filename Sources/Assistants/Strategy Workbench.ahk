@@ -1631,19 +1631,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x . " yp+26 w85 h20 +0x200", translate("Pressure"))
 		workbenchGui.Add("Text", "x" . x0 . " yp w85 h20 +0x200", translate("FL"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure", true))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("FR"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure", true))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RL"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure", true))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RR"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
-		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
+		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure", true))
 
 		x := 371
 		x0 := x - 4

@@ -2522,12 +2522,12 @@ class TeamCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x378 yp+30 w95 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Pressure Front"))
 		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureFLEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
 		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureFREdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
-		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure"))
+		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure", true))
 
 		centerGui.Add("Text", "x378 yp+20 w95 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Pressure Rear"))
 		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureRLEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
 		centerGui.Add("Edit", "xp+52 yp w50 h23 vsetupBasePressureRREdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
-		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure"))
+		centerGui.Add("Text", "xp+52 yp+3 w30 h20" . ((this.Mode = "Simple") ? " X:Move" : ""), getUnit("Pressure", true))
 
 		centerGui.Add("Text", "x378 yp+20 w95 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Notes"))
 		centerGui.Add("Edit", "x474 yp+1 w126 h46 vsetupNotesEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
@@ -2586,10 +2586,10 @@ class TeamCenter extends ConfigurationItem {
 
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit").OnEvent("Change", validateNumber.Bind("pitstopPressureFLEdit"))
 		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureFREdit").OnEvent("Change", validateNumber.Bind("pitstopPressureFREdit"))
-		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure"))
+		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure", true))
 		centerGui.Add("Edit", "x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit").OnEvent("Change", validateNumber.Bind("pitstopPressureRLEdit"))
 		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureRREdit").OnEvent("Change", validateNumber.Bind("pitstopPressureRREdit"))
-		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure"))
+		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure", true))
 
 		centerGui.Add("Text", "x24 yp+24 w80 h23 +0x200", translate("Brakes"))
 		centerGui.Add("DropDownList", "x106 yp w50 vpitstopBrakesDropDown", collect(["Yes", "No"], translate))

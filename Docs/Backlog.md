@@ -23,7 +23,6 @@
   3. Integrate support for LAMs
   4. Approaching corner braking point countdown
   5. Configurable priority for voice output between Spotter and other Assistants
-  6. Support for unit localization when interacting with an LLM
 
 #### Session Database
   1. Active validation of value ranges in settings definitions

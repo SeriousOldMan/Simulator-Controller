@@ -1986,11 +1986,11 @@ class DrivingCoach extends GridRaceAssistant {
 										if conjunction
 											conjunction := speaker.Fragments[conjunction]
 										else if !lastHint
-											conjunction := ""
+											conjunction := A_Space
 										else
-											conjunction := ". "
+											conjunction := translate(". ")
 
-										conclusion := ((index = instructionHints.Length) ? "." : "")
+										conclusion := ((index = instructionHints.Length) ? translate(".") : "")
 
 										speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
 

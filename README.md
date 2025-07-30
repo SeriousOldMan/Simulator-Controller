@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.4.3.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/o_c21pQ-) (Early build for 6.4.3. Changes: Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation.)
+[6.4.3.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/o_c21pQ-) (Early build for 6.4.3. Changes: Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-643) of this version and all the versions you might have skipped, before installing and using this version.
 

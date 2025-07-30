@@ -39,6 +39,7 @@
   - Increased resilience against incomplete driver data returned by the *Le Mans Ultimate* API.
   - Fixed handling of fractional numbers with "." or "," in voice commands. This had been broken since a couple releases.
   - Fixed translation of Driving Coach on-track instructions in Restricted mode for Japanese and Chinese.
+  - Fixed several translations for the announcement of the front right tyre wear by the Race Assistent.
   
 #### Changes
 

@@ -1,26 +1,30 @@
 [Development]
 Version=6.4.3.0-dev
 Target=6.4.3.0-release
-Date=07/29/2025
+Date=07/31/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/o_c21pQ-
 Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement
-Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
+Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
 Version=6.4.2.0-release
 Date=07/25/2025
-Download=https://cutt.ly/hrPBQT4k;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BDTvF6wX;https://www.dropbox.com/scl/fi/dpjgjdfi397r8y59xzdax/Simulator-Controller-6.4.2.0-release.zip?rlkey=ovv92egc46hfi3vxs70ixdjqt&st=e3cpoyjb&dl=1;http://%master%:800/api/public/dl/M1u-RBJf;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.2.0-release.zip
+Download=https://cutt.ly/hrPBQT4k;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BDTvF6wX;https://www.dropbox.com/scl/fi/dpjgjdfi397r8y59xzdax/Simulator-Controller-6.4.2.0-release.zip?rlkey=ovv92egc46hfi3vxs70ixdjqt&st=e3cpoyjb&dl=1;http://%master%/Releases/Simulator Controller 6.4.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.2.0-release.zip
 Changes=Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench", Fixed setup comparison tool for inverse settings
 Components=Media->5.6.1,Configuration->6.4.1,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
-Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%:800/api/public/dl/QoDnWZ83;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
+Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
 Configuration.6.4.1.Path=Resources
 Configuration.6.4.1.Content=Setup
-Configuration.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VLlEf6UQ;https://www.dropbox.com/scl/fi/tj45xz722f0lv3rtf48sb/Configuration-6.4.1.zip?rlkey=29v5ormd744ocg834ry101bly&st=9faxbrsh&dl=1;http://%master%:800/api/public/dl/TMIhOl7f;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.1.zip
+Configuration.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VLlEf6UQ;https://www.dropbox.com/scl/fi/tj45xz722f0lv3rtf48sb/Configuration-6.4.1.zip?rlkey=29v5ormd744ocg834ry101bly&st=9faxbrsh&dl=1;http://%master%/Components/Configuration 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.1.zip
+Configuration.6.4.3.Path=Resources
+Configuration.6.4.3.Content=Setup
+Configuration.6.4.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zoHkt9TS;https://www.dropbox.com/scl/fi/q8stf68kh7z07tq2k4m6f/Configuration-6.4.3.zip?rlkey=n9bs5x2y1jj185vxhxvkllxkj&st=q3y9dvbh&dl=1;http://%master%/Components/Configuration 6.4.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.3.zip
+Configuration.6.4.3.Path=Resources
 Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
-Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%:800/api/public/dl/1LvxfUlm;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
+Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
 Type=Development
 [Version]

@@ -46,8 +46,9 @@
   - Combining the activation of an Assistant and the first command into one phrase like in "Jona, can you plan a pitstop?" is now supported for all voice recognition engines, which are not built into Windows itself. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#combining-activation-and-command) for more information.
   - Values like fuel amount, tyre pressures, and so on are now passed in localized units to an LLM for coneration purposes.
   - Additional information about car damage is passed to an LLM for conversation and reasoning.
-  - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
   - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
+  - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
+  - [Internal] Reorganized master download repository (once again).
 
 # Release history
 

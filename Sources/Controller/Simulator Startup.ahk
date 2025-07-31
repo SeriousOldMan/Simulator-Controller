@@ -616,7 +616,7 @@ updateNews(availableNews := false, news := false) {
 			deleteFile(kTempDirectory . "NEWS.ini")
 
 			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-							  , "http://" . MASTER . ":800/api/public/dl/jipSYNLz"
+							  , "http://" . MASTER . "/News/NEWS"
 							  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 				try
 					Download(url, kTempDirectory . "NEWS.ini")
@@ -735,7 +735,7 @@ checkForNews() {
 				check := false
 
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
-								  , "http://" . MASTER . ":800/api/public/dl/jipSYNLz"
+								  , "http://" . MASTER . "/News/NEWS"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")

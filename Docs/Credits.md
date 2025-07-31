@@ -36,4 +36,33 @@ And another contribution must be mentioned here: Maurice Bish (@bishman) has mad
 
 ### Supporters
 
-And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller. Many thanks to all my patrons on Patreon, especially to Robert Deutsch (@iEnki), who was my first supporter, and still is. I also want to mention Peter Kasbergen, who has also been a long-time supporter on Patreon, but additionally is also my favorite bug hunter. And there are so many more: Ashton Smith, Chris Matthews, Lars Gutsch, Michael Ischen, Stephane Rouche, and so on, the list is very long.
+And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller.
+
+A special thanks goes out to all my patrons on [Patreon](https://www.patreon.com/c/simulatorcontroller), especially to Robert Deutsch (@iEnki), who was my first supporter, and still is. I also want to mention Peter Kasbergen, who also has been a long-time supporter on Patreon, but additionally is also my favorite bug hunter. And there are so many more:
+
+	Danny03
+	tu ta
+	Wayne Wortley
+	Paul Mettam
+	Patric S.
+	Chris O'Donoghue
+	Keith
+	Tony Raharidzery
+	Menno van Zanden
+	Harald Becker
+	Vandy Surf
+	PM 76
+	Robert Gerke
+	Roman Woronowicz
+	Alejandro
+	m0ellemeister
+	Ryux
+	Danny Lugt
+	Trailbrake
+	Arco Hollestelle
+	Michael Ischen
+	Jordan Moss
+	Lars Gutsch
+	Chris Matthews
+
+Of course, I also want to thank all my other patrons, who do not want to be mentioned personally for privacy reasons.

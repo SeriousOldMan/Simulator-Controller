@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 6.4.3.0
+
+#### Date: 08/01/25
+
+#### Fixes
+
+  - Fixed a critical bug for team races, where all pitstop setups by the "Team Center" after the first one failed.
+  - Increased resilience against incomplete driver data returned by the *Le Mans Ultimate* API.
+  - Fixed handling of fractional numbers with "." or "," in voice commands. This had been broken since a couple releases.
+  - Fixed translation of Driving Coach on-track instructions in Restricted mode for Japanese and Chinese.
+  - Fixed several translations for the announcement of the front right tyre wear by the Race Assistent.
+  
+#### Changes
+
+  - Combining the activation of an Assistant and the first command into one phrase like in "Jona, can you plan a pitstop?" is now supported for all voice recognition engines, which are not built into Windows itself. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#combining-activation-and-command) for more information.
+  - Values like fuel amount, tyre pressures, and so on are now passed in localized units to an LLM for coneration purposes.
+  - Additional information about car damage is passed to an LLM for conversation and reasoning.
+  - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
+  - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
+  - [Internal] Reorganized master download repository (once again).
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.4.2.0
 
 #### Date: 07/25/25
@@ -26,31 +53,6 @@
 	  - Aston Martin Valkyrie
       - Mercedes-AMG LMGT3
 	  - McLaren 720s LMGT3 Evo (fixed)
-
-# Upcoming release
-
-## 6.4.3.0
-
-#### Date: 08/01/25 (planned)
-
-#### Fixes
-
-  - Fixed a critical bug for team races, where all pitstop setups by the "Team Center" after the first one failed.
-  - Increased resilience against incomplete driver data returned by the *Le Mans Ultimate* API.
-  - Fixed handling of fractional numbers with "." or "," in voice commands. This had been broken since a couple releases.
-  - Fixed translation of Driving Coach on-track instructions in Restricted mode for Japanese and Chinese.
-  - Fixed several translations for the announcement of the front right tyre wear by the Race Assistent.
-  
-#### Changes
-
-  - Combining the activation of an Assistant and the first command into one phrase like in "Jona, can you plan a pitstop?" is now supported for all voice recognition engines, which are not built into Windows itself. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#combining-activation-and-command) for more information.
-  - Values like fuel amount, tyre pressures, and so on are now passed in localized units to an LLM for coneration purposes.
-  - Additional information about car damage is passed to an LLM for conversation and reasoning.
-  - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
-  - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
-  - [Internal] Reorganized master download repository (once again).
-
-# Release history
 
 ## 6.4.1.0
 

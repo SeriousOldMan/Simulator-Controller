@@ -45,7 +45,8 @@ class AssistantMode extends ControllerMode {
 	activate() {
 		super.activate()
 
-		this.updateActions(this.Plugin.Session)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(this.Plugin.Session)
 	}
 
 	updateActions(session) {
@@ -620,7 +621,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {

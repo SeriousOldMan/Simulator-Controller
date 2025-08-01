@@ -464,7 +464,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	updateFunctions() {
-		this.updateActions()
+		if (this.Controller.State = "Foreground")
+			this.updateActions()
 	}
 
 	updateActions() {
@@ -484,12 +485,14 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		this.updateActions()
+		if (this.Controller.State = "Foreground") {
+			this.updateActions()
 
-		if !this.iUpdateVibrationStateTask {
-			this.iUpdateVibrationStateTask := PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
+			if !this.iUpdateVibrationStateTask {
+				this.iUpdateVibrationStateTask := PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
 
-			this.iUpdateVibrationStateTask.start()
+				this.iUpdateVibrationStateTask.start()
+			}
 		}
 	}
 

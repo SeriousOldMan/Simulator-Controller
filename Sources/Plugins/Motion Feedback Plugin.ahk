@@ -158,14 +158,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		activate() {
 			super.activate()
 
-			this.deselectEffect()
+			if (this.Controller.State = "Foreground") {
+				this.deselectEffect()
 
-			this.updateActionStates()
+				this.updateActionStates()
 
-			if !this.iUpdateLabelsTask {
-				this.iUpdateLabelsTask := PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
+				if !this.iUpdateLabelsTask {
+					this.iUpdateLabelsTask := PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
 
-				this.iUpdateLabelsTask.start()
+					this.iUpdateLabelsTask.start()
+				}
 			}
 		}
 
@@ -669,14 +671,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		super.activate()
 
-		isRunning := this.Application.isRunning()
+		if (this.Controller.State = "Foreground") {
+			isRunning := this.Application.isRunning()
 
-		this.updateActions()
+			this.updateActions()
 
-		if !this.iUpdateMotionStateTask {
-			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
+			if !this.iUpdateMotionStateTask {
+				this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
 
-			this.iUpdateMotionStateTask.start()
+				this.iUpdateMotionStateTask.start()
+			}
 		}
 	}
 
@@ -691,7 +695,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 	
 	updateFunctions() {
-		this.updateActions()
+		if (this.Controller.State = "Foreground")
+			this.updateActions()
 	}
 
 	updateActions() {

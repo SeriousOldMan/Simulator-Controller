@@ -1209,7 +1209,7 @@ launchPad(command := false, arguments*) {
 			launchPad(kClose)
 	}
 	else {
-		availableFunctions(getControllerState(true, true), &hasTeamServer)
+		availableFunctions(getControllerState(), &hasTeamServer)
 
 		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -1533,7 +1533,7 @@ availableFunctions(configuration, &hasTeamServer := false
 loadStartupProfiles(target, fileName := false) {
 	local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
 	local hasTeamServer := false
-	local functions := availableFunctions(getControllerState(true, true), &hasTeamServer)
+	local functions := availableFunctions(getControllerState(), &hasTeamServer)
 	local profiles := []
 	local selected := false
 	local activeProfiles := []
@@ -2801,7 +2801,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		functions := []
 		activeAssistants := []
 
-		controllerConfiguration := getControllerState(true, true)
+		controllerConfiguration := getControllerState()
 
 		functions := availableFunctions(controllerConfiguration
 									  , &hasTeamServer, &hasDrivingCoach, &hasRaceSpotter, &hasRaceStrategist, &hasRaceEngineer

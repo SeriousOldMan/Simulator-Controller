@@ -482,7 +482,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			for ignore, widget in this.iControllerWidgets
 				widget.Visible := false
 
-		configuration := this.SetupWizard.getSimulatorConfiguration()
+		configuration := this.SetupWizard.getSimulatorConfiguration(false)
 		assistantConfiguration := readMultiMap(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
 
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
@@ -500,11 +500,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	hidePage(page) {
+		return super.hidePage(this.TransposePage[page])
+	}
+
+	savePage(page) {
 		local ignore, configurator, configuration, assistantConfiguration, section, subConfiguration
 
-		page := this.TransposePage[page]
-
-		if super.hidePage(page) {
+		if super.savePage(page) {
 			configurator := this.iAssistantConfigurators[page]
 
 			configuration := newMultiMap()

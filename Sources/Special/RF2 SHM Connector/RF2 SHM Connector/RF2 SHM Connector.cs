@@ -224,9 +224,10 @@ namespace SHMConnector {
 				for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
 				{
 					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
+					ref rF2VehicleTelemetry telemetry = ref GetPlayerTelemetry(vehicle.mID, ref this.telemetry);
 
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Lap.Running="); strWriter.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
@@ -245,35 +246,40 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
 					string carClass = GetStringFromBytes(vehicle.mVehicleClass);
-                    string carName = GetStringFromBytes(vehicle.mVehicleName);
+					string carName = GetStringFromBytes(vehicle.mVehicleName);
 
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(GetCarName(carClass, carName));
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".CarRaw="); strWriter.WriteLine(carName);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Nr="); strWriter.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Car="); strWriter.WriteLine(GetCarName(carClass, carName));
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".CarRaw="); strWriter.WriteLine(carName);
 
-                    strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(vehicle.mDriverName));
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
-					
-					if (vehicle.mInPits != 0) {
+
+					if (vehicle.mInPits != 0)
+					{
 						double speed = VehicleSpeed(ref vehicle);
-						
-						if (speed < 5 || vehicle.mPitState == (byte)Stopped) {
+
+						if (speed < 5 || vehicle.mPitState == (byte)Stopped)
+						{
 							strWriter.Write("Car."); strWriter.Write(i); strWriter.WriteLine(".InPit=true");
 						}
-						else {
+						else
+						{
 							strWriter.Write("Car."); strWriter.Write(i); strWriter.WriteLine(".InPit=false");
 						}
 					}
 
 					if (vehicle.mIsPlayer == 1)
-                    {
+					{
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(i);
 					}
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".FuelRemaining="); strWriter.WriteLine(Math.Round(telemetry.mFuel, 1));
 				}
 			}
 			else
@@ -313,7 +319,8 @@ namespace SHMConnector {
 			string session = "";
 
 			strWriter.WriteLine("[Session Data]");
-			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
+			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)
+                                                                       && GetStringFromBytes(playerTelemetry.mTrackName) != "") ? "true" : "false");
 			if (connected) {
 				if (playerTelemetry.mWheels == null)
 					strWriter.WriteLine("Paused=true");

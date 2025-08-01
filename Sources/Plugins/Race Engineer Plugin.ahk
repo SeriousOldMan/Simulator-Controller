@@ -66,7 +66,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 						driverSwapPlan := parseMultiMap(driverSwapPlan)
 
 						requestDriver := getMultiMapValue(driverSwapPlan, "Pitstop", "Driver", false)
-						requestDriver := (requestDriver ? [requestDriver] : [])
+
+						if !requestDriver
+							requestDriver := kUndefined
 
 						lap := getMultiMapValue(driverSwapPlan, "Pitstop", "Lap", 0)
 
@@ -83,7 +85,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Bodywork", false)
 															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
 															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
-															  , requestDriver*)
+															  , requestDriver, getMultiMapValue(driverSwapPlan, "Pitstop", "Change.Brakes", kUndefined))
 
 						return false
 					}
@@ -393,7 +395,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 					pitstopSettings := parseMultiMap(pitstopSettings)
 
 					requestDriver := getMultiMapValue(pitstopSettings, "Pitstop", "Driver", false)
-					requestDriver := (requestDriver ? [requestDriver] : [])
+
+					if !requestDriver
+						requestDriver := kUndefined
 
 					this.RaceEngineer.planPitstop(getMultiMapValue(pitstopSettings, "Pitstop", "Lap", 0)
 												, "!" . getMultiMapValue(pitstopSettings, "Pitstop", "Refuel", 0)
@@ -405,7 +409,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
 												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Engine", false)
-												, requestDriver*)
+												, requestDriver, getMultiMapValue(pitstopSettings, "Pitstop", "Change.Brakes", kUndefined))
 				}
 			}
 		}
@@ -542,6 +546,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
 		this.Simulator.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+	}
+
+	setPitstopBrakeChange(pitstopNumber, change, frontBrakePads := false, rearBrakePads := false) {
+		this.Simulator.setPitstopBrakeChange(pitstopNumber, change, frontBrakePads, rearBrakePads)
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {

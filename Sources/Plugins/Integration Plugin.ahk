@@ -176,11 +176,23 @@ class IntegrationPlugin extends ControllerPlugin {
 
 	createFuelState(sessionInfo) {
 		local fuelLow := (Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
+		local state := Map("LastConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0))
+						 , "AvgConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0))
+						 , "RemainingFuel", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0))
+						 , "RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
 
-		return Map("LastConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0))
-				 , "AvgConsumption", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0))
-				 , "RemainingFuel", convertUnit("Volume", getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0))
-				 , "RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
+		state["LastFuelConsumption"] := state["LastConsumption"]
+		state["AvgFuelConsumption"] := state["AvgConsumption"]
+		state["RemainingFuelLaps"] := state["RemainingLaps"]
+
+		if (getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", kUndefined) != kUndefined) {
+			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 1)
+			state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 1)
+			state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 1)
+			state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+		}
+
+		return state
 	}
 
 	createTyresState(sessionInfo) {
@@ -396,10 +408,12 @@ class IntegrationPlugin extends ControllerPlugin {
 		local state := Map()
 		local fuelService := false
 		local tyreService := false
+		local brakeService := false
 		local repairService := []
 		local tyreSet := false
 		local tyreCompound, tyreSet, tyrePressures, index, tyre, axle
 		local pressures, pressure, pressureIncrements
+		local driverRequest, driver
 
 		computeRepairs(bodywork, suspension, engine) {
 			local repairs := ""
@@ -425,7 +439,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		}
 
 		if this.Provider {
-			this.Provider.supportsPitstop(&fuelService, &tyreService, &repairService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &tyreSet)
 		}
 
@@ -443,6 +457,18 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", 0)
 			state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", 0)
 			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel")) : kNull)
+			state["Driver"] := kNull
+
+			driverRequest := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Driver.Request", false)
+
+			if driverRequest {
+				driverRequest := string2Values("|", driverRequest)
+
+				driver := string2Values(":", driverRequest[2])[1]
+
+				if (driver != string2Values(":", driverRequest[1])[1])
+					state["Driver"] := driver
+			}
 
 			if (repairService.Length > 0)
 				state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", 0)
@@ -518,6 +544,11 @@ class IntegrationPlugin extends ControllerPlugin {
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
 				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
+
+			if brakeService
+				state["Brakes"] := (getMultiMapValue(sessionInfo, "Pitstop", "Planned.Brake.Change", false) ? kTrue : kFalse)
+			else
+				state["Brakes"] := kNull
 
 			if (repairService.Length > 0)
 				state["Repairs"] := computeRepairs(getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Bodywork")
@@ -606,6 +637,11 @@ class IntegrationPlugin extends ControllerPlugin {
 				state["TyrePressures"] := [kNull, kNull, kNull, kNull]
 				state["TyrePressureIncrements"] := [0, 0, 0, 0]
 			}
+
+			if brakeService
+				state["Brakes"] := (getMultiMapValue(sessionInfo, "Pitstop", "Target.Brake.Change", false) ? kTrue : kFalse)
+			else
+				state["Brakes"] := kNull
 		}
 		else {
 			state["Number"] := kNull

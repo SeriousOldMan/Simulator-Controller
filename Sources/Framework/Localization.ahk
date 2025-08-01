@@ -116,92 +116,120 @@ getVolumeUnit(trans := false) {
 displayTemperatureValue(celsius, rnd) {
 	global gTemperatureUnit
 
-	switch gTemperatureUnit, false {
-		case "Celsius":
-			return (rnd ? Round(celsius, 1) : celsius)
-		case "Fahrenheit":
-			return (rnd ? Round(((celsius * 1.8) + 32), 1) : ((celsius * 1.8) + 32))
-		default:
-			throw "Unknown temperature unit detected in displayTemperatureValue..."
+	if isNumber(celsius) {
+		switch gTemperatureUnit, false {
+			case "Celsius":
+				return (rnd ? Round(celsius, 1) : celsius)
+			case "Fahrenheit":
+				return (rnd ? Round(((celsius * 1.8) + 32), 1) : ((celsius * 1.8) + 32))
+			default:
+				throw "Unknown temperature unit detected in displayTemperatureValue..."
+		}
 	}
+	else
+		return celsius
 }
 
 displayPressureValue(psi, rnd) {
 	global gPressureUnit
 
-	switch gPressureUnit, false {
-		case "PSI":
-			return (rnd ? Round(psi, 1) : psi)
-		case "Bar":
-			return (rnd ? Round(psi / 14.503773, 2) : (psi / 14.503773))
-		case "KPa":
-			return (rnd ? Round(psi * 6.894757) : (psi * 6.894757))
-		default:
-			throw "Unknown pressure unit detected in displayPressureValue..."
+	if isNumber(psi) {
+		switch gPressureUnit, false {
+			case "PSI":
+				return (rnd ? Round(psi, 1) : psi)
+			case "Bar":
+				return (rnd ? Round(psi / 14.503773, 2) : (psi / 14.503773))
+			case "KPa":
+				return (rnd ? Round(psi * 6.894757) : (psi * 6.894757))
+			default:
+				throw "Unknown pressure unit detected in displayPressureValue..."
+		}
 	}
+	else
+		return psi
 }
 
 displayLengthValue(meter, rnd) {
 	global gLengthUnit
 
-	switch gLengthUnit, false {
-		case "Meter":
-			return (rnd ? Round(meter, 1) : meter)
-		case "Yard":
-			return (rnd ? Round(meter * 0.9144) : (meter * 0.9144))
-		default:
-			throw "Unknown length unit detected in displayLengthValue..."
+	if isNumber(meter) {
+		switch gLengthUnit, false {
+			case "Meter":
+				return (rnd ? Round(meter, 1) : meter)
+			case "Yard":
+				return (rnd ? Round(meter * 0.9144) : (meter * 0.9144))
+			default:
+				throw "Unknown length unit detected in displayLengthValue..."
+		}
 	}
+	else
+		return meter
 }
 
 displaySpeedValue(kmh, rnd) {
 	global gSpeedUnit
 
-	switch gSpeedUnit, false {
-		case "km/h":
-			return (rnd ? Round(kmh, 1) : kmh)
-		case "mph":
-			return (rnd ? Round(kmh / 1.609344, 1) : (kmh / 1.609344))
-		default:
-			throw "Unknown speed unit detected in displaySpeedValue..."
+	if isNumber(kmh) {
+		switch gSpeedUnit, false {
+			case "km/h":
+				return (rnd ? Round(kmh, 1) : kmh)
+			case "mph":
+				return (rnd ? Round(kmh / 1.609344, 1) : (kmh / 1.609344))
+			default:
+				throw "Unknown speed unit detected in displaySpeedValue..."
+		}
 	}
+	else
+		return kmh
 }
 
 displayMassValue(kilogram, rnd) {
 	global gMassUnit
 
-	switch gMassUnit, false {
-		case "Kilogram":
-			return (rnd ? Round(kilogram, 1) : kilogram)
-		case "Pound":
-			return (rnd ? Round(kilogram * 2.204623): (kilogram * 2.204623))
-		default:
-			throw "Unknown mass unit detected in displayMassValue..."
+	if isNumber(kilogram) {
+		switch gMassUnit, false {
+			case "Kilogram":
+				return (rnd ? Round(kilogram, 1) : kilogram)
+			case "Pound":
+				return (rnd ? Round(kilogram * 2.204623): (kilogram * 2.204623))
+			default:
+				throw "Unknown mass unit detected in displayMassValue..."
+		}
 	}
+	else
+		return kilogram
 }
 
 displayVolumeValue(liter, rnd) {
 	global gVolumeUnit
 
-	switch gVolumeUnit, false {
-		case "Liter":
-			return (rnd ? Round(liter, 1) : liter)
-		case "Gallon (US)":
-			return (rnd ? Round(liter / 3.785411, 2) : (liter / 3.785411))
-		case "Gallon (GB)", "Gallon":
-			return (rnd ? Round(liter / 4.546092, 2) : (liter / 4.546092))
-		default:
-			throw "Unknown volume unit detected in displayVolumeValue..."
+	if isNumber(liter) {
+		switch gVolumeUnit, false {
+			case "Liter":
+				return (rnd ? Round(liter, 1) : liter)
+			case "Gallon (US)":
+				return (rnd ? Round(liter / 3.785411, 2) : (liter / 3.785411))
+			case "Gallon (GB)", "Gallon":
+				return (rnd ? Round(liter / 4.546092, 2) : (liter / 4.546092))
+			default:
+				throw "Unknown volume unit detected in displayVolumeValue..."
+		}
 	}
+	else
+		return liter
 }
 
 displayFloatValue(float, precision := kUndefined) {
-	if (precision = kUndefined)
-		return StrReplace(float, ".", getFloatSeparator())
-	else if (precision = 0)
-		return Round(float)
+	if isNumber(float) {
+		if (precision = kUndefined)
+			return StrReplace(float, ".", getFloatSeparator())
+		else if (precision = 0)
+			return Round(float)
+		else
+			return StrReplace(Round(float, precision), ".", getFloatSeparator())
+	}
 	else
-		return StrReplace(Round(float, precision), ".", getFloatSeparator())
+		return float
 }
 
 displayTimeValue(time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
@@ -210,38 +238,42 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 	local sign := (signum(time) < 0)
 	local hours, seconds, fraction, minutes
 
-	if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
-		return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
-	else {
-		time := Abs(time)
+	if isNumber(time) {
+		if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
+			return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
+		else {
+			time := Abs(time)
 
-		seconds := Floor(time)
-		fraction := (time - seconds)
-		minutes := Floor(seconds / 60)
-		hours := Floor(minutes / 60)
+			seconds := Floor(time)
+			fraction := (time - seconds)
+			minutes := Floor(seconds / 60)
+			hours := Floor(minutes / 60)
 
-		minutes -= (hours * 60)
+			minutes -= (hours * 60)
 
-		fraction := Round(fraction * 10)
+			fraction := Round(fraction * 10)
 
-		seconds := ((seconds - (minutes * 60) - (hours * 3600)) . "")
+			seconds := ((seconds - (minutes * 60) - (hours * 3600)) . "")
 
-		if (StrLen(seconds) = 1)
-			seconds := ("0" . seconds)
+			if (StrLen(seconds) = 1)
+				seconds := ("0" . seconds)
 
-		if fillHours {
-			hours := (Format("{1:02}", hours) . ":")
-			minutes := Format("{1:02}", minutes)
+			if fillHours {
+				hours := (Format("{1:02}", hours) . ":")
+				minutes := Format("{1:02}", minutes)
+			}
+			else if (hours > 0) {
+				hours := (hours . ":")
+				minutes := Format("{1:02}", minutes)
+			}
+			else
+				hours := ""
+
+			return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
 		}
-		else if (hours > 0) {
-			hours := (hours . ":")
-			minutes := Format("{1:02}", minutes)
-		}
-		else
-			hours := ""
-
-		return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
 	}
+	else
+		return time
 }
 
 internalPressureValue(value, rnd, unit := false) {
@@ -250,16 +282,20 @@ internalPressureValue(value, rnd, unit := false) {
 	if !unit
 		unit := gPressureUnit
 
-	switch unit, false {
-		case "PSI":
-			return (rnd ? Round(value, 1) : value)
-		case "Bar":
-			return (rnd ? Round(value * 14.503773, 2) : (value * 14.503773))
-		case "KPa":
-			return (rnd ? Round(value / 6.894757) : (value / 6.894757))
-		default:
-			throw "Unknown pressure unit detected in internalPressureValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "PSI":
+				return (rnd ? Round(value, 1) : value)
+			case "Bar":
+				return (rnd ? Round(value * 14.503773, 2) : (value * 14.503773))
+			case "KPa":
+				return (rnd ? Round(value / 6.894757) : (value / 6.894757))
+			default:
+				throw "Unknown pressure unit detected in internalPressureValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalTemperatureValue(value, rnd, unit := false) {
@@ -268,14 +304,18 @@ internalTemperatureValue(value, rnd, unit := false) {
 	if !unit
 		unit := gTemperatureUnit
 
-	switch unit, false {
-		case "Celsius":
-			return (rnd ? Round(value, 1) : value)
-		case "Fahrenheit":
-			return (rnd ? Round((value - 32) / 1.8, 1) : ((value - 32) / 1.8))
-		default:
-			throw "Unknown temperature unit detected in internalTemperatureValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "Celsius":
+				return (rnd ? Round(value, 1) : value)
+			case "Fahrenheit":
+				return (rnd ? Round((value - 32) / 1.8, 1) : ((value - 32) / 1.8))
+			default:
+				throw "Unknown temperature unit detected in internalTemperatureValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalLengthValue(value, rnd, unit := false) {
@@ -284,14 +324,18 @@ internalLengthValue(value, rnd, unit := false) {
 	if !unit
 		unit := gLengthUnit
 
-	switch unit, false {
-		case "Meter":
-			return (rnd ? Round(value, 1) : value)
-		case "Yard":
-			return (rnd ? Round(value / 0.9144) : (value / 0.9144))
-		default:
-			throw "Unknown length unit detected in internalLengthValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "Meter":
+				return (rnd ? Round(value, 1) : value)
+			case "Yard":
+				return (rnd ? Round(value / 0.9144) : (value / 0.9144))
+			default:
+				throw "Unknown length unit detected in internalLengthValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalSpeedValue(value, rnd, unit := false) {
@@ -300,14 +344,18 @@ internalSpeedValue(value, rnd, unit := false) {
 	if !unit
 		unit := gSpeedUnit
 
-	switch unit, false {
-		case "km/h":
-			return (rnd ? Round(value, 1) : value)
-		case "mph":
-			return (rnd ? Round(value * 1.609344, 1) : (value * 1.609344))
-		default:
-			throw "Unknown speed unit detected in internalSpeedValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "km/h":
+				return (rnd ? Round(value, 1) : value)
+			case "mph":
+				return (rnd ? Round(value * 1.609344, 1) : (value * 1.609344))
+			default:
+				throw "Unknown speed unit detected in internalSpeedValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalMassValue(value, rnd, unit := false) {
@@ -316,14 +364,18 @@ internalMassValue(value, rnd, unit := false) {
 	if !unit
 		unit := gMassUnit
 
-	switch unit, false {
-		case "Kilogram":
-			return (rnd ? Round(value, 1) : value)
-		case "Pound":
-			return (rnd ? Round(value / 2.204623) : (value / 2.204623))
-		default:
-			throw "Unknown mass unit detected in internalMassValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "Kilogram":
+				return (rnd ? Round(value, 1) : value)
+			case "Pound":
+				return (rnd ? Round(value / 2.204623) : (value / 2.204623))
+			default:
+				throw "Unknown mass unit detected in internalMassValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalVolumeValue(value, rnd, unit := false) {
@@ -332,23 +384,29 @@ internalVolumeValue(value, rnd, unit := false) {
 	if !unit
 		unit := gVolumeUnit
 
-	switch unit, false {
-		case "Liter":
-			return (rnd ? Round(value, 1) : value)
-		case "Gallon (US)":
-			return (rnd ? Round(value * 3.785411, 2) : (value * 3.785411))
-		case "Gallon (GB)", "Gallon":
-			return (rnd ? Round(value * 4.546092, 2) : (value * 4.546092))
-		default:
-			throw "Unknown volume unit detected in internalVolumeValue..."
+	if isNumber(value) {
+		switch unit, false {
+			case "Liter":
+				return (rnd ? Round(value, 1) : value)
+			case "Gallon (US)":
+				return (rnd ? Round(value * 3.785411, 2) : (value * 3.785411))
+			case "Gallon (GB)", "Gallon":
+				return (rnd ? Round(value * 4.546092, 2) : (value * 4.546092))
+			default:
+				throw "Unknown volume unit detected in internalVolumeValue..."
+		}
 	}
+	else
+		return value
 }
 
 internalFloatValue(value, precision := kUndefined) {
 	if (precision = kUndefined)
 		return StrReplace(value, getFloatSeparator(), ".")
-	else
+	else if isNumber(value)
 		return Round(StrReplace(value, getFloatSeparator(), "."), precision)
+	else
+		return value
 }
 
 internalTimeValue(time, arguments*) {

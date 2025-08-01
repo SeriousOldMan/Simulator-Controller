@@ -231,28 +231,32 @@ class InstallationStepWizard extends StepWizard {
 				}
 	}
 
-	hidePage(page) {
+	savePage(page) {
 		local wizard := this.SetupWizard
 		local done := true
 		local software, ignore, msgResult
 
-		for software, ignore in this.iPages[page]
-			if (wizard.isSoftwareRequested(software) && !wizard.isSoftwareOptional(software) && !wizard.isSoftwareInstalled(software)) {
-				done := false
+		if super.savePage(page) {
+			for software, ignore in this.iPages[page]
+				if (wizard.isSoftwareRequested(software) && !wizard.isSoftwareOptional(software) && !wizard.isSoftwareInstalled(software)) {
+					done := false
 
-				break
+					break
+				}
+
+			if !done {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup "), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "No")
+					return false
 			}
 
-		if !done {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup "), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
-
-			if (msgResult = "No")
-				return false
+			return true
 		}
-
-		return super.hidePage(page)
+		else
+			return false
 	}
 }
 

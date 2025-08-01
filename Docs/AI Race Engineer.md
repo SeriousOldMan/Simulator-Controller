@@ -178,6 +178,10 @@ As you can see here, each phrase provides different alternative sentences. Varia
 
 6. [Portuguese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(PT))
 
+7. [Chinese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(ZH))
+
+8. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(JA))
+
 I strongly recommed to memorize the phrases in the language you use to interact with Jona. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Engineer.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Engineer.grammars.de).
 
 #### Extending conversation and reasoning capabilities using an LLM
@@ -324,12 +328,11 @@ The following table shows, which simulator supports which damage type:
 | Project CARS 2             | Yes      | Yes        | Yes    |
 | RaceRoom Racing Experience | Yes      | Yes        | Yes    |
 | rFactor 2                  | Yes      | No         | No     |
-| Le Mans Ultimate           | Yes      | No (2)     | No     |
+| Le Mans Ultimate           | Yes      | Yes        | No     |
 
 ##### Notes
 
 (1) Supported but not reported in the data API.
-(2) Supported but not reported in the API. However, when it comes to pitstop planning, it is detected, that suspension damage must be repaired and that option is chosen.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered around 85 Celsius and for wet tyres something around 50 Celsius. These values can be specified in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"
 
@@ -367,12 +370,12 @@ The pitstop is handled by Jona in two phases. In the first phase, the planning p
 
 Please note, that the range of supported pitstop services depends on the specific simulator. See the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for full information about each simulator. Additionally, some simulators support the use of different tyre compounds for each wheel or at least separate for each axle (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#handling-of-tyre-compounds-on-inidividual-wheels) for more information). Jona fully understands individual tyre compounds on each wheel and even pitstops, where not all tyres are changed, but he will always plan a pitstop with one of the available tyre compounds for all wheels and will also change all tyres at once. But eiher by using the controller actions for the given simulator before the pitstop is prepared or by using the in-game Pitstop MFD after the pitstop has been prepared (see below), you can alter the tyre compound choices made by Jona. The following table gives you an overview over the supplied pitstop services for the different simulators:
 
-| Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes (4) |
+| Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes     |
 | -------------------------- | ------ | --------------- | ----------------- | -------------- | ----------- | ---------- |
 | Assetto Corsa              | Yes    | All             | Uniform           | Yes            | Yes         | No         |
 | Assetto Corsa Competizione | Yes    | All             | Uniform           | Yes            | Yes         | Yes        |
 | Automobilista 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
-| iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (5)      | No         |
+| iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (4)      | No         |
 | Projects CARS 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
 | RaceRoom Racing Experience | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
 | rFactor 2                  | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
@@ -386,24 +389,26 @@ Please note, that the range of supported pitstop services depends on the specifi
 
 (3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section about the pitstop settings.
 
-(4) The Engineer will not (yet) plan automatically for a brake pad change.
-
-(5) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
+(4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
-Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
+Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and already prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode may be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
 
-| Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Repairs |
-| -------------------------- | ---- | ------------- | -------- | -------------- | ------- |
-| Assetto Corsa              | No   | No            | -        | No             | No      |
-| Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | No      |
-| Automobilista 2            | No   | No            | -        | No             | No      |
-| iRacing                    | Yes  | Yes           | -        | Yes            | No      |
-| Projects CARS 2            | No   | No            | -        | No             | No      |
-| RaceRoom Racing Experience | No   | No            | -        | No             | No      |
-| rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     |
-| Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | Yes     |
+| Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Brakes  | Repairs |
+| -------------------------- | ---- | ------------- | -------- | -------------- | ------- | ------- |
+| Assetto Corsa              | No   | No            | -        | No             | No      | No      |
+| Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | Yes (1) | Yes (1) |
+| Automobilista 2            | No   | No            | -        | No             | No      | No      |
+| iRacing                    | Yes  | Yes           | -        | Yes            | No      | No      |
+| Projects CARS 2            | No   | No            | -        | No             | No      | No      |
+| RaceRoom Racing Experience | No   | No            | -        | No             | No      | No      |
+| rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     | Yes     |
+| Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | No      | Yes     |
+
+##### Notes
+
+(1) Change is detected only, if triggered by a controller action using a Button Box or a Stream Deck and alike.
 
 It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
 
@@ -472,7 +477,7 @@ The following statistical models are currently implemented:
      | Projects CARS 2            | Yes                     | Yes                  | Yes    |
      | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
-     | Le Mans Ultimate           | Yes (1)                 | No (1)               | No (1) |
+     | Le Mans Ultimate           | Yes                     | Yes                  | No     |
 	 
 	 Notes:
 	 
@@ -504,9 +509,13 @@ The following statistical models are currently implemented:
 	   
 	   Repair recommendations will be given for all damage types.
 	 
-	 - *rFactor 2* and *Le Mans Ultimate*
+	 - *rFactor 2*
 	 
 	   Since the damage types are not distinguishable in the API, only bodywork & aerodynamics damage will be recommended. Handle other damage types manually.
+	   
+	 - *Le Mans Ultimate*
+	 
+	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
 	 
   6. Tyre pressure gambling
   
@@ -576,8 +585,8 @@ The rule engine used for Jona and the other Assistants implements support for a 
 Forward chaining rules (aka Productions) look like this:
 
 	{All: [?Pitstop.Plan], [?Tyre.Pressure.Target.FL]} =>
-		(Set: Pitstop.Planned.Tyre.Pressure.FL, ?Tyre.Pressure.Target.FL),
-		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment, !Tyre.Pressure.Target.FL.Increment)
+		(Set: Pitstop.Planned.Tyre.Pressure.FL = ?Tyre.Pressure.Target.FL),
+		(Set: Pitstop.Planned.Tyre.Pressure.FL.Increment = !Tyre.Pressure.Target.FL.Increment)
 
 This rule, for example, is triggered, when a new pitstop plan had been requested (*[?Pitstop.Plan]*) and when at the same time a target pressure for the front left tyre had been derived (typically by another rule). The rule above then *fires* and thereby copies this information to the pitstop plan.
 

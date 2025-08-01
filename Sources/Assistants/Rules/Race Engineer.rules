@@ -85,7 +85,7 @@ priority: -20, [?Update] => (Clear: Update)
 
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap))
 
-updateFuelTarget(?lap) <= lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
+updateFuelTarget(?lap) <= lapAvgFuelConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
 						  remainingSessionLaps(?lap, ?sessionLaps), postRaceLaps(?postRaceLaps),
 						  ?remainingLaps = ?sessionLaps + ?postRaceLaps,
 						  ?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel, false),
@@ -460,15 +460,16 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 
 priority: -20, {Any: [?Lap], [?Damage.Update.Bodywork], [?Damage.Update.Suspension], [?Damage.Update.Engine]} => (Prove: updatePitstopTargetTime())
 
-updatePitstopTargetTime() <= bound?(!Fuel.Amount.Target), bound?(!Tyre.Compound.Target), !, computeTargetDamages(?damages),
-							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, ?damages,
+updatePitstopTargetTime() <= bound?(!Fuel.Amount.Target), bound?(!Tyre.Compound.Target), bound?(!Brake.Change.Target), !,
+							 computeTargetDamages(?damages),
+							 pitstopDeltaTime(!Lap, !Fuel.Amount.Target, !Tyre.Compound.Target, !Brake.Change.Target, ?damages,
 											  ?targetServiceTime, ?targetRepairTime, ?pitlaneDelta),
 							 ?targetTime = ?targetServiceTime + ?targetRepairTime,
 							 Set(Target.Time.Box, ?targetTime), Set(Target.Time.Pitlane, ?pitlaneDelta), 
 							 Set(Target.Time.Service, ?targetServiceTime), Set(Target.Time.Repairs, ?targetRepairTime)
 
 updatePitstopTargetTime() <= computeTargetDamages(?damages),
-							 pitstopDeltaTime(!Lap, 0, Dry, ?damages, ?, ?targetRepairTime, ?),
+							 pitstopDeltaTime(!Lap, 0, Dry, false, ?damages, ?, ?targetRepairTime, ?),
 							 Set(Target.Time.Repairs, ?targetRepairTime)
 
 computeTargetDamages(?damages) <= computeDamages([true, true, true], [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
@@ -772,25 +773,32 @@ brakeWearWarning(?lap, ?brake, ?wear) <= Call(brakeWearWarning, ?brake, ?wear)
 priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
 
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+updateRemainingLaps(?lap) <= Clear(Lap.Remaining.Energy), remainingStintLaps(?lap, Energy, ?energyLaps), Set(Lap.Remaining.Energy, ?energyLaps)
 updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
 updateRemainingLaps(?lap) <= remainingSessionLaps(?lap, ?sessionLaps), Set(Lap.Remaining.Session, ?sessionLaps)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Energy, Set(Lap.Remaining.Stint, !Lap.Remaining.Energy)
 updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
 
-priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Remaining.Fuel < ?Lap.Remaining.Session]},
-					 [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning], [?Lap.Remaining.Session > 0]} =>
-		(Prove: lowFuelWarning(!Lap, !Lap.Remaining.Fuel))
+priority: -50, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Session], [?Lap.Remaining.Energy < ?Lap.Remaining.Session]},
+					 {Any: [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning],
+						   [?Lap.Remaining.Energy <= ?Session.Settings.Lap.PitstopWarning]},
+					 [?Lap.Remaining.Session > 0]} =>
+		(Prove: lowFuelWarning(!Lap))
 
-lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
+lowFuelWarning(?lap) <= recentPitstopLap(?lap), !, fail
+lowFuelWarning(?lap) <= !Lap.Remaining.Fuel > !Lap.Remaining.Energy,
+						floor(!Lap.Remaining.Energy, ?remainingLaps), !, lowEnergyWarning(?lap, ?remainingLaps)
+lowFuelWarning(?lap) <= floor(!Lap.Remaining.Fuel, ?remainingLaps), lowFuelWarning(!Lap, ?remainingLaps)
+
 lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(raiseEvent, FuelLow, ?remainingFuel, ?remainingLaps), !
 lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(lowFuelWarning, ?remainingFuel, ?remainingLaps)
 
-priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
-					[?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: 20, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
-					[?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+lowEnergyWarning(?lap, ?remainingLaps) <= lapRemainingEnergy(?lap, ?remainingEnergy), Call(raiseEvent, EnergyLow, ?remainingEnergy, ?remainingLaps), !
+lowEnergyWarning(?lap, ?remainingLaps) <= lapRemainingEnergy(?lap, ?remainingEnergy), Call(lowEnergyWarning, ?remainingEnergy, ?remainingLaps)
+
+priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1210,8 +1218,8 @@ priority: -5, {All: [?Pitstop.Plan],
 priority: -5, [?Pitstop.Plan] => (Prove: updatePitstopTime())
 
 updatePitstopTime() <= computePitstopDamages(?damages),
-					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound, ?damages,
-											  ?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
+					   pitstopDeltaTime(!Lap, !Pitstop.Planned.Fuel, !Pitstop.Planned.Tyre.Compound,
+											  !Pitstop.Planned.Brake.Change, ?damages, ?pitstopServiceTime, ?pitstopRepairTime, ?pitlaneDelta),
 					   ?pitstopTime = ?pitstopServiceTime + ?pitstopRepairTime,
 					   Set(Pitstop.Planned.Time.Box, ?pitstopTime), Set(Pitstop.Planned.Time.Pitlane, ?pitlaneDelta), 
 					   Set(Pitstop.Planned.Time.Service, ?pitstopServiceTime), Set(Pitstop.Planned.Time.Repairs, ?pitstopRepairTime)
@@ -1232,7 +1240,8 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.FL), (Clear: Pitstop.Plan.Tyre.Pressure.FR),
 								  (Clear: Pitstop.Plan.Tyre.Pressure.RL), (Clear: Pitstop.Plan.Tyre.Pressure.RR),
 								  (Clear: Pitstop.Plan.Repair.Bodywork), (Clear: Pitstop.Plan.Repair.Suspension),
-								  (Clear: Pitstop.Plan.Repair.Engine), (Clear: Pitstop.Plan.Driver.Request)
+								  (Clear: Pitstop.Plan.Repair.Engine),
+								  (Clear: Pitstop.Plan.Brake.Change), (Clear: Pitstop.Plan.Driver.Request)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -555,7 +555,7 @@ viewNews(fileName, title := false, readCallback := false) {
 		return
 	}
 	else if newsGui
-		throw "Multiple active news viewer not supported in viewNews..."
+		viewNews(false)
 
 	SplitPath(fileName, , &directory)
 
@@ -606,6 +606,112 @@ viewNews(fileName, title := false, readCallback := false) {
 	}
 }
 
+updateNews(availableNews := false, news := false) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+
+	if !availableNews {
+		if FileExist(kConfigDirectory . "NEWS")
+			availableNews := readMultiMap(kConfigDirectory . "NEWS")
+		else {
+			deleteFile(kTempDirectory . "NEWS.ini")
+
+			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
+							  , "http://" . MASTER . "/News/NEWS"
+							  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
+				try
+					Download(url, kTempDirectory . "NEWS.ini")
+
+				if FileExist(kTempDirectory . "NEWS.ini") {
+					availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
+
+					break
+				}
+			}
+
+			if !availableNews
+				return
+		}
+	}
+
+	if !news
+		news := readMultiMap(kUserConfigDirectory . "NEWS")
+
+	if !getMultiMapValue(news, "General", "Version", false) {
+		setMultiMapValues(news, "Visited", getMultiMapValues(news, "News"))
+		removeMultiMapValues(news, "News")
+
+		setMultiMapValue(news, "General", "Version", "1.0")
+	}
+
+	loop {
+		if !getMultiMapValue(availableNews, "Names", A_Index, false)
+			break
+
+		setMultiMapValue(news, "News", getMultiMapValue(availableNews, "Names", A_Index)
+							 , A_Index . "|" . getMultiMapValue(availableNews, "News", A_Index))
+	}
+
+	writeMultiMap(kUserConfigDirectory . "NEWS", news)
+}
+
+showNews() {
+	local news := readMultiMap(kUserConfigDirectory . "NEWS")
+	local newsMenu := Menu()
+	local name, urls
+
+	showNews(nr, urls, *) {
+		if loadNews(urls)
+			viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+				setMultiMapValue(news, "Visited", nr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
+
+				updateNews(false, news)
+			})
+	}
+
+	for name, urls in getMultiMapValues(news, "News") {
+		urls := string2Values("|", urls, 2)
+
+		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], urls[2]))
+	}
+
+	newsMenu.Add()
+	newsMenu.Add(translate("Cancel"), (*) => true)
+
+	newsMenu.Show( , , true)
+}
+
+loadNews(urls) {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
+	local ignore, url
+
+	deleteFile(A_Temp . "\News.zip")
+
+	for ignore, url in string2Values(";", urls)
+		try {
+			Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
+
+			try {
+				if InStr(FileExist(kTempDirectory . "News"), "F")
+					deleteFile(kTempDirectory . "News")
+
+				if InStr(FileExist(kTempDirectory . "News"), "D")
+					deleteDirectory(kTempDirectory . "News")
+			}
+
+			DirCreate(kTempDirectory . "News")
+
+			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+
+			if FileExist(kTempDirectory . "News\News.htm")
+				return true
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+	return false
+}
+
 checkForNews() {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
@@ -628,7 +734,8 @@ checkForNews() {
 			else {
 				check := false
 
-				for ignore, url in ["https://" . MASTER . ":801/api/public/dl/jipSYNLz"
+				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
+								  , "http://" . MASTER . "/News/NEWS"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
 					try
 						Download(url, kTempDirectory . "NEWS.ini")
@@ -658,24 +765,37 @@ checkForNews() {
 				if isNumber(nr) {
 					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-					if InStr(rule, "Timed") {
-						rule := string2Values(":", rule)
+					if (InStr(rule, "Welcome") && !getMultiMapValue(news, "Visited", nr, false)) {
+						newsNr := nr
+						newsUrls := url
 
-						if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
-						 && !getMultiMapValue(news, "News", nr, false)) {
-							newsNr := nr
-							newsUrls := url
-
-							break
-						}
+						break
 					}
 				}
+
+			if !newsNr
+				for nr, url in getMultiMapValues(availableNews, "News")
+					if isNumber(nr) {
+						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
+
+						if InStr(rule, "Timed") {
+							rule := string2Values(":", rule)
+
+							if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+							 && !getMultiMapValue(news, "Visited", nr, false)) {
+								newsNr := nr
+								newsUrls := url
+
+								break
+							}
+						}
+					}
 
 			if !newsNr
 				for nr, url in getMultiMapValues(availableNews, "News") {
 					rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-					if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "News", nr, false)) {
+					if (isNumber(nr) && !InStr(rule, "Timed") && !getMultiMapValue(news, "Visited", nr, false)) {
 						newsNr := nr
 						newsUrls := url
 
@@ -688,7 +808,7 @@ checkForNews() {
 
 				for nr, url in getMultiMapValues(availableNews, "News")
 					if isNumber(nr) {
-						shown := getMultiMapValue(news, "News", nr, false)
+						shown := getMultiMapValue(news, "Visited", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
 						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
@@ -703,41 +823,15 @@ checkForNews() {
 				}
 			}
 
-			if (newsNr && !SimulatorStartup.Instance) {
-				deleteFile(A_Temp . "\News.zip")
+			if (newsNr && !SimulatorStartup.Instance)
+				if loadNews(newsUrls)
+					viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+						setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
-				for ignore, url in string2Values(";", newsUrls)
-					try {
-						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
-
-						try {
-							if InStr(FileExist(kTempDirectory . "News"), "F")
-								deleteFile(kTempDirectory . "News")
-
-							if InStr(FileExist(kTempDirectory . "News"), "D")
-								deleteDirectory(kTempDirectory . "News")
-						}
-
-						DirCreate(kTempDirectory . "News")
-
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
-
-						if FileExist(kTempDirectory . "News\News.htm") {
-							viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
-								setMultiMapValue(news, "News", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
-
-								writeMultiMap(kUserConfigDirectory . "NEWS", news)
-							})
-
-							break
-						}
-						else
-							writeMultiMap(kUserConfigDirectory . "NEWS", news)
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-			}
+						updateNews(availableNews, news)
+					})
+				else
+					updateNews(availableNews, news)
 		}, 10000)
 	}
 }
@@ -752,7 +846,8 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, theApplication, startupConfig, x, y, infoButton, profileButton, settingsButton
+	local ignore, theApplication, startupConfig, x, y
+	local infoButton, profileButton, settingsButton, docsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
@@ -1063,8 +1158,10 @@ launchPad(command := false, arguments*) {
 	else if (command = "Launch") {
 		theApplication := arguments[1]
 
-		if ProcessExist(theApplication)
-			WinActivate("ahk_exe " . theApplication)
+		if ProcessExist(theApplication) {
+			try
+				WinActivate("ahk_exe " . theApplication)
+		}
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], theApplication)
@@ -1210,7 +1307,11 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		infoButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
+		docsButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
+		docsButton.OnEvent("Click", (*) => (GetKeyState("Ctrl") ? showNews() : Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview")))
+		setButtonIcon(docsButton, kIconsDirectory . "Book.ico", 1)
+
+		infoButton := launchPadGui.Add("Button", "xp+24 yp w23 h23")
 		infoButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits"))
 		setButtonIcon(infoButton, kIconsDirectory . "Team.ico", 1)
 
@@ -3188,6 +3289,10 @@ startSimulator() {
 		if !noLaunch {
 			if kLogStartup
 				logMessage(kLogOff, "Checking for news...")
+
+			if (!FileExist(kUserConfigDirectory . "NEWS")
+			 || (getMultiMapValues(readMultiMap(kUserConfigDirectory . "NEWS"), "Visited").Count = 0))
+				updateNews()
 
 			checkForNews()
 		}

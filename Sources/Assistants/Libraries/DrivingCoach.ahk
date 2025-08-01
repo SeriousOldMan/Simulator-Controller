@@ -1637,7 +1637,9 @@ class DrivingCoach extends GridRaceAssistant {
 		if !prepared {
 			if formationLap {
 				this.updateDynamicValues({KnowledgeBase: false
-										, OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+										, OverallTime: 0, BestLapTime: 0
+										, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+										, EnoughData: false})
 				this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false, Laps: Map(), Standings: []})
 			}
 
@@ -1698,8 +1700,9 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateConfigurationValues({LearningLaps: 1, AdjustLapTime: true, SaveSettings: false})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0
-								, InitialFuelAmount: 0, EnoughData: false})
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 
 		this.updateSessionValues({Standings: [], Laps: Map()})
 
@@ -1983,11 +1986,11 @@ class DrivingCoach extends GridRaceAssistant {
 										if conjunction
 											conjunction := speaker.Fragments[conjunction]
 										else if !lastHint
-											conjunction := ""
+											conjunction := A_Space
 										else
-											conjunction := ". "
+											conjunction := translate(". ")
 
-										conclusion := ((index = instructionHints.Length) ? "." : "")
+										conclusion := ((index = instructionHints.Length) ? translate(".") : "")
 
 										speaker.speakPhrase(hint, {conjunction: conjunction, conclusion: conclusion})
 

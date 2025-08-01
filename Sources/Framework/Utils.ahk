@@ -549,49 +549,25 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 		return false
 	}
 
-	writeMultiMap(configurationFile, configuration)
+	if (configuration.Count > 0) {
+		writeMultiMap(configurationFile, configuration)
 
-	if !isDebug()
-		OnExit(deleteConfiguration)
+		if !isDebug()
+			OnExit(deleteConfiguration)
 
-	Run(kBinariesDirectory . "Voice Server.exe -Debug true -Configuration `"" . configurationFile . "`"")
+		Run(kBinariesDirectory . "Voice Server.exe -Debug true -Configuration `"" . configurationFile . "`"")
 
-	Sleep(2000)
+		Sleep(2000)
 
-	language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
 
-	for ignore, assistant in assistants {
-		thePlugin := Plugin(assistant, configuration)
+		for ignore, assistant in assistants {
+			thePlugin := Plugin(assistant, configuration)
 
-		if thePlugin.Active {
-			options := ""
+			if thePlugin.Active {
+				options := ""
 
-			for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
-				found := false
-
-				if thePlugin.hasArgument(parameter) {
-					value := thePlugin.getArgumentValue(parameter)
-
-					found := true
-				}
-				else if thePlugin.hasArgument("raceAssistant" . parameter) {
-					value := thePlugin.getArgumentValue("raceAssistant" . parameter)
-
-					found := true
-				}
-
-				if found {
-					if ((value = "On") || (value = kTrue))
-						value := true
-					else if ((value = "Off") || (value = kFalse))
-						value := false
-
-					options .= (" -" . parameter . " `"" . value . "`"")
-				}
-			}
-
-			if booster
-				for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+				for ignore, parameter in ["Name", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"] {
 					found := false
 
 					if thePlugin.hasArgument(parameter) {
@@ -615,7 +591,33 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 					}
 				}
 
-			Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
+				if booster
+					for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+						found := false
+
+						if thePlugin.hasArgument(parameter) {
+							value := thePlugin.getArgumentValue(parameter)
+
+							found := true
+						}
+						else if thePlugin.hasArgument("raceAssistant" . parameter) {
+							value := thePlugin.getArgumentValue("raceAssistant" . parameter)
+
+							found := true
+						}
+
+						if found {
+							if ((value = "On") || (value = kTrue))
+								value := true
+							else if ((value = "Off") || (value = kFalse))
+								value := false
+
+							options .= (" -" . parameter . " `"" . value . "`"")
+						}
+					}
+
+				Run(kBinariesDirectory . assistant . ".exe -Logo true -Debug true -Configuration `"" . configurationFile . "`"" . options)
+			}
 		}
 	}
 }

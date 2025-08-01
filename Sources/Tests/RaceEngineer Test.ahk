@@ -67,9 +67,10 @@ class UnknownProvider extends SimulatorProvider {
 		}
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "All"
+		brakeService := true
 		repairService := ["Bodywork", "Suspension", "Engine"]
 
 		return true
@@ -1025,12 +1026,12 @@ class PitstopHandling extends Assert {
 				if (A_Index = 3) {
 					engineer.planPitstop()
 
-					if engineer.Debug[kDebugKnowledgeBase]
+					; if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					engineer.preparePitstop()
 
-					if engineer.Debug[kDebugKnowledgeBase]
+					; if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 

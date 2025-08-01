@@ -491,13 +491,21 @@ class BasicStepWizard extends StepWizard {
 		if !this.SetupWizard.Initialize
 			page := 2
 
-		if (page = 2) {
-			this.updateSelectedSimulators()
-
-			this.saveSetup()
-		}
-
 		return super.hidePage(page)
+	}
+
+	savePage(page) {
+		if super.savePage(page) {
+			if (page = 2) {
+				this.updateSelectedSimulators()
+
+				this.saveSetup()
+			}
+
+			return true
+		}
+		else
+			return false
 	}
 
 	updateState() {
@@ -523,6 +531,10 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	testPushToTalk() {
+		this.updateSelectedSimulators()
+
+		this.saveSetup()
+
 		testAssistants(this.SetupWizard, , GetKeyState("Ctrl"))
 	}
 
@@ -1309,7 +1321,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										, [editorGui["basicAzureTokenIssuerLabel"], editorGui["basicAzureTokenIssuerEdit"]]
 										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
 
-		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("API Key"))
+		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Service Key"))
 		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
 		widget20.OnEvent("Change", updateGoogleVoices)
 

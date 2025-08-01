@@ -2113,11 +2113,11 @@ class SectionInfoViewer {
 		}
 
 		unitCell(name, unit) {
-			local value := (convertUnit(unit, nullRound(section.%name%)) . A_Space . getUnit(unit))
+			local value := (convertUnit(unit, nullRound(section.%name%)) . A_Space . getUnit(unit, true))
 			local referenceValue
 
 			if referenceSection {
-				referenceValue := (convertUnit(unit, nullRound(referenceSection.%name%)) . A_Space . getUnit(unit))
+				referenceValue := (convertUnit(unit, nullRound(referenceSection.%name%)) . A_Space . getUnit(unit, true))
 
 				return ("<td class=`"td-std td-left`">" . value . "</td><td class=`"td-std td-left`">" . referenceValue . "</td>")
 			}
@@ -2146,11 +2146,11 @@ class SectionInfoViewer {
 		}
 
 		startCell(name) {
-			local value := (convertUnit("Length", Round(section.Start[name], 1)) . A_Space . getUnit("Length"))
+			local value := (convertUnit("Length", Round(section.Start[name], 1)) . A_Space . getUnit("Length", true))
 			local referenceValue
 
 			if referenceSection {
-				referenceValue := (convertUnit("Length", referenceSection.Start[name]) . A_Space . getUnit("Length"))
+				referenceValue := (convertUnit("Length", referenceSection.Start[name]) . A_Space . getUnit("Length", true))
 
 				return ("<td class=`"td-std td-left`">" . value . "</td><td class=`"td-std td-left`">" . referenceValue . "</td>")
 			}
@@ -2159,11 +2159,11 @@ class SectionInfoViewer {
 		}
 
 		unitFieldCell(name, field, unit, precision := 1) {
-			local value := (convertUnit(unit, nullRound(section.%name%[field], precision)) . A_Space . getUnit(unit))
+			local value := (convertUnit(unit, nullRound(section.%name%[field], precision)) . A_Space . getUnit(unit, true))
 			local referenceValue
 
 			if referenceSection {
-				referenceValue := (convertUnit(unit, nullRound(referenceSection.%name%[field], precision)) . A_Space . getUnit(unit))
+				referenceValue := (convertUnit(unit, nullRound(referenceSection.%name%[field], precision)) . A_Space . getUnit(unit, true))
 
 				return ("<td class=`"td-std td-left`">" . value . "</td><td class=`"td-std td-left`">" . referenceValue . "</td>")
 			}

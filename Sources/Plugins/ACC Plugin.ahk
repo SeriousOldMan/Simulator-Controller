@@ -198,7 +198,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if !ACCPlugin.kUnknown
 			ACCPlugin.kUnknown := translate("Unknown")
 
-		super.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration, false)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iPitstopMode := this.findMode(kPitstopMode)
@@ -1661,6 +1661,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						return (inList(this.iPSOptions, "Tyre Set") ? ["Dry", "Black"] : ["Wet", "Black"])
 					else
 						return [false, false]
+				case "Brake Change":
+					return [this.iPSChangeBrakes]
 				case "Repair Suspension":
 					return [this.iRepairSuspensionChosen]
 				case "Repair Bodywork":
@@ -1747,6 +1749,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 												   , "Service.Driver.Previous", currentDriver
 												   , "Service.Driver.Next", pitstopState["newDriverNameToDisplay"]
 												   , "Service.Refuel", pitstopState["fuelToAdd"]
+												   , "Service.Brake.Change", pitstopState["changeBrakeDiscs"]
 												   , "Service.Bodywork.Repair", (pitstopState["repairBody"] ? true : false)
 												   , "Service.Suspension.Repair", (pitstopState["repairSuspension"] ? true : false)
 												   , "Service.Engine.Repair", (pitstopState["repairEngine"] ? true : false))

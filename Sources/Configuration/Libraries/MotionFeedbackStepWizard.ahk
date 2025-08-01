@@ -287,45 +287,45 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 	}
 
-	hidePage(page) {
+	savePage(page) {
 		local wizard := this.SetupWizard
 		local function, action, msgResult, ignore, motionIntensityField, effectSelectorField, effectIntensityField
 
-		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
-							  , translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+		if super.savePage(page) {
+			if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
+								  , translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "No")
-				return false
-		}
+				if (msgResult = "No")
+					return false
+			}
 
-		function := this.getActionFunction(false, "Motion")
+			function := this.getActionFunction(false, "Motion")
 
-		if !function {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			if !function {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "No")
-				return false
-		}
+				if (msgResult = "No")
+					return false
+			}
 
-		motionIntensityField := this.Control["motionIntensityField"].Text
-		effectSelectorField := this.Control["effectSelectorField"].Text
-		effectIntensityField := this.Control["effectIntensityField"].Text
+			motionIntensityField := this.Control["motionIntensityField"].Text
+			effectSelectorField := this.Control["effectSelectorField"].Text
+			effectIntensityField := this.Control["effectIntensityField"].Text
 
-		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "No")
-				return false
-		}
+				if (msgResult = "No")
+					return false
+			}
 
-		if super.hidePage(page) {
 			wizard := this.SetupWizard
 
 			if (motionIntensityField != "")

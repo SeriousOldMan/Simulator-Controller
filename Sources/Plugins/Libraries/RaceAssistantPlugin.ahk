@@ -769,7 +769,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local openSoloCenter, openTeamCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first, index
 
-		super.__New(controller, name, configuration, register)
+		super.__New(controller, name, configuration, false)
 
 		RaceAssistantPlugin.sCollectData.Default := true
 
@@ -937,7 +937,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			deleteDirectory(kTempDirectory . "Race Assistant")
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 
 			registerMessageHandler(this.Plugin, methodMessageHandler, this)
 
@@ -957,7 +958,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.sReplayDirectory := false
 
 			RaceAssistantPlugin.sCollectorTask
-				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
+				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 20000, kHighPriority)
 
 			RaceAssistantPlugin.CollectorTask.start()
 		}
@@ -1264,6 +1265,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return RaceAssistantPlugin.Settings[key]
 		else
 			return (RaceAssistantPlugin.Settings[key] := assistant.prepareSettings(data))
+	}
+
+	static prepareAssistantsSimulation(data) {
+		RaceAssistantPlugin.Simulator.prepareSimulation(data)
+
+		do(RaceAssistantPlugin.Assistants, (a) => a.prepareSimulation(data))
 	}
 
 	static prepareAssistantsSession(data, count) {
@@ -1727,7 +1734,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {
@@ -2023,6 +2031,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return settings
 	}
 
+	prepareSimulation(data) {
+		if this.Simulator
+			this.Simulator.prepareSimulation(data)
+	}
+
 	prepareSession(settings, data) {
 		local dataFile, settingsFile, ignore
 
@@ -2121,7 +2134,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	performPitstop(lapNumber, options) {
 		local data, dataFile, ignore, key, value
 
-
 		if this.RaceAssistant {
 			dataFile := temporaryFileName(this.Plugin, "pitstop")
 
@@ -2130,7 +2142,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Compound Front", "Tyre Compound Rear"
 							  , "Tyre Compound Front Left", "Tyre Compound Front Right"
 							  , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
-							  , "Tyre Set", "Tyre Pressures"
+							  , "Tyre Set", "Tyre Pressures", "Change Brakes"
 							  , "Repair Suspension", "Repair Bodywork", "Repair Engine"]
 				if options.Has(key) {
 					value := options[key]
@@ -2486,8 +2498,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				splitTime := A_TickCount
 			}
 
-			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0) && (dataLastLap == 1))
-				prepareSessionDatabase(data)
+			if RaceAssistantPlugin.runningSession(data) {
+				if ((lastLap == 0) && (dataLastLap == 1))
+					prepareSessionDatabase(data)
+
+				if (getMultiMapValue(data, "Session Data", "Paused", false) && ((lastLap == 0) && (dataLastLap == 0)))
+					if (getMultiMapValue(data, "Session Data", "Car", false)
+					 && getMultiMapValue(data, "Session Data", "Track", false))
+					RaceAssistantPlugin.prepareAssistantsSimulation(data)
+			}
+			else if (getMultiMapValue(data, "Session Data", "Car", false)
+				  && getMultiMapValue(data, "Session Data", "Track", false))
+				RaceAssistantPlugin.prepareAssistantsSimulation(data)
 
 			if (false && isDebug()) {
 				testData := getMultiMapValues(data, "Test Data")

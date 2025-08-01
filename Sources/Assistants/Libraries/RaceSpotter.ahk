@@ -931,20 +931,13 @@ class RaceSpotter extends GridRaceAssistant {
 			speakPhrase(phrase, arguments*) {
 				local assistant := this.VoiceManager.RaceAssistant
 
+				if this.Awaitable
+					this.wait()
+
 				if assistant.skipAlert(phrase) {
 					assistant.cleanupAlerts(phrase)
 
 					return
-				}
-
-				if this.Awaitable {
-					this.wait()
-
-					if assistant.skipAlert(phrase) {
-						assistant.cleanupAlerts(phrase)
-
-						return
-					}
 				}
 
 				super.speakPhrase(phrase, arguments*)
@@ -1787,7 +1780,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (!this.SessionInfos.Has("BestSpeed") || (lastTopSpeed > this.SessionInfos["BestSpeed"])) {
 				if (enoughData && (lastLap > (this.BaseLap + 2))) {
-					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed")})
+					speaker.speakPhrase("BestSpeed", {speed: speaker.number2Speech(lastTopSpeed), unit: getUnit("Speed", true)})
 
 					this.SessionInfos["BestSpeed"] := lastTopSpeed
 
@@ -2450,7 +2443,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	informSectorDifference(otherCar, mode) {
-		local speaker := this.getSpeaker(true)
+		local speaker := this.getSpeaker()
 		local sectors := string2Values(",", speaker.Fragments["Sectors"])
 		local driverCar := this.DriverCar
 		local betterSectors := []
@@ -2484,7 +2477,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker := this.getSpeaker(true)
+		local speaker := this.getSpeaker()
 		local spoken := false
 		local informed := false
 		local standingsAhead := false
@@ -3025,6 +3018,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	skipAlert(alert) {
+		static nextCarBehind := 0
+
 		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
 							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
@@ -3042,8 +3037,17 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (InStr(alert, "Clear") && this.pendingAlerts(["Left", "Right", "Three", "Side", "ClearAll"]))
 				return true
-			else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
-				return true
+			else if InStr(alert, "Behind") {
+				if this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true)
+					return true
+				else if (A_TickCount < nextCarBehind)
+					return true
+				else {
+					nextCarBehind := (A_TickCount + 5000)
+
+					return false
+				}
+			}
 			else if (InStr(alert, "Yellow") && this.pendingAlert("Yellow", true))
 				return true
 
@@ -3174,18 +3178,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	accidentAlert(type, arguments*) {
 		local distance := false
-		local speaker
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
-				speaker := this.getSpeaker(true)
-
 				if ((arguments.Length > 0) && (type = "Ahead")) {
 					distance := (Round(arguments[1] / 50) * 50)
 
 					if (distance > 0)
 						this.pushAlert("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																	  , unit: speaker.Fragments[getUnit("Length")]})
+																	  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]})
 				}
 				else
 					this.pushAlert("Accident" . type, false, false, "Accident" . type)
@@ -3553,7 +3554,8 @@ class RaceSpotter extends GridRaceAssistant {
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0
+								, BestLapTime: 0, OverallTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
 		this.initializeHistory()
@@ -3597,7 +3599,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
 		}
 
-		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0, LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
+								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
+								, EnoughData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 

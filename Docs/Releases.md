@@ -1,5 +1,180 @@
 # Latest stable release
 
+## 6.4.3.0
+
+#### Date: 08/01/25
+
+#### Fixes
+
+  - Fixed a critical bug for team races, where all pitstop setups by the "Team Center" after the first one failed.
+  - Increased resilience against incomplete driver data returned by the *Le Mans Ultimate* API.
+  - Fixed handling of fractional numbers with "." or "," in voice commands. This had been broken since a couple releases.
+  - Fixed translation of Driving Coach on-track instructions in Restricted mode for Japanese and Chinese.
+  - Fixed several translations for the announcement of the front right tyre wear by the Race Assistent.
+  
+#### Changes
+
+  - Combining the activation of an Assistant and the first command into one phrase like in "Jona, can you plan a pitstop?" is now supported for all voice recognition engines, which are not built into Windows itself. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#combining-activation-and-command) for more information.
+  - Values like fuel amount, tyre pressures, and so on are now passed in localized units to an LLM for coneration purposes.
+  - Additional information about car damage is passed to an LLM for conversation and reasoning.
+  - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
+  - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
+  - [Internal] Reorganized master download repository (once again).
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 6.4.2.0
+
+#### Date: 07/25/25
+
+#### Fixes
+
+  - Fixed handling of optional voice recognition libraries in "Simulator Setup". The recently added languages had been set to required by mistake.
+  - Fixed several UI translation errors.
+  - Fixed Japanase translation codings for the grammar files. This error prevented the Spotter from working.
+  - Fixed display of *Brake Balance* and other *inverse* settings for the Setup Editor in the "Setup Workbench" for *Le Mans Ultimate* and *rFactor 2*.
+  - Fixed setup merge calculation in the setup comparison tool of the "Setup Workbench" for *inverse* settings.
+  - Fixed ABS setting in "Setup Workbench" for many cars in *Le Mans Ultimate*.
+  - Workaround for a critical bug introduced in the API of *Le Mans Ultimate* by version 1.0. This bug causes the tyre compound choice during pitstop preparation to malfunction, if the same tyre compound is chosen for all tyres (which is quite common, of course).
+  
+#### Changes
+
+  - Multiple successive car behind alerts are no longer given by the Spotter.
+  - Further optimization of the session startup process for *Le Mans Ultimate*.
+  - Tweaked the priority of the different Spotter phrases a bit to get more up 2 date proximity alerts.
+  - [Important] Updated the weather information retrieval for *Le Mans Ultimate* to work around a bug in the API of the game. Unfortunately the information now does not reflect the **current** weather precisely anymore.
+  - [Important] The voice recognition system of Simulator Controller is using a special recognizer for the activation phrases. In the past, this recognizer was running the "Windows (Desktop)" recognizer engine as default. This can be changed using the "Activation Recognizer" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings). From now on, the default for this activation recognizer is to use the recognition engine, which has been configured in general. If you want to change it back to the previous setting, add the corresponding value in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - Aston Martin Valkyrie
+      - Mercedes-AMG LMGT3
+	  - McLaren 720s LMGT3 Evo (fixed)
+
+## 6.4.1.0
+
+#### Date: 07/18/25
+
+#### Fixes
+
+  - The installer for the Chinese voice recognition in "Simulator Setup" has been fixed/updated.
+  - Chinese and Japanese languages are now available as UI language in "Simulator Setup".
+  - A couple of missing translations have been added for all languages.
+  
+#### Changes
+
+  - The startup sequence of a session in *Le Mans Ultimate* has been changed, so that most of the required data is loaded, before the car gets rolling. This will reduce the number of frame rate drops at session begin to a minimum.
+  - And we have another translation. Thanks to the great effort of @PAL2000, we can introduce a full translation for the Japanese language as well.
+    - The user interface of all applications has been fully translated.
+    - Support for voice interaction with the Assistants using Japanese language output and recognition is included.
+    - An installer for Japanese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended.
+  - Command reference sheets have been added to the documentation for Chinese and Japanese.
+  - A new button in "Simulator Startup" allows you to [open the documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#accessing-documentation) for Simulator Controller in a browser or, if the Control key is held down, lets you access all available news articles, even those that already have been marked as read.
+  - Added several new articles in the tips & tricks section this week.
+  
+## 6.4.0.0
+
+#### Date: 07/11/25
+
+#### Fixes
+
+  - Fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. See [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638) of last release for information how to handle wrong database entries.
+  - Fixed an additional rare bug for *Le Mans Ultimate*, which caused instabilities when reading session data, while the session has not been fully initialized yet.
+  - Fixed a couple of translation errors for the Italian language in "Simulator Setup".
+  - Fixed the availability of voice recognition libraries for Portuguese in "Simulator Setup".
+  
+#### Changes
+
+  - Thanks to the marvelous work of @rysimabd, we have a full translation for the Chinese language.
+    - The user interface of all applications has been fully translated.
+    - Support for voice interaction with the Assistants using Chinese language output and recognition is included.
+    - An installer for Chinese voice recognition libraries is provided, but in general the use of Azure, Google or Whisper is recommended. Especially Whisper works very well.
+  - Additional preparation for driver swaps in LMU. Still not tested yet.
+  - The selected report category is now remembered for both "Team Center" and "Solo Center".
+  - [Important] When starting "Team Center", the connection settings for the Team Server will be taken from the active Startup Profile, even if the "Team Center" has been started manually. The behaviour will be the same as before in almost all cases. Only if you have an invalid Team Server connection configuration in the currently active Startup Profile, you will encounter problems.
+  
+## 6.3.9.1
+
+#### Date: 07/06/25
+
+#### Fixes
+
+  - Fixed a rare crash when joining an online lobby in *Le Mans Ultimate* with activated practice session while Simulator Controller is already running.
+
+## 6.3.9.0
+
+#### Date: 07/04/25
+
+#### Fixes
+
+  - (Partly) fixed handling of car model, car class and team name in *Le Mans Ultimate*, when a server for a solo race is configured to handle custom liveries **and** a custom livery is selected. This could lead to wrong entries in the session database. See also the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you want to remove the wrong entries.
+  
+    There are still cases, where this happens. I am working on it.
+  - Brake pad wear is now reported differently - possibly more correct - for *Le Mans Ultimate*.
+  - Fixed suspension repair request by a controller action for *Le Mans Ultimate*.
+  
+#### Changes
+
+  - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
+  - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*
+
+## 6.3.8.0
+
+#### Date: 06/27/25
+
+#### Fixes
+
+  - Fixed multiple bugs in traffic simulation for pitstop prediction.
+  - Fixed a critical bug in "Solo Center", which prevented loading of sessions created in *rFactor 2*.
+
+#### Changes
+
+  - Information about the last pitstop of each opponent is now available in the knowledge that is passed to an LLM for the Strategist.
+  - The default for the large language model of OpenAI has changed to "GPT 4.1 mini". You may want to review your model configuration as well, because "GPT 4o mini" will get deprecated soon.
+  - The Engineer now observes virtual energy consumption in addition to fuel consumption when running *le Mans Ultimate*, and will warn you, if the available virtual energy will be depleted soon.
+    - Information about the available virtual energy and also energy consumption is displayed in the "Fuel" widget in the "System Monitor".
+	- [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+	- A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer, which allows a connected LLM to handle low energy conditions. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new event and the new action, if necessary.
+  - [Expert] The controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can now handle arguments which are then passed to the external application or script.
+  - [Developer] All fuel releated fields in the "Session State.json" file have changed their name to be aligned with the new energy related fields. The old fields are still available for compatibility reasons.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638), especially if you have configured a *Reasoning* booster for the Race Engineer.
+
+## 6.3.7.0
+
+#### Date: 06/20/25
+
+#### Fixes
+
+  - Fixed a critical bug with pitstop history building for the Strategist, which could cause wrong strategy decisions.
+  - Fixed some rare problems with outdated or incomplete configuration information when using the voice recognition test mode in "Simulator Setup".
+  - Fixed a bug in the strategy handling for the Strategist, that prevented using a strategy with restricted tyre sets, if the simulator actually provides no information about tyre sets in the API. Mostly affected iRacing.
+
+#### Changes
+
+  - The Race Engineer now can handle brake pad changes during pitstop.
+    - A brake change will be automatically planned in solo races, if a high brake pad wear had been detected and reported before.
+	- The upcoming change of brake pads will be announced by the Engineer, when he informs about the pitstop plan.
+	- The Engineer will also react to [changes made using the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared (in ACC and Le Mans Ultimate).
+	- Several new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) let you specify, whether the Engineer will provide brake service at all and how long a brake service will take at a pitstop (default is 50 seconds).
+	- Brake pad changes can be controlled from the "Team Center" when [planning a pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop).
+	- Information about executed brake pad changes has been added to various reports in the "Team Center".
+	- Information about planned brake changes are shown on the pitstop information widget in the "System Monitor".
+	- [Developer] Also, the same information is available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - The driver for the next stint can now be selected in *Le Mans Ultimate*, as long as the corresponding setting is available in the Pitstop MFD.
+    - This has not been tested, because no LMU servers with team support are yet available.
+    - Supported in the "Team Center" pitstop planning tab. Make sure that the order of the drivers set in the entry list of the "Team Center" is identical to the order of the drivers as they appear in the in-game Pitstop MFD.
+	- Also supported by using the repective controller action of the ["LMU" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu).
+	- The Engineer recognizes the manual [change of the next driver in the in-game Pitstop MFD settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop), once a pitstop has been prepared.
+  - The selected driver for the next stint will now be shown on the pitstop information widget in the "System Monitor".
+  - [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - [Developer] General expressions, that even can produce side effects, are now allowed in the [conditions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#conditions) and also in the [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) of production rules.
+  
 ## 6.3.6.0
 
 #### Date: 06/13/25
@@ -43,12 +218,6 @@
       - Lexus RC F LMGT3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-636), if you have configured a *Reasoning* booster for the Race Engineer.
-
-# Upcoming release
-
-Not yet planned...
-  
-# Release history
 
 ## 6.3.5.0
 
@@ -1161,7 +1330,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledge base of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   9. Configuration of the Conversation Booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
-  11. Added "GPT-4o" to the list of OpenAI models.
+  11. Added "GPT 4o" to the list of OpenAI models.
   12. The pitstop component on the session info page of "System Monitor" now also displays the relative tyre pressure increment values for the next pitstop.
   13. [Internal] Migrated to AHK 2.0.15.
   14. [Developer] Add information about tyre pressure increment values to the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.

@@ -44,8 +44,8 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	__New(controller, name, simulator, configuration := false) {
-		super.__New(controller, name, simulator, configuration)
+	__New(controller, name, simulator, configuration := false, register := true) {
+		super.__New(controller, name, simulator, configuration, register)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			if !inList(A_Args, "-Replay") {

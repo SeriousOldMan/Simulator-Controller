@@ -206,6 +206,25 @@ class VoiceServer extends ConfigurationItem {
 				super.__New(arguments*)
 			}
 
+			_onTextCallback(text) {
+				local words := this.parseText(&text, false)
+				local target
+
+				if (words.Length > 0) {
+					target := this.VoiceClient.VoiceServer.targetVoiceClient(words[1])
+
+					if target {
+						words.RemoveAt(1)
+
+						target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
+
+						return
+					}
+				}
+
+				super._onTextCallBack(values2String(A_Space, words*))
+			}
+
 			textRecognized(text) {
 				this.VoiceClient.VoiceServer.recognizeText(this.VoiceClient, text)
 			}
@@ -701,8 +720,9 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				if (words.Length = 0)
+				if (words.Length = 0) {
 					messageSend(kFileMessage, "Voice", this.ActivationCallback, this.PID)
+				}
 				else
 					messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
@@ -728,6 +748,25 @@ class VoiceServer extends ConfigurationItem {
 			Get {
 				return "Activation"
 			}
+		}
+
+		_onTextCallback(text) {
+			local words := this.parseText(&text, false)
+			local target
+
+			if (words.Length > 0) {
+				target := VoiceServer.Instance.targetVoiceClient(words[1])
+
+				if target {
+					words.RemoveAt(1)
+
+					target.SpeechRecognizer[true].recognize(values2String(A_Space, words*))
+
+					return
+				}
+			}
+
+			super._onTextCallBack(values2String(A_Space, words*))
 		}
 	}
 
@@ -851,25 +890,28 @@ class VoiceServer extends ConfigurationItem {
 
 	SpeechRecognizer[create := false] {
 		Get {
-			local settings
+			local settings, engine
 
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
 						settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						engine := getMultiMapValue(settings, "Voice", "Activation Recognizer"
+														   , getMultiMapValue(settings, "Voice", "ActivationRecognizer", "*"))
 
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(getMultiMapValue(settings, "Voice", "Activation Recognizer"
-																										, getMultiMapValue(settings, "Voice", "ActivationRecognizer", "Desktop"))
-																					   , true, this.Language, true)
+						if (Trim(engine) = "*")
+							engine := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Recognizer", "Desktop")
+
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine, true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
-							throw "Server speech recognizer engine not installed..."
+							throw "Activation Recognizer engine not installed..."
 					}
 					catch Any as exception {
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
-							throw "Desktop speech recognizer engine not installed..."
+							throw "Activation Recognizer engine not installed..."
 					}
 				}
 				catch Any as exception {
@@ -1034,7 +1076,7 @@ class VoiceServer extends ConfigurationItem {
 
 		try {
 			for ignore, key in this.PushToTalk
-				clicked := (clicked || GetKeyState(key))
+				clicked := (clicked || GetKeyState(key, "P"))
 
 			pressed := (toggle ? down : clicked)
 		}
@@ -1159,14 +1201,33 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	activateVoiceClient(descriptor, words := false) {
+	targetVoiceClient(word) {
+		local candidate := false
+
+		try
+			candidate := this.VoiceClients[word]
+
+		if (candidate && candidate.Listener) {
+			if this.Debug[kDebugRecognitions]
+				showMessage("Activation phrase recognized: " . word)
+
+			if (candidate != this.ActiveVoiceClient)
+				this.activateVoiceClient(word, [], false)
+
+			return candidate
+		}
+
+		return false
+	}
+
+	activateVoiceClient(descriptor, words := false, stop := true) {
 		local activeVoiceClient
 
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
 			this.ActiveVoiceClient.activate(words)
 		else {
 			if this.ActiveVoiceClient
-				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
+				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor, stop)
 
 			if this.VoiceClients.Has(descriptor) {
 				activeVoiceClient := this.VoiceClients[descriptor]
@@ -1178,18 +1239,16 @@ class VoiceServer extends ConfigurationItem {
 				if !this.hasPushToTalk()
 					this.startListening()
 			}
-			else
-				return true
 		}
-
-		return true
 	}
 
-	deactivateVoiceClient(descriptor) {
+	deactivateVoiceClient(descriptor, stop := true) {
 		local activeVoiceClient := this.ActiveVoiceClient
 
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
-			activeVoiceClient.stopListening()
+
+			if stop
+				activeVoiceClient.stopListening()
 
 			this.iActiveVoiceClient := false
 
@@ -1644,7 +1703,7 @@ class VoiceServer extends ConfigurationItem {
 
 	activationCommandRecognized(voiceClient, grammar, words) {
 		if this.Debug[kDebugRecognitions]
-			showMessage("Activation phrase recognized: " . values2String(A_Space, words*))
+			showMessage("Activation phrase recognized: " . ((words.Length > 0) ? values2String(A_Space, words*) : voiceClient.Descriptor))
 
 		this.activateVoiceClient(ConfigurationItem.splitDescriptor(grammar)[1], words)
 	}
@@ -1738,6 +1797,10 @@ startupVoiceServer() {
 			SupportMenu.Check(label)
 
 		registerMessageHandler("Voice", handleVoiceMessage)
+
+		if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						  , "Voice", "Keyboard Hook", false)
+			InstallKeybdHook(true, true)
 
 		startupProcess()
 	}

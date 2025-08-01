@@ -305,54 +305,61 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
-		local buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		local streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
-		local function, streamDeckFunctions, controller, definition, ignore, msgResult
-
 		showSelectorHint(false)
 
 		this.SetupWizard.toggleTriggerDetector("Stop")
 
-		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
-			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-
-			return false
-		}
-
-		streamDeckFunctions := 0
-
-		for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
-			controller := ConfigurationItem.splitDescriptor(controller)
-
-			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
-				for ignore, function in string2Values(";", definition)
-					if (function && (function != ""))
-						streamDeckFunctions += 1
-		}
-
-		if this.iFunctionTriggers
-			if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
-
-				if (msgResult = "No")
-					return false
-			}
-
 		if super.hidePage(page) {
 			this.iControllerEditor.close(true)
-
 			this.iControllerEditor := false
+
+			this.iFunctionTriggers := false
+
+			return true
+		}
+		else
+			return false
+	}
+
+	savePage(page) {
+		local buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		local streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		local function, streamDeckFunctions, controller, definition, ignore, msgResult
+
+		if super.savePage(page) {
+			if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
+				OnMessage(0x44, translateOkButton)
+				withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+
+				return false
+			}
+
+			streamDeckFunctions := 0
+
+			for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
+				controller := ConfigurationItem.splitDescriptor(controller)
+
+				if ((controller[2] != "Layout") && (controller[2] != "Visible"))
+					for ignore, function in string2Values(";", definition)
+						if (function && (function != ""))
+							streamDeckFunctions += 1
+			}
+
+			if this.iFunctionTriggers
+				if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := withBlockedWindows(MsgBox, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
+
+					if (msgResult = "No")
+						return false
+				}
 
 			buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 			streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
-
-			this.iFunctionTriggers := false
 
 			return true
 		}
@@ -1073,28 +1080,33 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	hidePage(page) {
-		local msgResult
-
-		if this.SetupWizard.isModuleSelected("Controller")
-			this.saveActions()
-
-		if !this.validateActions() {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
-
-			if (msgResult = "No")
-				return false
-		}
-
 		if super.hidePage(page) {
 			ActionsStepWizard.sCurrentActionsStep := false
 
+			this.iPendingFunctionRegistration := false
+			this.iPendingActionRegistration := false
+
+			return true
+		}
+		else
+			return false
+	}
+
+	savePage(page) {
+		local msgResult
+
+		if super.savePage(page) {
 			if this.SetupWizard.isModuleSelected("Controller")
 				this.saveActions()
 
-			this.iPendingFunctionRegistration := false
-			this.iPendingActionRegistration := false
+			if !this.validateActions() {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "No")
+					return false
+			}
 
 			return true
 		}

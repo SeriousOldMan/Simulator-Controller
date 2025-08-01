@@ -14,6 +14,12 @@ For your convinience, you can click on the version number to open the release no
  
 If you don't want to use the launch window and want "Simulator Startup" to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running "Simulator Startup". The other way around can also be used: If you press the Shift key while running "Simulator Startup" normally, no launch window will be shown and the startup process will run directly.
 
+## Accessing documentation
+
+You can open the entry page of the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, incl. those, that already have been marked as read, in case you want to re-visit one of those articles.
+
+Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
+
 ## Managing your *privacy*
 
 Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.
@@ -241,7 +247,22 @@ You have to press the configured *Push-To-Talk* button twice like double-clickin
 
 Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
-As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent. 
+As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent.
+
+##### Combining activation and command
+
+If the chosen voice recognizer supports arbitrary phrases, which is the case for Azure, Google, Whisper and so on, you can combine activation and command into one phrase. To do this, precede the normal command phrase with the name of the Assistant you wand to address.
+
+Example: "Jona, can you plan a pitstop?"
+
+This activates Jona, the Race Engineer, and immediately asks Jona to plan a pitstop.
+
+[Listen to a conversation](https://www.dropbox.com/scl/fi/0o8i8vzaxj5o6h31hu8se/Activation_and_Command.mp3?rlkey=3ak6dwanpzwdndbd1zi45igb8&st=lv0w51aq&dl=1)
+
+###### Notes
+
+1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").
+2. The combined phrase is only recognized, if the first word is the name of the Assistant. For example: "Hey Jona, can you plan a pitstop?" or "Can you plan a pitstop, Jona?" won't be recognized.
 
 #### Push-To-Talk Behaviour
 

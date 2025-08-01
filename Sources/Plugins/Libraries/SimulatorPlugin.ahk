@@ -379,7 +379,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		this.iSimulator := Application(simulator, SimulatorController.Instance.Configuration)
 
-		super.__New(controller, name, configuration, register)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
@@ -395,7 +395,8 @@ class SimulatorPlugin extends ControllerPlugin {
 					this.createPitstopAction(controller, arguments*)
 			}
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 
@@ -479,8 +480,8 @@ class SimulatorPlugin extends ControllerPlugin {
 		return SimulatorProvider.createSimulatorProvider(this.Simulator[true], this.Car, this.Track)
 	}
 
-	supportsPitstop(&refuelService?, &tyreService?, &repairService?) {
-		return this.Provider.supportsPitstop(&refuelService, &tyreService, &repairService)
+	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
+		return this.Provider.supportsPitstop(&refuelService, &tyreService, &brakeService, &repairService)
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
@@ -687,7 +688,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				   , "Tyre Compound Front", "Tyre Compound Rear"
 				   , "Tyre Compound Front Left", "Tyre Compound Front Right"
 				   , "Tyre Compound Rear Left", "Tyre Compound Rear Right"
-				   , "Repair Suspension", "Repair Bodywork", "Repair Engine":
+				   , "Repair Suspension", "Repair Bodywork", "Repair Engine", "Driver":
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues {
@@ -711,9 +712,9 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	getPitstopAllOptionValues() {
 		local options := CaseInsenseMap()
-		local tyreSet, refuelService, tyreService, repairService
+		local tyreSet, refuelService, tyreService, brakeService, repairService
 
-		if this.supportsPitstop(&refuelService, &tyreService, &repairService) {
+		if this.supportsPitstop(&refuelService, &tyreService, &brakeService, &repairService) {
 			if refuelService
 				options["Refuel"] := this.getPitstopOptionValues("Refuel")
 
@@ -736,6 +737,9 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (this.supportsTyreManagement( , &tyreSet) && tyreSet)
 					options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
 			}
+
+			if brakeService
+				options["Change Brakes"] := this.getPitstopOptionValues("Change Brakes")
 
 			if repairService {
 				if inList(repairService, "Suspension")
@@ -939,10 +943,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	__New(controller, name, simulator, configuration := false) {
+	__New(controller, name, simulator, configuration := false, register := true) {
 		local ignore, theAction
 
-		super.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration, false)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iActionMode := kAssistantMode
@@ -950,7 +954,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			for ignore, theAction in string2Values(",", this.getArgumentValue("assistantCommands", ""))
 				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
-			controller.registerPlugin(this)
+			if register
+				controller.registerPlugin(this)
 		}
 	}
 
@@ -1093,6 +1098,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return (this.sessionActive(data)
 			 && (getMultiMapValue(data, "Stint Data", "DriverForname") = driverForName)
 			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
+	}
+
+	prepareSimulation(data) {
+		local car := getMultiMapValue(data, "Session Data", "Car", false)
+		local track := getMultiMapValue(data, "Session Data", "Track", false)
+
+		if (car && track) {
+			this.Car := car
+			this.Track := track
+
+			this.Provider.prepareProvider(data)
+		}
 	}
 
 	hasPrepared(settings, data, count) {

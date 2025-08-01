@@ -161,13 +161,15 @@ namespace RF2SHMProvider {
 
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
-			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
+			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
+			{
 				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
+				ref rF2VehicleTelemetry telemetry = ref GetPlayerTelemetry(vehicle.mID, ref this.telemetry);
 
-                Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
-                Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
+				Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
-                Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
 
@@ -176,7 +178,7 @@ namespace RF2SHMProvider {
 				if (lapTime == 0)
 					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
 
-                int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
+				int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
 				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000) - sector1Time;
 				int sector3Time = lapTime - sector1Time - sector2Time;
 
@@ -185,34 +187,39 @@ namespace RF2SHMProvider {
 
 				string carClass = GetStringFromBytes(vehicle.mVehicleClass);
 				string carName = GetStringFromBytes(vehicle.mVehicleName);
-				
-				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
-                Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
-                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetCarName(carClass, carName));
-                Console.Write("Car."); Console.Write(i); Console.Write(".CarRaw="); Console.WriteLine(carName);
 
-                Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
+				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
+				Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
+				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(GetCarName(carClass, carName));
+				Console.Write("Car."); Console.Write(i); Console.Write(".CarRaw="); Console.WriteLine(carName);
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
-					
-				if (vehicle.mInPits != 0) {
+
+				if (vehicle.mInPits != 0)
+				{
 					double speed = VehicleSpeed(ref vehicle);
-					
-					if (speed < 5 || vehicle.mPitState == (byte)Stopped) {
+
+					if (speed < 5 || vehicle.mPitState == (byte)Stopped)
+					{
 						Console.Write("Car."); Console.Write(i); Console.WriteLine(".InPit=true");
 					}
-					else {
+					else
+					{
 						Console.Write("Car."); Console.Write(i); Console.WriteLine(".InPit=false");
 					}
 				}
 
 				if (vehicle.mIsPlayer == 1)
-                {
+				{
 					Console.Write("Driver.Car=");
 					Console.WriteLine(i);
 				}
+
+				Console.Write("Car."); Console.Write(i); Console.Write(".FuelRemaining="); Console.WriteLine(Math.Round(telemetry.mFuel, 1));
 			}
 		}
 
@@ -223,7 +230,8 @@ namespace RF2SHMProvider {
 			string session = "";
 
 			Console.WriteLine("[Session Data]");
-			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
+			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)
+																   && GetStringFromBytes(playerTelemetry.mTrackName) != "") ? "true" : "false");
 			if (connected) {
 				if (playerTelemetry.mWheels == null)
 					Console.WriteLine("Paused=true");

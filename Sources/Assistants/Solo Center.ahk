@@ -1776,7 +1776,7 @@ class SoloCenter extends ConfigurationItem {
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
-		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure") . translate(")"))
+		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure", true) . translate(")"))
 
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
 		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
@@ -1851,7 +1851,7 @@ class SoloCenter extends ConfigurationItem {
 		columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 		loop columns.Length
-			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1))
+			columns[A_Index] := (columns[A_Index] . A_Space . SubStr(getUnit("Volume", true), 1, 1))
 
 		this.iFuelDataListView := centerGui.Add("ListView", "x134 ys+33 w467 h132 H:Grow(0.5) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", concatenate([translate("Map")], columns))
 		this.iFuelDataListView.OnEvent("Click", noSelect)
@@ -4227,7 +4227,7 @@ class SoloCenter extends ConfigurationItem {
 					else
 						data[A_Index] := displayValue("Time", data[A_Index])
 
-				this.TyreDataListView.Add("", displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1), data*)
+				this.TyreDataListView.Add("", displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume", true), 1, 1), data*)
 			}
 
 			this.FuelDataListView.ModifyCol()
@@ -4375,7 +4375,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if this.HasData {
 			if !this.SelectedReport
-				this.selectReport("Running")
+				this.selectReport(this.getSelectedReport("Running"))
 
 			this.showReport(this.SelectedReport, true)
 		}
@@ -4982,7 +4982,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadLaps() {
-		local ignore, lap, newLap, engineDamage
+		local ignore, lap, newLap, engineDamage, position, wear
 
 		this.iLaps := CaseInsenseWeakMap()
 
@@ -5003,6 +5003,12 @@ class SoloCenter extends ConfigurationItem {
 					 , WaterTemperature: lap["Engine.Temperature.Water"]
 					 , OilTemperature: lap["Engine.Temperature.Oil"]
 					 , Data: false}
+
+			for ignore, position in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				wear := lap["Brake.Wear." . position]
+
+				lap["Brake.Wear." . position] := (isNumber(wear) ? Round(wear, 2) : wear)
+			}
 
 			if lap.Has("Data.Telemetry")
 				newLap.TelemetryData := lap["Data.Telemetry"]
@@ -5225,7 +5231,8 @@ class SoloCenter extends ConfigurationItem {
 						else
 							telemetryData := string2Values("---", lap.TelemetryData)
 
-						telemetryData.RemoveAt(16)
+						if !InStr(telemetryData[16], ",")
+							telemetryData.RemoveAt(16)
 
 						this.addTelemetry(lap, telemetryData*)
 					}
@@ -5427,7 +5434,7 @@ class SoloCenter extends ConfigurationItem {
 
 							this.analyzeTelemetry()
 
-							this.showOverviewReport()
+							this.showReport(this.getSelectedReport("Overview"))
 
 							this.updateState()
 
@@ -5802,18 +5809,30 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	selectReport(report) {
-		if report {
-			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+	getSelectedReport(default := "Running") {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			this.iSelectedReport := report
-		}
-		else {
+		return (getMultiMapValue(settings, "Solo Center", "SelectedReport", default) || default)
+	}
+
+	setSelectedReport(report) {
+		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		setMultiMapValue(settings, "Solo Center", "SelectedReport", report)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+	}
+
+	selectReport(report) {
+		if report
+			this.ReportsListView.Modify(inList(kSessionReports, report), "+Select")
+		else
 			loop this.ReportsListView.GetCount()
 				this.ReportsListView.Modify(A_Index, "-Select")
 
-			this.iSelectedReport := false
-		}
+		this.iSelectedReport := report
+
+		this.pushTask(ObjBindMethod(this, "setSelectedReport", report))
 	}
 
 	showOverviewReport() {
@@ -6634,10 +6653,10 @@ class SoloCenter extends ConfigurationItem {
 						wearRL := brakeWears[3]
 						wearRR := brakeWears[4]
 
-						lapData["Brake.Wear.Front.Left"] := null(wearFL)
-						lapData["Brake.Wear.Front.Right"] := null(wearFR)
-						lapData["Brake.Wear.Rear.Left"] := null(wearRL)
-						lapData["Brake.Wear.Rear.Right"] := null(wearRR)
+						lapData["Brake.Wear.Front.Left"] := null(isNumber(wearFL) ? Round(wearFL, 2) : wearFL)
+						lapData["Brake.Wear.Front.Right"] := null(isNumber(wearFR) ? Round(wearFR, 2) : wearFR)
+						lapData["Brake.Wear.Rear.Left"] := null(isNumber(wearRL) ? Round(wearRL, 2) : wearRL)
+						lapData["Brake.Wear.Rear.Right"] := null(isNumber(wearRR) ? Round(wearRR, 2) : wearRR)
 						lapData["Brake.Wear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR, wearRL, wearRR])))
 						lapData["Brake.Wear.Front.Average"] := ((wearFL = kNull) ? kNull : null(average([wearFL, wearFR])))
 						lapData["Brake.Wear.Rear.Average"] := ((wearFL = kNull) ? kNull : null(average([wearRL, wearRR])))
@@ -6931,7 +6950,7 @@ class SoloCenter extends ConfigurationItem {
 						columns := collect(kFuelBuckets, convertUnit.Bind("Volume"))
 
 						loop columns.Length
-							html .= ("<th class=`"th-std`">" . (columns[A_Index] . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</th>")
+							html .= ("<th class=`"th-std`">" . (columns[A_Index] . A_Space . SubStr(getUnit("Volume", true), 1, 1)) . "</th>")
 
 						html .= "</tr>"
 
@@ -6950,7 +6969,7 @@ class SoloCenter extends ConfigurationItem {
 							else
 								data[A_Index] := ("<td class=`"td-std`">" . displayValue("Time", data[A_Index]) . "</td>")
 
-						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume"), 1, 1)) . "</td>", data*))
+						rows.Push(Array("<td class=`"td-std`">" . (displayValue("Float", convertUnit("Volume", fuel)) . A_Space . SubStr(getUnit("Volume", true), 1, 1)) . "</td>", data*))
 					}
 
 					if (rows.Length > 0) {
@@ -7645,9 +7664,9 @@ class SoloCenter extends ConfigurationItem {
 										  , displayNullValue(lapTable[lap.Nr]["Tyre.Wear.Rear.Right"]))
 
 			brakeWear := values2String(", ", displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Left"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Right"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Left"])
-										  , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Right"]))
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Front.Right"])
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Left"])
+										   , displayNullValue(lapTable[lap.Nr]["Brake.Wear.Rear.Right"]))
 		}
 
 		remainingFuel := lap.FuelRemaining
@@ -8231,12 +8250,12 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
-											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[2], unit: getUnit("Volume", true)})
 
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("3. Go to the track and run clean laps in race speed until your fuel level reaches %fuel% %unit%.")
-											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 2))[1], unit: getUnit("Volume", true)})
 
 					if isNumber(listView.GetText(line, 1)) {
 						text .= "`n`n"
@@ -8254,7 +8273,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 					text .= "`n`n"
 
 					text .= substituteVariables(translate("2. Put %fuel% %unit% fuel into the tank. Add a little bit more for the outlap.")
-											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume")})
+											  , {fuel: string2Values("-", listView.GetText(line, 1))[2], unit: getUnit("Volume", true)})
 
 					text .= "`n`n"
 

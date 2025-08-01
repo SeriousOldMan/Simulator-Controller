@@ -36,6 +36,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iGoogleSynthesizerWidgets := []
 	iAzureRecognizerWidgets := []
 	iGoogleRecognizerWidgets := []
+	iWhisperRecognizerWidgets := []
 	iOtherWidgets := []
 
 	iTopAzureCredentialsVisible := false
@@ -43,6 +44,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	iTopGoogleCredentialsVisible := false
 	iBottomGoogleCredentialsVisible := false
+
+	iBottomWhisperCredentialsVisible := false
 
 	iSoundProcessingSettings := false
 
@@ -116,8 +119,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.hideAzureRecognizerEditor()
 			else if (oldChoice == 4)
 				this.hideGoogleRecognizerEditor()
+			else if (oldChoice == 5)
+				this.hideWhisperServerRecognizerEditor()
 			else
-				this.hideWhisperRecognizerEditor()
+				this.hideWhisperLocalRecognizerEditor()
 
 			if (voiceRecognizerDropDown.Value == 1)
 				this.showServerRecognizerEditor()
@@ -149,8 +154,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				this.showGoogleRecognizerEditor()
 			}
+			else if (voiceRecognizerDropDown.Value == 5)
+				this.showWhisperServerRecognizerEditor()
 			else
-				this.showWhisperRecognizerEditor()
+				this.showWhisperLocalRecognizerEditor()
 
 			if (voiceRecognizerDropDown.Value <= 2) {
 				try {
@@ -163,9 +170,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 			}
-			else if (voiceRecognizerDropDown.Value = 5)
+			else if (voiceRecognizerDropDown.Value >= 5)
 				try {
-					recognizers := SpeechRecognizer("Whisper", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+					recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
 				catch Any as exception {
 					logError(exception)
@@ -351,11 +358,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)
 
-		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services"]
+		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "Whisper Server"]
 		chosen := 0
 
-		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime"))
-			choices.Push("Whisper Runtime")
+		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
+			choices.Push("Whisper Local")
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
 		widget19 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
@@ -401,7 +408,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
 							  , window["activationCommandEdit"]]]
 
-		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Service Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 
@@ -424,7 +431,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iAzureRecognizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 									   , [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]]
 
-		widget35 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("API Key"))
+		widget35 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VgoogleAPIKeyFileLabel Hidden", translate("Service Key"))
 		widget36 := window.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VgoogleAPIKeyFileEdit Hidden")
 		widget36.OnEvent("Change", updateGoogleVoices)
 
@@ -444,15 +451,23 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 										 , [window["googleSpeakerLabel"], window["googleSpeakerDropDown"], widget40]]
 		this.iGoogleRecognizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]]
 
+		widget42 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwhisperServerURLLabel Hidden", translate("Server URL"))
+		widget43 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VwhisperServerURLEdit Hidden")
+
+		this.iWhisperRecognizerWidgets := [[window["whisperServerURLLabel"], window["whisperServerURLEdit"]]]
+
 		this.updateLanguage(false)
 
-		loop 41
+		loop 43
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
 		this.hideControls(this.iWindowsSynthesizerWidgets)
 		this.hideControls(this.iAzureSynthesizerWidgets)
 		this.hideControls(this.iGoogleSynthesizerWidgets)
+		this.hideControls(this.iAzureRecognizerWidgets)
+		this.hideControls(this.iGoogleRecognizerWidgets)
+		this.hideControls(this.iWhisperRecognizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
 		this.iSynthesizerMode := "Init"
@@ -488,12 +503,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(recognizer, "Google") == 1)
 				recognizer := "Google"
 
+			if (InStr(recognizer, "Whisper Server") == 1)
+				recognizer := "Whisper Server"
+
+			if (recognizer = "Whisper")
+				recognizer := "Whisper Local"
+
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
 
 			if FileExist(kProgramsDirectory . "Whisper Runtime")
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server", "Whisper Local"], recognizer) || 2)
 			else
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server"], recognizer) || 2)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
@@ -504,6 +525,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
 
 			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
+
+			this.Value["whisperServerURL"] := getMultiMapValue(configuration, "Voice Control", "ServerURL", "")
 
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
@@ -600,6 +623,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "APIKeyFile", Trim(this.Control["googleAPIKeyFileEdit"].Text))
 
+		setMultiMapValue(configuration, "Voice Control", "ServerURL", Trim(this.Control["whisperServerURLEdit"].Text))
+
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["speakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["speakerPitchSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", this.Control["speakerSpeedSlider"].Value)
@@ -616,8 +641,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
 		else if (this.Control["voiceRecognizerDropDown"].Value == 4)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
+		else if (this.Control["voiceRecognizerDropDown"].Value == 5)
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text))
 		else
-			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper")
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Local")
 
 		setMultiMapValue(configuration, "Voice Control", "Listener", listener)
 		setMultiMapValue(configuration, "Voice Control", "PushToTalk", (Trim(this.Control["pushToTalkEdit"].Text) = "") ? false : this.Control["pushToTalkEdit"].Text)
@@ -675,6 +702,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 
+		this.Control["whisperServerURLEdit"].Text := this.Value["whisperServerURL"]
+
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)
 		else if (this.Value["voiceSynthesizer"] = 2)
@@ -709,7 +738,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else if (this.Control["voiceRecognizerDropDown"].Value = 5)
-				recognizers := SpeechRecognizer("Whisper", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			else if (this.Control["voiceRecognizerDropDown"].Value = 6)
+				recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else
 				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
@@ -786,8 +818,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if (voiceRecognizer == 4)
 			this.showGoogleRecognizerEditor()
+		else if (voiceRecognizer == 5)
+			this.showWhisperServerRecognizerEditor()
 		else
-			this.showWhisperRecognizerEditor()
+			this.showWhisperLocalRecognizerEditor()
 	}
 
 	hideWidgets() {
@@ -815,14 +849,23 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideAzureRecognizerEditor()
 		else if (this.iRecognizerMode = "Google")
 			this.hideGoogleRecognizerEditor()
-		else if (this.iRecognizerMode = "Whisper")
-			this.hideWhisperRecognizerEditor()
+		else if (this.iRecognizerMode = "Whisper Server")
+			this.hideWhisperServerRecognizerEditor()
+		else if (this.iRecognizerMode = "Whisper Local")
+			this.hideWhisperLocalRecognizerEditor()
+		else {
+			this.hideControls(this.iAzureRecognizerWidgets)
+			this.hideControls(this.iGoogleRecognizerWidgets)
+			this.hideControls(this.iWhisperRecognizerWidgets)
+		}
 
 		this.iTopAzureCredentialsVisible := false
 		this.iBottomAzureCredentialsVisible := false
 
 		this.iTopGoogleCredentialsVisible := false
 		this.iBottomGoogleCredentialsVisible := false
+
+		this.iBottomWhisperCredentialsVisible := false
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -865,6 +908,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	showAzureSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
 			azureWasOpen := true
@@ -875,6 +919,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomWhisperCredentialsVisible {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
 		}
 
 		this.showControls(this.iTopWidgets)
@@ -891,6 +940,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
 
 		this.showControls(this.iOtherWidgets)
 
@@ -900,6 +951,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	hideAzureSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
 			azureWasOpen := true
@@ -910,6 +962,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
 		}
 
 		this.hideControls(this.iTopWidgets)
@@ -927,6 +984,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
 
 		this.iSynthesizerMode := false
 	}
@@ -934,6 +993,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	showGoogleSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
 			azureWasOpen := true
@@ -944,6 +1004,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomWhisperCredentialsVisible {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
 		}
 
 		this.showControls(this.iTopWidgets)
@@ -960,6 +1025,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
 
 		this.showControls(this.iOtherWidgets)
 
@@ -969,6 +1036,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	hideGoogleSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
 			azureWasOpen := true
@@ -979,6 +1047,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
 		}
 
 		this.hideControls(this.iTopWidgets)
@@ -996,6 +1069,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
 
 		this.iSynthesizerMode := false
 	}
@@ -1016,11 +1091,52 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iRecognizerMode := false
 	}
 
-	showWhisperRecognizerEditor() {
-		this.iRecognizerMode := "Whisper"
+	showWhisperServerRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
+			if this.iTopAzureCredentialsVisible
+				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
+			else
+				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+
+			this.showControls(this.iWhisperRecognizerWidgets)
+			this.transposeControls(this.iBottomWidgets, 24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
+		}
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showWhisperRecognizerEditor..."
+
+		this.iBottomWhisperCredentialsVisible := true
+
+		this.iRecognizerMode := "Whisper Server"
 	}
 
-	hideWhisperRecognizerEditor() {
+	hideWhisperServerRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if (this.iRecognizerMode == "Whisper Server") {
+			this.hideControls(this.iWhisperRecognizerWidgets)
+
+			if this.iTopAzureCredentialsVisible
+				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
+			else
+				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+
+			this.transposeControls(this.iBottomWidgets, -24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
+		}
+		else if (this.iRecognizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+
+		this.iBottomWhisperCredentialsVisible := false
+
+		this.iRecognizerMode := false
+	}
+
+	showWhisperLocalRecognizerEditor() {
+		this.iRecognizerMode := "Whisper Local"
+	}
+
+	hideWhisperLocalRecognizerEditor() {
 		this.iRecognizerMode := false
 	}
 
@@ -1157,8 +1273,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				else if (this.Control["voiceRecognizerDropDown"].Value == 4)
 					recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
 												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				else if (this.Control["voiceRecognizerDropDown"].Value == 5)
+					recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				else
-					recognizers := SpeechRecognizer("Whisper", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+					recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			}
 			catch Any as exception {
 				logError(exception)

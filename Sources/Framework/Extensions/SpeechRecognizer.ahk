@@ -206,6 +206,8 @@ class SpeechRecognizer {
 	iGoogleMode := "HTTP"
 	iGoogleAPIKey := false
 
+	iWhisperServerURL := false
+
 	iCapturedAudioFile := false
 
 	static sAudioRoutingInitialized := false
@@ -318,7 +320,10 @@ class SpeechRecognizer {
 
 	Method {
 		Get {
-			return (inList(["Azure", "Google", "Whisper"], this.Engine) ? "Text" : "Pattern")
+			if InStr(this.Engine, "Whisper")
+				return "Text"
+			else
+				return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -342,7 +347,7 @@ class SpeechRecognizer {
 		Get {
 			local result, ignore, recognizer
 
-			if (this.Engine = "Whisper") {
+			if InStr(this.Engine, "Whisper") {
 				if (language = "en")
 					return kWhisperModels
 				else
@@ -368,6 +373,9 @@ class SpeechRecognizer {
 		global kNirCmd
 
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
+
+		if (engine = "Whisper")
+			engine := "Whisper Local"
 
 		if !InStr(engine, "Whisper") {
 			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
@@ -491,13 +499,26 @@ class SpeechRecognizer {
 
 				instance.SetEngine(engine)
 			}
-			else if (engine = "Whisper") {
-				if (!isDebug() && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
+			else if InStr(engine, "Whisper") {
+				if (InStr(engine, "Whisper Server|") = 1) {
+					engine := string2Values("|", engine)
+
+					this.iWhisperServerURL := engine[2]
+					engine := engine[1]
+				}
+
+				if (!isDebug() && (engine = "Whisper Local") && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
 					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
-				this.iEngine := "Whisper"
+				this.iEngine := engine
 
-				this.Instance := SpeechRecognizer.AudioCapture()
+				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
+
+				if (engine = "Whisper Server") {
+					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")
+
+					this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
+				}
 
 				choices := []
 
@@ -519,7 +540,7 @@ class SpeechRecognizer {
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if (this.Instance.OkCheck() != "OK") {
+				if (!InStr(this.Engine, "Whisper") && (this.Instance.OkCheck() != "OK")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -538,7 +559,7 @@ class SpeechRecognizer {
 
 				found := false
 
-				if (this.Engine = "Whisper") {
+				if InStr(this.Engine, "Whisper") {
 					found := true
 
 					if ((recognizer == true) && (language = "en"))
@@ -569,7 +590,7 @@ class SpeechRecognizer {
 						}
 
 				if !found
-					recognizer := ((this.Engine = "Whisper") ? "medium" : 0)
+					recognizer := (InStr(this.Engine, "Whisper") ? "medium" : 0)
 
 				this.initialize(recognizer)
 			}
@@ -640,7 +661,7 @@ class SpeechRecognizer {
 					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
 				}
 		}
-		else if (this.Engine = "Whisper")
+		else if InStr(this.Engine, "Whisper")
 			recognizerList := kWhisperModels
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
@@ -674,7 +695,7 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
-			else if (this.Engine = "Whisper")
+			else if InStr(this.Engine, "Whisper")
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -712,11 +733,14 @@ class SpeechRecognizer {
 				}
 			}
 
-			if ((this.Engine = "Google") || ((this.Engine = "Whisper") && this.Model)) {
+			if ((this.Engine = "Google") || (InStr(this.Engine, "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
-					return this.Instance.StartRecognizer(this.iCapturedAudioFile)
+					if InStr(this.Engine, "Whisper")
+						return this.Instance.AudioRecorder.StartRecognizer(this.iCapturedAudioFile)
+					else
+						return this.Instance.StartRecognizer(this.iCapturedAudioFile)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -724,8 +748,10 @@ class SpeechRecognizer {
 					return false
 				}
 			}
-			else
+			else if !InStr(this.Engine, "Whisper")
 				return this.Instance.StartRecognizer()
+			else
+				return false
 		}
 		else
 			return false
@@ -737,8 +763,10 @@ class SpeechRecognizer {
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
-			if (this.Instance ? this.Instance.StopRecognizer() : false) {
-				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || (this.Engine = "Whisper")) && this.iCapturedAudioFile)
+			if (this.Instance ? (InStr(this.Engine, "Whisper") ? this.Instance.AudioRecorder.StopRecognizer()
+															   : this.Instance.StopRecognizer())
+							  : false) {
+				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")) && this.iCapturedAudioFile)
 					try {
 						this.processAudio(this.iCapturedAudioFile)
 					}
@@ -803,44 +831,65 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Model {
-			DirCreate(kTempDirectory . "Whisper")
+			if (this.Engine = "Whisper Local") {
+				DirCreate(kTempDirectory . "Whisper")
 
-			install := !FileExist(kProgramsDirectory . "Whisper Runtime\_models\faster-whisper-" . this.Model)
+				install := !FileExist(kProgramsDirectory . "Whisper Runtime\_models\faster-whisper-" . this.Model)
 
-			if (install && !kSilentMode)
-				showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
+				if (install && !kSilentMode)
+					showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
 
-			try {
-				Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
+				try {
+					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
 
-				while ProcessExist(pid) {
-					if (install && !kSilentMode) {
-						showProgress({progress: progress++})
+					while ProcessExist(pid) {
+						if (install && !kSilentMode) {
+							showProgress({progress: progress++})
 
-						if (progress >= 100)
-							progress := 0
+							if (progress >= 100)
+								progress := 0
+						}
+
+						Sleep(200)
 					}
+				}
+				finally {
+					if (install && !kSilentMode)
+						hideProgress()
+				}
 
-					Sleep(200)
+				deleteFile(audioFile)
+
+				SplitPath(audioFile, , , , &name)
+
+				try {
+					result := JSON.parse(FileRead(kTempDirectory . "Whisper\" . name . ".JSON"))
+
+					if result.Has("text")
+						this._onTextCallback(result["text"])
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					deleteFile(kTempDirectory . "Whisper\" . name . ".JSON")
 				}
 			}
-			finally {
-				if (install && !kSilentMode)
-					hideProgress()
-			}
+			else if (this.Engine = "Whisper Server") {
+				try {
+					this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
 
-			deleteFile(audioFile)
+					result := this.Instance.Connector.Recognize(audioFile)
 
-			SplitPath(audioFile, , , , &name)
-
-			try {
-				result := JSON.parse(FileRead(kTempDirectory . "Whisper\" . name . ".JSON"))
-
-				if result.Has("text")
-					this._onTextCallback(result["text"])
-			}
-			catch Any as exception {
-				logError(exception)
+					if result
+						this._onTextCallback(result)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+				finally {
+					deleteFile(audioFile)
+				}
 			}
 		}
 	}
@@ -862,7 +911,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if inList(["Azure", "Google", "Compiler", "Whisper"], this.Engine)
+			else if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -892,7 +941,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler", "Whisper":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -907,7 +956,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler", "Whisper":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -918,7 +967,7 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google", "Whisper"], this.Engine)
+		if inList(["Azure", "Google", "Whisper Local", "Whisper Server"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -944,7 +993,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if inList(["Azure", "Google", "Compiler", "Whisper"], this.Engine) {
+		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}
@@ -1024,8 +1073,12 @@ class SpeechRecognizer {
 		local index, literal
 
 		for index, literal in words {
-			literal := StrReplace(literal, ".", "")
-			literal := StrReplace(literal, ",", "")
+			if !isNumber(literal)
+				literal := StrReplace(literal, ".", "")
+
+			if !isNumber(StrReplace(literal, ",", "."))
+				literal := StrReplace(literal, ",", "")
+
 			literal := StrReplace(literal, ";", "")
 			literal := StrReplace(literal, "?", "")
 			literal := StrReplace(literal, "-", "")

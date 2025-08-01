@@ -145,7 +145,7 @@ Syntax: condition **=>** action1, ..., actionN
 	
 The left hand side of the rule therefore is an expression which repreusents a condition, followed by a "=>" and the a comma-seperated list of actions. Example:
 
-	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready, true)
+	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready = true)
 
 #### Referencing facts in Production Rules
 
@@ -209,11 +209,11 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 	
 	This is a special one. The condition is matched by invoking the given target in the reduction rule engine. Ultimately, this allows to define new types of conditions and even call the host programming language, as you will see below.
 	
-  - Calc Quantor
+  - Is Quantor
   
-	Syntax: {Calc: expression}
+	Syntax: {Is: expression}
   
-	Example: {Calc: ?Pressure = ?BasePressure * ?TempFactor}
+	Example: {Is: ?Pressure = ?BasePressure * ?TempFactor}
 	
 	This is another special one. It allows general expressions to be used, that also can be used in the tail of reduction rules. The Quantor is matched, if the expression succeeds. If variables are involved, these variables are changed as a side effect.
 
@@ -242,9 +242,9 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	Syntax / Example: (ProveAll: preparePitstop(?Lap))
 	
-  - Calc
+  - Let
   
-    Syntax / Example: (Calc: !Increment = !Increment + 1)
+    Syntax / Example: (Let: !Increment = !Increment + 1)
 	
 	This action allows general expressions to be used as an action. Variables can be used in these expressions and can be altered as a side effect.
 	
@@ -256,7 +256,7 @@ Once the condition of a production rule is matched, all actions on the right-han
   
   - Set
   
-    Syntax / Example: (Set: Session.Laps, ?Lap)
+    Syntax / Example: (Set: Session.Laps, ?Lap) or (Set: Session.Laps = ?Lap)
 	
 	Using this action, you can create a fact in the knowledge base or alter the value of an existing one. If you omit the value, the fact is set to *true*.
   

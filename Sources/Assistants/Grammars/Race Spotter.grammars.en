@@ -138,8 +138,8 @@ ProtectSlower.1=In front of you is a slower car. Try to overtake him as quickly 
 ProtectSlower.2=Overtake the car in front of you as quickly as possible and put it between you and your pursuer.
 LapDownFaster.1=The lapped car behind you is faster.
 LapDownFaster.2=The car behind you is at least one lap behind, but it's faster.
-LapUpFaster.1=The car behind you is only slightly faster.
-LapUpFaster.2=The car behind you is not much faster.
+LapUpFaster.1=The car behind you is faster.
+LapUpFaster.2=The car behind is faster than you.
 Slipstream.1=Hang on to him when he's overtaken you.
 Slipstream.2=Let him pass and use his slipstream.
 Slipstream.3=You can use his slipstream if he has overtaken you.
@@ -190,12 +190,6 @@ Penalty.1=Damn, we've got a %penalty% penalty.
 Penalty.2=Damn, %penalty% penalty. That sets us back.
 Disqualified.1=We are disqualified. What a shame.
 Disqualified.2=Damn, we have been disqualified.
-[Spotter Phrases]
-// Race Start //
-Green.1=Green, go.
-Green.2=Go, it is green.
-Green.3=Green, put the pedal down.
-Green.4=Green, show them what you're made of.
 // Delta Information //
 GainedFront.1=You're catching up on the car ahead, gained %gained% seconds in %deltaLaps% %laps%. The gap is still %delta% seconds, but you are %lapTime% seconds faster.
 GainedFront.2=You gained %gained% seconds in %deltaLaps% %laps% on the car ahead, but you still have %delta% seconds to go.
@@ -252,12 +246,12 @@ LostFocusBehind.3=The car %indicator% is closing in. You lost %lost% seconds in 
 GainedFocusBehind.1=The car %indicator% has lost %gained% seconds in %deltaLaps% %laps% and is %lapTime% seconds slower. Well done.
 GainedFocusBehind.2=You gained %gained% seconds in %deltaLaps% %laps% to the car %indicator%. The gap is already %delta% seconds and you are %lapTime% seconds faster.
 GainedFocusBehind.3=The car %indicator% falls back. You gained %gained% seconds in %deltaLaps% %laps%.
-LessPitstops.1=%conjunction% you have already pitted.
-LessPitstops.2=%conjunction% you have %pitstops% pitstops more.
-LessPitstops.3=%conjunction% I think he still needs to pit.
-MorePitstops.1=%conjunction% he has already pitted.
-MorePitstops.2=%conjunction% you have %pitstops% pitstops less.
-MorePitstops.3=%conjunction% he has more pitstops than you.
+[Spotter Phrases]
+// Race Start //
+Green.1=Green, go.
+Green.2=Go, it is green.
+Green.3=Green, put the pedal down.
+Green.4=Green, show them what you're made of.
 // Spotting //
 Right.1=Attention right.
 Right.2=Car on the right.

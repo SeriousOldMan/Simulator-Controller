@@ -12,6 +12,8 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    Please note, that you can enable the Driving Coach here and it will react to your voice command afterwards, but for it to be fully functional, you will have to configure the GPT Service API in a later step of the full configuration. You can skip this for the moment, since the Driving Coach, although a very clever little helper, is not necessary for your initial experiences with the other Assistants.
    
+   For experts: You can choose the speech generation method for each Assistant independently by clicking on the small settings button with the "Gear" symbol. To the right of this button, you find another button with a small "Rocket" symbol. This allows you to add additional intelligence by configuring several so-called boosters. See the documentation about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
+   
    If you don't want to use the basic configuration page, simply select "Extended" and continue to the next page. Then go through the following steps for a basic configuration.
 
 2. Select modules
@@ -28,13 +30,13 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    Here we have to install:
    
-   - Runtimes from Microsoft - Most likely already installed on your computer, but it does not harm to run those installer again.
+   - Runtimes from Microsoft - Most likely already installed on your computer, but it does not harm to run those installers again.
    
-   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* or *Le Mans Ultimate* are your only games. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2* ür *Le Mans Ultimate*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
+   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* or *Le Mans Ultimate* are part of your game collection. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2* and *Le Mans Ultimate*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
    
-   - SoX - Although optional, I strongly recommend installing SoX for an immersive sound experience.
+   - SoX - Although technically optional, I strongly recommend installing SoX for an immersive sound experience and also optimized audio routing.
    
-   - NirCmd - Also optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
+   - NirCmd - Also technically optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
    
    - Speech Runtime and libraries - Runtime and at least the English library should be installed.
    

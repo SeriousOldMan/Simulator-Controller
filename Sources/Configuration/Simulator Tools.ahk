@@ -1771,6 +1771,16 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV642() {
+	local text
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := "`nSoftware.MSSpeechLibrary_fr-FR.Requested=OPTIONAL`nSoftware.MSSpeechLibrary_it-IT.Requested=OPTIONAL`nSoftware.MSSpeechLibrary_ja-JP.Requested=OPTIONAL`nSoftware.MSSpeechLibrary_pt-PT.Requested=OPTIONAL`nSoftware.MSSpeechLibrary_zh-CN.Requested=OPTIONAL"
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+}
+
 updateConfigurationForV627() {
 	local ignore, assistant, extension, type, fileName, configuration, name, definition
 

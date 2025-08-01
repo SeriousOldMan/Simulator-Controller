@@ -32,7 +32,7 @@ As said, the Driving Coach is a bit different in the sense, that it allows free 
 
 IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to an LLM. Additionally, using a GPT service like OpenAI may create some costs, and running an LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
-Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4o or o1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
+Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4.1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
 ## Overview of the different Assistant Boosters
 
@@ -388,9 +388,9 @@ As a special case can the *Reasoning* booster also be used to extend the rules o
 
 The *Reasoning* booster as well as to some extent the *Conversation* booster rely on the capability of the configured LLM to *call* external functions as part of their reasoning process. This is achieved by the so-called tool interface of the LLM. Tools are supported at the time of this writing by the following models:
 
-  - GPT 4o mini and above from *OpenAI*
+  - GPT 4.1 mini and above from *OpenAI*
   - Mistral Small, Mistral Large and Mixtral 8x22b from *Mistral AI*
-  - Gemini 1.5 and above from *Google*
+  - Gemini 2 Flash and above from *Google*
   - Claude3 and above by *Anthropic* (via *OpenRouter*)
   - Command-R+ by *Cohere* (via *OpenRouter*, but not working properly yet)
   - Some Open Source models, such as Open Hermes, also support tools but with a varying degree of reliability
@@ -689,6 +689,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pitstop Clearance           | -                 | Yes | Yes | "I have changed my mind, the pitstop is no longer needed." |
 | Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
 | Low Fuel Reporting          | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that fuel is getting low and the pitstop will be needed. |
+| Low Energy Reporting        | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that virtual energy is getting low and the pitstop will be needed. Only used in *Le Mans Ultimate* at the time of this writing. |
 | Tyre Wear Reporting         | 1. [Required] tyre<br>2. [Required] wear | No | Yes | Informs the driver that the tread of at least one of the tyres may be worn out and a tyre change should be planned. *tyre* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
 | Brake Wear Reporting        | 1. [Required] wheel<br>2. [Required] wear | No | Yes | Informs the driver that at least one of the brake pads may be worn out and a change of brake pads should be planned. *wheel* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
 | Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | This action informs the driver that some damage has been collected in the last accident. |
@@ -706,6 +707,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Event                       | Parameter(s)      | Description |
 |-----------------------------|-------------------|-------------|
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
+| Energy Low                  | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | When the car is running low on virtual energy, this event is signalled. Only used in *Le Mans Ultimate* at the time of this writing. |
 | Tyre Wear                   | 1. [Required] tyre<br>2. [Required] wear | When a tyre is almost worn out, this event is signalled. *tyre* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of the tread of this tyre in percentage. |
 | Brake Wear                   | 1. [Required] wheel<br>2. [Required] wear | When one of the brake pads is almost worn out, this event is signalled. *wheel* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of this brake pad in percentage. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |

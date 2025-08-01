@@ -284,6 +284,10 @@ class RaceAssistant extends ConfigurationItem {
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
 
+	iLastEnergyAmount := 0
+	iInitialEnergyAmount := 0
+	iAvgEnergyConsumption := 0
+
 	iWeather := false
 
 	iEnoughData := false
@@ -883,6 +887,24 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	InitialEnergyAmount {
+		Get {
+			return this.iInitialEnergyAmount
+		}
+	}
+
+	LastEnergyAmount {
+		Get {
+			return this.iLastEnergyAmount
+		}
+	}
+
+	AvgEnergyConsumption {
+		Get {
+			return this.iAvgEnergyConsumption
+		}
+	}
+
 	Weather {
 		Get {
 			return this.iWeather
@@ -1130,6 +1152,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.iBaseLap := false
 				this.iInitialFuelAmount := 0
+				this.iInitialEnergyAmount := 0
 
 				this.iWeather := false
 
@@ -1172,6 +1195,15 @@ class RaceAssistant extends ConfigurationItem {
 
 		if values.HasProp("AvgFuelConsumption")
 			this.iAvgFuelConsumption := values.AvgFuelConsumption
+
+		if values.HasProp("LastEnergyAmount")
+			this.iLastEnergyAmount := values.LastEnergyAmount
+
+		if values.HasProp("InitialEnergyAmount")
+			this.iInitialEnergyAmount := values.InitialEnergyAmount
+
+		if values.HasProp("AvgEnergyConsumption")
+			this.iAvgEnergyConsumption := values.AvgEnergyConsumption
 
 		if values.HasProp("Weather")
 			this.iWeather := values.Weather
@@ -1391,11 +1423,20 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator := this.SettingsDatabase.getSimulatorName(this.Simulator)
 		local car := this.SettingsDatabase.getCarName(this.Simulator, this.Car)
 		local track := this.SettingsDatabase.getTrackName(this.Simulator, this.Track)
+		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
+		local temperatureUnit := ((type != "Agent") ? (A_Space . getUnit("Temperature")) : " Celsius")
 		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint, engine, value
-		local sessionFormat, additionalLaps
-		local mixedCompounds, tyreSet, index, tyre, axle
+		local sessionFormat, additionalLaps, lap
+		local mixedCompounds, tyreSet, index, tyre, axle, unit
 
 		static sessionTypes
+
+		convert(unit, value, arguments*) {
+			if (type != "Agent")
+				return convertUnit(unit, value, arguments*)
+			else
+				return value
+		}
 
 		getBestLapTime(weather) {
 			local lookup := values2String(";", simulator, car, track, weather)
@@ -1447,7 +1488,7 @@ class RaceAssistant extends ConfigurationItem {
 											  , "Type", sessionTypes[this.Session]
 											  , "Format", sessionFormat
 											  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
-											  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 1000) . " seconds")
+											  , "RemainingTime", (Round(knowledgeBase.getValue("Session.Time.Remaining", 0) / 1000) . " Seconds")
 											  , "AvailableTyres", tyreSets)
 				}
 				catch Any as exception {
@@ -1474,9 +1515,9 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Fuel")
 				try {
-					knowledge["Fuel"] := Map("Capacity", (knowledgeBase.getValue("Session.Settings.Fuel.Max") . " Liter")
-										   , "Remaining", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0), 1) . " Liter")
-										   , "Consumption", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0), 1)  . " Liter"))
+					knowledge["Fuel"] := Map("Capacity", (convert("Volume", knowledgeBase.getValue("Session.Settings.Fuel.Max")) . volumeUnit)
+										   , "Remaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0)) . volumeUnit)
+										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1492,18 +1533,24 @@ class RaceAssistant extends ConfigurationItem {
 
 						lapNr := (lapNumber - A_Index)
 
-						if knowledgeBase.hasFact("Lap." . lapNr . ".Time")
-							laps.Push(Map("Nr", lapNr
-										, "LapTime", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time", 0) / 1000, 1) . " Seconds")
-										, "FuelConsumption", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption", 0)) . " Liters")
-										, "FuelRemaining", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining", 0)) . " Liters")
-										, "Weather", Map("Now", knowledgeBase.getValue("Lap." . lapNr . ".Weather", "Dry")
-													   , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.10Min")
-																	   , "30 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.30Min"))
-													   , "Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air", 0))
-										, "Track", Map("Temperature", (knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track", 0) . " Celsius")
-													 , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip", "Fast"))
-										, "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse)))
+						if knowledgeBase.hasFact("Lap." . lapNr . ".Time") {
+							lap := Map("Nr", lapNr
+									 , "LapTime", (Round(knowledgeBase.getValue("Lap." . lapNr . ".Time", 0) / 1000, 1) . " Seconds")
+									 , "FuelConsumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Consumption", 0)) . volumeUnit)
+									 , "FuelRemaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNr . ".Fuel.Remaining", 0)) . volumeUnit)
+									 , "Weather", Map("Now", knowledgeBase.getValue("Lap." . lapNr . ".Weather", "Dry")
+													, "Forecast", Map("10 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.10Min")
+																	, "30 Minutes", knowledgeBase.getValue("Lap." . lapNr . ".Weather.30Min"))
+													, "Temperature", (convert("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Air", 0)) . temperatureUnit))
+									 , "Track", Map("Temperature", (convert("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Temperature.Track", 0)) . temperatureUnit)
+												  , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip", "Fast"))
+									 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse))
+
+							if knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining", kUndefined)
+								lap.EnergyRemaining := (knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining") . " %")
+
+							laps.Push(lap)
+						}
 						else
 							break
 					}
@@ -1520,7 +1567,7 @@ class RaceAssistant extends ConfigurationItem {
 					knowledge["Weather"] := Map("Now", weather
 											  , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
 															  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min", "Dry"))
-											  , "Temperature", (knowledgeBase.getValue("Weather.Temperature.Air", 0) . " Celsius"))
+											  , "Temperature", (convert("Temperature", knowledgeBase.getValue("Weather.Temperature.Air", 0)) . temperatureUnit))
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1528,7 +1575,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Track")
 				try {
-					knowledge["Track"] := Map("Temperature", (knowledgeBase.getValue("Track.Temperature", 0) . " Celsius")
+					knowledge["Track"] := Map("Temperature", (convert("Temperature", knowledgeBase.getValue("Track.Temperature", 0)) . temperatureUnit)
 											, "Grip", knowledgeBase.getValue("Track.Grip", "Fast"))
 				}
 				catch Any as exception {
@@ -1580,12 +1627,12 @@ class RaceAssistant extends ConfigurationItem {
 					value := knowledgeBase.getValue("Lap." . lapNumber . ".Engine.Temperature.Water", false)
 
 					if value
-						engine["WaterTemperature"] := value
+						engine["WaterTemperature"] := (convert("Temperature", value) . temperatureUnit)
 
 					value := knowledgeBase.getValue("Lap." . lapNumber . ".Engine.Temperature.Oil", false)
 
 					if value
-						engine["OilTemperature"] := value
+						engine["OilTemperature"] := (convert("Temperature", value) . temperatureUnit)
 
 					if (engine.Count > 0)
 						knowledge["Engine"] := engine
@@ -2419,7 +2466,7 @@ class RaceAssistant extends ConfigurationItem {
 								, TrackLength: knowledgeBase.getValue("Session.Track.Length")
 								, SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
 								, SessionLaps: knowledgeBase.getValue("Session.Laps")})
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0, EnoughData: false})
 	}
 
 	loadSessionSettings(settings) {
@@ -2479,6 +2526,13 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Laps", lapNumber - this.BaseLap + 1)
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
+
+			if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption", kUndefined) != kUndefined) {
+				setMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.AvgConsumption", 0), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption"), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", Round(getMultiMapValue(data, "Car Data", "EnergyRemaining", 0), 1))
+				setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", Floor(knowledgeBase.getValue("Lap.Remaining.Energy", 0)))
+			}
 
 			if (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
 				driverTime := Round(getMultiMapValue(data, "Stint Data", "DriverTimeRemaining") / 1000)
@@ -2586,7 +2640,7 @@ class RaceAssistant extends ConfigurationItem {
 		local adjustedLapTime := false
 		local driverForname, driverSurname, driverNickname, tyreSet, airTemperature, trackTemperature, sessionTimeRemaining, driverTimeRemaining
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
-		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
+		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key, noBaseLap
 		local mixedCompounds, tyreSet, index, tyre, axle
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -2765,13 +2819,15 @@ class RaceAssistant extends ConfigurationItem {
 			this.updateDynamicValues(values)
 		}
 
+		noBaseLap := !this.BaseLap
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.End", overallTime)
 
 		fuelRemaining := getMultiMapValue(data, "Car Data", "FuelRemaining", 0)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 
-		if ((lapNumber < 5) && !this.BaseLap) {
+		if ((lapNumber < 5) && noBaseLap) {
 			this.updateDynamicValues({BaseLap: lapNumber
 									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
@@ -2793,6 +2849,34 @@ class RaceAssistant extends ConfigurationItem {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
 
 			this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
+		}
+
+		energyRemaining := getMultiMapValue(data, "Car Data", "EnergyRemaining", kUndefined)
+
+		if (energyRemaining != kUndefined) {
+			knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Remaining", Round(energyRemaining, 1))
+
+			if ((lapNumber < 5) && noBaseLap) {
+				this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
+
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", 0)
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", 0)
+			}
+			else if (!this.InitialEnergyAmount || (energyRemaining > this.LastEnergyAmount)) {
+				; This is the case after a pitstop
+				this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
+
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.AvgConsumption", 0))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.Consumption", 0))
+			}
+			else {
+				avgEnergyConsumption := Round((this.InitialEnergyAmount - energyRemaining) / (lapNumber - baseLap), 1)
+
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", avgEnergyConsumption)
+				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", Round(this.LastEnergyAmount - energyRemaining, 1))
+
+				this.updateDynamicValues({LastEnergyAmount: energyRemaining, AvgEnergyConsumption: avgEnergyConsumption})
+			}
 		}
 
 		tyrePressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
@@ -2943,7 +3027,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.finishPitstop(lapNumber)
 
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0, EnoughData: false})
 	}
 
 	startPitstop(lapNumber) {
@@ -2968,7 +3052,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if this.RemoteHandler {
 			if isDebug()
-				logMessage(kLogCritical, "Saving session state for " . this.AssistantType . "...")
+				logMessage(kLogDebug, "Saving session state for " . this.AssistantType . "...")
 
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
@@ -3268,13 +3352,24 @@ class GridRaceAssistant extends RaceAssistant {
 		local driver := (knowledgeBase ? knowledgeBase.getValue("Driver.Car", false) : false)
 		local standingsData := CaseInsenseWeakMap()
 		local standings := []
+		local lengthUnit := ((type != "Agent") ? (A_Space . getUnit("Length")) : " Meters")
+		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local keys, ignore, car, carData, sectorTimes
-		local positions, position, classPosition, car
+		local positions, position, classPosition, car, numPitstops, fuelRemaining
+
+		convert(unit, value, arguments*) {
+			if (type != "Agent")
+				return convertUnit(unit, value, arguments*)
+			else
+				return value
+		}
 
 		getCar(car, type?) {
 			local carData
 
 			try {
+				numPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+
 				carData := Map("Nr", this.getNr(car)
 							 , "DriverName", driverName(knowledgeBase.getValue("Car." . car . ".Driver.Forname")
 													  , knowledgeBase.getValue("Car." . car . ".Driver.Surname")
@@ -3283,10 +3378,16 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 							 , "OverallPosition", this.getPosition(car, "Overall")
 							 , "ClassPosition", this.getPosition(car, "Class")
-							 , "DistanceIntoTrack", (Round(this.getRunning(car) * this.TrackLength) . " Meters")
+							 , "DistanceIntoTrack", (convert("Length", (this.getRunning(car) * this.TrackLength)) . lengthUnit)
 							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
-							 , "NumPitstops", this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+							 , "NumPitstops", numPitstops
+							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)
 							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
+
+				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", 0)
+
+				if (fuelRemaining > 0)
+					carData["RemainingFuel"] := (convert("Volume", fuelRemaining) . volumeUnit)
 
 				if isSet(type)
 					carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
@@ -3342,6 +3443,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if (this.activeTopic(options, "Standings") && driver)
 			try {
 				for ignore, car in this.getCars() {
+					/*
 					sectorTimes := this.getSectorTimes(car)
 
 					if sectorTimes {
@@ -3352,6 +3454,7 @@ class GridRaceAssistant extends RaceAssistant {
 					}
 					else
 						sectorTimes := false
+					*/
 
 					carData := getCar(car)
 

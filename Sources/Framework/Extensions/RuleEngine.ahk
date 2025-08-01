@@ -22,7 +22,8 @@ global kOne := "One:"
 global kNone := "None:"
 global kPredicate := "Predicate:"
 global kProve := "Prove:"
-global kCalc := "Calc:"
+global kExpression := "Is:"
+global kLet := "Let:"
 
 global kEqual := "="
 global kNotEqual := "!="
@@ -464,15 +465,15 @@ class Goal extends Condition {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    Calc                                           ;;;
+;;; Class                    Expression                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class Calc extends Condition {
+class Expression extends Condition {
 	iRule := false
 
 	Type {
 		Get {
-			return kCalc
+			return kExpression
 		}
 	}
 
@@ -527,13 +528,13 @@ class Calc extends Condition {
 	}
 
 	toString(facts := kNotInitialized) {
-		return ("{" . kCalc . A_Space . this.Rule.Tail[1].toString(facts) . "}")
+		return ("{" . kExpression . A_Space . this.Rule.Tail[1].toString(facts) . "}")
 	}
 
 	toObject(facts := kNotInitialized) {
 		local predicate := Object()
 
-		predicate[kCalc] := [this.Rule.Tail[1].toObject(facts)]
+		predicate[kExpression] := [this.Rule.Tail[1].toObject(facts)]
 
 		return predicate
 	}
@@ -1083,15 +1084,15 @@ class ProveAction extends CallAction {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Class                    CalcAction                                     ;;;
+;;; Class                    LetAction                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class CalcAction extends Action {
+class LetAction extends Action {
 	iRule := false
 
 	Action {
 		Get {
-			return kCalc
+			return kLet
 		}
 	}
 
@@ -1142,13 +1143,13 @@ class CalcAction extends Action {
 	}
 
 	toString(facts := kNotInitialized) {
-		return ("(" . kCalc . A_Space . this.Rule.Tail[1].toString(facts) . ")")
+		return ("(" . kLet . A_Space . this.Rule.Tail[1].toString(facts) . ")")
 	}
 
 	toObject(facts := kNotInitialized) {
 		local action := Object()
 
-		action[kCalc] := [this.Rule.Tail[1].toObject(facts)]
+		action[kLet] := [this.Rule.Tail[1].toObject(facts)]
 
 		return action
 	}
@@ -4167,7 +4168,7 @@ class RuleCompiler {
 
 				if (keyword = kProve)
 					conditions.Push(Array(keyword, this.readStruct(&text, &nextCharIndex)))
-				else if (keyword = kCalc)
+				else if (keyword = kExpression)
 					conditions.Push(Array(keyword, this.readTailTerm(&text, &nextCharIndex)))
 				else
 					conditions.Push(Array(keyword, this.readConditions(&text, &nextCharIndex)*))
@@ -4204,7 +4205,7 @@ class RuleCompiler {
 
 	readActions(&text, &nextCharIndex) {
 		local actions := []
-		local action, arguments
+		local action, arguments, delimiter
 
 		loop {
 			this.skipDelimiter("(", &text, &nextCharIndex)
@@ -4213,13 +4214,22 @@ class RuleCompiler {
 
 			if inList([kCall, kProve, kProveAll], action)
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
-			else if (action = kCalc)
+			else if (action = kLet)
 				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
 			else {
 				arguments := Array(action)
 
 				loop {
-					if ((A_Index > 1) && !this.skipDelimiter(",", &text, &nextCharIndex, false))
+					delimiter := ","
+
+					if (action = kSet) {
+						this.skipWhiteSpace(&text, &nextCharIndex)
+
+						if (SubStr(text, nextCharIndex, 1) = "=")
+							delimiter := "="
+					}
+
+					if ((A_Index > 1) && !this.skipDelimiter(delimiter, &text, &nextCharIndex, false))
 						break
 
 					arguments.Push(this.readLiteral(&text, &nextCharIndex))
@@ -4582,8 +4592,8 @@ class ConditionParser extends Parser {
 				return NotExistQuantor(this.parseArguments(expressions, 2))
 			case kProve:
 				return Goal(this.parseStruct(expressions, 2))
-			case kCalc:
-				return Calc(this.parseCalcRule(expressions, 2))
+			case kExpression:
+				return Expression(this.parseExpressionRule(expressions, 2))
 			default:
 				return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
 		}
@@ -4604,11 +4614,11 @@ class ConditionParser extends Parser {
 		return this.Compiler.createStructParser(conditions[2], this.Variables).parse(conditions[2])
 	}
 
-	parseCalcRule(conditions, start) {
+	parseExpressionRule(conditions, start) {
 		local variables := CaseInsenseMap()
 		local term := this.Compiler.createTermParser(conditions[2], variables).parse(conditions[2])
 
-		return ReductionRule(Struct("calc", collect(getKeys(variables), (v) => Variable(v))), [term])
+		return ReductionRule(Struct("expression", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 
@@ -4666,8 +4676,8 @@ class ActionParser extends Parser {
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
 				return ProveAction(Literal(struct.Functor), struct.Arguments, true)
-			case kCalc:
-				return CalcAction(this.parseCalcRule(expressions))
+			case kLet:
+				return LetAction(this.parseLetRule(expressions))
 			case kExecute:
 				argument := this.Compiler.createPrimaryParser(expressions[2], this.Variables).parse(expressions[2])
 				arguments := this.parseArguments(expressions, 3)
@@ -4710,11 +4720,11 @@ class ActionParser extends Parser {
 		return result
 	}
 
-	parseCalcRule(expressions) {
+	parseLetRule(expressions) {
 		local variables := CaseInsenseMap()
 		local term := this.Compiler.createTermParser(expressions[2], variables).parse(expressions[2])
 
-		return ReductionRule(Struct("calc", collect(getKeys(variables), (v) => Variable(v))), [term])
+		return ReductionRule(Struct("expression", collect(getKeys(variables), (v) => Variable(v))), [term])
 	}
 }
 

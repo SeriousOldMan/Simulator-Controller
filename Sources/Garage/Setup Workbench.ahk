@@ -2192,6 +2192,9 @@ class DiscreteValuesHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
+		if (rawValue = 10)
+			a := 1
+
 		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
@@ -2207,10 +2210,10 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if !this.Reverse
-			return Min(this.MaxValue, Max(this.MinValue, displayValue))
-		else
+		else if this.Reverse
 			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 	}
 
 	decreaseValue(displayValue) {
@@ -2218,8 +2221,8 @@ class DiscreteValuesHandler extends NumberHandler {
 
 		if this.validValue(value)
 			return value
-		else if !this.Reverse
-			return Max(this.MinValue, Min(this.MaxValue, displayValue))
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
 		else
 			return Min(this.MaxValue, Max(this.MinValue, displayValue))
 	}
@@ -2919,7 +2922,7 @@ class SetupEditor extends ConfigurationItem {
 						unit := getUnit("Pressure")
 
 					this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check"
-											, categoriesLabels[category], label, value, unit)
+											, categoriesLabels[category], label, value, translate(unit))
 
 					this.Settings[setting] := label
 					this.Settings[label] := setting
@@ -3492,11 +3495,13 @@ class SetupComparator extends ConfigurationItem {
 
 				if (isNumber(valueB) && isNumber(valueA)) {
 					targetAB := ((valueA * (((mix * -1) + 100) / 200)) + (valueB * (mix + 100) / 200))
-					valueAB := ((valueA < valueB) ? valueA : valueB)
+					valueAB := (!handler.Reverse ? ((valueA < valueB) ? valueA : valueB)
+											     : ((valueA < valueB) ? valueB: valueA))
 					lastValueAB := kUndefined
 
 					loop {
-						if (valueAB >= targetAB) {
+						if ((!handler.Reverse && (valueAB >= targetAB))
+						 || (handler.Reverse && (valueAB < targetAB))) {
 							if (lastValueAB != kUndefined) {
 								delta := (valueAB - lastValueAB)
 
@@ -3594,7 +3599,7 @@ class SetupComparator extends ConfigurationItem {
 					unit := getUnit("Pressure")
 
 				this.SettingsListView.Add("", categoriesLabels[category]
-											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, unit)
+											, label, isNumber(valueA) ? displayValue("Float", valueA) : valueA, valueB, valueAB, translate(unit))
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting

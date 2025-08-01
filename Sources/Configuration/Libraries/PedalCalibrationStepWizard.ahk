@@ -160,19 +160,23 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		this.iPedalsCheck := CaseInsenseMap()
 	}
 
-	hidePage(page) {
+	savePage(page) {
 		local msgResult
 
-		if !this.SetupWizard.isSoftwareInstalled("SmartControl") {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+		if super.savePage(page) {
+			if !this.SetupWizard.isSoftwareInstalled("SmartControl") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := withBlockedWindows(MsgBox, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-			if (msgResult = "No")
-				return false
+				if (msgResult = "No")
+					return false
+			}
+
+			return true
 		}
-
-		return super.hidePage(page)
+		else
+			return false
 	}
 
 	getModule() {

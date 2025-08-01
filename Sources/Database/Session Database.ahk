@@ -1941,7 +1941,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("Bold Italic", "Arial")
 
 		editorGui.Add("Text", "x342 yp+30 w267 0x10 X:Move(0.2)")
-		editorGui.Add("Text", "x296 yp+10 w370 h20 X:Move(0.2) Center BackgroundTrans", substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")}))
+		editorGui.Add("Text", "x296 yp+10 w370 h20 X:Move(0.2) Center BackgroundTrans", substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure", true)}))
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -2000,7 +2000,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")])
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")])
 
 		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
 		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
@@ -3710,11 +3710,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		if hasNames {
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")]
+			for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
 				this.TrackSectionsListView.InsertCol(A_Index, "", column)
 		}
 		else
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . translate(getUnit("Length")) . translate(")"), translate("X"), translate("Y")]
+			for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
 				this.TrackSectionsListView.InsertCol(A_Index, "", column)
 
 		bubbleSort(&sections, (a, b) => (a.Index > b.Index))

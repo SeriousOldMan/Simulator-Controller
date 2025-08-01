@@ -1765,13 +1765,11 @@ class ControllerPlugin extends Plugin {
 
 		logMessage(kLogInfo, translate("Activating plugin ") . translate(this.Plugin))
 
-		Task.startTask(() {
-			for ignore, theAction in this.Actions {
-				controller.connectAction(this, theAction.Function, theAction)
+		for ignore, theAction in this.Actions {
+			controller.connectAction(this, theAction.Function, theAction)
 
-				theAction.Function.enable(kAllTrigger, theAction)
-			}
-		})
+			theAction.Function.enable(kAllTrigger, theAction)
+		}
 	}
 
 	deactivate() {
@@ -1780,10 +1778,8 @@ class ControllerPlugin extends Plugin {
 
 		logMessage(kLogInfo, translate("Deactivating plugin ") . translate(this.Plugin))
 
-		Task.startTask(() {
-			for ignore, theAction in this.Actions
-				controller.disconnectAction(this, theAction.Function, theAction)
-		})
+		for ignore, theAction in this.Actions
+			controller.disconnectAction(this, theAction.Function, theAction)
 	}
 
 	updateFunctions() {
@@ -2459,4 +2455,4 @@ if kLogStartup
 if kLogStartup
 	logMessage(kLogOff, "Starting controller...")
 
-Task.startTask(startupSimulatorController, 0, kHighPriority)
+startupSimulatorController()

@@ -665,29 +665,27 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	activate() {
+		local action, isRunning
+
 		super.activate()
 
-		Task.startTask(() {
-			local isRunning := this.Application.isRunning()
-		
-			this.updateActions()
+		isRunning := this.Application.isRunning()
 
-			if !this.iUpdateMotionStateTask {
-				this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
+		this.updateActions()
 
-				this.iUpdateMotionStateTask.start()
-			}
-		})
+		if !this.iUpdateMotionStateTask {
+			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
+
+			this.iUpdateMotionStateTask.start()
+		}
 	}
 
 	deactivate() {
-		Task.startTask(() {
-			if this.iUpdateMotionStateTask {
-				this.iUpdateMotionStateTask.stop()
+		if this.iUpdateMotionStateTask {
+			this.iUpdateMotionStateTask.stop()
 
-				this.iUpdateMotionStateTask := false
-			}
-		})
+			this.iUpdateMotionStateTask := false
+		}
 
 		super.deactivate()
 	}

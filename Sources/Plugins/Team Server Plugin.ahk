@@ -587,7 +587,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		Task.startTask(() => this.updateActions(kSessionUnknown))
+		this.updateActions(kSessionUnknown)
 	}
 
 	updateFunctions() {

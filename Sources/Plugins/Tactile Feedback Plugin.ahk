@@ -484,25 +484,21 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		Task.startTask(() {
-			this.updateActions()
+		this.updateActions()
 
-			if !this.iUpdateVibrationStateTask {
-				this.iUpdateVibrationStateTask := PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
+		if !this.iUpdateVibrationStateTask {
+			this.iUpdateVibrationStateTask := PeriodicTask(ObjBindMethod(this, "updateVibrationState"), 50, kLowPriority)
 
-				this.iUpdateVibrationStateTask.start()
-			}
-		})
+			this.iUpdateVibrationStateTask.start()
+		}
 	}
 
 	deactivate() {
-		Task.startTask(() {
-			if this.iUpdateVibrationStateTask {
-				this.iUpdateVibrationStateTask.stop()
+		if this.iUpdateVibrationStateTask {
+			this.iUpdateVibrationStateTask.stop()
 
-				this.iUpdateVibrationStateTask := false
-			}
-		})
+			this.iUpdateVibrationStateTask := false
+		}
 
 		super.deactivate()
 	}

@@ -822,7 +822,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, this.getClass(raceData, car))
+					if inList(selectedClasses, this.getClass(raceData, car)) {
 						if times.Has(lap) {
 							time := (times[lap].Has(car) ? times[lap][car] : 0)
 							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
@@ -834,6 +834,9 @@ class RaceReportViewer extends RaceReportReader {
 						}
 						else
 							lapTimes.Push(kNull)
+					}
+					else
+						lapTimes.Push(kNull)
 
 				driverTimes[lap] := lapTimes
 			}

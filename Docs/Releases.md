@@ -31,6 +31,7 @@
 
   - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
   - Fixed detection of active driver for *Le Mans Ultimate*.
+  - Fixed a bug, that caused the *Lap Times* report to be empty when switching from the *Positions* with the car class being restricted. Affected "Race Reports", "Solo Center" and "Team Center".
   
 #### Changes
 

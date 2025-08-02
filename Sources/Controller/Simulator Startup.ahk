@@ -1334,8 +1334,8 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", icons["RaceSettings"]).OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", icons["SessionDatabase"]).OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSoloCenter", icons["SoloCenter"]).OnEvent("Click", launchApplication.Bind("SoloCenter"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSoloCenter", icons["SoloCenter"]).OnEvent("Click", launchApplication.Bind("SoloCenter"))
 
 		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vTeamCenter", icons["TeamCenter"])
 
@@ -1357,8 +1357,8 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
-		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Solo Center")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Strategy Workbench")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Strategy Workbench")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Solo Center")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Team Center")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
 

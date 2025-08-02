@@ -5893,7 +5893,7 @@ class SoloCenter extends ConfigurationItem {
 		this.Window.Block()
 
 		try {
-			return this.ReportViewer.editReportSettings("Laps", "Classes")
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 		}
 		finally {
 			this.Window.Unblock()

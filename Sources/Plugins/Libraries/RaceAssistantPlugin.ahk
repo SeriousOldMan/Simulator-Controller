@@ -2721,7 +2721,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 							; Was in the pits, check if same driver for next stint...
 
-							if (RaceAssistantPlugin.TeamSessionActive && RaceAssistantPlugin.driverActive(data))
+							if (RaceAssistantPlugin.TeamSessionActive && driverActive)
 								RaceAssistantPlugin.TeamServer.addStint(dataLastLap)
 						}
 
@@ -2763,7 +2763,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						}
 						else if firstLap {
 							if RaceAssistantPlugin.connectTeamSession()
-								if RaceAssistantPlugin.driverActive(data) {
+								if driverActive {
 									teamServer := RaceAssistantPlugin.TeamServer
 
 									teamServer.joinSession(getMultiMapValue(data, "Session Data", "Simulator")

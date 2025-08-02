@@ -23,7 +23,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.4.4.0
+
+#### Date: 08/08/25 (planned)
+
+#### Fixes
+
+  - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
+  - Fixed detection of active driver for *Le Mans Ultimate*.
+  
+#### Changes
+
+  - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
+  - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
+  - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
+  - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.
 
 # Release history
 

@@ -276,6 +276,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.simulatorStartup(simulator)
 	}
 
+	sessionActive(data) {
+		return (super.sessionActive(data) && !getMultiMapValue(data, "Session Data", "Paused", false))
+	}
+
 	driverActive(data, driverForName, driverSurName) {
 		return this.sessionActive(data)
 	}

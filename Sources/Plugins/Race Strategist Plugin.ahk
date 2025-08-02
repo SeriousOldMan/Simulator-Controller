@@ -335,10 +335,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 		return settings
 	}
 
-	saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, tyreLaps, pressures, temperatures, wear, lapState
-			   , waterTemperature, oilTemperature) {
+	saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			  , compound, compoundColor, tyreLaps, pressures, temperatures, wear, lapState
+			  , waterTemperature, oilTemperature) {
 		local teamServer := this.TeamServer
 		local pid
 

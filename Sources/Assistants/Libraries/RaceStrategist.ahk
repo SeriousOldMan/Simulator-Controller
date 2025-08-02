@@ -123,8 +123,8 @@ class RaceStrategist extends GridRaceAssistant {
 			this.callRemote("saveStandingsData", arguments*)
 		}
 
-		saveLapsData(arguments*) {
-			this.callRemote("saveLapsData", arguments*)
+		saveLapData(arguments*) {
+			this.callRemote("saveLapData", arguments*)
 		}
 
 		updateLapsDatabase(arguments*) {
@@ -2223,11 +2223,11 @@ class RaceStrategist extends GridRaceAssistant {
 			waterTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Water", kNull)
 			oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
 
-			this.saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-							, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
-							, values2String(",", compound*), values2String(",", compoundColor*)
-							, pressures, temperatures, wear, lapState
-							, waterTemperature, oilTemperature)
+			this.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
+						   , values2String(",", compound*), values2String(",", compoundColor*)
+						   , pressures, temperatures, wear, lapState
+						   , waterTemperature, oilTemperature)
 		}
 
 		if this.Strategy {
@@ -4116,7 +4116,8 @@ class RaceStrategist extends GridRaceAssistant {
 			Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
 														 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
 														 , engineerPID)
-						 , 30000, kLowPriority)
+						 , (this.TeamSession ? (this.BestLapTime ? (this.BestLapTime * 2) : 240000) : 60000)
+						 , kLowPriority)
 
 		return result
 	}
@@ -4730,10 +4731,10 @@ class RaceStrategist extends GridRaceAssistant {
 			this.RemoteHandler.createRaceReport()
 	}
 
-	saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
-			   , compound, compoundColor, pressures, temperatures, wear, lapState
-			   , waterTemperature, oilTemperature) {
+	saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			  , compound, compoundColor, pressures, temperatures, wear, lapState
+			  , waterTemperature, oilTemperature) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local lapsDB := this.LapsDatabase
@@ -4779,7 +4780,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (this.RemoteHandler && this.CollectLaps) {
 			this.updateDynamicValues({HasLapsData: true})
 
-			this.RemoteHandler.saveLapsData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+			this.RemoteHandler.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
 										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 										  , compound, compoundColor, tyreLaps, values2String(",", pressures*), values2String(",", temperatures*)
 										  , wear ? values2String(",", wear*) : false

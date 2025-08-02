@@ -35,6 +35,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static sLapRunning := 0
 	static sAssistantWaitForShutdown := 0
 	static sTeamServerWaitForShutdown := 0
+	static sDriverWasActive := false
 	static sInPit := false
 	static sFinish := false
 	static sSettings := CaseInsenseMap()
@@ -576,6 +577,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	InPit {
 		Get {
 			return RaceAssistantPlugin.InPit
+		}
+	}
+
+	static DriverWasActive {
+		Get {
+			return RaceAssistantPlugin.sDriverWasActive
+		}
+	}
+
+	DriverWasActive {
+		Get {
+			return RaceAssistantPlugin.DriverWasActive
 		}
 	}
 
@@ -1190,6 +1203,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		RaceAssistantPlugin.sStintStartTime := false
 		RaceAssistantPlugin.sLastLap := 0
 		RaceAssistantPlugin.sLapRunning := 0
+		RaceAssistantPlugin.sDriverWasActive := false
 		RaceAssistantPlugin.sInPit := false
 		RaceAssistantPlugin.sFinish := false
 		RaceAssistantPlugin.sSettings.Clear()
@@ -2412,7 +2426,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local telemetryData, standingsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
-		local simulator, car, track, weather
+		local simulator, car, track, weather, driverActive
 
 		static replayLap := false
 		static replayIndex := false
@@ -2549,18 +2563,32 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					splitTime := A_TickCount
 				}
 
+				driverActive := RaceAssistantPlugin.driverActive(data)
+
+				if (session == kSessionPaused) {
+					if (!driverActive && RaceAssistantPlugin.DriverWasActive && !RaceAssistantPlugin.InPit
+					 && (getMultiMapValue(data, "Stint Data", "InPit", false) || getMultiMapValue(data, "Stint Data", "InPitLane", false))) {
+						setMultiMapValue(data, "Session Data", "Paused", false)
+
+						session := RaceAssistantPlugin.Session
+					}
+					else {
+						RaceAssistantPlugin.updateAssistantsSession(session)
+
+						RaceAssistantPlugin.sInPit := false
+
+						return
+					}
+				}
+
+				RaceAssistantPlugin.sDriverWasActive := driverActive
+
 				RaceAssistantPlugin.updateAssistantsSession(session)
 
 				if isDebug() {
 					logMessage(kLogInfo, "Collect session data (Update Session):" . (A_TickCount - splitTime) . " ms...")
 
 					splitTime := A_TickCount
-				}
-
-				if (session == kSessionPaused) {
-					RaceAssistantPlugin.sInPit := false
-
-					return
 				}
 
 				if !RaceAssistantPlugin.sessionActive(data) {
@@ -2645,7 +2673,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								RaceAssistantPlugin.sStintStartTime := false
 
 								if (teamSessionActive && RaceAssistantPlugin.TeamServer.Connected) {
-									if !RaceAssistantPlugin.driverActive(data) {
+									if !driverActive {
 										RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
 
 										logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
@@ -2666,7 +2694,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 								RaceAssistantPlugin.sStintStartTime := false
 
-								if !RaceAssistantPlugin.driverActive(data) {
+								if !driverActive {
 									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
 
 									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
@@ -2681,7 +2709,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 								RaceAssistantPlugin.restoreAssistantsSessionState(data)
 							}
 
-							if !RaceAssistantPlugin.driverActive(data)
+							if !driverActive
 								return ; Oops, a different driver, might happen in some simulations after a pitstop
 						}
 

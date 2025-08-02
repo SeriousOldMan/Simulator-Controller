@@ -3,7 +3,7 @@ Version=6.4.4.0-dev
 Target=6.4.4.0-release
 Date=08/02/2025
 Download=
-Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center" and "Solo Center"
+Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center" and "Solo Center", Select inidividual cars in the Positions report
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
 Version=6.4.3.0-release

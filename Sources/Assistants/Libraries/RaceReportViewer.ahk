@@ -670,7 +670,8 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local raceData, drivers, positions, times, cars, carsCount, simulator
 		local carIndices, minPosition, maxPosition, newMinPosition, newMaxPosition
-		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions, selectedClasses
+		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions
+		local selectedClasses, selectedCars
 
 		if report {
 			raceData := true
@@ -690,11 +691,10 @@ class RaceReportViewer extends RaceReportReader {
 			maxPosition := 0
 
 			selectedClasses := this.getReportClasses(raceData)
+			selectedCars := this.getReportCars(raceData)
 
-			loop carsCount {
-				car := A_Index
-
-				if inList(selectedClasses, this.getClass(raceData, A_Index)) {
+			for ignore, car in selectedCars
+				if inList(selectedClasses, this.getClass(raceData, car)) {
 					valid := false
 
 					newMinPosition := minPosition
@@ -724,7 +724,6 @@ class RaceReportViewer extends RaceReportReader {
 									   . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
-			}
 
 			for ignore, lap in this.getReportLaps(raceData)
 				loop carsCount {
@@ -795,7 +794,7 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editPositionsReportSettings() {
-		return this.editReportSettings("Laps", "Classes")
+		return this.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showLapTimesReport() {

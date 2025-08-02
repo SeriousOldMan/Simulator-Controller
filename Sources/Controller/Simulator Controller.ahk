@@ -2257,6 +2257,8 @@ initializeSimulatorController() {
 
 	SetKeyDelay(10, 30)
 
+	Thread("Priority", 9999)
+
 	try {
 		settings := readMultiMap(kSimulatorSettingsFile)
 
@@ -2317,6 +2319,8 @@ startupSimulatorController() {
 		controller.startup()
 
 		startupApplication()
+
+		Thread("Priority", 0)
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -2435,7 +2439,6 @@ writeControllerState() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorController()
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Plugin Include Section                         ;;;

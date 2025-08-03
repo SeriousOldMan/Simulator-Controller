@@ -32,10 +32,12 @@
   - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
   - Fixed detection of active driver for *Le Mans Ultimate*.
   - Fixed a bug, that caused the *Lap Times* report to be empty when switching from the *Positions* with the car class being restricted. Affected "Race Reports", "Solo Center" and "Team Center".
+  - Fixed minor problems with Japanese speech generation.
   
 #### Changes
 
   - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
+  - Initial support for ElevenLabs Speech API. Using ElevenLabs, you can create your own voices easily. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. See the new [documentation](*) for more information.
   - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
   - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
   - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.

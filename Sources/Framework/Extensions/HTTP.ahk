@@ -189,7 +189,10 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         result.Status := this.whr.Status
 
         try {
-            result.Text := this._Text(options.HasProp("Encoding") && options.Encoding)
+            if (options.HasProp("Raw") && options.Raw)
+                result.Raw := this._Raw()
+            else
+                result.Text := this._Text(options.HasProp("Encoding") && options.Encoding)
         }
         catch {
             result.Text := ""
@@ -364,6 +367,20 @@ class WinHTTPRequest extends WinHttpRequest._Call {
 
             response := StrGet(ptr, length, encoding)
         }
+
+        return response
+    }
+
+    _Raw() {
+        local response, arr, ptr, length
+
+        arr := this.whr.ResponseBody
+        ptr := NumGet(ComObjValue(arr) + 8 + A_PtrSize, "Ptr")
+        length := (arr.MaxIndex() + 1)
+
+        response := Buffer(length)
+
+        DllCall("RtlMoveMemory", "Ptr", response.Ptr, "Ptr", ptr, "Ptr", length)
 
         return response
     }

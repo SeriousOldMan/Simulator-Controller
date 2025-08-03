@@ -2566,11 +2566,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				driverActive := RaceAssistantPlugin.driverActive(data)
 
 				if (session == kSessionPaused) {
-					if (!driverActive && RaceAssistantPlugin.DriverWasActive && !RaceAssistantPlugin.InPit
-					 && (getMultiMapValue(data, "Stint Data", "InPit", false) || getMultiMapValue(data, "Stint Data", "InPitLane", false))) {
+					if (!driverActive && this.TeamSessionActive && RaceAssistantPlugin.DriverWasActive
+									  && !RaceAssistentPlugin.InPit && !RaceAssistantPlugin.Finish) {
 						setMultiMapValue(data, "Session Data", "Paused", false)
+						setMultiMapValue(data, "Stint Data", "InPit", true)
 
 						session := RaceAssistantPlugin.Session
+
+						RaceAssistantPlugin.updateAssistantsSession(session)
 					}
 					else {
 						RaceAssistantPlugin.updateAssistantsSession(session)
@@ -2580,10 +2583,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						return
 					}
 				}
+				else
+					RaceAssistantPlugin.updateAssistantsSession(session)
 
 				RaceAssistantPlugin.sDriverWasActive := driverActive
-
-				RaceAssistantPlugin.updateAssistantsSession(session)
 
 				if isDebug() {
 					logMessage(kLogInfo, "Collect session data (Update Session):" . (A_TickCount - splitTime) . " ms...")

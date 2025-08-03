@@ -867,7 +867,7 @@ class LLMConnector {
 		}
 
 		ParseAnswer(answer) {
-			return Trim(StrReplace(StrReplace(StrReplace(super.ParseAnswer(answer), "System:", ""), "Assistant:", ""), "User:", ""))
+			return StrReplace(StrReplace(StrReplace(super.ParseAnswer(answer), "System:", ""), "Assistant:", ""), "User:", "")
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
@@ -937,7 +937,7 @@ class LLMConnector {
 					return false
 				}
 
-				answer := Trim(FileRead(kTempDirectory . "LLMRuntime.out", "`n"))
+				answer := FileRead(kTempDirectory . "LLMRuntime.out", "`n")
 
 				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
 					answer := SubStr(answer, 2)

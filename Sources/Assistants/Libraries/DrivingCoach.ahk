@@ -879,7 +879,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static conversationNr := 1
 
 		normalizeAnswer(answer) {
-			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), "`t`r`n")
 
 			while InStr(answer, "\n", , -2)
 				answer := SubStr(answer, 1, StrLen(answer) - 2)

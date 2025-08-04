@@ -78,7 +78,6 @@ class SpeechSynthesizer {
 	iSpeechStatusCallback := false
 
 	iGoogleMode := "HTTP"
-	iElevenLabsVoice := false
 
 	class WAVHeader {
 		riff		: u32
@@ -144,7 +143,7 @@ class SpeechSynthesizer {
 		Get {
 			local voices, voice, lcid, ignore, candidate, name
 
-			if !language
+			if (!language || (this.Synthesizer = "ElevenLabs"))
 				return this.iVoices
 			else {
 				voices := []
@@ -372,7 +371,6 @@ class SpeechSynthesizer {
 
 			try {
 				this.iAPIKey := string2Values("|", synthesizer, 2)[2]
-				this.iElevenLabsVoice := voice
 
 				this.iVoices := this.getVoices()
 
@@ -435,8 +433,25 @@ class SpeechSynthesizer {
 			else
 				return string2Values("|", voices)
 		}
-		else if (this.Synthesizer = "ElevenLabs")
-			return []
+		else if (this.Synthesizer = "ElevenLabs") {
+			voices := []
+
+			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=default", ""
+										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+
+			if ((result.Status >= 200) && (result.Status < 300))
+				for ignore, voiceInfo in result.JSON["voices"]
+					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+
+			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=personal", ""
+										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+
+			if ((result.Status >= 200) && (result.Status < 300))
+				for ignore, voiceInfo in result.JSON["voices"]
+					voices.Push(voiceInfo["name"])
+
+			return voices
+		}
 		else if (this.iGoogleMode = "HTTP") {
 			result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iAPIKey, "", Map(), {Encoding: "UTF-8"})
 
@@ -768,8 +783,7 @@ class SpeechSynthesizer {
 		else if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 		else if inList(["dotNet", "Azure", "Google", "ElevenLabs"], this.Synthesizer) {
-			tempName := (cache ? cacheFileName
-							   : temporaryFileName("temp", "wav"))
+			tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 			this.speakToFile(tempName, text)
 
@@ -784,7 +798,7 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
-		local oldStream, stream, ssml, name, voice, request, result, header, file
+		local oldStream, stream, ssml, name, voice, request, result, header, file, id
 
 		this.stop()
 
@@ -871,7 +885,9 @@ class SpeechSynthesizer {
 		}
 		else if (this.Synthesizer = "ElevenLabs") {
 			try {
-				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . this.iElevenLabsVoice . "?output_format=pcm_16000"
+				id := StrReplace(string2Values("(", this.Voice)[2], ")", "")
+
+				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . id . "?output_format=pcm_16000"
 											  , JSON.print(Map("text", text))
 											  , Map("xi-api-key", this.iAPIKey
 												  , "Content-Type", "application/json")
@@ -1025,16 +1041,20 @@ class SpeechSynthesizer {
 	computeVoice(voice, language, randomize := true) {
 		local availableVoices := []
 		local voices := this.Voices
-		local count, locale, ignore, candidate
+		local count, locale, ignore, candidate, id
 
 		if inList(voices, voice)
 			return voice
 
 		if InStr(voice, "(") {
-			locale := StrReplace(string2Values("(", voice)[2], ")", "")
+			if (this.Synthesizer != "ElevenLabs")
+				id := StrReplace(string2Values("(", voice)[2], ")", "")
+			else {
+				locale := StrReplace(string2Values("(", voice)[2], ")", "")
 
-			if (InStr(locale, language) != 1)
-				voice := false
+				if (InStr(locale, language) != 1)
+					voice := false
+			}
 		}
 
 		if (this.Synthesizer = "Windows") {
@@ -1052,7 +1072,7 @@ class SpeechSynthesizer {
 					voice := availableVoices[1]
 			}
 		}
-		else if inList(["dotNet", "Azure", "Google", "ElevenLabs"], this.Synthesizer) {
+		else if inList(["dotNet", "Azure", "Google"], this.Synthesizer) {
 			if language {
 				availableVoices := []
 
@@ -1065,6 +1085,18 @@ class SpeechSynthesizer {
 			}
 
 			if ((voice == true) && language) {
+				count := availableVoices.Length
+
+				if (count == 0)
+					voice := false
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
+				else
+					voice := availableVoices[1]
+			}
+		}
+		else if (this.Synthesizer = "ElevenLabs") {
+			if (voice == true) {
 				count := availableVoices.Length
 
 				if (count == 0)

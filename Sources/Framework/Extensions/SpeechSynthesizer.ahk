@@ -448,7 +448,7 @@ class SpeechSynthesizer {
 
 			if ((result.Status >= 200) && (result.Status < 300))
 				for ignore, voiceInfo in result.JSON["voices"]
-					voices.Push(voiceInfo["name"])
+					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
 			return voices
 		}

@@ -198,7 +198,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 			}
-			else if (voiceRecognizerDropDown.Value >= 5)
+			else if (voiceRecognizerDropDown.Value == 5) {
+				try {
+					recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+			}
+			else if (voiceRecognizerDropDown.Value >= 6)
 				try {
 					recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}

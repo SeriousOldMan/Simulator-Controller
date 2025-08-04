@@ -911,10 +911,7 @@ class SpeechSynthesizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				if (this.Synthesizer = "Azure")
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
-				else if (this.Synthesizer = "Google")
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
 			}
 		}
 	}

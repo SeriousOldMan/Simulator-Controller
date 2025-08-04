@@ -32,17 +32,21 @@ namespace WhisperServer
 
         string ServerURL = "";
         string Language = "";
-        string Model = "";
+        string Model = "medium";
 
         public WhisperServerConnector()
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
-        public void Initialize(string url, string language, string model)
+        public void Initialize(string url, string language)
         {
             ServerURL = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
             Language = language.ToLower();
+        }
+
+        public void SetModel(string model)
+        {
             Model = model.ToLower();
         }
 

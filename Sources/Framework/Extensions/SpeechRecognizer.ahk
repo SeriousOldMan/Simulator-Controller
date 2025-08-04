@@ -210,8 +210,6 @@ class SpeechRecognizer {
 
 	iElevenLabsAPIKey := false
 
-	iWhisperServerURL := false
-
 	iCapturedAudioFile := false
 
 	static sAudioRoutingInitialized := false
@@ -379,6 +377,7 @@ class SpeechRecognizer {
 		global kNirCmd
 
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
+		local whisperServerURL
 
 		if (engine = "Whisper")
 			engine := "Whisper Local"
@@ -509,7 +508,8 @@ class SpeechRecognizer {
 				if (InStr(engine, "Whisper Server|") = 1) {
 					engine := string2Values("|", engine)
 
-					this.iWhisperServerURL := engine[2]
+					whisperServerURL := engine[2]
+
 					engine := engine[1]
 				}
 
@@ -523,7 +523,7 @@ class SpeechRecognizer {
 				if (engine = "Whisper Server") {
 					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")
 
-					this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
+					this.Instance.Connector.Initialize(whisperServerURL, this.Language)
 				}
 
 				choices := []
@@ -543,9 +543,9 @@ class SpeechRecognizer {
 			else if InStr(engine, "ElevenLabs|") {
 				engine := string2Values("|", engine)
 
-				this.iElevenLapsAPIKey := engine[2]
-
 				this.iEngine := engine[1]
+
+				this.iElevenLabsAPIKey := engine[2]
 
 				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
@@ -740,7 +740,12 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
-			else if (InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))
+			else if (this.Engine = "Whisper Server") {
+				this.iModel := id
+
+				this.Instance.Connector.SetModel(id)
+			}
+			else if ((this.Engine, "Whisper Local") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -793,6 +798,18 @@ class SpeechRecognizer {
 					return false
 				}
 			}
+			else if (this.Engine = "ElevenLabs") {
+				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
+
+				try {
+					return this.Instance.AudioRecorder.StartRecognizer(this.iCapturedAudioFile)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
 			else if !InStr(this.Engine, "Whisper")
 				return this.Instance.StartRecognizer()
 			else
@@ -808,10 +825,13 @@ class SpeechRecognizer {
 		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 		try {
-			if (this.Instance ? (InStr(this.Engine, "Whisper") ? this.Instance.AudioRecorder.StopRecognizer()
-															   : this.Instance.StopRecognizer())
+			if (this.Instance ? ((InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))
+									? this.Instance.AudioRecorder.StopRecognizer()
+									: this.Instance.StopRecognizer())
 							  : false) {
-				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")) && this.iCapturedAudioFile)
+				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")
+																			   || (this.Engine = "ElevenLabs"))
+				 && this.iCapturedAudioFile)
 					try {
 						this.processAudio(this.iCapturedAudioFile)
 					}
@@ -922,8 +942,6 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "Whisper Server") {
 				try {
-					this.Instance.Connector.Initialize(this.iWhisperServerURL, this.Language, this.Model)
-
 					result := this.Instance.Connector.Recognize(audioFile)
 
 					if result
@@ -931,6 +949,40 @@ class SpeechRecognizer {
 				}
 				catch Any as exception {
 					logError(exception)
+				}
+				finally {
+					deleteFile(audioFile)
+				}
+			}
+			else if (this.Engine = "ElevenLabs") {
+				try {
+					/*
+					result := this.Instance.Connector.Recognize(audioFile)
+
+					if result
+						this._onTextCallback(JSON.parse(result)["text"])
+					*/
+
+					result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/speech-to-text"
+												  , Map("model_id", this.Model
+													  , "language_code", StrLower(this.Language)
+													  , "file", {fileName: audioFile})
+												  , Map("xi-api-key", this.iElevenLabsAPIKey)
+												  , {Multipart: true, Encoding: "UTF-8"})
+
+					if ((result.Status >= 200) && (result.Status < 300)) {
+						result := result.JSON
+
+						if result.Has("text")
+							this._onTextCallback(result["text"])
+					}
+					else
+						throw "Error while speech recognition..."
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
 				}
 				finally {
 					deleteFile(audioFile)
@@ -956,7 +1008,7 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine)
+			else if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -986,7 +1038,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -1001,7 +1053,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -1012,7 +1064,7 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google", "Whisper Local", "Whisper Server"], this.Engine)
+		if inList(["Azure", "Google", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -1038,7 +1090,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"], this.Engine) {
+		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

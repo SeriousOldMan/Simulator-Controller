@@ -41,9 +41,9 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         else
             this.whr.SetProxy(2, options.Proxy)
 
-        if (options.HasProp("Revocation")) ; EnableCertificateRevocationCheck
+        if options.HasProp("Revocation") ; EnableCertificateRevocationCheck
             this.whr.Option[18] := options.Revocation
-        if (options.HasProp("SslError")) { ; SslErrorIgnoreFlags
+        if options.HasProp("SslError") { ; SslErrorIgnoreFlags
             if (options.SslError = false)
                 options.SslError := 0x3300 ; Ignore all
             else
@@ -52,13 +52,13 @@ class WinHTTPRequest extends WinHttpRequest._Call {
             this.whr.Option[4] := options.SslError
         }
 
-        if (!options.HasProp("TLS")) ; SecureProtocols
+        if !options.HasProp("TLS") ; SecureProtocols
             this.whr.Option[9] := 0x2800 ; TLS 1.2/1.3
 
-        if (options.HasProp("UA")) ; UserAgentString
+        if options.HasProp("UA") ; UserAgentString
             this.whr.Option[0] := options.UA
 
-        if (options.HasProp("Timeouts"))
+        if options.HasProp("Timeouts")
             this.SetTimeouts(options.Timeouts*)
 
         if (options.HasProp("Certificate") && (options.Certificate != false))
@@ -104,7 +104,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         local result := {}
         local ignore, part, pair, key, value
 
-        if (isObject(data))
+        if isObject(data)
             return data
 
         data := LTrim(data, "?")
@@ -122,7 +122,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
     }
 
     SetTimeouts(resolve := 0, connect := 60000, send := 30000, receive := 30000) {
-        if (!this.whr)
+        if !this.whr
             throw "Internal error detected in WinHTTPRequest.SetTimeouts..."
 
         this.whr.SetTimeouts(resolve, connect, send, receive)
@@ -131,7 +131,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
     Request(method, url, body := "", headers := false, options := false) {
         local multipart, forceSave, result, key, value
 
-        if (!this.whr)
+        if !this.whr
             throw "Internal error detected in WinHTTPRequest.Request..."
 
         method := Format("{:U}", method)
@@ -155,7 +155,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
 
             this._Post(&body, &headers, multipart)
         }
-        else if (method = "GET" && body) {
+        else if ((method = "GET") && body) {
             url := RTrim(url, "&")
             url .= (InStr(url, "?") ? "&" : "?")
             url .= this.ObjToQuery(body)
@@ -270,7 +270,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         if !isObject(value) {
             str := ("--" . boundary)
             str .= EOL
-            str .= ("Content-Disposition: form-data; name=`"" . field . "`n")
+            str .= ("Content-Disposition: form-data; name=`"" . field . "`"")
             str .= EOL
             str .= EOL
             str .= value
@@ -303,6 +303,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
         this._memPtr := DllCall("LocalReAlloc", "Ptr", this._memPtr, "UInt", this._memLen, "UInt", 0x0042)
 
         file.RawRead(this._memPtr + this._memLen - file.Length, file.Length)
+        file.Close()
     }
 
     _MultipartStr(text) {
@@ -319,7 +320,7 @@ class WinHTTPRequest extends WinHttpRequest._Call {
 
         if isObject(body)
             for ignore, value in (isInstance(body, Map) ? body : body.OwnProps())
-                isMultipart := (multipart || !!isObject(value))
+                multipart := (multipart || !!isObject(value))
 
         if multipart {
             body := this.QueryToObj(body)

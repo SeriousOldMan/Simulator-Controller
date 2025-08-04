@@ -163,7 +163,7 @@ The next step is to setup everything in the configuration, either in "Simulator 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2012.JPG)
 
-Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use one of the "Azure Cognitive Services", "Google Speech Services" or "Whisper Runtime" voice recognition engines. The "Windows (Desktop)" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech page. But in the end, you will see many recognition errors, because the recognition engines built into Windows are not made for free conversation. The "Windows (Server)" recognition engine can't be used at all.
+Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use one of the "Azure Cognitive Services", "Google Speech Services", "ElevenLabs" or "Whisper Runtime" voice recognition engines. The "Windows (Desktop)" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech page. But in the end, you will see many recognition errors, because the recognition engines built into Windows are not made for free conversation. The "Windows (Server)" recognition engine can't be used at all.
 
 ### Instructions
 

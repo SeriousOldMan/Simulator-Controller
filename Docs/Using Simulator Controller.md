@@ -247,11 +247,11 @@ You have to press the configured *Push-To-Talk* button twice like double-clickin
 
 Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
 
-As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent.
+As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, for example, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent.
 
 ##### Combining activation and command
 
-If the chosen voice recognizer supports arbitrary phrases, which is the case for Azure, Google, Whisper and so on, you can combine activation and command into one phrase. To do this, precede the normal command phrase with the name of the Assistant you wand to address.
+If the chosen voice recognizer supports arbitrary phrases, which is the case for Azure, Google, ElevenLabs, Whisper and so on, you can combine activation and command into one phrase. To do this, precede the normal command phrase with the name of the Assistant you wand to address.
 
 Example: "Jona, can you plan a pitstop?"
 

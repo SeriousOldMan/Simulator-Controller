@@ -1332,7 +1332,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.transposeControls(this.iBottomWidgets, 24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
 		}
 		else
-			throw "Internal error detected in VoiceControlConfigurator.showWhisperRecognizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.showWhisperServerRecognizerEditor..."
 
 		this.iBottomWhisperCredentialsVisible := true
 
@@ -1347,7 +1347,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if this.iTopAzureCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
-			else this.iTopGoogleCredentialsVisible
+			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
 			else
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
@@ -1355,7 +1355,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.transposeControls(this.iBottomWidgets, -24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
 		}
 		else if (this.iRecognizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideWhisperServerRecognizerEditor..."
 
 		this.iBottomWhisperCredentialsVisible := false
 
@@ -1375,10 +1375,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopAzureCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				/*
 				this.transposeControls(this.iAzureRecognizerWidgets
 									 , (24 * ((this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible) ? 8 : 7)) - 3, titleBarHeight)
-				*/
 				this.showControls(this.iAzureRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -1397,10 +1395,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopAzureCredentialsVisible {
 			if (this.iRecognizerMode == "Azure") {
 				this.hideControls(this.iAzureRecognizerWidgets)
-				/*
 				this.transposeControls(this.iAzureRecognizerWidgets
 									 , (-24 * ((this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible) ? 8 : 7)) + 3, titleBarHeight)
-				*/
 				this.transposeControls(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -1417,9 +1413,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopGoogleCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				/*
 				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
-				*/
 				this.showControls(this.iGoogleRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -1438,10 +1432,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopGoogleCredentialsVisible {
 			if (this.iRecognizerMode == "Google") {
 				this.hideControls(this.iGoogleRecognizerWidgets)
-				/*
 				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
-				*/
 			}
 			else if (this.iRecognizerMode != "Init")
 				throw "Internal error detected in VoiceControlConfigurator.hideGoogleRecognizerEditor..."
@@ -1457,9 +1449,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopElevenLabsCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				/*
 				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
-				*/
 				this.showControls(this.iElevenLabsRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -1475,12 +1465,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	hideElevenLabsRecognizerEditor() {
 		local titleBarHeight := this.Window.TitleBarHeight
 
-		if !this.iTopElevenCredentialsVisible {
+		if !this.iTopElevenLabsCredentialsVisible {
 			if (this.iRecognizerMode == "ElevenLabs") {
 				this.hideControls(this.iElevenLabsRecognizerWidgets)
-				/*
 				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
-				*/
 				this.transposeControls(this.iBottomWidgets, -24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")

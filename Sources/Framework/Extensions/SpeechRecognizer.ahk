@@ -185,6 +185,8 @@ initializeGoogleLanguages()
 global kWhisperModels := ["tiny", "tiny.en", "base", "base.en", "small", "small.en"
 						, "medium", "medium.en", "large", "turbo"]
 
+global kElevenLabsModels := ["scribe_v1", "scribe_v1_experimental"]
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -205,6 +207,8 @@ class SpeechRecognizer {
 
 	iGoogleMode := "HTTP"
 	iGoogleAPIKey := false
+
+	iElevenLabsAPIKey := false
 
 	iWhisperServerURL := false
 
@@ -323,7 +327,7 @@ class SpeechRecognizer {
 			if InStr(this.Engine, "Whisper")
 				return "Text"
 			else
-				return (inList(["Azure", "Google"], this.Engine) ? "Text" : "Pattern")
+				return (inList(["Azure", "Google", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -353,6 +357,8 @@ class SpeechRecognizer {
 				else
 					return choose(kWhisperModels, (m) => !InStr(m, ".en"))
 			}
+			else if (this.Engine = "ElevenLabs")
+				return kElevenLabsModels
 			else {
 				result := []
 
@@ -534,13 +540,36 @@ class SpeechRecognizer {
 
 				this.setChoices("Digit", choices)
 			}
+			else if InStr(engine, "ElevenLabs|") {
+				engine := string2Values("|", engine)
+
+				this.iElevenLapsAPIKey := engine[2]
+
+				this.iEngine := engine[1]
+
+				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
+
+				choices := []
+
+				loop 101
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Number", choices)
+
+				choices := []
+
+				loop 10
+					choices.Push((A_Index - 1) . "")
+
+				this.setChoices("Digit", choices)
+			}
 			else
 				throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
 
 			this.setMode(mode)
 
 			if (engine != "Compiler") {
-				if (!InStr(this.Engine, "Whisper") && (this.Instance.OkCheck() != "OK")) {
+				if (!InStr(this.Engine, "Whisper") && (this.Engine != "ElevenLabs") && (this.Instance.OkCheck() != "OK")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
@@ -569,9 +598,18 @@ class SpeechRecognizer {
 					else if (recognizer && !inList(kWhisperModels, recognizer))
 						recognizer := "medium"
 				}
+				else if (this.Engine = "ElevenLabs") {
+					found := true
+
+					if (recognizer == true)
+						recognizer := "scribe_v1"
+					else if (recognizer && !inList(kElevenLabsModels, recognizer))
+						recognizer := "scribe_v1"
+				}
 				else if ((recognizer == true) && language) {
 					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if ((recognizerDescriptor.Language = language) && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_short"))) {
+						if (((recognizerDescriptor.Language = language) || (recognizerDescriptor.Language = "*"))
+						 && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_short"))) {
 							recognizer := recognizerDescriptor.ID
 
 							found := true
@@ -590,7 +628,12 @@ class SpeechRecognizer {
 						}
 
 				if !found
-					recognizer := (InStr(this.Engine, "Whisper") ? "medium" : 0)
+					if InStr(this.Engine, "Whisper")
+						recognizer := "medium"
+					else if (this.Engine = "ElevenLabs")
+						recognizer := "scribe_v1"
+					else
+						recognizer := 0
 
 				this.initialize(recognizer)
 			}
@@ -663,6 +706,8 @@ class SpeechRecognizer {
 		}
 		else if InStr(this.Engine, "Whisper")
 			recognizerList := kWhisperModels
+		else if (this.Engine = "ElevenLabs")
+			recognizerList := kElevenLabsModels
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
@@ -695,7 +740,7 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
-			else if InStr(this.Engine, "Whisper")
+			else if (InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."

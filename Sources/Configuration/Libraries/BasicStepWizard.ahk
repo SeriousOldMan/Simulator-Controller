@@ -1006,12 +1006,19 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", setup.Voice)
 			else if (setup.Synthesizer = "Windows")
 				setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", setup.Voice)
-			else {
+			else if (InStr(setup.Synthesizer, "Google") = 1) {
 				setMultiMapValue(configuration, "Voice Control", "Speaker.Google", setup.Voice)
 
 				setup := string2Values("|", setup.Synthesizer)
 
 				setMultiMapValue(configuration, "Voice Control", "APIKeyFile", setup[2])
+			}
+			else {
+				setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", setup.Voice)
+
+				setup := string2Values("|", setup.Synthesizer)
+
+				setMultiMapValue(configuration, "Voice Control", "APIKey", setup[2])
 			}
 
 			configuration := VoiceSynthesizerEditor(this, configuration).editSynthesizer(window)
@@ -1145,10 +1152,12 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 	iWindowsSynthesizerWidgets := []
 	iAzureSynthesizerWidgets := []
 	iGoogleSynthesizerWidgets := []
+	iElevenLabsSynthesizerWidgets := []
 	iOtherWidgets := []
 
 	iTopAzureCredentialsVisible := false
 	iTopGoogleCredentialsVisible := false
+	iTopElevenLabsCredentialsVisible := false
 
 	StepWizard {
 		Get {
@@ -1183,6 +1192,10 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.updateGoogleVoices()
 		}
 
+		updateElevenLabsVoices(*) {
+			this.updateElevenVoices()
+		}
+
 		chooseVoiceSynthesizer(*) {
 			local voiceSynthesizerDropDown := this.Control["basicVoiceSynthesizerDropDown"]
 			local oldChoice := voiceSynthesizerDropDown.LastValue
@@ -1193,8 +1206,10 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 				this.hideDotNETSynthesizerEditor()
 			else if (oldChoice == 3)
 				this.hideAzureSynthesizerEditor()
-			else
+			else if (oldChoice == 4)
 				this.hideGoogleSynthesizerEditor()
+			else
+				this.hideElevenLabsSynthesizerEditor()
 
 			if (voiceSynthesizerDropDown.Value == 1)
 				this.showWindowsSynthesizerEditor()
@@ -1202,10 +1217,12 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 				this.showDotNETSynthesizerEditor()
 			else if (voiceSynthesizerDropDown.Value == 3)
 				this.showAzureSynthesizerEditor()
-			else
+			else if (voiceSynthesizerDropDown.Value == 4)
 				this.showGoogleSynthesizerEditor()
+			else
+				this.showElevenLabsSynthesizerEditor()
 
-			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value == 4))
+			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 4))
 				this.updateLanguage()
 
 			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
@@ -1258,7 +1275,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		w4 := width - (x4 - x)
 		x5 := x3 + 24
 
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "ElevenLabs"]
 		chosen := 0
 
 		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
@@ -1340,12 +1357,33 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		this.iGoogleSynthesizerWidgets := [[editorGui["basicGoogleAPIKeyFileLabel"], editorGui["basicGoogleAPIKeyFileEdit"], widget21]
 										 , [editorGui["basicGoogleSpeakerLabel"], editorGui["basicGoogleSpeakerDropDown"], widget24]]
 
+
+
+
+		widget25 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicElevenLabsAPIKeyLabel Hidden", translate("Service Key"))
+		widget26 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicElevenLabsAPIKeyEdit Hidden")
+		widget26.OnEvent("Change", updateElevenLabsVoices)
+
+		voices := [translate("Random"), translate("Deactivated")]
+
+		widget27 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicElevenLabsSpeakerLabel Hidden", translate("Voice"))
+		widget28 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicElevenLabsSpeakerDropDown Hidden", voices)
+
+		widget29 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget29.OnEvent("Click", (*) => this.testSpeaker())
+		setButtonIcon(widget29, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		this.iElevenLabsSynthesizerWidgets := [[editorGui["basicElevenLabsAPIKeyLabel"], editorGui["basicElevenLabsAPIKeyEdit"]]
+											 , [editorGui["basicElevenLabsSpeakerLabel"], editorGui["basicElevenLabsSpeakerDropDown"], widget29]]
+
+
 		this.updateLanguage()
 
 		this.hideControls(this.iTopWidgets)
 		this.hideControls(this.iWindowsSynthesizerWidgets)
 		this.hideControls(this.iAzureSynthesizerWidgets)
 		this.hideControls(this.iGoogleSynthesizerWidgets)
+		this.hideControls(this.iElevenLabsSynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
 		this.iSynthesizerMode := "Init"
@@ -1373,24 +1411,30 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			if (InStr(synthesizer, "Google") == 1)
 				synthesizer := "Google"
 
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
+			if (InStr(synthesizer, "ElevenLabs") == 1)
+				synthesizer := "ElevenLabs"
+
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "ElevenLabs"], synthesizer)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
 			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.doNET", true)
 			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "SubscriptionKey", "")
 			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
 
 			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
 
+			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "APIKey", "")
+
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 
 			if this.Configuration
-				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker"]
+				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
 					if (this.Value[speaker] == true)
 						this.Value[speaker] := translate("Random")
 					else if (this.Value[speaker] == false)
@@ -1402,6 +1446,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		local windowsSpeaker := this.Control["basicWindowsSpeakerDropDown"].Text
 		local azureSpeaker := this.Control["basicAzureSpeakerDropDown"].Text
 		local googleSpeaker := this.Control["basicGoogleSpeakerDropDown"].Text
+		local elevenLabsSpeaker := this.Control["basicElevenLabsSpeakerDropDown"].Text
 
 		super.saveToConfiguration(configuration)
 
@@ -1423,6 +1468,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 2) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
@@ -1430,6 +1476,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 3) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text))
@@ -1437,13 +1484,23 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
-		else {
+		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 4) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", elevenLabsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		}
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
@@ -1452,6 +1509,9 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "APIKeyFile", Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "APIKey", Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["basicSpeakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["basicSpeakerPitchSlider"].Value)
@@ -1471,6 +1531,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.Control["basicGoogleAPIKeyFilePathButton"].Enabled := false
 
+		this.Control["basicElevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
+
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)
 		else if (this.Value["voiceSynthesizer"] = 2)
@@ -1478,6 +1540,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.updateAzureVoices(configuration)
 		this.updateGoogleVoices(configuration)
+		this.updateElevenLabsVoices(configuration)
 
 		this.Control["basicSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
 		this.Control["basicSpeakerPitchSlider"].Value := this.Value["speakerPitch"]
@@ -1535,8 +1598,10 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.showDotNETSynthesizerEditor()
 		else if (voiceSynthesizer == 3)
 			this.showAzureSynthesizerEditor()
-		else
+		else if (voiceSynthesizer == 4)
 			this.showGoogleSynthesizerEditor()
+		else
+			this.showElevenLabsSynthesizerEditor()
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -1546,7 +1611,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
 			this.transposeControls(this.iOtherWidgets, 24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else
-			throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.showWindowsSynthesizerEditor..."
 
 		this.showControls(this.iOtherWidgets)
 
@@ -1571,7 +1636,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
 			this.transposeControls(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.hideWindowsSynthesizerEditor..."
 
 		this.Control["basicWindowsSettingsButton"].Enabled := false
 
@@ -1593,7 +1658,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
 			this.transposeControls(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else
-			throw "Internal error detected in VoiceControlConfigurator.showAzureSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.showAzureSynthesizerEditor..."
 
 		this.showControls(this.iOtherWidgets)
 
@@ -1612,7 +1677,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if (this.iSynthesizerMode == "Azure")
 			this.transposeControls(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideAzureSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.hideAzureSynthesizerEditor..."
 
 		this.Control["basicWindowsSettingsButton"].Enabled := false
 
@@ -1628,7 +1693,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
 			this.transposeControls(this.iOtherWidgets, 24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else
-			throw "Internal error detected in VoiceControlConfigurator.showGoogleSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.showGoogleSynthesizerEditor..."
 
 		this.showControls(this.iOtherWidgets)
 
@@ -1647,7 +1712,42 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		if (this.iSynthesizerMode == "Google")
 			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceSynthesizerEditor.hideWindowsSynthesizerEditor..."
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := false
+	}
+
+	showElevenLabsSynthesizerEditor() {
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iElevenLabsSynthesizerWidgets)
+
+		this.iTopElevenLabsCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceSynthesizerEditor.showElevenLabsSynthesizerEditor..."
+
+		this.showControls(this.iOtherWidgets)
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := "ElevenLabs"
+	}
+
+	hideElevenLabsSynthesizerEditor() {
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iElevenLabsSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopElevenLabsCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "ElevenLabs")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceSynthesizerEditor.hideWindowsSynthesizerEditor..."
 
 		this.Control["basicWindowsSettingsButton"].Enabled := false
 
@@ -1687,6 +1787,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.updateAzureVoices()
 		this.updateGoogleVoices()
+		this.updateElevenLabsVoices()
 	}
 
 	loadVoices(synthesizer, configuration) {
@@ -1817,6 +1918,40 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicAzureSpeakerDropDown"].Delete()
 		this.Control["basicAzureSpeakerDropDown"].Add(voices)
 		this.Control["basicAzureSpeakerDropDown"].Choose(chosen)
+	}
+
+	updateElevenLabsVoices(configuration := false) {
+		local voices := []
+		local elevenLabsSpeaker, chosen, language
+
+		if configuration
+			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+		else {
+			elevenLabsSpeaker := this.Control["basicElevenLabsSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		if (configuration && !elevenLabsSpeaker)
+			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+
+		if (Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text) != "") {
+			language := this.getCurrentLanguage()
+
+			voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
+		}
+
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Random"))
+
+		chosen := inList(voices, elevenLabsSpeaker)
+
+		if (chosen == 0)
+			chosen := 1
+
+		this.Control["basicElevenLabsSpeakerDropDown"].Delete()
+		this.Control["basicElevenLabsSpeakerDropDown"].Add(voices)
+		this.Control["basicElevenLabsSpeakerDropDown"].Choose(chosen)
 	}
 
 	showControls(widgets) {

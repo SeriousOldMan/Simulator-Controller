@@ -171,10 +171,10 @@ class LMUProvider extends Sector397Provider {
 
 		super.prepareProvider(data)
 
-		ignore := this.TeamData
-		ignore := this.TrackData
-		ignore := this.GridData
-		ignore := this.DriversData
+		ignore := this.TeamData.Data
+		ignore := this.TrackData.Data
+		ignore := this.GridData.Data
+		ignore := this.DriversData.Data
 	}
 
 	getRefuelAmount(setupData) {

@@ -36,8 +36,13 @@
   
 #### Changes
 
+  - (Once again) optimized startup process for *Le Mans Ultimate*.
   - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
-  - Initial support for ElevenLabs Speech API. Using ElevenLabs, you can create your own voices easily. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. See the new [documentation](*) for more information.
+  - Full support for ElevenLabs Speech API.
+    - Use the famous voices from ElevenLabs, where you can create your own voices easily from a couple of samples. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. All voices being marked as "personal", "default" or "workspace" are available in the standard configuration, but with an additional step any voice from the community can be used.
+	- ElevenLabs services for speech recognition is also supported.
+	
+    See the new [documentation](*) for more information.
   - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
   - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
   - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.

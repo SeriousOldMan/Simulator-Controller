@@ -2561,8 +2561,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				if (session == kSessionPaused) {
 					if (!driverActive && this.TeamSessionActive && RaceAssistantPlugin.DriverWasActive
-									  && !RaceAssistentPlugin.InPit && !RaceAssistantPlugin.Finish
-									  && (RaceAssistentPlugin.Simulator.Simulator[true] != "Assetto Corsa Competizione")) {
+									  && !RaceAssistantPlugin.InPit && !RaceAssistantPlugin.Finish
+									  && (RaceAssistantPlugin.Simulator.Simulator[true] != "Assetto Corsa Competizione")) {
 						setMultiMapValue(data, "Session Data", "Paused", false)
 						setMultiMapValue(data, "Stint Data", "InPit", true)
 

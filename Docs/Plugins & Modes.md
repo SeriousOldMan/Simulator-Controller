@@ -262,10 +262,10 @@ Important: Please be aware, that curve names  containing spaces must be enclosed
 The "Driving Coach" plugin handles the interaction with the AI Driving Coach. Aiden, the coach will be automatically started, whenever Simulator Controller is running. Additional information, for example about your performance in the current race, or telemetry data of your car, might be available to the coach, if a simulation is running as well. The following configuration parameters allow you to customize Aiden to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; name: *name*; logo: On | Off; language: DE | EN | ...;
-	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey;
 	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
-	recognizer: Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | Whisper Local | Whisper Server|serverURL;
+	recognizer: Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey | Whisper Local | Whisper Server|serverURL;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
 	agentBooster: *agentBooster*;
 	telemetryCoaching: *onOffFunction*; trackCoaching: *onOffFunction*;
@@ -280,7 +280,7 @@ The paranmeter *synthesizer* allows you to specify the speech synthesis engine, 
 
 With *recognizer* you specify the engine used for voice recognition. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone. You can also activate voice recognition on the Azure, Google or ElevenLabs cloud using the same syntax as described above for the *synthesizer* parameter. Additonally, Whisper can be used here, either as *Whisper Local* or as *Whisper Server|serverURL* for a Whisper service running on a local server (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for more information). The default value for *recognizer* is also taken from the general voice configuration, when no value is supplied.
 
-Please note, that the voice recognizer *Server* cannot be used for the Driving Coach, since this recognition engine does not support the conversion of free speech to text.
+Please note, that the voice recognizer *Server* cannot be used for the Driving Coach, since this recognition engine does not support the conversion of free speech to text. Also, *Desktop* is not recommended as well, since there will be too many misunderstandings.
 
 With *speaker* and *listener* you can customize the natural language interface (or the personality) of Aiden. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice). Using the parameter *speakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *speakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Aiden, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach). The name of a GPT-based post-processor to bring some variation to some predefined spoken messages of Aiden can be supplied using *speakerBooster* and the name of a GPT-based pre-processor for voice recognition can be supplied with *listenerBooster*. *agentBooster* can be used to give the Assistant even more intelligence and autonomous behaviour using a GPT-based extension to the rule engine. With *language* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). 
 
@@ -297,10 +297,10 @@ With *Interrupt* you can interrupt the currently running speech of Aiden.
 The "Race Engineer" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Jona, the AI Race Engineer. If one of these simulation is started, the "Race Engineer" plugin will be automatically activated, and will start Jona in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Jona to your preferences:
 
 	raceAssistant: [*initialState*] [*onOffFunction*]; name: *name*; logo: On | Off; language: DE | EN | ...;
-	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey;
 	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
-	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | Whisper Local | Whisper Server|serverURL;
+	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey | Whisper Local | Whisper Server|serverURL;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
 	conversationBooster: *conversationBooster*; agentBooster: *agentBooster*;
 	muted: true | false;
@@ -373,10 +373,10 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Strategist" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Cato, the AI Race Strategist. If one of these simulation is started, the "Race Strategist" plugin will be automatically activated, and will start Cato in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Cato to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; name: *name*; logo: On | Off; language: DE | EN | ...;
-	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey;
 	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
-	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | Whisper Local | Whisper Server|serverURL;
+	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey | Whisper Local | Whisper Server|serverURL;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
 	conversationBooster: *conversationBooster*; agentBooster: *agentBooster*;
 	muted: true | false;
@@ -458,10 +458,10 @@ Note: All these commands are also available in most of the simulation plugins, e
 The "Race Spotter" plugin handles the interaction of the currently active simulation as represented by the plugins "ACC", "RF2", "R3E", and so on, and Elisa, the AI Race Spotter. If one of these simulation is started, the "Race Spotter" plugin will be automatically activated, and will start Elisa in the background according to the configuration arguments described below. The following configuration parameters allow you to customize Elisa to your preferences:
 
 	raceAssistant: [*initialState*] *onOffFunction*; name: *name*; logo: On | Off; language: DE | EN | ...;
-	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey;
+	synthesizer: Windows | dotNET | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey;
 	speaker: On | Off | *Speech Generation Language*; speakerVocalics: *volume* , *pitch* , *rate*;
 	speakerBooster: *speakerBooster*;
-	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | Whisper Local | Whisper Server|serverURL;
+	recognizer: Server | Desktop | Azure|tokenIssuerEndpoint|subscriptionKey | Google|apikey | ElevenLabs|apikey | Whisper Local | Whisper Server|serverURL;
 	listener: On | Off | *Speech Recognition Engine*; listenerBooster: *listenerBooster*;
 	conversationBooster: *conversationBooster*; agentBooster: *agentBooster*;
 	muted: true | false;

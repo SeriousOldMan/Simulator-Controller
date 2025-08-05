@@ -450,6 +450,13 @@ class SpeechSynthesizer {
 				for ignore, voiceInfo in result.JSON["voices"]
 					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
+			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=workspace", ""
+										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+
+			if ((result.Status >= 200) && (result.Status < 300))
+				for ignore, voiceInfo in result.JSON["voices"]
+					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+
 			return voices
 		}
 		else if (this.iGoogleMode = "HTTP") {
@@ -885,7 +892,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.Synthesizer = "ElevenLabs") {
 			try {
-				id := StrReplace(string2Values("(", this.Voice)[2], ")", "")
+				id := (InStr(this.Voice, "(") ? StrReplace(string2Values("(", this.Voice)[2], ")", "") : this.Voice)
 
 				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . id . "?output_format=pcm_16000"
 											  , JSON.print(Map("text", text))
@@ -1103,6 +1110,8 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
+			else if (voice && InStr(voice, "("))
+				return voice
 		}
 
 		if (availableVoices.Length > 0)

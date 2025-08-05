@@ -657,6 +657,7 @@ updateNews(availableNews := false, news := false) {
 showNews() {
 	local news := readMultiMap(kUserConfigDirectory . "NEWS")
 	local newsMenu := Menu()
+	local hasNews := false
 	local name, urls
 
 	showNews(nr, urls, *) {
@@ -668,13 +669,21 @@ showNews() {
 			})
 	}
 
+	newsMenu.Add(translate("News, tips and tricks"), (*) => {})
+	newsMenu.Disable(translate("News, tips and tricks"))
+	newsMenu.Add()
+
 	for name, urls in getMultiMapValues(news, "News") {
 		urls := string2Values("|", urls, 2)
 
 		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], urls[2]))
+
+		hasNews := true
 	}
 
-	newsMenu.Add()
+	if hasNews
+		newsMenu.Add()
+
 	newsMenu.Add(translate("Cancel"), (*) => true)
 
 	newsMenu.Show( , , true)

@@ -71,6 +71,8 @@ class SpeechSynthesizer {
 	static sAudioDriver := false
 	static sAudioDevice := false
 
+	static sSampleFrequency := false
+
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
@@ -388,6 +390,12 @@ class SpeechSynthesizer {
 		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
+
+		if !SpeechSynthesizer.sSampleFrequency
+			SpeechSynthesizer.sSampleFrequency := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																						  , kUserConfigDirectory
+																						  , kConfigDirectory))
+																 , "Voice", "Sample Frequency", 16000)
 
 		if kSox {
 			if !SpeechSynthesizer.sAudioRoutingInitialized {
@@ -894,14 +902,15 @@ class SpeechSynthesizer {
 			try {
 				id := (InStr(this.Voice, "(") ? StrReplace(string2Values("(", this.Voice)[2], ")", "") : this.Voice)
 
-				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . id . "?output_format=pcm_16000"
+				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . id
+											  . "?output_format=pcm_" . SpeechSynthesizer.sSampleFrequency
 											  , JSON.print(Map("text", text))
 											  , Map("xi-api-key", this.iAPIKey
 												  , "Content-Type", "application/json")
 											  , {Raw: true})
 
 				if ((result.Status >= 200) && (result.Status < 300)) {
-					header := SpeechSynthesizer.WAVHeader()
+					header := SpeechSynthesizer.WAVHeader(SpeechSynthesizer.sSampleFrequency)
 
 					header.setLength(result.Raw.Size)
 

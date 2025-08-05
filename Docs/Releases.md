@@ -23,7 +23,7 @@
 
 # Upcoming release
 
-## 6.4.4.0
+## 6.5.0.0
 
 #### Date: 08/08/25 (planned)
 

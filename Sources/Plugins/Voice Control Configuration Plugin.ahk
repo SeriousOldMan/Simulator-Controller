@@ -182,8 +182,19 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				this.showElevenLabsRecognizerEditor()
 			}
-			else if (voiceRecognizerDropDown.Value == 6)
+			else if (voiceRecognizerDropDown.Value == 6) {
+				try {
+					recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
 				this.showWhisperServerRecognizerEditor()
+			}
 			else
 				this.showWhisperLocalRecognizerEditor()
 
@@ -198,6 +209,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 			}
+
+			/*
 			else if (voiceRecognizerDropDown.Value == 5) {
 				try {
 					recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
@@ -218,6 +231,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 					recognizers := []
 				}
+			*/
 
 			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))

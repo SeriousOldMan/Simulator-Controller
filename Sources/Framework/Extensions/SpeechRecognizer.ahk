@@ -201,14 +201,13 @@ class SpeechRecognizer {
 	iLanguage := "en"
 	iModel := false
 
+	iAPIKey := ""
+
 	iChoices := CaseInsenseMap()
 
 	iMode := "Grammar"
 
 	iGoogleMode := "HTTP"
-	iGoogleAPIKey := false
-
-	iElevenLabsAPIKey := false
 
 	iCapturedAudioFile := false
 
@@ -440,6 +439,8 @@ class SpeechRecognizer {
 				if (engine != "Compiler") {
 					engine := string2Values("|", engine, 3)
 
+					this.iAPIKey := engine[3]
+
 					if !instance.Connect(engine[2], engine[3], ObjBindMethod(this, "_onTextCallback")) {
 						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
@@ -474,7 +475,7 @@ class SpeechRecognizer {
 				if (this.iGoogleMode = "RPC")
 					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])
 				else
-					this.iGoogleAPIKey := engine[2]
+					this.iAPIKey := engine[2]
 
 				if !instance.Connect(this.iGoogleMode, engine[2], ObjBindMethod(this, "_onTextCallback")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -520,6 +521,8 @@ class SpeechRecognizer {
 
 				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
+				this.iAPIKey := whisperServerURL
+
 				if (engine = "Whisper Server") {
 					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")
 
@@ -545,7 +548,7 @@ class SpeechRecognizer {
 
 				this.iEngine := engine[1]
 
-				this.iElevenLabsAPIKey := engine[2]
+				this.iAPIKey := engine[2]
 
 				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
@@ -674,40 +677,49 @@ class SpeechRecognizer {
 		local culture, name, index, language, recognizer, ignore, model
 
 		if ((this.Engine = "Azure") || (this.Engine = "Compiler")) {
-			for culture, name in kAzureLanguages {
-				index := A_Index - 1
+			if ((this.Engine = "Compiler") || (Trim(this.iAPIKey) != ""))
+				for culture, name in kAzureLanguages {
+					index := A_Index - 1
 
-				language := StrSplit(culture, "-")[1]
-
-				recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language})
-			}
-		}
-		else if (this.Engine = "Google") {
-			index := -1
-
-			for culture, models in kGoogleLanguages
-				for ignore, model in models {
-					index += 1
 					language := StrSplit(culture, "-")[1]
 
-					name := model
-
-					switch name, false {
-						case "Long Speech (latest_long)":
-							model := "latest_long"
-						case "Short Speech (latest_short)":
-							model := "latest_short"
-						case "Command (command_and_search)":
-							model := "command_and_search"
-					}
-
-					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
+					recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language})
 				}
 		}
-		else if InStr(this.Engine, "Whisper")
+		else if (this.Engine = "Google") {
+			if (Trim(this.iAPIKey) != "") {
+				index := -1
+
+				for culture, models in kGoogleLanguages
+					for ignore, model in models {
+						index += 1
+						language := StrSplit(culture, "-")[1]
+
+						name := model
+
+						switch name, false {
+							case "Long Speech (latest_long)":
+								model := "latest_long"
+							case "Short Speech (latest_short)":
+								model := "latest_short"
+							case "Command (command_and_search)":
+								model := "command_and_search"
+						}
+
+						recognizerList.Push({ID: index, Name: name . " (" . culture . ")", Culture: culture, Language: language, Model: model})
+					}
+			}
+		}
+		else if (this.Engine = "Whisper Local")
 			recognizerList := kWhisperModels
-		else if (this.Engine = "ElevenLabs")
-			recognizerList := kElevenLabsModels
+		else if (this.Engine = "Whisper Server") {
+			if (Trim(this.iAPIKey) != "")
+				recognizerList := kWhisperModels
+		}
+		else if (this.Engine = "ElevenLabs") {
+			if (Trim(this.iAPIKey) != "")
+				recognizerList := kElevenLabsModels
+		}
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
@@ -745,7 +757,7 @@ class SpeechRecognizer {
 
 				this.Instance.Connector.SetModel(id)
 			}
-			else if ((this.Engine, "Whisper Local") || (this.Engine = "ElevenLabs"))
+			else if ((this.Engine = "Whisper Local") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -876,7 +888,7 @@ class SpeechRecognizer {
 									   , "useEnhanced", true)
 						 , "audio", Map("content", this.Instance.ReadAudio(audioFile)))
 
-			result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iGoogleAPIKey
+			result := WinHttpRequest().POST("https://speech.googleapis.com/v1/speech:recognize?key=" . this.iAPIKey
 										  , JSON.print(request), Map("Content-Type", "application/json"), {Object: true, Encoding: "UTF-8"})
 
 			try {
@@ -956,18 +968,11 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "ElevenLabs") {
 				try {
-					/*
-					result := this.Instance.Connector.Recognize(audioFile)
-
-					if result
-						this._onTextCallback(JSON.parse(result)["text"])
-					*/
-
 					result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/speech-to-text"
 												  , Map("model_id", this.Model
 													  , "language_code", StrLower(this.Language)
 													  , "file", {fileName: audioFile})
-												  , Map("xi-api-key", this.iElevenLabsAPIKey)
+												  , Map("xi-api-key", this.iAPIKey)
 												  , {Multipart: true, Encoding: "UTF-8"})
 
 					if ((result.Status >= 200) && (result.Status < 300)) {

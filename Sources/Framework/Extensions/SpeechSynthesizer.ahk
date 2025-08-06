@@ -301,6 +301,8 @@ class SpeechSynthesizer {
 
 				synthesizer := string2Values("|", synthesizer, 3)
 
+				this.iAPIKey := synthesizer[3]
+
 				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
@@ -427,56 +429,66 @@ class SpeechSynthesizer {
 		else if (this.Synthesizer = "dotNET")
 			return string2Values("|", this.iSpeechSynthesizer.GetVoices())
 		else if (this.Synthesizer = "Azure") {
-			voices := this.iSpeechSynthesizer.GetVoices()
+			if (Trim(this.iAPIKey) != "") {
+				voices := this.iSpeechSynthesizer.GetVoices()
 
-			if (voices = "") {
-				result := []
+				if (voices = "") {
+					result := []
 
-				for languageCode, voiceInfos in kAzureVoices
-					for ignore, voiceInfo in voiceInfos
-						result.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
+					for languageCode, voiceInfos in kAzureVoices
+						for ignore, voiceInfo in voiceInfos
+							result.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
 
-				return result
+					return result
+				}
+				else
+					return string2Values("|", voices)
 			}
 			else
-				return string2Values("|", voices)
+				return []
 		}
 		else if (this.Synthesizer = "ElevenLabs") {
 			voices := []
 
-			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=default", ""
-										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+			if (Trim(this.iAPIKey) != "") {
+				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=default", ""
+											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-			if ((result.Status >= 200) && (result.Status < 300))
-				for ignore, voiceInfo in result.JSON["voices"]
-					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+				if ((result.Status >= 200) && (result.Status < 300))
+					for ignore, voiceInfo in result.JSON["voices"]
+						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
-			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=personal", ""
-										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=personal", ""
+											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-			if ((result.Status >= 200) && (result.Status < 300))
-				for ignore, voiceInfo in result.JSON["voices"]
-					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+				if ((result.Status >= 200) && (result.Status < 300))
+					for ignore, voiceInfo in result.JSON["voices"]
+						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
-			result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=workspace", ""
-										 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=workspace", ""
+											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-			if ((result.Status >= 200) && (result.Status < 300))
-				for ignore, voiceInfo in result.JSON["voices"]
-					voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+				if ((result.Status >= 200) && (result.Status < 300))
+					for ignore, voiceInfo in result.JSON["voices"]
+						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+			}
 
 			return voices
 		}
 		else if (this.iGoogleMode = "HTTP") {
-			result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iAPIKey, "", Map(), {Encoding: "UTF-8"})
+			if (Trim(this.iAPIKey) != "") {
+				result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iAPIKey, "", Map(), {Encoding: "UTF-8"})
 
-			if ((result.Status >= 200) && (result.Status < 300)) {
-				voices := []
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					voices := []
 
-				for ignore, voiceInfo in result.JSON["voices"]
-					voices.Push(voiceInfo["name"] . " - " . voiceInfo["ssmlGender"] . " (" . voiceInfo["languageCodes"][1] . ")")
+					for ignore, voiceInfo in result.JSON["voices"]
+						voices.Push(voiceInfo["name"] . " - " . voiceInfo["ssmlGender"] . " (" . voiceInfo["languageCodes"][1] . ")")
 
-				return voices
+					return voices
+				}
+				else
+					return []
 			}
 			else
 				return []

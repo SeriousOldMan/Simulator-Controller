@@ -1664,8 +1664,8 @@ class RaceAssistant extends ConfigurationItem {
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
 						else
-							for ignore, part in string2Values(". ", text)
-								this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+							for ignore, part in string2Values(translate(". "), text)
+								this.getSpeaker().speak(part . translate("."), false, false, {Rephrase: false, Click: (A_Index = 1)})
 					}
 
 					return
@@ -4781,8 +4781,8 @@ speakAssistant(context, message, force := false) {
 		else if assistant.VoiceManager.UseTalking
 			speaker.speak(message)
 		else
-			for ignore, part in string2Values(". ", message)
-				speaker.speak(part . ".", false, false, {Click: (A_Index = 1)})
+			for ignore, part in string2Values(translate(". "), message)
+				speaker.speak(part . translate("."), false, false, {Click: (A_Index = 1)})
 	}
 
 	return true

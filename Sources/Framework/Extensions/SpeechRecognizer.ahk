@@ -350,12 +350,12 @@ class SpeechRecognizer {
 
 			if InStr(this.Engine, "Whisper") {
 				if (language = "en")
-					return kWhisperModels
+					return this.getRecognizerList()
 				else
-					return choose(kWhisperModels, (m) => !InStr(m, ".en"))
+					return choose(this.getRecognizerList(), (m) => !InStr(m, ".en"))
 			}
 			else if (this.Engine = "ElevenLabs")
-				return kElevenLabsModels
+				return this.getRecognizerList()
 			else {
 				result := []
 
@@ -651,6 +651,7 @@ class SpeechRecognizer {
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			this.Instance := false
+			this.iAPIKey := ""
 		}
 		finally {
 			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {

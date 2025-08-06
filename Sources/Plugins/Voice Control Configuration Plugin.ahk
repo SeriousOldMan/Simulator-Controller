@@ -77,14 +77,20 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		updateAzureVoices(*) {
 			this.updateAzureVoices()
+
+			chooseVoiceRecognizer(false)
 		}
 
 		updateGoogleVoices(*) {
 			this.updateGoogleVoices()
+
+			chooseVoiceRecognizer(false)
 		}
 
 		updateElevenLabsVoices(*) {
 			this.updateElevenLabsVoices()
+
+			chooseVoiceRecognizer(false)
 		}
 
 		chooseVoiceSynthesizer(*) {
@@ -119,30 +125,35 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
 		}
 
-		chooseVoiceRecognizer(*) {
+		chooseVoiceRecognizer(update, *) {
 			local voiceRecognizerDropDown := this.Control["voiceRecognizerDropDown"]
 			local oldChoice := voiceRecognizerDropDown.LastValue
 			local recognizers, chosen, raceAssistant
 
-			if (oldChoice == 1)
-				this.hideServerRecognizerEditor()
-			else if (oldChoice == 2)
-				this.hideDesktopRecognizerEditor()
-			else if (oldChoice == 3)
-				this.hideAzureRecognizerEditor()
-			else if (oldChoice == 4)
-				this.hideGoogleRecognizerEditor()
-			else if (oldChoice == 5)
-				this.hideElevenLabsRecognizerEditor()
-			else if (oldChoice == 6)
-				this.hideWhisperServerRecognizerEditor()
-			else
-				this.hideWhisperLocalRecognizerEditor()
+			if update
+				if (oldChoice == 1)
+					this.hideServerRecognizerEditor()
+				else if (oldChoice == 2)
+					this.hideDesktopRecognizerEditor()
+				else if (oldChoice == 3)
+					this.hideAzureRecognizerEditor()
+				else if (oldChoice == 4)
+					this.hideGoogleRecognizerEditor()
+				else if (oldChoice == 5)
+					this.hideElevenLabsRecognizerEditor()
+				else if (oldChoice == 6)
+					this.hideWhisperServerRecognizerEditor()
+				else
+					this.hideWhisperLocalRecognizerEditor()
 
-			if (voiceRecognizerDropDown.Value == 1)
-				this.showServerRecognizerEditor()
-			else if (voiceRecognizerDropDown.Value == 2)
-				this.showDesktopRecognizerEditor()
+			if (voiceRecognizerDropDown.Value == 1) {
+				if update
+					this.showServerRecognizerEditor()
+			}
+			else if (voiceRecognizerDropDown.Value == 2) {
+				if update
+					this.showDesktopRecognizerEditor()
+			}
 			else if (voiceRecognizerDropDown.Value == 3) {
 				try {
 					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
@@ -154,7 +165,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showAzureRecognizerEditor()
+				if update
+					this.showAzureRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 4) {
 				try {
@@ -167,7 +179,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showGoogleRecognizerEditor()
+				if update
+					this.showGoogleRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 5) {
 				try {
@@ -180,7 +193,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showElevenLabsRecognizerEditor()
+				if update
+					this.showElevenLabsRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 6) {
 				try {
@@ -193,7 +207,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showWhisperServerRecognizerEditor()
+				if update
+					this.showWhisperServerRecognizerEditor()
 			}
 			else
 				this.showWhisperLocalRecognizerEditor()
@@ -420,7 +435,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
 		widget19 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
 		widget19.LastValue := chosen
-		widget19.OnEvent("Change", chooseVoiceRecognizer)
+		widget19.OnEvent("Change", chooseVoiceRecognizer.Bind(true))
 
 		recognizers := []
 
@@ -523,6 +538,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		widget42 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwhisperServerURLLabel Hidden", translate("Server URL"))
 		widget43 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VwhisperServerURLEdit Hidden")
+		widget43.OnEvent("Change", chooseVoiceRecognizer.Bind(false))
 
 		this.iWhisperRecognizerWidgets := [[window["whisperServerURLLabel"], window["whisperServerURLEdit"]]]
 

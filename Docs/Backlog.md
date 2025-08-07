@@ -23,6 +23,9 @@
   4. Approaching corner braking point countdown
   5. Configurable priority for voice output between Spotter and other Assistants
 
+#### Race Reports
+  1. Make position numbers alphanumerically by adding leading zeros.
+  
 #### Session Database
   1. Active validation of value ranges in settings definitions
   
@@ -30,6 +33,9 @@
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
   3. Engineer's Diary with change history, lap times after change, notes and so on
+  
+#### Solo Center
+  1. Support for "Auto Telemetry" setting.
 
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

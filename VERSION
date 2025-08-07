@@ -1,9 +1,9 @@
 [Development]
 Version=6.5.0.0-beta
 Target=6.5.0.0-release
-Date=08/06/2025
+Date=08/07/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Unj51Ok6
-Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Initial support for ElevenLabs speech API, Optimized LMU startup time
+Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
 Version=6.4.3.0-release

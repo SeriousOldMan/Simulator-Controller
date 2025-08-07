@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Unj51Ok6) (Test build for 6.5.0. Changes: Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Initial support for ElevenLabs speech API, Optimized LMU startup time.)
+[6.5.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Unj51Ok6) (Test build for 6.5.0. Changes: Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-650) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1,15 +1,15 @@
 [Development]
-Version=6.5.0.0-beta
+Version=6.5.0.0-release
 Target=6.5.0.0-release
-Date=08/07/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Unj51Ok6
+Date=08/08/2025
+Download=https://cutt.ly/brD5Ys5W;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f7OZYq4g;https://www.dropbox.com/scl/fi/kxjfi7lob7k11o9vxr0ns/Simulator-Controller-6.5.0.0-release.zip?rlkey=jka2qqhrpd9y4oi3q8qc2jbiy&st=uh7za15d&dl=1;http://%master%/Releases/Simulator Controller 6.5.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.0.0-release.zip
 Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.4.3.0-release
-Date=08/01/2025
-Download=https://cutt.ly/grSE5H8y;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/MuYubXor;https://www.dropbox.com/scl/fi/xcrqv4w0s6r3i4za7a06v/Simulator-Controller-6.4.3.0-release.zip?rlkey=j3xfuttz0m09p30y6o1u7ncjj&st=uha9cuud&dl=1;http://%master%/Releases/Simulator Controller 6.4.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.3.0-release.zip
-Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement, Reorganized master download repository
+Version=6.5.0.0-release
+Date=08/08/2025
+Download=https://cutt.ly/brD5Ys5W;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f7OZYq4g;https://www.dropbox.com/scl/fi/kxjfi7lob7k11o9vxr0ns/Simulator-Controller-6.5.0.0-release.zip?rlkey=jka2qqhrpd9y4oi3q8qc2jbiy&st=uh7za15d&dl=1;http://%master%/Releases/Simulator Controller 6.5.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.0.0-release.zip
+Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -23,7 +23,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.5.0.0-beta
-Release=6.4.3.0-release
+Development=6.5.0.0-release
+Release=6.5.0.0-release

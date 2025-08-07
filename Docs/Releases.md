@@ -1,5 +1,36 @@
 # Latest stable release
 
+## 6.5.0.0
+
+#### Date: 08/08/25
+
+#### Fixes
+
+  - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
+  - Fixed detection of the active driver for *Le Mans Ultimate*.
+  - Fixed a bug, that caused the *Lap Times* report to be empty when switching from the *Positions* report with the car class being restricted. Affected "Race Reports", "Solo Center" and "Team Center".
+  - Fixed minor problems with Japanese speech generation.
+  - Fixed a couple translations for Japanese.
+  
+#### Changes
+
+  - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
+  - Full support for ElevenLabs Speech API.
+    - Use the famous voices from ElevenLabs, where you can create your own voices easily from a couple of samples. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. All voices being marked as "personal", "default" or "workspace" are available in the standard configuration, but with an additional step any voice from the community can be used.
+	- ElevenLabs services for speech recognition is also supported.
+	
+    See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#ElevenLabs) for more information.
+  - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
+  - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
+  - [Internal] (Once again) optimized startup process for *Le Mans Ultimate*.
+  - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.4.3.0
 
 #### Date: 08/01/25
@@ -20,36 +51,7 @@
   - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
   - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
   - [Internal] Reorganized master download repository (once again).
-
-# Upcoming release
-
-## 6.5.0.0
-
-#### Date: 08/08/25 (planned)
-
-#### Fixes
-
-  - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
-  - Fixed detection of the active driver for *Le Mans Ultimate*.
-  - Fixed a bug, that caused the *Lap Times* report to be empty when switching from the *Positions* report with the car class being restricted. Affected "Race Reports", "Solo Center" and "Team Center".
-  - Fixed minor problems with Japanese speech generation.
-  - Fixed a couple translations for Japanese.
   
-#### Changes
-
-  - (Once again) optimized startup process for *Le Mans Ultimate*.
-  - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
-  - Full support for ElevenLabs Speech API.
-    - Use the famous voices from ElevenLabs, where you can create your own voices easily from a couple of samples. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. All voices being marked as "personal", "default" or "workspace" are available in the standard configuration, but with an additional step any voice from the community can be used.
-	- ElevenLabs services for speech recognition is also supported.
-	
-    See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#ElevenLabs) for more information.
-  - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
-  - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
-  - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.
-
-# Release history
-
 ## 6.4.2.0
 
 #### Date: 07/25/25

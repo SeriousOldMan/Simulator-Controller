@@ -147,10 +147,28 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					this.hideWhisperLocalRecognizerEditor()
 
 			if (voiceRecognizerDropDown.Value == 1) {
+				try {
+					recognizers := SpeechRecognizer("Server", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
 				if update
 					this.showServerRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 2) {
+				try {
+					recognizers := SpeechRecognizer("Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
 				if update
 					this.showDesktopRecognizerEditor()
 			}
@@ -210,34 +228,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				if update
 					this.showWhisperServerRecognizerEditor()
 			}
-			else
-				this.showWhisperLocalRecognizerEditor()
-
-			if (voiceRecognizerDropDown.Value <= 2) {
-				try {
-					recognizers := SpeechRecognizer((voiceRecognizerDropDown.Value = 1) ? "Server" : "Desktop"
-												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-				}
-				catch Any as exception {
-					logError(exception)
-
-					recognizers := []
-				}
-			}
-
-			/*
-			else if (voiceRecognizerDropDown.Value == 5) {
-				try {
-					recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
-												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-				}
-				catch Any as exception {
-					logError(exception)
-
-					recognizers := []
-				}
-			}
-			else if (voiceRecognizerDropDown.Value >= 6)
+			else {
 				try {
 					recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
@@ -246,7 +237,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 					recognizers := []
 				}
-			*/
+
+				if update
+					this.showWhisperLocalRecognizerEditor()
+			}
 
 			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))

@@ -1193,7 +1193,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 
 		updateElevenLabsVoices(*) {
-			this.updateElevenVoices()
+			this.updateElevenLabsVoices()
 		}
 
 		chooseVoiceSynthesizer(*) {
@@ -1338,7 +1338,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										, [editorGui["basicAzureTokenIssuerLabel"], editorGui["basicAzureTokenIssuerEdit"]]
 										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
 
-		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Service Key"))
+		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Service Key"))
 		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
 		widget20.OnEvent("Change", updateGoogleVoices)
 
@@ -1357,10 +1357,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		this.iGoogleSynthesizerWidgets := [[editorGui["basicGoogleAPIKeyFileLabel"], editorGui["basicGoogleAPIKeyFileEdit"], widget21]
 										 , [editorGui["basicGoogleSpeakerLabel"], editorGui["basicGoogleSpeakerDropDown"], widget24]]
 
-
-
-
-		widget25 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicElevenLabsAPIKeyLabel Hidden", translate("Service Key"))
+		widget25 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicElevenLabsAPIKeyLabel Hidden", translate("Service Key"))
 		widget26 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicElevenLabsAPIKeyEdit Hidden")
 		widget26.OnEvent("Change", updateElevenLabsVoices)
 

@@ -510,6 +510,7 @@ class SpeechRecognizer {
 					engine := string2Values("|", engine)
 
 					whisperServerURL := engine[2]
+					this.iAPIKey := whisperServerURL
 
 					engine := engine[1]
 				}
@@ -520,8 +521,6 @@ class SpeechRecognizer {
 				this.iEngine := engine
 
 				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
-
-				this.iAPIKey := whisperServerURL
 
 				if (engine = "Whisper Server") {
 					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")

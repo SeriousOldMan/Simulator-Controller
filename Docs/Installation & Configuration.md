@@ -389,7 +389,7 @@ IMPORTANT: It is necessary to use one of the cloud based speech recognition serv
 
 ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs allows you to create new voices by using an AI to analyze the voice of any speaker. Voices can also be shared with the community, so the list of available voices is extremely huge, although many of them are of poor quality. Anyway, if you want the Race Spotter to talk with your favorite Crew Chief voice or with the voice of a well-known celebrity, give it a go. ElevenLabs can also be used for voice recognition. The recognition quality is extremely good, comparable to Whisper, and support free conversation.
 
-You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This key has a restricted amount of 10.000 tokens per month, which is more than enough for a normal usage.
+You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with Eleven labs in the browser. Using the API, however, will require a paid subscription.
 
 ###### Notes
 

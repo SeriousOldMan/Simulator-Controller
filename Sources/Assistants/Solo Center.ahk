@@ -164,6 +164,7 @@ class SoloCenter extends ConfigurationItem {
 	iAutoClear := false
 	iAutoExport := false
 	iAutoSave := false
+	iAutoTelemetry := false
 
 	iDate := A_Now
 
@@ -825,6 +826,16 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	AutoTelemetry {
+		Get {
+			return this.iAutoTelemetry
+		}
+
+		Set {
+			return (this.iAutoTelemetry := value)
+		}
+	}
+
 	SessionExported {
 		Get {
 			return this.iSessionExported
@@ -1190,6 +1201,7 @@ class SoloCenter extends ConfigurationItem {
 		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
 		this.AutoSave := getMultiMapValue(settings, "Solo Center", "AutoSave", false)
+		this.AutoTelemetry := getMultiMapValue(settings, "Solo Center", "AutoTelemetry", false)
 
 		this.iUseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
 		this.iUseLapsDatabase := getMultiMapValue(settings, "Solo Center", "UseLapsDatabase", getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false))
@@ -2569,9 +2581,10 @@ class SoloCenter extends ConfigurationItem {
 		local auto1 := ((this.AutoClear ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Clear"))
 		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
+		local auto4 := ((this.AutoTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Telemetry"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, auto4, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2641,7 +2654,11 @@ class SoloCenter extends ConfigurationItem {
 				this.AutoSave := !this.AutoSave
 
 				updateSetting("AutoSave", this.AutoSave)
-			case 7: ; Clear...
+			case 6: ; Auto Telemetry
+				this.AutoTelemetry := !this.AutoTelemetry
+
+				updateSetting("AutoTelemetry", this.AutoTelemetry)
+			case 8: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
@@ -2652,9 +2669,9 @@ class SoloCenter extends ConfigurationItem {
 				}
 				else
 					this.clearSession()
-			case 9: ; Load Session...
+			case 10: ; Load Session...
 				this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
-			case 10: ; Save Session...
+			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -2662,13 +2679,13 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 12: ; Telemetry Viewer
+			case 13: ; Telemetry Viewer
 				this.openTelemetryViewer()
-			case 14: ; Update Statistics
+			case 15: ; Update Statistics
 				this.updateStatistics()
-			case 16: ; Session Summary
+			case 17: ; Session Summary
 				this.showSessionSummary(GetKeyState("Ctrl"))
-			case 18: ; Export data
+			case 19: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -7974,6 +7991,9 @@ class SoloCenter extends ConfigurationItem {
 									   , getMultiMapValue(data, "Session Data", "Track"))
 
 				this.analyzeTelemetry()
+
+				if this.AutoTelemetry
+					this.openTelemetryViewer()
 			}
 			finally {
 				if fileName

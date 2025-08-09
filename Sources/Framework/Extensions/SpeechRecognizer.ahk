@@ -1181,11 +1181,7 @@ class SpeechRecognizer {
 			if !isNumber(StrReplace(literal, ",", "."))
 				literal := StrReplace(literal, ",", "")
 
-			literal := StrReplace(literal, ";", "")
-			literal := StrReplace(literal, "?", "")
-			literal := StrReplace(literal, "-", "")
-
-			words[index] := literal
+			words[index] := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(literal, "!", ""), "?", ""), "。", ""), "-", ""), ";", "")
 		}
 
 		return words

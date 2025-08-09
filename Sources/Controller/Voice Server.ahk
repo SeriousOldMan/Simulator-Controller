@@ -507,8 +507,15 @@ class VoiceServer extends ConfigurationItem {
 			else {
 				parts := []
 
-				for ignore, part in string2Values(translate(". "), text)
-					parts.Push(part . translate("."))
+				if InStr(text, "。") {
+					for ignore, part in string2Values("。", text)
+						if (Trim(part) != "")
+							parts.Push(part . "。")
+				}
+				else InStr(text, translate(". "))
+					for ignore, part in string2Values(translate(". "), text)
+						if (Trim(part) != "")
+							parts.Push(part . translate("."))
 			}
 
 			try {

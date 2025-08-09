@@ -1530,21 +1530,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		else
 			session := kSessionFinished
 
-		if (session = kSessionFinished) {
-			lastSessions := false
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if assistant.Active
+				if (lastSessions[assistant] != (session . assistant.RaceAssistantActive)) {
+					lastSessions[assistant] := (session . assistant.RaceAssistantActive)
 
-			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if assistant.Active
-					assistant.updateSession(kSessionFinished)
-		}
-		else
-			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if assistant.Active
-					if (lastSessions[assistant] != (session . assistant.RaceAssistantActive)) {
-						lastSessions[assistant] := (session . assistant.RaceAssistantActive)
-
-						assistant.updateSession(session)
-					}
+					assistant.updateSession(session)
+				}
 	}
 
 	static updateAssistantsTelemetryData(data) {

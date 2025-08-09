@@ -512,7 +512,7 @@ class VoiceServer extends ConfigurationItem {
 						if (Trim(part) != "")
 							parts.Push(part . "。")
 				}
-				else InStr(text, translate(". "))
+				else if InStr(text, translate(". "))
 					for ignore, part in string2Values(translate(". "), text)
 						if (Trim(part) != "")
 							parts.Push(part . translate("."))

@@ -486,6 +486,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	selectTrackAutomation(name := false, label := false) {
+		local enabled := this.TrackAutomationEnabled
 		local trackAutomation, ignore, candidate, enabled, trackAutomations
 
 		if this.Simulator {
@@ -494,10 +495,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 			for ignore, candidate in trackAutomations
 				if ((name && (candidate.Name = name)) || (!name && candidate.Active)) {
-					enabled := this.TrackAutomationEnabled
+					if enabled {
+						if (this.Simulator.TrackAutomation && (this.Simulator.TrackAutomation.Name = candidate.Name))
+							return
 
-					if enabled
 						this.disableTrackAutomation()
+					}
 
 					if !label
 						label := this.getLabel("TrackAutomation.Toggle")

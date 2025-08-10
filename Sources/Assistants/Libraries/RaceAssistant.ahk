@@ -1668,10 +1668,13 @@ class RaceAssistant extends ConfigurationItem {
 								if (Trim(part) != "")
 									this.getSpeaker().speak(part . "。", false, false, {Rephrase: false, Click: (A_Index = 1)})
 						}
-						else if InStr(text, translate(". "))
+						else if InStr(text, translate(". ")) {
 							for ignore, part in string2Values(translate(". "), text)
 								if (Trim(part) != "")
 									this.getSpeaker().speak(part . translate("."), false, false, {Rephrase: false, Click: (A_Index = 1)})
+						}
+						else
+							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
 					}
 
 					return
@@ -4791,10 +4794,13 @@ speakAssistant(context, message, force := false) {
 				if (Trim(part) != "")
 					speaker.speak(part . "。", false, false, {Click: (A_Index = 1)})
 		}
-		else if InStr(message, translate(". "))
+		else if InStr(message, translate(". ")) {
 			for ignore, part in string2Values(translate(". "), message)
 				if (Trim(part) != "")
 					speaker.speak(part . translate("."), false, false, {Click: (A_Index = 1)})
+		}
+		else
+			speaker.speak(message)
 	}
 
 	return true

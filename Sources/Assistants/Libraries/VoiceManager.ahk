@@ -363,10 +363,13 @@ class VoiceManager extends ConfigurationItem {
 								if (Trim(part) != "")
 									super.speak(part . "。", !this.Awaitable, cache, options)
 						}
-						else if InStr(text, translate(". "))
+						else if InStr(text, translate(". ")) {
 							for ignore, part in string2Values(translate(". "), text)
 								if (Trim(part) != "")
 									super.speak(part . translate("."), !this.Awaitable, cache, options)
+						}
+						else
+							super.speak(text, !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false

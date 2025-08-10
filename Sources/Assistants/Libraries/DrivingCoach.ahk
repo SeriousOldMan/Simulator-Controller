@@ -968,10 +968,13 @@ class DrivingCoach extends GridRaceAssistant {
 						if (Trim(part) != "")
 							this.getSpeaker().speak(part . "。", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
 				}
-				else if InStr(answer, translate(". "))
+				else if InStr(answer, translate(". ")) {
 					for ignore, part in string2Values(translate(". "), answer)
 						if (Trim(part) != "")
 							this.getSpeaker().speak(part . translate("."), false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+				}
+				else
+					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
 
 			if (this.Transcript && (this.Mode != "Coaching"))
 				try {

@@ -66,6 +66,7 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Low Rating | 0.7     | This value represents the Sorenson-Dice rating a registered command syntax must reach, when compared to a spoken command, so that this command is even considered. The range of the rating is from 0.0 (no match at all) up to 1.0 (perfect word by word match). |
 |      | Sample Frequency | 16000     | This is used for internal audio processing and represents the resolution of voice audion in Hz. This value is also used when requesting voice audio from the ElvenLabs text to speech API. The value here represents the *pcm_16000* format, of course. |
 |      | Interruptable | False | If not *False*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
+|      | Compute Type  | False | This setting only applies, when using Whisper as the voice recognition method. If not *False*, it specifies the computation method used on the graphics card, when evaluating the neural network. Allowed values are *default*, *auto*, *int8*, *int8_float32*, *int8_float16*, *int8_bfloat16*, *int16*, *float16*, *bfloat16*, *float32*. You won't touch this setting in most cases, with the exception of RTX 50xx GPUs, where it must be set to "float16". |
 
 ### Script Settings
 

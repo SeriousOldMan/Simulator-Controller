@@ -427,7 +427,11 @@ In either case, when using Whisper Runtime, you can choose between models of dif
 
 If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
-IMPORTANT: When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
+IMPORTANT:
+
+- If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) "Compute Type" and set it to *float16*.
+
+- When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
  
 ###### Notes
 

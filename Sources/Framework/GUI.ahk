@@ -1378,6 +1378,8 @@ class Window extends Gui {
 					options := argument
 			}
 
+		DllCall("SetThreadDpiAwarenessContext", "Ptr", -5, "Ptr")
+		
 		super.__New("", title, arguments*)
 
 		if !this.Theme

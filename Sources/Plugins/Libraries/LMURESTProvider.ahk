@@ -1152,7 +1152,7 @@ class LMURESTProvider {
 
 		GETURL {
 			Get {
-				return "http://localhost:6397/rest/garage/UIScreen/RaceHistory"
+				return "http://localhost:6397/rest/garage/summary"
 			}
 		}
 
@@ -1165,8 +1165,8 @@ class LMURESTProvider {
 		getTrack() {
 			if this.iCachedTrack
 				return this.iCachedTrack
-			else if (this.Data && this.Data.Has("trackInfo")) {
-				this.iCachedTrack := this.Data["trackInfo"]["properTrackName"]
+			else if (this.Data && this.Data.Has("track")) {
+				this.iCachedTrack := this.Data["track"]["displayProperties"]["shortName"]
 
 				return this.iCachedTrack
 			}

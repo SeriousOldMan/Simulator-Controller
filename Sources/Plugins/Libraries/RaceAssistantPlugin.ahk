@@ -1281,10 +1281,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			return (RaceAssistantPlugin.Settings[key] := assistant.prepareSettings(data))
 	}
 
-	static prepareAssistantsSimulation(data) {
-		RaceAssistantPlugin.Simulator.prepareSimulation(data)
+	static prepareAssistantsSimulation() {
+		RaceAssistantPlugin.Simulator.prepareSimulation()
 
-		do(RaceAssistantPlugin.Assistants, (a) => a.prepareSimulation(data))
+		do(RaceAssistantPlugin.Assistants, (a) => a.prepareSimulation())
 	}
 
 	static prepareAssistantsSession(data, count) {
@@ -2038,9 +2038,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		return settings
 	}
 
-	prepareSimulation(data) {
-		if this.Simulator
-			this.Simulator.prepareSimulation(data)
+	prepareSimulation() {
 	}
 
 	prepareSession(settings, data) {
@@ -2454,6 +2452,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			splitTime := A_TickCount
 		}
 
+		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.LastLap = 0)) {
+			RaceAssistantPlugin.prepareAssistantsSimulation()
+
+			if isDebug() {
+				logMessage(kLogInfo, "Collect session data (Preparing):" . (A_TickCount - splitTime) . " ms...")
+
+				splitTime := A_TickCount
+			}
+		}
+
 		if (RaceAssistantPlugin.ReplayDirectory && !RaceAssistantPlugin.Simulator) {
 			data := readMultiMap(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap 1.1.data")
 
@@ -2505,12 +2513,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				splitTime := A_TickCount
 			}
 
-			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0) && (dataLastLap == 1)) {
+			if (RaceAssistantPlugin.runningSession(data) && (lastLap == 0) && (dataLastLap == 1))
 				prepareSessionDatabase(data)
-
-				if getMultiMapValue(data, "Session Data", "Paused", false)
-					RaceAssistantPlugin.prepareAssistantsSimulation(data)
-			}
 
 			if (false && isDebug()) {
 				testData := getMultiMapValues(data, "Test Data")

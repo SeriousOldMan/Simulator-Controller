@@ -1102,16 +1102,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
 	}
 
-	prepareSimulation(data) {
-		local car := getMultiMapValue(data, "Session Data", "Car", false)
-		local track := getMultiMapValue(data, "Session Data", "Track", false)
-
-		if (car && track) {
-			this.Car := car
-			this.Track := track
-
-			this.Provider.prepareProvider(data)
-		}
+	prepareSimulation() {
+		this.Provider.prepareProvider()
 	}
 
 	hasPrepared(settings, data, count) {

@@ -104,6 +104,8 @@ startupDrivingCoach() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Driving Coach"
 
+	ProcessSetPriority("L")
+
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1

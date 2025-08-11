@@ -2453,6 +2453,8 @@ startupSystemMonitor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
 
+	ProcessSetPriority("L")
+
 	try {
 		registerMessageHandler("Monitoring", monitoringMessageHandler)
 

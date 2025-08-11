@@ -27,7 +27,26 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.5.1.0
+
+#### Date: 08/15/25 (planned)
+
+#### Fixes
+
+  - Fixed handling of "。" in spoken commands for Chinese and Japanese, so that the Sorenson-Dice matchmaking algorithm is happy.
+  
+#### Changes
+
+  - Reduced the OS priority of various background processes, so that the running simulator gets a few more CPU cycles.
+  - Reduced startup stutter in *Le Mans Ultimate* a bit more.
+  - "Overview" reports are now sortable on position, even if DNF'ed cars are present.
+  - "Solo Center" has a new *Auto Telemetry* setting, which automatically opens the Telemetry Viewer (thereby start collecting telemetry), when a new session is started.to 
+  - Splitting long speeches into individual sentences is now supported for Chinese and Japanese. Only the last sentence will then be repeated, if the speech is interrupted by the Spotter.
+  - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
+  - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651).
+  - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency".
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
 
 # Release history
 
@@ -146,7 +165,7 @@ Not yet planned...
   - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
   - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
 
 ## 6.3.8.0
 

@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.5.1
 
-Everything handled automatically.
+If you are using the "Whisper Server" to run the Whisper voice recognition on a second PC, copy the files "Whisper Server.exe" and "Whisper Server.dll" from the *Binaries\Whisper Server* directory in the installation directory of Simulator Controller over to your "Whisper Server" installation directory.
 
 ***
 

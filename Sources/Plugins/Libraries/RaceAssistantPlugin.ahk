@@ -2452,8 +2452,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			splitTime := A_TickCount
 		}
 
-		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.LastLap = 0))
+		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.LastLap = 0)) {
 			RaceAssistantPlugin.prepareAssistantsSimulation()
+
+			if isDebug() {
+				logMessage(kLogInfo, "Collect session data (Preparing):" . (A_TickCount - splitTime) . " ms...")
+
+				splitTime := A_TickCount
+			}
+		}
 
 		if (RaceAssistantPlugin.ReplayDirectory && !RaceAssistantPlugin.Simulator) {
 			data := readMultiMap(RaceAssistantPlugin.ReplayDirectory . "Race Engineer Lap 1.1.data")

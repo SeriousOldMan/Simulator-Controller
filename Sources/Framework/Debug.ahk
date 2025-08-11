@@ -127,7 +127,10 @@ initializeDebugging() {
 
 	OnError(logUnhandledError)
 
-	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
+	if getMultiMapValue(settings, "Process", "Memory.WatchDog", 10)
+		PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory)
+				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000
+				   , kInterruptPriority).start()
 
 	if kLogStartup
 		logMessage(kLogOff, "Debugger initialized...")

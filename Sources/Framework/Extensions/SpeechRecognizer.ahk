@@ -1181,16 +1181,22 @@ class SpeechRecognizer {
 
 	parseText(&text, rephrase := false) {
 		local words := string2Values(A_Space, text)
-		local index, literal
+		local index, literal, ignore, char
+
+		static removedChars := ["", "!", "?", "¿", "-", ";", "。", "，"]
 
 		for index, literal in words {
-			if !isNumber(literal)
+			if !isNumber(literal) {
 				literal := StrReplace(literal, ".", "")
+
+				for ignore, char in removedChars
+					literal := StrReplace(literal, char, "")
+			}
 
 			if !isNumber(StrReplace(literal, ",", "."))
 				literal := StrReplace(literal, ",", "")
 
-			words[index] := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(literal, "!", ""), "?", ""), "。", ""), "，", ""), "-", ""), ";", "")
+			words[index] := literal
 		}
 
 		return words

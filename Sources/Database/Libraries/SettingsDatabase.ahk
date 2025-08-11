@@ -236,9 +236,13 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	getSettingValue(simulator, car, track, weather, section, key, default := false) {
-		local database := this.getSettingsDatabase(simulator, "User")
 		local tries := 5
-		local rows
+		local database, rows
+
+		if (!simulator || (simulator = "0"))
+			return default
+
+		database := this.getSettingsDatabase(simulator, "User")
 
 		if (car != "*")
 			car := this.getCarCode(simulator, car)
@@ -277,10 +281,14 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	setSettingValue(simulator, car, track, weather, section, key, value) {
-		local database := this.getSettingsDatabase(simulator, "User")
-		local tries := 5
 		local cValue := value
-		local entry
+		local tries := 5
+		local database, entry
+
+		if (!simulator || (simulator = "0"))
+			return
+
+		database := this.getSettingsDatabase(simulator, "User")
 
 		if (car != "*")
 			car := this.getCarCode(simulator, car)
@@ -328,8 +336,13 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	removeSettingValue(simulator, car, track, weather, section, key) {
-		local database := this.getSettingsDatabase(simulator, "User")
 		local tries := 5
+		local database
+
+		if (!simulator || (simulator = "0"))
+			return
+
+		database := this.getSettingsDatabase(simulator, "User")
 
 		if (car != "*")
 			car := this.getCarCode(simulator, car)
@@ -379,6 +392,9 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 	local tries := 5
 	local success := false
 	local rows, ignore, row, settingsDB
+
+	if (!simulator || (simulator = "0"))
+		return default
 
 	try {
 		if user {
@@ -434,6 +450,9 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	local success := false
 	local ignore, row, filtered, visited, key
 	local settingsDB
+
+	if (!simulator || (simulator = "0"))
+		return
 
 	if community
 		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"

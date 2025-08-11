@@ -166,10 +166,10 @@ class LMUProvider extends Sector397Provider {
 		return true
 	}
 
-	prepareProvider(data) {
+	prepareProvider() {
 		local ignore
 
-		super.prepareProvider(data)
+		super.prepareProvider()
 
 		ignore := this.TeamData.Data
 		ignore := this.TrackData.Data

@@ -116,7 +116,7 @@ class SimulatorProvider {
 		return false
 	}
 
-	prepareProvider(data) {
+	prepareProvider() {
 		if isDebug()
 			logMessage(kLogDebug, "Preparing simulation...")
 	}

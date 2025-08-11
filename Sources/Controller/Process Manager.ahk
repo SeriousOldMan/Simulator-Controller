@@ -126,6 +126,8 @@ checkProcessMemory(maxMemory) {
 
 			if pid
 				checkMemory(process, pid)
+
+			Sleep(200)
 		}
 }
 

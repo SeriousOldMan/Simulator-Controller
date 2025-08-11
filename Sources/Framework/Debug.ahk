@@ -127,7 +127,7 @@ initializeDebugging() {
 
 	OnError(logUnhandledError)
 
-	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 1000, kInterruptPriority).start()
+	PeriodicTask(reportHighMemoryUsage.Bind(criticalMemory), 5000, kInterruptPriority).start()
 
 	if kLogStartup
 		logMessage(kLogOff, "Debugger initialized...")

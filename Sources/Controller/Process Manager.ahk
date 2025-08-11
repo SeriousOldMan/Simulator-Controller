@@ -126,6 +126,8 @@ checkProcessMemory(maxMemory) {
 
 			if pid
 				checkMemory(process, pid)
+
+			Sleep(200)
 		}
 }
 
@@ -152,13 +154,13 @@ killZombies() {
 
 startupProcessManager() {
 	local icon := kIconsDirectory . "Observer.ico"
-	
+
 	TraySetIcon(icon, "1")
 	A_IconTip := "Process Manager"
 
 	PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-														, "Process", "Memory.Max", 1024)), 500).start()
-	PeriodicTask(killZombies, 500).start()
+														, "Process", "Memory.Max", 1024)), 2500).start()
+	PeriodicTask(killZombies, 10000).start()
 
 	startupProcess()
 

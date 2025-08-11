@@ -222,6 +222,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName, configuration
+		local settings
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -393,11 +394,12 @@ class SpeechSynthesizer {
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
-		if !SpeechSynthesizer.sSampleFrequency
-			SpeechSynthesizer.sSampleFrequency := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
-																						  , kUserConfigDirectory
-																						  , kConfigDirectory))
-																 , "Voice", "Sample Frequency", 16000)
+		if !SpeechSynthesizer.sSampleFrequency {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+			
+			SpeechSynthesizer.sSampleFrequency := getMultiMapValue(settings, "Voice", "ElevenLabs.Sample Frequency"
+																 , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
+		}
 
 		if kSox {
 			if !SpeechSynthesizer.sAudioRoutingInitialized {

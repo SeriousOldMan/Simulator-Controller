@@ -1183,7 +1183,7 @@ class SpeechRecognizer {
 		local words := string2Values(A_Space, text)
 		local index, literal, ignore, char
 
-		static removedChars := ["", "!", "?", "¿", "-", ";", "。", "，"]
+		static removedChars := [":", "!", "?", "¿", "-", ";", "。", "，", "！", "？", "：", "；"]
 
 		for index, literal in words {
 			if !isNumber(literal) {

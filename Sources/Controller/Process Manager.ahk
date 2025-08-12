@@ -161,10 +161,12 @@ startupProcessManager() {
 
 	if getMultiMapValue(settings, "Process", "Memory.WatchDog", 10)
 		PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(settings, "Process", "Memory.Max", 1024))
-				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000).start()
+				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000, kHighPriority).start()
+				   
+	Sleep(4000)
 
 	if getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10)
-		PeriodicTask(killZombies, getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10) * 1000).start()
+		PeriodicTask(killZombies, getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10) * 1000, kLowPriority).start()
 
 	startupProcess()
 

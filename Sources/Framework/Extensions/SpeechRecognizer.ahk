@@ -1183,20 +1183,14 @@ class SpeechRecognizer {
 		local words := string2Values(A_Space, text)
 		local index, literal, ignore, char
 
-		static removedChars := [":", "!", "?", "¿", "-", ";", "。", "，", "！", "？", "：", "；"]
-
 		for index, literal in words {
-			if !isNumber(literal) {
+			if !isNumber(literal)
 				literal := StrReplace(literal, ".", "")
-
-				for ignore, char in removedChars
-					literal := StrReplace(literal, char, "")
-			}
 
 			if !isNumber(StrReplace(literal, ",", "."))
 				literal := StrReplace(literal, ",", "")
 
-			words[index] := literal
+			words[index] := RegExReplace(literal, "[:!?¿\-;。，！？：；]", "")
 		}
 
 		return words

@@ -134,7 +134,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(FileSelect, "D1" . window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")

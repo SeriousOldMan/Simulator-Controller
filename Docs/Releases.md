@@ -45,7 +45,7 @@
   - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows you to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
   - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
   - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency". The old name is still supported, but deprecated.
-  - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings).
+  - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
 

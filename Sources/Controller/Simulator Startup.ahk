@@ -527,7 +527,7 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-viewNews(fileName, title := false, readCallback := false) {
+viewNews(fileName, title := false, showAgain := true, readCallback := false) {
 	local curWorkingDir := A_WorkingDir
 	local html, innerWidth, editHeight, buttonX, x, y, w, h, directory, newsViewer
 
@@ -589,7 +589,7 @@ viewNews(fileName, title := false, readCallback := false) {
 
 		newsGui.Add("Text", "x8 yp+" . (editHeight + 10) . " Y:Move W:Grow w" . innerWidth . " 0x10")
 
-		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move vreadCheck", translate("Do not show again"))
+		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move Checked" . !showAgain . " vreadCheck", translate("Do not show again"))
 
 		newsGui.Add("Button", "Default X" . buttonX . " yp w80 Y:Move X:Move(0.5)", translate("Close")).OnEvent("Click", (*) => viewNews(false))
 
@@ -662,7 +662,7 @@ showNews() {
 
 	showNews(nr, urls, *) {
 		if loadNews(urls)
-			viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+			viewNews(kTempDirectory . "News\News.htm", false, true, (showAgain) {
 				setMultiMapValue(news, "Visited", nr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 				updateNews(false, news)
@@ -724,6 +724,7 @@ loadNews(urls) {
 checkForNews() {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
+	local welcome := false
 	local lastModified, ignore, url
 
 	if !check {
@@ -777,6 +778,7 @@ checkForNews() {
 					if (InStr(rule, "Welcome") && !getMultiMapValue(news, "Visited", nr, false)) {
 						newsNr := nr
 						newsUrls := url
+						welcome := true
 
 						break
 					}
@@ -834,7 +836,7 @@ checkForNews() {
 
 			if (newsNr && !SimulatorStartup.Instance)
 				if loadNews(newsUrls)
-					viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+					viewNews(kTempDirectory . "News\News.htm", false, !welcome, (showAgain) {
 						setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 						updateNews(availableNews, news)

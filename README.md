@@ -117,7 +117,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
-28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behaviour or change existing behaviour.
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
@@ -131,7 +131,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
-35. [Scripting Assistant Behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+35. [Scripting Assistant behaviour](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 This list will be extended from time to time to cover new functionalities.
 

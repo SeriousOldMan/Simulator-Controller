@@ -33,7 +33,7 @@
 
 #### Fixes
 
-  - Fixed handling of "。" and "，" in spoken commands for Chinese and Japanese, so that the Sorenson-Dice matchmaking algorithm is happy.
+  - Fixed handling of "。", "，" and other full-width punctuation characters in spoken commands for Chinese and Japanese when a neural network based voice recognition like Azure is used, so that the Sorenson-Dice matchmaking algorithm is happy.
   
 #### Changes
 
@@ -44,6 +44,7 @@
   - Splitting long speeches into individual sentences is now supported for Chinese and Japanese. Only the last sentence will then be repeated, if the speech is interrupted by the Spotter.
   - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows you to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
   - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+  - Added two new articles to the tips & tricks this time.
   - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency". The old name is still supported, but deprecated.
   - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
 
@@ -423,7 +424,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- It is now possible to use *Lua* coroutines even while interface with the host environments or with the Rule Engine.
   - [Internal] Full rewrite of the simulator data acquisition interface.
 
-As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behavior, let me know immediately.
+As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behaviour, let me know immediately.
   
 ## 6.2.8.0
 
@@ -502,7 +503,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Spotter alerts about accidents in a specific distance got a higher priority.
   - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) has been defined, which allows you to move the *Temp* folder and also the *Programs* folder of the [Documents]\Simulator Controller folder to a different location. This will be helpful, if your [Documents] folder is under control of *One Drive* or a similar replication tool, since there are reports of several issues and conflicts with the operation of Simulator Controller in that case.
   - The window resizing behaviour for "Strategy Workbench" has been optimized a bit to make the list of available tyre compounds more accessible.
-  - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioral actions of the Assistants, once they are based on a LAM (aka Large Action Model).
+  - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioural actions of the Assistants, once they are based on a LAM (aka Large Action Model).
 	- The new scripting language can be used to implement actions in *Conversation* and *Reasoning* boosters for the Assistants. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
     - Scripting can also be used to implement the [scenario validations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#script-based-validation) in "Strategy Workbench".
 	- Both integrations are already fully functional, but are not yet fully tested for each possible scenario.
@@ -1300,7 +1301,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
-  7. An editor has been implemented to enable or disable the predefined *Conversation* or *Behavior* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  7. An editor has been implemented to enable or disable the predefined *Conversation* or *behaviour* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), if you have configured the Conversation Booster for the Assistants.
 

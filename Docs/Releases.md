@@ -1,5 +1,34 @@
 # Latest stable release
 
+## 6.5.1.0
+
+#### Date: 08/15/25
+
+#### Fixes
+
+  - Fixed handling of "。", "，" and other full-width punctuation characters in spoken commands for Chinese and Japanese when a neural network based voice recognition like Azure is used, so that the Sorenson-Dice matchmaking algorithm is happy.
+  
+#### Changes
+
+  - Reduced the OS priority of various background processes, so that the running simulator gets a few more CPU cycles.
+  - Reduced startup stutter in *Le Mans Ultimate* a bit more.
+  - "Overview" reports are now sortable on position, even if DNF'ed cars are present.
+  - "Solo Center" has a new *Auto Telemetry* setting, which automatically opens the Telemetry Viewer (thereby start collecting telemetry), when a new session is started. But make sure, that the automatic opening of the Telemetry Viewer window does not interfere with the operation of the active simulator.
+  - Splitting long speeches into individual sentences is now supported for Chinese and Japanese. Only the last sentence will then be repeated, if the speech is interrupted by the Spotter.
+  - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows you to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
+  - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+  - Added two new articles to the tips & tricks this time.
+  - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency". The old name is still supported, but deprecated.
+  - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
+
+# Upcoming release
+
+Not yet plammed...
+
+# Release history
+
 ## 6.5.0.0
 
 #### Date: 08/08/25
@@ -24,33 +53,6 @@
   - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
   - [Internal] (Once again) optimized startup process for *Le Mans Ultimate*.
   - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.
-
-# Upcoming release
-
-## 6.5.1.0
-
-#### Date: 08/15/25 (planned)
-
-#### Fixes
-
-  - Fixed handling of "。", "，" and other full-width punctuation characters in spoken commands for Chinese and Japanese when a neural network based voice recognition like Azure is used, so that the Sorenson-Dice matchmaking algorithm is happy.
-  
-#### Changes
-
-  - Reduced the OS priority of various background processes, so that the running simulator gets a few more CPU cycles.
-  - Reduced startup stutter in *Le Mans Ultimate* a bit more.
-  - "Overview" reports are now sortable on position, even if DNF'ed cars are present.
-  - "Solo Center" has a new *Auto Telemetry* setting, which automatically opens the Telemetry Viewer (thereby start collecting telemetry), when a new session is started. But make sure, that the automatic opening of the Telemetry Viewer window does not interfere with the operation of the active simulator.
-  - Splitting long speeches into individual sentences is now supported for Chinese and Japanese. Only the last sentence will then be repeated, if the speech is interrupted by the Spotter.
-  - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows you to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
-  - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
-  - Added two new articles to the tips & tricks this time.
-  - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency". The old name is still supported, but deprecated.
-  - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
-
-# Release history
 
 ## 6.4.3.0
 

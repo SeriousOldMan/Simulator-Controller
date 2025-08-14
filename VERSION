@@ -1,15 +1,15 @@
 [Development]
-Version=6.5.1.0-beta
+Version=6.5.1.0-release
 Target=6.5.1.0-release
-Date=08/13/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/6mvFvaXS
+Date=08/15/2025
+Download=https://cutt.ly/xrGFwN15;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/sD3ZLAT1;https://www.dropbox.com/scl/fi/qu87bgie5l1lbwsyku7nx/Simulator-Controller-6.5.1.0-release.zip?rlkey=kc0esgw5q649lg9i0ddge5n64&st=06ycug8n&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.1.0-release.zip
 Changes=Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogs
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.5.0.0-release
-Date=08/08/2025
-Download=https://cutt.ly/brD5Ys5W;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f7OZYq4g;https://www.dropbox.com/scl/fi/kxjfi7lob7k11o9vxr0ns/Simulator-Controller-6.5.0.0-release.zip?rlkey=jka2qqhrpd9y4oi3q8qc2jbiy&st=uh7za15d&dl=1;http://%master%/Releases/Simulator Controller 6.5.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.0.0-release.zip
-Changes=Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations
+Version=6.5.1.0-release
+Date=08/15/2025
+Download=https://cutt.ly/xrGFwN15;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/sD3ZLAT1;https://www.dropbox.com/scl/fi/qu87bgie5l1lbwsyku7nx/Simulator-Controller-6.5.1.0-release.zip?rlkey=kc0esgw5q649lg9i0ddge5n64&st=06ycug8n&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.1.0-release.zip
+Changes=Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogss
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -23,7 +23,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.5.1.0-beta
-Release=6.5.0.0-release
+Development=6.5.1.0-release
+Release=6.5.1.0-release

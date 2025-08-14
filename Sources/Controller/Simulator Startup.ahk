@@ -836,11 +836,12 @@ checkForNews() {
 
 			if (newsNr && !SimulatorStartup.Instance)
 				if loadNews(newsUrls)
-					viewNews(kTempDirectory . "News\News.htm", false, !welcome, (showAgain) {
-						setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
+					viewNews(kTempDirectory . "News\News.htm", getMultiMapValue(availableNews, "Names", newsNr), !welcome
+						   , (showAgain) {
+								 setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
-						updateNews(availableNews, news)
-					})
+								 updateNews(availableNews, news)
+							 })
 				else
 					updateNews(availableNews, news)
 		}, 10000)

@@ -25,7 +25,17 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet plammed...
+## 6.5.2.0
+
+#### Date: 08/22/25
+
+#### Fixes
+
+  None...
+  
+#### Changes
+
+  - When using a simulator which does not support tyre sets (almost all beside *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice but in a race session all tyre laps will be *booked* on one tyre set. The number of driven laps per single tyre will still be computed based on known tyre changes.
 
 # Release history
 

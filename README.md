@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.5.2.0-dev]() (Early build for 6.5.2. Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

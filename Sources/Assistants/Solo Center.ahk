@@ -2408,7 +2408,7 @@ class SoloCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
-		local ignore, field
+		local ignore, field, tyreSets
 
 		window["runDropDown"].Enabled := false
 		window["driverDropDown"].Enabled := false
@@ -2479,11 +2479,21 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			for ignore, field in ["tyreSetEdit", "tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"]
-				window[field].Enabled := true
+			this.Providers.supportsTyreManagement( , &tyreSets)
 
-			if (window["tyreSetEdit"].Text = "")
-				window["tyreSetEdit"].Text := 1
+			if tyreSets {
+				window["tyreSetEdit"].Enabled := true
+
+				if (window["tyreSetEdit"].Text = "")
+					window["tyreSetEdit"].Text := 1
+			}
+			else {
+				window["tyreSetEdit"].Enabled := false
+				window["tyreSetEdit"].Text := ""
+			}
+
+			for ignore, field in ["tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"]
+				window[field].Enabled := true
 		}
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
@@ -3123,7 +3133,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreCompound := false
 		local tyreSet := false
 		local driver := false
-		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
+		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures, tyreSets, previousRun
 		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row, theCompound
 
 		run.FuelConsumption := 0.0
@@ -3176,6 +3186,8 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		if (this.SessionActive && (run.TyreMode = "Auto")) {
+			this.Provider.supportsTyreManagement( , &tyreSets)
+
 			theCompound := first(tyreCompound, (c) => (c && (c != "-")))
 
 			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
@@ -3214,6 +3226,11 @@ class SoloCenter extends ConfigurationItem {
 
 				if isDebug()
 					logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
+			}
+			else if (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)) {
+				previousRun := this.Runs[run.Nr - 1]
+
+				run.TyreLaps := (previousRun.Laps + previousRun.Laps.Length)
 			}
 		}
 

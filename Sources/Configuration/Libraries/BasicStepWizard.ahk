@@ -527,6 +527,7 @@ class BasicStepWizard extends StepWizard {
 			this.Control["basic" . key . "VoiceDropDown"].Enabled := enabled
 			this.Control["basic" . key . "NameEdit"].Enabled := enabled
 			this.Control["basic" . key . "SettingsButton"].Enabled := enabled
+			this.Control["basic" . key . "BoosterButton"].Enabled := enabled
 		}
 	}
 

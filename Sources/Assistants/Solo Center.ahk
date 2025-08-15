@@ -3049,13 +3049,13 @@ class SoloCenter extends ConfigurationItem {
 					lap := run.Laps[1]
 
 					if ((lap.Compounds[1] != "-") && !isNull(run.TyreSet)) {
-						if isDebug()
-							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
-
 						found := false
 
 						if (A_Index > 1) {
 							lastTyreSet := tyreSets[tyreSets.Length]
+
+							if isDebug()
+								logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . lastTyreSet.Laps . " / " . run.TyreLaps . " (" . run.Laps . ")")
 
 							if ((lap.TyreSet = "-") && (lastTyreSet.Nr = "-") && (lap.Compounds[1] = lastTyreSet.Compound)
 													&& (lastTyreSet.Laps <= run.TyreLaps)) {
@@ -3074,6 +3074,9 @@ class SoloCenter extends ConfigurationItem {
 										break
 									}
 						}
+						else if isDebug()
+							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
+
 
 						if !found
 							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compounds[1], Laps: this.getTyreLaps(run)})
@@ -3133,7 +3136,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreCompound := false
 		local tyreSet := false
 		local driver := false
-		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures, tyreSets, previousRun
+		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures, tyreSets
 		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row, theCompound
 
 		run.FuelConsumption := 0.0
@@ -3193,7 +3196,7 @@ class SoloCenter extends ConfigurationItem {
 			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
 				run.Compounds := tyreCompound
 
-			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
+			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1) && (this.Control["tyreCompoundDropDown"].Value > 1)) {
 				run.Compounds := tyreCompound
 				run.TyreSet := tyreSet
 
@@ -3227,11 +3230,9 @@ class SoloCenter extends ConfigurationItem {
 				if isDebug()
 					logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
 			}
-			else if (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)) {
-				previousRun := this.Runs[run.Nr - 1]
-
-				run.TyreLaps := (previousRun.Laps + previousRun.Laps.Length)
-			}
+			else if ((this.Control["tyreCompoundDropDown"].Value == 1)
+				  || (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)))
+				run.TyreLaps := this.getTyreLaps(this.Runs[run.Nr - 1])
 		}
 
 		if driver

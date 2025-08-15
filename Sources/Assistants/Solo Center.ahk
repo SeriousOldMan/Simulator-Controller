@@ -3055,7 +3055,7 @@ class SoloCenter extends ConfigurationItem {
 							lastTyreSet := tyreSets[tyreSets.Length]
 
 							if isDebug()
-								logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . lastTyreSet.Laps . " / " . run.TyreLaps . " (" . run.Laps . ")")
+								logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . lastTyreSet.Laps . " / " . run.TyreLaps . " (" . run.Laps.Length . ")")
 
 							if ((lap.TyreSet = "-") && (lastTyreSet.Nr = "-") && (lap.Compounds[1] = lastTyreSet.Compound)
 													&& (lastTyreSet.Laps <= run.TyreLaps)) {

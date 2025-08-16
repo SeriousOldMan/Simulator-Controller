@@ -1599,6 +1599,7 @@ class RaceStrategist extends GridRaceAssistant {
 									  , "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																								   , getMultiMapValue(settings, "Session Settings"
 																															, "Pitstop.Delta", 30))
+									  , "Session.Settings.Pitstop.Service.Last", getMultiMapValue(settings, "Session Settings", "Pitstop.Service.Last", 5)
 									  , "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											     , "Service.Refuel.Rule", "Dynamic")
 									  , "Session.Settings.Pitstop.Service.Refuel.Duration", getMultiMapValue(settings, "Strategy Settings"
@@ -4160,41 +4161,42 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
-			if (this.Speaker[false] && (this.Session == kSessionRace)) {
-				speaker := this.getSpeaker()
-				fragments := speaker.Fragments
+		if ((knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0))
+		   > knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5))
+		 && this.Speaker[false] && (this.Session == kSessionRace)) {
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 
-				speaker.beginTalk()
+			speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																												  : "WeatherDryChange"
-									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
+			try {
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
+																											  : "WeatherDryChange"
+								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if this.hasEnoughData(false)
-						if this.Strategy {
-							if this.confirmAction("Strategy.Weather") {
-								speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
+				if this.hasEnoughData(false)
+					if this.Strategy {
+						if this.confirmAction("Strategy.Weather") {
+							speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-								this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
-							}
-							else
-								this.recommendStrategy()
+							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
 						}
-						else if ProcessExist("Race Engineer.exe")
-							if this.confirmAction("Strategy.Weather") {
-								speaker.speakPhrase("ConfirmInformEngineer", false, true)
+						else
+							this.recommendStrategy()
+					}
+					else if ProcessExist("Race Engineer.exe")
+						if this.confirmAction("Strategy.Weather") {
+							speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-								this.setContinuation(ObjBindMethod(this, "planPitstop"))
-							}
-							else
-								this.planPitstop()
-				}
-				finally {
-					speaker.endTalk()
-				}
+							this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						}
+						else
+							this.planPitstop()
 			}
+			finally {
+				speaker.endTalk()
+			}
+		}
 	}
 
 	reportUpcomingPitstop(plannedPitstopLap, planPitstop := true) {

@@ -32,10 +32,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
+  - Fixed a few bugs, which crashed "Simulator Setup", if invalid values had been entered in the configuration page of the Driving Coach.
   
 #### Changes
 
-  - When using a simulator which does not support tyre sets (almost all beside *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice but in a race session all tyre laps will be *booked* on one tyre set. The number of driven laps per single tyre will still be computed based on known tyre changes.
+  - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
 
 # Release history
 

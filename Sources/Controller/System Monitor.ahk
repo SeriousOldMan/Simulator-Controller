@@ -1617,7 +1617,12 @@ systemMonitor(command := false, arguments*) {
 
 		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
 			if ((key = "Mode") || (key = "Session")) {
-				state := values2String(A_Space, collect(string2Values(";", state), translate)*)
+				state := values2String(A_Space, collect(string2Values(";", state), (info) {
+													if (info = "Qualification")
+														info := "Qualifying"
+
+													return translate(info)
+												})*)
 
 				info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . state . "</td></tr>")
 			}

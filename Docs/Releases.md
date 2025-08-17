@@ -32,10 +32,14 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
+  - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
+  - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
   
 #### Changes
 
-  - When using a simulator which does not support tyre sets (almost all beside *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice but in a race session all tyre laps will be *booked* on one tyre set. The number of driven laps per single tyre will still be computed based on known tyre changes.
+  - The Strategist and/or the Engineer no longer recommend a tyre change due to weather at the end of the race. To be precise, they use the [setting "Final laps without service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) from the "Session Database" to determine, if a tyre change should be scheduled.
+  - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
 
 # Release history
 
@@ -1184,7 +1188,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Most important, a new LLM Runtime has been implemented.
      - Better support for execution of all or parts of the model on the graphics card.
-	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
+	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime system for LLMs" preset.
 	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information.
   4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected". Revisit your event configuration and include the *updated* event, if necessary.
   5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident. Revisit your event configuration and include the new event and action, if necessary.

@@ -331,12 +331,12 @@ class PitstopRecommendation extends Assert {
 				strategist.KnowledgeBase.produce()
 
 				this.AssertEqual(7, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 2...")
-				this.AssertEqual(14, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Position"), "Unexpected position detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[18]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Traffic"), "Unexpected cars ahead detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual(18, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Position"), "Unexpected position detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Traffic"), "Unexpected cars ahead detected after pitstop recommmendation in lap 2...")
 
 				this.AssertEqual("[3, 4, 5, 6, 7]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Laps"), "Unexpected evaluated laps detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[19, 19, 19, 17, 14]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions"), "Unexpected evaluated positions detected after pitstop recommmendation in lap 2...")
-				this.AssertEqual("[[], [], [14], [17], [18]]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[19, 19, 19, 19, 18]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions"), "Unexpected evaluated positions detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[[11, 7, 5], [11, 7], [11], [], []]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
 			}
 
 			if strategist.Debug[kDebugKnowledgeBase]

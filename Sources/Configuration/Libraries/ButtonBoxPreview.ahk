@@ -184,7 +184,8 @@ class ButtonBoxPreview extends ControllerPreview {
 					x := horizontal + Round((columnWidth - imageWidth) / 2)
 					y := vertical + Round((rowHeight - (labelHeight + ButtonBoxPreview.kLabelMargin) - imageHeight) / 2)
 
-					buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image).OnEvent("Click", controlClick.Bind(buttonBoxGui))
+					if FileExist(image)
+						buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image).OnEvent("Click", controlClick.Bind(buttonBoxGui))
 
 					if ((labelWidth > 0) && (labelHeight > 0)) {
 						buttonBoxGui.SetFont("s8 Norm")

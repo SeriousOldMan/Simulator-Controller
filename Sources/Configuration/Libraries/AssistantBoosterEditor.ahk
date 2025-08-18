@@ -552,6 +552,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 	saveToConfiguration(configuration) {
 		local ignore, provider, reference, setting, value
+		local section, removedKeys, addedKeys, key
 
 		super.saveToConfiguration(configuration)
 
@@ -635,6 +636,24 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		else {
 			setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Model", false)
 			setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Service", false)
+		}
+
+		for ignore, section in ["Conversation Booster", "Agent Booster"] {
+			removedKeys := []
+			addedkeys := []
+
+			for key, value in getMultiMapValues(configuration, section)
+				if (InStr(key, "Instructions.") == 1) {
+					removedKeys.Push(key)
+
+					addedKeys.Push([this.Assistant . "." . key, value])
+				}
+
+			for ignore, key in removedKeys
+				removeMultiMapValue(configuration, section, key)
+
+			for ignore, key in addedkeys
+				setMultiMapValue(configuration, section, key[1], key[2])
 		}
 	}
 
@@ -1089,7 +1108,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		if !original
 			for ignore, configuration in [this.Configuration, this.iInstructions]
 				for key, value in getMultiMapValues(configuration, reference)
-					if (InStr(key, "Instructions." . type) = 1)
+					if (InStr(key, this.Assistant . ".Instructions." . type) = 1) {
+						key := StrReplace(key, this.Assistant . ".", "")
+
+						setMultiMapValue(instructions, reference, key, value)
+					}
+					else if (InStr(key, "Instructions." . type) = 1)
 						setMultiMapValue(instructions, reference, key, value)
 
 		return instructions

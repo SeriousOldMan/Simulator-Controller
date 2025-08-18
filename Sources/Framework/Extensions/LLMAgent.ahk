@@ -104,9 +104,25 @@ class AgentBooster extends LLMBooster {
 					}
 
 				for key, value in getMultiMapValues(this.Configuration, "Agent Booster")
-					if (InStr(key, "Instructions.") = 1) {
-						key := ConfigurationItem.splitDescriptor(key)
+					if (InStr(key, this.Descriptor . ".Instructions.") = 1) {
+						if (value == true)
+							key := false
+						else {
+							key := ConfigurationItem.splitDescriptor(key)
 
+							key.RemoveAt(1)
+						}
+					}
+					else if (InStr(key, "Instructions.") = 1) {
+						if (value == true)
+							key := false
+						else
+							key := ConfigurationItem.splitDescriptor(key)
+					}
+					else
+						key := false
+
+					if key {
 						instrLanguage := key[4]
 
 						if !instructions.Has(instrLanguage)

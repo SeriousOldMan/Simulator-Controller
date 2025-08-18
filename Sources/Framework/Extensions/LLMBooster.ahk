@@ -176,10 +176,26 @@ class ConversationBooster extends LLMBooster {
 						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
 					}
 
-				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster")
-					if (InStr(key, "Instructions.") = 1) {
-						key := ConfigurationItem.splitDescriptor(key)
+				for key, value in getMultiMapValues(this.Configuration, "Conversation Booster") {
+					if (InStr(key, this.Descriptor . ".Instructions.") = 1) {
+						if (value == true)
+							key := false
+						else {
+							key := ConfigurationItem.splitDescriptor(key)
 
+							key.RemoveAt(1)
+						}
+					}
+					else if (InStr(key, "Instructions.") = 1) {
+						if (value == true)
+							key := false
+						else
+							key := ConfigurationItem.splitDescriptor(key)
+					}
+					else
+						key := false
+
+					if key {
 						instrLanguage := key[4]
 
 						if !instructions.Has(instrLanguage)
@@ -187,6 +203,7 @@ class ConversationBooster extends LLMBooster {
 
 						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
 					}
+				}
 
 				this.iInstructions := instructions
 			}

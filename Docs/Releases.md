@@ -34,7 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
   - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
   - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
-  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*.
+  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*. This problem was introduced due to an API change in *Le Mans Ultimate*. Unfortunately this caused some data to be collected for the wrong track layout. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) for information, how to fix this.
   
 #### Changes
 
@@ -43,7 +43,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Again several new articles for the tips & tricks.
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime or if you need to fix some data, which had been collected for the wrond track layout.
 
 # Release history
 

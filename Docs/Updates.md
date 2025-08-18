@@ -37,7 +37,8 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.5.2
 
-The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
+1. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
+2. Due to a change in the *Le Mans Ultimate* API, data which had been collected for one of the shorter track layouts may have been stored for the base layout. You can fix this in the "Administration" tab of the "Session Database". Double click on the "Laps" and/or "Pressures" entry and delete the faulty lines, which can be identified by the lap time.
 
 ***
 

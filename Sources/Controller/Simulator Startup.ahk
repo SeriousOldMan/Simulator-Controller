@@ -660,9 +660,9 @@ showNews() {
 	local hasNews := false
 	local name, urls
 
-	showNews(nr, urls, *) {
+	showNews(nr, title, urls, *) {
 		if loadNews(urls)
-			viewNews(kTempDirectory . "News\News.htm", false, true, (showAgain) {
+			viewNews(kTempDirectory . "News\News.htm", title, true, (showAgain) {
 				setMultiMapValue(news, "Visited", nr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 				updateNews(false, news)
@@ -676,7 +676,7 @@ showNews() {
 	for name, urls in getMultiMapValues(news, "News") {
 		urls := string2Values("|", urls, 2)
 
-		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], urls[2]))
+		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], name, urls[2]))
 
 		hasNews := true
 	}

@@ -1771,6 +1771,18 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV652() {
+	local news
+
+	if FileExist(kUserConfigDirectory . "NEWS") {
+		news := readMultiMap(kUserConfigDirectory . "NEWS")
+
+		removeMultiMapValue(news, "News", "Customizing Assistant behaviour")
+
+		writeMultiMap(kUserConfigDirectory . "NEWS", news)
+	}
+}
+
 updateConfigurationForV642() {
 	local text
 

@@ -879,7 +879,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static conversationNr := 1
 
 		normalizeAnswer(answer) {
-			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), " `t`r`n")
+			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), "`t`r`n")
 
 			while InStr(answer, "\n", , -2)
 				answer := SubStr(answer, 1, StrLen(answer) - 2)
@@ -963,9 +963,18 @@ class DrivingCoach extends GridRaceAssistant {
 			if this.Speaker
 				if this.VoiceManager.UseTalking
 					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
+				else if InStr(answer, "。") {
+					for ignore, part in string2Values("。", answer)
+						if (Trim(part) != "")
+							this.getSpeaker().speak(part . "。", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+				}
+				else if InStr(answer, translate(". ")) {
+					for ignore, part in string2Values(translate(". "), answer)
+						if (Trim(part) != "")
+							this.getSpeaker().speak(part . translate("."), false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+				}
 				else
-					for ignore, part in string2Values(". ", answer)
-						this.getSpeaker().speak(part . ".", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
 
 			if (this.Transcript && (this.Mode != "Coaching"))
 				try {

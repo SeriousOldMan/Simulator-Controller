@@ -385,6 +385,20 @@ As an alternative to the Azure cloud services, corresponding Google services are
 
 IMPORTANT: It is necessary to use one of the cloud based speech recognition services or the Whisper Runtime described below, if you want to talk to Aiden, the AI Driving Coach. This is necessary, since the interaction with Aiden does not use pattern based commands, for which the builtin speech recognition engines of Windows are optimized for (the *Desktop* engine can actually handle a bit of free speech, but not very well). The aforementioned speech recognition services of Azure, Google or the free Whisper are way better, when it comes to free speech.
 
+###### ElevenLabs
+
+ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs allows you to create new voices by using an AI to analyze the voice of any speaker. Voices can also be shared with the community, so the list of available voices is extremely huge, although many of them are of poor quality. Anyway, if you want the Race Spotter to talk with your favorite Crew Chief voice or with the voice of a well-known celebrity, give it a go. ElevenLabs can also be used for voice recognition. The recognition quality is extremely good, comparable to Whisper, and support free conversation.
+
+You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with Eleven labs in the browser. Using the API, however, will require a paid subscription.
+
+###### Notes
+
+1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
+
+2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+
+3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
+
 ###### Whisper Runtime
 
 Whisper is a very capable neural speech recognition system developed by OpenAI. Whisper is open source and executes locally on your PC. Therefore it requires a powerful machine and a GPU with at least 6GB of free memory. The integration for Simulator Controller supports the execution of Whisper either on the same PC as Simulator Controller and of course also the simulator, which means that this machine must really high end, or you can Whisper on a different machine and connect to this machine using HTTP.
@@ -413,7 +427,11 @@ In either case, when using Whisper Runtime, you can choose between models of dif
 
 If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
-IMPORTANT: When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
+IMPORTANT:
+
+- If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) "Compute Type" and set it to *float16*.
+
+- When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
  
 ###### Notes
 

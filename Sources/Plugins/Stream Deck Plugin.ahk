@@ -214,7 +214,7 @@ class StreamDeck extends FunctionController {
 		local numDials := 0
 		local num1WayToggles := 0
 		local num2WayToggles := 0
-		local function, special, rows, row, ignore, label, icon, mode, isRunning, layout
+		local function, special, rows, row, ignore, label, icon, mode, layout
 
 		super.loadFromConfiguration(configuration)
 
@@ -265,12 +265,8 @@ class StreamDeck extends FunctionController {
 						label := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
 						mode := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
 
-						isRunning := this.isRunning()
-
-						if isRunning {
-							this.setFunctionTitle(function, "")
-							this.setFunctionImage(function, "clear")
-						}
+						this.setFunctionTitle(function, "")
+						this.setFunctionImage(function, "clear")
 
 						if (mode != kIconOrLabel) {
 							this.iModes[function] := mode
@@ -279,14 +275,14 @@ class StreamDeck extends FunctionController {
 						if (icon != true) {
 							this.iIcons[function] := icon
 
-							if (icon && (icon != "") && isRunning)
+							if (icon && (icon != ""))
 								this.setControlIcon(function, icon)
 						}
 
 						if (label != true) {
 							this.iLabels[function] := label
 
-							if (label && isRunning)
+							if label
 								this.setControlLabel(function, label)
 						}
 
@@ -326,7 +322,7 @@ class StreamDeck extends FunctionController {
 	}
 
 	static isRunning() {
-		return ((ProcessExist("SimulatorControllerPlugin.exe") != 0) && (SimulatorController.Instance.State = "Foreground"))
+		return ((ProcessExist("SimulatorControllerPlugin.exe") != 0) && SimulatorController.Instance.Started)
 	}
 
 	isRunning() {
@@ -372,7 +368,7 @@ class StreamDeck extends FunctionController {
 		if !isObject(function)
 			function := this.Controller.findFunction(function)
 
-		if (this.isRunning() && this.hasFunction(function)) {
+		if this.hasFunction(function) {
 			actions := this.Actions[function]
 			icon := false
 
@@ -409,7 +405,7 @@ class StreamDeck extends FunctionController {
 		if !isObject(function)
 			function := controller.findFunction(function)
 
-		if (this.isRunning() && this.hasFunction(function)) {
+		if this.hasFunction(function) {
 			enabled := false
 
 			actions := this.Actions[function]
@@ -446,69 +442,70 @@ class StreamDeck extends FunctionController {
 	}
 
 	setFunctionTitle(function, title, refresh := false) {
-		if this.isRunning() {
-			if refresh {
-				if (title = "")
-					title := " "
+		if refresh {
+			if (title = "")
+				title := " "
 
+			if this.isRunning()
 				this.Connector.SetTitle(function, title)
-			}
-			else if this.RefreshActive {
-				this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionTitle", function, title))
+		}
+		else if this.RefreshActive {
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionTitle", function, title))
 
-				return
-			}
-			else {
-				if this.iFunctionTitles.Has(function) {
-					if (this.iFunctionTitles[function] != title)
-						this.iChangedFunctionTitles[function] := true
-				}
-				else
+			return
+		}
+		else {
+			if this.iFunctionTitles.Has(function) {
+				if (this.iFunctionTitles[function] != title)
 					this.iChangedFunctionTitles[function] := true
-
-				this.iFunctionTitles[function] := title
-
-				this.Connector.SetTitle(function, title)
 			}
+			else
+				this.iChangedFunctionTitles[function] := true
+
+			this.iFunctionTitles[function] := title
+
+			if this.isRunning()
+				this.Connector.SetTitle(function, title)
 		}
 	}
 
 	setFunctionImage(function, icon, type := "Normal", refresh := false) {
 		local displayIcon := icon
 
-		if this.isRunning() {
-			if (type = "Deactivated")
-				type := "Normal"
+		if (type = "Deactivated")
+			type := "Normal"
 
-			if (icon && (icon != "clear"))
-				if (type = "Disabled")
-					displayIcon := disabledIcon(icon)
-				else if (type = "Activated")
-					displayIcon := activatedIcon(icon)
-				else if (type = "Deactivated")
-					displayIcon := deactivatedIcon(icon)
+		if (icon && (icon != "clear"))
+			if (type = "Disabled")
+				displayIcon := disabledIcon(icon)
+			else if (type = "Activated")
+				displayIcon := activatedIcon(icon)
+			else if (type = "Deactivated")
+				displayIcon := deactivatedIcon(icon)
 
-			if refresh
+		if refresh {
+			if this.isRunning()
 				this.Connector.SetImage(function, displayIcon)
-			else if this.RefreshActive {
-				this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon, type))
+		}
+		else if this.RefreshActive {
+			this.iPendingUpdates.Push(ObjBindMethod(this, "setFunctionImage", function, icon, type))
 
-				return
-			}
-			else {
-				if this.iFunctionImages.Has(function) {
-					if ((this.iFunctionImages[function][1] != icon) || (this.iFunctionImages[function][2] != type))
-						this.iChangedFunctionImages[function] := true
-					else
-						return
-				}
-				else
+			return
+		}
+		else {
+			if this.iFunctionImages.Has(function) {
+				if ((this.iFunctionImages[function][1] != icon) || (this.iFunctionImages[function][2] != type))
 					this.iChangedFunctionImages[function] := true
-
-				this.iFunctionImages[function] := [icon, type]
-
-				this.Connector.SetImage(function, displayIcon)
+				else
+					return
 			}
+			else
+				this.iChangedFunctionImages[function] := true
+
+			this.iFunctionImages[function] := [icon, type]
+
+			if this.isRunning()
+				this.Connector.SetImage(function, displayIcon)
 		}
 	}
 
@@ -649,15 +646,6 @@ disabledIcon(fileName) {
 	return modifiedIcon(fileName, "Dsbld", grayIcon)
 }
 
-refreshStreamDecks() {
-	local full, ignore, fnController
-
-	if SimulatorController.Instance.Started
-		for ignore, fnController in SimulatorController.Instance.FunctionController
-			if isInstance(fnController, StreamDeck)
-				fnController.refresh(true)
-}
-
 handleStreamDeckMessage(category, data) {
 	local command := string2Values(A_Space, data)
 	local function := command[1]
@@ -703,8 +691,20 @@ initializeStreamDeckPlugin() {
 
 	registerMessageHandler("Stream Deck", handleStreamDeckMessage)
 
-	if StreamDeck.isRunning()
-		PeriodicTask(refreshStreamDecks, 6000, kLowPriority).start()
+	Task.startTask(() {
+		if StreamDeck.isRunning()
+			PeriodicTask(() {
+				local ignore, fnController
+
+				for ignore, fnController in SimulatorController.Instance.FunctionController
+					if isInstance(fnController, StreamDeck)
+						fnController.refresh(true)
+
+				Task.CurrentTask.Sleep := 10000
+			}, 0, kLowPriority).start()
+		else
+			return Task.CurrentTask
+	}, 1000, kLowPriority)
 }
 
 

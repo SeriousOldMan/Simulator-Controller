@@ -410,8 +410,8 @@ class Task {
 	}
 
 	static schedule(priority := 2) {
-		local next, executed, oldScheduling, visited, schedule
 		local unprotect := true
+		local next, executed, oldScheduling, visited, schedule
 
 		static timings := [Task.sLow, Task.sNormal, Task.sHigh, Task.sInterrupt]
 		static scheduling := false

@@ -37,19 +37,21 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.4.3.0-release](https://cutt.ly/grSE5H8y) (Changes: Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement, Reorganized master download repository.)
+[6.5.1.0-release](https://cutt.ly/xrGFwN15) (Changes: Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogs.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-643) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.4.2.0-release](https://cutt.ly/hrPBQT4k) (Changes: Fixed handling of optional voice recognition libraries in "Simulator Setup", Changed default for Activation Recognizer, Fixed several UI translation errors, Fixed Japanase translation coding, Fixed Brake Balance in "Setup Workbench" for LMU, Fixed ABS setting in "Setup Workbench" for LMU, Fixed Spotter phrase priorities, Prevent multiple car behind alerts by the Spotter, New car models for "Setup Workbench", Fixed setup comparison tool for inverse settings, Fixed tyre compound selection for LMU pitstop.)
+[6.5.0.0-release](https://cutt.ly/brD5Ys5W) (Changes: Optimized startup sequence, Full support for LMU team races, Fixed tyre laps in session summary in "Team Center", Swapped icons in "Simulator Startup", Select inidividual cars in the Positions report, Fixed detection of active driver for LMU, Fixed empty lap times report when restricting car classes, Support for ElevenLabs speech API, Optimized LMU startup time, Fixed Japanese translations.)
 
-[6.4.1.0-release](https://cutt.ly/9rI5NShw) (Changes: Optimized LMU session startup, First part of Japanase translation, Fixed installer for Chinese voice recognition library, Made Chinese available in "Simulator Setup", Added some missing translations, Added command cheat sheets for Chinese and Japanese, Added documentation button to "Simulator Startup", Allow news articles to be actively selected.)
+[6.4.3.0-release](https://cutt.ly/grSE5H8y) (Changes: Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement, Reorganized master download repository.)
 
 #### Latest development build
 
-None for the moment...
+[6.5.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bkad892W) (Early build for 6.5.2. Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -115,7 +117,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
-28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behaviour or change existing behaviour.
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
@@ -129,7 +131,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
-35. [Scripting Assistant Behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+35. [Scripting Assistant behaviour](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 This list will be extended from time to time to cover new functionalities.
 

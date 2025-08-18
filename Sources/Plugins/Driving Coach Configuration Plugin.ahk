@@ -134,7 +134,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			window.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(FileSelect, "D1" . window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", window["dcConversationsPathEdit"].Text, translate("Select Conversations Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
@@ -547,78 +547,82 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		this.iCurrentProvider := provider
 
-		if !this.iProviderConfigurations.Has(this.iCurrentProvider)
+		if !this.iProviderConfigurations.Has(this.iCurrentProvider) {
 			this.iCurrentProvider := this.Providers[1]
 
-		provider := this.iCurrentProvider
+			provider := this.iCurrentProvider
+		}
 
 		if provider {
 			this.Control["dcProviderDropDown"].Delete()
 			this.Control["dcProviderDropDown"].Add(this.Providers)
 			this.Control["dcProviderDropDown"].Choose(inList(this.Providers, provider))
+
+			configuration := this.iProviderConfigurations[this.iCurrentProvider]
+
+			for ignore, setting in ["ServiceURL", "ServiceKey", "MaxHistory"]
+				this.Control["dc" . setting . "Edit"].Text := configuration[setting]
+
+			if (provider = "LLM Runtime") {
+				this.Control["dcLLMRTGPULayersEdit"].Text := configuration["GPULayers"]
+				this.Control["dcLLMRTMaxTokensEdit"].Text := configuration["MaxTokens"]
+			}
+			else
+				this.Control["dcMaxTokensEdit"].Text := configuration["MaxTokens"]
+
+			if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
+				this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
+
+			if ((provider = "Ollama") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
+				this.Control["dcServiceKeyEdit"].Text := "Ollama"
+
+			this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
+
+			this.Control["dcConfirmationDropDown"].Value := (configuration["Confirmation"] ? 1 : 2)
+
+			this.loadModels(this.iCurrentProvider, configuration["ServiceURL"]
+												 , configuration["ServiceKey"]
+												 , configuration["Model"])
+
+			this.Control["dcInstructionsDropDown"].Choose(1)
+			this.Control["dcInstructionsEdit"].Value := ((configuration["Instructions.Character"] != false) ? configuration["Instructions.Character"] : "")
+
+			for ignore, setting in this.Instructions
+				this.Value[setting] := configuration[setting]
 		}
-
-		configuration := this.iProviderConfigurations[this.iCurrentProvider]
-
-		for ignore, setting in ["ServiceURL", "ServiceKey", "MaxHistory"]
-			this.Control["dc" . setting . "Edit"].Text := configuration[setting]
-
-		if (provider = "LLM Runtime") {
-			this.Control["dcLLMRTGPULayersEdit"].Text := configuration["GPULayers"]
-			this.Control["dcLLMRTMaxTokensEdit"].Text := configuration["MaxTokens"]
-		}
-		else
-			this.Control["dcMaxTokensEdit"].Text := configuration["MaxTokens"]
-
-		if ((provider = "GPT4All") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
-			this.Control["dcServiceKeyEdit"].Text := "Any text will do the job"
-
-		if ((provider = "Ollama") && (Trim(this.Control["dcServiceKeyEdit"].Text) = ""))
-			this.Control["dcServiceKeyEdit"].Text := "Ollama"
-
-		this.Control["dcTemperatureEdit"].Text := Round(configuration["Temperature"] * 100)
-
-		this.Control["dcConfirmationDropDown"].Value := (configuration["Confirmation"] ? 1 : 2)
-
-		this.loadModels(this.iCurrentProvider, configuration["ServiceURL"]
-											 , configuration["ServiceKey"]
-											 , configuration["Model"])
-
-		this.Control["dcInstructionsDropDown"].Choose(1)
-		this.Control["dcInstructionsEdit"].Value := ((configuration["Instructions.Character"] != false) ? configuration["Instructions.Character"] : "")
-
-		for ignore, setting in this.Instructions
-			this.Value[setting] := configuration[setting]
 	}
 
 	saveProviderConfiguration() {
-		local providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
-		local value, ignore, setting
+		local providerConfiguration, value, ignore, setting
 
-		providerConfiguration["ServiceURL"] := Trim(this.Control["dcServiceURLEdit"].Text)
-		providerConfiguration["ServiceKey"] := Trim(this.Control["dcServiceKeyEdit"].Text)
+		if this.iProviderConfigurations.Has(this.iCurrentProvider) {
+			providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
 
-		if (this.iCurrentProvider = "LLM Runtime")
-			value := this.Control["dcLLMRTModelEdit"].Text
-		else
-			value := this.Control["dcModelDropDown"].Text
+			providerConfiguration["ServiceURL"] := Trim(this.Control["dcServiceURLEdit"].Text)
+			providerConfiguration["ServiceKey"] := Trim(this.Control["dcServiceKeyEdit"].Text)
 
-		providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+			if (this.iCurrentProvider = "LLM Runtime")
+				value := this.Control["dcLLMRTModelEdit"].Text
+			else
+				value := this.Control["dcModelDropDown"].Text
 
-		if (this.iCurrentProvider = "LLM Runtime")
-			providerConfiguration["MaxTokens"] := this.Control["dcLLMRTMaxTokensEdit"].Text
-		else
-			providerConfiguration["MaxTokens"] := this.Control["dcMaxTokensEdit"].Text
+			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
 
-		if (this.iCurrentProvider = "LLM Runtime")
-			providerConfiguration["GPULayers"] := this.Control["dcLLMRTGPULayersEdit"].Text
+			if (this.iCurrentProvider = "LLM Runtime")
+				providerConfiguration["MaxTokens"] := this.Control["dcLLMRTMaxTokensEdit"].Text
+			else
+				providerConfiguration["MaxTokens"] := this.Control["dcMaxTokensEdit"].Text
 
-		providerConfiguration["Temperature"] := Round(this.Control["dcTemperatureEdit"].Text / 100, 2)
-		providerConfiguration["MaxHistory"] := this.Control["dcMaxHistoryEdit"].Text
-		providerConfiguration["Confirmation"] := ((this.Control["dcConfirmationDropDown"].Value = 1) ? true : false)
+			if (this.iCurrentProvider = "LLM Runtime")
+				providerConfiguration["GPULayers"] := this.Control["dcLLMRTGPULayersEdit"].Text
 
-		for ignore, setting in this.Instructions
-			providerConfiguration[Setting] := ((Trim(this.Value[setting]) != "") ? this.Value[setting] : false)
+			providerConfiguration["Temperature"] := Round(this.Control["dcTemperatureEdit"].Text / 100, 2)
+			providerConfiguration["MaxHistory"] := this.Control["dcMaxHistoryEdit"].Text
+			providerConfiguration["Confirmation"] := ((this.Control["dcConfirmationDropDown"].Value = 1) ? true : false)
+
+			for ignore, setting in this.Instructions
+				providerConfiguration[setting] := ((Trim(this.Value[setting]) != "") ? this.Value[setting] : false)
+		}
 	}
 
 	loadConfigurator(configuration, simulators := false) {

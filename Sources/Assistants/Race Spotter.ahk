@@ -104,6 +104,8 @@ startupRaceSpotter() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Spotter"
 
+	ProcessSetPriority("L")
+
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1

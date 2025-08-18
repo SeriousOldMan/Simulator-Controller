@@ -587,11 +587,13 @@ class TeamServerPlugin extends ControllerPlugin {
 	activate() {
 		super.activate()
 
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {

@@ -126,6 +126,8 @@ checkProcessMemory(maxMemory) {
 
 			if pid
 				checkMemory(process, pid)
+
+			Sleep(200)
 		}
 }
 
@@ -151,14 +153,20 @@ killZombies() {
 }
 
 startupProcessManager() {
+	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local icon := kIconsDirectory . "Observer.ico"
-	
+
 	TraySetIcon(icon, "1")
 	A_IconTip := "Process Manager"
 
-	PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-														, "Process", "Memory.Max", 1024)), 500).start()
-	PeriodicTask(killZombies, 500).start()
+	if getMultiMapValue(settings, "Process", "Memory.WatchDog", 10)
+		PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(settings, "Process", "Memory.Max", 1024))
+				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000, kHighPriority).start()
+				   
+	Sleep(4000)
+
+	if getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10)
+		PeriodicTask(killZombies, getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10) * 1000, kLowPriority).start()
 
 	startupProcess()
 

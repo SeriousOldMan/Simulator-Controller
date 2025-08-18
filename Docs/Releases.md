@@ -1,5 +1,77 @@
 # Latest stable release
 
+## 6.5.1.0
+
+#### Date: 08/15/25
+
+#### Fixes
+
+  - Fixed handling of "。", "，" and other full-width punctuation characters in spoken commands for Chinese and Japanese when a neural network based voice recognition like Azure is used, so that the Sorenson-Dice matchmaking algorithm is happy.
+  
+#### Changes
+
+  - Reduced the OS priority of various background processes, so that the running simulator gets a few more CPU cycles.
+  - Reduced startup stutter in *Le Mans Ultimate* a bit more.
+  - "Overview" reports are now sortable on position, even if DNF'ed cars are present.
+  - "Solo Center" has a new *Auto Telemetry* setting, which automatically opens the Telemetry Viewer (thereby start collecting telemetry), when a new session is started. But make sure, that the automatic opening of the Telemetry Viewer window does not interfere with the operation of the active simulator.
+  - Splitting long speeches into individual sentences is now supported for Chinese and Japanese. Only the last sentence will then be repeated, if the speech is interrupted by the Spotter.
+  - The controller action function "selectTrackAutomation" can be called multiple times without side effects. This allows you to create an action in the *Reasoning* booster to automatically switch between track automations depending on weather conditions and track grip.
+  - Added a new setting "Whisper.Compute Type" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings). This setting must be set to *float16*, if you want to use Whisper on an RTX 50xx GPU. If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+  - Added two new articles to the tips & tricks this time.
+  - [Expert] The [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) "Sample Frequency" has been renamed to "ElevenLabs.Sample Frequency". The old name is still supported, but deprecated.
+  - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
+
+# Upcoming release
+
+## 6.5.2.0
+
+#### Date: 08/22/25
+
+#### Fixes
+
+  - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
+  - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
+  - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
+  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*. This problem was introduced due to an API change in *Le Mans Ultimate*. Unfortunately this caused some data to be collected for the wrong track layout. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) for information, how to fix this.
+  
+#### Changes
+
+  - The Strategist and/or the Engineer no longer recommend a tyre change due to weather at the end of the race. To be precise, they use the [setting "Final laps without service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) from the "Session Database" to determine, if a tyre change should be scheduled.
+  - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
+  - Again several new articles for the tips & tricks.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime or if you need to fix some data, which had been collected for the wrond track layout.
+
+# Release history
+
+## 6.5.0.0
+
+#### Date: 08/08/25
+
+#### Fixes
+
+  - Fixed the calculation of driven laps for individual tyres when running team races under control of the "Team Center".
+  - Fixed detection of the active driver for *Le Mans Ultimate*.
+  - Fixed a bug, that caused the *Lap Times* report to be empty when switching from the *Positions* report with the car class being restricted. Affected "Race Reports", "Solo Center" and "Team Center".
+  - Fixed minor problems with Japanese speech generation.
+  - Fixed a couple translations for Japanese.
+  
+#### Changes
+
+  - Full support for team races in *Le Mans Ultimate* under control of the "Team Center".
+  - Full support for ElevenLabs Speech API.
+    - Use the famous voices from ElevenLabs, where you can create your own voices easily from a couple of samples. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. All voices being marked as "personal", "default" or "workspace" are available in the standard configuration, but with an additional step any voice from the community can be used.
+	- ElevenLabs services for speech recognition is also supported.
+	
+    See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#ElevenLabs) for more information.
+  - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
+  - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
+  - [Internal] (Once again) optimized startup process for *Le Mans Ultimate*.
+  - [Internal] Optimized the startup sequence of the "Simulator Controller" background process and all its decendendants, safing a few seconds.
+
 ## 6.4.3.0
 
 #### Date: 08/01/25
@@ -20,13 +92,7 @@
   - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
   - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
   - [Internal] Reorganized master download repository (once again).
-
-# Upcoming release
-
-Not yet planned...
-
-# Release history
-
+  
 ## 6.4.2.0
 
 #### Date: 07/25/25
@@ -121,7 +187,7 @@ Not yet planned...
   - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
   - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
 
 ## 6.3.8.0
 
@@ -378,7 +444,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- It is now possible to use *Lua* coroutines even while interface with the host environments or with the Rule Engine.
   - [Internal] Full rewrite of the simulator data acquisition interface.
 
-As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behavior, let me know immediately.
+As mentioned above, this version contains an all new simulator data interface. It has passed all my tests, but tests may not cover everything. Therefore, if you encounter an unexpected behaviour, let me know immediately.
   
 ## 6.2.8.0
 
@@ -457,7 +523,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Spotter alerts about accidents in a specific distance got a higher priority.
   - New [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration) has been defined, which allows you to move the *Temp* folder and also the *Programs* folder of the [Documents]\Simulator Controller folder to a different location. This will be helpful, if your [Documents] folder is under control of *One Drive* or a similar replication tool, since there are reports of several issues and conflicts with the operation of Simulator Controller in that case.
   - The window resizing behaviour for "Strategy Workbench" has been optimized a bit to make the list of available tyre compounds more accessible.
-  - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioral actions of the Assistants, once they are based on a LAM (aka Large Action Model).
+  - This Release introduces support for a new algorithmic scripting language as addition to the support of rule-based programming, which has been around for some time now. The new scripting engine is based on the well-known and wide-spread programming language [Lua](https://lua.org). A long term goal is to use the scripting language for the implementation of all behavioural actions of the Assistants, once they are based on a LAM (aka Large Action Model).
 	- The new scripting language can be used to implement actions in *Conversation* and *Reasoning* boosters for the Assistants. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
     - Scripting can also be used to implement the [scenario validations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#script-based-validation) in "Strategy Workbench".
 	- Both integrations are already fully functional, but are not yet fully tested for each possible scenario.
@@ -1126,7 +1192,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates here and there, as always
   3. Most important, a new LLM Runtime has been implemented.
      - Better support for execution of all or parts of the model on the graphics card.
-	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime for LLMs" preset.
+	 - Since this runtime is quite large (> 200 MB), it is provided as a downloadable component. Run "Simulator Setup", go to the presets page and install the "Local runtime system for LLMs" preset.
 	 - See the completely [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information.
   4. The Race Engineer LLM event "damage_collected" has been renamed to "damage_detected". Revisit your event configuration and include the *updated* event, if necessary.
   5. A new event and a new action has been defined for the *Reasoning* booster of the Race Engineer. This pair handles reporting of critical time loss after an incident. Revisit your event configuration and include the new event and action, if necessary.
@@ -1255,7 +1321,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
      Please note, that using *Actions* is not enabled by default, but must be explicitly activated in the configuration.
   6. Action definition files are customizeable in the [Documents]\Simulator Controller\Actions folder.
-  7. An editor has been implemented to enable or disable the predefined *Conversation* or *Behavior* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
+  7. An editor has been implemented to enable or disable the predefined *Conversation* or *behaviour* actions and even define your own ones. But this will require extensive knowledge of the inner workings of Simulator Controller and the Assistants and also a very good understanding how LLMs work. You have been warned. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-576), if you have configured the Conversation Booster for the Assistants.
 

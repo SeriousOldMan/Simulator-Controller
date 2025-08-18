@@ -1143,7 +1143,6 @@ else {
 				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if (A_Index = 3) {
-					msgbox 1
 					engineer.planPitstop()
 					engineer.preparePitstop()
 				}

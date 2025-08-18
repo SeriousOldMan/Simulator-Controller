@@ -527,7 +527,7 @@ class SimulatorStartup extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-viewNews(fileName, title := false, readCallback := false) {
+viewNews(fileName, title := false, showAgain := true, readCallback := false) {
 	local curWorkingDir := A_WorkingDir
 	local html, innerWidth, editHeight, buttonX, x, y, w, h, directory, newsViewer
 
@@ -589,7 +589,7 @@ viewNews(fileName, title := false, readCallback := false) {
 
 		newsGui.Add("Text", "x8 yp+" . (editHeight + 10) . " Y:Move W:Grow w" . innerWidth . " 0x10")
 
-		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move vreadCheck", translate("Do not show again"))
+		newsGui.Add("CheckBox", "x16 yp+10 w150 h21 Y:Move Checked" . !showAgain . " vreadCheck", translate("Do not show again"))
 
 		newsGui.Add("Button", "Default X" . buttonX . " yp w80 Y:Move X:Move(0.5)", translate("Close")).OnEvent("Click", (*) => viewNews(false))
 
@@ -657,24 +657,33 @@ updateNews(availableNews := false, news := false) {
 showNews() {
 	local news := readMultiMap(kUserConfigDirectory . "NEWS")
 	local newsMenu := Menu()
+	local hasNews := false
 	local name, urls
 
 	showNews(nr, urls, *) {
 		if loadNews(urls)
-			viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
+			viewNews(kTempDirectory . "News\News.htm", false, true, (showAgain) {
 				setMultiMapValue(news, "Visited", nr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 				updateNews(false, news)
 			})
 	}
 
+	newsMenu.Add(translate("News, tips and tricks"), (*) => {})
+	newsMenu.Disable(translate("News, tips and tricks"))
+	newsMenu.Add()
+
 	for name, urls in getMultiMapValues(news, "News") {
 		urls := string2Values("|", urls, 2)
 
 		newsMenu.Add(StrReplace(name, " & ", " && "), showNews.Bind(urls[1], urls[2]))
+
+		hasNews := true
 	}
 
-	newsMenu.Add()
+	if hasNews
+		newsMenu.Add()
+
 	newsMenu.Add(translate("Cancel"), (*) => true)
 
 	newsMenu.Show( , , true)
@@ -715,6 +724,7 @@ loadNews(urls) {
 checkForNews() {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local check := !FileExist(kUserConfigDirectory . "NEWS")
+	local welcome := false
 	local lastModified, ignore, url
 
 	if !check {
@@ -768,6 +778,7 @@ checkForNews() {
 					if (InStr(rule, "Welcome") && !getMultiMapValue(news, "Visited", nr, false)) {
 						newsNr := nr
 						newsUrls := url
+						welcome := true
 
 						break
 					}
@@ -825,11 +836,12 @@ checkForNews() {
 
 			if (newsNr && !SimulatorStartup.Instance)
 				if loadNews(newsUrls)
-					viewNews(kTempDirectory . "News\News.htm", false, (showAgain) {
-						setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
+					viewNews(kTempDirectory . "News\News.htm", getMultiMapValue(availableNews, "Names", newsNr), !welcome
+						   , (showAgain) {
+								 setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
-						updateNews(availableNews, news)
-					})
+								 updateNews(availableNews, news)
+							 })
 				else
 					updateNews(availableNews, news)
 		}, 10000)
@@ -1209,7 +1221,7 @@ launchPad(command := false, arguments*) {
 			launchPad(kClose)
 	}
 	else {
-		availableFunctions(getControllerState(true, true), &hasTeamServer)
+		availableFunctions(getControllerState(), &hasTeamServer)
 
 		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -1334,8 +1346,8 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+47 ys w60 h60 vRaceSettings", icons["RaceSettings"]).OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", icons["SessionDatabase"]).OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
-		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vSoloCenter", icons["SoloCenter"]).OnEvent("Click", launchApplication.Bind("SoloCenter"))
-		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vStrategyWorkbench", icons["StrategyWorkbench"]).OnEvent("Click", launchApplication.Bind("StrategyWorkbench"))
+		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSoloCenter", icons["SoloCenter"]).OnEvent("Click", launchApplication.Bind("SoloCenter"))
 
 		widget := launchPadGui.Add("Picture", "xp+74 yp w60 h60 vTeamCenter", icons["TeamCenter"])
 
@@ -1357,8 +1369,8 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
-		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Solo Center")
-		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Strategy Workbench")
+		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Strategy Workbench")
+		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Solo Center")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Team Center")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Reports")
 
@@ -1533,7 +1545,7 @@ availableFunctions(configuration, &hasTeamServer := false
 loadStartupProfiles(target, fileName := false) {
 	local settings := readMultiMap(fileName ? fileName : (kUserConfigDirectory . "Startup.settings"))
 	local hasTeamServer := false
-	local functions := availableFunctions(getControllerState(true, true), &hasTeamServer)
+	local functions := availableFunctions(getControllerState(), &hasTeamServer)
 	local profiles := []
 	local selected := false
 	local activeProfiles := []
@@ -2801,7 +2813,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		functions := []
 		activeAssistants := []
 
-		controllerConfiguration := getControllerState(true, true)
+		controllerConfiguration := getControllerState()
 
 		functions := availableFunctions(controllerConfiguration
 									  , &hasTeamServer, &hasDrivingCoach, &hasRaceSpotter, &hasRaceStrategist, &hasRaceEngineer

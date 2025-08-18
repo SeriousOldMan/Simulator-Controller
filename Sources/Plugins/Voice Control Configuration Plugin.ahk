@@ -34,8 +34,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iWindowsSynthesizerWidgets := []
 	iAzureSynthesizerWidgets := []
 	iGoogleSynthesizerWidgets := []
+	iElevenLabsSynthesizerWidgets := []
 	iAzureRecognizerWidgets := []
 	iGoogleRecognizerWidgets := []
+	iElevenLabsRecognizerWidgets := []
 	iWhisperRecognizerWidgets := []
 	iOtherWidgets := []
 
@@ -44,6 +46,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	iTopGoogleCredentialsVisible := false
 	iBottomGoogleCredentialsVisible := false
+
+	iTopElevenLabsCredentialsVisible := false
+	iBottomElevenLabsCredentialsVisible := false
 
 	iBottomWhisperCredentialsVisible := false
 
@@ -72,10 +77,20 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		updateAzureVoices(*) {
 			this.updateAzureVoices()
+
+			chooseVoiceRecognizer(false)
 		}
 
 		updateGoogleVoices(*) {
 			this.updateGoogleVoices()
+
+			chooseVoiceRecognizer(false)
+		}
+
+		updateElevenLabsVoices(*) {
+			this.updateElevenLabsVoices()
+
+			chooseVoiceRecognizer(false)
 		}
 
 		chooseVoiceSynthesizer(*) {
@@ -88,8 +103,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.hideDotNETSynthesizerEditor()
 			else if (oldChoice == 3)
 				this.hideAzureSynthesizerEditor()
-			else
+			else if (oldChoice == 4)
 				this.hideGoogleSynthesizerEditor()
+			else
+				this.hideElevenLabsSynthesizerEditor()
 
 			if (voiceSynthesizerDropDown.Value == 1)
 				this.showWindowsSynthesizerEditor()
@@ -97,37 +114,64 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.showDotNETSynthesizerEditor()
 			else if (voiceSynthesizerDropDown.Value == 3)
 				this.showAzureSynthesizerEditor()
-			else
+			else if (voiceSynthesizerDropDown.Value == 4)
 				this.showGoogleSynthesizerEditor()
+			else
+				this.showElevenLabsSynthesizerEditor()
 
-			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value == 4))
+			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 4))
 				this.updateLanguage(false)
 
 			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
 		}
 
-		chooseVoiceRecognizer(*) {
+		chooseVoiceRecognizer(update, *) {
 			local voiceRecognizerDropDown := this.Control["voiceRecognizerDropDown"]
 			local oldChoice := voiceRecognizerDropDown.LastValue
 			local recognizers, chosen, raceAssistant
 
-			if (oldChoice == 1)
-				this.hideServerRecognizerEditor()
-			else if (oldChoice == 2)
-				this.hideDesktopRecognizerEditor()
-			else if (oldChoice == 3)
-				this.hideAzureRecognizerEditor()
-			else if (oldChoice == 4)
-				this.hideGoogleRecognizerEditor()
-			else if (oldChoice == 5)
-				this.hideWhisperServerRecognizerEditor()
-			else
-				this.hideWhisperLocalRecognizerEditor()
+			if update
+				if (oldChoice == 1)
+					this.hideServerRecognizerEditor()
+				else if (oldChoice == 2)
+					this.hideDesktopRecognizerEditor()
+				else if (oldChoice == 3)
+					this.hideAzureRecognizerEditor()
+				else if (oldChoice == 4)
+					this.hideGoogleRecognizerEditor()
+				else if (oldChoice == 5)
+					this.hideElevenLabsRecognizerEditor()
+				else if (oldChoice == 6)
+					this.hideWhisperServerRecognizerEditor()
+				else
+					this.hideWhisperLocalRecognizerEditor()
 
-			if (voiceRecognizerDropDown.Value == 1)
-				this.showServerRecognizerEditor()
-			else if (voiceRecognizerDropDown.Value == 2)
-				this.showDesktopRecognizerEditor()
+			if (voiceRecognizerDropDown.Value == 1) {
+				try {
+					recognizers := SpeechRecognizer("Server", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
+				if update
+					this.showServerRecognizerEditor()
+			}
+			else if (voiceRecognizerDropDown.Value == 2) {
+				try {
+					recognizers := SpeechRecognizer("Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
+				if update
+					this.showDesktopRecognizerEditor()
+			}
 			else if (voiceRecognizerDropDown.Value == 3) {
 				try {
 					recognizers := SpeechRecognizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text)
@@ -139,7 +183,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showAzureRecognizerEditor()
+				if update
+					this.showAzureRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 4) {
 				try {
@@ -152,16 +197,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := []
 				}
 
-				this.showGoogleRecognizerEditor()
+				if update
+					this.showGoogleRecognizerEditor()
 			}
-			else if (voiceRecognizerDropDown.Value == 5)
-				this.showWhisperServerRecognizerEditor()
-			else
-				this.showWhisperLocalRecognizerEditor()
-
-			if (voiceRecognizerDropDown.Value <= 2) {
+			else if (voiceRecognizerDropDown.Value == 5) {
 				try {
-					recognizers := SpeechRecognizer((voiceRecognizerDropDown.Value = 1) ? "Server" : "Desktop"
+					recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
 												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
 				catch Any as exception {
@@ -169,8 +210,25 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 					recognizers := []
 				}
+
+				if update
+					this.showElevenLabsRecognizerEditor()
 			}
-			else if (voiceRecognizerDropDown.Value >= 5)
+			else if (voiceRecognizerDropDown.Value == 6) {
+				try {
+					recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				}
+				catch Any as exception {
+					logError(exception)
+
+					recognizers := []
+				}
+
+				if update
+					this.showWhisperServerRecognizerEditor()
+			}
+			else {
 				try {
 					recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				}
@@ -179,6 +237,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 					recognizers := []
 				}
+
+				if update
+					this.showWhisperLocalRecognizerEditor()
+			}
 
 			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))
@@ -309,7 +371,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget2 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . " VvoiceLanguageDropDown Hidden", choices)
 		widget2.OnEvent("Change", updateLanguage)
 
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "ElevenLabs"]
 		chosen := 0
 
 		widget3 := window.Add("Text", "x" . x . " yp+32 w112 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
@@ -358,7 +420,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)
 
-		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "Whisper Server"]
+		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "ElevenLabs", "Whisper Server"]
 		chosen := 0
 
 		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
@@ -367,7 +429,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget18 := window.Add("Text", "x" . x . " yp+42 w112 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
 		widget19 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
 		widget19.LastValue := chosen
-		widget19.OnEvent("Change", chooseVoiceRecognizer)
+		widget19.OnEvent("Change", chooseVoiceRecognizer.Bind(true))
 
 		recognizers := []
 
@@ -451,22 +513,42 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 										 , [window["googleSpeakerLabel"], window["googleSpeakerDropDown"], widget40]]
 		this.iGoogleRecognizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]]
 
+		widget44 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VelevenLabsAPIKeyLabel Hidden", translate("Service Key"))
+		widget45 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VelevenLabsAPIKeyEdit Hidden")
+		widget45.OnEvent("Change", updateElevenLabsVoices)
+
+		voices := [translate("Random"), translate("Deactivated")]
+
+		widget46 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VelevenLabsSpeakerLabel Hidden", translate("Voice"))
+		widget47 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VelevenLabsSpeakerDropDown Hidden", voices)
+
+		widget48 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget48.OnEvent("Click", (*) => this.testSpeaker())
+		setButtonIcon(widget48, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		this.iElevenLabsSynthesizerWidgets := [[window["elevenLabsAPIKeyLabel"], window["elevenLabsAPIKeyEdit"]]
+											 , [window["elevenLabsSpeakerLabel"], window["elevenLabsSpeakerDropDown"], widget48]]
+		this.iElevenLabsRecognizerWidgets := [[window["elevenLabsAPIKeyLabel"], window["elevenLabsAPIKeyEdit"]]]
+
 		widget42 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwhisperServerURLLabel Hidden", translate("Server URL"))
 		widget43 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VwhisperServerURLEdit Hidden")
+		widget43.OnEvent("Change", chooseVoiceRecognizer.Bind(false))
 
 		this.iWhisperRecognizerWidgets := [[window["whisperServerURLLabel"], window["whisperServerURLEdit"]]]
 
 		this.updateLanguage(false)
 
-		loop 43
+		loop 48
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
 		this.hideControls(this.iWindowsSynthesizerWidgets)
 		this.hideControls(this.iAzureSynthesizerWidgets)
 		this.hideControls(this.iGoogleSynthesizerWidgets)
+		this.hideControls(this.iElevenLabsSynthesizerWidgets)
 		this.hideControls(this.iAzureRecognizerWidgets)
 		this.hideControls(this.iGoogleRecognizerWidgets)
+		this.hideControls(this.iElevenLabsRecognizerWidgets)
 		this.hideControls(this.iWhisperRecognizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
@@ -495,6 +577,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(synthesizer, "Google") == 1)
 				synthesizer := "Google"
 
+			if (InStr(synthesizer, "ElevenLabs") == 1)
+				synthesizer := "ElevenLabs"
+
 			recognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 
 			if (InStr(recognizer, "Azure") == 1)
@@ -503,28 +588,34 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(recognizer, "Google") == 1)
 				recognizer := "Google"
 
+			if (InStr(recognizer, "ElevenLabs") == 1)
+				recognizer := "ElevenLabs"
+
 			if (InStr(recognizer, "Whisper Server") == 1)
 				recognizer := "Whisper Server"
 
 			if (recognizer = "Whisper")
 				recognizer := "Whisper Local"
 
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google"], synthesizer)
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "ElevenLabs"], synthesizer)
 
 			if FileExist(kProgramsDirectory . "Whisper Runtime")
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server", "Whisper Local"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "ElevenLabs", "Whisper Server", "Whisper Local"], recognizer) || 2)
 			else
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "Whisper Server"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "ElevenLabs", "Whisper Server"], recognizer) || 2)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
 			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "SubscriptionKey", "")
 			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
 
 			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
+
+			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "APIKey", "")
 
 			this.Value["whisperServerURL"] := getMultiMapValue(configuration, "Voice Control", "ServerURL", "")
 
@@ -546,7 +637,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.Value["activationCommand"] := ""
 
 			if this.Configuration {
-				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker"]
+				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
 					if (this.Value[speaker] == true)
 						this.Value[speaker] := translate("Random")
 					else if (this.Value[speaker] == false)
@@ -571,6 +662,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local windowsSpeaker := this.Control["windowsSpeakerDropDown"].Text
 		local azureSpeaker := this.Control["azureSpeakerDropDown"].Text
 		local googleSpeaker := this.Control["googleSpeakerDropDown"].Text
+		local elevenLabsSpeaker := this.Control["elevenLabsSpeakerDropDown"].Text
 		local listener := this.Control["listenerDropDown"].Text
 
 		super.saveToConfiguration(configuration)
@@ -593,6 +685,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 2) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
@@ -600,6 +693,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 3) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
@@ -607,11 +701,21 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
-		else {
+		else if (this.Control["voiceSynthesizerDropDown"].Value = 4) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", elevenLabsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
@@ -622,6 +726,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "APIKeyFile", Trim(this.Control["googleAPIKeyFileEdit"].Text))
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "APIKey", Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "ServerURL", Trim(this.Control["whisperServerURLEdit"].Text))
 
@@ -642,6 +749,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (this.Control["voiceRecognizerDropDown"].Value == 4)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text))
 		else if (this.Control["voiceRecognizerDropDown"].Value == 5)
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
+		else if (this.Control["voiceRecognizerDropDown"].Value == 6)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text))
 		else
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Local")
@@ -700,6 +809,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.Control["googleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
 
+		this.Control["elevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
+
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 
 		this.Control["whisperServerURLEdit"].Text := this.Value["whisperServerURL"]
@@ -711,6 +822,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateAzureVoices(configuration)
 		this.updateGoogleVoices(configuration)
+		this.updateElevenLabsVoices(configuration)
 
 		this.Control["speakerVolumeSlider"].Value := this.Value["speakerVolume"]
 		this.Control["speakerPitchSlider"].Value := this.Value["speakerPitch"]
@@ -738,9 +850,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else if (this.Control["voiceRecognizerDropDown"].Value = 5)
-				recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+				recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else if (this.Control["voiceRecognizerDropDown"].Value = 6)
+				recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
+											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			else if (this.Control["voiceRecognizerDropDown"].Value = 7)
 				recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else
 				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
@@ -804,8 +919,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showDotNETSynthesizerEditor()
 		else if (voiceSynthesizer == 3)
 			this.showAzureSynthesizerEditor()
-		else
+		else if (voiceSynthesizer == 4)
 			this.showGoogleSynthesizerEditor()
+		else
+			this.showElevenLabsSynthesizerEditor()
 
 		if !voiceRecognizer
 			voiceRecognizer := 1
@@ -819,6 +936,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (voiceRecognizer == 4)
 			this.showGoogleRecognizerEditor()
 		else if (voiceRecognizer == 5)
+			this.showElevenLabsRecognizerEditor()
+		else if (voiceRecognizer == 6)
 			this.showWhisperServerRecognizerEditor()
 		else
 			this.showWhisperLocalRecognizerEditor()
@@ -833,11 +952,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideAzureSynthesizerEditor()
 		else if (this.iSynthesizerMode = "Google")
 			this.hideGoogleSynthesizerEditor()
+		else if (this.iSynthesizerMode = "ElevenLabs")
+			this.hideElevenLabsSynthesizerEditor()
 		else {
 			this.hideControls(this.iTopWidgets)
 			this.hideControls(this.iWindowsSynthesizerWidgets)
 			this.hideControls(this.iAzureSynthesizerWidgets)
 			this.hideControls(this.iGoogleSynthesizerWidgets)
+			this.hideControls(this.iElevenLabsSynthesizerWidgets)
 			this.hideControls(this.iOtherWidgets)
 		}
 
@@ -849,6 +971,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideAzureRecognizerEditor()
 		else if (this.iRecognizerMode = "Google")
 			this.hideGoogleRecognizerEditor()
+		else if (this.iRecognizerMode = "ElevenLabs")
+			this.hideElevenLabsRecognizerEditor()
 		else if (this.iRecognizerMode = "Whisper Server")
 			this.hideWhisperServerRecognizerEditor()
 		else if (this.iRecognizerMode = "Whisper Local")
@@ -856,6 +980,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else {
 			this.hideControls(this.iAzureRecognizerWidgets)
 			this.hideControls(this.iGoogleRecognizerWidgets)
+			this.hideControls(this.iElevenLabsRecognizerWidgets)
 			this.hideControls(this.iWhisperRecognizerWidgets)
 		}
 
@@ -864,6 +989,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iTopGoogleCredentialsVisible := false
 		this.iBottomGoogleCredentialsVisible := false
+
+		this.iTopElevenLabsCredentialsVisible := false
+		this.iBottomElevenLabsCredentialsVisible := false
 
 		this.iBottomWhisperCredentialsVisible := false
 	}
@@ -908,6 +1036,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	showAzureSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local elevenLabsWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -919,6 +1048,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomElevenLabsCredentialsVisible {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -940,6 +1074,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -951,6 +1087,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	hideAzureSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local elevenLabsWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -962,6 +1099,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "ElevenLabs") {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -984,6 +1126,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -993,6 +1137,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	showGoogleSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local elevenLabsWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -1004,6 +1149,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomElevenLabsCredentialsVisible {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -1025,6 +1175,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1036,6 +1188,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	hideGoogleSynthesizerEditor() {
 		local azureWasOpen := false
 		local googleWasOpen := false
+		local elevenLabsWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -1047,6 +1200,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			googleWasOpen := true
 
 			this.hideGoogleRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "ElevenLabs") {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -1063,12 +1221,115 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.iSynthesizerMode == "Google")
 			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideWindowsSynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideGoogleSynthesizerEditor..."
 
 		if azureWasOpen
 			this.showAzureRecognizerEditor()
 		else if googleWasOpen
 			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
+
+		this.iSynthesizerMode := false
+	}
+
+	showElevenLabsSynthesizerEditor() {
+		local azureWasOpen := false
+		local googleWasOpen := false
+		local elevenLabsWasOpen := false
+		local whisperWasOpen := false
+
+		if this.iBottomAzureCredentialsVisible {
+			azureWasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+		else if this.iBottomGoogleCredentialsVisible {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomElevenLabsCredentialsVisible {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomWhisperCredentialsVisible {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
+		}
+
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iElevenLabsSynthesizerWidgets)
+
+		this.iTopElevenLabsCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showElevenLabsSynthesizerEditor..."
+
+		if azureWasOpen
+			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
+
+		this.showControls(this.iOtherWidgets)
+
+		this.iSynthesizerMode := "ElevenLabs"
+	}
+
+	hideElevenLabsSynthesizerEditor() {
+		local azureWasOpen := false
+		local googleWasOpen := false
+		local elevenLabsWasOpen := false
+		local whisperWasOpen := false
+
+		if (this.iRecognizerMode = "Azure") {
+			azureWasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Google") {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "ElevenLabs") {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
+		}
+
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iElevenLabsSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopElevenLabsCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "ElevenLabs")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideElevenLabsSynthesizerEditor..."
+
+		if azureWasOpen
+			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1097,14 +1358,16 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 			if this.iTopAzureCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
-			else
+			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+			else
+				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
 
 			this.showControls(this.iWhisperRecognizerWidgets)
 			this.transposeControls(this.iBottomWidgets, 24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
 		}
 		else
-			throw "Internal error detected in VoiceControlConfigurator.showWhisperRecognizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.showWhisperServerRecognizerEditor..."
 
 		this.iBottomWhisperCredentialsVisible := true
 
@@ -1119,13 +1382,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if this.iTopAzureCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
-			else
+			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+			else
+				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
 
 			this.transposeControls(this.iBottomWidgets, -24 * this.iWhisperRecognizerWidgets.Length, titleBarHeight)
 		}
 		else if (this.iRecognizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hideAzureRecognizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideWhisperServerRecognizerEditor..."
 
 		this.iBottomWhisperCredentialsVisible := false
 
@@ -1145,7 +1410,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopAzureCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iAzureRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+				this.transposeControls(this.iAzureRecognizerWidgets
+									 , (24 * ((this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible) ? 8 : 7)) - 3, titleBarHeight)
 				this.showControls(this.iAzureRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -1164,7 +1430,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopAzureCredentialsVisible {
 			if (this.iRecognizerMode == "Azure") {
 				this.hideControls(this.iAzureRecognizerWidgets)
-				this.transposeControls(this.iAzureRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+				this.transposeControls(this.iAzureRecognizerWidgets
+									 , (-24 * ((this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible) ? 8 : 7)) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iAzureRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -1181,7 +1448,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopGoogleCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : 7)) - 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
 				this.showControls(this.iGoogleRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -1200,13 +1467,49 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopGoogleCredentialsVisible {
 			if (this.iRecognizerMode == "Google") {
 				this.hideControls(this.iGoogleRecognizerWidgets)
-				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : 7)) + 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
 				throw "Internal error detected in VoiceControlConfigurator.hideGoogleRecognizerEditor..."
 
 			this.iBottomGoogleCredentialsVisible := false
+		}
+
+		this.iRecognizerMode := false
+	}
+
+	showElevenLabsRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if !this.iTopElevenLabsCredentialsVisible {
+			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
+				this.showControls(this.iElevenLabsRecognizerWidgets)
+				this.transposeControls(this.iBottomWidgets, 24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
+			}
+			else
+				throw "Internal error detected in VoiceControlConfigurator.showElevenLabsRecognizerEditor..."
+
+			this.iBottomElevenLabsCredentialsVisible := true
+		}
+
+		this.iRecognizerMode := "ElevenLabs"
+	}
+
+	hideElevenLabsRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if !this.iTopElevenLabsCredentialsVisible {
+			if (this.iRecognizerMode == "ElevenLabs") {
+				this.hideControls(this.iElevenLabsRecognizerWidgets)
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * (this.iTopAzureCredentialsVisible ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
+				this.transposeControls(this.iBottomWidgets, -24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
+			}
+			else if (this.iRecognizerMode != "Init")
+				throw "Internal error detected in VoiceControlConfigurator.hideElevenLabsRecognizerEditor..."
+
+			this.iBottomElevenLabsCredentialsVisible := false
 		}
 
 		this.iRecognizerMode := false
@@ -1261,6 +1564,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateAzureVoices()
 		this.updateGoogleVoices()
+		this.updateElevenLabsVoices()
 
 		if recognizer {
 			try {
@@ -1274,6 +1578,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					recognizers := SpeechRecognizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text)
 												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				else if (this.Control["voiceRecognizerDropDown"].Value == 5)
+					recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
+												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+				else if (this.Control["voiceRecognizerDropDown"].Value == 6)
 					recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
 												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 				else
@@ -1445,6 +1752,47 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["googleSpeakerDropDown"].Delete()
 		this.Control["googleSpeakerDropDown"].Add(voices)
 		this.Control["googleSpeakerDropDown"].Choose(chosen)
+	}
+
+	updateElevenLabsVoices(configuration := false) {
+		local voices := []
+		local elevenLabsSpeaker, chosen, language
+
+		if configuration
+			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+		else {
+			elevenLabsSpeaker := this.Control["elevenLabsSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		if (configuration && !elevenLabsSpeaker)
+			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+
+		if (Trim(this.Control["elevenLabsAPIKeyEdit"].Text) != "") {
+			language := this.getCurrentLanguage()
+
+			try {
+				voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
+			}
+			catch Any as exception {
+				logError(exception)
+
+				voices := []
+			}
+		}
+
+		voices.InsertAt(1, translate("Deactivated"))
+		voices.InsertAt(1, translate("Random"))
+
+		chosen := inList(voices, elevenLabsSpeaker)
+
+		if (chosen == 0)
+			chosen := 1
+
+		this.Control["elevenLabsSpeakerDropDown"].Delete()
+		this.Control["elevenLabsSpeakerDropDown"].Add(voices)
+		this.Control["elevenLabsSpeakerDropDown"].Choose(chosen)
 	}
 
 	editSoundProcessing() {

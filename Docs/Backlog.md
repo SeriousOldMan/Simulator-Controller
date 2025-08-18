@@ -5,7 +5,6 @@
   1. Integration of local TTS engines for voice generation
   2. Support automatic language translation when using Whisper voice recognition
   3. New GPT booster that supports automatic translation to a different language for voice generation
-  4. Support for ElevenLabs API
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -21,9 +20,10 @@
   1. Better answers by the Strategist, when a pitstop cannot be recommended
   2. Support for partial tyre changes by the Engineer based on tyre wear, remaining laps, lap times, and so on
   3. Integrate support for LAMs
-  4. Approaching corner braking point countdown
-  5. Configurable priority for voice output between Spotter and other Assistants
-
+  4. Approaching corner braking point countdown by the Coach
+  5. Shift beeps by the Coach
+  6. Configurable priority for voice output between Spotter and other Assistants
+  
 #### Session Database
   1. Active validation of value ranges in settings definitions
   

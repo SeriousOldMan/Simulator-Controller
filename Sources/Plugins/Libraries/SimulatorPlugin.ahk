@@ -45,7 +45,8 @@ class AssistantMode extends ControllerMode {
 	activate() {
 		super.activate()
 
-		this.updateActions(this.Plugin.Session)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(this.Plugin.Session)
 	}
 
 	updateActions(session) {
@@ -620,7 +621,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	updateFunctions() {
-		this.updateActions(kSessionUnknown)
+		if (this.Controller.State = "Foreground")
+			this.updateActions(kSessionUnknown)
 	}
 
 	updateActions(session) {
@@ -1100,16 +1102,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
 	}
 
-	prepareSimulation(data) {
-		local car := getMultiMapValue(data, "Session Data", "Car", false)
-		local track := getMultiMapValue(data, "Session Data", "Track", false)
-
-		if (car && track) {
-			this.Car := car
-			this.Track := track
-
-			this.Provider.prepareProvider(data)
-		}
+	prepareSimulation() {
+		this.Provider.prepareProvider()
 	}
 
 	hasPrepared(settings, data, count) {

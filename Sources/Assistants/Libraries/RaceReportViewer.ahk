@@ -282,10 +282,11 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local classes := CaseInsenseMap()
 		local invalids := 0
+		local maxDigits := 0
 		local raceData, drivers, categories, driver, category, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid, carClasses
 		local ignore, lap, rows, rowClasses, classRows, hasDNF, hasAlphaNr, result, lapTimes, hasNull, lapTime
-		local min, avg, filteredLapTimes, nr, row, settings
+		local min, avg, filteredLapTimes, nr, row, settings, value
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -361,8 +362,14 @@ class RaceReportViewer extends RaceReportReader {
 				car := A_Index
 				class := this.getClass(raceData, car)
 
-				if positions[lapsCount].Has(car)
-					result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				if positions[lapsCount].Has(car) {
+					value := positions[lapsCount][car]
+
+					result := (extendedIsNull(value) ? "DNF" : value)
+
+					if isNumber(value)
+						maxDigits := Max(maxDigits, StrLen(String(value)))
+				}
 				else
 					result := "DNF"
 
@@ -374,10 +381,8 @@ class RaceReportViewer extends RaceReportReader {
 
 					if (!extendedIsNull(lapTime, A_Index < 2) && (lapTime > 0))
 						lapTimes.Push(lapTime)
-					else {
-						if (A_Index == lapsCount)
-							result := "DNF"
-					}
+					else if (A_Index == lapsCount)
+						result := "DNF"
 				}
 
 				min := minimum(lapTimes)
@@ -454,8 +459,8 @@ class RaceReportViewer extends RaceReportReader {
 						row[8] := classResults[A_Index]
 
 					if hasDNF {
-						row[7] := ("'" . row[7] . "'")
-						row[8] := ("'" . row[8] . "'")
+						row[7] := ("'" . (isInteger(row[7]) ? Format("{:0" . maxDigits . "}", row[7]) : row[7]) . "'")
+						row[8] := ("'" . (isInteger(row[8]) ? Format("{:0" . maxDigits . "}", row[8]) : row[8]) . "'")
 					}
 
 					if !hasClasses {
@@ -670,7 +675,8 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local raceData, drivers, positions, times, cars, carsCount, simulator
 		local carIndices, minPosition, maxPosition, newMinPosition, newMaxPosition
-		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions, selectedClasses
+		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions
+		local selectedClasses, selectedCars
 
 		if report {
 			raceData := true
@@ -690,11 +696,10 @@ class RaceReportViewer extends RaceReportReader {
 			maxPosition := 0
 
 			selectedClasses := this.getReportClasses(raceData)
+			selectedCars := this.getReportCars(raceData)
 
-			loop carsCount {
-				car := A_Index
-
-				if inList(selectedClasses, this.getClass(raceData, A_Index)) {
+			for ignore, car in selectedCars
+				if inList(selectedClasses, this.getClass(raceData, car)) {
 					valid := false
 
 					newMinPosition := minPosition
@@ -724,7 +729,6 @@ class RaceReportViewer extends RaceReportReader {
 									   . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
-			}
 
 			for ignore, lap in this.getReportLaps(raceData)
 				loop carsCount {
@@ -795,7 +799,7 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editPositionsReportSettings() {
-		return this.editReportSettings("Laps", "Classes")
+		return this.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showLapTimesReport() {
@@ -822,7 +826,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, this.getClass(raceData, car))
+					if inList(selectedClasses, this.getClass(raceData, car)) {
 						if times.Has(lap) {
 							time := (times[lap].Has(car) ? times[lap][car] : 0)
 							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
@@ -834,6 +838,9 @@ class RaceReportViewer extends RaceReportReader {
 						}
 						else
 							lapTimes.Push(kNull)
+					}
+					else
+						lapTimes.Push(kNull)
 
 				driverTimes[lap] := lapTimes
 			}

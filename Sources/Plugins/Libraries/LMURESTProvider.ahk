@@ -1152,7 +1152,7 @@ class LMURESTProvider {
 
 		GETURL {
 			Get {
-				return "http://localhost:6397/rest/garage/UIScreen/RaceHistory"
+				return "http://localhost:6397/rest/garage/summary"
 			}
 		}
 
@@ -1163,12 +1163,22 @@ class LMURESTProvider {
 		}
 
 		getTrack() {
+			local id, data, ignore, entry
+
 			if this.iCachedTrack
 				return this.iCachedTrack
-			else if (this.Data && this.Data.Has("trackInfo")) {
-				this.iCachedTrack := this.Data["trackInfo"]["properTrackName"]
+			else if (this.Data && this.Data.Has("track")) {
+				id := this.Data["track"]["id"]
 
-				return this.iCachedTrack
+				data := this.read("http://localhost:6397/rest/sessions/getTracksInSeries", false)
+
+				if data
+					for ignore, entry in data
+						if (entry["id"] = id) {
+							this.iCachedTrack := entry["properTrackName"]
+
+						return this.iCachedTrack
+					}
 			}
 			else
 				return false

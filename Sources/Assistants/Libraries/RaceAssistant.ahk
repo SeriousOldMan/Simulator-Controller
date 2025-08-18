@@ -1663,9 +1663,18 @@ class RaceAssistant extends ConfigurationItem {
 
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
+						else if InStr(text, "。") {
+							for ignore, part in string2Values("。", text)
+								if (Trim(part) != "")
+									this.getSpeaker().speak(part . "。", false, false, {Rephrase: false, Click: (A_Index = 1)})
+						}
+						else if InStr(text, translate(". ")) {
+							for ignore, part in string2Values(translate(". "), text)
+								if (Trim(part) != "")
+									this.getSpeaker().speak(part . translate("."), false, false, {Rephrase: false, Click: (A_Index = 1)})
+						}
 						else
-							for ignore, part in string2Values(". ", text)
-								this.getSpeaker().speak(part . ".", false, false, {Rephrase: false, Click: (A_Index = 1)})
+							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
 					}
 
 					return
@@ -4780,9 +4789,18 @@ speakAssistant(context, message, force := false) {
 			speaker.speakPhrase(message)
 		else if assistant.VoiceManager.UseTalking
 			speaker.speak(message)
+		else if InStr(message, "。") {
+			for ignore, part in string2Values("。", message)
+				if (Trim(part) != "")
+					speaker.speak(part . "。", false, false, {Click: (A_Index = 1)})
+		}
+		else if InStr(message, translate(". ")) {
+			for ignore, part in string2Values(translate(". "), message)
+				if (Trim(part) != "")
+					speaker.speak(part . translate("."), false, false, {Click: (A_Index = 1)})
+		}
 		else
-			for ignore, part in string2Values(". ", message)
-				speaker.speak(part . ".", false, false, {Click: (A_Index = 1)})
+			speaker.speak(message)
 	}
 
 	return true

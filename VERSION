@@ -1,15 +1,15 @@
 [Development]
-Version=6.4.3.0-release
-Target=6.4.3.0-release
-Date=08/01/2025
-Download=https://cutt.ly/grSE5H8y;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/MuYubXor;https://www.dropbox.com/scl/fi/xcrqv4w0s6r3i4za7a06v/Simulator-Controller-6.4.3.0-release.zip?rlkey=j3xfuttz0m09p30y6o1u7ncjj&st=uha9cuud&dl=1;http://%master%/Releases/Simulator Controller 6.4.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.3.0-release.zip
-Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement, Reorganized master download repository
+Version=6.5.2.0-dev
+Target=6.5.2.0-release
+Date=08/17/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bkad892W
+Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.4.3.0-release
-Date=08/01/2025
-Download=https://cutt.ly/grSE5H8y;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/MuYubXor;https://www.dropbox.com/scl/fi/xcrqv4w0s6r3i4za7a06v/Simulator-Controller-6.4.3.0-release.zip?rlkey=j3xfuttz0m09p30y6o1u7ncjj&st=uha9cuud&dl=1;http://%master%/Releases/Simulator Controller 6.4.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.4.3.0-release.zip
-Changes=Fixed Race Engineer pitstop instructed by the "Team Center", Increased resilience against wrong driver returned by LMU pitstop data, Optimized driver names loading, Support for keyboard hooks to work with keyboard P2T keys, Support for in-phrase activation, Fixed number handling in voice commands, Pass values in localized units to LLM for conversation, Fixed translation of Restricted mode for Coach in Japanese and Chinese, Fixed tyre wear announcement, Reorganized master download repository
+Version=6.5.1.0-release
+Date=08/15/2025
+Download=https://cutt.ly/xrGFwN15;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/sD3ZLAT1;https://www.dropbox.com/scl/fi/qu87bgie5l1lbwsyku7nx/Simulator-Controller-6.5.1.0-release.zip?rlkey=kc0esgw5q649lg9i0ddge5n64&st=06ycug8n&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.1.0-release.zip
+Changes=Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogss
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -23,7 +23,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.4.3.0-release
-Release=6.4.3.0-release
+Development=6.5.2.0-dev
+Release=6.5.1.0-release

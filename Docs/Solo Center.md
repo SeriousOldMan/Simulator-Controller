@@ -111,6 +111,8 @@ A valuable tool to improve your lap times is the integrated Telemetry Viewer, wh
 
 While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
+Note: You can use the "Auto Telemetry" setting, so that the Telemetry Viewer is automatically opened, whenever a new session is started. But make sure, that the new window does not interfere with the running simulation.
+
 #### Choosing the telemetry provider
 
 The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.

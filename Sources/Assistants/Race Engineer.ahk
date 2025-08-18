@@ -104,6 +104,8 @@ startupRaceEngineer() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Engineer"
 
+	ProcessSetPriority("L")
+
 	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1

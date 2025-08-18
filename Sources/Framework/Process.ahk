@@ -29,6 +29,8 @@ startupProcess() {
 	if kLogStartup
 		logMessage(kLogOff, "Starting process...")
 
+	ProcessSetPriority("L")
+
 	guardExit(arguments*) {
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false

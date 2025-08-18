@@ -34,6 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
   - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
   - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
+  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*.
   
 #### Changes
 

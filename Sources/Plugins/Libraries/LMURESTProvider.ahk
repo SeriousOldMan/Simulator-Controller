@@ -1163,12 +1163,22 @@ class LMURESTProvider {
 		}
 
 		getTrack() {
+			local id, data, ignore, entry
+
 			if this.iCachedTrack
 				return this.iCachedTrack
 			else if (this.Data && this.Data.Has("track")) {
-				this.iCachedTrack := this.Data["track"]["displayProperties"]["shortName"]
+				id := this.Data["track"]["id"]
 
-				return this.iCachedTrack
+				data := this.read("http://localhost:6397/rest/sessions/getTracksInSeries", false)
+
+				if data
+					for ignore, entry in data
+						if (entry["id"] = id) {
+							this.iCachedTrack := entry["properTrackName"]
+
+						return this.iCachedTrack
+					}
 			}
 			else
 				return false

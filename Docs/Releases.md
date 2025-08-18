@@ -39,7 +39,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - The Strategist and/or the Engineer no longer recommend a tyre change due to weather at the end of the race. To be precise, they use the [setting "Final laps without service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) from the "Session Database" to determine, if a tyre change should be scheduled.
   - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
+  - Again several new articles for the tips & tricks.
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime.
 
 # Release history
 

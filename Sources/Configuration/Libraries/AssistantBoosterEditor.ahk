@@ -1227,8 +1227,8 @@ class CallbacksEditor {
 					this.CallbacksEditor.iResult := kOk
 				else if (msgResult = "No")
 					this.CallbacksEditor.iResult := kCancel
-				else if (msgResult = "Cancel")
-					return true
+
+				return true
 			}
 			else
 				return true

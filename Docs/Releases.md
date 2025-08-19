@@ -35,6 +35,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
   - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
   - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*. This problem was introduced due to an API change in *Le Mans Ultimate*. Unfortunately this caused some data to be collected for the wrong track layout. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) for information, how to fix this.
+  - Fixed a bug in the configuration app, which caused the window to freeze, when an Assistant Booster Editor was closed by the close control of the window, but the currently selected script had a syntax error.
   
 #### Changes
 

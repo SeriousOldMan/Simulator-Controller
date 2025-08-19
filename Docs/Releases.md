@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.5.1.1
+
+#### Date: 08/19/25
+
+#### Fixes
+
+  - Fixed a critical performance issue in the API for Le Mans Ultimate after the latest game patch.
+  
 ## 6.5.1.0
 
 #### Date: 08/15/25

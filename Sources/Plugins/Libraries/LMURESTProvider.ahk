@@ -1168,6 +1168,12 @@ class LMURESTProvider {
 			}
 		}
 
+		reload() {
+			this.iCachedTrack := false
+
+			super.reload()
+		}
+
 		getTrack() {
 			local id, data, ignore, entry
 
@@ -1211,6 +1217,13 @@ class LMURESTProvider {
 			Get {
 				return this.getTeam()
 			}
+		}
+
+		reload() {
+			this.iCachedCar := false
+			this.iCachedTeam := false
+
+			super.reload()
 		}
 
 		getCar() {
@@ -1427,8 +1440,6 @@ class LMURESTProvider {
 		}
 
 		reload() {
-			LMURestProvider.GridData.sCarData := false
-
 			this.iCachedCars := CaseInsenseMap()
 
 			super.reload()

@@ -269,8 +269,11 @@ class SoloCenter extends ConfigurationItem {
 							if (msgResult = "Yes")
 								this.SoloCenter.exportSession(true)
 
-							if (msgResult = "Cancel")
+							if (msgResult = "Cancel") {
+								save := false
+
 								return true
+							}
 						}
 					}
 				}
@@ -1925,7 +1928,7 @@ class SoloCenter extends ConfigurationItem {
 			return false
 	}
 
-	openTelemetryViewer() {
+	openTelemetryViewer(verbose := true) {
 		if this.TelemetryViewer
 			WinActivate(this.TelemetryViewer.Window)
 		else if !this.SessionLoaded {
@@ -1943,7 +1946,7 @@ class SoloCenter extends ConfigurationItem {
 
 			this.TelemetryViewer.show()
 		}
-		else {
+		else if verbose {
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
@@ -8011,7 +8014,7 @@ class SoloCenter extends ConfigurationItem {
 				this.analyzeTelemetry()
 
 				if this.AutoTelemetry
-					this.openTelemetryViewer()
+					this.openTelemetryViewer(false)
 			}
 			finally {
 				if fileName

@@ -190,8 +190,26 @@ class LMUProvider extends Sector397Provider {
 	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
 		local gridData := this.GridData
 
+		static nextRefresh := 0
+
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
+
+		if (!model || !team) {
+			if isDebug()
+				logMessage(kLogDebug, "Car model or team not found for car " . carName . "...")
+
+			if (A_TickCount > nextRefresh) {
+				nextRefresh := (A_TickCount + 10000)
+
+				this.iGridData := false
+
+				gridData := this.GridData
+
+				model := gridData.Car[carName]
+				team := gridData.Team[carName]
+			}
+		}
 
 		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 			nr := this.parseNr(carName, &carName)

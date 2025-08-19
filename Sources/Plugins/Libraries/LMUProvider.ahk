@@ -195,9 +195,9 @@ class LMUProvider extends Sector397Provider {
 		model := gridData.Car[carName]
 		team := gridData.Team[carName]
 
-		if (!model || !team) {
+		if !model {
 			if isDebug()
-				logMessage(kLogDebug, "Car model or team not found for car " . carName . "...")
+				logMessage(kLogDebug, "Car model not found for car " . carName . "...")
 
 			if (A_TickCount > nextReload) {
 				nextReload := (A_TickCount + 10000)

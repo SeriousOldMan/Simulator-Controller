@@ -27,7 +27,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 ## 6.5.2.0
 
-#### Date: 08/22/25
+#### Date: 08/22/25 (planned)
 
 #### Fixes
 

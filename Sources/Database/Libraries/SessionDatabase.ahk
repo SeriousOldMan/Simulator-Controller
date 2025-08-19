@@ -1122,7 +1122,7 @@ class SessionDatabase extends ConfigurationItem {
 		local carCode := SessionDatabase.getCarCode(simulator, car)
 		local carData, fileName
 
-		if (simulator && simulatorCode && car && carCode) {
+		if (simulator && simulatorCode && (simulatorCode != "0")  && car && carCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode)
 
 			carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
@@ -1206,7 +1206,7 @@ class SessionDatabase extends ConfigurationItem {
 		local trackCode := SessionDatabase.getTrackCode(simulator, track)
 		local trackData, fileName
 
-		if (simulator && simulatorCode && car && carCode && track && trackCode) {
+		if (simulator && simulatorCode && (simulatorCode != "0") && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
 			trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")

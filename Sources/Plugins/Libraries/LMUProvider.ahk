@@ -166,10 +166,10 @@ class LMUProvider extends Sector397Provider {
 		return true
 	}
 
-	prepareProvider(data) {
+	prepareProvider() {
 		local ignore
 
-		super.prepareProvider(data)
+		super.prepareProvider()
 
 		ignore := this.TeamData.Data
 		ignore := this.TrackData.Data
@@ -262,8 +262,9 @@ class LMUProvider extends Sector397Provider {
 
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
+		local carData := false
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
-		local carData, weatherData, wheelData, lap, weather, time, session, remainingTime, fuelRatio
+		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
 		local sessionData
 
@@ -280,6 +281,11 @@ class LMUProvider extends Sector397Provider {
 		static lastWeather := false
 		static lastWeather10Min := false
 		static lastWeather30Min := false
+		static lastWheelData := false
+		static lastTyreWear := false
+		static lastBrakeWear := false
+
+		static nextUpdate := 0
 
 		if InStr(options, "Setup=true") {
 			car := this.Car
@@ -354,6 +360,8 @@ class LMUProvider extends Sector397Provider {
 				if (lap != lastLap) {
 					lastLap := lap
 
+					nextUpdate := (A_TickCount - 1)
+
 					session := getMultiMapValue(data, "Session Data", "Session", "Race")
 					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
 					weatherData := LMURestProvider.WeatherData()
@@ -380,44 +388,15 @@ class LMUProvider extends Sector397Provider {
 					if weather
 						lastWeather30Min := weather
 				}
-
-				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
-				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)
-				setMultiMapValue(data, "Weather Data", "Weather30Min", lastWeather30Min)
 			}
 
+			if (!getMultiMapValue(data, "Session Data", "Paused", false) && sessionData.Paused)
+				setMultiMapValue(data, "Session Data", "Paused", true)
+
+			if getMultiMapValue(data, "Session Data", "Paused", false)
+				removeMultiMapValues(data, "Position Data")
+
 			if !InStr(options, "Standings=true") {
-				if false {
-					newPositions := []
-
-					loop {
-						position := getMultiMapValue(data, "Track Data", "Car." . A_Index . ".Position", false)
-
-						if position
-							newPositions.Push(position)
-						else
-							break
-					}
-
-					paused := true
-
-					if (lastPositions && (lastPositions.Length = newPositions.Length)) {
-						loop lastPositions.Length
-							if (lastPositions[A_Index] != newPositions[A_Index]) {
-								paused := false
-
-								break
-							}
-
-						if paused
-							setMultiMapValue(data, "Session Data", "Paused", true)
-					}
-
-					lastPositions := newPositions
-				}
-				else if (!getMultiMapValue(data, "Session Data", "Paused", false) && sessionData.Paused)
-					setMultiMapValue(data, "Session Data", "Paused", true)
-
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)
 				else
@@ -428,16 +407,20 @@ class LMUProvider extends Sector397Provider {
 				else
 					track := this.Track
 
-				if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
-					wheelData := LMURestProvider.WheelData()
-					carData := LMURestProvider.CarData()
+				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
+				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)
+				setMultiMapValue(data, "Weather Data", "Weather30Min", lastWeather30Min)
 
+				if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
 					if data.Has("Car Data") {
 						energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
 						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
 						if !fuelAmount {
+							if !carData
+								carData := LMURestProvider.CarData()
+
 							fuelAmount := carData.FuelAmount
 
 							if !fuelAmount
@@ -457,8 +440,20 @@ class LMUProvider extends Sector397Provider {
 
 					}
 
+					if !carData
+						carData := LMURestProvider.CarData()
+
+					if (A_TickCount > nextUpdate) {
+						nextUpdate := (A_TickCount + 60000)
+
+						lastWheelData := LMURestProvider.WheelData()
+
+						lastTyreWear := carData.TyreWear["All"]
+						lastBrakeWear := carData.BrakePadWear["All"]
+					}
+
 					for key, postFix in wheels {
-						tyreCompound := wheelData.TyreCompound[key]
+						tyreCompound := lastWheelData.TyreCompound[key]
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {
@@ -469,15 +464,13 @@ class LMUProvider extends Sector397Provider {
 						}
 					}
 
-					tyreWear := carData.TyreWear["All"]
-					brakeWear := carData.BrakePadWear["All"]
+					if (isObject(lastTyreWear) && exist(lastTyreWear, (w) => (w != false)))
+						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", lastTyreWear*))
+
+					if (isObject(lastBrakeWear) && exist(lastBrakeWear, (w) => (w != false)))
+						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", lastBrakeWear*))
+
 					suspensionDamage := carData.SuspensionDamage["All"]
-
-					if (isObject(tyreWear) && exist(tyreWear, (w) => (w != false)))
-						setMultiMapValue(data, "Car Data", "TyreWear", values2String(",", tyreWear*))
-
-					if (isObject(brakeWear) && exist(brakeWear, (w) => (w != false)))
-						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", brakeWear*))
 
 					if (isObject(suspensionDamage) && exist(suspensionDamage, (d) => (d != false)))
 						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))

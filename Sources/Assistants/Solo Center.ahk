@@ -164,6 +164,7 @@ class SoloCenter extends ConfigurationItem {
 	iAutoClear := false
 	iAutoExport := false
 	iAutoSave := false
+	iAutoTelemetry := false
 
 	iDate := A_Now
 
@@ -825,6 +826,16 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	AutoTelemetry {
+		Get {
+			return this.iAutoTelemetry
+		}
+
+		Set {
+			return (this.iAutoTelemetry := value)
+		}
+	}
+
 	SessionExported {
 		Get {
 			return this.iSessionExported
@@ -1190,6 +1201,7 @@ class SoloCenter extends ConfigurationItem {
 		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
 		this.AutoSave := getMultiMapValue(settings, "Solo Center", "AutoSave", false)
+		this.AutoTelemetry := getMultiMapValue(settings, "Solo Center", "AutoTelemetry", false)
 
 		this.iUseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
 		this.iUseLapsDatabase := getMultiMapValue(settings, "Solo Center", "UseLapsDatabase", getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false))
@@ -2396,7 +2408,7 @@ class SoloCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
-		local ignore, field
+		local ignore, field, tyreSets
 
 		window["runDropDown"].Enabled := false
 		window["driverDropDown"].Enabled := false
@@ -2467,11 +2479,21 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			for ignore, field in ["tyreSetEdit", "tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"]
-				window[field].Enabled := true
+			this.Providers.supportsTyreManagement( , &tyreSets)
 
-			if (window["tyreSetEdit"].Text = "")
-				window["tyreSetEdit"].Text := 1
+			if tyreSets {
+				window["tyreSetEdit"].Enabled := true
+
+				if (window["tyreSetEdit"].Text = "")
+					window["tyreSetEdit"].Text := 1
+			}
+			else {
+				window["tyreSetEdit"].Enabled := false
+				window["tyreSetEdit"].Text := ""
+			}
+
+			for ignore, field in ["tyrePressureFLEdit", "tyrePressureFREdit", "tyrePressureRLEdit", "tyrePressureRREdit"]
+				window[field].Enabled := true
 		}
 
 		this.Control["compoundAddButton"].Enabled := (this.AvailableTyreCompounds.Length > this.TyreCompoundsListView.GetCount())
@@ -2569,9 +2591,10 @@ class SoloCenter extends ConfigurationItem {
 		local auto1 := ((this.AutoClear ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Clear"))
 		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
+		local auto4 := ((this.AutoTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Telemetry"))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, auto4, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2641,7 +2664,11 @@ class SoloCenter extends ConfigurationItem {
 				this.AutoSave := !this.AutoSave
 
 				updateSetting("AutoSave", this.AutoSave)
-			case 7: ; Clear...
+			case 6: ; Auto Telemetry
+				this.AutoTelemetry := !this.AutoTelemetry
+
+				updateSetting("AutoTelemetry", this.AutoTelemetry)
+			case 8: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
@@ -2652,9 +2679,9 @@ class SoloCenter extends ConfigurationItem {
 				}
 				else
 					this.clearSession()
-			case 9: ; Load Session...
+			case 10: ; Load Session...
 				this.loadSession(GetKeyState("Ctrl") ? "Import" : "Browse")
-			case 10: ; Save Session...
+			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -2662,13 +2689,13 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
-			case 12: ; Telemetry Viewer
+			case 13: ; Telemetry Viewer
 				this.openTelemetryViewer()
-			case 14: ; Update Statistics
+			case 15: ; Update Statistics
 				this.updateStatistics()
-			case 16: ; Session Summary
+			case 17: ; Session Summary
 				this.showSessionSummary(GetKeyState("Ctrl"))
-			case 18: ; Export data
+			case 19: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
@@ -3022,13 +3049,13 @@ class SoloCenter extends ConfigurationItem {
 					lap := run.Laps[1]
 
 					if ((lap.Compounds[1] != "-") && !isNull(run.TyreSet)) {
-						if isDebug()
-							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
-
 						found := false
 
 						if (A_Index > 1) {
 							lastTyreSet := tyreSets[tyreSets.Length]
+
+							if isDebug()
+								logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . lastTyreSet.Laps . " / " . run.TyreLaps . " (" . run.Laps.Length . ")")
 
 							if ((lap.TyreSet = "-") && (lastTyreSet.Nr = "-") && (lap.Compounds[1] = lastTyreSet.Compound)
 													&& (lastTyreSet.Laps <= run.TyreLaps)) {
@@ -3047,6 +3074,9 @@ class SoloCenter extends ConfigurationItem {
 										break
 									}
 						}
+						else if isDebug()
+							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
+
 
 						if !found
 							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compounds[1], Laps: this.getTyreLaps(run)})
@@ -3106,7 +3136,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreCompound := false
 		local tyreSet := false
 		local driver := false
-		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures
+		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures, tyreSets
 		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row, theCompound
 
 		run.FuelConsumption := 0.0
@@ -3159,12 +3189,14 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		if (this.SessionActive && (run.TyreMode = "Auto")) {
+			this.Provider.supportsTyreManagement( , &tyreSets)
+
 			theCompound := first(tyreCompound, (c) => (c && (c != "-")))
 
 			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
 				run.Compounds := tyreCompound
 
-			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1)) {
+			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1) && (this.Control["tyreCompoundDropDown"].Value > 1)) {
 				run.Compounds := tyreCompound
 				run.TyreSet := tyreSet
 
@@ -3198,6 +3230,9 @@ class SoloCenter extends ConfigurationItem {
 				if isDebug()
 					logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
 			}
+			else if ((this.Control["tyreCompoundDropDown"].Value == 1)
+				  || (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)))
+				run.TyreLaps := this.getTyreLaps(this.Runs[run.Nr - 1])
 		}
 
 		if driver
@@ -7974,6 +8009,9 @@ class SoloCenter extends ConfigurationItem {
 									   , getMultiMapValue(data, "Session Data", "Track"))
 
 				this.analyzeTelemetry()
+
+				if this.AutoTelemetry
+					this.openTelemetryViewer()
 			}
 			finally {
 				if fileName

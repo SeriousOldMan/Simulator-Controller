@@ -200,7 +200,7 @@ namespace WhisperServer
         #endregion
 
         #region SpeechToText
-        public string Recognize(string audioFileName)
+        public string Recognize(string audioFileName, string computeType)
         {
             string result;
 
@@ -208,7 +208,9 @@ namespace WhisperServer
             {
                 string audio = Convert.ToBase64String(File.ReadAllBytes(audioFileName));
 
-                result = Post("speechtotext/recognize", new Parameters() { { "Language", Language }, { "Model", Model } }, body: audio);
+                result = Post("speechtotext/recognize",
+                              new Parameters() { { "Language", Language }, { "Model", Model }, { "Compute", computeType } },
+                              body: audio);
             }
             catch (Exception e)
             {

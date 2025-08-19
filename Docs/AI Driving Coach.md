@@ -56,13 +56,13 @@ Remember, trail braking is a skill that takes time and practice to master. Be pa
 
 2. Pit stop execution: During the pit stop, the primary focus will be on refueling the car. Make sure to communicate effectively with your team to ensure a quick and efficient pit stop. Practice entering and exiting the pit lane smoothly to avoid any penalties or delays.
 
-3. Strategy adjustments: Depending on the characteristics of the track and the behavior of your competitors, you may need to adjust your strategy during the race. Pay attention to any changes in track conditions, weather, or the performance of your competitors. This will help you make informed decisions about your pit stop timing or any necessary adjustments to your driving style.
+3. Strategy adjustments: Depending on the characteristics of the track and the behaviour of your competitors, you may need to adjust your strategy during the race. Pay attention to any changes in track conditions, weather, or the performance of your competitors. This will help you make informed decisions about your pit stop timing or any necessary adjustments to your driving style.
 
 Remember, every race is unique, and it's important to adapt your strategy based on the specific circumstances. Analyzing telemetry data, working closely with your team, and staying aware of the race dynamics will help you make the best decisions for a successful race.
 
 **Driver:** Would an early pit stop or late pit stop be better?
 
-**Aiden:** Determining whether an early or late pit stop is better depends on various factors, including track conditions, tire degradation, and the behavior of your competitors. Here are some considerations for both options:
+**Aiden:** Determining whether an early or late pit stop is better depends on various factors, including track conditions, tire degradation, and the behaviour of your competitors. Here are some considerations for both options:
 
 Early Pit Stop:
 - Track position advantage: An early pit stop can give you the advantage of running in clean air without traffic. This can allow you to push harder and potentially gain positions before other competitors make their pit stops.
@@ -74,13 +74,13 @@ Late Pit Stop:
 - Overtaking opportunities: A late pit stop can offer opportunities for overtaking as other competitors make their pit stops. By staying out longer, you may benefit from fresher tires and potentially gain positions as others rejoin the track after their stops.
 - Track position preservation: If you have a good track position and are confident in your pace, a late pit stop can help you maintain that position without risking losing positions in the pits.
 
-Ultimately, the decision between an early or late pit stop should be based on careful analysis of the specific race circumstances, including tire wear, track conditions, and the behavior of your competitors. It's also essential to consult with your team and analyze telemetry data to make an informed decision that best suits your race strategy.
+Ultimately, the decision between an early or late pit stop should be based on careful analysis of the specific race circumstances, including tire wear, track conditions, and the behaviour of your competitors. It's also essential to consult with your team and analyze telemetry data to make an informed decision that best suits your race strategy.
 
 **Driver:** Can you shorten this answer?
 
 **Aiden**: Certainly! Here's a shorter version:
 
-The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behavior. 
+The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behaviour. 
 
 An early pit stop can give you a track position advantage, help manage tire wear, and potentially allow for an undercut strategy. 
 
@@ -163,7 +163,7 @@ The next step is to setup everything in the configuration, either in "Simulator 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2012.JPG)
 
-Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use one of the "Azure Cognitive Services", "Google Speech Services", "ElevenLabs" or "Whisper Runtime" voice recognition engines. The "Windows (Desktop)" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech page. But in the end, you will see many recognition errors, because the recognition engines built into Windows are not made for free conversation. The "Windows (Server)" recognition engine can't be used at all.
+Since the voice recognition quality is so important for a correct dialog with Aiden, I strongly recommend to use one of the "Azure Cognitive Services", "Google Speech Services" or "Whisper Runtime" voice recognition engines. The "Windows (Desktop)" engine may be used as well, especially, when you are using a high quality headset. And use the training mode of the Windows speech recognition, which is available in the Windows Settings -> Time & Language -> Speech page. But in the end, you will see many recognition errors, because the recognition engines built into Windows are not made for free conversation. The "Windows (Server)" recognition engine can't be used at all.
 
 ### Instructions
 

@@ -881,7 +881,16 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		local request, result, name, install, progress, pid
+		local request, result, name, install, progress, pid, settings
+
+		static computeType := kUndefined
+
+		if (computeType == kUndefined) {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+			computeType := getMultiMapValue(settings, "Voice", "Whisper.Compute Type"
+										  , getMultiMapValue(settings, "Voice", "Compute Type", false))
+		}
 
 		if (this.Engine = "Google") {
 			request := Map("config", Map("languageCode", this.Instance.GetLanguage(), "model", this.Instance.GetModel()
@@ -917,7 +926,7 @@ class SpeechRecognizer {
 					showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
 
 				try {
-					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off", , "Hide", &pid)
+					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off" . (computeType ? (" --compute_type " . computeType) : ""), , "Hide", &pid)
 
 					while ProcessExist(pid) {
 						if (install && !kSilentMode) {
@@ -954,7 +963,7 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "Whisper Server") {
 				try {
-					result := this.Instance.Connector.Recognize(audioFile)
+					result := this.Instance.Connector.Recognize(audioFile, computeType ? computeType : "-")
 
 					if result
 						this._onTextCallback(result)
@@ -1172,7 +1181,7 @@ class SpeechRecognizer {
 
 	parseText(&text, rephrase := false) {
 		local words := string2Values(A_Space, text)
-		local index, literal
+		local index, literal, ignore, char
 
 		for index, literal in words {
 			if !isNumber(literal)
@@ -1181,11 +1190,7 @@ class SpeechRecognizer {
 			if !isNumber(StrReplace(literal, ",", "."))
 				literal := StrReplace(literal, ",", "")
 
-			literal := StrReplace(literal, ";", "")
-			literal := StrReplace(literal, "?", "")
-			literal := StrReplace(literal, "-", "")
-
-			words[index] := literal
+			words[index] := RegExReplace(literal, "[:!?¿\-;。，！？：；]", "")
 		}
 
 		return words

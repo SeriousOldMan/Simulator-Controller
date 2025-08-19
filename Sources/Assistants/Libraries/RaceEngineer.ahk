@@ -4962,31 +4962,33 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3))
-			if (this.Speaker[false] && (this.Session == kSessionRace)) {
-				speaker := this.getSpeaker()
-				fragments := speaker.Fragments
+		if (!ProcessExist("Race Strategist.exe")
+		 && (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0))
+		   > knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5))
+		 && this.Speaker[false] && (this.Session == kSessionRace)) {
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
 
-				speaker.beginTalk()
+			speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																												  : "WeatherDryChange"
-									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
+			try {
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
+																											  : "WeatherDryChange"
+								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
-					if (this.hasEnoughData(false) && this.supportsPitstop())
-						if this.confirmAction("Pitstop.Weather") {
-							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+				if (this.hasEnoughData(false) && this.supportsPitstop())
+					if this.confirmAction("Pitstop.Weather") {
+						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
-						}
-						else
-							this.planPitstop("Now")
-				}
-				finally {
-					speaker.endTalk()
-				}
+						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+					}
+					else
+						this.planPitstop("Now")
 			}
+			finally {
+				speaker.endTalk()
+			}
+		}
 	}
 
 	startPitstopSetup(pitstopNumber) {

@@ -35,6 +35,18 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 6.5.2
+
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
+
+***
+
+## Release 6.5.1
+
+If you are using the "Whisper Server" to run the Whisper voice recognition on a second PC, copy the files "Whisper Server.exe" and "Whisper Server.dll" from the *Binaries\Whisper Server* directory in the installation directory of Simulator Controller over to your "Whisper Server" installation directory.
+
+***
+
 ## Release 6.5.0
 
 Nothing to do.
@@ -105,7 +117,7 @@ Everything handled automatically.
 
 ## Release 6.3.3
 
-The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
 ***
 
@@ -164,7 +176,7 @@ Nothing to do.
 
 ## Release 6.2.5
 
-The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
 ***
 
@@ -206,7 +218,7 @@ The Driving Coach instructions have changed with this release. If you have modif
 
 ## Release 6.1.5
 
-The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
 ***
 
@@ -266,7 +278,7 @@ Nothing to do.
 
 ## Release 5.9.9
 
-The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
 ***
 
@@ -339,7 +351,7 @@ No actions required.
 ## Release 5.8.6
 
 1. A new builtin LLM Event has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
-2. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it.
+2. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 3. If you have used the controller action functions "openRaceCenter" or "openPracticeCenter" in your custom configuration, you have to change them to "openTeamCenter" and "openSoloCenter" respectively.
 
 ***
@@ -354,7 +366,7 @@ New builtin LLM Events has been defined for the Race Spotter. As always, you may
 
 1. New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
 2. New builtin LLM Actions have been defined for the Race Spotter. As always, you may want to revisit your *Conversation* booster configuration.
-3. The local LLM Runtime now also supports a Vulkan driver for non-Nvidia GPUs. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local Runtime..." preset and reinstall it. This is not necessary, if you are already running a CUDA setup. But: If you have a Nvidia GPU and perform the update, you may encounter conflicts with the CUDA driver as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime). If this is the case, remove the "vulkan" folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder and continue using CUDA.
+3. The local LLM Runtime now also supports a Vulkan driver for non-Nvidia GPUs. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it. This is not necessary, if you are already running a CUDA setup. But: If you have a Nvidia GPU and perform the update, you may encounter conflicts with the CUDA driver as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime). If this is the case, remove the "vulkan" folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder and continue using CUDA.
 
 ***
 

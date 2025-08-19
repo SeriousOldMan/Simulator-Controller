@@ -6,9 +6,9 @@ Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bkad892W
 Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.5.1.0-release
-Date=08/15/2025
-Download=https://cutt.ly/xrGFwN15;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/sD3ZLAT1;https://www.dropbox.com/scl/fi/qu87bgie5l1lbwsyku7nx/Simulator-Controller-6.5.1.0-release.zip?rlkey=kc0esgw5q649lg9i0ddge5n64&st=06ycug8n&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.1.0-release.zip
+Version=6.5.1.1-release
+Date=08/19/2025
+Download=https://cutt.ly/jrH9Ry53;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/AuKjCgCH;https://www.dropbox.com/scl/fi/6umkzms0dmcdumb0usmaq/Simulator-Controller-6.5.1.1-release.zip?rlkey=7oj7m31an9inkucyi3zscyqlm&st=6zeiw2ph&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.1-release.zip
 Changes=Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogss
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
@@ -23,7 +23,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=6.5.2.0-dev
-Release=6.5.1.0-release
+Release=6.5.1.1-release

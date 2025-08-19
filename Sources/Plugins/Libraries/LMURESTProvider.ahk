@@ -79,16 +79,18 @@ class LMURESTProvider {
 		}
 
 		read(url := this.GETURL, update := true) {
-			local data
+			local data, tickCount
 
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
 			if lmuApplication.isRunning() {
 				try {
-					if isDebug()
-						logMessage(kLogDebug, "LMU REST GET: " . url)
+					tickCount := A_TickCount
 
 					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
+
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 
 					if !isObject(data)
 						data := false
@@ -112,16 +114,20 @@ class LMURESTProvider {
 		}
 
 		write(url := this.POSTURL, data := this.Data) {
+			local tickCount
+
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
 			if (data && lmuApplication.isRunning()) {
 				data := JSON.print(data, "  ")
 
 				try {
-					if isDebug()
-						logMessage(kLogDebug, "LMU REST POST: " . url)
+					tickCount := A_TickCount
 
 					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
+
+					if isDebug()
+						logMessage(kLogDebug, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1334,7 +1340,8 @@ class LMURESTProvider {
 	}
 
 	class GridData extends LMURESTProvider.RESTData {
-		iCarData := false
+		static sCarData := false
+
 		iCachedCars := CaseInsenseMap()
 
 		class CarData extends LMURESTProvider.RESTData {
@@ -1380,10 +1387,10 @@ class LMURESTProvider {
 
 		CarData {
 			Get {
-				if !this.iCarData
-					this.iCarData := LMURESTProvider.GridData.CarData()
+				if !LMURestProvider.GridData.sCarData
+					LMURestProvider.GridData.sCarData := LMURESTProvider.GridData.CarData()
 
-				return this.iCarData
+				return LMURestProvider.GridData.sCarData
 			}
 		}
 
@@ -1451,7 +1458,17 @@ class LMURESTProvider {
 		getCar(carDesc) {
 			local car := this.getCarDescriptor(carDesc)
 
-			return (car ? this.CarData.Car[car["carId"]] : false)
+			if car {
+				car := this.CarData.Car[car["carId"]]
+
+				if !car {
+					LMURestProvider.GridData.sCarData := false
+
+					car := this.CarData.Car[car["carId"]]
+				}
+			}
+
+			return car
 		}
 
 		getClass(carDesc) {

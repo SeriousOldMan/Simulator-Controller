@@ -1267,6 +1267,8 @@ class LMURESTProvider {
 		reload() {
 			LMURestProvider.DriversData.sCachedData := false
 
+			this.iCachedCars := CaseInsenseMap()
+
 			super.reload()
 		}
 
@@ -1422,6 +1424,14 @@ class LMURESTProvider {
 			Get {
 				return this.getTeam(carDesc)
 			}
+		}
+
+		reload() {
+			LMURestProvider.GridData.sCarData := false
+
+			this.iCachedCars := CaseInsenseMap()
+
+			super.reload()
 		}
 
 		getCarDescriptor(carDesc) {

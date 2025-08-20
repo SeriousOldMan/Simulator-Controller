@@ -1,8 +1,8 @@
 [Development]
-Version=6.5.2.0-dev
+Version=6.5.2.0-beta
 Target=6.5.2.0-release
-Date=08/18/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bkad892W
+Date=08/20/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/lRtWZrRE
 Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
@@ -25,5 +25,5 @@ Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.5.2.0-dev
+Development=6.5.2.0-beta
 Release=6.5.1.1-release

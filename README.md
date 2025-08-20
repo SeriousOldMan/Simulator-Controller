@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bkad892W) (Early build for 6.5.2. Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant.)
+[6.5.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/lRtWZrRE) (Test build for 6.5.2. Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) of this version and all the versions you might have skipped, before installing and using this version.
 

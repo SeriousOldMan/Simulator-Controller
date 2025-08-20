@@ -929,6 +929,7 @@ class LMURESTProvider {
 
 		getBrakeDiscThickness(tyre) {
 			local thickness
+
 			if this.Data
 				try {
 					thickness := this.Data[inList(["FL", "FR", "RL", "RR"], LMURESTProvider.WheelTypes[tyre])]
@@ -1346,9 +1347,14 @@ class LMURESTProvider {
 				car := this.getCarDescriptor(carDesc)
 
 			if car
-				for ignore, driver in car["drivers"]
-					if (Trim(driver["name"]) != "")
-						result.Push({Name: driver["name"], Category: driver["skill"]})
+				try {
+					for ignore, driver in car["drivers"]
+						if (Trim(driver["name"]) != "")
+							result.Push({Name: driver["name"], Category: driver["skill"]})
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			return result
 		}
@@ -1479,15 +1485,21 @@ class LMURESTProvider {
 		getCar(carDesc) {
 			local car := this.getCarDescriptor(carDesc)
 
-			if car {
-				car := this.CarData.Car[car["carId"]]
-
-				if !car {
-					LMURestProvider.GridData.sCarData := false
-
+			if car
+				try {
 					car := this.CarData.Car[car["carId"]]
+
+					if !car {
+						LMURestProvider.GridData.sCarData := false
+
+						car := this.CarData.Car[car["carId"]]
+					}
 				}
-			}
+				catch Any as exception {
+					logError(exception)
+
+					car := false
+				}
 
 			return car
 		}
@@ -1495,13 +1507,13 @@ class LMURESTProvider {
 		getClass(carDesc) {
 			local car := this.getCarDescriptor(carDesc)
 
-			return (car ? car["carClass"] : false)
+			return ((car && car.Has("carClass")) ? Trim(car["carClass"]) : false)
 		}
 
 		getTeam(carDesc) {
 			local car := this.getCarDescriptor(carDesc)
 
-			return (car ? car["fullTeamName"] : false)
+			return ((car && car.Has("fullTeamName")) ? Trim(car["fullTeamName"]) : false)
 		}
 	}
 
@@ -1562,19 +1574,19 @@ class LMURESTProvider {
 		getDriver(position) {
 			local car := this.getCarDescriptor(position)
 
-			return (car ? car["driverName"] : false)
+			return ((car && car.Has("driverName")) ? car["driverName"] : false)
 		}
 
 		getClass(position) {
 			local car := this.getCarDescriptor(position)
 
-			return (car ? car["carClass"] : false)
+			return ((car && car.Has("carClass")) ? car["carClass"] : false)
 		}
 
 		getLaps(position) {
 			local car := this.getCarDescriptor(position)
 
-			return (car ? car["totalLaps"] : false)
+			return ((car && car.Has("totalLaps")) ? car["totalLaps"] : false)
 		}
 	}
 
@@ -1630,8 +1642,16 @@ class LMURESTProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if (data && data.Has("closeestWeatherNode"))
-					return Round(data["closeestWeatherNode"]["Humidity"])
+				if (data && data.Has("closeestWeatherNode")) {
+					try {
+						return Round(data["closeestWeatherNode"]["Humidity"])
+					}
+					catch Any as exception {
+						logError(exception)
+
+						return false
+					}
+				}
 				else
 					return false
 			}
@@ -1656,8 +1676,16 @@ class LMURESTProvider {
 							name := ("Node_" . time)
 					}
 
-					if data.Has(name)
-						return data[name]["WNV_HUMIDITY"]["currentValue"]
+					if data.Has(name) {
+						try {
+							return data[name]["WNV_HUMIDITY"]["currentValue"]
+						}
+						catch Any as exception {
+							logError(exception)
+
+							return false
+						}
+					}
 					else
 						return false
 				}
@@ -1674,8 +1702,16 @@ class LMURESTProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if (data && data.Has("closeestWeatherNode"))
-					return this.getWeather(data["closeestWeatherNode"]["RainChance"])
+				if (data && data.Has("closeestWeatherNode")) {
+					try {
+						return this.getWeather(data["closeestWeatherNode"]["RainChance"])
+					}
+					catch Any as exception {
+						logError(exception)
+
+						return false
+					}
+				}
 				else
 					return false
 			}
@@ -1700,8 +1736,16 @@ class LMURESTProvider {
 							name := ("Node_" . time)
 					}
 
-					if data.Has(name)
-						return this.getWeather(data[name]["WNV_RAIN_CHANCE"]["currentValue"])
+					if data.Has(name) {
+						try {
+							return this.getWeather(data[name]["WNV_RAIN_CHANCE"]["currentValue"])
+						}
+						catch Any as exception {
+							logError(exception)
+
+							return false
+						}
+					}
 					else
 						return false
 				}
@@ -1718,8 +1762,16 @@ class LMURESTProvider {
 			if (session = "Now") {
 				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
-				if (data && data.Has("closeestWeatherNode"))
-					return this.getWeather(data["closeestWeatherNode"]["Sky"])
+				if (data && data.Has("closeestWeatherNode")) {
+					try {
+						return this.getWeather(data["closeestWeatherNode"]["Sky"])
+					}
+					catch Any as exception {
+						logError(exception)
+
+						return false
+					}
+				}
 				else
 					return false
 			}
@@ -1744,8 +1796,16 @@ class LMURESTProvider {
 							name := ("Node_" . time)
 					}
 
-					if data.Has(name)
-						return this.getWeather(data[name]["WNV_SKY"]["currentValue"])
+					if data.Has(name) {
+						try {
+							return this.getWeather(data[name]["WNV_SKY"]["currentValue"])
+						}
+						catch Any as exception {
+							logError(exception)
+
+							return false
+						}
+					}
 					else
 						return false
 				}

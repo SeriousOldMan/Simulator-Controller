@@ -1,15 +1,15 @@
 [Development]
-Version=6.5.2.0-beta
+Version=6.5.2.0-release
 Target=6.5.2.0-release
-Date=08/20/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/lRtWZrRE
+Date=08/22/2025
+Download=https://cutt.ly/jrJR79yk;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1trhtp8Y;https://www.dropbox.com/scl/fi/9y6wq8k00ww0st86nt66g/Simulator-Controller-6.5.2.0-release.zip?rlkey=9npc8qayk5bzbbatlh2mm8u9c&st=8y9b07kv&dl=1;http://%master%/Releases/Simulator Controller 6.5.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.2.0-release.zip
 Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.5.1.1-release
-Date=08/19/2025
-Download=https://cutt.ly/jrH9Ry53;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/AuKjCgCH;https://www.dropbox.com/scl/fi/6umkzms0dmcdumb0usmaq/Simulator-Controller-6.5.1.1-release.zip?rlkey=7oj7m31an9inkucyi3zscyqlm&st=6zeiw2ph&dl=1;http://%master%/Releases/Simulator Controller 6.5.1.1-release.zip
-Changes=Make reports with DNF cars sortable on positions, Added "Auto Telemetry" setting to "Solo Center", Optimized long speech pagination for Japanese and Chinese, Fixed handling of "。" in spoken commands for Japanese and Chinese, selectTrackAutomation can be called multiple times without side effects, Renamed "ElevenLabs.Sample Frequency" core setting, Added "Whisper.Compute Type" core setting, Updated "Whisper Server", Reduced process priorities, Optimized LMU startup sequence, Configurable process watchdogss
+Version=6.5.2.0-release
+Date=08/22/2025
+Download=
+Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -23,7 +23,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.5.2.0-beta
-Release=6.5.1.1-release
+Development=6.5.2.0-release
+Release=6.5.2.0-release

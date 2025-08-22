@@ -1,5 +1,33 @@
 # Latest stable release
 
+## 6.5.2.0
+
+#### Date: 08/22/25
+
+#### Fixes
+
+  - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
+  - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
+  - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
+  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*. This problem was introduced due to an API change in *Le Mans Ultimate*. Unfortunately this caused some data to be collected for the wrong track layout. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) for information, how to fix this.
+  - Fixed a bug in the configuration app, which caused the window to freeze, when an Assistant Booster Editor was closed by the close control of the window, but the currently selected script had a syntax error.
+  
+#### Changes
+
+  - The Strategist and/or the Engineer no longer recommend a tyre change due to weather at the end of the race. To be precise, they use the [setting "Final laps without service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) from the "Session Database" to determine, if a tyre change should be scheduled.
+  - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
+  - [Important] LLM Instructions can now be defined individually for each Assistant. Your current changes will be preserved and active until you change the Instructions next time. In this case, you have to incorporate your changes individually for each Assistant.
+  - Again several new articles for the tips & tricks.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime or if you need to fix some data, which had been collected for the wrond track layout.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.5.1.1
 
 #### Date: 08/19/25
@@ -30,32 +58,6 @@
   - [Expert] The process watchdogs can now be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#system-settings).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), if you are using the "Whisper Server" to run Whisper on a second PC.
-
-# Upcoming release
-
-## 6.5.2.0
-
-#### Date: 08/22/25 (planned)
-
-#### Fixes
-
-  - The booster buttons on the "Basic" setup page in "Simulator Setup" are now disabled as well, when the corresponding Assistant has been disabled.
-  - Fixed a few bugs, which caused "Simulator Setup" to freeze when invalid values had been entered in the configuration page of the Driving Coach.
-  - Fixed a bug, which caused the Strategist to not consider pitstop service times during strategy simulation. This caused wrong predictions for position and ahead traffic after a pitstop in some situations.
-  - Fixed a bug introduced with the last release, which caused the track name to always be the base layout name in *Le Mans Ultimate*. This problem was introduced due to an API change in *Le Mans Ultimate*. Unfortunately this caused some data to be collected for the wrong track layout. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) for information, how to fix this.
-  - Fixed a bug in the configuration app, which caused the window to freeze, when an Assistant Booster Editor was closed by the close control of the window, but the currently selected script had a syntax error.
-  
-#### Changes
-
-  - The Strategist and/or the Engineer no longer recommend a tyre change due to weather at the end of the race. To be precise, they use the [setting "Final laps without service"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) from the "Session Database" to determine, if a tyre change should be scheduled.
-  - When using a simulator which does not support tyre sets (which are almost all except *Assetto Corsa Competizione*), "Solo Center" no longer automatically creates a new entry in the list of used tyre sets. You can still create tyre set changes manually during practice for documentation purposes, but in a race session all tyre laps will be *booked* on the initial tyre set as long as the compound of the front left tyre is unchanged. The number of driven laps for each mounted tyre will still be computed based on known tyre changes, for example during a pitstop.
-  - [Important] LLM Instructions can now be defined individually for each Assistant. Your current changes will be preserved and active until you change the Instructions next time. In this case, you have to incorporate your changes individually for each Assistant.
-  - Again several new articles for the tips & tricks.
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime or if you need to fix some data, which had been collected for the wrond track layout.
-
-# Release history
 
 ## 6.5.0.0
 

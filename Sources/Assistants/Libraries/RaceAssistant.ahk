@@ -171,10 +171,11 @@ class AssistantEvent extends AgentEvent {
 	}
 
 	createVariables(event, arguments) {
+		local data := assistant.getKnowledge("Agent", this.Options)
 		local assistant := this.Assistant
 
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
-			  , knowledge: StrReplace(JSON.print(assistant.getKnowledge("Agent", this.Options)), "%", "\%")}
+			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")}
 	}
 
 	handledEvent(event) {
@@ -1379,7 +1380,9 @@ class RaceAssistant extends ConfigurationItem {
 						case "Data":
 							return printMultiMap(this.Data)
 						case "Knowledge":
-							return StrReplace(JSON.print(this.getKnowledge(type)), "%", "\%")
+							data := this.getKnowledge(type)
+							
+							return StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")
 					}
 				case "Stint":
 					switch item, false {
@@ -1646,16 +1649,19 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handleVoiceText(grammar, text) {
-		local ignore, part
+		local ignore, part, data
 
 		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Conversation.AudioDevice", false)
 		static conversationSound := getFileName("Conversation.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (grammar = "Text") {
 			if this.ConversationBooster {
+				data := this.getKnowledge("Conversation")
+				
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: StrReplace(JSON.print(this.getKnowledge("Conversation")), "%", "\%")}))
+																	 , knowledge: (data > 0) ? StrReplace(JSON.print(data), "%", "\%")
+																							 : "{}"}))
 
 				if text {
 					if (text != true) {

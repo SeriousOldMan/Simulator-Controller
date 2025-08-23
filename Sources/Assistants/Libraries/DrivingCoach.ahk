@@ -435,7 +435,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
 		local collector, issues, handling, ignore, type, speed, where, issue, index
-		local key, value, text, filter, telemetry, reference, command
+		local key, value, text, filter, telemetry, reference, command, data
 
 		static sessions := false
 
@@ -540,8 +540,11 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Knowledge":
-				if (knowledgeBase && (this.Mode = "Conversation"))
-					return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(this.getKnowledge("Conversation")), "%", "\%")})
+				if (knowledgeBase && (this.Mode = "Conversation")) {
+					data := this.getKnowledge("Conversation")
+					
+					if (data.Count > 0)
+						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data), "%", "\%")})
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
 					collector := this.iIssueCollector

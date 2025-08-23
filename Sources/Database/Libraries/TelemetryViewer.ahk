@@ -522,6 +522,8 @@ class TelemetryViewer {
 	iTelemetryDirectory := false
 	iTelemetryCollector := false
 
+	iOwnedTelemetryCollector := true
+
 	iCollectingNotifier := false
 
 	iWindow := false
@@ -640,8 +642,10 @@ class TelemetryViewer {
 		}
 	}
 
-	TelemetryCollector {
+	TelemetryCollector[detach := false] {
 		Get {
+			this.iOwnedTelemetryCollector := (this.iTelemetryCollector && detach)
+
 			return this.iTelemetryCollector
 		}
 	}
@@ -1205,41 +1209,60 @@ class TelemetryViewer {
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
-	startupCollector(simulator, track, trackLength) {
+	startupCollector(simulatorOrCollector, track?, trackLength?) {
 		if this.Collect
-			if !this.TelemetryCollector {
+			if isInstance(simulatorOrCollector, TelemetryCollector) {
+				this.iTelemetryCollector := simulatorOrCollector
+				this.iOwnedTelemetryCollector := false
+
+				this.updateCollecting(simulatorOrCollector)
+			}
+			else if !this.TelemetryCollector {
 				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 																			  , "Telemetry Viewer", "Provider", "Internal")
-															 , this.TelemetryDirectory, simulator, track, trackLength)
+															 , this.TelemetryDirectory
+															 , simulatorOrCollector, track, trackLength)
+				this.iOwnedTelemetryCollector := true
 
-				this.iTelemetryCollector.startup()
+				this.TelemetryCollector.startup()
 
-				this.CollectingNotifier.show()
-
-				this.CollectingNotifier.document.open()
-				this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
-				this.CollectingNotifier.document.close()
+				this.updateCollecting(this.TelemetryCollector)
 			}
 			else {
-				if ((this.iTelemetryCollector.Simulator != simulator) || (this.iTelemetryCollector.Track != track)
-																	  || (this.iTelemetryCollector.TrackLength != trackLength)) {
-					this.iTelemetryCollector.initialize(simulator, track, trackLength)
+				if ((this.iTelemetryCollector.Simulator != simulatorOrCollector)
+				 || (this.iTelemetryCollector.Track != track)
+				 || (this.iTelemetryCollector.TrackLength != trackLength)) {
+					this.TelemetryCollector.initialize(simulatorOrCollector, track, trackLength)
 
-					this.iTelemetryCollector.startup(true)
+					this.TelemetryCollector.startup(true)
 				}
 				else
-					this.iTelemetryCollector.startup()
+					this.TelemetryCollector.startup()
 			}
 	}
 
 	shutdownCollector() {
 		if this.TelemetryCollector {
-			this.TelemetryCollector.shutdown()
+			if this.iOwnedTelemetryCollector {
+				this.TelemetryCollector.shutdown()
 
-			this.iTelemetryCollector := false
+				this.iTelemetryCollector := false
+			}
 
-			this.CollectingNotifier.hide()
+			this.updateCollecting()
 		}
+	}
+
+	updateCollecting(collector := false) {
+		if (collector && collector.Collecting) {
+			this.CollectingNotifier.show()
+
+			this.CollectingNotifier.document.open()
+			this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif?" . Random(1, 10000)) . "' width=28 height=28 border=0 padding=0></body></html>")
+			this.CollectingNotifier.document.close()
+		}
+		else
+			this.CollectingNotifier.hide()
 	}
 
 	openTrackMap() {

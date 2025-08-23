@@ -44,6 +44,7 @@
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
+#Include "..\Database\Libraries\TelemetryCollector.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
@@ -232,6 +233,7 @@ class SoloCenter extends ConfigurationItem {
 	iSelectedDetailReport := false
 	iSelectedDetailHTML := false
 
+	iTelemetryCollector := false
 	iTelemetryViewer := false
 
 	class SoloCenterWindow extends Window {
@@ -1176,6 +1178,12 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	TelemetryCollector {
+		Get {
+			return this.iTelemetryCollector
+		}
+	}
+
 	TelemetryViewer {
 		Get {
 			return this.iTelemetryViewer
@@ -1215,6 +1223,9 @@ class SoloCenter extends ConfigurationItem {
 		SoloCenter.Instance := this
 
 		OnExit((*) {
+			if isInstance(this.TelemetryCollector, TelemetryCollector)
+				this.TelemetryCollector.shutdown()
+
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
 		})
@@ -2595,9 +2606,12 @@ class SoloCenter extends ConfigurationItem {
 		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 		local auto4 := ((this.AutoTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Telemetry"))
+		local telemetry := ((this.TelemetryCollector ? translate("[x]") : translate("[  ]")) . A_Space . translate("Telemetry..."))
 
 		this.Control["sessionMenuDropDown"].Delete()
-		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, auto4, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------", "Telemetry...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
+		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, auto4, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------"], translate))
+		this.Control["sessionMenuDropDown"].Add([telemetry])
+		this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Update Statistics", "---------------------------------------------", "Session Summary"], translate))
 
 		if !this.SessionExported
 			this.Control["sessionMenuDropDown"].Add(collect(["---------------------------------------------", "Export to Database..."], translate))
@@ -2693,7 +2707,25 @@ class SoloCenter extends ConfigurationItem {
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 13: ; Telemetry Viewer
-				this.openTelemetryViewer()
+				if GetKeyState("Ctrl") {
+					if isInstance(this.TelemetryCollector, TelemetryCollector) {
+						this.TelemetryCollector.shutdown()
+
+						this.iTelemetryCollector := false
+					}
+					else if this.TelemetryCollector
+						this.iTelemetryCollector := false
+					else
+						this.iTelemetryCollector := true
+
+					if this.TelemetryViewer
+						if isInstance(this.TelemetryCollector, TelemetryCollector)
+							this.TelemetryViewer.updateCollecting(this.TelemetryCollector)
+						else
+							this.TelemetryViewer.updateCollecting()
+				}
+				else
+					this.openTelemetryViewer()
 			case 15: ; Update Statistics
 				this.updateStatistics()
 			case 17: ; Session Summary
@@ -2866,6 +2898,9 @@ class SoloCenter extends ConfigurationItem {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
+			if isInstance(this.TelemetryCollector, TelemetryCollector)
+				this.TelemetryCollector.shutdown()
+
 			if this.TelemetryViewer {
 				this.TelemetryViewer.shutdownCollector()
 
@@ -4912,6 +4947,9 @@ class SoloCenter extends ConfigurationItem {
 					logError(exception)
 				}
 			}
+
+			if isInstance(this.TelemetryCollector, TelemetryCollector)
+				this.TelemetryCollector.shutdown()
 
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
@@ -8033,13 +8071,43 @@ class SoloCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 			local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 			local trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
+			local provider
 
 			try {
 				if (!this.LastLap && !update)
 					this.startSession(data, true)
 
+				if this.TelemetryCollector
+					if ((track != "Unknown") && (trackLength > 0)) {
+						if (this.TelemetryCollector == true) {
+							provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+																	, "Telemetry Viewer", "Provider", "Internal")
+
+							this.iTelemetryCollector := TelemetryCollector(provider, this.TelemetryDirectory
+																		 , this.Simulator, track, trackLength)
+						}
+
+						if ((this.TelemetryCollector.Simulator != this.Simulator)
+						 || (this.TelemetryCollector.Track != track)
+						 || (this.iTelemetryCollector.TrackLength != trackLength)) {
+							this.TelemetryCollector.initialize(this.Simulator, track, trackLength)
+
+							this.TelemetryCollector.startup(true)
+						}
+						else
+							this.TelemetryCollector.startup()
+					}
+					else if isInstance(this.TelemetryCollector, TelemetryCollector)
+						this.TelemetryCollector.shutdown()
+
 				if (this.TelemetryViewer && (track != "Unknown") && (trackLength > 0))
-					this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
+					if this.TelemetryCollector
+						this.TelemetryViewer.startupCollector(this.TelemetryCollector)
+					else {
+						this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
+
+						this.iTelemetryCollector := this.TelemetryViewer.TelemetryCollector[true]
+					}
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

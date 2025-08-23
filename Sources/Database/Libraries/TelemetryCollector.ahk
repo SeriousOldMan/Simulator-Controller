@@ -378,6 +378,12 @@ class TelemetryCollector {
 		}
 	}
 
+	Collecting {
+		Get {
+			return (this.iTelemetryCollectorPID || this.iSecondMonitorTask)
+		}
+	}
+
 	__New(provider, telemetryDirectory, simulator, track, trackLength) {
 		if (provider != "Internal") {
 			provider := string2Values("|", provider)

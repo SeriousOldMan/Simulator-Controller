@@ -1381,7 +1381,7 @@ class RaceAssistant extends ConfigurationItem {
 							return printMultiMap(this.Data)
 						case "Knowledge":
 							data := this.getKnowledge(type)
-							
+
 							return StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")
 					}
 				case "Stint":
@@ -1657,7 +1657,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (grammar = "Text") {
 			if this.ConversationBooster {
 				data := this.getKnowledge("Conversation")
-				
+
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
 																	 , knowledge: (data > 0) ? StrReplace(JSON.print(data), "%", "\%")
@@ -3612,7 +3612,9 @@ class GridRaceAssistant extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)
+											   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+											   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 					delta := (driverLapTime - lapTime)
 
@@ -3704,7 +3706,9 @@ class GridRaceAssistant extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToAhead", {delta: speaker.number2Speech(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: speaker.number2Speech(delta / 1000, 1)
+													  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+													  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -3749,7 +3753,9 @@ class GridRaceAssistant extends RaceAssistant {
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
 					speaker.speakPhrase("StandingsAheadLapped")
 				else
-					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
+					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)
+															  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+															  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 				if inPit
 					speaker.speakPhrase("GapCarInPit")
@@ -3785,7 +3791,9 @@ class GridRaceAssistant extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: speaker.number2Speech(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToBehind", {delta: speaker.number2Speech(delta / 1000, 1)
+													   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+													   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -3834,7 +3842,9 @@ class GridRaceAssistant extends RaceAssistant {
 					lapped := true
 				}
 				else
-					speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
+					speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)
+															   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+															   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 				if (!lapped && inPit)
 					speaker.speakPhrase("GapCarInPit")
@@ -3861,7 +3871,9 @@ class GridRaceAssistant extends RaceAssistant {
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
 
-			speaker.speakPhrase("GapToLeader", {delta: speaker.number2Speech(delta, 1)})
+			speaker.speakPhrase("GapToLeader", {delta: speaker.number2Speech(delta, 1)
+											  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+											  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 		}
 	}
 
@@ -3949,14 +3961,18 @@ class GridRaceAssistant extends RaceAssistant {
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
 						speaker.speakPhrase((delta < 0) ? "FocusBehindLapped" : "FocusAheadLapped"
-										  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))})
+										  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
+										   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+										   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 						lapped := true
 					}
 					else
 						speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
 										  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
-										   , delta: speaker.number2Speech(Abs(delta), 1)})
+										   , delta: speaker.number2Speech(Abs(delta), 1)
+										   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+										   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 					if (!lapped && inPit)
 						speaker.speakPhrase("GapCarInPit")
@@ -4001,7 +4017,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 					speaker.speakPhrase("FocusLapTime", {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
 													   , time: speaker.number2Speech(lapTime, 1)
-													   , minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+													   , minute: minute, seconds: speaker.number2Speech(seconds, 1)
+													   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+													   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 				}
 			}
 			else if number
@@ -4052,7 +4070,10 @@ class GridRaceAssistant extends RaceAssistant {
 				minute := Floor(lapTime / 60)
 				seconds := (lapTime - (minute * 60))
 
-				speaker.speakPhrase("PositionLapTime", {position: position, time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
+				speaker.speakPhrase("PositionLapTime", {position: position
+													  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+													  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
+													  , time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 			}
 		}
 		else if position
@@ -4176,6 +4197,8 @@ class GridRaceAssistant extends RaceAssistant {
 
 				speaker.speakPhrase((numPitstops = 0) ? "NoFocusPitstops" : "FocusPitstops"
 								  , {indicator: this.getCarIndicatorFragment(speaker, number, knowledgeBase.getValue("Car." . car . ".Position", false))
+								   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+								   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")
 								   , pitstops: numPitstops})
 			}
 			else if number

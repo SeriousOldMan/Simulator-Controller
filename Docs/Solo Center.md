@@ -109,9 +109,9 @@ A valuable tool to improve your lap times is the integrated Telemetry Viewer, wh
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser.JPG)
 
-While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
+While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison. Additionally, you can enable telemetry collection without opening the Telemetry Viewer with holding down the Control key while choosing the "Telemetry..." command from the "Session" menu, so that the command line in the menu is checked.
 
-Note: You can use the "Auto Telemetry" setting, so that the Telemetry Viewer is automatically opened, whenever a new session is started. But make sure, that the new window does not interfere with the running simulation.
+Note: You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
 
 #### Choosing the telemetry provider
 

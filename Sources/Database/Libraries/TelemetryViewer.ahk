@@ -1214,8 +1214,6 @@ class TelemetryViewer {
 			if isInstance(simulatorOrCollector, TelemetryCollector) {
 				this.iTelemetryCollector := simulatorOrCollector
 				this.iOwnedTelemetryCollector := false
-
-				this.updateCollecting(simulatorOrCollector)
 			}
 			else if !this.TelemetryCollector {
 				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1225,13 +1223,11 @@ class TelemetryViewer {
 				this.iOwnedTelemetryCollector := true
 
 				this.TelemetryCollector.startup()
-
-				this.updateCollecting(this.TelemetryCollector)
 			}
-			else {
-				if ((this.iTelemetryCollector.Simulator != simulatorOrCollector)
-				 || (this.iTelemetryCollector.Track != track)
-				 || (this.iTelemetryCollector.TrackLength != trackLength)) {
+			else if this.iOwnedTelemetryCollector {
+				if ((this.TelemetryCollector.Simulator != simulatorOrCollector)
+				 || (this.TelemetryCollector.Track != track)
+				 || (this.TelemetryCollector.TrackLength != trackLength)) {
 					this.TelemetryCollector.initialize(simulatorOrCollector, track, trackLength)
 
 					this.TelemetryCollector.startup(true)
@@ -1239,15 +1235,14 @@ class TelemetryViewer {
 				else
 					this.TelemetryCollector.startup()
 			}
+
+		this.updateCollecting(this.TelemetryCollector)
 	}
 
 	shutdownCollector() {
 		if this.TelemetryCollector {
-			if this.iOwnedTelemetryCollector {
+			if this.iOwnedTelemetryCollector
 				this.TelemetryCollector.shutdown()
-
-				this.iTelemetryCollector := false
-			}
 
 			this.updateCollecting()
 		}

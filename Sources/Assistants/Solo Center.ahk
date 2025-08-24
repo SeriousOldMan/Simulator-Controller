@@ -2713,10 +2713,8 @@ class SoloCenter extends ConfigurationItem {
 
 						this.iTelemetryCollector := false
 					}
-					else if this.TelemetryCollector
-						this.iTelemetryCollector := false
 					else
-						this.iTelemetryCollector := true
+						this.iTelemetryCollector := !this.TelemetryCollector
 
 					if this.TelemetryViewer
 						if isInstance(this.TelemetryCollector, TelemetryCollector)
@@ -8051,8 +8049,18 @@ class SoloCenter extends ConfigurationItem {
 
 				this.analyzeTelemetry()
 
-				if this.AutoTelemetry
-					this.openTelemetryViewer(false)
+				if this.AutoTelemetry {
+					if isInstance(this.TelemetryCollector, TelemetryCollector) {
+						this.TelemetryCollector.shutdown()
+
+						if this.TelemetryViewer
+							this.TelemetryViewer.updateCollecting()
+					}
+
+					this.iTelemetryCollector := false
+
+					this.updateSessionMenu()
+				}
 			}
 			finally {
 				if fileName
@@ -8100,14 +8108,20 @@ class SoloCenter extends ConfigurationItem {
 					else if isInstance(this.TelemetryCollector, TelemetryCollector)
 						this.TelemetryCollector.shutdown()
 
-				if (this.TelemetryViewer && (track != "Unknown") && (trackLength > 0))
-					if this.TelemetryCollector
-						this.TelemetryViewer.startupCollector(this.TelemetryCollector)
-					else {
-						this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
+				if this.TelemetryViewer
+					if ((track != "Unknown") && (trackLength > 0)) {
+						if this.TelemetryCollector
+							this.TelemetryViewer.startupCollector(this.TelemetryCollector)
+						else {
+							this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
 
-						this.iTelemetryCollector := this.TelemetryViewer.TelemetryCollector[true]
+							this.iTelemetryCollector := this.TelemetryViewer.TelemetryCollector[true]
+						}
 					}
+					else
+						this.TelemetryViewer.shutdownCollector()
+
+				this.updateSessionMenu()
 
 				if update {
 					if (this.SessionActive && (this.LastLap.Nr = lapNumber))

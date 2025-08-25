@@ -649,9 +649,9 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	Speaking {
+	Speaking[all := false] {
 		Get {
-			return this.iIsSpeaking
+			return (this.iIsSpeaking || (all && FileExist(kTempDirectory . "Speaking.status")))
 		}
 
 		Set {
@@ -1222,9 +1222,9 @@ class VoiceManager extends ConfigurationItem {
 
 		if voiceServer {
 			if all
-				messageSend(kWindowMessage, "Voice", "interrupt", "ahk_pid " . this.VoiceServer, "INTR")
+				messageSend(kWindowMessage, "Voice", "Interrupt", "ahk_pid " . this.VoiceServer, "INTR")
 			else
-				messageSend(kWindowMessage, "Voice", "interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
+				messageSend(kWindowMessage, "Voice", "Interrupt:" . this.Name, "ahk_pid " . this.VoiceServer, "INTR")
 		}
 		else {
 			speaker := this.getSpeaker()

@@ -579,11 +579,16 @@ class VoiceServer extends ConfigurationItem {
 		startSpeaking() {
 			if this.SpeakingStatusCallback
 				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Start", this.PID)
+
+			try
+				FileAppend("True", kTempDirectory . "Speaking.status")
 		}
 
 		stopSpeaking() {
 			if this.SpeakingStatusCallback
 				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Stop", this.PID)
+
+			deleteFile(kTempDirectory . "Speaking.status")
 		}
 
 		startListening(retry := true) {

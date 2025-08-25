@@ -974,10 +974,17 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		updateSpeechStatus(status) {
-			if (status = "Start")
+			if (status = "Start") {
+				try
+					FileAppend("True", kTempDirectory . "Speaking.status")
+
 				this.mute()
-			else if (status = "Stop")
+			}
+			else if (status = "Stop") {
+				deleteFile(kTempDirectory . "Speaking.status")
+
 				this.unmute()
+			}
 		}
 
 		buildPhrases(language, fast := false) {

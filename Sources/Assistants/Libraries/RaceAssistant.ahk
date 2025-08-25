@@ -3751,7 +3751,8 @@ class GridRaceAssistant extends RaceAssistant {
 				}
 				else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) > lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
-					speaker.speakPhrase("StandingsAheadLapped")
+					speaker.speakPhrase("StandingsAheadLapped", {forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+															   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 				else
 					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)
 															  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
@@ -3837,7 +3838,8 @@ class GridRaceAssistant extends RaceAssistant {
 				}
 				else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap")) < lap)
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000))) {
-					speaker.speakPhrase("StandingsBehindLapped")
+					speaker.speakPhrase("StandingsBehindLapped", {forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+																, surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
 					lapped := true
 				}

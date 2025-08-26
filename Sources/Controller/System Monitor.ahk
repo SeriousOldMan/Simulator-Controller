@@ -639,7 +639,7 @@ systemMonitor(command := false, arguments*) {
 		local html := ""
 		local mixedCompounds := false
 		local tyreSet := false
-		local pressures, temperatures, wear, tyreCompounds
+		local pressures, temperatures, wear, tyreCompounds, laps
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -743,6 +743,17 @@ systemMonitor(command := false, arguments*) {
 				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[3]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[4]) . "</td></tr>")
+			}
+
+			laps := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Laps", ""))
+
+			if ((laps.Length = 4) && exist(laps, nonZero)) {
+				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Laps") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . Round(laps[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . Round(laps[2]) . "</td></tr>")
+				html .= ("<tr><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . Round(laps[3]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
+					   . Round(laps[4]) . "</td></tr>")
 			}
 		}
 		catch Any as exception {

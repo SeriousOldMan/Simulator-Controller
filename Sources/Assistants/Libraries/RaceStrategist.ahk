@@ -1966,8 +1966,11 @@ class RaceStrategist extends GridRaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+		local tyreLaps := false
 		local nextPitstop, pitstop, ignore, theFact
 		local fuelService, tyreService, index, tyre, axle, tyreCompound, tyreCompoundColor
+		local ignore, pitstop, stintLaps
 
 		if (knowledgeBase && knowledgeBase.getValue("Strategy.Name", false)) {
 			this.Provider.supportsPitstop(&fuelService, &tyreService)
@@ -2026,6 +2029,28 @@ class RaceStrategist extends GridRaceAssistant {
 							   , knowledgeBase.getValue("Strategy.Pitstop." . pitstop . ".Lap"))
 			}
 		}
+
+		if lastPitstop
+			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+		else
+			stintLaps := lapNumber
+
+		if this.PitstopHistory {
+			tyreLaps := false
+
+			for ignore, pitstop in this.PitstopHistory
+				if (pitstop.Nr = lastPitstop) {
+					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
+												 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+
+					break
+				}
+		}
+
+		if !tyreLaps
+			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
+
+		setMultiMapValue(sessionInfo, "Tyres", "Laps", tyreLaps)
 
 		return sessionInfo
 	}
@@ -4741,16 +4766,14 @@ class RaceStrategist extends GridRaceAssistant {
 		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local lapsDB := this.LapsDatabase
 		local tyreLaps := false
-		local stintLaps
+		local stintLaps, ignore, pitstop
 
 		if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 		else
 			stintLaps := lapNumber
 
-		if this.PitstopHistory {
-			tyreLaps := false
-
+		if this.PitstopHistory
 			for ignore, pitstop in this.PitstopHistory
 				if (pitstop.Nr = lastPitstop) {
 					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
@@ -4758,7 +4781,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 					break
 				}
-		}
 
 		if !tyreLaps
 			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)

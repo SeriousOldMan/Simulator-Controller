@@ -3,7 +3,7 @@ Version=6.5.3.0-dev
 Target=6.5.3.0-release
 Date=08/26/2025
 Download=
-Changes=Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E
+Changes=Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json"
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
 Version=6.5.2.0-release

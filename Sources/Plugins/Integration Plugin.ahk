@@ -199,7 +199,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local state := Map()
 		local mixedCompounds := false
 		local tyreSet := false
-		local pressures, temperatures, wear, tyreSet
+		local pressures, temperatures, wear, tyreSet, laps
 
 		if this.Provider
 			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
@@ -245,6 +245,13 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
 		else
 			state["Wear"] := [kNull, kNull, kNull, kNull]
+
+		laps := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Laps", ""))
+
+		if (laps.Length = 4)
+			state["Laps"] := [Round(laps[1]), Round(laps[2]), Round(laps[3]), Round(laps[4])]
+		else
+			state["Laps"] := [kNull, kNull, kNull, kNull]
 
 		state["TyreCompound"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound", "-"))
 

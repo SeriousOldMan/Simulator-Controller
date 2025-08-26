@@ -1561,9 +1561,9 @@ The content of the JSON file looks like this (depending on the current situation
 		"Duration": {
 			"Format": "Time",
 			"SessionLapsLeft": 24,
-			"SessionTimeLeft": "54:53,0",
+			"SessionTimeLeft": "54:53.0",
 			"StintLapsLeft": 9,
-			"StintTimeLeft": "54:53,0"
+			"StintTimeLeft": "54:53.0"
 		},
 		"Fuel": {
 			"AvgFuelConsumption": 4.1,
@@ -1694,6 +1694,12 @@ The content of the JSON file looks like this (depending on the current situation
 				null,
 				null,
 				null
+			],
+			"Laps": [
+				2,
+				2,
+				2,
+				2
 			],
 			"TyreCompound": "Dry (M)"
 			"TyreCompoundFrontLeft": "Dry (M)"

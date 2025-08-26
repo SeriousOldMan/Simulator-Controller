@@ -649,9 +649,9 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	Speaking[all := false] {
+	Speaking[any := false] {
 		Get {
-			return (this.iIsSpeaking || (all && FileExist(kTempDirectory . "Speaking.status")))
+			return (this.iIsSpeaking || (any && FileExist(kTempDirectory . "Speaking.status")))
 		}
 
 		Set {
@@ -768,6 +768,7 @@ class VoiceManager extends ConfigurationItem {
 		super.__New(configuration)
 
 		deleteFile(kTempDirectory . "Voice.cmd")
+		deleteFile(kTempDirectory . "Speaking.status")
 
 		this.initialize(options)
 

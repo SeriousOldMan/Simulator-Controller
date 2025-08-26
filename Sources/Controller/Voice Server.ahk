@@ -579,16 +579,11 @@ class VoiceServer extends ConfigurationItem {
 		startSpeaking() {
 			if this.SpeakingStatusCallback
 				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Start", this.PID)
-
-			try
-				FileAppend("True", kTempDirectory . "Speaking.status")
 		}
 
 		stopSpeaking() {
 			if this.SpeakingStatusCallback
 				messageSend(kFileMessage, "Voice", this.SpeakingStatusCallback . ":Stop", this.PID)
-
-			deleteFile(kTempDirectory . "Speaking.status")
 		}
 
 		startListening(retry := true) {
@@ -843,9 +838,20 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	Speaking {
+	Speaking[any := false] {
 		Get {
-			return this.iSpeaking
+			return (this.iSpeaking || (any && FileExist(kTempDirectory . "Speaking.status")))
+		}
+
+		Set {
+			if value {
+				try
+					FileAppend("True", kTempDirectory . "Speaking.status")
+			}
+			else
+				deleteFile(kTempDirectory . "Speaking.status")
+
+			return (this.iSpeaking := value)
 		}
 	}
 
@@ -947,6 +953,7 @@ class VoiceServer extends ConfigurationItem {
 		VoiceServer.Instance := this
 
 		deleteFile(kTempDirectory . "Voice.cmd")
+		deleteFile(kTempDirectory . "Speaking.status")
 
 		PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
 		PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
@@ -1380,7 +1387,7 @@ class VoiceServer extends ConfigurationItem {
 		text := text
 
 		speak() {
-			this.iSpeaking := true
+			this.Speaking := true
 
 			try {
 				this.getVoiceClient(descriptor).speak(text, options ? string2Map("|", "->", options) : false)
@@ -1392,19 +1399,19 @@ class VoiceServer extends ConfigurationItem {
 				logError(exception)
 			}
 			finally {
-				this.iSpeaking := oldSpeaking
+				this.Speaking := oldSpeaking
 			}
 		}
 
 		speakAgain() {
 			if (this.iLastInterrupt < Task.CurrentTask.SpeechStart)
-				if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
+				if (this.Speaking[true] || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0))
 					return this
 				else
 					speak()
 		}
 
-		if (this.Speaking || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0)) {
+		if (this.Speaking[true] || this.Listening || (choose(this.VoiceClients, (c) => (c.Speaking || c.Listening)).Length > 0)) {
 			retryTask := Task(speakAgain)
 
 			retryTask.SpeechStart := A_TickCount

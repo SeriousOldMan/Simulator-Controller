@@ -2037,6 +2037,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	tacticalAdvice(lastLap, sector, positions, regular) {
 		local speaker := this.getSpeaker()
+		local speaking := this.VoiceManager.Speaking[true]
 		local standingsAhead := false
 		local standingsBehind := false
 		local trackAhead := false
@@ -2046,61 +2047,62 @@ class RaceSpotter extends GridRaceAssistant {
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
-		if ((this.Session = kSessionQualification) && !this.PrivateSession) {
-			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
+		if !speaking
+			if ((this.Session = kSessionQualification) && !this.PrivateSession) {
+				this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
-			if (trackAhead && trackAhead.inRange(sector, true)) {
-				if (trackAhead.Car.Valid && this.DriverCar.Valid) {
-					situation := ("AheadValid " . trackAhead.Car.ID . A_Space . lastLap)
+				if (trackAhead && trackAhead.inRange(sector, true)) {
+					if (trackAhead.Car.Valid && this.DriverCar.Valid) {
+						situation := ("AheadValid " . trackAhead.Car.ID . A_Space . lastLap)
 
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
 
-						speaker.speakPhrase("AheadValid")
+							speaker.speakPhrase("AheadValid")
 
-						return true
+							return true
+						}
+					}
+
+					if (!trackAhead.Car.Valid && this.DriverCar.Valid) {
+						situation := ("AheadInvalid " . trackAhead.Car.ID . A_Space . lastLap)
+
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
+
+							speaker.speakPhrase("AheadInvalid")
+
+							return true
+						}
 					}
 				}
 
-				if (!trackAhead.Car.Valid && this.DriverCar.Valid) {
-					situation := ("AheadInvalid " . trackAhead.Car.ID . A_Space . lastLap)
+				if (trackBehind && trackBehind.inRange(sector, true)) {
+					if (trackBehind.Car.Valid && !this.DriverCar.Valid) {
+						situation := ("BehindValid " . trackBehind.Car.ID . A_Space . lastLap)
 
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
 
-						speaker.speakPhrase("AheadInvalid")
+							speaker.speakPhrase("BehindValid")
 
-						return true
+							return true
+						}
+					}
+
+					if (!trackBehind.Car.Valid && !this.DriverCar.Valid) {
+						situation := ("BehindInvalid " . trackBehind.Car.ID . A_Space . lastLap)
+
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
+
+							speaker.speakPhrase("BehindInvalid")
+
+							return true
+						}
 					}
 				}
 			}
-
-			if (trackBehind && trackBehind.inRange(sector, true)) {
-				if (trackBehind.Car.Valid && !this.DriverCar.Valid) {
-					situation := ("BehindValid " . trackBehind.Car.ID . A_Space . lastLap)
-
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
-
-						speaker.speakPhrase("BehindValid")
-
-						return true
-					}
-				}
-
-				if (!trackBehind.Car.Valid && !this.DriverCar.Valid) {
-					situation := ("BehindInvalid " . trackBehind.Car.ID . A_Space . lastLap)
-
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
-
-						speaker.speakPhrase("BehindInvalid")
-
-						return true
-					}
-				}
-			}
-		}
 
 		if (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > (this.BaseLap + 2))) {
 			this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, true)
@@ -2187,66 +2189,68 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-			if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
-			 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
-			 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
-			 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
-				situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
-
-				if !this.TacticalAdvices.Has(situation) {
-					this.TacticalAdvices[situation] := true
-
-					speaker.speakPhrase("ProtectSlower")
-
-					return true
-				}
-			}
-
-			opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
-
-			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
-			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
-				if (standingsBehind && (trackBehind != standingsBehind)
-				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
-				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
-					situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
+			if !speaking {
+				if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
+				 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
+				 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
+				 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
+					situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
 
 					if !this.TacticalAdvices.Has(situation) {
 						this.TacticalAdvices[situation] := true
 
-						speaker.speakPhrase("ProtectFaster")
+						speaker.speakPhrase("ProtectSlower")
 
 						return true
 					}
 				}
-				else if (((opponentType = "LapDown") || (opponentType = "LapUp")) && trackBehind.isFaster(sector, 0.25)) {
-					situation := (opponentType . "Faster " . trackBehind.Car.ID)
 
-					if !this.TacticalAdvices.Has(situation) {
-						this.TacticalAdvices[situation] := true
+				opponentType := (trackBehind ? trackBehind.OpponentType[sector] : false)
 
-						speaker.beginTalk()
+				if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
+				 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)) {
+					if (standingsBehind && (trackBehind != standingsBehind)
+					 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
+					 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
+						situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
 
-						try {
-							speaker.speakPhrase(opponentType . "Faster")
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
 
-							driverPitstops := this.DriverCar.Pitstops.Length
-							carPitstops := trackBehind.Car.Pitstops.Length
+							speaker.speakPhrase("ProtectFaster")
 
-							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"]
-																   , pitstops: carPitstops - driverPitstops})
-							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"]
-																   , pitstops: driverPitstops - carPitstops})
-							else if !trackBehind.isFaster(sector, 0.75)
-								speaker.speakPhrase("Slipstream")
+							return true
 						}
-						finally {
-							speaker.endTalk()
-						}
+					}
+					else if (((opponentType = "LapDown") || (opponentType = "LapUp")) && trackBehind.isFaster(sector, 0.25)) {
+						situation := (opponentType . "Faster " . trackBehind.Car.ID)
 
-						return true
+						if !this.TacticalAdvices.Has(situation) {
+							this.TacticalAdvices[situation] := true
+
+							speaker.beginTalk()
+
+							try {
+								speaker.speakPhrase(opponentType . "Faster")
+
+								driverPitstops := this.DriverCar.Pitstops.Length
+								carPitstops := trackBehind.Car.Pitstops.Length
+
+								if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
+									speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"]
+																	   , pitstops: carPitstops - driverPitstops})
+								else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
+									speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"]
+																	   , pitstops: driverPitstops - carPitstops})
+								else if !trackBehind.isFaster(sector, 0.75)
+									speaker.speakPhrase("Slipstream")
+							}
+							finally {
+								speaker.endTalk()
+							}
+
+							return true
+						}
 					}
 				}
 			}
@@ -2563,369 +2567,371 @@ class RaceSpotter extends GridRaceAssistant {
 			FileAppend(info, kTempDirectory . "Race Spotter.positions")
 		}
 
-		speaker.beginTalk()
+		if !this.VoiceManager.Speaking[true] {
+			speaker.beginTalk()
 
-		try {
-			driverPitstops := this.DriverCar.Pitstops.Length
-			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
+			try {
+				driverPitstops := this.DriverCar.Pitstops.Length
+				opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
-			if (trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
-			 && (opponentType != "Position") && !trackAhead.Car.InPit
-			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
-			 && !trackAhead.inRange(sector, true, overtakeThreshold)
-			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
-			 && !trackAhead.Reported) {
-				carPitstops := trackAhead.Car.Pitstops.Length
+				if (trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
+				 && (opponentType != "Position") && !trackAhead.Car.InPit
+				 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
+				 && !trackAhead.inRange(sector, true, overtakeThreshold)
+				 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
+				 && !trackAhead.Reported) {
+					carPitstops := trackAhead.Car.Pitstops.Length
 
-				if (opponentType = "LapDown") {
-					speaker.speakPhrase("LapDownDriver")
+					if (opponentType = "LapDown") {
+						speaker.speakPhrase("LapDownDriver")
 
-					if (driverPitstops < carPitstops)
-						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
+						if (driverPitstops < carPitstops)
+							speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
 
-					trackAhead.Reported := true
+						trackAhead.Reported := true
 
-					spoken := true
+						spoken := true
+					}
+					else if (opponentType = "LapUp") {
+						speaker.speakPhrase("LapUpDriver")
+
+						if (driverPitstops < carPitstops)
+							speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
+						else if (driverPitstops > carPitstops)
+							speaker.speakPhrase("LessPitstops", {conjunction: "", pitstops: driverPitstops - carPitstops})
+
+						trackAhead.Reported := true
+
+						spoken := true
+					}
 				}
-				else if (opponentType = "LapUp") {
-					speaker.speakPhrase("LapUpDriver")
+				else if (standingsAhead && standingsAhead.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
+					delta := Abs(standingsAhead.Delta[false, true, 1])
+					deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
+					lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
 
-					if (driverPitstops < carPitstops)
-						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
-					else if (driverPitstops > carPitstops)
-						speaker.speakPhrase("LessPitstops", {conjunction: "", pitstops: driverPitstops - carPitstops})
+					if this.Debug[kDebugPositions] {
+						info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+												  , standingsAhead.Car.Nr, standingsAhead.Car.InPit, standingsAhead.Reported
+												  , values2String("|", standingsAhead.Car.LapTimes*), standingsAhead.Car.LapTime[true]
+												  , values2String("|", standingsAhead.Car.Deltas[sector]*)
+												  , standingsAhead.Delta[sector], standingsAhead.Delta[false, true, 1]
+												  , standingsAhead.inFront(), standingsAhead.atBehind()
+												  , standingsAhead.inFront(false), standingsAhead.atBehind(false), standingsAhead.forPosition()
+												  , standingsAhead.DeltaDifference[sector], standingsAhead.LapTimeDifference[true]
+												  , standingsAhead.isFaster(sector)
+												  , standingsAhead.closingIn(sector, frontGainThreshold)
+												  , standingsAhead.runningAway(sector, frontLostThreshold))
 
-					trackAhead.Reported := true
+						info := ("=================================`n" . info . "`n=================================`n`n")
 
-					spoken := true
-				}
-			}
-			else if (standingsAhead && standingsAhead.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
-				delta := Abs(standingsAhead.Delta[false, true, 1])
-				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
-				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
+						FileAppend(info, kTempDirectory . "Race Spotter.positions")
+					}
 
-				if this.Debug[kDebugPositions] {
-					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-											  , standingsAhead.Car.Nr, standingsAhead.Car.InPit, standingsAhead.Reported
-											  , values2String("|", standingsAhead.Car.LapTimes*), standingsAhead.Car.LapTime[true]
-											  , values2String("|", standingsAhead.Car.Deltas[sector]*)
-											  , standingsAhead.Delta[sector], standingsAhead.Delta[false, true, 1]
-											  , standingsAhead.inFront(), standingsAhead.atBehind()
-											  , standingsAhead.inFront(false), standingsAhead.atBehind(false), standingsAhead.forPosition()
-											  , standingsAhead.DeltaDifference[sector], standingsAhead.LapTimeDifference[true]
-											  , standingsAhead.isFaster(sector)
-											  , standingsAhead.closingIn(sector, frontGainThreshold)
-											  , standingsAhead.runningAway(sector, frontLostThreshold))
+					if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported
+														&& !standingsAhead.inRange(sector, true, overtakeThreshold)) {
+						speaker.speakPhrase("GotHim", {delta: speaker.number2Speech(delta, 1)
+													 , gained: speaker.number2Speech(deltaDifference, 1)
+													 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
-					info := ("=================================`n" . info . "`n=================================`n`n")
+						car := standingsAhead.Car
 
-					FileAppend(info, kTempDirectory . "Race Spotter.positions")
-				}
+						this.informSectorDifference(car, "Ahead")
 
-				if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported
-													&& !standingsAhead.inRange(sector, true, overtakeThreshold)) {
-					speaker.speakPhrase("GotHim", {delta: speaker.number2Speech(delta, 1)
-												 , gained: speaker.number2Speech(deltaDifference, 1)
-												 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+						unsafe := true
 
-					car := standingsAhead.Car
+						if (car.Incidents > 0)
+							speaker.speakPhrase("UnsafeDriverFront")
+						else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
+							speaker.speakPhrase("InconsistentDriverFront")
+						else
+							unsafe := false
 
-					this.informSectorDifference(car, "Ahead")
+						carPitstops := standingsAhead.Car.Pitstops.Length
 
-					unsafe := true
+						if (driverPitstops < carPitstops)
+							speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
+						else if (driverPitstops > carPitstops)
+							speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
 
-					if (car.Incidents > 0)
-						speaker.speakPhrase("UnsafeDriverFront")
-					else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
-						speaker.speakPhrase("InconsistentDriverFront")
-					else
-						unsafe := false
+						standingsAhead.Reported := true
 
-					carPitstops := standingsAhead.Car.Pitstops.Length
+						standingsAhead.reset(sector, false, true)
 
-					if (driverPitstops < carPitstops)
-						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
-					else if (driverPitstops > carPitstops)
-						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
+						spoken := true
+					}
+					else if regular {
+						lapDifference := standingsAhead.LapDifference[sector]
 
-					standingsAhead.Reported := true
+						if ((lapDifference > 0) && (delta >= frontGapMin) && (delta <= frontGapMax)) {
+							if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
+								speaker.speakPhrase("GainedFront"
+												  , getDriverVariables(standingsAhead.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , gained: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
 
-					standingsAhead.reset(sector, false, true)
+								remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-					spoken := true
-				}
-				else if regular {
-					lapDifference := standingsAhead.LapDifference[sector]
+								if ((remaining > 0) && (lapTimeDifference > 0))
+									if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
+										speaker.speakPhrase("CanDoIt")
+									else
+										speaker.speakPhrase("CantDoIt")
 
-					if ((lapDifference > 0) && (delta >= frontGapMin) && (delta <= frontGapMax)) {
-						if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
-							speaker.speakPhrase("GainedFront"
-											  , getDriverVariables(standingsAhead.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , gained: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
+								this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), true)
 
-							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
+								informed := true
 
-							if ((remaining > 0) && (lapTimeDifference > 0))
-								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
-									speaker.speakPhrase("CanDoIt")
-								else
-									speaker.speakPhrase("CantDoIt")
+								standingsAhead.reset(sector, false, true)
 
-							this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), true)
+								spoken := true
+							}
+							else if (standingsAhead.runningAway(sector, frontLostThreshold)) {
+								speaker.speakPhrase("LostFront"
+												  , getDriverVariables(standingsAhead.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , lost: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
 
-							informed := true
+								this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), false)
 
-							standingsAhead.reset(sector, false, true)
+								standingsAhead.reset(sector, true, true)
 
-							spoken := true
-						}
-						else if (standingsAhead.runningAway(sector, frontLostThreshold)) {
-							speaker.speakPhrase("LostFront"
-											  , getDriverVariables(standingsAhead.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , lost: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
-
-							this.handleEvent("AheadGapUpdate", standingsAhead.Car.Nr, Round(delta, 1), false)
-
-							standingsAhead.reset(sector, true, true)
-
-							spoken := true
+								spoken := true
+							}
 						}
 					}
 				}
-			}
 
-			if (standingsBehind && standingsBehind.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
-				delta := Abs(standingsBehind.Delta[false, true, 1])
-				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
-				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
+				if (standingsBehind && standingsBehind.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
+					delta := Abs(standingsBehind.Delta[false, true, 1])
+					deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
+					lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
 
-				if this.Debug[kDebugPositions] {
-					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-																 , standingsBehind.Car.Nr, standingsBehind.Car.InPit, standingsBehind.Reported
-																 , values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
-																 , values2String("|", standingsBehind.Car.Deltas[sector]*)
-																 , standingsBehind.Delta[sector], standingsBehind.Delta[false, true, 1]
-																 , standingsBehind.inFront(), standingsBehind.atBehind()
-																 , standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
-																 , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
-																 , standingsBehind.isFaster(sector)
-																 , standingsBehind.closingIn(sector, behindLostThreshold)
-																 , standingsBehind.runningAway(sector, behindGainThreshold))
+					if this.Debug[kDebugPositions] {
+						info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+																	 , standingsBehind.Car.Nr, standingsBehind.Car.InPit, standingsBehind.Reported
+																	 , values2String("|", standingsBehind.Car.LapTimes*), standingsBehind.Car.LapTime[true]
+																	 , values2String("|", standingsBehind.Car.Deltas[sector]*)
+																	 , standingsBehind.Delta[sector], standingsBehind.Delta[false, true, 1]
+																	 , standingsBehind.inFront(), standingsBehind.atBehind()
+																	 , standingsBehind.inFront(false), standingsBehind.atBehind(false), standingsBehind.forPosition()
+																	 , standingsBehind.DeltaDifference[sector], standingsBehind.LapTimeDifference[true]
+																	 , standingsBehind.isFaster(sector)
+																	 , standingsBehind.closingIn(sector, behindLostThreshold)
+																	 , standingsBehind.runningAway(sector, behindGainThreshold))
 
-					info := ("=================================`n" . info . "`n=================================`n`n")
+						info := ("=================================`n" . info . "`n=================================`n`n")
 
-					FileAppend(info, kTempDirectory . "Race Spotter.positions")
-				}
+						FileAppend(info, kTempDirectory . "Race Spotter.positions")
+					}
 
-				if ((delta <= behindAttackThreshold) && (standingsBehind.isFaster(sector) || standingsBehind.closingIn(sector, behindLostThreshold))
-													 && !standingsBehind.Reported) {
-					speaker.speakPhrase("ClosingIn", {delta: speaker.number2Speech(delta, 1)
-													, lost: speaker.number2Speech(deltaDifference, 1)
-													, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+					if ((delta <= behindAttackThreshold) && (standingsBehind.isFaster(sector) || standingsBehind.closingIn(sector, behindLostThreshold))
+														 && !standingsBehind.Reported) {
+						speaker.speakPhrase("ClosingIn", {delta: speaker.number2Speech(delta, 1)
+														, lost: speaker.number2Speech(deltaDifference, 1)
+														, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
-					car := standingsBehind.Car
+						car := standingsBehind.Car
 
-					this.informSectorDifference(car, "Behind")
+						this.informSectorDifference(car, "Behind")
 
-					this.handleEvent("AttackImminent", standingsBehind.Car.Nr, Round(delta, 1))
+						this.handleEvent("AttackImminent", standingsBehind.Car.Nr, Round(delta, 1))
 
-					unsafe := true
+						unsafe := true
 
-					if (car.Incidents > 0)
-						speaker.speakPhrase("UnsafeDriveBehind")
-					else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
-						speaker.speakPhrase("InconsistentDriverBehind")
-					else
-						unsafe := false
+						if (car.Incidents > 0)
+							speaker.speakPhrase("UnsafeDriveBehind")
+						else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
+							speaker.speakPhrase("InconsistentDriverBehind")
+						else
+							unsafe := false
 
-					carPitstops := standingsBehind.Car.Pitstops.Length
+						carPitstops := standingsBehind.Car.Pitstops.Length
 
-					if (driverPitstops < carPitstops)
-						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
-					else if (driverPitstops > carPitstops)
-						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
+						if (driverPitstops < carPitstops)
+							speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
+						else if (driverPitstops > carPitstops)
+							speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
 
-					standingsBehind.Reported := true
+						standingsBehind.Reported := true
 
-					standingsBehind.reset(sector, false, true)
+						standingsBehind.reset(sector, false, true)
 
-					spoken := true
-				}
-				else if regular {
-					lapDifference := standingsBehind.LapDifference[sector]
+						spoken := true
+					}
+					else if regular {
+						lapDifference := standingsBehind.LapDifference[sector]
 
-					if ((lapDifference > 0) && (delta >= behindGapMin) && (delta <= behindGapMax)) {
-						if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
-							speaker.speakPhrase("LostBehind"
-											  , getDriverVariables(standingsBehind.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , lost: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
+						if ((lapDifference > 0) && (delta >= behindGapMin) && (delta <= behindGapMax)) {
+							if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
+								speaker.speakPhrase("LostBehind"
+												  , getDriverVariables(standingsBehind.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , lost: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
 
-							if !informed
-								speaker.speakPhrase("Focus")
+								if !informed
+									speaker.speakPhrase("Focus")
 
-							this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), true)
+								this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), true)
 
-							standingsBehind.reset(sector, false, true)
+								standingsBehind.reset(sector, false, true)
 
-							spoken := true
-						}
-						else if (standingsBehind.runningAway(sector, behindGainThreshold)) {
-							speaker.speakPhrase("GainedBehind"
-											  , getDriverVariables(standingsBehind.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , gained: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
+								spoken := true
+							}
+							else if (standingsBehind.runningAway(sector, behindGainThreshold)) {
+								speaker.speakPhrase("GainedBehind"
+												  , getDriverVariables(standingsBehind.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , gained: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]}))
 
-							this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), false)
+								this.handleEvent("BehindGapUpdate", standingsBehind.Car.Nr, Round(delta, 1), false)
 
-							standingsBehind.reset(sector, true, true)
+								standingsBehind.reset(sector, true, true)
 
-							spoken := true
+								spoken := true
+							}
 						}
 					}
 				}
-			}
 
-			if ((focused = standingsAhead) || (focused = standingsBehind))
-				focused := false
+				if ((focused = standingsAhead) || (focused = standingsBehind))
+					focused := false
 
-			if (focused && (method >= kDeltaMethodDynamic)) {
-				position := focused.Car.Position["Class"]
-				number := focused.Car.Nr
-				delta := focused.Delta[false, true, 1]
-				deltaDifference := Abs(focused.DeltaDifference[sector])
-				lapTimeDifference := Abs(focused.LapTimeDifference)
+				if (focused && (method >= kDeltaMethodDynamic)) {
+					position := focused.Car.Position["Class"]
+					number := focused.Car.Nr
+					delta := focused.Delta[false, true, 1]
+					deltaDifference := Abs(focused.DeltaDifference[sector])
+					lapTimeDifference := Abs(focused.LapTimeDifference)
 
-				if this.Debug[kDebugPositions] {
-					info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
-																 , number, focused.Car.InPit, focused.Reported
-																 , values2String("|", focused.Car.LapTimes*), focused.Car.LapTime[true]
-																 , values2String("|", focused.Car.Deltas[sector]*)
-																 , focused.Delta[sector], focused.Delta[false, true, 1]
-																 , focused.inFront(), focused.atBehind()
-																 , focused.inFront(false), focused.atBehind(false), focused.forPosition()
-																 , focused.DeltaDifference[sector], focused.LapTimeDifference[true]
-																 , focused.isFaster(sector)
-																 , focused.closingIn(sector, behindLostThreshold)
-																 , focused.runningAway(sector, behindGainThreshold))
+					if this.Debug[kDebugPositions] {
+						info := values2String(", ", values2String("|", this.DriverCar.LapTimes*), this.DriverCar.LapTime[true]
+																	 , number, focused.Car.InPit, focused.Reported
+																	 , values2String("|", focused.Car.LapTimes*), focused.Car.LapTime[true]
+																	 , values2String("|", focused.Car.Deltas[sector]*)
+																	 , focused.Delta[sector], focused.Delta[false, true, 1]
+																	 , focused.inFront(), focused.atBehind()
+																	 , focused.inFront(false), focused.atBehind(false), focused.forPosition()
+																	 , focused.DeltaDifference[sector], focused.LapTimeDifference[true]
+																	 , focused.isFaster(sector)
+																	 , focused.closingIn(sector, behindLostThreshold)
+																	 , focused.runningAway(sector, behindGainThreshold))
 
-					info := ("=================================`n" . info . "`n=================================`n`n")
+						info := ("=================================`n" . info . "`n=================================`n`n")
 
-					FileAppend(info, kTempDirectory . "Race Spotter.positions")
+						FileAppend(info, kTempDirectory . "Race Spotter.positions")
+					}
+
+					lapDifference := focused.LapDifference[sector]
+
+					if (lapDifference > 0)
+						if (delta < 0) {
+							delta := Abs(delta)
+
+							if (focused.closingIn(sector, behindLostThreshold) && !focused.Reported) {
+								speaker.speakPhrase("LostFocusBehind"
+												  , getDriverVariables(focused.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , lost: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																	  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
+
+								if !informed
+									speaker.speakPhrase("Focus")
+
+								focused.reset(sector, false, true)
+
+								spoken := true
+							}
+							else if focused.runningAway(sector, behindGainThreshold) {
+								speaker.speakPhrase("GainedFocusBehind"
+												  , getDriverVariables(focused.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , gained: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																	  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
+
+								focused.reset(sector, true, true)
+
+								spoken := true
+							}
+						}
+						else {
+							if (focused.closingIn(sector, frontGainThreshold) && !focused.Reported) {
+								speaker.speakPhrase("GainedFocusFront"
+												  , getDriverVariables(focused.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , gained: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																	  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
+
+								remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
+
+								if ((remaining > 0) && (lapTimeDifference > 0))
+									if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
+										speaker.speakPhrase("CanDoIt")
+									else
+										speaker.speakPhrase("CantDoIt")
+
+								focused.reset(sector, false, true)
+
+								spoken := true
+							}
+							else if (focused.runningAway(sector, frontLostThreshold)) {
+								speaker.speakPhrase("LostFocusFront"
+												  , getDriverVariables(focused.Driver.Car
+																	 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+																	  , lost: speaker.number2Speech(deltaDifference, 1)
+																	  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+																	  , deltaLaps: lapDifference
+																	  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
+																	  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
+
+								focused.reset(sector, true, true)
+
+								spoken := true
+							}
+						}
 				}
-
-				lapDifference := focused.LapDifference[sector]
-
-				if (lapDifference > 0)
-					if (delta < 0) {
-						delta := Abs(delta)
-
-						if (focused.closingIn(sector, behindLostThreshold) && !focused.Reported) {
-							speaker.speakPhrase("LostFocusBehind"
-											  , getDriverVariables(focused.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , lost: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
-
-							if !informed
-								speaker.speakPhrase("Focus")
-
-							focused.reset(sector, false, true)
-
-							spoken := true
-						}
-						else if focused.runningAway(sector, behindGainThreshold) {
-							speaker.speakPhrase("GainedFocusBehind"
-											  , getDriverVariables(focused.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , gained: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
-
-							focused.reset(sector, true, true)
-
-							spoken := true
-						}
-					}
-					else {
-						if (focused.closingIn(sector, frontGainThreshold) && !focused.Reported) {
-							speaker.speakPhrase("GainedFocusFront"
-											  , getDriverVariables(focused.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , gained: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
-
-							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
-
-							if ((remaining > 0) && (lapTimeDifference > 0))
-								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
-									speaker.speakPhrase("CanDoIt")
-								else
-									speaker.speakPhrase("CantDoIt")
-
-							focused.reset(sector, false, true)
-
-							spoken := true
-						}
-						else if (focused.runningAway(sector, frontLostThreshold)) {
-							speaker.speakPhrase("LostFocusFront"
-											  , getDriverVariables(focused.Driver.Car
-																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-																  , lost: speaker.number2Speech(deltaDifference, 1)
-																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-																  , deltaLaps: lapDifference
-																  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]
-																  , indicator: this.getCarIndicatorFragment(speaker, number, position)}))
-
-							focused.reset(sector, true, true)
-
-							spoken := true
-						}
-					}
 			}
-		}
-		finally {
-			speaker.endTalk()
-		}
+			finally {
+				speaker.endTalk()
+			}
 
-		if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
-			if ((regular = "S") || (regular = "A"))
-				rnd := Random(1, 7)
-			else
-				rnd := Random(1, 9)
+			if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
+				if ((regular = "S") || (regular = "A"))
+					rnd := Random(1, 7)
+				else
+					rnd := Random(1, 9)
 
-			if (rnd > 6) {
-				rnd := Random(1, focused ? 14 : 10)
+				if (rnd > 6) {
+					rnd := Random(1, focused ? 14 : 10)
 
-				if (standingsAhead && (rnd > 3) && (rnd < 11))
-					spoken := this.standingsGapToAhead()
-				else if (standingsBehind && (rnd <= 3))
-					spoken := this.standingsGapToBehind()
-				else if (focused && (rnd > 10))
-					spoken := this.focusGap()
+					if (standingsAhead && (rnd > 3) && (rnd < 11))
+						spoken := this.standingsGapToAhead()
+					else if (standingsBehind && (rnd <= 3))
+						spoken := this.standingsGapToBehind()
+					else if (focused && (rnd > 10))
+						spoken := this.focusGap()
+				}
 			}
 		}
 

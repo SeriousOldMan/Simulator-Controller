@@ -2908,10 +2908,13 @@ class RaceEngineer extends RaceAssistant {
 	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local tyreChange := false
+		local tyreLaps := false
 		local planned, prepared, tyreCompound, lap
 		local bodyworkDamage, suspensionDamage, index, position, defaultTyreCompound, defaultTyreCompoundColor
 		local fuelService, tyreService, brakeService, repairService, index, tyre, axle
+		local pitstopHistory, ignore, pitstop, stintLaps
 
 		if knowledgeBase {
 			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
@@ -3112,6 +3115,42 @@ class RaceEngineer extends RaceAssistant {
 																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.FR", 0)
 																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RL", 0)
 																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RR", 0)))
+
+			if lastPitstop {
+				stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+
+				pitstopHistory := this.createPitstopHistory()
+
+				if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined)
+					setMultiMapValue(sessionInfo, "Tyres", "Laps"
+												, values2String(",", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft")
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight")
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft")
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight")))
+				else
+					setMultiMapValue(sessionInfo, "Tyres", "Laps", values2String(",", lapNumber, lapNumber, lapNumber, lapNumber))
+			}
+			else
+				setMultiMapValue(sessionInfo, "Tyres", "Laps", values2String(",", lapNumber, lapNumber, lapNumber, lapNumber))
+
+			if this.PitstopHistory {
+				tyreLaps := false
+
+				for ignore, pitstop in this.PitstopHistory
+					if (pitstop.Nr = lastPitstop) {
+						tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
+													 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+
+						break
+					}
+			}
+
+			if !tyreLaps
+				tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
+
+			setMultiMapValue(sessionInfo, "Tyres", "Laps", tyreLaps)
+
+
 
 			if data {
 				bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
@@ -4473,7 +4512,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID, arguments*) {
+	createPitstopHistory() {
 		local knowledgeBase := this.KnowledgeBase
 		local pitstopHistory := newMultiMap()
 		local numPitstops := 0
@@ -4483,7 +4522,7 @@ class RaceEngineer extends RaceAssistant {
 		local tyreLapsFR := 0
 		local tyreLapsRL := 0
 		local tyreLapsRR := 0
-		local fileName, pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
+		local pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
 		local tyreService, brakeService, tyreSets, pitstop, tyreChange, index, axle, tyre
 
 		static postfixes := ["FL", "FR", "RL", "RR"]
@@ -4656,6 +4695,12 @@ class RaceEngineer extends RaceAssistant {
 			setMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
 			setMultiMapValue(pitstopHistory, "TyreSets", "Count", 0)
 		}
+
+		return pitstopHistory
+	}
+
+	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID, arguments*) {
+		local pitstopHistory := this.createPitstopHistory()
 
 		fileName := temporaryFileName("Pitstop", "history")
 

@@ -4766,7 +4766,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local lapsDB := this.LapsDatabase
 		local tyreLaps := false
-		local stintLaps, ignore, pitstop
+		local stintLaps, ignore, thePitstop
 
 		if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
@@ -4774,10 +4774,12 @@ class RaceStrategist extends GridRaceAssistant {
 			stintLaps := lapNumber
 
 		if this.PitstopHistory
-			for ignore, pitstop in this.PitstopHistory
-				if (pitstop.Nr = lastPitstop) {
-					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
-												 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+			for ignore, thePitstop in this.PitstopHistory
+				if (thePitstop.Nr = lastPitstop) {
+					tyreLaps := values2String(",", thePitstop.TyreLapsFrontLeft + stintLaps
+												 , thePitstop.TyreLapsFrontRight + stintLaps
+												 , thePitstop.TyreLapsRearLeft + stintLaps
+												 , thePitstop.TyreLapsRearRight + stintLaps)
 
 					break
 				}

@@ -902,7 +902,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			Speaking {
 				Get {
-					return (this.iIsSpeaking || super.Speaking)
+					return this.iIsSpeaking
 				}
 
 				Set {
@@ -912,17 +912,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 			speak(text, focus := false, cache := false, options := false) {
 				local oldBoostable := this.iIsBoostable
-				local oldSpeaking := this.iIsSpeaking
 
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
 					this.iIsBoostable := !cache
-					this.iIsSpeaking := true
 
 					try {
 						super.speak(text, focus, cache, options)
 					}
 					finally {
-						this.iIsSpeaking := oldSpeaking
 						this.iIsBoostable := oldBoostable
 					}
 				}
@@ -975,12 +972,16 @@ class RaceSpotter extends GridRaceAssistant {
 
 		updateSpeechStatus(status) {
 			if (status = "Start") {
+				this.getSpeaker(true).Speaking := true
+
 				try
 					FileAppend("True", kTempDirectory . "Speaking.status")
 
 				this.mute()
 			}
 			else if (status = "Stop") {
+				this.getSpeaker(true).Speaking := false
+
 				deleteFile(kTempDirectory . "Speaking.status")
 
 				this.unmute()
@@ -3178,15 +3179,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 		this.iAlertProcessing := true
 
-		speaker.Speaking := true
-
 		try {
 			while (alert := this.popAlert())
 				speaker.speakPhrase(alert*)
 		}
 		finally {
-			speaker.Speaking := false
-
 			this.iAlertProcessing := oldAlertProcessing
 
 			Task.unblock(oldPriority)

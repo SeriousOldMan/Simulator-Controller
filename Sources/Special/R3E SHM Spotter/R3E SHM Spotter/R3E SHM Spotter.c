@@ -702,7 +702,7 @@ BOOL checkAccident() {
 					if (speed < (avgSpeed / 5))
 					{
 						if ((distanceAhead < aheadAccidentDistance) && (accidentsAheadCount < 10)) {
-							accidentsAhead[accidentsAheadCount].vehicle = id;
+							accidentsAhead[accidentsAheadCount].vehicle = map_buffer->all_drivers_data_1[id].driver_info.slot_id;
 							accidentsAhead[accidentsAheadCount].distance = distanceAhead;
 
 							accidentsAheadCount += 1;
@@ -711,14 +711,14 @@ BOOL checkAccident() {
 						long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + map_buffer->layout_length)) - carDistance);
 
 						if ((distanceBehind < behindAccidentDistance) && (accidentsBehindCount < 10)) {
-							accidentsBehind[accidentsBehindCount].vehicle = id;
+							accidentsBehind[accidentsBehindCount].vehicle = map_buffer->all_drivers_data_1[id].driver_info.slot_id;
 							accidentsBehind[accidentsBehindCount].distance = distanceBehind;
 
 							accidentsBehindCount += 1;
 						}
 					}
 					else if ((distanceAhead < slowCarDistance) && (slowCarsAheadCount < 10)) {
-						slowCarsAhead[slowCarsAheadCount].vehicle = id;
+						slowCarsAhead[slowCarsAheadCount].vehicle = map_buffer->all_drivers_data_1[id].driver_info.slot_id;
 						slowCarsAhead[slowCarsAheadCount].distance = distanceAhead;
 
 						slowCarsAheadCount += 1;
@@ -742,20 +742,27 @@ BOOL checkAccident() {
 			if (cycle > nextAccidentAhead)
 			{
 				long distance = LONG_MAX;
+				int vehicle = INT_MAX;
 
 				for (int i = 0; i < accidentsAheadCount; i++)
-					distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+					if (distance > accidentsAhead[i].distance) {
+						distance = accidentsAhead[i].distance;
+						vehicle = accidentsAhead[i].vehicle;
+					}
 
-				if (distance > 50) {
+				if ((distance > 50) && (vehicle < INT_MAX)) {
 					nextAccidentAhead = cycle + 400;
 					nextAccidentBehind = cycle + 200;
 					nextSlowCarAhead = cycle + 200;
 
-					char message[40] = "accidentAlert:Ahead;";
+					char message[80] = "accidentAlert:Ahead;";
 					char numBuffer[20];
 
 					sprintf_s(numBuffer, 20, "%d", distance);
-					strcat_s(message, 40, numBuffer);
+					strcat_s(message, 80, numBuffer);
+					strcat_s(message, 80, ";");
+					sprintf_s(numBuffer, 20, "%d", vehicle);
+					strcat_s(message, 80, numBuffer);
 
 					sendSpotterMessage(message);
 					
@@ -799,18 +806,25 @@ BOOL checkAccident() {
 			if (cycle > nextAccidentBehind)
 			{
 				long distance = LONG_MAX;
+				int vehicle = INT_MAX;
 
 				for (int i = 0; i < accidentsBehindCount; i++)
-					distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+					if (distance > accidentsBehind[i].distance) {
+						distance = accidentsBehind[i].distance;
+						vehicle = accidentsBehind[i].vehicle;
+					}
 
-				if (distance > 50) {
+				if ((distance > 50) && (vehicle < INT_MAX)) {
 					nextAccidentBehind = cycle + 400;
 
-					char message[40] = "accidentAlert:Behind;";
+					char message[80] = "accidentAlert:Behind;";
 					char numBuffer[20];
 
 					sprintf_s(numBuffer, 20, "%d", distance);
-					strcat_s(message, 40, numBuffer);
+					strcat_s(message, 80, numBuffer);
+					strcat_s(message, 80, ";");
+					sprintf_s(numBuffer, 20, "%d", vehicle);
+					strcat_s(message, 80, numBuffer);
 
 					sendSpotterMessage(message);
 					

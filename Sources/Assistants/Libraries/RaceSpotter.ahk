@@ -3237,10 +3237,22 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	accidentAlert(type, arguments*) {
-		local distance := false
+		local distance, car
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
+				if ((arguments.Length > 1) && (Random(1, 10) > 5)) {
+					car := arguments[2]
+
+					loop knowledgeBase.getValue("Car.Count")
+						if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
+							this.pushAlert("Accident" . type . "Driver", {forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+																	    , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+
+							return
+						}
+				}
+
 				if ((arguments.Length > 0) && (type = "Ahead")) {
 					distance := (Round(arguments[1] / 50) * 50)
 

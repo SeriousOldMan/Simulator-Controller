@@ -715,6 +715,7 @@ void writePositions(const irsdk_header *header, const char* data)
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
 				printf("Car.%s.ID=%s\n", carIdx1, carIdx1);
+				printf("Car.%s.LID=%s\n", carIdx1, carIdx);
 				printf("Car.%s.Nr=%s\n", carIdx1, result);
 
 				if (carPositions)

@@ -798,16 +798,16 @@ namespace RF2SHMSpotter {
                                 if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance)
-										accidentsAhead.Add(new SlowCarInfo(i, distanceAhead));
+										accidentsAhead.Add(new SlowCarInfo(i + 1, distanceAhead));
 
 									long distanceBehind = (long)(((vehicle.mLapDist < playerScoring.mLapDist) ? playerScoring.mLapDist
 																											  : (playerScoring.mLapDist + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
 
 									if (distanceBehind < behindAccidentDistance)
-										accidentsBehind.Add(new SlowCarInfo(i, distanceBehind));
+										accidentsBehind.Add(new SlowCarInfo(i + 1, distanceBehind));
 								}
 								else if (distanceAhead < slowCarDistance)
-									slowCarsAhead.Add(new SlowCarInfo(i, distanceAhead));
+									slowCarsAhead.Add(new SlowCarInfo(i + 1, distanceAhead));
 							}
 							else
 								updateIdealLine(ref vehicle, running, speed);
@@ -834,17 +834,21 @@ namespace RF2SHMSpotter {
 					if (cycle > nextAccidentAhead)
 					{
 						long distance = long.MaxValue;
+						int vehicle = 0;
 
 						foreach (SlowCarInfo i in accidentsAhead)
-							distance = Math.Min(distance, i.distance);
+							if (i.distance < distance) {
+								distance = i.distance;
+								vehicle = i.vehicle;
+							}
 
-						if (distance > 50)
+						if ((distance > 50) && (vehicle > 0))
 						{
 							nextAccidentAhead = cycle + 400;
                             nextAccidentBehind = cycle + 200;
                             nextSlowCarAhead = cycle + 200;
 
-							SendSpotterMessage("accidentAlert:Ahead;" + distance);
+							SendSpotterMessage("accidentAlert:Ahead;" + distance + ";" + vehicle);
 							
 							numAccidents += 1;
 
@@ -881,15 +885,19 @@ namespace RF2SHMSpotter {
 					if (cycle > nextAccidentBehind)
 					{
 						long distance = long.MaxValue;
-
+						int vehicle = 0;
+						
 						foreach (SlowCarInfo i in accidentsBehind)
-							distance = Math.Min(distance, i.distance);
+							if (i.distance < distance) {
+								distance = i.distance;
+								vehicle = i.vehicle;
+							}
 
-						if (distance > 50)
+						if ((distance > 50) && (vehicle > 0))
 						{
 							nextAccidentBehind = cycle + 400;
 
-							SendSpotterMessage("accidentAlert:Behind;" + distance);
+							SendSpotterMessage("accidentAlert:Behind;" + distance + ";" + vehicle);
 							
 							numAccidents += 1;
 

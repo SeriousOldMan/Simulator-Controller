@@ -480,6 +480,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				}
 				
 				print(&output, "Car.", i); printLine(&output, ".Nr=", i);
+				print(&output, "Car.", i); printLine(&output, ".LID=", i);
 				print(&output, "Car.", i); printLine(&output, ".Class=", localCopy->mCarClassNames[i - 1]);
 				print(&output, "Car.", i); printLine(&output, ".Position=", (long)vehicle.mRacePosition);
 				print(&output, "Car.", i); printLine(&output, ".Laps=", (long)vehicle.mLapsCompleted);

@@ -673,16 +673,16 @@ bool checkAccident(const SharedMemory* sharedData)
 						if (speed < (avgSpeed / 5))
 						{
 							if (distanceAhead < aheadAccidentDistance)
-								accidentsAhead.push_back(SlowCarInfo(i, distanceAhead));
+								accidentsAhead.push_back(SlowCarInfo(i + 1, distanceAhead));
 
 							long distanceBehind = (long)(((vehicle.mCurrentLapDistance < driver.mCurrentLapDistance) ? driver.mCurrentLapDistance
 								: (driver.mCurrentLapDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
 
 							if (distanceBehind < behindAccidentDistance)
-								accidentsBehind.push_back(SlowCarInfo(i, distanceBehind));
+								accidentsBehind.push_back(SlowCarInfo(i + 1, distanceBehind));
 						}
 						else if (distanceAhead < slowCarDistance)
-							slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead));
+							slowCarsAhead.push_back(SlowCarInfo(i + 1, distanceAhead));
 					}
 					else
 						updateIdealLine(vehicle, running, speed);
@@ -712,19 +712,26 @@ bool checkAccident(const SharedMemory* sharedData)
 			if (cycle > nextAccidentAhead)
 			{
 				long distance = LONG_MAX;
+				int vehicle = 0;
 
 				for (int i = 0; i < accidentsAhead.size(); i++)
-					distance = ((distance < accidentsAhead[i].distance) ? distance : accidentsAhead[i].distance);
+					if (distance > accidentsAhead[i].distance) {
+						distance = accidentsAhead[i].distance;
+						vehicle = accidentsAhead[i].vehicle;
+					}
 
-				if (distance > 50) {
+				if ((distance > 50) && (vehicle > 0)) {
 					nextAccidentAhead = cycle + 400;
 					nextAccidentBehind = cycle + 200;
 					nextSlowCarAhead = cycle + 200;
 
-					char message[40] = "accidentAlert:Ahead;";
+					char message[80] = "accidentAlert:Ahead;";
 					char numBuffer[20];
 
 					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
+					strcat_s(message, ";");
+					sprintf_s(numBuffer, "%d", vehicle);
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
@@ -769,17 +776,24 @@ bool checkAccident(const SharedMemory* sharedData)
 			if (cycle > nextAccidentBehind)
 			{
 				long distance = LONG_MAX;
+				int vehicle = 0;
 
 				for (int i = 0; i < accidentsBehind.size(); i++)
-					distance = ((distance < accidentsBehind[i].distance) ? distance : accidentsBehind[i].distance);
+					if (distance > accidentsBehind[i].distance) {
+						distance = accidentsBehind[i].distance;
+						vehicle = accidentsBehind[i].vehicle;
+					}
 
-				if (distance > 50) {
+				if ((distance > 50) && (vehicle > 0)) {
 					nextAccidentBehind = cycle + 400;
 
-					char message[40] = "accidentAlert:Behind;";
+					char message[80] = "accidentAlert:Behind;";
 					char numBuffer[20];
 
 					sprintf_s(numBuffer, "%d", distance);
+					strcat_s(message, numBuffer);
+					strcat_s(message, ";");
+					sprintf_s(numBuffer, "%d", vehicle);
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);

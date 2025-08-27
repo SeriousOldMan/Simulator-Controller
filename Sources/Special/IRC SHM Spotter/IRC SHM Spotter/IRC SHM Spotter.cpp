@@ -391,6 +391,7 @@ const char* computeAlert(int newSituation) {
 
 				carBehindReported = true;
 				carBehindCount = 21;
+				nextCarBehind = cycle + 200;
 
 				break;
 			case LEFT:

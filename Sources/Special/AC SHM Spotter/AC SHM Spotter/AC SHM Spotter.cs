@@ -384,6 +384,7 @@ namespace ACSHMSpotter {
 
 							carBehindReported = true;
 							carBehindCount = 21;
+							nextCarBehind = cycle + 200;
 
 							break;
 						case LEFT:
@@ -583,11 +584,11 @@ namespace ACSHMSpotter {
 				else {
 					longitudinalRearDistance = 5;
 
-					if (carBehind)
+					if (carBehind && (cycle > nextCarBehind))
 					{
 						if (!carBehindReported)
 						{
-							if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind)))
+							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
                             {
                                 nextCarBehind = cycle + 200;
                                 carBehindReported = true;

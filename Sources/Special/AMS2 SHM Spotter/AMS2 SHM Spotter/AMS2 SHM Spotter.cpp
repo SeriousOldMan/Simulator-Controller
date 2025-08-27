@@ -207,6 +207,7 @@ const char* computeAlert(int newSituation) {
 
 				carBehindReported = true;
 				carBehindCount = 21;
+				nextCarBehind = cycle + 200;
 
 				break;
 			case LEFT:
@@ -389,9 +390,9 @@ bool checkPositions(const SharedMemory* sharedData) {
 		else {
 			longitudinalRearDistance = 5;
 			
-			if (carBehind) {
+			if (carBehind && (cycle > nextCarBehind)) {
 				if (!carBehindReported) {
-					if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind))) {
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
 						nextCarBehind = cycle + 200;
 						carBehindReported = true;
 

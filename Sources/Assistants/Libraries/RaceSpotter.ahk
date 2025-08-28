@@ -911,33 +911,49 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			speak(text, focus := false, cache := false, options := false) {
-				local oldBoostable := this.iIsBoostable
-
-				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice) {
-					this.iIsBoostable := !cache
-
-					try {
-						super.speak(text, focus, cache, options)
-					}
-					finally {
-						this.iIsBoostable := oldBoostable
-					}
-				}
+				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
+					super.speak(text, focus, cache, options)
 			}
 
-			speakPhrase(phrase, arguments*) {
-				local assistant := this.VoiceManager.RaceAssistant
+			speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
+				if !options
+					options := {rephrase: false}
+				else if !options.Has("rephrase")
+					options.rephrase := false
 
 				if this.Awaitable
 					this.wait()
 
-				if assistant.skipAlert(phrase) {
-					assistant.cleanupAlerts(phrase)
+				super.speakPhrase(phrase, variables, focus, cache, options)
+			}
 
-					return
+			speakAlert(phrase, variables := false, focus := false, cache := false, options := false) {
+				local assistant := this.VoiceManager.RaceAssistant
+				local oldBoostable := this.iIsBoostable
+
+				this.iIsBoostable := !cache
+
+				if !options {
+					options := {rephrase: false}
 				}
+				else if !options.Has("rephrase")
+					options.rephrase := false
 
-				super.speakPhrase(phrase, arguments*)
+				try {
+					if this.Awaitable
+						this.wait()
+
+					if assistant.skipAlert(phrase) {
+						assistant.cleanupAlerts(phrase)
+
+						return
+					}
+
+					super.speakPhrase(phrase, variables, focus, cache, options)
+				}
+				finally {
+					this.iIsBoostable := oldBoostable
+				}
 			}
 
 			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
@@ -3185,7 +3201,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		try {
 			while (alert := this.popAlert())
-				speaker.speakPhrase(alert*)
+				speaker.speakAlert(alert*)
 		}
 		finally {
 			this.iAlertProcessing := oldAlertProcessing

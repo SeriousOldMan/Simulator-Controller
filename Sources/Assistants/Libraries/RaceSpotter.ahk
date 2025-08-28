@@ -915,7 +915,14 @@ class RaceSpotter extends GridRaceAssistant {
 					super.speak(text, focus, cache, options)
 			}
 
-			speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
+			speakNormal(phrase, variables := false, focus := false, cache := false, options := false) {
+				if this.Awaitable
+					this.wait()
+
+				this.speakPhrase(phrase, variables, focus, cache, options)
+			}
+
+			speakFast(phrase, variables := false, focus := false, cache := false, options := false) {
 				if !options
 					options := {rephrase: false}
 				else if !options.Has("rephrase")
@@ -924,7 +931,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if this.Awaitable
 					this.wait()
 
-				super.speakPhrase(phrase, variables, focus, cache, options)
+				this.speakPhrase(phrase, variables, focus, cache, options)
 			}
 
 			speakAlert(phrase, variables := false, focus := false, cache := false, options := false) {
@@ -949,7 +956,7 @@ class RaceSpotter extends GridRaceAssistant {
 						return
 					}
 
-					super.speakPhrase(phrase, variables, focus, cache, options)
+					this.speakPhrase(phrase, variables, focus, cache, options)
 				}
 				finally {
 					this.iIsBoostable := oldBoostable
@@ -2076,7 +2083,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if !this.TacticalAdvices.Has(situation) {
 							this.TacticalAdvices[situation] := true
 
-							fastSpeaker.speakPhrase("AheadValid")
+							fastSpeaker.speakNormal("AheadValid")
 
 							return true
 						}
@@ -2088,7 +2095,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if !this.TacticalAdvices.Has(situation) {
 							this.TacticalAdvices[situation] := true
 
-							fastSpeaker.speakPhrase("AheadInvalid")
+							fastSpeaker.speakNormal("AheadInvalid")
 
 							return true
 						}
@@ -2102,7 +2109,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if !this.TacticalAdvices.Has(situation) {
 							this.TacticalAdvices[situation] := true
 
-							fastSpeaker.speakPhrase("BehindValid")
+							fastSpeaker.speakNormal("BehindValid")
 
 							return true
 						}
@@ -2114,7 +2121,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if !this.TacticalAdvices.Has(situation) {
 							this.TacticalAdvices[situation] := true
 
-							fastSpeaker.speakPhrase("BehindInvalid")
+							fastSpeaker.speakNormal("BehindInvalid")
 
 							return true
 						}
@@ -2217,7 +2224,7 @@ class RaceSpotter extends GridRaceAssistant {
 					if !this.TacticalAdvices.Has(situation) {
 						this.TacticalAdvices[situation] := true
 
-						fastSpeaker.speakPhrase("ProtectSlower")
+						fastSpeaker.speakFast("ProtectSlower")
 
 						return true
 					}
@@ -2235,7 +2242,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if !this.TacticalAdvices.Has(situation) {
 							this.TacticalAdvices[situation] := true
 
-							fastSpeaker.speakPhrase("ProtectFaster")
+							fastSpeaker.speakFast("ProtectFaster")
 
 							return true
 						}
@@ -2249,19 +2256,19 @@ class RaceSpotter extends GridRaceAssistant {
 							fastSpeaker.beginTalk()
 
 							try {
-								fastSpeaker.speakPhrase(opponentType . "Faster")
+								fastSpeaker.speakFast(opponentType . "Faster")
 
 								driverPitstops := this.DriverCar.Pitstops.Length
 								carPitstops := trackBehind.Car.Pitstops.Length
 
 								if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-									fastSpeaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"]
-																		   , pitstops: carPitstops - driverPitstops})
+									fastSpeaker.speakFast("MorePitstops", {conjunction: speaker.Fragments["But"]
+																		 , pitstops: carPitstops - driverPitstops})
 								else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-									fastSpeaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"]
-																		   , pitstops: driverPitstops - carPitstops})
+									fastSpeaker.speakFast("LessPitstops", {conjunction: speaker.Fragments["But"]
+																		 , pitstops: driverPitstops - carPitstops})
 								else if !trackBehind.isFaster(sector, 0.75)
-									fastSpeaker.speakPhrase("Slipstream")
+									fastSpeaker.speakFast("Slipstream")
 							}
 							finally {
 								fastSpeaker.endTalk()
@@ -2650,9 +2657,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported
 														&& !standingsAhead.inRange(sector, true, overtakeThreshold)) {
-						fastSpeaker.speakPhrase("GotHim", {delta: speaker.number2Speech(delta, 1)
-														 , gained: speaker.number2Speech(deltaDifference, 1)
-														 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+						fastSpeaker.speakFast("GotHim", {delta: speaker.number2Speech(delta, 1)
+													   , gained: speaker.number2Speech(deltaDifference, 1)
+													   , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 						car := standingsAhead.Car
 
@@ -2661,18 +2668,18 @@ class RaceSpotter extends GridRaceAssistant {
 						unsafe := true
 
 						if (car.Incidents > 0)
-							fastSpeaker.speakPhrase("UnsafeDriverFront")
+							fastSpeaker.speakFast("UnsafeDriverFront")
 						else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
-							fastSpeaker.speakPhrase("InconsistentDriverFront")
+							fastSpeaker.speakFast("InconsistentDriverFront")
 						else
 							unsafe := false
 
 						carPitstops := standingsAhead.Car.Pitstops.Length
 
 						if (driverPitstops < carPitstops)
-							fastSpeaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
+							fastSpeaker.speakFast("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
 						else if (driverPitstops > carPitstops)
-							fastSpeaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
+							fastSpeaker.speakFast("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
 
 						standingsAhead.Reported := true
 
@@ -2753,9 +2760,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 					if ((delta <= behindAttackThreshold) && (standingsBehind.isFaster(sector) || standingsBehind.closingIn(sector, behindLostThreshold))
 														 && !standingsBehind.Reported) {
-						fastSpeaker.speakPhrase("ClosingIn", {delta: speaker.number2Speech(delta, 1)
-															, lost: speaker.number2Speech(deltaDifference, 1)
-															, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
+						fastSpeaker.speakFast("ClosingIn", {delta: speaker.number2Speech(delta, 1)
+														  , lost: speaker.number2Speech(deltaDifference, 1)
+														  , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 						car := standingsBehind.Car
 
@@ -2766,18 +2773,18 @@ class RaceSpotter extends GridRaceAssistant {
 						unsafe := true
 
 						if (car.Incidents > 0)
-							fastSpeaker.speakPhrase("UnsafeDriverBehind")
+							fastSpeaker.speakFast("UnsafeDriverBehind")
 						else if ((car.InvalidLaps >= this.DriverCar.InvalidLaps) && (car.InvalidLaps > (car.LastLap / 10)))
-							fastSpeaker.speakPhrase("InconsistentDriverBehind")
+							fastSpeaker.speakFast("InconsistentDriverBehind")
 						else
 							unsafe := false
 
 						carPitstops := standingsBehind.Car.Pitstops.Length
 
 						if (driverPitstops < carPitstops)
-							fastSpeaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
+							fastSpeaker.speakFast("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
 						else if (driverPitstops > carPitstops)
-							fastSpeaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
+							fastSpeaker.speakFast("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
 
 						standingsBehind.Reported := true
 
@@ -3258,15 +3265,21 @@ class RaceSpotter extends GridRaceAssistant {
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
 				if ((arguments.Length > 1) && (Random(1, 10) > 5)) {
-					car := arguments[2]
+					distance := (Round(arguments[1] / 50) * 50)
 
-					loop knowledgeBase.getValue("Car.Count")
-						if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
-							this.pushAlert("Accident" . type . "Driver", {forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-																	    , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+					if (distance > 0) {
+						car := arguments[2]
 
-							return
-						}
+						loop knowledgeBase.getValue("Car.Count")
+							if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
+								this.pushAlert("Accident" . type . "Driver", {distance: Round(convertUnit("Length", distance))
+																			, unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+																			, forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+																			, surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+
+								return
+							}
+					}
 				}
 
 				if ((arguments.Length > 0) && (type = "Ahead")) {

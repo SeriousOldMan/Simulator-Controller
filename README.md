@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.5.3.0-release]() (Early build for 6.5.3. Changes: Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-653) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

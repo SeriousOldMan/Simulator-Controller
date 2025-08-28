@@ -944,8 +944,6 @@ class SpeechRecognizer {
 						hideProgress()
 				}
 
-				deleteFile(audioFile)
-
 				SplitPath(audioFile, , , , &name)
 
 				try {
@@ -971,9 +969,6 @@ class SpeechRecognizer {
 				catch Any as exception {
 					logError(exception)
 				}
-				finally {
-					deleteFile(audioFile)
-				}
 			}
 			else if (this.Engine = "ElevenLabs") {
 				try {
@@ -997,9 +992,6 @@ class SpeechRecognizer {
 					logError(exception, true)
 
 					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
-				}
-				finally {
-					deleteFile(audioFile)
 				}
 			}
 		}

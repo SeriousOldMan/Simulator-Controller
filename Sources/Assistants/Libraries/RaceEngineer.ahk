@@ -870,12 +870,9 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						tyreChange := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
 
-						if (pitstop["TyreChange"] = kTrue) {
-							tyreChange := true
-
-							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", "Dry")
+						if tyreChange
+							pitstop["TyreCompound"] := compound(tyreChange
 															  , knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", "Black"))
-						}
 					}
 
 					pitstop["TyreChange"] := (tyreChange ? kTrue : kFalse)
@@ -960,7 +957,7 @@ class RaceEngineer extends RaceAssistant {
 						tyreChange := knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", false)
 
 						if tyreChange
-							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", tyreChange)
+							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound")
 															  , knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound.Color", "Black"))
 					}
 

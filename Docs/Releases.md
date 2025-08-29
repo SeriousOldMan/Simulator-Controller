@@ -31,9 +31,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Instructions for an LLM of the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
+  - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
   
 #### Changes
 
+  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
   - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
   - Also, the Spotter may mention the name of the driver who caused an accident.
   - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.

@@ -58,6 +58,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iReferenceModeAuto := true
 	iLoadReference := "None"
 
+	iSaveReference := false
+
 	iOnTrackCoaching := false
 	iFocusedCorners := []
 	iTelemetryFuture := false
@@ -264,6 +266,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	SaveReference {
+		Get {
+			return this.iSaveReference
+		}
+	}
+
 	AvailableTelemetry {
 		Get {
 			return this.iAvailableTelemetry
@@ -374,6 +382,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", "None")
+			this.iSaveReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Save", false)
 
 			if !this.LoadReference
 				this.iLoadReference := "None"
@@ -1242,6 +1251,70 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	saveReferenceTelemetry() {
+		local bestSessionLapTime := 999999
+		local bestSessionLap := kUndefined
+		local bestInfo := false
+		local bestDBLapTime := 999999
+		local bestDBLap := kUndefined
+		local info, telemetries, ignore, candidate, lapTime
+		local file, size, telemetry, driver, fileName
+
+		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
+			info := readMultiMap(A_LoopFileName)
+
+			if (SessionDatabase.getUserName() = getMultiMapValue(info, "Info", "Driver")) {
+				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
+
+				if (lapTime && ((bestSessionLap == kUndefined) || (lapTime < bestSessionLapTime))) {
+					bestSessionLap := A_LoopFileName
+					bestSessionLapTime := lapTime
+					bestInfo := info
+				}
+			}
+		}
+
+		if (bestSessionLap != kUndefined) {
+			SesionDatabase().getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
+
+			for ignore, candidate in telemetries {
+				info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+
+				lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+				if (lapTime && ((bestDBLap == kUndefined) || (lapTime < bestDBLapTime))) {
+					bestDBLap := candidate
+					bestDBLapTime := lapTime
+				}
+			}
+
+			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
+				fileName := (nickName . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
+									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "TrackTemperature", 27))
+									  . A_Space . getMultiMapValue(bestInfo, "Info", "Weather", "Dry")
+									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "Fuel", 0)) . "L"
+									  . " - " . Round(bestSessionLapTime, 2))
+
+				file := FileOpen(bestSessionLap, "r-wd")
+
+				if file {
+					size := file.Length
+
+					telemetry := Buffer(size)
+
+					file.RawRead(telemetry, size)
+
+					file.Close()
+
+					sessionDB.writeTelemetry(this.Simulator, this.Car, this.Track, fileName, telemetry, size
+										   , false, true, SessionDatabase.ID)
+
+					sessionDB.writeTelemetryInfo(this.Simulator, this.Car, this.Track, fileName, info)
+				}
+			}
+		}
+	}
+
 	getTelemetry(&reference?, corner?) {
 		local mode := this.ReferenceMode
 		local laps := getKeys(this.AvailableTelemetry)
@@ -1468,6 +1541,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if (sectorTimes && (sectorTimes.Length > 0))
 							setMultiMapValue(info, "Info", "SectorTimes", values2String(",", collect(sectorTimes, (t) => Round(t / 1000, 2))*))
+
+						setMultiMapValue(info, "Info", "Fuel", this.LastFuelAmount)
+						setMultiMapValue(info, "Info", "Weather", knowledgeBase.getValue("Weather", "Dry"))
+						setMultiMapValue(info, "Info", "AirTemperature", knowledgeBase.getValue("Weather.Temperature.Air", 23))
+						setMultiMapValue(info, "Info", "TrackTemperature", knowledgeBase.getValue("Weather.Temperature.Track", 27))
 
 						writeMultiMap(A_LoopFileFullPath . ".info", info)
 
@@ -1727,8 +1805,12 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	finishSession(shutdown := true) {
-		if (this.Session != kSessionFinished)
+		if (this.Session != kSessionFinished) {
+			if this.SaveReference
+				this.saveReferenceTelemetry()
+
 			this.shutdownTelemetryCoaching(false)
+		}
 
 		this.stopIssueAnalyzer()
 

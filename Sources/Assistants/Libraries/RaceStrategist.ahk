@@ -114,6 +114,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iDebugStrategyCounter := [1, 1, 1]
 
+	iCollectSessionKnowledge := false
+
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Strategist", remotePID)
@@ -849,6 +851,12 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	CollectSessionKnowledge {
+		Get {
+			return this.iCollectSessionKnowledge
+		}
+	}
+
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -858,6 +866,9 @@ class RaceStrategist extends GridRaceAssistant {
 													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
+
+		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+														, "Diagnostics", "Session", false)
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -2278,6 +2289,9 @@ class RaceStrategist extends GridRaceAssistant {
 												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
 					 , 1000, kLowPriority)
 
+		if this.CollectSessionKnowledge
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
+
 		return result
 	}
 
@@ -2334,6 +2348,27 @@ class RaceStrategist extends GridRaceAssistant {
 					 , 1000, kLowPriority)
 
 		return result
+	}
+
+	saveSessionKnowledge(lapNumber, simulator, car, track) {
+		local info
+
+		static startTime := false
+
+		if (lapNumber == 1) {
+			startTime := A_Now
+
+			DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+
+			info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+				   , Car: SessionDatabase.getCarName(simulator, car)
+				   , Track: SessionDatabase.getTrackName(simulator, track)}
+
+			FileAppend(JSON.print(info, "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Session.json")
+		}
+
+		if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+			FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
 	}
 
 	reportStrategy(options := true, strategy := false) {

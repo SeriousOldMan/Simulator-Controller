@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
@@ -238,6 +239,8 @@ class RaceEngineer extends RaceAssistant {
 	iCurrentBrakeTemperatures := false
 	iCurrentRemainingFuel := false
 
+	iCollectSessionKnowledge := false
+
 	class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Engineer", remotePID)
@@ -370,6 +373,12 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	CollectSessionKnowledge {
+		Get {
+			return this.iCollectSessionKnowledge
+		}
+	}
+
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -382,6 +391,9 @@ class RaceEngineer extends RaceAssistant {
 													  , TyreWearWarning: true, BrakeWearWarning: true
 													  , DamageReporting: true, DamageAnalysis: true
 													  , PressureReporting: true, WeatherUpdate: true}})
+
+		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+														, "Diagnostics", "Session", false)
 	}
 
 	updateConfigurationValues(values) {
@@ -722,6 +734,8 @@ class RaceEngineer extends RaceAssistant {
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
 				return convertUnit(unit, value, arguments*)
+			else if isNumber(value)
+				return Round(value, 2)
 			else
 				return value
 		}
@@ -945,12 +959,9 @@ class RaceEngineer extends RaceAssistant {
 					else {
 						tyreChange := knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", false)
 
-						if (pitstop["TyreChange"] = kTrue) {
-							tyreChange := true
-
-							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", "Dry")
+						if tyreChange
+							pitstop["TyreCompound"] := compound(knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound", tyreChange)
 															  , knowledgeBase.getValue("Pitstop." . nr . ".Tyre.Compound.Color", "Black"))
-						}
 					}
 
 					pitstop["TyreChange"] := (tyreChange ? kTrue : kFalse)
@@ -3351,6 +3362,9 @@ class RaceEngineer extends RaceAssistant {
 																		, data, simulator, car, track))
 					 , 1000, kLowPriority)
 
+		if this.CollectSessionKnowledge
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
+
 		return result
 	}
 
@@ -3522,6 +3536,27 @@ class RaceEngineer extends RaceAssistant {
 		finally {
 			this.iSessionDataActive := false
 		}
+	}
+
+	saveSessionKnowledge(lapNumber, simulator, car, track) {
+		local info
+
+		static startTime := false
+
+		if (lapNumber == 1) {
+			startTime := A_Now
+
+			DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+
+			info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+				   , Car: SessionDatabase.getCarName(simulator, car)
+				   , Track: SessionDatabase.getTrackName(simulator, track)}
+
+			FileAppend(JSON.print(info, "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Session.json")
+		}
+
+		if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+			FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
 	}
 
 	updateTyresDatabase() {

@@ -1318,6 +1318,8 @@ class RaceAssistant extends ConfigurationItem {
 		if options {
 			active := true
 
+			options := toMap(options)
+
 			if options.Has("include")
 				active := inList(options["include"], topic)
 			else

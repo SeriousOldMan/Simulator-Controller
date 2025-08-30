@@ -162,7 +162,7 @@ startupProcessManager() {
 	if getMultiMapValue(settings, "Process", "Memory.WatchDog", 10)
 		PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(settings, "Process", "Memory.Max", 1024))
 				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000, kHighPriority).start()
-				   
+
 	Sleep(4000)
 
 	if getMultiMapValue(settings, "Process", "Zombie.WatchDog", 10)
@@ -189,6 +189,19 @@ startupProcessManager() {
 				deleteFile(kUserHomeDirectory . "Diagnostics\Critical.log")
 
 			ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
+		}, 1000, kLowPriority)
+
+		Task.startTask(() {
+			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
+				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") > A_Now) {
+					RunWait("PowerShell.exe -Command Compress-Archive -Path '" . A_LoopFileFullPath . "\*' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . A_LoopFileName . ".zip'", , "Hide")
+
+					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
+						deleteFile(kTempDirectory . A_LoopFileName . ".zip")
+
+						deleteDirectory(A_LoopFileFullPath)
+					}
+				}
 		}, 1000, kLowPriority)
 	}
 }

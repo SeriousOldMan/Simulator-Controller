@@ -114,6 +114,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iDebugStrategyCounter := [1, 1, 1]
 
+	iCollectSessionKnowledge := false
+
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Strategist", remotePID)
@@ -849,6 +851,12 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
+	CollectSessionKnowledge {
+		Get {
+			return this.iCollectSessionKnowledge
+		}
+	}
+
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -858,6 +866,9 @@ class RaceStrategist extends GridRaceAssistant {
 													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
+
+		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+														, "Diagnostics", "Session", false)
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -1890,6 +1901,9 @@ class RaceStrategist extends GridRaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
+			if ((phase = "Before") && this.CollectSessionKnowledge)
+				this.saveSessionKnowledge("Finish")
+
 			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
 				if (this.Session == kSessionRace)
 					this.saveSessionSettings()
@@ -2278,6 +2292,9 @@ class RaceStrategist extends GridRaceAssistant {
 												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
 					 , 1000, kLowPriority)
 
+		if this.CollectSessionKnowledge
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
+
 		return result
 	}
 
@@ -2334,6 +2351,48 @@ class RaceStrategist extends GridRaceAssistant {
 					 , 1000, kLowPriority)
 
 		return result
+	}
+
+	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
+		local info, laps
+
+		static startTime := false
+		static lastLap := 0
+
+		if (lapNumber = "Finish") {
+			if startTime {
+				laps := this.KnowledgeBase.getValue("Lap", 0)
+
+				if (laps > 10) {
+					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+						   , Car: SessionDatabase.getCarName(simulator, car)
+						   , Track: SessionDatabase.getTrackName(simulator, track)
+						   , Laps: laps, Started: startTime, Finished: A_Now}
+
+					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Session.json")
+
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
+
+					DirCopy(kTempDirectory . "Race Strategist\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
+
+					startTime := false
+					lastLap := 0
+				}
+			}
+		}
+		else if (lapNumber = (lastLap + 1)) {
+			if (lapNumber == 1) {
+				startTime := A_Now
+
+				DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+			}
+
+			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime) {
+				FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
+
+				lastLap += 1
+			}
+		}
 	}
 
 	reportStrategy(options := true, strategy := false) {

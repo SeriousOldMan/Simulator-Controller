@@ -2357,6 +2357,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local info, laps
 
 		static startTime := false
+		static lastLap := 0
 
 		if (lapNumber = "Finish") {
 			if startTime {
@@ -2375,18 +2376,22 @@ class RaceStrategist extends GridRaceAssistant {
 					DirCopy(kTempDirectory . "Race Strategist\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
 
 					startTime := false
+					lastLap := 0
 				}
 			}
 		}
-		else {
+		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
 				startTime := A_Now
 
 				DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 			}
 
-			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime) {
 				FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
+
+				lastLap += 1
+			}
 		}
 	}
 

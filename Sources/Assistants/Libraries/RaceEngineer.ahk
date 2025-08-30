@@ -3546,6 +3546,7 @@ class RaceEngineer extends RaceAssistant {
 		local info, laps
 
 		static startTime := false
+		static laspLap := 0
 
 		if (lapNumber = "Finish") {
 			if startTime {
@@ -3564,10 +3565,11 @@ class RaceEngineer extends RaceAssistant {
 					DirCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
 
 					startTime := false
+					lastLap := 0
 				}
 			}
 		}
-		else {
+		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
 				startTime := A_Now
 
@@ -3576,6 +3578,9 @@ class RaceEngineer extends RaceAssistant {
 
 			if FileExist(kTempDirectory . "Race Engineer\Sessions\" . startTime)
 				FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
+
+				lastLap += 1
+			}
 		}
 	}
 

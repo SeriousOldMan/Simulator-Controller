@@ -1261,13 +1261,13 @@ class DrivingCoach extends GridRaceAssistant {
 		local file, size, telemetry, driver, fileName
 
 		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
-			info := readMultiMap(A_LoopFileName)
+			info := readMultiMap(A_LoopFileFullPath)
 
 			if (SessionDatabase.getUserName() = getMultiMapValue(info, "Info", "Driver")) {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 
 				if (lapTime && ((bestSessionLap == kUndefined) || (lapTime < bestSessionLapTime))) {
-					bestSessionLap := A_LoopFileName
+					bestSessionLap := A_LoopFileFullPath
 					bestSessionLapTime := lapTime
 					bestInfo := info
 				}

@@ -35,15 +35,16 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
-  - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
-  - Also, the Spotter may mention the name of the driver who caused an accident.
-  - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.
-  - The Spotter no longer tells you about a car directly behind you, which you actually have overtaken a moment before.
-  - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
-  - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
-  - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - [Important] The collection of telemetry data can now be enabled in the "Solo Center" without having the Telemetry Viewer open. Additionally, the Telemetry Viewer will no longer be opened by the *Auto Telemetry* setting. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
+  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
+  - A lot of optimizations and enhancements for the Spotter:
+    - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
+    - Also, the Spotter may mention the name of the driver who caused an accident.
+    - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.
+    - The Spotter no longer tells you about a car directly behind you, which you actually have just overtaken.
+    - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
+  - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
+    - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
 
 # Release history

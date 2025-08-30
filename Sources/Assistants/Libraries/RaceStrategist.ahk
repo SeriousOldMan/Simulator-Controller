@@ -1901,6 +1901,9 @@ class RaceStrategist extends GridRaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
+			if ((phase = "Before") && this.CollectSessionKnowledge)
+				this.saveSessionKnowledge("Finish")
+
 			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
 				if (this.Session == kSessionRace)
 					this.saveSessionSettings()
@@ -2350,25 +2353,41 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	saveSessionKnowledge(lapNumber, simulator, car, track) {
-		local info
+	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
+		local info, laps
 
 		static startTime := false
 
-		if (lapNumber == 1) {
-			startTime := A_Now
+		if (lapNumber = "Finish") {
+			if startTime {
+				laps := this.KnowledgeBase.getValue("Lap", 0)
 
-			DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+				if (laps > 10) {
+					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+						   , Car: SessionDatabase.getCarName(simulator, car)
+						   , Track: SessionDatabase.getTrackName(simulator, track)
+						   , Laps: laps, Started: startTime, Finished: A_Now}
 
-			info := {Simulator: SessionDatabase.getSimulatorName(simulator)
-				   , Car: SessionDatabase.getCarName(simulator, car)
-				   , Track: SessionDatabase.getTrackName(simulator, track)}
+					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Session.json")
 
-			FileAppend(JSON.print(info, "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Session.json")
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
+
+					DirCopy(kTempDirectory . "Race Strategist\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
+
+					startTime := false
+				}
+			}
 		}
+		else {
+			if (lapNumber == 1) {
+				startTime := A_Now
 
-		if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
-			FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
+				DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+			}
+
+			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+				FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
+		}
 	}
 
 	reportStrategy(options := true, strategy := false) {

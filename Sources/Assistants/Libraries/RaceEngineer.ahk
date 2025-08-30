@@ -394,6 +394,10 @@ class RaceEngineer extends RaceAssistant {
 
 		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 														, "Diagnostics", "Session", false)
+
+		deleteDirectory(kTempDirectory . "Race Engineer")
+
+		DirCreate(kTempDirectory . "Race Engineer")
 	}
 
 	updateConfigurationValues(values) {
@@ -2858,6 +2862,9 @@ class RaceEngineer extends RaceAssistant {
 		this.iSessionDataActive := true
 
 		try {
+			if ((phase = "Before") && this.CollectSessionKnowledge)
+				this.saveSessionKnowledge("Finish")
+
 			if (((phase = "After") && (this.SaveSettings = kAsk) && confirmed) || ((phase = "Before") && (this.SaveSettings = kAlways)))
 				if (this.Session == kSessionRace)
 					this.saveSessionSettings()
@@ -3535,25 +3542,41 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	saveSessionKnowledge(lapNumber, simulator, car, track) {
-		local info
+	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
+		local info, laps
 
 		static startTime := false
 
-		if (lapNumber == 1) {
-			startTime := A_Now
+		if (lapNumber = "Finish") {
+			if startTime {
+				laps := this.KnowledgeBase.getValue("Lap", 0)
 
-			DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+				if (laps > 10) {
+					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+						   , Car: SessionDatabase.getCarName(simulator, car)
+						   , Track: SessionDatabase.getTrackName(simulator, track)
+						   , Laps: laps, Started: startTime, Finished: A_Now}
 
-			info := {Simulator: SessionDatabase.getSimulatorName(simulator)
-				   , Car: SessionDatabase.getCarName(simulator, car)
-				   , Track: SessionDatabase.getTrackName(simulator, track)}
+					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Session.json")
 
-			FileAppend(JSON.print(info, "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Session.json")
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
+
+					DirCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
+
+					startTime := false
+				}
+			}
 		}
+		else {
+			if (lapNumber == 1) {
+				startTime := A_Now
 
-		if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
-			FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
+				DirCreate(kTempDirectory . "Race Engineer\Sessions\" . startTime)
+			}
+
+			if FileExist(kTempDirectory . "Race Engineer\Sessions\" . startTime)
+				FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
+		}
 	}
 
 	updateTyresDatabase() {

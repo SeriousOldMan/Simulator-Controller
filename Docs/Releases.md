@@ -42,10 +42,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Also, the Spotter may mention the name of the driver who caused an accident.
     - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.
     - The Spotter no longer tells you about a car directly behind you, which you actually have just overtaken.
-	- [Expert] All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
-	- [Expert] The "OpponentPitting" is now also signalled for *focused* opponents.
-	- [Expert] A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
     - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
+	- {Expert] A couple of updates to the *Conversation* and *Reasoning* booster events:
+	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
+	  - The "OpponentPitting" is now also signalled for *focused* opponents.
+	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
     - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.

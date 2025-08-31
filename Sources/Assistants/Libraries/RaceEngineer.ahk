@@ -3576,7 +3576,7 @@ class RaceEngineer extends RaceAssistant {
 				DirCreate(kTempDirectory . "Race Engineer\Sessions\" . startTime)
 			}
 
-			if FileExist(kTempDirectory . "Race Engineer\Sessions\" . startTime)
+			if FileExist(kTempDirectory . "Race Engineer\Sessions\" . startTime) {
 				FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
 
 				lastLap += 1

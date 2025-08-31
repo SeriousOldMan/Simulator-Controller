@@ -2153,7 +2153,7 @@ class RaceSpotter extends GridRaceAssistant {
 					this.TacticalAdvices[situation . focused.Car.LastLap] := true
 
 					speaker.speakPhrase("FocusPitting"
-									  , getDriverVariables(focusedCar.Car.Driver
+									  , getDriverVariables(focused.Car.Driver
 														 , {indicator: this.getCarIndicatorFragment(speaker, focused.Car.Nr, focused.Car.Position["Class"])}))
 
 					return true

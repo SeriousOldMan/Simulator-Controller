@@ -1258,7 +1258,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local bestDBLapTime := 999999
 		local bestDBLap := kUndefined
 		local sessionDB, info, telemetries, ignore, candidate, lapTime
-		local file, size, telemetry, driver, fileName
+		local file, size, telemetry, driver, fileName, nickName
 
 		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
 			info := readMultiMap(A_LoopFileFullPath)
@@ -1275,7 +1275,7 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if (bestSessionLap != kUndefined) {
-			sessionDB := SesionDatabase()
+			sessionDB := SessionDatabase()
 
 			sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
@@ -1291,6 +1291,8 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
+				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickName := true)
+
 				fileName := (nickName . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "TrackTemperature", 27))
 									  . A_Space . getMultiMapValue(bestInfo, "Info", "Weather", "Dry")
@@ -1313,7 +1315,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, fileName)
 
-					addMultiMapValues(infe, bestInfo)
+					addMultiMapValues(info, bestInfo)
 
 					sessionDB.writeTelemetryInfo(this.Simulator, this.Car, this.Track, fileName, info)
 				}

@@ -1293,13 +1293,15 @@ class DrivingCoach extends GridRaceAssistant {
 			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
 				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickName := true)
 
+				SplitPath(bestSessionLap, , &directory, , &fileName)
+
+				file := FileOpen(directory . "\" . fileName, "r-wd")
+
 				fileName := (nickName . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "TrackTemperature", 27))
 									  . A_Space . getMultiMapValue(bestInfo, "Info", "Weather", "Dry")
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "Fuel", 0)) . "L"
 									  . " - " . Round(bestSessionLapTime, 2))
-
-				file := FileOpen(bestSessionLap, "r-wd")
 
 				if file {
 					size := file.Length
@@ -1818,6 +1820,8 @@ class DrivingCoach extends GridRaceAssistant {
 				this.saveReferenceTelemetry(this.SaveReference)
 
 			this.shutdownTelemetryCoaching(false)
+
+			deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
 		}
 
 		this.stopIssueAnalyzer()

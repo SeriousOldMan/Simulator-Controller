@@ -2354,7 +2354,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
-		local info, laps
+		local info, laps, strategy
 
 		static startTime := false
 		static lastLap := 0
@@ -2384,11 +2384,14 @@ class RaceStrategist extends GridRaceAssistant {
 			if (lapNumber == 1) {
 				startTime := A_Now
 
-				DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+				DirCreate(kTempDirectory . "Race Strategist\Sessions\" . startTime)
 			}
 
-			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime) {
-				FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
+			if FileExist(kTempDirectory . "Race Strategist\Sessions\" . startTime) {
+				strategy := this.getKnowledge("Agent", {include: ["Strategy"]})
+
+				if (strategy.Count > 0)
+					FileAppend(JSON.print(strategy, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
 
 				lastLap += 1
 			}

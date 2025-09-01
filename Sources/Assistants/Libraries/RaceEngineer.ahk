@@ -3132,40 +3132,22 @@ class RaceEngineer extends RaceAssistant {
 																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RR", 0)))
 
 			if lastPitstop {
-				stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
-
 				pitstopHistory := this.createPitstopHistory()
 
-				if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined)
+				if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined) {
+					stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+
 					setMultiMapValue(sessionInfo, "Tyres", "Laps"
-												, values2String(",", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft")
-																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight")
-																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft")
-																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight")))
+												, values2String(",", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft") + stintLaps
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight") + stintLaps
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft") + stintLaps
+																   , getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight") + stintLaps))
+				}
 				else
 					setMultiMapValue(sessionInfo, "Tyres", "Laps", values2String(",", lapNumber, lapNumber, lapNumber, lapNumber))
 			}
 			else
 				setMultiMapValue(sessionInfo, "Tyres", "Laps", values2String(",", lapNumber, lapNumber, lapNumber, lapNumber))
-
-			if this.PitstopHistory {
-				tyreLaps := false
-
-				for ignore, pitstop in this.PitstopHistory
-					if (pitstop.Nr = lastPitstop) {
-						tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
-													 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
-
-						break
-					}
-			}
-
-			if !tyreLaps
-				tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
-
-			setMultiMapValue(sessionInfo, "Tyres", "Laps", tyreLaps)
-
-
 
 			if data {
 				bodyworkDamage := string2Values(",", getMultiMapValue(data, "Car Data", "BodyworkDamage", ""))
@@ -3546,7 +3528,7 @@ class RaceEngineer extends RaceAssistant {
 		local info, laps
 
 		static startTime := false
-		static laspLap := 0
+		static lastLap := 0
 
 		if (lapNumber = "Finish") {
 			if startTime {

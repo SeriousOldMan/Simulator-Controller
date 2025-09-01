@@ -8049,18 +8049,19 @@ class SoloCenter extends ConfigurationItem {
 
 				this.analyzeTelemetry()
 
-				if this.AutoTelemetry {
-					if isInstance(this.TelemetryCollector, TelemetryCollector) {
-						this.TelemetryCollector.shutdown()
+				if isInstance(this.TelemetryCollector, TelemetryCollector) {
+					this.TelemetryCollector.shutdown()
 
-						if this.TelemetryViewer
-							this.TelemetryViewer.updateCollecting()
-					}
+					if this.TelemetryViewer
+						this.TelemetryViewer.updateCollecting()
 
 					this.iTelemetryCollector := false
-
-					this.updateSessionMenu()
 				}
+
+				if this.AutoTelemetry
+					this.iTelemetryCollector := true
+
+				this.updateSessionMenu()
 			}
 			finally {
 				if fileName
@@ -8091,7 +8092,7 @@ class SoloCenter extends ConfigurationItem {
 							provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 																	, "Telemetry Viewer", "Provider", "Internal")
 
-							this.iTelemetryCollector := TelemetryCollector(provider, this.TelemetryDirectory
+							this.iTelemetryCollector := TelemetryCollector(provider, this.SessionDirectory . "Telemetry"
 																		 , this.Simulator, track, trackLength)
 						}
 

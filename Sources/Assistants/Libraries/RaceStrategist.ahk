@@ -2293,7 +2293,7 @@ class RaceStrategist extends GridRaceAssistant {
 					 , 1000, kLowPriority)
 
 		if this.CollectSessionKnowledge
-			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
 
 		return result
 	}
@@ -2353,7 +2353,10 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
+	saveSessionKnowledge(lapNumber) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
 		local info, laps, strategy
 
 		static startTime := false

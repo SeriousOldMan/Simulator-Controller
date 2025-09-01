@@ -3349,7 +3349,7 @@ class RaceEngineer extends RaceAssistant {
 					 , 1000, kLowPriority)
 
 		if this.CollectSessionKnowledge
-			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
 
 		return result
 	}
@@ -3524,7 +3524,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
+	saveSessionKnowledge(lapNumber) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
 		local info, laps
 
 		static startTime := false

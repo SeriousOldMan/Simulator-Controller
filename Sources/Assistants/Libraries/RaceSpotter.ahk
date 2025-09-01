@@ -2533,8 +2533,8 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
-	informSectorDifference(speaker, otherCar, mode) {
-		local sectors := string2Values(",", speaker.Fragments["Sectors"])
+	informSectorDifference(fastSpeaker, otherCar, mode) {
+		local sectors := string2Values(",", fastSpeaker.Fragments["Sectors"])
 		local driverCar := this.DriverCar
 		local betterSectors := []
 		local driverSectorTime, otherSectorTime, sector1, sector2
@@ -2552,16 +2552,16 @@ class RaceSpotter extends GridRaceAssistant {
 		if (betterSectors.Length = 1) {
 			sector1 := betterSectors[1]
 
-			speaker.speakFast((mode = "Ahead") ? "SectorFasterAhead" : "SectorSlowerBehind"
-							, {sector: sectors[sector1[1]], sectorTime: speaker.number2Speech(sector1[4], 1)})
+			fastSpeaker.speakFast((mode = "Ahead") ? "SectorFasterAhead" : "SectorSlowerBehind"
+								, {sector: sectors[sector1[1]], sectorTime: fastSpeaker.number2Speech(sector1[4], 1)})
 		}
 		else if (betterSectors.Length = 2) {
 			sector1 := betterSectors[1]
 			sector2 := betterSectors[2]
 
-			speaker.speakFast((mode = "Ahead") ? "SectorsFasterAhead" : "SectorsSlowerBehind"
-							, {sector1: sectors[sector1[1]], sector1Time: speaker.number2Speech(sector1[4], 1)
-							 , sector2: sectors[sector2[1]], sector2Time: speaker.number2Speech(sector2[4], 1)})
+			fastSpeaker.speakFast((mode = "Ahead") ? "SectorsFasterAhead" : "SectorsSlowerBehind"
+								, {sector1: sectors[sector1[1]], sector1Time: fastSpeaker.number2Speech(sector1[4], 1)
+								 , sector2: sectors[sector2[1]], sector2Time: fastSpeaker.number2Speech(sector2[4], 1)})
 		}
 	}
 
@@ -2806,7 +2806,7 @@ class RaceSpotter extends GridRaceAssistant {
 					car := standingsBehind.Car
 
 					if speak
-						this.informSectorDifference(speaker, car, "Behind")
+						this.informSectorDifference(fastSpeaker, car, "Behind")
 
 					this.handleEvent("AttackImminent", standingsBehind.Car.Nr, Round(delta, 1))
 

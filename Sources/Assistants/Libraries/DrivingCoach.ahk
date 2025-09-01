@@ -1816,7 +1816,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	finishSession(shutdown := true) {
 		if (this.Session != kSessionFinished) {
-			if (this.SaveReference != "Off")
+			if (this.Prepared && (this.SaveReference != "Off"))
 				this.saveReferenceTelemetry(this.SaveReference)
 
 			this.shutdownTelemetryCoaching(false)

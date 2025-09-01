@@ -1504,6 +1504,7 @@ class RaceAssistant extends ConfigurationItem {
 				try {
 					knowledge["Stint"] := Map("Driver", this.DriverFullName
 											, "Lap", (lapNumber + 1)
+											, "OverallPosition", knowledgeBase.getValue("Position", 0)
 											, "LastLapTime", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0) / 1000, 1) . " Seconds")
 											, "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining", 0), knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0)) / 1000) . " Seconds"))
 

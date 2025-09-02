@@ -1439,6 +1439,8 @@ class RaceAssistant extends ConfigurationItem {
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
 				return convertUnit(unit, value, arguments*)
+			else if isNumber(value)
+				return Round(value, 2)
 			else
 				return value
 		}

@@ -190,25 +190,25 @@ startupProcessManager() {
 
 			ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kUserHomeDirectory . "Diagnostics\Usage.stat", "Diagnostics-Uploads/" . ID . ".Usage.stat")
 		}, 1000, kLowPriority)
-	}
 
-	Task.startTask(() {
-		local processed := []
-		local ignore, directory
+		Task.startTask(() {
+			local processed := []
+			local ignore, directory
 
-		loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
-			if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") < A_Now) {
-				RunWait("PowerShell.exe -Command Compress-Archive -Path '" . A_LoopFileFullPath . "\*' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . A_LoopFileName . ".zip'", , "Hide")
+			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
+				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") < A_Now) {
+					RunWait("PowerShell.exe -Command Compress-Archive -Path '" . A_LoopFileFullPath . "\*' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . A_LoopFileName . ".zip'", , "Hide")
 
-				if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
-					deleteFile(kTempDirectory . A_LoopFileName . ".zip")
+					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
+						deleteFile(kTempDirectory . A_LoopFileName . ".zip")
 
-					processed.Push(A_LoopFileFullPath)
+						processed.Push(A_LoopFileFullPath)
+					}
 				}
-			}
 
-		do(processed, deleteDirectory)
-	}, 1000, kLowPriority)
+			do(processed, deleteDirectory)
+		}, 1000, kLowPriority)
+	}
 }
 
 

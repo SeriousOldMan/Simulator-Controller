@@ -3302,6 +3302,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	accidentAlert(type, arguments*) {
+		local knowledgeBase := this.KnowledgeBase
 		local numArgs, distance, car
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
@@ -3315,15 +3316,26 @@ class RaceSpotter extends GridRaceAssistant {
 						if ((numArgs > 1) && (Random(1, 10) > 5)) {
 							car := arguments[2]
 
-							loop knowledgeBase.getValue("Car.Count")
-								if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
-									this.pushAlert("Accident" . type . "Driver", {distance: Round(convertUnit("Length", distance))
-																				, unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-																				, forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-																				, surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+							if (car = knowledgeBase.getValue("Car." . car . ".LID", knowledgeBase.getValue("Car." . car . ".ID"))) {
+								this.pushAlert("Accident" . type . "Driver"
+											 , {distance: Round(convertUnit("Length", distance))
+											  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+											  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+											  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
-									return
-								}
+								return
+							}
+							else
+								loop knowledgeBase.getValue("Car.Count")
+									if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
+										this.pushAlert("Accident" . type . "Driver"
+													 , {distance: Round(convertUnit("Length", distance))
+													  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+													  , forName: knowledgeBase.getValue("Car." . A_Index . ".Driver.ForName", "John")
+													  , surName: knowledgeBase.getValue("Car." . A_Index . ".Driver.SurName", "Doe")})
+
+										return
+									}
 						}
 
 						if (type = "Ahead") {

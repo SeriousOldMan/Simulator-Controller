@@ -32,6 +32,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Instructions for an LLM of the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
+  - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
   
 #### Changes
 

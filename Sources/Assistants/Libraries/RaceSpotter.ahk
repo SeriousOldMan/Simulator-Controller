@@ -3302,37 +3302,40 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	accidentAlert(type, arguments*) {
-		local distance, car
+		local numArgs, distance, car
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)
 			if (this.Announcements["Accidents" . type] && this.Speaker[false] && this.Running && this.hasEnoughData(false)) {
-				if ((arguments.Length > 1) && (Random(1, 10) > 5)) {
+				numArgs := arguments.Length
+
+				if (numArgs > 0) {
 					distance := (Round(arguments[1] / 50) * 50)
 
 					if (distance > 0) {
-						car := arguments[2]
+						if ((numArgs > 1) && (Random(1, 10) > 5)) {
+							car := arguments[2]
 
-						loop knowledgeBase.getValue("Car.Count")
-							if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
-								this.pushAlert("Accident" . type . "Driver", {distance: Round(convertUnit("Length", distance))
-																			, unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-																			, forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-																			, surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+							loop knowledgeBase.getValue("Car.Count")
+								if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
+									this.pushAlert("Accident" . type . "Driver", {distance: Round(convertUnit("Length", distance))
+																				, unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+																				, forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+																				, surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
-								return
-							}
+									return
+								}
+						}
+
+						if (type = "Ahead") {
+							this.pushAlert("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
+																		  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]})
+
+							return
+						}
 					}
 				}
 
-				if ((arguments.Length > 0) && (type = "Ahead")) {
-					distance := (Round(arguments[1] / 50) * 50)
-
-					if (distance > 0)
-						this.pushAlert("Accident" . type . "Distance", {distance: Round(convertUnit("Length", distance))
-																	  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]})
-				}
-				else
-					this.pushAlert("Accident" . type, false, false, "Accident" . type)
+				this.pushAlert("Accident" . type, false, false, "Accident" . type)
 			}
 	}
 

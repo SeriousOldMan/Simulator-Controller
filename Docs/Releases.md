@@ -40,7 +40,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - A lot of optimizations and enhancements for the Spotter:
     - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
     - Also, the Spotter may mention the name of the driver who caused an accident.
-    - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.
+    - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is, that a configured *Rephrasing* booster is not used in those cases.
     - The Spotter no longer tells you about a car directly behind you, which you actually have just overtaken.
     - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
 	- {Expert] A couple of updates to the *Conversation* and *Reasoning* booster events:

@@ -947,8 +947,8 @@ class RaceSpotter extends GridRaceAssistant {
 			speakFast(phrase, variables := false, focus := false, cache := false, options := false) {
 				if !this.Talking
 					if !options
-						options := {rephrase: false}
-					else if !options.Has("rephrase")
+						options := {Rephrase: false}
+					else if !options.Has("Rephrase")
 						options.rephrase := false
 
 				if this.Awaitable
@@ -965,9 +965,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if !this.Talking
 					if !options {
-						options := {rephrase: false}
+						options := {Rephrase: false}
 					}
-					else if !options.Has("rephrase")
+					else if !options.Has("Rephrase")
 						options.rephrase := false
 
 				try {
@@ -2307,7 +2307,7 @@ class RaceSpotter extends GridRaceAssistant {
 								fastSpeaker.speakFast("Slipstream")
 						}
 						finally {
-							fastSpeaker.endTalk({rephrase: false})
+							fastSpeaker.endTalk({Rephrase: false})
 						}
 
 						return speak
@@ -2988,7 +2988,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 		finally {
-			fastSpeaker.endTalk({rephrase: false})
+			fastSpeaker.endTalk({Rephrase: false})
 			speaker.endTalk()
 		}
 

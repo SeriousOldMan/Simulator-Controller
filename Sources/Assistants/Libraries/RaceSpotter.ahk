@@ -2702,7 +2702,7 @@ class RaceSpotter extends GridRaceAssistant {
 					car := standingsAhead.Car
 
 					if speak
-						this.informSectorDifference(speaker, car, "Ahead")
+						this.informSectorDifference(fastSpeaker, car, "Ahead")
 
 					unsafe := true
 

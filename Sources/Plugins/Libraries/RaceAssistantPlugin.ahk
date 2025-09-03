@@ -482,6 +482,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static WaitForShutdown[teamServer := false] {
 		Get {
+			if (GetKeyState("Shift") && GetKeyState("Ctrl")) {
+				RaceAssistantPlugin.sTeamServerWaitForShutdown := 0
+				RaceAssistantPlugin.sAssistantWaitForShutdown := 0
+			}
+
 			return (A_TickCount < (teamServer ? RaceAssistantPlugin.sTeamServerWaitForShutdown
 											  : RaceAssistantPlugin.sAssistantWaitForShutdown))
 		}

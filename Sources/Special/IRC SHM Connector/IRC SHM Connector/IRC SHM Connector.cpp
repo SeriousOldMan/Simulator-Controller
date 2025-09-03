@@ -776,7 +776,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 					printLine(output, "Car." + std::string(carIdx1) + ".InPitLane=" + std::string(((bool*)pitLaneStates)[carIndex] ? "true" : "false"));
 
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxTrackSurface"))
-					printLine(output, "Car." + std::string(carIdx1) + "InPit=" + (((irsdk_TrkLoc*)pitLaneStates)[carIndex] == irsdk_InPitStall ? "true" : "false"));
+					printLine(output, "Car." + std::string(carIdx1) + ".InPit=" + (((irsdk_TrkLoc*)pitLaneStates)[carIndex] == irsdk_InPitStall ? "true" : "false"));
 			}
 		}
 

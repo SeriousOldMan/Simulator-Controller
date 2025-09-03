@@ -3325,24 +3325,30 @@ class RaceSpotter extends GridRaceAssistant {
 							car := arguments[2]
 
 							if (car = knowledgeBase.getValue("Car." . car . ".LID", knowledgeBase.getValue("Car." . car . ".ID"))) {
-								this.pushAlert("Accident" . type . "Driver"
-											 , {distance: Round(convertUnit("Length", distance))
-											  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-											  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-											  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+								if (this.getClass() = this.getClass(car)) {
+									this.pushAlert("Accident" . type . "Driver"
+												 , {distance: Round(convertUnit("Length", distance))
+												  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+												  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
+												  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
 
-								return
+									return
+								}
 							}
 							else
 								loop knowledgeBase.getValue("Car.Count")
 									if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
-										this.pushAlert("Accident" . type . "Driver"
-													 , {distance: Round(convertUnit("Length", distance))
-													  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-													  , forName: knowledgeBase.getValue("Car." . A_Index . ".Driver.ForName", "John")
-													  , surName: knowledgeBase.getValue("Car." . A_Index . ".Driver.SurName", "Doe")})
+										if (this.getClass() = this.getClass(A_Index)) {
+											this.pushAlert("Accident" . type . "Driver"
+														 , {distance: Round(convertUnit("Length", distance))
+														  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
+														  , forName: knowledgeBase.getValue("Car." . A_Index . ".Driver.ForName", "John")
+														  , surName: knowledgeBase.getValue("Car." . A_Index . ".Driver.SurName", "Doe")})
 
-										return
+											return
+										}
+										else
+											break
 									}
 						}
 

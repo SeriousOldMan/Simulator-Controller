@@ -877,6 +877,7 @@ class RaceSpotter extends GridRaceAssistant {
 	iFinalLap := false
 
 	iPendingAlerts := []
+	iHadAlerts := false
 	iAlertProcessing := false
 
 	iLastPenalty := false
@@ -1235,6 +1236,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iRunning := false
 			this.iFinalLap := false
 			this.iEnabled := true
+
+			this.iPendingAlerts := []
+			this.iHadAlerts := false
 
 			this.initializeHistory()
 		}
@@ -3204,7 +3208,10 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	superfluousAlert(alert) {
-		return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		if (alert = "Green")
+			return this.iHadAlerts
+		else
+			return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
 	nextAlert() {
@@ -3214,6 +3221,7 @@ class RaceSpotter extends GridRaceAssistant {
 	pushAlert(alert, arguments*) {
 		if !this.superfluousAlert(alert) {
 			this.iPendingAlerts.Push(Array(alert, arguments*))
+			this.iHadAlerts := true
 
 			this.processAlerts(false)
 		}
@@ -3302,6 +3310,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	accidentAlert(type, arguments*) {
+		local knowledgeBase := this.KnowledgeBase
 		local numArgs, distance, car
 
 		if (((type = "Ahead") || (this.Session = kSessionRace)) && !this.PrivateSession)

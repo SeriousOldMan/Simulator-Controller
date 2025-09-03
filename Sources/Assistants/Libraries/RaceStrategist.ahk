@@ -1091,6 +1091,8 @@ class RaceStrategist extends GridRaceAssistant {
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
 				return convertUnit(unit, value, arguments*)
+			else if isNumber(value)
+				return Round(value, 2)
 			else
 				return value
 		}
@@ -2374,9 +2376,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Session.json")
 
-					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 
-					DirCopy(kTempDirectory . "Race Strategist\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
+					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions" . startTime, 1)
 
 					startTime := false
 					lastLap := 0

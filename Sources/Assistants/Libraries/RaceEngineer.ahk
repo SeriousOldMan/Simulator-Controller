@@ -808,7 +808,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 
 					if brakeService
-						pitstop["BrakeChange"] := knowledgeBase.getValue("Brake.Change.Target", false)
+						pitstop["BrakeChange"] := (knowledgeBase.getValue("Brake.Change.Target", false) ? kTrue : kFalse)
 				}
 
 				return pitstop
@@ -3545,9 +3545,9 @@ class RaceEngineer extends RaceAssistant {
 
 					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Session.json")
 
-					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 
-					DirCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
+					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions" . startTime, 1)
 
 					startTime := false
 					lastLap := 0

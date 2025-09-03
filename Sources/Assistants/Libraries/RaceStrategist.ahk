@@ -4427,6 +4427,9 @@ class RaceStrategist extends GridRaceAssistant {
 		raceInfo["Driver"] := getMultiMapValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getMultiMapValue(raceData, "Cars", "Count")
 
+		if (raceInfo["Cars"] = 0)
+			return
+
 		if getMultiMapValue(raceData, "Cars", "Slots", false)
 			raceInfo["Slots"] := string2Map("|", "->", getMultiMapValue(raceData, "Cars", "Slots"))
 		else if this.RaceInfo
@@ -4501,8 +4504,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if slots
 			raceInfo["Slots"] := slots
 
-		if (raceInfo["Cars"] > 0)
-			this.updateSessionValues({RaceInfo: raceInfo})
+		this.updateSessionValues({RaceInfo: raceInfo})
 	}
 
 	saveStandingsData(lapNumber, simulator, car, track) {

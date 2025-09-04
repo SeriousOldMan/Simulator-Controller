@@ -415,7 +415,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				printf("Car.%d.Nr=%d\n", i, i);
-				printf("Car.%d.LID=%d\n", i, i);
+				printf("Car.%d.ID=%d\n", i, i);
 				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
 				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
 				printf("Car.%d.Laps=%d\n", i, vehicle.mLapsCompleted);

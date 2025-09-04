@@ -280,7 +280,7 @@ namespace ACSHMProvider
                 {
                     ref AcCarInfo car = ref cars.cars[i - 1];
 
-					Console.Write("Car."); Console.Write(i); Console.Write(".LID="); Console.WriteLine(i);
+					Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(car.carId);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 

@@ -3324,7 +3324,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if ((numArgs > 1) && (Random(1, 10) > 5)) {
 							car := arguments[2]
 
-							if (car = knowledgeBase.getValue("Car." . car . ".LID", knowledgeBase.getValue("Car." . car . ".ID"))) {
+							if (car = knowledgeBase.getValue("Car." . car . ".ID")) {
 								if (this.getClass() = this.getClass(car)) {
 									this.pushAlert("Accident" . type . "Driver"
 												 , {distance: Round(convertUnit("Length", distance))
@@ -3337,7 +3337,7 @@ class RaceSpotter extends GridRaceAssistant {
 							}
 							else
 								loop knowledgeBase.getValue("Car.Count")
-									if (car = knowledgeBase.getValue("Car." . A_Index . ".LID", knowledgeBase.getValue("Car." . A_Index . ".ID"))) {
+									if (car = knowledgeBase.getValue("Car." . A_Index . ".ID")) {
 										if (this.getClass() = this.getClass(A_Index)) {
 											this.pushAlert("Accident" . type . "Driver"
 														 , {distance: Round(convertUnit("Length", distance))

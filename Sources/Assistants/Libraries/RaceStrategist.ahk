@@ -2378,7 +2378,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 
-					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions" . startTime, 1)
+					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions\" . startTime, 1)
 
 					startTime := false
 					lastLap := 0
@@ -2387,7 +2387,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
-				startTime := A_Now
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", A_Now)
 
 				DirCreate(kTempDirectory . "Race Strategist\Sessions\" . startTime)
 			}

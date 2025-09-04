@@ -30,6 +30,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static sAssistants := []
 
 	static sSession := 0 ; kSessionFinished
+	static sSessionStartTime := false
 	static sStintStartTime := false
 	static sLastLap := 0
 	static sLapRunning := 0
@@ -1205,6 +1206,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static initializeAssistantsState() {
 		RaceAssistantPlugin.sSession := kSessionFinished
+		RaceAssistantPlugin.sSessionStartTime := false
 		RaceAssistantPlugin.sStintStartTime := false
 		RaceAssistantPlugin.sLastLap := 0
 		RaceAssistantPlugin.sLapRunning := 0
@@ -1366,6 +1368,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.Simulator {
 			RaceAssistantPlugin.sSession := RaceAssistantPlugin.getSession(data)
+			RaceAssistantPlugin.sSessionStartTime := false
 			RaceAssistantPlugin.sStintStartTime := false
 			RaceAssistantPlugin.sFinish := false
 
@@ -1450,6 +1453,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
+		if RaceAssistantPlugin.sSessionStartTime {
+			setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+			setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+		}
+
 		if RaceAssistantPlugin.sStintStartTime {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
 			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
@@ -1468,6 +1476,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static updateAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
+
+		if RaceAssistantPlugin.sSessionStartTime {
+			setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+			setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+		}
 
 		if RaceAssistantPlugin.sStintStartTime {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
@@ -2644,6 +2657,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
+
+						if !RaceAssistantPlugin.sSessionStartTime
+							RaceAssistantPlugin.sSessionStartTime := A_Now
 
 						RaceAssistantPlugin.sStintStartTime := false
 

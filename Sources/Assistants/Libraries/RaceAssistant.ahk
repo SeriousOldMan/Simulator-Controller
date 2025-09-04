@@ -2686,6 +2686,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.updateDynamicValues({EnoughData: enoughData, Data: data})
 
+		if (!knowledgeBase.hasFact("Session.StartTime") && getMultiMapValue(data, "Session Data", "StartTime", false))
+			knowledgeBase.addFact("Session.StartTime", getMultiMapValue(data, "Session Data", "StartTime"))
+
 		sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))

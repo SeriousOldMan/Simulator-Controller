@@ -34,6 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
   - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
+  - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
   
 #### Changes
 

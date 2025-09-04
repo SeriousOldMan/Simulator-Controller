@@ -718,8 +718,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarNumber:", carIdx);
 
-				printLine(output, "Car." + std::string(carIdx1) + ".ID=" + std::string(carIdx1));
-				printLine(output, "Car." + std::string(carIdx1) + ".LID=" + std::string(carIdx));
+				printLine(output, "Car." + std::string(carIdx1) + ".ID=" + std::string(carIdx));
 				printLine(output, "Car." + std::string(carIdx1) + ".Nr=" + std::string(result));
 
 				if (carPositions)
@@ -776,7 +775,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 					printLine(output, "Car." + std::string(carIdx1) + ".InPitLane=" + std::string(((bool*)pitLaneStates)[carIndex] ? "true" : "false"));
 
 				if (getRawDataValue(pitLaneStates, header, data, "CarIdxTrackSurface"))
-					printLine(output, "Car." + std::string(carIdx1) + "InPit=" + (((irsdk_TrkLoc*)pitLaneStates)[carIndex] == irsdk_InPitStall ? "true" : "false"));
+					printLine(output, "Car." + std::string(carIdx1) + ".InPit=" + (((irsdk_TrkLoc*)pitLaneStates)[carIndex] == irsdk_InPitStall ? "true" : "false"));
 			}
 		}
 

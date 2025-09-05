@@ -304,7 +304,7 @@ createTrackMap(simulator, track, fileName) {
 		deleteFile(fileName)
 
 		if trackData
-			deleteFile(fileName)
+			deleteFile(trackData)
 
 		Sleep(10000)
 

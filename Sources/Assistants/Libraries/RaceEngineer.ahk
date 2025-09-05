@@ -731,7 +731,7 @@ class RaceEngineer extends RaceAssistant {
 		local lapNumber, tyres, brakes, tyreCompound, tyreType, setupPressures, idealPressures, ignore, tyreType, goal, resultSet
 		local bodyworkDamage, suspensionDamage, engineDamage, bodyworkDamageSum, suspensionDamageSum, pitstop, pitstops, lap, lapNr
 		local tyres, brakes, postfix, tyre, brake, tyreTemperatures, tyrePressures, tyreWear, brakeTemperatures, brakeWear
-		local fuelService, tyreService, brakeService, repairService, tyreSet
+		local fuelService, tyreService, brakeService, repairService, tyreSet, pitstopHistory, stintLaps, lastPitstop
 
 		static wheels := ["FL", "FR", "RL", "RR"]
 
@@ -1170,6 +1170,25 @@ class RaceEngineer extends RaceAssistant {
 											, "FrontRight", (convert("Temperature", this.CurrentTyreTemperatures[2]) . temperatureUnit)
 											, "RearLeft", (convert("Temperature", this.CurrentTyreTemperatures[3]) . temperatureUnit)
 											, "RearRight", (convert("Temperature", this.CurrentTyreTemperatures[4]) . temperatureUnit)))
+
+					lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
+					if lastPitstop {
+						pitstopHistory := this.createPitstopHistory()
+
+						if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined) {
+							stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
+
+							tyres["Laps"] := Map("FrontLeft", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft") + stintLaps
+											   , "FrontRight", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight") + stintLaps
+											   , "RearLeft", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft") + stintLaps
+											   , "RearRight", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight") + stintLaps)
+						}
+						else
+							tyres["Laps"] := Map("FrontLeft", lapNumber, "FrontRight", lapNumber, "RearLeft", lapNumber, "RearRight", lapNumber)
+					}
+					else
+						tyres["Laps"] := Map("FrontLeft", lapNumber, "FrontRight", lapNumber, "RearLeft", lapNumber, "RearRight", lapNumber)
 				}
 				catch Any as exception {
 					logError(exception, true)

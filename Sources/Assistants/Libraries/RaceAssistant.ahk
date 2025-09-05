@@ -1491,7 +1491,7 @@ class RaceAssistant extends ConfigurationItem {
 											  , "Car", car
 											  , "Track", track
 											  , "TrackType", this.TrackType
-											  , "TrackLength", (this.TrackLength . " Meters")
+											  , "TrackLength", (Round(this.TrackLength, 1) . " Meters")
 											  , "Type", sessionTypes[this.Session]
 											  , "Format", sessionFormat
 											  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))

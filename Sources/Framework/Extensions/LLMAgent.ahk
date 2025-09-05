@@ -103,7 +103,7 @@ class AgentBooster extends LLMBooster {
 						addMultiMapValues(instructions[instrLanguage], readMultiMap(A_LoopFilePath))
 					}
 
-				for key, value in getMultiMapValues(this.Configuration, "Agent Booster")
+				for key, value in getMultiMapValues(this.Configuration, "Agent Booster") {
 					if (InStr(key, this.Descriptor . ".Instructions.") = 1) {
 						if (value == true)
 							key := false
@@ -130,6 +130,7 @@ class AgentBooster extends LLMBooster {
 
 						setMultiMapValue(instructions[instrLanguage], key[2] . ".Instructions", key[3], value)
 					}
+				}
 
 				this.iInstructions := instructions
 			}

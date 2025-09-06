@@ -3785,7 +3785,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if ((tyreCompoundColor != kUndefined) && InStr(tyreCompoundColor, ",")) {
 					tyreCompoundColor := collect(string2Values(",", tyreCompoundColor), (cc) => ((cc = "-") ? false : cc))
-					first := false
+					first := true
 
 					if (tyreService = "Wheel") {
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {

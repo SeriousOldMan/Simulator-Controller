@@ -264,7 +264,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData
+		local sessionData, paused
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -388,10 +388,14 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
-			if (!getMultiMapValue(data, "Session Data", "Paused", false) && sessionData.Paused)
-				setMultiMapValue(data, "Session Data", "Paused", true)
+			paused := sessionData.Paused
 
-			if getMultiMapValue(data, "Session Data", "Paused", false)
+			if paused {
+				setMultiMapValue(data, "Session Data", "Active", true)
+				setMultiMapValue(data, "Session Data", "Paused", true)
+			}
+
+			if (paused || getMultiMapValue(data, "Session Data", "Paused", false))
 				removeMultiMapValues(data, "Position Data")
 
 			if !InStr(options, "Standings=true") {

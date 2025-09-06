@@ -360,6 +360,8 @@ namespace SHMConnector {
 
 				strWriter.Write("SessionLapsRemaining="); strWriter.WriteLine(GetRemainingLaps(ref playerScoring));
 			}
+			else
+				strWriter.WriteLine("Paused=false");
 
 			strWriter.WriteLine("[Stint Data]");
 			if (connected) {

@@ -1100,9 +1100,16 @@ class LMURESTProvider {
 
 		isPaused() {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+			local state
 
-			if (data && data.Has("MultiStintState"))
-				return (data["MultiStintState"] != "DRIVING")
+			if data {
+				if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+					return "Not Driving"
+				else if (data.Has("MultiStintState") && (data["MultiStintState"] != "Driving"))
+					return "Driving"
+				else
+					return false
+			}
 			else
 				return true
 		}

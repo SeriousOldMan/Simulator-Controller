@@ -35,6 +35,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
   - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
+  - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
   
 #### Changes
 
@@ -48,9 +49,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
 	- {Expert] A couple of updates to the *Conversation* and *Reasoning* booster events:
 	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
-	  - The "OpponentPitting" is now also signalled for *focused* opponents.
+	  - The "OpponentPitting" event in the *Reasoning* booster is now also signalled for *focused* opponents.
 	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
+    - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster.
     - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
 

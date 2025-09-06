@@ -228,6 +228,7 @@ namespace RF2SHMProvider {
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			string session = "";
+			bool running = (connected && (extended.mSimulationThreadStarted != 0));
 
 			Console.WriteLine("[Session Data]");
 			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");

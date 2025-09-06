@@ -319,10 +319,9 @@ namespace SHMConnector {
 			string session = "";
 
 			strWriter.WriteLine("[Session Data]");
-			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)
-                                                                       && GetStringFromBytes(playerTelemetry.mTrackName) != "") ? "true" : "false");
+			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
-				if (playerTelemetry.mWheels == null)
+				if ((playerTelemetry.mWheels == null) || (playerTelemetry.mTrackName == null))
 					strWriter.WriteLine("Paused=true");
 				else
 				{

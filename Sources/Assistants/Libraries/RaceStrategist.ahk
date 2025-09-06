@@ -2368,7 +2368,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if startTime {
 				laps := this.KnowledgeBase.getValue("Lap", 0)
 
-				if (laps > 10) {
+				if (laps >= 20) {
 					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
 						   , Car: SessionDatabase.getCarName(simulator, car)
 						   , Track: SessionDatabase.getTrackName(simulator, track)

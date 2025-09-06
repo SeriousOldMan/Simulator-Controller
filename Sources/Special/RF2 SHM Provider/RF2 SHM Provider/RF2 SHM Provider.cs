@@ -230,10 +230,9 @@ namespace RF2SHMProvider {
 			string session = "";
 
 			Console.WriteLine("[Session Data]");
-			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)
-																   && GetStringFromBytes(playerTelemetry.mTrackName) != "") ? "true" : "false");
+			Console.Write("Active="); Console.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
-				if (playerTelemetry.mWheels == null)
+				if ((playerTelemetry.mWheels == null) || (playerTelemetry.mTrackName == null))
 					Console.WriteLine("Paused=true");
 				else
 				{

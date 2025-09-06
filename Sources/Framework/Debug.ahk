@@ -272,6 +272,9 @@ logError(exception, unexpected := false, report := true) {
 
 	static verbose := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Debug", "Verbose", debug && !A_IsCompiled)
 
+	if (debug && !unexpected)
+		report := false
+
 	if isObject(exception) {
 		message := exception.Message
 

@@ -36,6 +36,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
   - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
   - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
+  - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
+  - Fixed premature end of session in team races after a driver swap for *Le Mans Ultimate*.
+  - Fixed a critical bug, which caused non-processed pitstop settings in *Le Mans Ultimate*, if a UI language was chosen, which was not English.
   
 #### Changes
 

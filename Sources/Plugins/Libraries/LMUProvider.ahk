@@ -247,7 +247,7 @@ class LMUProvider extends Sector397Provider {
 	acquireStandingsData(telemetryData, finished := false) {
 		local standingsData, driver, forName, surName, nickName
 
-		this.iStandingsData := LMUProvider.StandingsData(this.readStandingsData(telemetryData))
+		this.iStandingsData := LMUProvider.StandingsData(this.readStandingsData(telemetryData, !finished))
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 

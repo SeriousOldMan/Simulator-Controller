@@ -208,29 +208,24 @@ class SimulatorProvider {
 		local count, driver, carNr
 
 		telemetryData := this.acquireTelemetryData()
+		standingsData := this.acquireStandingsData(telemetryData, finished)
 
-		if !getMultiMapValue(telemetryData, "Session Data", "Paused", false) {
-			standingsData := this.acquireStandingsData(telemetryData, finished)
+		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
+		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
 
-			count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
-			driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
+		loop count {
+			carNr := StrReplace(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", "")
 
-			loop count {
-				carNr := StrReplace(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", "")
+			if !IsAlnum(carNr)
+				carNr := "-"
 
-				if !IsAlnum(carNr)
-					carNr := "-"
-
-				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", carNr)
-			}
-
-			if (driver && (count > 0))
-				if (getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".InPitLane", false)
-				 && !getMultiMapValue(telemetryData, "Stint Data", "InPitLane", false))
-					setMultiMapValue(telemetryData, "Stint Data", "InPitLane", true)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", carNr)
 		}
-		else
-			standingsData := newMultiMap()
+
+		if (driver && (count > 0))
+			if (getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".InPitLane", false)
+			 && !getMultiMapValue(telemetryData, "Stint Data", "InPitLane", false))
+				setMultiMapValue(telemetryData, "Stint Data", "InPitLane", true)
 	}
 
 	readSessionData(options := "", protocol?) {

@@ -3575,7 +3575,10 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
-				startTime := this.KnowledgeBase.getValue("Session.StartTime", A_Now)
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
+
+				if !startTime
+					return
 
 				DirCreate(kTempDirectory . "Race Engineer\Sessions\" . startTime)
 			}

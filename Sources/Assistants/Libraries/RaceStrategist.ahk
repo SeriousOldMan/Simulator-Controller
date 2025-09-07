@@ -2387,7 +2387,10 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
-				startTime := this.KnowledgeBase.getValue("Session.StartTime", A_Now)
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
+
+				if !startTime
+					return
 
 				DirCreate(kTempDirectory . "Race Strategist\Sessions\" . startTime)
 			}
@@ -4422,6 +4425,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local slots := false
 		local duplicateNr := false
 		local duplicateID := false
+		local driverID := getMultiMapValue(raceData, "Cars", "Driver.ID", kUndefined)
+		local driverNr := getMultiMapValue(raceData, "Cars", "Driver.Nr", kUndefined)
 		local carNr, carID, carClass, carCategory, carPosition, nrKey, idKey
 
 		raceInfo["Driver"] := getMultiMapValue(raceData, "Cars", "Driver")
@@ -4497,6 +4502,22 @@ class RaceStrategist extends GridRaceAssistant {
 		raceInfo["HasNr"] := !duplicateNr
 		raceInfo["HasID"] := !duplicateID
 
+		if (!duplicateID && (driverID != kUndefined)) {
+			loop raceInfo["Cars"]
+				if (driverID = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)) {
+					raceInfo["Driver"] := A_Index
+
+					break
+				}
+		}
+		else if (!duplicateNr && (driverNr != kUndefined) && (driverNr != "-"))
+			loop raceInfo["Cars"]
+				if (driverNr = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-")) {
+					raceInfo["Driver"] := A_Index
+
+					break
+				}
+
 		raceInfo["Grid"] := grid
 		raceInfo["Classes"] := classes
 		raceInfo["Categories"] := categories
@@ -4536,6 +4557,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 				setMultiMapValue(data, "Cars", "Count", carCount)
 				setMultiMapValue(data, "Cars", "Driver", driver)
+				setMultiMapValue(data, "Cars", "Driver.Nr", knowledgeBase.getValue("Car." . driver . ".Nr", "-"))
+				setMultiMapValue(data, "Cars", "Driver.ID", knowledgeBase.getValue("Car." . driver . ".ID", driver))
 
 				raceInfo := this.RaceInfo
 				grid := (raceInfo ? raceInfo["Grid"] : false)

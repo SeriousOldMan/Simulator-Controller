@@ -1453,10 +1453,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
-		if RaceAssistantPlugin.sSessionStartTime {
-			setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
-			setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
-		}
+		if !RaceAssistantPlugin.sSessionStartTime
+			RaceAssistantPlugin.sSessionStartTime := A_Now
+
+		setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+		setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
 
 		if RaceAssistantPlugin.sStintStartTime {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
@@ -1477,10 +1478,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	static updateAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
-		if RaceAssistantPlugin.sSessionStartTime {
-			setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
-			setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
-		}
+		if !RaceAssistantPlugin.sSessionStartTime
+			RaceAssistantPlugin.sSessionStartTime := A_Now
+
+		setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+		setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
 
 		if RaceAssistantPlugin.sStintStartTime {
 			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
@@ -2671,9 +2673,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 					else if (dataLastLap == 0) {
 						; Waiting for the car to cross the start line for the first time
-
-						if !RaceAssistantPlugin.sSessionStartTime
-							RaceAssistantPlugin.sSessionStartTime := A_Now
 
 						RaceAssistantPlugin.sStintStartTime := false
 

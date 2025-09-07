@@ -55,6 +55,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
 	  - The "OpponentPitting" event in the *Reasoning* booster is now also signalled for *focused* opponents.
 	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
+  - The tyre compound in the pitstop settings is now initialized from the strategy, if available, in the "Team Center", when using the command "Initialize from Session".
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
     - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster.
     - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.

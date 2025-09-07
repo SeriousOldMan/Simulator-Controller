@@ -288,8 +288,6 @@ namespace RF2SHMProvider {
 				}
 				*/
 			}
-			else
-				Console.WriteLine("Paused=false");
 
 			Console.WriteLine("[Stint Data]");
 			if (connected) {

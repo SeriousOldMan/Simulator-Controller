@@ -57,6 +57,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
     - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster.
     - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
 
 # Release history

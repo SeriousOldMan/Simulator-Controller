@@ -2430,6 +2430,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local splitTime := startTime
 		local lastLap := RaceAssistantPlugin.LastLap
 		local skippedLap := false
+		local inPit := false
 		local telemetryData, standingsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
@@ -2442,6 +2443,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		static isInactive := false
 		static wasInactive := false
+
+		static skip := false
+
+		if (skip > A_TickCount)
+			return
 
 		wasInactive := isInactive
 
@@ -2579,6 +2585,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						setMultiMapValue(data, "Session Data", "Paused", false)
 						setMultiMapValue(data, "Stint Data", "InPit", true)
 
+						inPit := true
+
 						session := RaceAssistantPlugin.Session
 
 						RaceAssistantPlugin.updateAssistantsSession(session)
@@ -2591,8 +2599,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						return
 					}
 				}
-				else
+				else {
 					RaceAssistantPlugin.updateAssistantsSession(session)
+
+					inPit := getMultiMapValue(data, "Stint Data", "InPit", false)
+				}
 
 				RaceAssistantPlugin.sDriverWasActive := driverActive
 
@@ -2602,7 +2613,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					splitTime := A_TickCount
 				}
 
-				if !RaceAssistantPlugin.sessionActive(data) {
+				if (!RaceAssistantPlugin.sessionActive(data) && !inPit) {
 					; Not in a supported session
 
 					isInactive := true
@@ -2614,7 +2625,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				else
 					isInactive := false
 
-				if ((dataLastLap < lastLap) || (RaceAssistantPlugin.Session != session)) {
+				if (!inPit && ((dataLastLap < lastLap) || (RaceAssistantPlugin.Session != session))) {
 					; Start of new session without finishing previous session first
 
 					if (RaceAssistantPlugin.Session != kSessionFinished) {
@@ -2653,6 +2664,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							RaceAssistantPlugin.performAssistantsPitstop(dataLastLap)
 
 							RaceAssistantPlugin.sInPit := dataLastLap
+
+							if (RaceAssistantPlugin.Simulator.Simulator[true] != "Assetto Corsa Competizione")
+								skip := (A_TickCount + 60000)
 						}
 					}
 					else if (dataLastLap == 0) {

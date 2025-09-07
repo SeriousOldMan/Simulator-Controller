@@ -245,11 +245,11 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
-		local standingsData, driver, forName, surName, nickName
-
-		this.iStandingsData := LMUProvider.StandingsData(this.readStandingsData(telemetryData, !finished))
+		local standingsData, forName, surName, nickName
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
+
+		this.iStandingsData := LMUProvider.StandingsData(standingsData)
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			parseDriverName(this.StandingsData.Driver[getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")]

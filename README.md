@@ -39,7 +39,7 @@ An automated update mechanism for local configuration databases exists since Rel
 
 [6.5.2.0-release](https://cutt.ly/jrJR79yk) (Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6520) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
@@ -49,9 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.3.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/J6sHaHx9) (Early build for 6.5.3. Changes: Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry, Spotter fires events even if shout outs are disabled, New Spotter event "Focus Gap Update", Fixed positions in race reports for iRacing, Fixed loading of instructions in the *Reasoning* booster, Fixed session handling in LMU, Fixed pit menu handling in non-English UIs of LMU, Preserve instructions when a GPT service is changed in a booster.)
+[6.5.3.0-alpha]() (Test build for 6.5.3. Changes: Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry, Spotter fires events even if shout outs are disabled, New Spotter event "Focus Gap Update", Fixed positions in race reports for iRacing, Fixed loading of instructions in the *Reasoning* booster, Fixed session handling in LMU, Fixed pit menu handling in non-English UIs of LMU, Preserve instructions when a GPT service is changed in a booster.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-653) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6530) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-653) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

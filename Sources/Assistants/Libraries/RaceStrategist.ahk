@@ -4640,6 +4640,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.updateRaceInfo(data)
 
+				setMultiMapValue(data, "Cars", "Driver", this.RaceInfo["Driver"])
 				setMultiMapValue(data, "Cars", "Slots", map2String("|", "->", this.RaceInfo["Slots"]))
 
 				fileName := temporaryFileName("Race Strategist Race", "info")

@@ -1619,9 +1619,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static sessionActive(data) {
-		local ignore, simulator
+		local session, ignore, simulator
 
-		if (getDataSession(data, &ignore) >= kSessionPractice) {
+		session := getDataSession(data, &ignore)
+
+		if ((session >= kSessionPractice) || (session == kSessionPaused)) {
 			simulator := RaceAssistantPlugin.Simulator
 
 			if simulator
@@ -2521,6 +2523,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else
 				data := RaceAssistantPlugin.acquireSessionData(&telemetryData, &standingsData)
 
+			if isDebug() {
+				deleteFile(kTempDirectory . "Race Assistant.data")
+
+				FileAppend(printMultiMap(data), kTempDirectory . "Race Assistant.data")
+			}
+
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
 			if isDebug() {
@@ -2577,6 +2585,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					splitTime := A_TickCount
 				}
+
+				if !getMultiMapValue(data, "Session Data", "Active", false) {
+					; Not in an active session
+
+					isInactive := true
+
+					RaceAssistantPlugin.finishAssistantsSession()
+
+					return
+				}
+				else
+					isInactive := false
 
 				driverActive := RaceAssistantPlugin.driverActive(data)
 

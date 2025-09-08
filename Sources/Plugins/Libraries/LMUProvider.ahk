@@ -415,6 +415,21 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
+			switch sessionData.State, false {
+				case "Driving":
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", false)
+				case "Not Driving", "Paused":
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", true)
+				case "Disabled":
+					setMultiMapValue(data, "Session Data", "Active", false)
+					setMultiMapValue(data, "Session Data", "Paused", false)
+				default:
+					throw "Unknown session state detected in LMUProvider.readSessionData..."
+			}
+
+			/*
 			paused := sessionData.Paused
 
 			if paused {
@@ -422,7 +437,6 @@ class LMUProvider extends Sector397Provider {
 				setMultiMapValue(data, "Session Data", "Paused", true)
 			}
 
-			/*
 			if (paused || getMultiMapValue(data, "Session Data", "Paused", false))
 				removeMultiMapValues(data, "Position Data")
 			*/

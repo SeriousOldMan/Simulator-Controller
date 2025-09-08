@@ -1080,9 +1080,9 @@ class LMURESTProvider {
 			}
 		}
 
-		Paused {
+		State {
 			Get {
-				return this.isPaused()
+				return this.getState()
 			}
 		}
 
@@ -1098,19 +1098,27 @@ class LMURESTProvider {
 			}
 		}
 
-		isPaused() {
+		getState() {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if data {
 				if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
 					return "Not Driving"
-				else if (data.Has("MultiStintState") && (data["MultiStintState"] != "Driving"))
-					return "Driving"
+				else if data.Has("MultiStintState") {
+					switch data["MultiStintState"], false {
+						case "Disabled":
+							return "Disabled"
+						case "Driving":
+							return "Driving"
+						default:
+							return "Paused"
+					}
+				}
 				else
-					return false
+					return "Paused"
 			}
 			else
-				return true
+				return "Disabled"
 		}
 
 		getDuration(session) {

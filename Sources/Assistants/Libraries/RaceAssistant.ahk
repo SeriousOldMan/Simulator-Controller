@@ -3179,7 +3179,7 @@ class RaceAssistant extends ConfigurationItem {
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
-		local info, laps
+		local info, laps, knowledge
 
 		static startTime := false
 		static lastLap := 0
@@ -3221,7 +3221,7 @@ class RaceAssistant extends ConfigurationItem {
 			if FileExist(kTempDirectory . this.AssistantType . "\Sessions\" . startTime) {
 				knowledge := this.createSessionKnowledge(lapNumber)
 
-				if (knowledge && (knowledge.Count > 0))
+				if (knowledge && ((isInstance(knowledge, Map) ? knowledge.Count : knowledge.Length) > 0))
 					FileAppend(JSON.print(knowledge, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
 
 				lastLap += 1

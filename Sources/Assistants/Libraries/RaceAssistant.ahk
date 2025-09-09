@@ -302,6 +302,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	iProvider := false
 
+	iCollectSessionKnowledge := false
+
 	class RulesBooster extends AgentBooster {
 		trigger(event, trigger, goal := false, options := false) {
 			return false
@@ -918,6 +920,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	CollectSessionKnowledge {
+		Get {
+			return this.iCollectSessionKnowledge
+		}
+	}
+
 	SettingsDatabase {
 		Get {
 			if !this.iSettingsDatabase
@@ -955,6 +963,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
+
+		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+														, "Diagnostics", "Session", false)
 
 		super.__New(configuration)
 
@@ -2975,6 +2986,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
+		if this.CollectSessionKnowledge
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
+
 		return result
 	}
 
@@ -3154,6 +3168,64 @@ class RaceAssistant extends ConfigurationItem {
 			writeMultiMap(fileName, sessionInfo)
 
 			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
+		}
+	}
+
+	createSessionKnowledge(lapNumber) {
+		return false
+	}
+
+	saveSessionKnowledge(lapNumber) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
+		local info, laps
+
+		static startTime := false
+		static lastLap := 0
+
+		if this.TeamSession
+			return
+
+		if (lapNumber = "Finish") {
+			if startTime {
+				laps := this.KnowledgeBase.getValue("Lap", 0)
+
+				if (laps >= 20) {
+					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+						   , Car: SessionDatabase.getCarName(simulator, car)
+						   , Track: SessionDatabase.getTrackName(simulator, track)
+						   , Laps: laps, Started: startTime, Finished: A_Now}
+
+					FileAppend(JSON.print(info, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
+
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+
+					FileCopy(kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions\" . startTime, 1)
+
+					startTime := false
+					lastLap := 0
+				}
+			}
+		}
+		else if (lapNumber = (lastLap + 1)) {
+			if (lapNumber == 1) {
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
+
+				if !startTime
+					return
+
+				DirCreate(kTempDirectory . this.AssistantType . "\Sessions\" . startTime)
+			}
+
+			if FileExist(kTempDirectory . this.AssistantType . "\Sessions\" . startTime) {
+				knowledge := this.createSessionKnowledge(lapNumber)
+
+				if (knowledge && (knowledge.Count > 0))
+					FileAppend(JSON.print(knowledge, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
+
+				lastLap += 1
+			}
 		}
 	}
 

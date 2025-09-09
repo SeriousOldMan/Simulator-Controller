@@ -114,8 +114,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iDebugStrategyCounter := [1, 1, 1]
 
-	iCollectSessionKnowledge := false
-
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Strategist", remotePID)
@@ -851,12 +849,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	CollectSessionKnowledge {
-		Get {
-			return this.iCollectSessionKnowledge
-		}
-	}
-
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -866,9 +858,6 @@ class RaceStrategist extends GridRaceAssistant {
 													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
-
-		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-														, "Diagnostics", "Session", false)
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -2294,9 +2283,6 @@ class RaceStrategist extends GridRaceAssistant {
 												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
 					 , 1000, kLowPriority)
 
-		if this.CollectSessionKnowledge
-			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
-
 		return result
 	}
 
@@ -2355,55 +2341,8 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	saveSessionKnowledge(lapNumber) {
-		local simulator := this.Simulator
-		local car := this.Car
-		local track := this.Track
-		local info, laps, strategy
-
-		static startTime := false
-		static lastLap := 0
-
-		if (lapNumber = "Finish") {
-			if startTime {
-				laps := this.KnowledgeBase.getValue("Lap", 0)
-
-				if (laps >= 20) {
-					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
-						   , Car: SessionDatabase.getCarName(simulator, car)
-						   , Track: SessionDatabase.getTrackName(simulator, track)
-						   , Laps: laps, Started: startTime, Finished: A_Now}
-
-					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Session.json")
-
-					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
-
-					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions\" . startTime, 1)
-
-					startTime := false
-					lastLap := 0
-				}
-			}
-		}
-		else if (lapNumber = (lastLap + 1)) {
-			if (lapNumber == 1) {
-				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
-
-				if !startTime
-					return
-
-				DirCreate(kTempDirectory . "Race Strategist\Sessions\" . startTime)
-			}
-
-			if FileExist(kTempDirectory . "Race Strategist\Sessions\" . startTime) {
-				strategy := this.getKnowledge("Agent", {include: ["Strategy"]})
-
-				if (strategy.Count > 0)
-					FileAppend(JSON.print(strategy, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
-
-				lastLap += 1
-			}
-		}
+	createSessionKnowledge(lapNumber) {
+		return this.getKnowledge("Agent", {include: ["Strategy"]})
 	}
 
 	reportStrategy(options := true, strategy := false) {

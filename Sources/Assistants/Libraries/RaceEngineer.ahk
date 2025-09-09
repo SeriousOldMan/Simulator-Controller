@@ -239,8 +239,6 @@ class RaceEngineer extends RaceAssistant {
 	iCurrentBrakeTemperatures := false
 	iCurrentRemainingFuel := false
 
-	iCollectSessionKnowledge := false
-
 	class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Engineer", remotePID)
@@ -373,12 +371,6 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	CollectSessionKnowledge {
-		Get {
-			return this.iCollectSessionKnowledge
-		}
-	}
-
 	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -391,9 +383,6 @@ class RaceEngineer extends RaceAssistant {
 													  , TyreWearWarning: true, BrakeWearWarning: true
 													  , DamageReporting: true, DamageAnalysis: true
 													  , PressureReporting: true, WeatherUpdate: true}})
-
-		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-														, "Diagnostics", "Session", false)
 
 		deleteDirectory(kTempDirectory . "Race Engineer")
 
@@ -3367,9 +3356,6 @@ class RaceEngineer extends RaceAssistant {
 																		, data, simulator, car, track))
 					 , 1000, kLowPriority)
 
-		if this.CollectSessionKnowledge
-			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
-
 		return result
 	}
 
@@ -3543,49 +3529,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	saveSessionKnowledge(lapNumber) {
-		local simulator := this.Simulator
-		local car := this.Car
-		local track := this.Track
-		local info, laps
-
-		static startTime := false
-		static lastLap := 0
-
-		if (lapNumber = "Finish") {
-			if startTime {
-				laps := this.KnowledgeBase.getValue("Lap", 0)
-
-				if (laps >= 20) {
-					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
-						   , Car: SessionDatabase.getCarName(simulator, car)
-						   , Track: SessionDatabase.getTrackName(simulator, track)
-						   , Laps: laps, Started: startTime, Finished: A_Now}
-
-					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Session.json")
-
-					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
-
-					FileCopy(kTempDirectory . "Race Engineer\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions\" . startTime, 1)
-
-					startTime := false
-					lastLap := 0
-				}
-			}
-		}
-		else if (lapNumber = (lastLap + 1)) {
-			if (lapNumber == 1) {
-				startTime := this.KnowledgeBase.getValue("Session.StartTime", A_Now)
-
-				DirCreate(kTempDirectory . "Race Engineer\Sessions\" . startTime)
-			}
-
-			if FileExist(kTempDirectory . "Race Engineer\Sessions\" . startTime) {
-				FileAppend(JSON.print(this.getKnowledge("Agent"), "`t"), kTempDirectory . "Race Engineer\Sessions\" . startTime . "\Telemetry Lap " . lapNumber . ".json")
-
-				lastLap += 1
-			}
-		}
+	createSessionKnowledge(lapNumber) {
+		return this.getKnowledge("Agent")
 	}
 
 	updateTyresDatabase() {

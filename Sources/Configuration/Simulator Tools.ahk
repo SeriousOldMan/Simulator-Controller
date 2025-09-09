@@ -3741,8 +3741,10 @@ prepareTargets(&buildProgress, updateOnly) {
 
 startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
+	global gSpecialTargets
 
 	local forceExit := GetKeyState("Shift")
+	local noSpecial := GetKeyState("Alt")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
 	local buildProgress
@@ -3789,6 +3791,9 @@ startupSimulatorTools() {
 	gTargetsCount := 0
 
 	prepareTargets(&buildProgress, updateOnly)
+
+	if (noSpecial || GetKeyState("Alt"))
+		gSpecialTargets := []
 
 	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
 	; 				+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))

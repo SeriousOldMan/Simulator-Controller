@@ -1010,8 +1010,8 @@ class RaceEngineer extends RaceAssistant {
 						tyreTemperatures := Map()
 						tyrePressures := Map()
 
-						for postfix, tyre in Map("FL", "Front.Left", "FR", "Front.Right"
-											   , "RL", "Rear.Left", "RR", "Rear.Right") {
+						for postfix, tyre in Map("FL", "FrontLeft", "FR", "FrontRight"
+											   , "RL", "RearLeft", "RR", "RearRight") {
 							tyreTemperatures[tyre] := (convert("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Temperature." . postfix, 0)) . temperatureUnit)
 							tyrePressures[tyre] := (convert("Pressure", knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Pressure." . postfix, 0)) . pressureUnit)
 						}
@@ -1022,8 +1022,8 @@ class RaceEngineer extends RaceAssistant {
 						if (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear.FL", kUndefined) != kUndefined) {
 							tyreWear := Map()
 
-							for postfix, tyre in Map("FL", "Front.Left", "FR", "Front.Right"
-												   , "RL", "Rear.Left", "RR", "Rear.Right")
+							for postfix, tyre in Map("FL", "FrontLeft", "FR", "FrontRight"
+												   , "RL", "RearLeft", "RR", "RearRight")
 								tyreWear[tyre] := (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear." . postfix, 0) . percent)
 
 							tyres["Wear"] := tyreWear
@@ -1036,8 +1036,8 @@ class RaceEngineer extends RaceAssistant {
 						if (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear.FL", kUndefined) != kUndefined) {
 							brakeWear := Map()
 
-							for postfix, brake in Map("FL", "Front.Left", "FR", "Front.Right"
-												    , "RL", "Rear.Left", "RR", "Rear.Right")
+							for postfix, brake in Map("FL", "FrontLeft", "FR", "FrontRight"
+												    , "RL", "RearLeft", "RR", "RearRight")
 								brakeWear[brake] := (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear." . postfix, 0) . percent)
 
 							brakes["Wear"] := brakeWear
@@ -1046,11 +1046,11 @@ class RaceEngineer extends RaceAssistant {
 						if (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Temperature.FL", kUndefined) != kUndefined) {
 							brakeTemperatures := Map()
 
-							for postfix, brake in Map("FL", "Front.Left", "FR", "Front.Right"
-												   , "RL", "Rear.Left", "RR", "Rear.Right")
+							for postfix, brake in Map("FL", "FrontLeft", "FR", "FrontRight"
+												   , "RL", "RearLeft", "RR", "RearRight")
 								brakeTemperatures[brake] := (convert("Temperature", knowledgeBase.getValue("Lap." . lapNr . ".Brake.Temperature." . postfix, 0)) . temperatureUnit)
 
-							brakes["Wear"] := brakeTemperatures
+							brakes["Temperatures"] := brakeTemperatures
 						}
 
 						if (brakes.Count > 0)
@@ -3575,10 +3575,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else if (lapNumber = (lastLap + 1)) {
 			if (lapNumber == 1) {
-				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
-
-				if !startTime
-					return
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", A_Now)
 
 				DirCreate(kTempDirectory . "Race Engineer\Sessions\" . startTime)
 			}

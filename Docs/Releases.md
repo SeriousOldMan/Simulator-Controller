@@ -32,6 +32,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Instructions for an LLM of the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
+  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs. 
   - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
   - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
@@ -62,6 +63,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
   - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  - [Developer] New [keyboard modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Tools" to control aspects of the build process.
 
 # Release history
 

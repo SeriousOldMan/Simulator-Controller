@@ -30,17 +30,17 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - Instructions for an LLM of the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
+  - LLM instructions for the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
-  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs. 
-  - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
-  - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
-  - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
+  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs.
   - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
   - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
+  - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
+  - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
+  - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
+  - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
   - Fixed several minor bugs for team races with driver swap for *Le Mans Ultimate*. A problem with a premature end of the Simulator Controller session for the driver who leaves the car remains, but this causes no problem for the team session itself.
   - Fixed a critical bug, which caused non-processed pitstop settings in *Le Mans Ultimate*, if a UI language was chosen, which was not English.
-  - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
   
 #### Changes
 
@@ -58,8 +58,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
   - The tyre compound in the pitstop settings is now initialized from the strategy, if available, in the "Team Center", when using the command "Initialize from Session".
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
-    - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster.
-    - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+    - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster of the Race Engineer.
+    - [Developer] Also, the numbers of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
   - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.

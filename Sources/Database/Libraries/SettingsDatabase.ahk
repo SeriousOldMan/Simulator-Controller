@@ -24,7 +24,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSettingsDataSchemas := CaseInsenseMap("Settings", ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"])
+global kSettingsSchemas := CaseInsenseMap("Settings", ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value", "Mode"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -40,8 +40,8 @@ class SettingsDatabase extends SessionDatabase {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator
 
-			this.iUserDatabase := Database(this.DatabasePath . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
-			this.iCommunityDatabase := Database(this.DatabasePath . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iUserDatabase := Database(this.DatabasePath . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsSchemas)
+			this.iCommunityDatabase := Database(this.DatabasePath . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsSchemas)
 		}
 
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)

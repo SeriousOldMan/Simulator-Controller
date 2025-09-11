@@ -39,6 +39,7 @@
 #Include "..\Framework\Extensions\Database.ahk"
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
 
@@ -1769,6 +1770,41 @@ updateInstallationForV500() {
 			logError(exception)
 		}
 	}
+}
+
+updateConfigurationForV654() {
+	local settingsDB, ignore, code, entry, text
+
+	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "R3E", "ACE", "RSP"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Settings.CSV") {
+			settingsDB := Database(kDatabaseDirectory . "User\" . code . "\", kSettingsSchemas)
+
+			settingsDB.lock()
+
+			try {
+				for ignore, entry in settingsDB.Table["Settings"]
+					entry["Mode"] := "*"
+
+				settingsDB.changed("Settings")
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+			finally {
+				settingsDB.unlock()
+			}
+		}
+
+	for ignore, code in ["R3E"]
+		if FileExist(kDatabaseDirectory . "User\" . code . "\Drivers.CSV") {
+			text := FileRead(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			text := StrReplace(text, "﻿", "")
+
+			deleteFile(kDatabaseDirectory . "User\" . code . "\Drivers.CSV")
+
+			FileAppend(text, kDatabaseDirectory . "User\" . code . "\Drivers.CSV", "UTF-8")
+		}
 }
 
 updateConfigurationForV652() {

@@ -1676,8 +1676,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: (data > 0) ? StrReplace(JSON.print(data), "%", "\%")
-																							 : "{}"}))
+																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data), "%", "\%")
+																								   : "{}"}))
 
 				if text {
 					if (text != true) {

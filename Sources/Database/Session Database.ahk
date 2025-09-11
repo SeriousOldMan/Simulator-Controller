@@ -94,6 +94,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSelectedSimulator := false
 	iSelectedCar := true
 	iSelectedTrack := true
+	iSelectedMode := true
 	iSelectedWeather := true
 
 	iAllTracks := []
@@ -283,6 +284,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				return translate("All")
 			else
 				return this.iSelectedTrack
+		}
+	}
+
+	SelectedMode[label := false] {
+		Get {
+			if ((label = "*") && (this.iSelectedMode == true))
+				return "*"
+			else if (label && (this.iSelectedMode == true))
+				return translate("All")
+			else
+				return this.iSelectedMode
 		}
 	}
 
@@ -484,6 +496,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
 			}
+		}
+
+		chooseMode(*) {
+			editor.loadMode([true, "Solo", "Team"][editor.Control["modeDropDown"].Value])
 		}
 
 		chooseWeather(*) {
@@ -1701,6 +1717,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
 		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
 
+		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Mode"))
+		editorGui.Add("DropDownList", "x100 yp w170 W:Grow(0.2) vmodeDropDown Choose1", collect(["All", "Solo", "Team"], translate)).OnEvent("Change", chooseMode)
+
 		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Weather"))
 
 		choices := collect(kWeatherConditions, translate)
@@ -1730,9 +1749,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Edit", "x280 yp+26 w390 h94 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
+		editorGui.Add("Edit", "x280 yp+26 w390 h118 X:Move(0.2) W:Grow(0.8) vnotesEdit").OnEvent("Change", updateNotes)
 
-		editorGui.Add("Text", "x16 yp+104 w654 W:Grow 0x10")
+		editorGui.Add("Text", "x16 yp+128 w654 W:Grow 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
@@ -2823,6 +2842,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 			else
 				window["trackDropDown"].Choose(inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
+
+			this.updateModules()
+		}
+	}
+
+	loadMode(mode, force := false) {
+		local window
+
+		if (force || (mode != this.SelectedMode)) {
+			this.iSelectedMode := mode
+
+			window := this.Window
+
+			if (mode == true)
+				window["modeDropDown"].Choose(1)
+			else
+				window["modeDropDown"].Choose(inList(["Solo", "Team"], mode) + 1)
 
 			this.updateModules()
 		}

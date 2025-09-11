@@ -758,22 +758,26 @@ class DrivingCoach extends GridRaceAssistant {
 		this.Mode := "Review"
 
 		try {
-			if (cornerNr = kUndefined) {
+			if ((cornerNr = kUndefined) || !isNumber(cornerNr)) {
 				if this.Speaker
 					this.getSpeaker().speakPhrase("Repeat")
 			}
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-				if (this.TelemetryAnalyzer && telemetry && (telemetry.Sections.Length > 0)) {
-					command := substituteVariables(this.Instructions["Coaching.Corner"]
-												 , {telemetry: telemetry.JSON, corner: cornerNr})
+				if this.TelemetryAnalyzer {
+					if (telemetry && (telemetry.Sections.Length > 0)) {
+						command := substituteVariables(this.Instructions["Coaching.Corner"]
+													 , {telemetry: telemetry.JSON, corner: cornerNr})
 
-					if reference
-						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: reference.JSON}))
+						if reference
+							command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																   , {telemetry: reference.JSON}))
 
-					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+						this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+					}
+					else if this.Speaker
+						this.getSpeaker().speakPhrase("Repeat")
 				}
 				else if this.Speaker
 					this.getSpeaker().speakPhrase("Later")

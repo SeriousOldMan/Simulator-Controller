@@ -56,10 +56,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
 	  - The "OpponentPitting" event in the *Reasoning* booster is now also signalled for *focused* opponents.
 	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
+  - The Strategist also refers to other cars by the name of the driver from time to time, when asked for gaps, positions, lap times and so on.
   - The tyre compound in the pitstop settings is now initialized from the strategy, if available, in the "Team Center", when using the command "Initialize from Session".
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
     - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster of the Race Engineer.
-    - [Developer] Also, the numbers of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+    - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
   - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.

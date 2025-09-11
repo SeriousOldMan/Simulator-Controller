@@ -788,7 +788,7 @@ namespace RF2SHMSpotter {
                     {
                         if (speed >= 1)
 						{
-							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+							if (speed < (avgSpeed / 2))
 							{
 								long distanceAhead = (long)(((vehicle.mLapDist > playerScoring.mLapDist) ? vehicle.mLapDist
 																										 : (vehicle.mLapDist + scoring.mScoringInfo.mLapDist)) - playerScoring.mLapDist);

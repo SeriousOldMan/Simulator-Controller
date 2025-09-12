@@ -1109,8 +1109,11 @@ class RaceStrategist extends GridRaceAssistant {
 						tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tcCandidate))
 
 						if (tyreSet && availableTyreSets.Has(tyreCompound))
-							if (availableTyreSets[tyreCompound][2].Length > 0)
+							if (availableTyreSets[tyreCompound][2].Length > 0) {
 								tyreSet["Sets"] := availableTyreSets[tyreCompound][2].Length
+
+								tyreSet["Usable"] := (availableTyreSets[tyreCompound][1] . " Laps")
+							}
 							else
 								tyreSets.RemoveAt(inList(tyreSets, tyreSet))
 					}
@@ -2353,46 +2356,8 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	saveSessionKnowledge(lapNumber, simulator?, car?, track?) {
-		local info, laps
-
-		static startTime := false
-		static lastLap := 0
-
-		if (lapNumber = "Finish") {
-			if startTime {
-				laps := this.KnowledgeBase.getValue("Lap", 0)
-
-				if (laps > 10) {
-					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
-						   , Car: SessionDatabase.getCarName(simulator, car)
-						   , Track: SessionDatabase.getTrackName(simulator, track)
-						   , Laps: laps, Started: startTime, Finished: A_Now}
-
-					FileAppend(JSON.print(info, "`t"), kTempDirectory . "Race Strategist\Sessions\" . startTime . "\Session.json")
-
-					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions")
-
-					DirCopy(kTempDirectory . "Race Strategist\Sessions\" . startTime, kUserHomeDirectory . "Diagnostics\Sessions", 1)
-
-					startTime := false
-					lastLap := 0
-				}
-			}
-		}
-		else if (lapNumber = (lastLap + 1)) {
-			if (lapNumber == 1) {
-				startTime := A_Now
-
-				DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
-			}
-
-			if FileExist(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime) {
-				FileAppend(JSON.print(this.getKnowledge("Agent", {include: ["Strategy"]}), "`t"), kUserHomeDirectory . "Diagnostics\Sessions\" . startTime . "\Strategy Lap " . lapNumber . ".json")
-
-				lastLap += 1
-			}
-		}
+	createSessionKnowledge(lapNumber) {
+		return this.getKnowledge("Agent", {include: ["Session", "Strategy"]})
 	}
 
 	reportStrategy(options := true, strategy := false) {

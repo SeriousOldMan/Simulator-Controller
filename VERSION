@@ -1,9 +1,9 @@
 [Development]
-Version=6.5.3.0-dev
-Target=6.5.3.0-release
-Date=08/29/2025
+Version=6.5.4.0-dev
+Target=6.5.4.0-release
+Date=09/12/2025
 Download=
-Changes=Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry
+Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database"
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
 Version=6.5.2.0-release
@@ -25,5 +25,5 @@ Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.5.3.0-dev
-Release=6.5.2.0-release
+Development=6.5.4.0-dev
+Release=6.5.3.0-release

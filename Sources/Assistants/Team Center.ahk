@@ -4362,7 +4362,11 @@ class TeamCenter extends ConfigurationItem {
 						lap := (pitstop.Lap + 1)
 						refuel := pitstop.RefuelAmount
 
-						if !pitstop.TyreChange {
+						if pitstop.TyreChange  {
+							tyreCompound := pitstop.TyreCompound
+							tyreCompoundColor := pitstop.TyreCompoundColor
+						}
+						else {
 							tyreCompound := false
 							tyreCompoundColor := false
 						}

@@ -4,6 +4,7 @@ Active=
 [Agent.LLM.Events.Builtin]
 ahead_gap_update=Assistant.Class|AheadGapUpdateEvent|AheadGapUpdate||3|Periodically signalled to update the gap to the car ahead.
 behind_gap_update=Assistant.Class|BehindGapUpdateEvent|BehindGapUpdate||3|Periodically signalled to update the gap to the car behind.
+focus_gap_update=Assistant.Class|FocusGapUpdateEvent|FocusGapUpdate||3|Periodically signalled to update the gap to the focused car.
 attack_imminent=Assistant.Class|AttackImminentEvent|AttackImminent||2|Signals that an opponent is closing in and an attack will happen soon.
 blue_flag_alert=Assistant.Class|BlueFlagAlertEvent|BlueFlagAlert||0|Signals that the blue flag is being shown, because an opponent is closing in who is at least one lap ahead.
 pitstop_performed=Assistant.Rule|Race Spotter.pitstop_detection.rules|PitstopPerformed|Pitstop number %pitstopNumber% has been performed in lap %pitstopLap%.|2|This event is triggered when the car just pitted.
@@ -18,6 +19,9 @@ ahead_gap_update.3=closingIn|Boolean||true|Indicates that the gap got smaller.
 behind_gap_update.1=carNumber|Integer||true|The race or car number of the car behind.
 behind_gap_update.2=delta|Number||true|The new gap in seconds to the car behind.
 behind_gap_update.3=closingIn|Boolean||true|Indicates that the gap got smaller.
+focus_gap_update.1=carNumber|Integer||true|The race or car number of the focused car.
+focus_gap_update.2=delta|Number||true|The new gap in seconds to the focused car.
+focus_gap_update.3=change|String||true|Indicates the change of the gap. Must be either "Gained" or "Lost".
 attack_imminent.1=carNumber|Integer||true|The race or car number of the car closing in.
 attack_imminent.2=delta|Number||true|The gap in seconds to the car behind.
 pitstop_performed.1=pitstopNumber|Integer||true|The number of the pitstop.

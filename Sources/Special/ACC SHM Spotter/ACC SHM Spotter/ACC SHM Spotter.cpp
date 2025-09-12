@@ -1098,7 +1098,7 @@ bool checkAccident() {
 								output.close();
 							}
 
-							if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+							if (speed < (avgSpeed / 2))
 							{
 								clearAverageSpeed(running);
 								

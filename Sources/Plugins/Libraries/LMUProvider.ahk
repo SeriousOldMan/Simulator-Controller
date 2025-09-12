@@ -23,12 +23,11 @@ class LMUProvider extends Sector397Provider {
 	iDriversData := false
 	iGridData := false
 
-	iCarInfos := false
-	iCarInfosRefresh := 0
+	iStandingsData := false
 
 	iFuelRatio := false
 
-	class CarInfos extends LMURestProvider.StandingsData {
+	class StandingsData extends LMURestProvider.StandingsData {
 		iCarIDs := false
 		iCarPositions := false
 
@@ -144,9 +143,9 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
-	CarInfos {
+	StandingsData {
 		Get {
-			return this.iCarInfos
+			return this.iStandingsData
 		}
 	}
 
@@ -219,7 +218,7 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
-		local drivers, carInfos
+		local drivers, standingsData
 
 		getCategory(drivers, driver) {
 			local ignore, candidate
@@ -234,9 +233,9 @@ class LMUProvider extends Sector397Provider {
 		if isSet(category)
 			try {
 				drivers := this.DriversData.Drivers[carName]
-				carInfos := (carID ? this.CarInfos : false)
+				standingsData := (carID ? this.StandingsData : false)
 
-				category := (carInfos ? getCategory(drivers, carInfos.Driver[carID]) : false)
+				category := (standingsData ? getCategory(drivers, standingsData.Driver[carID]) : false)
 			}
 			catch Any {
 				category := false
@@ -246,16 +245,44 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
-		if (A_TickCount > this.iCarInfosRefresh)
-			this.iCarInfos := false
+		local standingsData, forName, surName, nickName
 
-		if !this.CarInfos {
-			this.iCarInfos := LMUProvider.CarInfos(this.readStandingsData(telemetryData))
+		standingsData := super.acquireStandingsData(telemetryData, finished)
 
-			this.iCarInfosRefresh := (A_TickCount + 30000)
+		this.iStandingsData := LMUProvider.StandingsData(standingsData)
+
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			parseDriverName(this.StandingsData.Driver[getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")]
+						  , &forName, &surName, &nickName)
+
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
 		}
 
-		return super.acquireStandingsData(telemetryData, finished)
+		return standingsData
+	}
+
+	acquireSessionData(&telemetryData, &standingsData, finished := false) {
+		local driver, forName, surName, nickName
+
+		super.acquireSessionData(&telemetryData, &standingsData, finished)
+
+		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
+
+		if driver {
+			forName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Forname")
+			surName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Surname")
+			nickName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Nickname")
+
+			if ((forName != getMultiMapValue(telemetryData, "Stint Data", "DriverForname"))
+			 || (surName != getMultiMapValue(telemetryData, "Stint Data", "DriverSurname")))
+				setMultiMapValue(telemetryData, "Session Data", "Paused", true)
+
+			setMultiMapValue(telemetryData, "Stint Data", "DriverForname", forName)
+			setMultiMapValue(telemetryData, "Stint Data", "DriverSurname", surName)
+			setMultiMapValue(telemetryData, "Stint Data", "DriverNickname", nickName)
+		}
 	}
 
 	readSessionData(options := "", protocol?) {
@@ -264,7 +291,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData
+		local sessionData, paused
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -388,11 +415,31 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
-			if (!getMultiMapValue(data, "Session Data", "Paused", false) && sessionData.Paused)
-				setMultiMapValue(data, "Session Data", "Paused", true)
+			switch sessionData.State, false {
+				case "Driving":
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", false)
+				case "Not Driving", "Paused":
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", true)
+				case "Disabled":
+					setMultiMapValue(data, "Session Data", "Active", false)
+					setMultiMapValue(data, "Session Data", "Paused", false)
+				default:
+					throw "Unknown session state detected in LMUProvider.readSessionData..."
+			}
 
-			if getMultiMapValue(data, "Session Data", "Paused", false)
+			/*
+			paused := sessionData.Paused
+
+			if paused {
+				setMultiMapValue(data, "Session Data", "Active", true)
+				setMultiMapValue(data, "Session Data", "Paused", true)
+			}
+
+			if (paused || getMultiMapValue(data, "Session Data", "Paused", false))
 				removeMultiMapValues(data, "Position Data")
+			*/
 
 			if !InStr(options, "Standings=true") {
 				if car

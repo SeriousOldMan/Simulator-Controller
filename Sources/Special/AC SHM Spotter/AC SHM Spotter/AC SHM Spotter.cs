@@ -850,7 +850,7 @@ namespace ACSHMSpotter {
 							{
                                 IdealLine slot = idealLine[(int)Math.Round(running * (idealLine.Count - 1))];
 
-								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+								if (speed < (avgSpeed / 2))
 								{
 									double carLapDistance = running * staticInfo.TrackSPlineLength;
 									long distanceAhead = (long)(((carLapDistance > driverLapDistance) ? carLapDistance

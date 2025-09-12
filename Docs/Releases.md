@@ -1,5 +1,53 @@
 # Latest stable release
 
+## 6.5.3.0
+
+#### Date: 09/12/25
+
+#### Fixes
+
+  - LLM instructions for the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
+  - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
+  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs.
+  - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
+  - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
+  - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
+  - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
+  - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
+  - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
+  - Fixed several minor bugs for team races with driver swap for *Le Mans Ultimate*. A problem with a premature end of the Simulator Controller session for the driver who leaves the car remains, but this causes no problem for the team session itself.
+  - Fixed a critical bug, which caused non-processed pitstop settings in *Le Mans Ultimate*, if a UI language was chosen, which was not English.
+  
+#### Changes
+
+  - [Important] The collection of telemetry data can now be enabled in the "Solo Center" without having the Telemetry Viewer open. Additionally, the Telemetry Viewer will no longer be opened by the *Auto Telemetry* setting. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
+  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
+  - A lot of optimizations and enhancements for the Spotter:
+    - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
+    - Also, the Spotter may mention the name of the driver who caused an accident.
+    - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is, that a configured *Rephrasing* booster is not used in those cases.
+    - The Spotter no longer tells you about a car directly behind you, which you actually have just overtaken.
+    - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
+	- {Expert] A couple of updates to the *Conversation* and *Reasoning* booster events:
+	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
+	  - The "OpponentPitting" event in the *Reasoning* booster is now also signalled for *focused* opponents.
+	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
+  - The Strategist also refers to other cars by the name of the driver from time to time, when asked for gaps, positions, lap times and so on.
+  - The tyre compound in the pitstop settings is now initialized from the strategy, if available, in the "Team Center", when using the command "Initialize from Session".
+  - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
+    - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster of the Race Engineer.
+    - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
+  - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
+  - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
+  - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
+  - [Developer] New [keyboard modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Tools" to control aspects of the build process.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.5.2.0
 
 #### Date: 08/22/25
@@ -21,32 +69,6 @@
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-652), if you are using the local LLM Runtime or if you need to fix some data, which had been collected for the wrond track layout.
-
-# Upcoming release
-
-## 6.5.3.0
-
-#### Date: 09/12/25 (planned)
-
-#### Fixes
-
-  - Instructions for an LLM of the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
-  - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
-  
-#### Changes
-
-  - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
-  - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
-  - Also, the Spotter may mention the name of the driver who caused an accident.
-  - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is that a configured *Rephrasing* booster is not used in those cases.
-  - The Spotter no longer tells you about a car directly behind you, which you actually have overtaken a moment before.
-  - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
-  - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
-  - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
-  - [Important] The collection of telemetry data can now be enabled in the "Solo Center" without having the Telemetry Viewer open. Additionally, the Telemetry Viewer will no longer be opened by the *Auto Telemetry* setting. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
-  - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
-
-# Release history
 
 ## 6.5.1.1
 

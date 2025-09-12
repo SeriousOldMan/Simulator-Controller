@@ -693,7 +693,7 @@ BOOL checkAccident() {
 
 		if (id != playerIdx) {
 			if (speed >= 1) {
-				if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+				if (speed < (avgSpeed / 2))
 				{
 					long distanceAhead = (long)(((carDistance > driverDistance) ? carDistance : (carDistance + map_buffer->layout_length)) - driverDistance);
 

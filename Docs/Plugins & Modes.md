@@ -1623,7 +1623,7 @@ The content of the JSON file looks like this (depending on the current situation
 			},
 			"Leader": null,
 			"OverallPosition": 1,
-			"Position": 1
+			"ClassPosition": 1
 		},
 		"Stint": {
 			"BestTime": null,

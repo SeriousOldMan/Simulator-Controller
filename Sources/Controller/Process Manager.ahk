@@ -153,6 +153,7 @@ killZombies() {
 }
 
 startupProcessManager() {
+	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 	local icon := kIconsDirectory . "Observer.ico"
 
@@ -181,7 +182,6 @@ startupProcessManager() {
 		}
 
 		Task.startTask(() {
-			local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 			local ID := StrSplit(FileRead(kUserConfigDirectory . "ID"), "`n", "`r")[1]
 			local fileName := (ID . "." . A_Now . ".log")
 
@@ -192,16 +192,21 @@ startupProcessManager() {
 		}, 1000, kLowPriority)
 
 		Task.startTask(() {
+			local processed := []
+			local ignore, directory
+
 			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
-				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") > A_Now) {
+				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") < A_Now) {
 					RunWait("PowerShell.exe -Command Compress-Archive -Path '" . A_LoopFileFullPath . "\*' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . A_LoopFileName . ".zip'", , "Hide")
 
 					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
 						deleteFile(kTempDirectory . A_LoopFileName . ".zip")
 
-						deleteDirectory(A_LoopFileFullPath)
+						processed.Push(A_LoopFileFullPath)
 					}
 				}
+
+			do(processed, deleteDirectory)
 		}, 1000, kLowPriority)
 	}
 }

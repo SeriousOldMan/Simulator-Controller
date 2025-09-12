@@ -302,6 +302,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	iProvider := false
 
+	iCollectSessionKnowledge := false
+
 	class RulesBooster extends AgentBooster {
 		trigger(event, trigger, goal := false, options := false) {
 			return false
@@ -918,6 +920,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	CollectSessionKnowledge {
+		Get {
+			return this.iCollectSessionKnowledge
+		}
+	}
+
 	SettingsDatabase {
 		Get {
 			if !this.iSettingsDatabase
@@ -955,6 +963,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
+
+		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+														, "Diagnostics", "Session", false)
 
 		super.__New(configuration)
 
@@ -1439,6 +1450,8 @@ class RaceAssistant extends ConfigurationItem {
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
 				return convertUnit(unit, value, arguments*)
+			else if isNumber(value)
+				return Round(value, 2)
 			else
 				return value
 		}
@@ -1489,7 +1502,7 @@ class RaceAssistant extends ConfigurationItem {
 											  , "Car", car
 											  , "Track", track
 											  , "TrackType", this.TrackType
-											  , "TrackLength", (this.TrackLength . " Meters")
+											  , "TrackLength", (Round(this.TrackLength, 1) . " Meters")
 											  , "Type", sessionTypes[this.Session]
 											  , "Format", sessionFormat
 											  , "RemainingLaps", Ceil(knowledgeBase.getValue("Lap.Remaining.Session", 0))
@@ -1504,6 +1517,7 @@ class RaceAssistant extends ConfigurationItem {
 				try {
 					knowledge["Stint"] := Map("Driver", this.DriverFullName
 											, "Lap", (lapNumber + 1)
+											, "OverallPosition", knowledgeBase.getValue("Position", 0)
 											, "LastLapTime", (Round(knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0) / 1000, 1) . " Seconds")
 											, "RemainingTime", (Round(Min(knowledgeBase.getValue("Driver.Time.Remaining", 0), knowledgeBase.getValue("Driver.Time.Stint.Remaining", 0)) / 1000) . " Seconds"))
 
@@ -1662,8 +1676,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: (data > 0) ? StrReplace(JSON.print(data), "%", "\%")
-																							 : "{}"}))
+																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data), "%", "\%")
+																								   : "{}"}))
 
 				if text {
 					if (text != true) {
@@ -2683,6 +2697,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.updateDynamicValues({EnoughData: enoughData, Data: data})
 
+		if (!knowledgeBase.hasFact("Session.StartTime") && getMultiMapValue(data, "Session Data", "StartTime", false))
+			knowledgeBase.addFact("Session.StartTime", getMultiMapValue(data, "Session Data", "StartTime"))
+
 		sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
@@ -2969,6 +2986,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
+		if this.CollectSessionKnowledge
+			Task.startTask((*) => this.saveSessionKnowledge(lapNumber), 1000, kLowPriority)
+
 		return result
 	}
 
@@ -3148,6 +3168,64 @@ class RaceAssistant extends ConfigurationItem {
 			writeMultiMap(fileName, sessionInfo)
 
 			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
+		}
+	}
+
+	createSessionKnowledge(lapNumber) {
+		return false
+	}
+
+	saveSessionKnowledge(lapNumber) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
+		local info, laps, knowledge
+
+		static startTime := false
+		static lastLap := 0
+
+		if this.TeamSession
+			return
+
+		if (lapNumber = "Finish") {
+			if startTime {
+				laps := this.KnowledgeBase.getValue("Lap", 0)
+
+				if (laps >= 20) {
+					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
+						   , Car: SessionDatabase.getCarName(simulator, car)
+						   , Track: SessionDatabase.getTrackName(simulator, track)
+						   , Laps: laps, Started: startTime, Finished: A_Now}
+
+					FileAppend(JSON.print(info, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
+
+					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
+
+					FileCopy(kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\*.*", kUserHomeDirectory . "Diagnostics\Sessions\" . startTime, 1)
+
+					startTime := false
+					lastLap := 0
+				}
+			}
+		}
+		else if (lapNumber = (lastLap + 1)) {
+			if (lapNumber == 1) {
+				startTime := this.KnowledgeBase.getValue("Session.StartTime", false)
+
+				if !startTime
+					return
+
+				DirCreate(kTempDirectory . this.AssistantType . "\Sessions\" . startTime)
+			}
+
+			if FileExist(kTempDirectory . this.AssistantType . "\Sessions\" . startTime) {
+				knowledge := this.createSessionKnowledge(lapNumber)
+
+				if (knowledge && ((isInstance(knowledge, Map) ? knowledge.Count : knowledge.Length) > 0))
+					FileAppend(JSON.print(knowledge, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
+
+				lastLap += 1
+			}
 		}
 	}
 

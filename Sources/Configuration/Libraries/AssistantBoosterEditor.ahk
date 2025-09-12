@@ -720,6 +720,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 																				 , configuration["Model"])
 			else
 				this.loadModels("Conversation", false)
+
+			this.setInstructions("Speaker", this.getInstructions("Speaker"))
+			this.setInstructions("Listener", this.getInstructions("Listener"))
+			this.setInstructions("Conversation", this.getInstructions("Conversation"))
 		}
 		else {
 			if (provider = translate("Rules") || (provider = "Rules"))
@@ -767,6 +771,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 																   , configuration["Model"])
 			else
 				this.loadModels("Agent", false)
+
+			this.setInstructions("Agent", this.getInstructions("Agent"))
 		}
 
 		this.updateState()

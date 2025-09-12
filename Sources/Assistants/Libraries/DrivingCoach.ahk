@@ -382,7 +382,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
 			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", "None")
-			this.iSaveReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Save", false)
+			this.iSaveReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Save", "Off")
 
 			if !this.LoadReference
 				this.iLoadReference := "None"
@@ -758,22 +758,26 @@ class DrivingCoach extends GridRaceAssistant {
 		this.Mode := "Review"
 
 		try {
-			if (cornerNr = kUndefined) {
+			if ((cornerNr = kUndefined) || !isNumber(cornerNr)) {
 				if this.Speaker
 					this.getSpeaker().speakPhrase("Repeat")
 			}
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
 
-				if (this.TelemetryAnalyzer && telemetry && (telemetry.Sections.Length > 0)) {
-					command := substituteVariables(this.Instructions["Coaching.Corner"]
-												 , {telemetry: telemetry.JSON, corner: cornerNr})
+				if this.TelemetryAnalyzer {
+					if (telemetry && (telemetry.Sections.Length > 0)) {
+						command := substituteVariables(this.Instructions["Coaching.Corner"]
+													 , {telemetry: telemetry.JSON, corner: cornerNr})
 
-					if reference
-						command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-															   , {telemetry: reference.JSON}))
+						if reference
+							command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																   , {telemetry: reference.JSON}))
 
-					this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+						this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
+					}
+					else if this.Speaker
+						this.getSpeaker().speakPhrase("Repeat")
 				}
 				else if this.Speaker
 					this.getSpeaker().speakPhrase("Later")
@@ -1251,23 +1255,23 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	saveReferenceTelemetry() {
+	saveReferenceTelemetry(scope) {
 		local bestSessionLapTime := 999999
 		local bestSessionLap := kUndefined
 		local bestInfo := false
 		local bestDBLapTime := 999999
 		local bestDBLap := kUndefined
-		local info, telemetries, ignore, candidate, lapTime
-		local file, size, telemetry, driver, fileName
+		local sessionDB, info, telemetries, ignore, candidate, lapTime
+		local file, size, telemetry, driver, fileName, nickName
 
 		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
-			info := readMultiMap(A_LoopFileName)
+			info := readMultiMap(A_LoopFileFullPath)
 
 			if (SessionDatabase.getUserName() = getMultiMapValue(info, "Info", "Driver")) {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 
 				if (lapTime && ((bestSessionLap == kUndefined) || (lapTime < bestSessionLapTime))) {
-					bestSessionLap := A_LoopFileName
+					bestSessionLap := A_LoopFileFullPath
 					bestSessionLapTime := lapTime
 					bestInfo := info
 				}
@@ -1275,7 +1279,9 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if (bestSessionLap != kUndefined) {
-			SesionDatabase().getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
+			sessionDB := SessionDatabase()
+
+			sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
 			for ignore, candidate in telemetries {
 				info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
@@ -1289,13 +1295,17 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
+				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickName := true)
+
+				SplitPath(bestSessionLap, , &directory, , &fileName)
+
+				file := FileOpen(directory . "\" . fileName, "r-wd")
+
 				fileName := (nickName . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "TrackTemperature", 27))
 									  . A_Space . getMultiMapValue(bestInfo, "Info", "Weather", "Dry")
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "Fuel", 0)) . "L"
 									  . " - " . Round(bestSessionLapTime, 2))
-
-				file := FileOpen(bestSessionLap, "r-wd")
 
 				if file {
 					size := file.Length
@@ -1307,7 +1317,11 @@ class DrivingCoach extends GridRaceAssistant {
 					file.Close()
 
 					sessionDB.writeTelemetry(this.Simulator, this.Car, this.Track, fileName, telemetry, size
-										   , false, true, SessionDatabase.ID)
+										   , (scope = "Community"), true, SessionDatabase.ID)
+
+					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, fileName)
+
+					addMultiMapValues(info, bestInfo)
 
 					sessionDB.writeTelemetryInfo(this.Simulator, this.Car, this.Track, fileName, info)
 				}
@@ -1806,10 +1820,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 	finishSession(shutdown := true) {
 		if (this.Session != kSessionFinished) {
-			if this.SaveReference
-				this.saveReferenceTelemetry()
+			if (this.Prepared && (this.SaveReference != "Off"))
+				this.saveReferenceTelemetry(this.SaveReference)
 
 			this.shutdownTelemetryCoaching(false)
+
+			deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
 		}
 
 		this.stopIssueAnalyzer()

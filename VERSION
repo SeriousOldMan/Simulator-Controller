@@ -6,10 +6,10 @@ Download=
 Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database"
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Release]
-Version=6.5.2.0-release
-Date=08/22/2025
+Version=6.5.3.0-release
+Date=09/12/2025
 Download=
-Changes=Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant
+Changes=Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry, Spotter fires events even if shout outs are disabled, New Spotter event "Focus Gap Update", Fixed positions in race reports for iRacing, Fixed loading of instructions in the *Reasoning* booster, Fixed session handling in LMU, Fixed pit menu handling in non-English UIs of LMU, Preserve instructions when a GPT service is changed in a booster, Fixed brake information in lap history for the LLM knowledge
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources

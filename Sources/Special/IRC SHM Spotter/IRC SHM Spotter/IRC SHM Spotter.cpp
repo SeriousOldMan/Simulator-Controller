@@ -823,7 +823,7 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 
 						if (carIndex != playerCarIndex) {
 							if (speed >= 1) {
-								if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+								if (speed < (avgSpeed / 2))
 								{
 									long distanceAhead = (long)(((running > driverRunning) ? (running * trackLength)
 																						   : ((running * trackLength) + trackLength)) - (driverRunning * trackLength));

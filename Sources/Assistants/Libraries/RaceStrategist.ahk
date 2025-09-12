@@ -114,8 +114,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iDebugStrategyCounter := [1, 1, 1]
 
-	iCollectSessionKnowledge := false
-
 	class RaceStrategistRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			super.__New("Race Strategist", remotePID)
@@ -851,12 +849,6 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	CollectSessionKnowledge {
-		Get {
-			return this.iCollectSessionKnowledge
-		}
-	}
-
 	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
@@ -866,9 +858,6 @@ class RaceStrategist extends GridRaceAssistant {
 													, muted, voiceServer)
 
 		this.updateConfigurationValues({Announcements: {WeatherUpdate: true, StrategySummary: true, StrategyUpdate: true, StrategyPitstop: false}})
-
-		this.iCollectSessionKnowledge := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-														, "Diagnostics", "Session", false)
 
 		deleteDirectory(kTempDirectory . "Race Strategist")
 
@@ -1091,6 +1080,8 @@ class RaceStrategist extends GridRaceAssistant {
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
 				return convertUnit(unit, value, arguments*)
+			else if isNumber(value)
+				return Round(value, 2)
 			else
 				return value
 		}
@@ -2294,9 +2285,6 @@ class RaceStrategist extends GridRaceAssistant {
 		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
 												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
 					 , 1000, kLowPriority)
-
-		if this.CollectSessionKnowledge
-			Task.startTask((*) => this.saveSessionKnowledge(lapNumber, simulator, car, track), 1000, kLowPriority)
 
 		return result
 	}
@@ -4379,10 +4367,15 @@ class RaceStrategist extends GridRaceAssistant {
 		local slots := false
 		local duplicateNr := false
 		local duplicateID := false
+		local driverID := getMultiMapValue(raceData, "Cars", "Driver.ID", kUndefined)
+		local driverNr := getMultiMapValue(raceData, "Cars", "Driver.Nr", kUndefined)
 		local carNr, carID, carClass, carCategory, carPosition, nrKey, idKey
 
 		raceInfo["Driver"] := getMultiMapValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getMultiMapValue(raceData, "Cars", "Count")
+
+		if (raceInfo["Cars"] = 0)
+			return
 
 		if getMultiMapValue(raceData, "Cars", "Slots", false)
 			raceInfo["Slots"] := string2Map("|", "->", getMultiMapValue(raceData, "Cars", "Slots"))
@@ -4451,6 +4444,22 @@ class RaceStrategist extends GridRaceAssistant {
 		raceInfo["HasNr"] := !duplicateNr
 		raceInfo["HasID"] := !duplicateID
 
+		if (!duplicateID && (driverID != kUndefined)) {
+			loop raceInfo["Cars"]
+				if (driverID = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)) {
+					raceInfo["Driver"] := A_Index
+
+					break
+				}
+		}
+		else if (!duplicateNr && (driverNr != kUndefined) && (driverNr != "-"))
+			loop raceInfo["Cars"]
+				if (driverNr = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", "-")) {
+					raceInfo["Driver"] := A_Index
+
+					break
+				}
+
 		raceInfo["Grid"] := grid
 		raceInfo["Classes"] := classes
 		raceInfo["Categories"] := categories
@@ -4458,8 +4467,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if slots
 			raceInfo["Slots"] := slots
 
-		if (raceInfo["Cars"] > 0)
-			this.updateSessionValues({RaceInfo: raceInfo})
+		this.updateSessionValues({RaceInfo: raceInfo})
 	}
 
 	saveStandingsData(lapNumber, simulator, car, track) {
@@ -4491,6 +4499,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 				setMultiMapValue(data, "Cars", "Count", carCount)
 				setMultiMapValue(data, "Cars", "Driver", driver)
+				setMultiMapValue(data, "Cars", "Driver.Nr", knowledgeBase.getValue("Car." . driver . ".Nr", "-"))
+				setMultiMapValue(data, "Cars", "Driver.ID", knowledgeBase.getValue("Car." . driver . ".ID", driver))
 
 				raceInfo := this.RaceInfo
 				grid := (raceInfo ? raceInfo["Grid"] : false)
@@ -4572,6 +4582,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				this.updateRaceInfo(data)
 
+				setMultiMapValue(data, "Cars", "Driver", this.RaceInfo["Driver"])
 				setMultiMapValue(data, "Cars", "Slots", map2String("|", "->", this.RaceInfo["Slots"]))
 
 				fileName := temporaryFileName("Race Strategist Race", "info")

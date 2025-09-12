@@ -314,15 +314,13 @@ namespace SHMConnector {
 			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
-			int currentLap = playerScoring.mTotalLaps;
-
 			string session = "";
+			bool running = (connected && (extended.mSimulationThreadStarted != 0));
 
 			strWriter.WriteLine("[Session Data]");
-			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)
-                                                                       && GetStringFromBytes(playerTelemetry.mTrackName) != "") ? "true" : "false");
+			strWriter.Write("Active="); strWriter.WriteLine((connected && (extended.mSessionStarted != 0)) ? "true" : "false");
 			if (connected) {
-				if (playerTelemetry.mWheels == null)
+				if ((playerTelemetry.mWheels == null) || (playerTelemetry.mTrackName == null))
 					strWriter.WriteLine("Paused=true");
 				else
 				{
@@ -373,14 +371,14 @@ namespace SHMConnector {
 				strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
 
 				strWriter.Write("LapLastTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
-																													 : playerScoring.mBestLapTime) * 1000));
+																														 : playerScoring.mBestLapTime) * 1000));
 				strWriter.Write("LapBestTime="); strWriter.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				if (playerScoring.mNumPenalties > 0)
 					strWriter.WriteLine("Penalty=true");
 
 				strWriter.Write("Sector="); strWriter.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
-				strWriter.Write("Laps="); strWriter.WriteLine(currentLap);
+				strWriter.Write("Laps="); strWriter.WriteLine(playerScoring.mTotalLaps);
 
 				long time = GetRemainingTime(ref playerScoring);
 

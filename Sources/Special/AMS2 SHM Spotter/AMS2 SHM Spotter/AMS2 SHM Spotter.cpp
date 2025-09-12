@@ -663,7 +663,7 @@ bool checkAccident(const SharedMemory* sharedData)
 			if (sharedData->mViewedParticipantIndex != i)
 			{
 				if (speed >= 1) {
-					if ((avgSpeed >= 0) && (speed < (avgSpeed / 2)))
+					if (speed < (avgSpeed / 2))
 					{
 						long distanceAhead = (long)(((vehicle.mCurrentLapDistance > driver.mCurrentLapDistance) ? vehicle.mCurrentLapDistance
 							: (vehicle.mCurrentLapDistance + sharedData->mTrackLength)) - driver.mCurrentLapDistance);

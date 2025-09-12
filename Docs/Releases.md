@@ -8,7 +8,7 @@
 
   - LLM instructions for the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
-  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs.
+  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperatures.
   - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
   - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
   - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.

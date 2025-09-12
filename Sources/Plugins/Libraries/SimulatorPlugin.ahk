@@ -261,7 +261,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				car := (this.Car ? this.Car : "*")
 				track := (this.Track ? this.Track : "*")
 
-				settings := SettingsDatabase().loadSettings(simulator, car, track, "*")
+				settings := SettingsDatabase().loadSettings(simulator, car, track, "*", "*")
 
 				default := getMultiMapValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 30)
 

@@ -220,7 +220,7 @@ class Sector397Provider extends SimulatorProvider {
 			lastCar := this.Car
 			lastTrack := this.Track
 
-			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*"
+			loadSetup := SettingsDatabase().readSettingValue(lastSimulator, lastCar, lastTrack, "*", "*"
 														   , "Simulator." . this.Simulator, "Session.Data.Setup"
 														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}

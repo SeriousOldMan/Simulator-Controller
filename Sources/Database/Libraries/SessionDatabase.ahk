@@ -1190,7 +1190,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !settingsDB
 			settingsDB := SettingsDatabase()
 
-		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "Session Settings", "Car.SteerLock", kUndefined)
+		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car.SteerLock", kUndefined)
 
 		if (steerLock == kUndefined)
 			steerLock := getCarSteerLock(simulator, car)
@@ -1290,7 +1290,7 @@ class SessionDatabase extends ConfigurationItem {
 			nms := []
 
 			try {
-				compounds := settingsDB.readSettingValue(simulator, car, track, "*"
+				compounds := settingsDB.readSettingValue(simulator, car, track, "*", "*"
 													   , "Session Settings", "Tyre.Compound.Choices"
 													   , kUndefined)
 				data := SessionDatabase.loadData(SessionDatabase.sTyreData, code, "Tyre Data.ini")

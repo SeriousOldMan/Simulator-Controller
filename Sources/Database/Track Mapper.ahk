@@ -125,7 +125,7 @@ createTrackMap(simulator, track, fileName) {
 	setMultiMapValue(trackMap, "General", "Simulator", simulator)
 	setMultiMapValue(trackMap, "General", "Track", track)
 	setMultiMapValue(trackMap, "General", "TrackType"
-				   , settingsDB.readSettingValue(simulator, "*", track, "*", ("Simulator." . simulatorName), "Track.Type", "Circuit"))
+				   , settingsDB.readSettingValue(simulator, "*", track, "*", "*", ("Simulator." . simulatorName), "Track.Type", "Circuit"))
 
 	setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
 	setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)

@@ -4558,7 +4558,7 @@ class TeamCenter extends ConfigurationItem {
 				return true
 			}
 			else {
-				settings := SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+				settings := SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, "Team", weather)
 
 				correctionAir := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
 				correctionTrack := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)

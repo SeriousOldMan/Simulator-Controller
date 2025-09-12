@@ -162,7 +162,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
-			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
+			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*", "*")
 
 			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 

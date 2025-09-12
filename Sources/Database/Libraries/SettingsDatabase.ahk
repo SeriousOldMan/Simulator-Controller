@@ -47,7 +47,7 @@ class SettingsDatabase extends SessionDatabase {
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
 	}
 
-	querySettings(simulator, car, track, weather, &userSettings, &communitySettings) {
+	querySettings(simulator, car, track, mode, weather, &userSettings, &communitySettings) {
 		local database
 		local id := this.ID
 		local result, ignore, setting
@@ -61,14 +61,26 @@ class SettingsDatabase extends SessionDatabase {
 		if userSettings {
 			result := CaseInsenseMap()
 
-			readSettings(this, simulator, result, id, true, false, "*", "*", "*")
-			readSettings(this, simulator, result, id, true, false, car, "*", "*")
-			readSettings(this, simulator, result, id, true, false, "*", track, "*")
-			readSettings(this, simulator, result, id, true, false, "*", "*", weather)
-			readSettings(this, simulator, result, id, true, false, car, track, "*")
-			readSettings(this, simulator, result, id, true, false, car, "*", weather)
-			readSettings(this, simulator, result, id, true, false, "*", track, weather)
-			readSettings(this, simulator, result, id, true, false, car, track, weather)
+			readSettings(this, simulator, result, id, true, false, "*", "*", "*", "*")
+
+			readSettings(this, simulator, result, id, true, false, car, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, false, "*", track, "*", "*")
+			readSettings(this, simulator, result, id, true, false, "*", "*", mode, "*")
+			readSettings(this, simulator, result, id, true, false, "*", "*", "*", weather)
+
+			readSettings(this, simulator, result, id, true, false, car, track, "*", "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", mode, "*")
+			readSettings(this, simulator, result, id, true, false, car, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, false, "*", track, mode, "*")
+			readSettings(this, simulator, result, id, true, false, "*", track, "*", weather)
+			readSettings(this, simulator, result, id, true, false, "*", "*", mode, weather)
+
+			readSettings(this, simulator, result, id, true, false, car, track, mode, "*")
+			readSettings(this, simulator, result, id, true, false, car, track, "*", weather)
+			readSettings(this, simulator, result, id, true, false, car, "*", mode, weather)
+			readSettings(this, simulator, result, id, true, false, "*", track, mode, weather)
+
+			readSettings(this, simulator, result, id, true, false, car, track, mode, weather)
 
 			userSettings := []
 
@@ -79,14 +91,26 @@ class SettingsDatabase extends SessionDatabase {
 		if communitySettings {
 			result := CaseInsenseMap()
 
-			readSettings(this, simulator, result, id, false, true, "*", "*", "*")
-			readSettings(this, simulator, result, id, false, true, car, "*", "*")
-			readSettings(this, simulator, result, id, false, true, "*", track, "*")
-			readSettings(this, simulator, result, id, false, true, "*", "*", weather)
-			readSettings(this, simulator, result, id, false, true, car, track, "*")
-			readSettings(this, simulator, result, id, false, true, car, "*", weather)
-			readSettings(this, simulator, result, id, false, true, "*", track, weather)
-			readSettings(this, simulator, result, id, false, true, car, track, weather)
+			readSettings(this, simulator, result, id, false, true, "*", "*", "*", "*")
+
+			readSettings(this, simulator, result, id, false, true, car, "*", "*", "*")
+			readSettings(this, simulator, result, id, false, true, "*", track, "*", "*")
+			readSettings(this, simulator, result, id, false, true, "*", "*", mode, "*")
+			readSettings(this, simulator, result, id, false, true, "*", "*", "*", weather)
+
+			readSettings(this, simulator, result, id, false, true, car, track, "*", "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", mode, "*")
+			readSettings(this, simulator, result, id, false, true, car, "*", "*", weather)
+			readSettings(this, simulator, result, id, false, true, "*", track, mode, "*")
+			readSettings(this, simulator, result, id, false, true, "*", track, "*", weather)
+			readSettings(this, simulator, result, id, false, true, "*", "*", mode, weather)
+
+			readSettings(this, simulator, result, id, false, true, car, track, mode, "*")
+			readSettings(this, simulator, result, id, false, true, car, track, "*", weather)
+			readSettings(this, simulator, result, id, false, true, car, "*", mode, weather)
+			readSettings(this, simulator, result, id, false, true, "*", track, mode, weather)
+
+			readSettings(this, simulator, result, id, false, true, car, track, mode, weather)
 
 			communitySettings := []
 
@@ -95,10 +119,10 @@ class SettingsDatabase extends SessionDatabase {
 		}
 	}
 
-	doSettings(simulator, car, track, weather, function, userSettings := true, communitySettings := true) {
+	doSettings(simulator, car, track, mode, weather, function, userSettings := true, communitySettings := true) {
 		local ignore, setting
 
-		this.querySettings(simulator, car, track, weather, &userSettings, &communitySettings)
+		this.querySettings(simulator, car, track, mode, weather, &userSettings, &communitySettings)
 
 		if (car != "*")
 			car := this.getCarCode(simulator, car)
@@ -108,14 +132,14 @@ class SettingsDatabase extends SessionDatabase {
 
 		if userSettings
 			for ignore, setting in userSettings
-				function.Call(simulator, car, track, weather, setting)
+				function.Call(simulator, car, track, mode, weather, setting)
 
 		if communitySettings
 			for ignore, setting in communitySettings
-				function.Call(simulator, car, track, weather, setting)
+				function.Call(simulator, car, track, mode, weather, setting)
 	}
 
-	loadSettings(simulator, car, track, weather, community := kUndefined) {
+	loadSettings(simulator, car, track, mode, weather, community := kUndefined) {
 		local settings := newMultiMap()
 		local id := this.ID
 		local dryPressure, wetPressure, ignore, tyre
@@ -140,19 +164,31 @@ class SettingsDatabase extends SessionDatabase {
 			for ignore, tyre in ["FL", "FR", "RL", "RR"]
 				setMultiMapValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target." . tyre, wetPressure)
 
-		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*")
-		loadSettings(this, simulator, settings, id, true, community, car, "*", "*")
-		loadSettings(this, simulator, settings, id, true, community, "*", track, "*")
-		loadSettings(this, simulator, settings, id, true, community, "*", "*", weather)
-		loadSettings(this, simulator, settings, id, true, community, car, track, "*")
-		loadSettings(this, simulator, settings, id, true, community, car, "*", weather)
-		loadSettings(this, simulator, settings, id, true, community, "*", track, weather)
-		loadSettings(this, simulator, settings, id, true, community, car, track, weather)
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*", "*")
+
+		loadSettings(this, simulator, settings, id, true, community, car, "*", "*", "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", track, "*", "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", mode, "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*", weather)
+
+		loadSettings(this, simulator, settings, id, true, community, car, track, "*", "*")
+		loadSettings(this, simulator, settings, id, true, community, car, "*", mode, "*")
+		loadSettings(this, simulator, settings, id, true, community, car, "*", "*", weather)
+		loadSettings(this, simulator, settings, id, true, community, "*", track, mode, "*")
+		loadSettings(this, simulator, settings, id, true, community, "*", track, "*", weather)
+		loadSettings(this, simulator, settings, id, true, community, "*", "*", mode, weather)
+
+		loadSettings(this, simulator, settings, id, true, community, car, track, mode, "*")
+		loadSettings(this, simulator, settings, id, true, community, car, track, "*", weather)
+		loadSettings(this, simulator, settings, id, true, community, car, "*", mode, weather)
+		loadSettings(this, simulator, settings, id, true, community, "*", track, mode, weather)
+
+		loadSettings(this, simulator, settings, id, true, community, car, track, mode, weather)
 
 		return settings
 	}
 
-	readSettings(simulator, car, track, weather, inherited := true, community := kUndefined) {
+	readSettings(simulator, car, track, mode, weather, inherited := true, community := kUndefined) {
 		local result := CaseInsenseMap()
 		local id := this.ID
 		local settings := []
@@ -168,16 +204,27 @@ class SettingsDatabase extends SessionDatabase {
 			track := this.getTrackCode(simulator, track)
 
 		if inherited {
-			readSettings(this, simulator, result, id, true, community, "*", "*", "*")
-			readSettings(this, simulator, result, id, true, community, car, "*", "*")
-			readSettings(this, simulator, result, id, true, community, "*", track, "*")
-			readSettings(this, simulator, result, id, true, community, "*", "*", weather)
-			readSettings(this, simulator, result, id, true, community, car, track, "*")
-			readSettings(this, simulator, result, id, true, community, car, "*", weather)
-			readSettings(this, simulator, result, id, true, community, "*", track, weather)
+			readSettings(this, simulator, result, id, true, community, "*", "*", "*", "*")
+
+			readSettings(this, simulator, result, id, true, community, car, "*", "*", "*")
+			readSettings(this, simulator, result, id, true, community, "*", track, "*", "*")
+			readSettings(this, simulator, result, id, true, community, "*", "*", mode, "*")
+			readSettings(this, simulator, result, id, true, community, "*", "*", "*", weather)
+
+			readSettings(this, simulator, result, id, true, community, car, track, "*", "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", mode, "*")
+			readSettings(this, simulator, result, id, true, community, car, "*", "*", weather)
+			readSettings(this, simulator, result, id, true, community, "*", track, mode, "*")
+			readSettings(this, simulator, result, id, true, community, "*", track, "*", weather)
+			readSettings(this, simulator, result, id, true, community, "*", "*", mode, weather)
+
+			readSettings(this, simulator, result, id, true, community, car, track, mode, "*")
+			readSettings(this, simulator, result, id, true, community, car, track, "*", weather)
+			readSettings(this, simulator, result, id, true, community, car, "*", mode, weather)
+			readSettings(this, simulator, result, id, true, community, "*", track, mode, weather)
 		}
 
-		readSettings(this, simulator, result, id, true, community, car, track, weather)
+		readSettings(this, simulator, result, id, true, community, car, track, mode, weather)
 
 		for ignore, setting in result
 			settings.Push(setting)
@@ -185,7 +232,7 @@ class SettingsDatabase extends SessionDatabase {
 		return settings
 	}
 
-	readSettingValue(simulator, car, track, weather, section, key
+	readSettingValue(simulator, car, track, mode, weather, section, key
 				   , default := false, inherited := true, community := kUndefined) {
 		local id := this.ID
 		local value
@@ -200,42 +247,74 @@ class SettingsDatabase extends SessionDatabase {
 			track := this.getTrackCode(simulator, track)
 
 		value := readSetting(this, simulator, id, true, community
-						   , car, track, weather, section, key, kUndefined)
+						   , car, track, mode, weather, section, key, kUndefined)
 
 		if inherited {
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , "*", track, weather, section, key, kUndefined)
+								   , "*", track, mode, weather, section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , car, "*", weather, section, key, kUndefined)
+								   , car, "*", mode, weather, section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , car, track, "*", section, key, kUndefined)
+								   , car, track, "*", weather, section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , "*", "*", weather, section, key, kUndefined)
+								   , car, track, mode, "*", section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , "*", track, "*", section, key, kUndefined)
+								   , "*", "*", mode, weather, section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , car, "*", "*", section, key, kUndefined)
+								   , "*", track, "*", weather section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , "*", "*", "*", section, key, kUndefined)
+								   , "*", track, mode, "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , car, "*", "*", weather, weather section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , car, "*", mode, "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , car, track, "*", "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , "*", "*", "*", weather, section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , "*", "*", mode, "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , "*", track, "*", "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , car, "*", "*", "*", section, key, kUndefined)
+
+			if (value == kUndefined)
+				value := readSetting(this, simulator, id, true, community
+								   , "*", "*", "*", "*", section, key, kUndefined)
 		}
 
 		return ((value == kUndefined) ? default : value)
 	}
 
-	getSettingValue(simulator, car, track, weather, section, key, default := false) {
+	getSettingValue(simulator, car, track, mode, weather, section, key, default := false) {
 		local tries := 5
 		local database, rows
 
@@ -254,7 +333,8 @@ class SettingsDatabase extends SessionDatabase {
 			if database.lock("Settings", false)
 				try {
 					rows := database.query("Settings", {Where: {Owner: this.ID
-															  , Car: car, Track: track, Weather: weather
+															  , Car: car, Track: track
+															  , Mode: mode, Weather: weather
 															  , Section: section, Key: key}})
 
 					return ((rows.Length > 0) ? rows[1]["Value"] : default)
@@ -280,7 +360,7 @@ class SettingsDatabase extends SessionDatabase {
 		return default
 	}
 
-	setSettingValue(simulator, car, track, weather, section, key, value) {
+	setSettingValue(simulator, car, track, mode, weather, section, key, value) {
 		local cValue := value
 		local tries := 5
 		local database, entry
@@ -302,7 +382,9 @@ class SettingsDatabase extends SessionDatabase {
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
 				try {
-					entry := database.query("Settings", {Where: {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}})
+					entry := database.query("Settings", {Where: {Owner: this.ID, Car: car, Track: track
+															   , Mode: mode, Weather: weather
+															   , Section: section, Key: key}})
 
 					if (entry.Length > 0) {
 						if (entry[1]["Value"] != cValue) {
@@ -312,7 +394,9 @@ class SettingsDatabase extends SessionDatabase {
 						}
 					}
 					else
-						database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+						database.add("Settings", {Owner: this.ID, Car: car, Track: track
+												, Mode: mode, Weather: weather
+												, Section: section, Key: key, Value: value})
 
 					return
 				}
@@ -335,7 +419,7 @@ class SettingsDatabase extends SessionDatabase {
 			logMessage(kLogWarn, "Waiting for file `"Settings.CSV`"...")
 	}
 
-	removeSettingValue(simulator, car, track, weather, section, key) {
+	removeSettingValue(simulator, car, track, mode, weather, section, key) {
 		local tries := 5
 		local database
 
@@ -356,8 +440,10 @@ class SettingsDatabase extends SessionDatabase {
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
 				try {
-					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-											   , always.Bind(true), true)
+					database.remove("Settings", {Owner: this.ID, Car: car, Track: track
+											   , Mode: mode, Weather: weather
+											   , Section: section, Key: key}
+											  , always.Bind(true), true)
 
 					return
 				}
@@ -387,7 +473,7 @@ constraintSettings(constraints, row) {
 	return true
 }
 
-readSetting(database, simulator, owner, user, community, car, track, weather
+readSetting(database, simulator, owner, user, community, car, track, mode, weather
 		  , section, key, default := false) {
 	local tries := 5
 	local success := false
@@ -404,7 +490,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 				if settingsDB.lock("Settings", false)
 					try {
 						rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
-																	, Weather: weather
+																	, Mode: mode, Weather: weather
 																	, Section: section, Key: key
 																	, Owner: owner}})
 
@@ -430,10 +516,11 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 		}
 
 		if community
-			for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
-																						, {Where: {Car: car, Track: track
-																								 , Weather: weather
-																								 , Section: section, Key: key}})
+			for ignore, row in database.getSettingsDatabase(simulator
+														  , "Community").query("Settings"
+																			 , {Where: {Car: car, Track: track
+																					  , Mode: mode, Weather: weather
+																					  , Section: section, Key: key}})
 				if (row["Owner"] != owner)
 					return rows[1]["Value"]
 	}
@@ -444,7 +531,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 	return default
 }
 
-readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
+readSettings(database, simulator, settings, owner, user, community, car, track, mode, weather) {
 	local result := []
 	local tries := 5
 	local success := false
@@ -455,8 +542,10 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 		return
 
 	if community
-		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
-																					, {Where: {Car: car, Track: track, Weather: weather}})
+		for ignore, row in database.getSettingsDatabase(simulator
+													  , "Community").query("Settings"
+																		 , {Where: {Car: car, Track: track
+																				  , Mode: mode, Weather: weather}})
 			if (row["Owner"] != owner)
 				result.Push(row)
 
@@ -467,7 +556,8 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 			if settingsDB.lock("Settings", false)
 				try {
 					for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
-																		   , Weather: weather, Owner: owner}})
+																		   , Mode: mode, Weather: weather
+																		   , Owner: owner}})
 						result.Push(row)
 
 					success := true
@@ -493,7 +583,7 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	visited := CaseInsenseMap()
 
 	for ignore, row in reverse(result) {
-		key := row["Section"] . "." . row["Key"]
+		key := (row["Section"] . "." . row["Key"])
 
 		if !visited.Has(key) {
 			visited[key] := true
@@ -506,11 +596,11 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 		settings[row["Section"] . "." . row["Key"]] := row
 }
 
-loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
+loadSettings(database, simulator, settings, owner, user, community, car, track, mode, weather) {
 	local values := CaseInsenseMap()
 	local ignore, setting
 
-	readSettings(database, simulator, values, owner, user, community, car, track, weather)
+	readSettings(database, simulator, values, owner, user, community, car, track, mode, weather)
 
 	for ignore, setting in values
 		setMultiMapValue(settings, setting["Section"], setting["Key"], setting["Value"])

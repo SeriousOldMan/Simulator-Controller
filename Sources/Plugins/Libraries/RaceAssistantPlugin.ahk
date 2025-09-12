@@ -1218,6 +1218,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static requireRaceAssistants(simulator, car, track, weather) {
 		local teamServer := this.TeamServer
+		local teamSession := (teamServer && teamServer.TeamServerEnabled)
 		local activeAssistant := false
 		local startupAssistant := false
 		local ignore, assistant, wasActive, wait, settingsDB
@@ -1240,7 +1241,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			settingsDB := SettingsDatabase()
 
 			try {
-				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
+				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track
+														 , (teamSession ? "Team" : "Solo"), weather
+														 , "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -1249,7 +1252,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 
 			try {
-				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
+				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track
+																					  , (teamSession ? "Team" : "Solo"), weather
+																					  , "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -1258,7 +1263,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 
 			try {
-				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+				wait := settingsDB.readSettingValue(simulator, car, track
+												  , (teamSession ? "Team" : "Solo"), weather
+												  , "Assistant", "Session.Data.Frequency", 10)
 
 				if (teamServer && teamServer.Connected[true])
 					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
@@ -1576,7 +1583,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		track := getMultiMapValue(data, "Session Data", "Track")
 
 		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
-			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined)
 
 			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
@@ -1992,7 +1999,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local settingsDB := SettingsDatabase()
 		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local teamServer := this.TeamServer
+		local teamSession := (teamServer && teamServer.TeamServerEnabled)
 		local dbSettings := settingsDB.loadSettings(simulatorName, car, track
+												  , (teamSession ? "Team" : "Solo")
 												  , (data ? getMultiMapValue(data, "Weather Data", "Weather", "Dry") : "Dry"))
 		local load, section, values, key, value
 

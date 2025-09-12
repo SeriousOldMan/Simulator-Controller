@@ -369,7 +369,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				if (car && track) {
 					simulator := simulator.Simulator[true]
 
-					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*", "*"
 																   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
 																   , "Track.Type", "Circuit")
 
@@ -452,7 +452,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				if (car && track) {
 					simulator := simulator.Simulator[true]
 
-					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*"
+					trackType := SettingsDatabase().readSettingValue(simulator, car, track, "*", "*"
 																   , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
 																   , "Track.Type", "Circuit")
 
@@ -782,7 +782,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	addLap(lap, running, data) {
-		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Simulator.Car, this.Simulator.Track, "*"
+		local trackType := SettingsDatabase().readSettingValue(this.Simulator.Simulator[true], this.Simulator.Car, this.Simulator.Track, "*", "*"
 															 , "Simulator." . SessionDatabase.getSimulatorName(this.Simulator.Simulator[true])
 															 , "Track.Type", "Circuit")
 

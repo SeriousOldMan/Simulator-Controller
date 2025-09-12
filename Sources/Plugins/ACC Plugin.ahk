@@ -328,7 +328,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			car := (this.Car ? this.Car : "*")
 			track := (this.Track ? this.Track : "*")
 
-			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*")
+			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
 
 			this.iImageSearch := getMultiMapValue(settings, "Simulator.Assetto Corsa Competizione", "Pitstop.ImageSearch", false)
 		}

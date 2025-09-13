@@ -1242,8 +1242,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			try {
 				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track
-														 , (teamSession ? "Team" : "Solo"), weather
-														 , "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
+																					 , (teamSession ? "Team" : "Solo"), weather
+																					 , "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
 			}
 			catch Any as exception {
 				logError(exception)

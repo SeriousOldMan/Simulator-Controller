@@ -272,7 +272,7 @@ class SettingsDatabase extends SessionDatabase {
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community
-								   , "*", track, "*", weather section, key, kUndefined)
+								   , "*", track, "*", weather, section, key, kUndefined)
 
 			if (value == kUndefined)
 				value := readSetting(this, simulator, id, true, community

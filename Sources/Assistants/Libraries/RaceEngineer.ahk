@@ -4533,6 +4533,7 @@ class RaceEngineer extends RaceAssistant {
 		local tyreLapsRR := 0
 		local pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
 		local tyreService, brakeService, tyreSets, pitstop, tyreChange, index, axle, tyre
+		local tc, tcc, first
 
 		static postfixes := ["FL", "FR", "RL", "RR"]
 
@@ -4593,10 +4594,11 @@ class RaceEngineer extends RaceAssistant {
 					pitstop := A_Index
 
 					if (tyreService = "Axle") {
+						first := true
+
 						for index, axle in ["Front", "Rear"] {
-							local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . axle, false)
-							local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
-							local first := false
+							tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . axle, false)
+							tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . axle, false)
 
 							if (tc && (tc != "-")) {
 								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . axle, tc)
@@ -4631,12 +4633,18 @@ class RaceEngineer extends RaceAssistant {
 								}
 							}
 						}
+
+						if first {
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", false)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", false)
+						}
 					}
 					else if (tyreService = "Wheel") {
+						first := true
+
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-							local tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . tyre, false)
-							local tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
-							local first := false
+							tc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound." . tyre, false)
+							tcc := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color." . tyre, false)
 
 							if (tc && (tc != "-")) {
 								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, tc)
@@ -4660,18 +4668,23 @@ class RaceEngineer extends RaceAssistant {
 								%"tyreLaps" . postfixes[index]% += pitstopLaps
 							}
 						}
+
+						if first {
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", false)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", false)
+						}
 					}
 					else if tyreCompound {
-						tyreLapsFL += pitstopLaps
-						tyreLapsFR += pitstopLaps
-						tyreLapsRL += pitstopLaps
-						tyreLapsRR += pitstopLaps
-					}
-					else {
 						tyreLapsFL := 0
 						tyreLapsFR := 0
 						tyreLapsRL := 0
 						tyreLapsRR := 0
+					}
+					else {
+						tyreLapsFL += pitstopLaps
+						tyreLapsFR += pitstopLaps
+						tyreLapsRL += pitstopLaps
+						tyreLapsRR += pitstopLaps
 					}
 
 					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", tyreLapsFL)
@@ -4709,11 +4722,9 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	requestPitstopHistory(callbackCategory, callbackMessage, callbackPID, arguments*) {
-		local pitstopHistory := this.createPitstopHistory()
+		local fileName := temporaryFileName("Pitstop", "history")
 
-		fileName := temporaryFileName("Pitstop", "history")
-
-		writeMultiMap(filename, pitstopHistory)
+		writeMultiMap(filename, this.createPitstopHistory())
 
 		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . values2String(";", fileName, arguments*), callbackPID)
 	}

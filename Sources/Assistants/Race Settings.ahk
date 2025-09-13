@@ -980,7 +980,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	loadTyreCompounds() {
-		local settings := (gSimulator ? SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, gWeather) : newMultiMap())
+		local settings := (gSimulator ? SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, "*", gWeather) : newMultiMap())
 		local translatedCompounds, ignore, compound, tyreLife
 
 		translatedCompounds := collect(gTyreCompounds, translate)

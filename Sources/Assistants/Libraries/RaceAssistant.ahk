@@ -4397,13 +4397,13 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 		else {
 			if inList(categories, "Class") {
-				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown) : kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Class", kUnknown) : kUnknown)
 
 				if inList(categories, "Cup")
-					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined) : kUndefined)
+					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Category", kUndefined) : kUndefined)
 			}
 			else
-				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUnknown) : kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Category", kUnknown) : kUnknown)
 		}
 
 		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)

@@ -14417,11 +14417,10 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 
 				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) {
 					if arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
-						tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
-																										 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
-																								: "-")
-
-						tyreChange := true
+						tyreChange := arguments[1]["Pitstop.Planned.Tyre.Compound"]
+						tyreCompound := translate(tyreChange ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
+																	  , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+															 : "-")
 
 						for index, tyre in wheels
 							tyreCompound%tyre% := tyreCompound

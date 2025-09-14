@@ -50,6 +50,7 @@
 
 #### Fixes
 
+  - Fixed a critical bug introduced with the last release, when the Spotter wants to reference an opponent car by the name of the driver.
   - Fixed internal car class descriptor for the active driver.
   - Fixed calculation of driven laps per tyre in some rare cases in team races.
   

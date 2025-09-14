@@ -2736,7 +2736,7 @@ class RaceSpotter extends GridRaceAssistant {
 					if ((lapDifference > 0) && (delta >= frontGapMin) && (delta <= frontGapMax)) {
 						if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 							speaker.speakPhrase("GainedFront"
-											  , getDriverVariables(standingsAhead.Driver.Car
+											  , getDriverVariables(standingsAhead.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , gained: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2761,7 +2761,7 @@ class RaceSpotter extends GridRaceAssistant {
 						}
 						else if (standingsAhead.runningAway(sector, frontLostThreshold)) {
 							speaker.speakPhrase("LostFront"
-											  , getDriverVariables(standingsAhead.Driver.Car
+											  , getDriverVariables(standingsAhead.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2842,7 +2842,7 @@ class RaceSpotter extends GridRaceAssistant {
 					if ((lapDifference > 0) && (delta >= behindGapMin) && (delta <= behindGapMax)) {
 						if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 							speaker.speakPhrase("LostBehind"
-											  , getDriverVariables(standingsBehind.Driver.Car
+											  , getDriverVariables(standingsBehind.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2860,7 +2860,7 @@ class RaceSpotter extends GridRaceAssistant {
 						}
 						else if (standingsBehind.runningAway(sector, behindGainThreshold)) {
 							speaker.speakPhrase("GainedBehind"
-											  , getDriverVariables(standingsBehind.Driver.Car
+											  , getDriverVariables(standingsBehind.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , gained: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2913,7 +2913,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 						if (focused.closingIn(sector, behindLostThreshold) && !focused.Reported) {
 							speaker.speakPhrase("LostFocusBehind"
-											  , getDriverVariables(focused.Driver.Car
+											  , getDriverVariables(focused.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2932,7 +2932,7 @@ class RaceSpotter extends GridRaceAssistant {
 						}
 						else if focused.runningAway(sector, behindGainThreshold) {
 							speaker.speakPhrase("GainedFocusBehind"
-											  , getDriverVariables(focused.Driver.Car
+											  , getDriverVariables(focused.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , gained: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2950,7 +2950,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else {
 						if (focused.closingIn(sector, frontGainThreshold) && !focused.Reported) {
 							speaker.speakPhrase("GainedFocusFront"
-											  , getDriverVariables(focused.Driver.Car
+											  , getDriverVariables(focused.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , gained: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
@@ -2974,7 +2974,7 @@ class RaceSpotter extends GridRaceAssistant {
 						}
 						else if (focused.runningAway(sector, frontLostThreshold)) {
 							speaker.speakPhrase("LostFocusFront"
-											  , getDriverVariables(focused.Driver.Car
+											  , getDriverVariables(focused.Car.Driver
 																 , {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
 																  , lost: speaker.number2Speech(deltaDifference, 1)
 																  , lapTime: speaker.number2Speech(lapTimeDifference, 1)

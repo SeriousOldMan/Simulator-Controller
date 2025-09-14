@@ -1773,6 +1773,7 @@ updateInstallationForV500() {
 }
 
 updateConfigurationForV654() {
+	local fileName := (kUserHomeDirectory . "Simulator Data\AC\Track Data.ini")
 	local settingsDB, ignore, code, entry, text
 
 	for ignore, code in ["AC", "ACC", "IRC", "AMS2", "PCARS2", "RF2", "LMU", "R3E", "ACE", "RSP"]
@@ -1805,6 +1806,9 @@ updateConfigurationForV654() {
 
 			FileAppend(text, kDatabaseDirectory . "User\" . code . "\Drivers.CSV", "UTF-8")
 		}
+
+	if FileExist(fileName)
+		FileMove(fileName, fileName . ".bak", 1)
 }
 
 updateConfigurationForV652() {

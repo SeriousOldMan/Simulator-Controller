@@ -55,8 +55,11 @@
   
 #### Changes
 
+  - Completely rewritten the handling of track names and track layouts for *Assetto Corsa*. Track names and layouts are now much more human readable. The current "Track Data.ini" file in the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup in case you have edited or extended it already.
   - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of laps a tyre compound may be typically be used will be available in the knowledge passed to an LLM for the Race Strategist.
-  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
+  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". For example, if you want that the Engineer to **not** manage tyres in *Solo* races, but tyres should be managed by instructions given by the "Team Center" of course in *Team* races, this discriminator is your friend. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654), if you have edited the "Track Data.ini" file for *Assetto Corsa*.
 
 # Release history
 

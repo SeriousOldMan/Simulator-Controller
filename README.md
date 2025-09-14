@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.4.0-dev]() (Early build for 6.5.4. Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races.)
+[6.5.4.0-dev]() (Early build for 6.5.4. Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6540) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654) of this version and all the versions you might have skipped, before installing and using this version.
 

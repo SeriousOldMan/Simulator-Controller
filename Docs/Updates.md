@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.5.4
 
-Everything handled automatically.
+The handling of names of tracks and track layouts in *Assetto Corsa* has changed. The file "Track Data.ini" n the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup, in case you have edited or extended it. The format of an internal track name is *track***-***layout* and there can be a short and a long name for each track configuration. See the original "Track Data.ini" file located in *Simulator Data\AC* folder in the installation folder of Simulator Controller for information about the structure of the file.
 
 ***
 

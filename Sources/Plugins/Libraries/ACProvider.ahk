@@ -31,11 +31,11 @@ class ACProvider extends SimulatorProvider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := false
 		tyreSets := false
-		
+
 		return true
 	}
 
@@ -45,7 +45,23 @@ class ACProvider extends SimulatorProvider {
 
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local track := getMultiMapValue(data, "Session Data", "Track", "")
+		local layout := getMultiMapValue(data, "Session Data", "Layout", "")
+		local extension := ""
 		local forName, surName, nickName, name
+
+		if (track != "") {
+			setMultiMapValue(data, "Session Data", "Track", track . "-" . layout)
+
+			if (layout != "")
+				extension := (" (" . layout . ")")
+
+			setMultiMapValue(data, "Session Data", "TrackShortName"
+								 , SessionDatabase.getTrackName(simulator, track, false) . extension)
+			setMultiMapValue(data, "Session Data", "TrackLongName"
+								 , SessionDatabase.getTrackName(simulator, track, true) . extension)
+		}
 
 		setMultiMapValue(data, "Car Data", "TC", Round((getMultiMapValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setMultiMapValue(data, "Car Data", "ABS", Round((getMultiMapValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))

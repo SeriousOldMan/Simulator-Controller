@@ -883,7 +883,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 
 					if brakeService
-						pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false)
+						pitstop["BrakeChange"] := (knowledgeBase.getValue("Pitstop.Planned.Brake.Change", false) ? kTrue : kFalse)
 				}
 
 				return pitstop
@@ -968,7 +968,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 
 					if brakeService
-						pitstop["BrakeChange"] := knowledgeBase.getValue("Pitstop." . nr . ".Brake.Change", false)
+						pitstop["BrakeChange"] := (knowledgeBase.getValue("Pitstop." . nr . ".Brake.Change", false) ? kTrue : kFalse)
 				}
 
 				return pitstop

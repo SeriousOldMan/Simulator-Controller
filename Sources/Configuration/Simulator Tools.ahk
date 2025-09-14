@@ -1784,7 +1784,8 @@ updateConfigurationForV654() {
 
 			try {
 				for ignore, entry in settingsDB.Table["Settings"]
-					entry["Mode"] := "*"
+					if (entry["Mode"] = kNull)
+						entry["Mode"] := "*"
 
 				settingsDB.changed("Settings")
 			}

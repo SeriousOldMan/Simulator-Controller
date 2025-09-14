@@ -1,7 +1,7 @@
 [Development]
 Version=6.5.4.0-dev
 Target=6.5.4.0-release
-Date=09/13/2025
+Date=09/14/2025
 Download=
 Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races
 Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1

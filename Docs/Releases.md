@@ -44,7 +44,19 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.5.4.0
+
+#### Date: 09/19/25 (planned)
+
+#### Fixes
+
+  - Fixed internal car class descriptor for the active driver.
+  - Fixed calculation of driven laps per tyre in some rare cases in team races.
+  
+#### Changes
+
+  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of laps a tyre compound may be typically be used will be available in the knowledge passed to an LLM for the Race Strategist.
+  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
 
 # Release history
 

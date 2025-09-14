@@ -24,7 +24,7 @@ A continuación encontrará una lista completa de todos los comandos de voz reco
    
 		{ presiones, presiones de neumáticos }
 
-   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática] (https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.grammars.es) y se ve así:
+   Si una determinada lista de opciones se utiliza en varias frases, se puede definir una variable para ella y se puede utilizar una referencia de variable (el nombre de la lista de opciones encerrado entre **(** y **)**) en lugar de explícito sintaxis. Todas las opciones predefinidas se enumeran en la sección "[Choices]" del [archivo de gramática](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Assistants/Grammars/Choices.grammars.es) y se ve así:
 
 		TellMe=Puedes decirme, Por favor dime, Puedes darme, Por favor dame, Dame
 
@@ -82,7 +82,7 @@ Information=Información de la sesión, Información de la Stint, Información d
 
 3.  Entrenamiento
 
-	[(CanYou) (1)darme una {entrenamiento, lección de entrenamiento}, (CanWe) realizar una sesión de {entrenamiento, entrenamiento, práctica, practicar}, (CanYou) {ayudarme, ayudarme} con {el, mi} {entrenamiento, práctica, práctica}, (CanYou) {observar, observar} mi {entrenamiento, práctica, practicar, condución}, (CanYou) {revisar, observar} mi conducción {técnica, estilo}, (CanWe) mejorar mis habilidades de conducción, (CanWe) realizar un entrenamiento, (CanYou) darme una lección de entrenamiento, (CanWe) realizar una sesion de {entrenamiento, práctica}]
+	[(CanYou) darme una {entrenamiento, lección de entrenamiento}, (CanWe) realizar una sesión de {entrenamiento, entrenamiento, práctica, practicar}, (CanYou) {ayudarme, ayudarme} con {el, mi} {entrenamiento, práctica, práctica}, (CanYou) {observar, observar} mi {entrenamiento, práctica, practicar, condución}, (CanYou) {revisar, observar} mi conducción {técnica, estilo}, (CanWe) mejorar mis habilidades de conducción, (CanWe) realizar un entrenamiento, (CanYou) darme una lección de entrenamiento, (CanWe) realizar una sesion de {entrenamiento, práctica}]
 
 	[Gracias {por tu ayuda, aprendí mucho, estuvo genial}, estuvo genial, gracias, está bien, es suficiente por hoy]
 

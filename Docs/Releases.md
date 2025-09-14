@@ -51,6 +51,7 @@
 #### Fixes
 
   - Fixed internal car class descriptor for the active driver.
+  - Fixed calculation of driven laps per tyre in some rare cases in team races.
   
 #### Changes
 

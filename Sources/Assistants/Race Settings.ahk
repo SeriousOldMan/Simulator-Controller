@@ -1793,9 +1793,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairSuspensionGreaterLabel", translate(">"))
-		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit"
+		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairSuspensionThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairSuspensionState()
 
@@ -1807,9 +1807,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairBodyworkGreaterLabel", translate(">"))
-		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit"
+		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairBodyworkThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairBodyworkState()
 
@@ -1820,9 +1820,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairEngineGreaterLabel", translate(">"))
-		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairEngineThresholdEdit"
+		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairEngineThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
-		settingsGui.Add("Text", "x318 yp+2 w70 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
+		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairEngineState()
 
@@ -1833,9 +1833,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VchangeTyreGreaterLabel", translate(">"))
-		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VchangeTyreThresholdEdit"
+		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VchangeTyreThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1))
-		settingsGui.Add("Text", "x318 yp+2 w90 h20 VchangeTyreThresholdLabel", translate("Degrees"))
+		settingsGui.Add("Text", "x303 yp+2 w84 h20 VchangeTyreThresholdLabel", translate("Degrees"))
 
 		updateChangeTyreState()
 

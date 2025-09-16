@@ -184,7 +184,7 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		getPhrase(phrase, variables := false, cache := false) {
+		getPhrase(phrase, variables := false, &cache := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -203,7 +203,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
-			phrase := this.getPhrase(phrase, variables, cache)
+			phrase := this.getPhrase(phrase, variables, &cache)
 
 			if phrase
 				this.speak(phrase, focus, cache, options)
@@ -382,7 +382,7 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		getPhrase(phrase, variables := false, cache := false) {
+		getPhrase(phrase, variables := false, &cache := false) {
 			local phrases := this.Phrases
 			local index
 
@@ -401,7 +401,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
-			phrase := this.getPhrase(phrase, variables, cache)
+			phrase := this.getPhrase(phrase, variables, &cache)
 
 			if phrase
 				this.speak(phrase, focus, cache, options)

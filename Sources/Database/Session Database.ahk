@@ -2085,7 +2085,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				if documentation {
 					loop 8
-						editorGui["settingsTab" . A_Index].SetFont("Italic Underline C" . editorGui.Theme.LinkColor)
+						editorGui["settingsTab" . A_Index].SetFont("Norm Italic Underline C" . editorGui.Theme.LinkColor)
 				}
 				else {
 					loop 8
@@ -3196,7 +3196,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						if (section.Length = 5) {
 							for key, value in values
-								settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[5], section[1], key, value)						
+								settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[5], section[1], key, value)
 						}
 						else
 							for key, value in values

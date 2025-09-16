@@ -868,7 +868,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (this.TeamServerActive && !this.SessionActive) {
 			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Starting team session: " . car . ", " . track)
+				logMessage(kLogDebug, "Starting team session: " . car . ", " . track)
 
 			try {
 				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
@@ -926,7 +926,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				if this.DriverActive {
 					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Finishing team session")
+						logMessage(kLogDebug, "Finishing team session")
 
 					this.Connector.FinishSession(this.Session)
 
@@ -961,13 +961,13 @@ class TeamServerPlugin extends ControllerPlugin {
 			if !this.SessionActive {
 				if (lapNumber = 1) {
 					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Creating team session: " . car . ", " . track)
+						logMessage(kLogDebug, "Creating team session: " . car . ", " . track)
 
 					this.startSession(simulator, car, track, duration)
 				}
 				else {
 					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Joining team session: " . car . ", " . track)
+						logMessage(kLogDebug, "Joining team session: " . car . ", " . track)
 
 					this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 					this.iSessionActive := true
@@ -994,7 +994,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if this.DriverActive {
 			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Leaving team session")
+				logMessage(kLogDebug, "Leaving team session")
 
 			if isLogLevel(kLogInfo)
 				logMessage(kLogInfo, translate("Leaving team session (Session: ") . this.Session . translate(")"))
@@ -1060,7 +1060,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						value := this.Connector.GetSessionValue(this.Session, name)
 
 						if (isDebug() && isLogLevel(kLogDebug))
-							showMessage("Fetching session value: " . name . " => " . value)
+							logMessage(kLogDebug, "Fetching session value: " . name . " => " . value)
 
 						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
@@ -1093,7 +1093,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.SessionActive {
 			try {
 				if (isDebug() && isLogLevel(kLogDebug))
-					showMessage("Saving session value: " . name . " => " . value)
+					logMessage(kLogDebug, "Saving session value: " . name . " => " . value)
 
 				loop retries
 					try {
@@ -1147,7 +1147,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							value := this.Connector.GetStintValue(stint, name)
 
 						if (isDebug() && isLogLevel(kLogDebug))
-							showMessage("Fetching value for " . stint . ": " . name . " => " . value)
+							logMessage(kLogDebug, "Fetching value for " . stint . ": " . name . " => " . value)
 
 						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
@@ -1183,7 +1183,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if session {
 			try {
 				if (isDebug() && isLogLevel(kLogDebug))
-					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
+					logMessage(kLogDebug, "Saving value for stint " . stint . ": " . name . " => " . value)
 
 				loop retries
 					try {
@@ -1363,7 +1363,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							value := this.Connector.GetLapValue(lap, name)
 
 						if (isDebug() && isLogLevel(kLogDebug))
-							showMessage("Fetching value for " . lap . ": " . name . " => " . value)
+							logMessage(kLogDebug, "Fetching value for " . lap . ": " . name . " => " . value)
 
 						if (isLogLevel(kLogInfo) && value && (value != ""))
 							logMessage(kLogInfo, translate("Fetching lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
@@ -1399,7 +1399,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if session {
 			try {
 				if (isDebug() && isLogLevel(kLogDebug))
-					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
+					logMessage(kLogDebug, "Saving value for lap " . lap . ": " . name . " => " . value)
 
 				loop retries
 					try {
@@ -1467,7 +1467,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							try {
 								this.setLapValue(lap, "Lap Telemetry", FileRead(this.TelemetryDirectory . "\Lap " . lap . ".telemetry"))
 								this.setSessionValue("HasTelemetry", true)
-								
+
 								loadedLaps[lap] := true
 							}
 							catch Any as exception {
@@ -1526,7 +1526,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					throw "Cannot add a stint to an inactive session..."
 
 				if (isDebug() && isLogLevel(kLogDebug))
-					showMessage("Updating stint in lap " . lapNumber . " for team session")
+					logMessage(kLogDebug, "Updating stint in lap " . lapNumber . " for team session")
 
 				loop retries
 					try {
@@ -1571,7 +1571,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				driverNickName := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
 
 				if (isDebug() && isLogLevel(kLogDebug)) {
-					showMessage("Updating lap for team session: " . lapNumber)
+					logMessage(kLogDebug, "Updating lap for team session: " . lapNumber)
 
 					if (isDevelopment() && ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName)))
 						throw "Driver inconsistency detected..."
@@ -1608,7 +1608,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							telemetryText := printMultiMap(telemetryData)
 
 							if (isDebug() && isLogLevel(kLogDebug))
-								showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryText)
+								logMessage(kLogDebug, "Setting telemetry data for lap " . lapNumber . ": " . telemetryText)
 
 							this.setLapValue(lapNumber, "Telemetry Data", telemetryText)
 
@@ -1628,7 +1628,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					standingsData := printMultiMap(standingsData)
 
 					if (isDebug() && isLogLevel(kLogDebug))
-						showMessage("Setting standings data for lap " . lapNumber . ": " . standingsData)
+						logMessage(kLogDebug, "Setting standings data for lap " . lapNumber . ": " . standingsData)
 
 					this.setLapValue(lapNumber, "Positions Data", standingsData)
 

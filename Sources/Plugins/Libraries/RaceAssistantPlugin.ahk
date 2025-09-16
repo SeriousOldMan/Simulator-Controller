@@ -384,7 +384,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
 					if isDebug() {
 						if isLogLevel(kLogDebug)
-							showMessage("Restoring session state for " . raceAssistant.Plugin)
+							logMessage(kLogDebug, "Restoring session state for " . raceAssistant.Plugin)
 
 						logMessage(kLogCritical, "Restoring session state for " . raceAssistant.Plugin . "...")
 					}
@@ -2287,7 +2287,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (teamServer && this.TeamSessionActive) {
 			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Saving lap state for " . this.Plugin)
+				logMessage(kLogDebug, "Saving lap state for " . this.Plugin)
 
 			if state {
 				stateName := getKeys(state)
@@ -2337,7 +2337,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (teamServer && this.TeamSessionActive) {
 			if isDebug() {
 				if isLogLevel(kLogDebug)
-					showMessage("Saving session state for " . this.Plugin)
+					logMessage(kLogDebug, "Saving session state for " . this.Plugin)
 
 				logMessage(kLogCritical, "Saving session state for " . this.Plugin . "...")
 			}
@@ -2353,7 +2353,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	restoreSessionState(data) {
 		if isDebug() {
 			if isLogLevel(kLogDebug)
-				showMessage("Start session state restoring for " . this.Plugin)
+				logMessage(kLogDebug, "Start session state restoring for " . this.Plugin)
 
 			logMessage(kLogCritical, "Start session state restoring for " . this.Plugin . "...")
 		}
@@ -2566,7 +2566,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					message := "Raw Data`n`n"
 
 					for key, value in testData
-						message := message . key . " = " . value . "`n"
+						message := (message . key . " = " . value . "`n")
 
 					showMessage(message, translate("Modular Simulator Controller System"), "Information.ico", 5000, "Left", "Bottom", 400, 400)
 				}

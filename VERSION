@@ -1,10 +1,10 @@
 [Development]
 Version=6.5.4.0-dev
 Target=6.5.4.0-release
-Date=09/15/2025
+Date=09/16/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5msKjNt-
-Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter
-Components=Media->5.6.1,Configuration->6.4.3,Utilities->6.4.1
+Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter, Changed the Pitstop Planning action for Conversation and Reasoning booster for the Engineer
+Components=Media->5.6.1,Configuration->6.5.4,Utilities->6.4.1
 [Release]
 Version=6.5.3.0-release
 Date=09/12/2025
@@ -18,7 +18,9 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.4.3.Path=Resources
 Configuration.6.4.3.Content=Setup
 Configuration.6.4.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zoHkt9TS;https://www.dropbox.com/scl/fi/q8stf68kh7z07tq2k4m6f/Configuration-6.4.3.zip?rlkey=n9bs5x2y1jj185vxhxvkllxkj&st=q3y9dvbh&dl=1;http://%master%/Components/Configuration 6.4.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.4.3.zip
-Configuration.6.4.3.Path=Resources
+Configuration.6.5.4.Path=Resources
+Configuration.6.5.4.Content=Setup
+Configuration.6.5.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/m-73Sz6d;https://www.dropbox.com/scl/fi/52hjh6d8jumrcuyidywik/Configuration-6.5.4.zip?rlkey=uz3nlqhkdciipowti3jnov7vh&st=hk75xo2w&dl=1;http://%master%/Components/Configuration 6.5.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.5.4.zip
 Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip

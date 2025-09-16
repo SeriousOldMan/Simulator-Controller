@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5msKjNt-) (Early build for 6.5.4. Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter.)
+[6.5.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5msKjNt-) (Early build for 6.5.4. Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter, Changed the Pitstop Planning action for Conversation and Reasoning booster for the Engineer.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6540) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654) of this version and all the versions you might have skipped, before installing and using this version.
 

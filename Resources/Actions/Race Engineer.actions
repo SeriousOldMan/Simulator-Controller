@@ -1,7 +1,7 @@
 [Conversation.Actions]
 Active=plan_pitstop,cancel_pitstop,recalculate_damage_impact
 [Conversation.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|true|5|Create a plan for the next pitstop.
+plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|true|5|Create a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 recalculate_damage_impact=Assistant.Rule|Race Engineer.recalculate_damage_impact.rules|false|true|0|Resets the damage impact calculation and then starts a full recalculation of the time loss caused by the damage.
 [Conversation.Actions.Parameters]
@@ -13,7 +13,7 @@ plan_pitstop.5=swapDriver|Boolean||false|Indicates in a team race whether the ne
 [Agent.LLM.Actions]
 Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_low_energy,report_tyre_wear,report_brake_wear,report_pressure_loss
 [Agent.LLM.Actions.Builtin]
-plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %changeTyres%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|5|Creates a plan for the next pitstop.
+plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %tyreCompound%, %repairDamage%, %swapDriver%)|false|false|5|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
 report_low_energy=Assistant.Method|lowEnergyWarning(%remainingEnergy%, %remainingLaps%)|false|false|2|Reports that the car is running low on virtual energy.

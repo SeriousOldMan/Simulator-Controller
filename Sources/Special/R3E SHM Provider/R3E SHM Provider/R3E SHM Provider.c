@@ -316,6 +316,9 @@ int main(int argc, char* argv[])
 			wprintf_s(L"EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0);
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
+			if (map_buffer->virtual_energy_left != -1 && map_buffer->virtual_energy_capacity != -1)
+				wprintf_s(L"EnergyRemaining=%f\n", map_buffer->virtual_energy_left / map_buffer->virtual_energy_capacity * 100);
+			
 			char tyreCompoundRaw[11] = "Unknown";
 			
 			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_PRIMARY)

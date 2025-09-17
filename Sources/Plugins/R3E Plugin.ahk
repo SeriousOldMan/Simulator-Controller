@@ -170,7 +170,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
 
-			this.iImageSearch := getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.ImageSearch", true)
+			this.iImageSearch := getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.ImageSearch", false)
 		}
 
 		if !this.OpenPitstopMFDHotkey {

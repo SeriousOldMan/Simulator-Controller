@@ -379,6 +379,9 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeFloatOption(result, "EngineDamage=", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0, &pos);
 
 			writeFloatOption(result, "FuelRemaining=", map_buffer->fuel_left, &pos);
+			
+			if (map_buffer->virtual_energy_left != -1 && map_buffer->virtual_energy_capacity != -1)
+				writeFloatOption(result, "EnergyRemaining=", map_buffer->virtual_energy_left / map_buffer->virtual_energy_capacity * 100, &pos);
 
 			char tyreCompoundRaw[11] = "Unknown";
 

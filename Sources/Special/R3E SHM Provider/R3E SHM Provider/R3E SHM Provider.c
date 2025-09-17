@@ -394,8 +394,8 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"BrakeTemperature=0,0,0,0\n");
 
-			if ((int)map_buffer->engine_water_temp)
-				wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_water_temp);
+			if ((int)map_buffer->engine_temp)
+				wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_temp);
 
 			if ((int)map_buffer->engine_oil_temp)
 				wprintf_s(L"OilTemperature=%d\n", (int)map_buffer->engine_oil_temp);
@@ -521,12 +521,12 @@ int main(int argc, char* argv[])
 					wprintf(L"Repair Rear Aero\n");
 
 					break;
-				/*
+				
 				case R3E_PIT_MENU_SUSPENSION:
 					wprintf(L"Repair Suspension\n");
 
 					break;
-				*/
+				
 				case R3E_PIT_MENU_BUTTON_TOP:
 					wprintf(L"Top Button\n");
 

@@ -516,6 +516,10 @@ int main(int argc, char* argv[])
 					wprintf(L"Change Rear Tyres\n");
 
 					break;
+				case R3E_PIT_MENU_BODY:
+					wprintf(L"Repair Bodywork\n");
+
+					break;
 				case R3E_PIT_MENU_FRONTWING:
 					wprintf(L"Repair Front Aero\n");
 

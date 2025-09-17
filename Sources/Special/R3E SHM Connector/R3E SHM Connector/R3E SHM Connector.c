@@ -585,6 +585,10 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					writeString(result, "Change Rear Tyres\n", &pos);
 
 					break;
+				case R3E_PIT_MENU_BODY:
+					writeString(result, "Repair Bodywork\n", &pos);
+
+					break;
 				case R3E_PIT_MENU_FRONTWING:
 					writeString(result, "Repair Front Aero\n", &pos);
 

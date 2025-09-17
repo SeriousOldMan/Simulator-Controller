@@ -150,11 +150,20 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	pitstopMFDIsOpen() {
+		local pitMenuState
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if this.activateWindow()
-				return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
-			else
-				return false
+			if this.iImageSearch {
+				if this.activateWindow()
+					return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
+				else
+					return false
+			}
+			else {
+				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
+
+				return ((pitMenuState["Selected"] != "Unavailable") || (pitMenuState["Strategy"] != "Unavailable") || (pitMenuState["Refuel"] != "Unavailable"))
+			}
 		}
 		else
 			return false

@@ -30,8 +30,6 @@ global kR3EPlugin := "R3E"
 
 global kBinaryOptions := ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
 
-global kUseImageRecognition := true
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -50,6 +48,24 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPSImageSearchArea := false
 	iPitstopOptions := []
 	iPitstopOptionStates := []
+
+	iImageSearch := kUndefined
+
+	Car {
+		Set {
+			this.iImageSearch := kUndefined
+
+			return (super.Car := value)
+		}
+	}
+
+	Track {
+		Set {
+			this.iImageSearch := kUndefined
+
+			return (super.Track := value)
+		}
+	}
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -143,10 +159,19 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	openPitstopMFD(descriptor := false) {
-		local secondTry
+		local secondTry, car, track, settings
 
 		static first := true
 		static reported := false
+
+		if (this.iImageSearch = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
+
+			this.iImageSearch := getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.ImageSearch", true)
+		}
 
 		if !this.OpenPitstopMFDHotkey {
 			if !reported {
@@ -223,7 +248,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			loop 15
 				this.sendCommand(this.NextOptionHotkey)
 
-			if kUseImageRecognition {
+			if this.iImageSearch {
 				if this.searchMFDImage("Strategy") {
 					this.iPitstopOptions.Push("Strategy")
 					this.iPitstopOptionStates.Push(true)

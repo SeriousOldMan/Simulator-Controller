@@ -184,7 +184,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 	openPitstopMFD(descriptor := false) {
 		local isOpen := false
-		local secondTry, car, track, settings
+		local car, track, settings
 
 		static first := true
 		static reported := false
@@ -214,19 +214,16 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.activateWindow() {
-				secondTry := false
-
 				if first
 					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				if !this.pitstopMFDIsOpen() {
+				if this.pitstopMFDIsOpen()
+					isOpen := true
+				else {
 					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-					secondTry := true
-				}
-
-				if (first && secondTry)
 					isOpen := this.pitstopMFDIsOpen()
+				}
 
 				first := false
 

@@ -316,6 +316,9 @@ int main(int argc, char* argv[])
 			wprintf_s(L"EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0);
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
+			if (map_buffer->virtual_energy_left != -1 && map_buffer->virtual_energy_capacity != -1)
+				wprintf_s(L"EnergyRemaining=%f\n", map_buffer->virtual_energy_left / map_buffer->virtual_energy_capacity * 100);
+			
 			char tyreCompoundRaw[11] = "Unknown";
 			
 			if (map_buffer->tire_subtype_front == R3E_TIRE_SUBTYPE_PRIMARY)
@@ -394,8 +397,8 @@ int main(int argc, char* argv[])
 			else
 				wprintf_s(L"BrakeTemperature=0,0,0,0\n");
 
-			if ((int)map_buffer->engine_water_temp)
-				wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_water_temp);
+			if ((int)map_buffer->engine_temp)
+				wprintf_s(L"WaterTemperature=%d\n", (int)map_buffer->engine_temp);
 
 			if ((int)map_buffer->engine_oil_temp)
 				wprintf_s(L"OilTemperature=%d\n", (int)map_buffer->engine_oil_temp);
@@ -513,6 +516,10 @@ int main(int argc, char* argv[])
 					wprintf(L"Change Rear Tyres\n");
 
 					break;
+				case R3E_PIT_MENU_BODY:
+					wprintf(L"Repair Bodywork\n");
+
+					break;
 				case R3E_PIT_MENU_FRONTWING:
 					wprintf(L"Repair Front Aero\n");
 
@@ -521,12 +528,12 @@ int main(int argc, char* argv[])
 					wprintf(L"Repair Rear Aero\n");
 
 					break;
-				/*
+				
 				case R3E_PIT_MENU_SUSPENSION:
 					wprintf(L"Repair Suspension\n");
 
 					break;
-				*/
+				
 				case R3E_PIT_MENU_BUTTON_TOP:
 					wprintf(L"Top Button\n");
 

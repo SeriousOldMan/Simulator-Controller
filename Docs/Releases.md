@@ -1,5 +1,31 @@
 # Latest stable release
 
+## 6.5.4.0
+
+#### Date: 09/19/25
+
+#### Fixes
+
+  - Fixed a critical bug introduced with the last release, when the Spotter wants to reference an opponent car by the name of the driver.
+  - Fixed internal car class descriptor for the active driver.
+  - Fixed calculation of driven laps per tyre in some rare cases in team races.
+  
+#### Changes
+
+  - Introduced more speech variations for the Spotter shout outs which are cached for performance reasons.
+  - Completely rewritten the handling of track names and track layouts for *Assetto Corsa*. Track names and layouts are now much more human readable. The current "Track Data.ini" file in the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup in case you have edited or extended it already.
+  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of typical usable laps of a tyre compound will be available in the knowledge passed to an LLM for the Race Strategist.
+  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". For example, if you want that the Engineer do **not** handle tyres in pitstop preparation in *Solo* races, but tyres should be managed by instructions given by the "Team Center" of course in *Team* races, this discriminator is your friend. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
+  - [Expert] The Pitstop Planning action for the *Conversation* and *Reasoning* booster of the Engineer has been changed in preparation of the LAM integration. Individual tyre compounds for each wheel are now supported.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654), if you have edited the "Track Data.ini" file for *Assetto Corsa*.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.5.3.0
 
 #### Date: 09/12/25
@@ -8,7 +34,7 @@
 
   - LLM instructions for the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
   - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
-  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperaturs.
+  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperatures.
   - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
   - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
   - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
@@ -41,12 +67,6 @@
   - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
   - [Developer] New [keyboard modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Tools" to control aspects of the build process.
-
-# Upcoming release
-
-Not yet planned...
-
-# Release history
 
 ## 6.5.2.0
 

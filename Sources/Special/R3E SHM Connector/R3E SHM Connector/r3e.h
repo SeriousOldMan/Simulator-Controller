@@ -12,13 +12,13 @@ typedef uint8_t r3e_u8char; // UTF-8 code unit
 enum
 {
     // Major version number to test against
-    R3E_VERSION_MAJOR = 2
+    R3E_VERSION_MAJOR = 3
 };
 
 enum
 {
     // Minor version number to test against
-    R3E_VERSION_MINOR = 9
+    R3E_VERSION_MINOR = 4
 };
 
 enum
@@ -28,11 +28,24 @@ enum
 
 typedef enum
 {
+    R3E_GAMEMODE_UNAVAILABLE = -1,
+    R3E_GAMEMODE_TRACKTEST = 0,
+    R3E_GAMEMODE_LEADERBOARDCHALLENGE = 1,
+    R3E_GAMEMODE_COMPETITION = 2,
+    R3E_GAMEMODE_SINGLERACE = 3,
+    R3E_GAMEMODE_CHAMPIONSHIP = 4,
+    R3E_GAMEMODE_MULTIPLAYER = 5,
+    R3E_GAMEMODE_MULTIPLAYERRANKED = 6, // not impl currently
+    R3E_GAMEMODE_TRYBEFOREYOUBUY = 7,
+} r3e_gamemode;
+
+typedef enum
+{
     R3E_SESSION_UNAVAILABLE = -1,
     R3E_SESSION_PRACTICE = 0,
     R3E_SESSION_QUALIFY = 1,
     R3E_SESSION_RACE = 2,
-	R3E_SESSION_WARMUP = 3,
+    R3E_SESSION_WARMUP = 3,
 } r3e_session;
 
 typedef enum
@@ -96,7 +109,7 @@ typedef enum
 } r3e_pit_window;
 
 typedef enum
-{	
+{
     // Pit menu unavailable
     R3E_PIT_MENU_UNAVAILABLE = -1,
 
@@ -109,18 +122,17 @@ typedef enum
     R3E_PIT_MENU_FUEL = 3,
     R3E_PIT_MENU_FRONTTIRES = 4,
     R3E_PIT_MENU_REARTIRES = 5,
-    R3E_PIT_MENU_BODYWORK = 6,
+    R3E_PIT_MENU_BODY = 6,
     R3E_PIT_MENU_FRONTWING = 7,
     R3E_PIT_MENU_REARWING = 8,
-    // R3E_PIT_MENU_SUSPENSION = 8,
-    // Waiting for a fix from S3 here...
-	
+    R3E_PIT_MENU_SUSPENSION = 9,
+
     // Pit menu buttons
-    R3E_PIT_MENU_BUTTON_TOP = 9,
-    R3E_PIT_MENU_BUTTON_BOTTOM = 10,
-	
+    R3E_PIT_MENU_BUTTON_TOP = 10,
+    R3E_PIT_MENU_BUTTON_BOTTOM = 11,
+
     // Pit menu nothing selected
-    R3E_PIT_MENU_MAX = 11,
+    R3E_PIT_MENU_MAX = 12,
 } r3e_pit_menu_selection;
 
 typedef enum
@@ -132,24 +144,38 @@ typedef enum
 
 typedef enum
 {
-	R3E_TIRE_SUBTYPE_UNAVAILABLE = -1,
-	R3E_TIRE_SUBTYPE_PRIMARY = 0,
-	R3E_TIRE_SUBTYPE_ALTERNATE = 1,
-	R3E_TIRE_SUBTYPE_SOFT = 2,
-	R3E_TIRE_SUBTYPE_MEDIUM = 3,
-	R3E_TIRE_SUBTYPE_HARD = 4,
+    R3E_TIRE_SUBTYPE_UNAVAILABLE = -1,
+    R3E_TIRE_SUBTYPE_PRIMARY = 0,
+    R3E_TIRE_SUBTYPE_ALTERNATE = 1,
+    R3E_TIRE_SUBTYPE_SOFT = 2,
+    R3E_TIRE_SUBTYPE_MEDIUM = 3,
+    R3E_TIRE_SUBTYPE_HARD = 4,
 } r3e_tire_subtype;
+
+typedef enum
+{
+    R3E_MTRL_TYPE_UNAVAILABLE = -1,
+    R3E_MTRL_TYPE_NONE = 0,
+    R3E_MTRL_TYPE_TARMAC = 1,
+    R3E_MTRL_TYPE_GRASS = 2,
+    R3E_MTRL_TYPE_DIRT = 3,
+    R3E_MTRL_TYPE_GRAVEL = 4,
+    R3E_MTRL_TYPE_RUMBLE = 5,
+} r3e_mtrl_type;
 
 typedef enum
 {
     // No mandatory pitstops
     R3E_PITSTOP_STATUS_UNAVAILABLE = -1,
 
-    // Mandatory pitstop not served yet
-    R3E_PITSTOP_STATUS_UNSERVED = 0,
+    // Mandatory pitstop for two tyres not served yet
+    R3E_PITSTOP_STATUS_TWO_TYRES_UNSERVED = 0,
+
+    // Mandatory pitstop for four tyres not served yet
+    R3E_PITSTOP_STATUS_FOUR_TYRES_UNSERVED = 1,
 
     // Mandatory pitstop served
-    R3E_PITSTOP_STATUS_SERVED = 1,
+    R3E_PITSTOP_STATUS_SERVED = 2,
 } r3e_pitstop_status;
 
 typedef enum
@@ -248,6 +274,9 @@ typedef struct
 // High precision data for player's vehicle only
 typedef struct
 {
+    // Player user id
+    r3e_int32 user_id;
+
     // Virtual physics time
     // Unit: Ticks (1 tick = 1/400th of a second)
     r3e_int32 game_simulation_ticks;
@@ -299,14 +328,14 @@ typedef struct
     // Total steering force coming through steering bars
     r3e_float64 steering_force;
     r3e_float64 steering_force_percentage;
-	
+
     // Current engine torque
     r3e_float64 engine_torque;
 
     // Current downforce
     // Unit: Newtons (N)
     r3e_float64 current_downforce;
-	
+
     // Currently unused
     r3e_float64 voltage;
     r3e_float64 ers_level;
@@ -329,6 +358,8 @@ typedef struct
 
     // Reserved data
     r3e_float64 unused1;
+    r3e_float64 unused2;
+    r3e_float64 unused3;
 } r3e_playerdata;
 
 typedef struct
@@ -356,7 +387,7 @@ typedef struct
     //  0 = no positions gained
     //  n = number of positions gained
     r3e_int32 yellowPositionsGained;
-	
+
     // Yellow flag for each sector; -1 = no data, 0 = not active, 1 = active
     r3e_int32 sector_yellow[3];
 
@@ -430,11 +461,12 @@ typedef struct
 
 typedef struct
 {
-    r3e_int32 drive_through;
-    r3e_int32 stop_and_go;
-    r3e_int32 pit_stop;
-    r3e_int32 time_deduction;
-    r3e_int32 slow_down;
+    // -1.0 = none pending, otherwise penalty time dep on penalty type (drive-through active = 0.0, stop-and-go = time to stay, slow-down = time left to give back etc))
+    r3e_float32 drive_through;
+    r3e_float32 stop_and_go;
+    r3e_float32 pit_stop;
+    r3e_float32 time_deduction;
+    r3e_float32 slow_down;
 } r3e_cut_track_penalties;
 
 typedef struct
@@ -506,10 +538,14 @@ typedef struct
     r3e_int32 slot_id;
     r3e_int32 class_performance_index;
     r3e_int32 engine_type;
+    r3e_float32 car_width;
+    r3e_float32 car_length;
+    r3e_float32 rating;
+    r3e_float32 reputation;
 
     // Reserved data
-    r3e_int32 unused1;
-    r3e_int32 unused2;
+    r3e_float32 unused1;
+    r3e_float32 unused2;
 } r3e_driver_info;
 
 typedef struct
@@ -519,6 +555,7 @@ typedef struct
     r3e_int32 place;
     r3e_int32 place_class;
     r3e_float32 lap_distance;
+    r3e_float32 lap_distance_fraction;
     r3e_vec3_f32 position;
     r3e_int32 track_sector;
     r3e_int32 completed_laps;
@@ -535,9 +572,9 @@ typedef struct
     r3e_cut_track_penalties penalties;
     r3e_float32 car_speed;
     r3e_int32 tire_type_front;
-	r3e_int32 tire_type_rear;
-	r3e_int32 tire_subtype_front;
-	r3e_int32 tire_subtype_rear;
+    r3e_int32 tire_type_rear;
+    r3e_int32 tire_subtype_front;
+    r3e_int32 tire_subtype_rear;
     r3e_float32 base_penalty_weight;
     r3e_float32 aid_penalty_weight;
 
@@ -545,10 +582,13 @@ typedef struct
     r3e_int32 drs_state;
     r3e_int32 ptp_state;
 
+    // -1.0 unavailable, 0.0 - 1.0 tank factor
+    r3e_float32 virtual_energy;
+
     // -1 unavailable, DriveThrough = 0, StopAndGo = 1, Pitstop = 2, Time = 3, Slowdown = 4, Disqualify = 5,
     r3e_int32 penaltyType;
 
-	// Based on the PenaltyType you can assume the reason is:
+    // Based on the PenaltyType you can assume the reason is:
 
     // DriveThroughPenaltyInvalid = 0,
     // DriveThroughPenaltyCutTrack = 1,
@@ -566,7 +606,8 @@ typedef struct
     // StopAndGoPenaltyCutTrack1st = 1,
     // StopAndGoPenaltyCutTrackMult = 2,
     // StopAndGoPenaltyYellowFlagOvertake = 3,
-    // StopAndGoPenaltyMax = 4
+    // StopAndGoPenaltyVirtualEnergy = 4,
+    // StopAndGoPenaltyMax = 5
 
     // PitstopPenaltyInvalid = 0,
     // PitstopPenaltyIgnoredPitstopWindow = 1,
@@ -600,11 +641,16 @@ typedef struct
     // DisqualifyPenaltyMax = 14
     r3e_int32 penaltyReason;
 
+    // -1 unavailable, 0 = ignition off, 1 = ignition on but not running, 2 = ignition on and starter running, 3 = ignition on and running
+    r3e_int32 engineState;
+
+    // Orientation in Euler coordinates
+    r3e_vec3_f32 orientation;
+
     // Reserved data
-    r3e_int32 unused1;
-    r3e_int32 unused2;
+    r3e_float32 unused1;
+    r3e_float32 unused2;
     r3e_float32 unused3;
-    r3e_float32 unused4;
 } r3e_driver_data;
 
 typedef struct
@@ -622,6 +668,7 @@ typedef struct
     // Game State
     //////////////////////////////////////////////////////////////////////////
 
+    r3e_int32 game_mode;
     r3e_int32 game_paused;
     r3e_int32 game_in_menus;
     r3e_int32 game_in_replay;
@@ -647,8 +694,8 @@ typedef struct
     r3e_int32 track_id;
     r3e_int32 layout_id;
     r3e_float32 layout_length;
-	r3e_sectorStarts sector_start_factors;
-	
+    r3e_sectorStarts sector_start_factors;
+
     // Race session durations
     // Note: Index 0-2 = race 1-3
     // Note: Value -1 = N/A
@@ -664,7 +711,7 @@ typedef struct
     r3e_int32 session_type;
     // The current iteration of the current type of session
     // Note: 1 = first, 2 = second etc, -1 = N/A
-    r3e_int32 session_iteration;	
+    r3e_int32 session_iteration;
     // If the session is time based, lap based or time based with an extra lap at the end
     r3e_session_length_format session_length_format;
     // Unit: Meter per second (m/s)
@@ -696,6 +743,7 @@ typedef struct
     r3e_int32 max_incident_points;
 
     // Reserved data
+    r3e_float32 event_unused1;
     r3e_float32 event_unused2;
 
     //////////////////////////////////////////////////////////////////////////
@@ -723,13 +771,13 @@ typedef struct
 
     // Current vehicle pit state (-1 = N/A, 0 = None, 1 = Requested stop, 2 = Entered pitlane heading for pitspot, 3 = Stopped at pitspot, 4 = Exiting pitspot heading for pit exit)
     r3e_int32 pit_state;
-	
-	// Current vehicle pitstop actions duration
+
+    // Current vehicle pitstop actions duration
     r3e_float32 pit_total_duration;
     r3e_float32 pit_elapsed_time;
 
-	// Current vehicle pit action (-1 = N/A, 0 = None, 1 = Preparing, (combination of 2 = Penalty serve, 4 = Driver change, 8 = Refueling, 16 = Front tires, 32 = Rear tires, 64 = Front wing, 128 = Rear wing, 256 = Suspension))
-	r3e_int32 pit_action;
+    // Current vehicle pit action (-1 = N/A, 0 = None, 1 = Preparing, (combination of 2 = Penalty serve, 4 = Driver change, 8 = Refueling, 16 = Front tires, 32 = Rear tires, 64 = Body, 128 = Front wing, 256 = Rear wing, 512 = Suspension))
+    r3e_int32 pit_action;
 
     // Number of pitstops the current vehicle has performed (-1 = N/A)
     r3e_int32 num_pitstops;
@@ -764,6 +812,7 @@ typedef struct
     r3e_int32 current_lap_valid;
     r3e_int32 track_sector;
     r3e_float32 lap_distance;
+
     // fraction of lap completed, 0.0-1.0, -1.0 = N/A
     r3e_float32 lap_distance_fraction;
 
@@ -811,10 +860,15 @@ typedef struct
     // Incident points (-1 = N/A)
     r3e_int32 incident_points;
 
+    // -1 = N/A, 0 = this and next lap valid, 1 = this lap invalid, 2 = this and next lap invalid
+    r3e_int32 lap_valid_state;
+    // -1 = N/A, 0 = invalid, 1 = valid
+    r3e_int32 prev_lap_valid;
+
     // Reserved data
-    r3e_int32 score_unused1;
-    r3e_float32 score_unused3;
-    r3e_float32 score_unused4;
+    r3e_float32 unused1;
+    r3e_float32 unused2;
+    r3e_float32 unused3;
 
     //////////////////////////////////////////////////////////////////////////
     // Vehicle information
@@ -853,7 +907,7 @@ typedef struct
     // From car center, +X=left, +Y=up, +Z=back.
     // Unit: Meter per second squared (m/s^2)
     r3e_vec3_f32 local_acceleration;
-	
+
     // Unit: Kilograms (kg)
     // Note: Car + penalty weight + fuel
     r3e_float32 total_mass;
@@ -863,9 +917,15 @@ typedef struct
     r3e_float32 fuel_left;
     r3e_float32 fuel_capacity;
     r3e_float32 fuel_per_lap;
+    // Unit: Mega-Joule (MJ)
+    // Note: -1.0f when not enough data, then max recorded virtual energy per lap
+    // Note: Not valid for remote players
+    r3e_float32 virtual_energy_left;
+    r3e_float32 virtual_energy_capacity;
+    r3e_float32 virtual_energy_per_lap;
     // Unit: Celsius (C)
     // Note: Not valid for AI or remote players
-    r3e_float32 engine_water_temp;
+    r3e_float32 engine_temp;
     r3e_float32 engine_oil_temp;
     // Unit: Kilopascals (KPa)
     // Note: Not valid for AI or remote players
@@ -901,8 +961,8 @@ typedef struct
     // Note: Not valid for AI or remote players
     r3e_int32 steer_wheel_range_degrees;
 
-	// Aid settings
-	r3e_aid_settings aid_settings;
+    // Aid settings
+    r3e_aid_settings aid_settings;
 
     // DRS data
     r3e_drs drs;
@@ -923,10 +983,22 @@ typedef struct
     // PTP activations available in total (-1 = N/A, or there's no restriction per lap, or endless), placed outside of ptp struct to keep backwards compatibility
     r3e_int32 ptp_numActivationsTotal;
 
+    // Battery state of charge
+    // Range: 0.0 - 100.0 (-1.0 = N/A)
+    r3e_float32 battery_soc;
+
+    // Brake water tank (-1.0 = N/A)
+    // Unit: Liters (l)
+    r3e_float32 water_left;
+
+    // -1 = N/A
+    r3e_int32 abs_setting;
+
+    // -1 = N/A or dont exist on car, 0 = ignition off or headlights off, 1 = on, 2 = strobing
+    r3e_int32 headlights;
+
     // Reserved data
     r3e_float32 vehicle_unused1;
-    r3e_float32 vehicle_unused2;
-    r3e_ori_f32 vehicle_unused3;
 
     //////////////////////////////////////////////////////////////////////////
     // Tires
@@ -960,14 +1032,14 @@ typedef struct
     // Unit: Celsius (C)
     // Note: Not valid for AI or remote players
     r3e_tire_temp tire_temp[R3E_TIRE_INDEX_MAX];
-	// Which type of tires the car has (option, prime, etc.)
-	// Note: See the r3e_tire_type enum
-	r3e_int32 tire_type_front;
-	r3e_int32 tire_type_rear;
-	// Which subtype of tires the car has
-	// Note: See the r3e_tire_subtype enum
-	r3e_int32 tire_subtype_front;
-	r3e_int32 tire_subtype_rear;
+    // Which type of tires the car has (option, prime, etc.)
+    // Note: See the r3e_tire_type enum
+    r3e_int32 tire_type_front;
+    r3e_int32 tire_type_rear;
+    // Which subtype of tires the car has
+    // Note: See the r3e_tire_subtype enum
+    r3e_int32 tire_subtype_front;
+    r3e_int32 tire_subtype_rear;
     // Current brake temperature (-1.0 = N/A)
     // Optimum temperature
     // Cold temperature
@@ -983,15 +1055,17 @@ typedef struct
     //////////////////////////////////////////////////////////////////////////
     // Electronics
     //////////////////////////////////////////////////////////////////////////
-	
+
     // -1 = N/A
     r3e_int32 traction_control_setting;
     r3e_int32 engine_map_setting;
     r3e_int32 engine_brake_setting;
-	
-    // Reserved data
-    r3e_float32 tire_unused1;
-    r3e_float32 tire_unused2[R3E_TIRE_INDEX_MAX];
+
+    // -1.0 = N/A, 0.0 -> 100.0 percent
+    r3e_float32 traction_control_percent;
+
+    // Material under player car tires, see the r3e_mtrl_type enum
+    r3e_int32 tire_on_mtrl[R3E_TIRE_INDEX_MAX];
 
     // Tire load (N)
     // -1.0 = N/A

@@ -143,6 +143,17 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		super.simulatorStartup(simulator)
 	}
 
+	prepareSession(settings, data) {
+		if (getMultiMapValue(data, "Session Data", "Track", "") != "")
+			SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+										, getMultiMapValue(data, "Session Data", "Car", "Unknown")
+										, getMultiMapValue(data, "Session Data", "Track")
+										, getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
+										, getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
+
+		super.prepareSession(settings, data)
+	}
+
 	updateSession(session, force := false) {
 		super.updateSession(session, force)
 
@@ -162,7 +173,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
-			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
+			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*", "*")
 
 			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 

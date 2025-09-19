@@ -67,7 +67,7 @@ global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMa
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Constant Declaration Section                  ;;;
+;;;                   Private Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global gPositionInfoEnabled := true
@@ -1629,8 +1629,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			try {
 				settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
 
-				for section, values in SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
-																	 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
+				for section, values in SettingsDatabase().loadSettings(editor.SelectedSimulator
+																	 , editor.SelectedCar["*"], editor.SelectedTrack["*"]
+																	 , editor.SelectedMode["*"], editor.SelectedWeather["*"], false)
 					for key, value in values
 						setMultiMapValue(settings, section, key, value)
 
@@ -2084,7 +2085,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				if documentation {
 					loop 8
-						editorGui["settingsTab" . A_Index].SetFont("Italic Underline C" . editorGui.Theme.LinkColor)
+						editorGui["settingsTab" . A_Index].SetFont("Norm Italic Underline C" . editorGui.Theme.LinkColor)
 				}
 				else {
 					loop 8
@@ -3091,7 +3092,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local settings := newMultiMap()
 		local progress := 0
 		local count := 0
-		local overall, simulator, ignore, car, track, weather, section, key, value
+		local overall, simulator, ignore, car, track, mode, weather, section, key, value
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -3108,37 +3109,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				for ignore, car in concatenate(["*"], this.getCars(simulator))
 					for ignore, track in concatenate(["*"], this.getTracks(simulator, "*"))
-						for ignore, weather in concatenate(["*"], kWeatherConditions) {
-							count += SettingsDatabase().readSettings(simulator, car, track, weather, false, false).Length
+						for ignore, mode in ["*", "Solo", "Team"]
+							for ignore, weather in concatenate(["*"], kWeatherConditions) {
+								count += SettingsDatabase().readSettings(simulator, car, track, mode, weather, false, false).Length
 
-							showProgress({progress: Round((++progress / overall) * 100)})
-						}
+								showProgress({progress: Round((++progress / overall) * 100)})
+							}
 
 				showProgress({Progress: (progress := 0), Color: "Green"})
 
 				for ignore, car in concatenate(["*"], this.getCars(simulator))
 					for ignore, track in concatenate(["*"], this.getTracks(simulator, "*"))
-						for ignore, weather in concatenate(["*"], kWeatherConditions)
-							for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
-								section := setting["Section"]
-								key := setting["Key"]
-								value := setting["Value"]
+						for ignore, mode in ["*", "Solo", "Team"]
+							for ignore, weather in concatenate(["*"], kWeatherConditions)
+								for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, mode, weather, false, false) {
+									section := setting["Section"]
+									key := setting["Key"]
+									value := setting["Value"]
 
-								showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
+									showProgress({progress: Round((++progress / count) * 100), message: this.getSettingLabel(section, key) . translate("...")})
 
-								Sleep(50)
+									Sleep(50)
 
-								setMultiMapValue(settings, values2String(" | ", section, car, track, weather), key, value)
-							}
+									setMultiMapValue(settings, values2String(" | ", section, car, track, mode, weather), key, value)
+								}
 			}
 			else {
 				car := this.SelectedCar["*"]
 				track := this.SelectedTrack["*"]
+				mode := this.SelectedMode["*"]
 				weather := this.SelectedWeather["*"]
 
 				count := this.SettingsListView.GetCount()
 
-				for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, weather, false, false) {
+				for ignore, setting in SettingsDatabase().readSettings(simulator, car, track, mode, weather, false, false) {
 					section := setting["Section"]
 					key := setting["Key"]
 					value := setting["Value"]
@@ -3147,7 +3151,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					Sleep(50)
 
-					setMultiMapValue(settings, values2String(" | ", section, car, track, weather), key, value)
+					setMultiMapValue(settings, values2String(" | ", section, car, track, mode, weather), key, value)
 				}
 			}
 
@@ -3190,8 +3194,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					for section, values in readMultiMap(directory . "\Export.settings") {
 						section := string2Values(" | ", section)
 
-						for key, value in values
-							settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[1], key, value)
+						if (section.Length = 5) {
+							for key, value in values
+								settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[5], section[1], key, value)
+						}
+						else
+							for key, value in values
+								settingsDB.setSettingValue(simulator, section[2], section[3], section[4], section[1], key, value)
 					}
 				}
 				catch Any as exception {
@@ -3219,7 +3228,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						Sleep(50)
 
-						settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
+						if (setting.Length = 7)
+							settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6], setting[7])
+						else
+							settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
 					}
 				}
 				catch Any as exception {
@@ -3244,8 +3256,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iSettings := []
 
-		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-															 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator
+															 , this.SelectedCar["*"], this.SelectedTrack["*"]
+															 , this.SelectedMode["*"], this.SelectedWeather["*"]
 															 , false, false) {
 			type := this.getSettingType(setting["Section"], setting["Key"], &ignore)
 
@@ -3292,8 +3305,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
 
-		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-															 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator
+															 , this.SelectedCar["*"], this.SelectedTrack["*"]
+															 , this.SelectedMode["*"], this.SelectedWeather["*"]
 															 , true, false) {
 			if (setting["Car"]!= "*")
 				references.Car += 1
@@ -5682,9 +5696,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SettingsListView.ModifyCol(1, "AutoHdr")
 			this.SettingsListView.ModifyCol(2, "AutoHdr")
 
-			SettingsDatabase().setSettingValue(this.SelectedSimulator
-											 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-											 , section, key, value)
+			SettingsDatabase().setSettingValue(this.SelectedSimulator, this.SelectedCar["*"], this.SelectedTrack["*"]
+											 , this.SelectedMode["*"], this.SelectedWeather["*"], section, key, value)
 
 			this.chooseSetting()
 
@@ -5714,9 +5727,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.SettingsListView.ModifyCol(1, "AutoHdr")
 			this.SettingsListView.ModifyCol(2, "AutoHdr")
 
-			SettingsDatabase().removeSettingValue(this.SelectedSimulator
-												, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-												, section, key)
+			SettingsDatabase().removeSettingValue(this.SelectedSimulator, this.SelectedCar["*"], this.SelectedTrack["*"]
+												, this.SelectedMode["*"], this.SelectedWeather["*"], section, key)
 
 			this.iSettings.RemoveAt(selected)
 
@@ -5764,17 +5776,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			settingsDB := SettingsDatabase()
 
 			if ((this.iSettings[selected][1] != section) || (this.iSettings[selected][2] != key)) {
-				settingsDB.removeSettingValue(this.SelectedSimulator
-											, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+				settingsDB.removeSettingValue(this.SelectedSimulator, this.SelectedCar["*"], this.SelectedTrack["*"]
+											, this.SelectedMode["*"], this.SelectedWeather["*"]
 											, this.iSettings[selected][1], this.iSettings[selected][2])
 
 				this.iSettings[selected][1] := section
 				this.iSettings[selected][2] := key
 			}
 
-			settingsDB.setSettingValue(this.SelectedSimulator
-									 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-									 , section, key, value)
+			settingsDB.setSettingValue(this.SelectedSimulator, this.SelectedCar["*"], this.SelectedTrack["*"]
+									 , this.SelectedMode["*"], this.SelectedWeather["*"], section, key, value)
 
 			this.selectSettings(false)
 			this.updateState()
@@ -6690,7 +6701,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 
 selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, w, h, editor, simulator, code, info, progressWindow, section, key, values, value, type
-	local settings, row, selection, car, track, weather
+	local settings, row, selection, car, track, mode, weather
 
 	static importSettingsGui
 	static importSelectCheck
@@ -6756,7 +6767,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 		importSelectCheck := importSettingsGui.Add("CheckBox", "Check3 x16 yp+12 w15 h21 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Weather", "Setting", "Value"], translate))
+		importListView := importSettingsGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Car", "Track", "Mode", "Weather", "Setting", "Value"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -6781,10 +6792,18 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 				for section, values in readMultiMap(directory . "\Export.settings") {
 					section := string2Values(" | ", section)
 
+					section := section[1]
 					car := section[2]
 					track := section[3]
-					weather := section[4]
-					section := section[1]
+
+					if (section.Length = 5) {
+						mode := section[4]
+						weather := section[5]
+					}
+					else {
+						mode := "*"
+						weather := section[4]
+					}
 
 					showProgress({Progress: Min(A_Index, 100)})
 
@@ -6804,7 +6823,8 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 						importListView.Add("Check", (car = "*") ? translate("All") : editor.getCarName(simulator, car)
 												  , (track = "*") ? translate("All") : editor.getTrackName(simulator, track)
-												  , (weather = "*") ? translate("All") : weather
+												  , (mode = "*") ? translate("All") : translate(mode)
+												  , (weather = "*") ? translate("All") : translate(weather)
 												  , editor.getSettingLabel(section, key), value)
 					}
 				}
@@ -6818,10 +6838,10 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 
 		importListView.ModifyCol()
 
-		loop 5
+		loop 6
 			importListView.ModifyCol(A_Index, 10)
 
-		loop 5
+		loop 6
 			importListView.ModifyCol(A_Index, "AutoHdr")
 
 		importSettingsGui.SetFont("s8 Norm", "Arial")

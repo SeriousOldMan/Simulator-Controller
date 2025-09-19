@@ -384,7 +384,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
 					if isDebug() {
 						if isLogLevel(kLogDebug)
-							showMessage("Restoring session state for " . raceAssistant.Plugin)
+							logMessage(kLogDebug, "Restoring session state for " . raceAssistant.Plugin)
 
 						logMessage(kLogCritical, "Restoring session state for " . raceAssistant.Plugin . "...")
 					}
@@ -1218,6 +1218,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static requireRaceAssistants(simulator, car, track, weather) {
 		local teamServer := this.TeamServer
+		local teamSession := (teamServer && teamServer.TeamServerEnabled)
 		local activeAssistant := false
 		local startupAssistant := false
 		local ignore, assistant, wasActive, wait, settingsDB
@@ -1240,7 +1241,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			settingsDB := SettingsDatabase()
 
 			try {
-				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
+				RaceAssistantPlugin.sAssistantCooldown := (settingsDB.readSettingValue(simulator, car, track
+																					 , (teamSession ? "Team" : "Solo"), weather
+																					 , "Assistant", "Shutdown.Assistant.Cooldown", 90) * 1000)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -1249,7 +1252,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 
 			try {
-				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
+				RaceAssistantPlugin.sTeamServerCooldown := (settingsDB.readSettingValue(simulator, car, track
+																					  , (teamSession ? "Team" : "Solo"), weather
+																					  , "Assistant", "Shutdown.TeamServer.Cooldown", 600) * 1000)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -1258,7 +1263,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 
 			try {
-				wait := settingsDB.readSettingValue(simulator, car, track, weather, "Assistant", "Session.Data.Frequency", 10)
+				wait := settingsDB.readSettingValue(simulator, car, track
+												  , (teamSession ? "Team" : "Solo"), weather
+												  , "Assistant", "Session.Data.Frequency", 10)
 
 				if (teamServer && teamServer.Connected[true])
 					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
@@ -1576,7 +1583,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		track := getMultiMapValue(data, "Session Data", "Track")
 
 		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
-			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined)
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined)
 
 			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
@@ -1992,7 +1999,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	loadSettings(simulator, car, track, data := false, settings := false) {
 		local settingsDB := SettingsDatabase()
 		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local teamServer := this.TeamServer
+		local teamSession := (teamServer && teamServer.TeamServerEnabled)
 		local dbSettings := settingsDB.loadSettings(simulatorName, car, track
+												  , (teamSession ? "Team" : "Solo")
 												  , (data ? getMultiMapValue(data, "Weather Data", "Weather", "Dry") : "Dry"))
 		local load, section, values, key, value
 
@@ -2277,7 +2287,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (teamServer && this.TeamSessionActive) {
 			if (isDebug() && isLogLevel(kLogDebug))
-				showMessage("Saving lap state for " . this.Plugin)
+				logMessage(kLogDebug, "Saving lap state for " . this.Plugin)
 
 			if state {
 				stateName := getKeys(state)
@@ -2327,7 +2337,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (teamServer && this.TeamSessionActive) {
 			if isDebug() {
 				if isLogLevel(kLogDebug)
-					showMessage("Saving session state for " . this.Plugin)
+					logMessage(kLogDebug, "Saving session state for " . this.Plugin)
 
 				logMessage(kLogCritical, "Saving session state for " . this.Plugin . "...")
 			}
@@ -2343,7 +2353,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	restoreSessionState(data) {
 		if isDebug() {
 			if isLogLevel(kLogDebug)
-				showMessage("Start session state restoring for " . this.Plugin)
+				logMessage(kLogDebug, "Start session state restoring for " . this.Plugin)
 
 			logMessage(kLogCritical, "Start session state restoring for " . this.Plugin . "...")
 		}
@@ -2556,7 +2566,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					message := "Raw Data`n`n"
 
 					for key, value in testData
-						message := message . key . " = " . value . "`n"
+						message := (message . key . " = " . value . "`n")
 
 					showMessage(message, translate("Modular Simulator Controller System"), "Information.ico", 5000, "Left", "Bottom", 400, 400)
 				}

@@ -232,7 +232,7 @@ class TyresDatabase extends SessionDatabase {
 		else
 			compounds := [Array(compound, compoundColor)]
 
-		settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
+		settings := SettingsDatabase().loadSettings(simulator, car, track, "*", weather)
 
 		correctionAir := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
 		correctionTrack := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)

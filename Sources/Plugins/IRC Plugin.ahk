@@ -221,11 +221,12 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	prepareSession(settings, data) {
-		SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
-									, getMultiMapValue(data, "Session Data", "Car", "Unknown")
-									, getMultiMapValue(data, "Session Data", "Track", "Unknown")
-									, getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
-									, getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
+		if (getMultiMapValue(data, "Session Data", "Track", "") != "")
+			SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+										, getMultiMapValue(data, "Session Data", "Car", "Unknown")
+										, getMultiMapValue(data, "Session Data", "Track")
+										, getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
+										, getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
 
 		super.prepareSession(settings, data)
 	}

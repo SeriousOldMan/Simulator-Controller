@@ -1962,10 +1962,14 @@ class SoloCenter extends ConfigurationItem {
 			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
+
+		this.updateSessionMenu()
 	}
 
 	closedTelemetryViewer() {
 		this.iTelemetryViewer := false
+
+		this.updateSessionMenu()
 	}
 
 	getSessionInformation(&simulator, &car, &track) {
@@ -2606,7 +2610,9 @@ class SoloCenter extends ConfigurationItem {
 		local auto2 := ((this.AutoExport ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Export"))
 		local auto3 := ((this.AutoSave ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Save"))
 		local auto4 := ((this.AutoTelemetry ? translate("[x]") : translate("[  ]")) . A_Space . translate("Auto Telemetry"))
-		local telemetry := ((this.TelemetryCollector ? translate("[x]") : translate("[  ]")) . A_Space . translate("Telemetry..."))
+		local telemetry := (((this.TelemetryCollector || this.TelemetryViewer) ? translate("[x]")
+																			   : translate("[  ]"))
+						  . A_Space . translate("Telemetry..."))
 
 		this.Control["sessionMenuDropDown"].Delete()
 		this.Control["sessionMenuDropDown"].Add(collect(["Session", "---------------------------------------------", auto1, auto2, auto3, auto4, "---------------------------------------------", "Clear...", "---------------------------------------------", "Load Session...", "Save Session...", "---------------------------------------------"], translate))

@@ -344,7 +344,8 @@ namespace SHMConnector
                 strWriter.Write("Session="); strWriter.WriteLine(session);
 
                 strWriter.Write("Car="); strWriter.WriteLine(normalizeName(staticInfo.CarModel));
-                strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track) + "-" + normalizeName(staticInfo.TrackConfiguration));
+                strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track));
+				strWriter.Write("Layout="); strWriter.WriteLine(normalizeName(staticInfo.TrackConfiguration));
                 strWriter.Write("SessionFormat="); strWriter.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 strWriter.Write("FuelAmount="); strWriter.WriteLine(staticInfo.MaxFuel);
 

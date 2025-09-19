@@ -30,8 +30,6 @@ global kR3EPlugin := "R3E"
 
 global kBinaryOptions := ["Serve Penalty", "Change Front Tyres", "Change Rear Tyres", "Repair Bodywork", "Repair Front Aero", "Repair Rear Aero", "Repair Suspension", "Request Pitstop"]
 
-global kUseImageRecognition := true
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -50,6 +48,26 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPSImageSearchArea := false
 	iPitstopOptions := []
 	iPitstopOptionStates := []
+
+	iImageSearch := kUndefined
+
+	Car {
+		Set {
+			if (this.Car != value)
+				this.iImageSearch := kUndefined
+
+			return (super.Car := value)
+		}
+	}
+
+	Track {
+		Set {
+			if (this.Track != value)
+				this.iImageSearch := kUndefined
+
+			return (super.Track := value)
+		}
+	}
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -102,7 +120,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off")) {
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
 				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 				this.iPreviousOptionHotkey := this.getArgumentValue("previousOption", "W")
@@ -132,21 +150,53 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	pitstopMFDIsOpen() {
+		local pitMenuState
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if this.activateWindow()
-				return this.searchMFDImage("PITSTOP 1", "PITSTOP 2")
-			else
-				return false
+			if this.iImageSearch {
+				if this.activateWindow() {
+					if this.searchMFDImage("PITSTOP 1", "PITSTOP 2") {
+						this.sendCommand(this.NextOptionHotkey)
+
+						return true
+					}
+					else
+						return false
+				}
+				else
+					return false
+			}
+			else {
+				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
+
+				if ((pitMenuState["Selected"] != "Unavailable") || (pitMenuState["Strategy"] != "Unavailable") || (pitMenuState["Refuel"] != "Unavailable")) {
+					this.sendCommand(this.NextOptionHotkey)
+
+					return true
+				}
+				else
+					return false
+			}
 		}
 		else
 			return false
 	}
 
 	openPitstopMFD(descriptor := false) {
-		local secondTry
+		local isOpen := false
+		local car, track, settings
 
 		static first := true
 		static reported := false
+
+		if (this.iImageSearch = kUndefined) {
+			car := (this.Car ? this.Car : "*")
+			track := (this.Track ? this.Track : "*")
+
+			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
+
+			this.iImageSearch := getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.ImageSearch", false)
+		}
 
 		if !this.OpenPitstopMFDHotkey {
 			if !reported {
@@ -164,23 +214,20 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.activateWindow() {
-				secondTry := false
-
 				if first
 					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				if !this.pitstopMFDIsOpen() {
+				if this.pitstopMFDIsOpen()
+					isOpen := true
+				else {
 					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-					secondTry := true
+					isOpen := this.pitstopMFDIsOpen()
 				}
-
-				if (first && secondTry)
-					this.pitstopMFDIsOpen()
 
 				first := false
 
-				return true
+				return isOpen
 			}
 			else
 				return false
@@ -223,7 +270,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			loop 15
 				this.sendCommand(this.NextOptionHotkey)
 
-			if kUseImageRecognition {
+			if this.iImageSearch {
 				if this.searchMFDImage("Strategy") {
 					this.iPitstopOptions.Push("Strategy")
 					this.iPitstopOptionStates.Push(true)
@@ -318,17 +365,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					this.iPitstopOptionStates.Push(pitMenuState["Change Rear Tyres"])
 				}
 
-				if true {
-					if this.searchMFDImage("Bodywork Damage") {
-						this.iPitstopOptions.Push("Repair Bodywork")
-						this.iPitstopOptionStates.Push(this.searchMFDImage("Bodywork Damage Selected") != false)
-					}
-				}
-				else {
-					if (pitMenuState["Repair Bodywork"] != "Unavailable") {
-						this.iPitstopOptions.Push("Repair Bodywork")
-						this.iPitstopOptionStates.Push(pitMenuState["Repair Bodywork"])
-					}
+				if (pitMenuState["Repair Bodywork"] != "Unavailable") {
+					this.iPitstopOptions.Push("Repair Bodywork")
+					this.iPitstopOptionStates.Push(pitMenuState["Repair Bodywork"])
 				}
 
 				if (pitMenuState["Repair Front Aero"] != "Unavailable") {

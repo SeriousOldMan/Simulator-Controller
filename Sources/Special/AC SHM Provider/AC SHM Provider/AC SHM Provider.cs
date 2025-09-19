@@ -354,7 +354,8 @@ namespace ACSHMProvider
                 Console.Write("Session="); Console.WriteLine(session);
 
                 Console.Write("Car="); Console.WriteLine(normalizeName(staticInfo.CarModel));
-                Console.Write("Track="); Console.WriteLine(normalizeName(staticInfo.Track) + "-" + normalizeName(staticInfo.TrackConfiguration));
+                Console.Write("Track="); Console.WriteLine(normalizeName(staticInfo.Track));
+				Console.Write("Layout="); Console.WriteLine(normalizeName(staticInfo.TrackConfiguration));
                 Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 

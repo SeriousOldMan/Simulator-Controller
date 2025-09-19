@@ -379,6 +379,9 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeFloatOption(result, "EngineDamage=", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0, &pos);
 
 			writeFloatOption(result, "FuelRemaining=", map_buffer->fuel_left, &pos);
+			
+			if (map_buffer->virtual_energy_left != -1 && map_buffer->virtual_energy_capacity != -1)
+				writeFloatOption(result, "EnergyRemaining=", map_buffer->virtual_energy_left / map_buffer->virtual_energy_capacity * 100, &pos);
 
 			char tyreCompoundRaw[11] = "Unknown";
 
@@ -461,21 +464,15 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			else
 				writeString(result, "BrakeTemperature=0,0,0,0\n", &pos);
 
-			if ((int)map_buffer->engine_water_temp) {
+			if ((int)map_buffer->engine_temp) {
 				writeString(result, "WaterTemperature=", &pos);
-				writeInt(result, (int)map_buffer->engine_water_temp, &pos); writeLine(result, &pos);
+				writeInt(result, (int)map_buffer->engine_temp, &pos); writeLine(result, &pos);
 			}
 
 			if ((int)map_buffer->engine_oil_temp) {
 				writeString(result, "OilTemperature=", &pos);
 				writeInt(result, (int)map_buffer->engine_oil_temp, &pos); writeLine(result, &pos);
 			}
-
-			writeString(result, "WaterTemperature=", &pos);
-			writeInt(result, (int)map_buffer->engine_water_temp, &pos); writeLine(result, &pos);
-
-			writeString(result, "OilTemperature=", &pos);
-			writeInt(result, (int)map_buffer->engine_oil_temp, &pos); writeLine(result, &pos);
 		}
 
 		writeString(result, "[Stint Data]\n", &pos);
@@ -588,6 +585,10 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					writeString(result, "Change Rear Tyres\n", &pos);
 
 					break;
+				case R3E_PIT_MENU_BODY:
+					writeString(result, "Repair Bodywork\n", &pos);
+
+					break;
 				case R3E_PIT_MENU_FRONTWING:
 					writeString(result, "Repair Front Aero\n", &pos);
 
@@ -596,12 +597,12 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					writeString(result, "Repair Rear Aero\n", &pos);
 
 					break;
-					/*
-					case R3E_PIT_MENU_SUSPENSION:
-						writeString(result, "Repair Suspension\n", &pos);
+					
+				case R3E_PIT_MENU_SUSPENSION:
+					writeString(result, "Repair Suspension\n", &pos);
 
-						break;
-					*/
+					break;
+					
 				case R3E_PIT_MENU_BUTTON_TOP:
 					writeString(result, "Top Button\n", &pos);
 

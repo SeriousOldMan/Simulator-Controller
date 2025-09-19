@@ -3001,7 +3001,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 			case 7, "Database":
 				if (simulator && car && track) {
-					settings := SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
+					settings := SettingsDatabase().loadSettings(simulator, car, track, "*", this.SelectedWeather)
 
 					if (settings.Count > 0) {
 						if (getMultiMapValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
@@ -3610,7 +3610,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		if !tyrePressures {
-			settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
+			settings := SettingsDatabase().loadSettings(simulator, car, track, "*", weather)
 
 			if (tyreCompound = "Dry")
 				tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)

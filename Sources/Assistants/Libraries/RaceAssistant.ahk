@@ -1465,7 +1465,7 @@ class RaceAssistant extends ConfigurationItem {
 			if (lookup != lastLookup) {
 				lastLookup := lookup
 
-				lapTime := SettingsDatabase().readSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", false)
+				lapTime := SettingsDatabase().readSettingValue(simulator, car, track, "*", weather, "Session Settings", "Lap.AvgTime", false)
 			}
 
 			return lapTime
@@ -2415,7 +2415,6 @@ class RaceAssistant extends ConfigurationItem {
 									, "Session.Settings.Lap.History.Damping", getMultiMapValue(configuration, this.AssistantType . " Analysis", simulatorName . ".HistoryLapsDamping", 0.2)))
 	}
 
-
 	callStartSession(settings, data) {
 		if (settings && !isObject(settings))
 			settings := readMultiMap(settings)
@@ -3123,13 +3122,13 @@ class RaceAssistant extends ConfigurationItem {
 
 			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
 				if (this.AvgFuelConsumption > 0)
-					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
-				if (settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
-					settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+				if (settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
+					settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
 
 				if (lapTime > 10)
-					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
+					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
 			}
 			else {
 				fileName := getFileName("Race.settings", kUserConfigDirectory)
@@ -4398,13 +4397,13 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 		else {
 			if inList(categories, "Class") {
-				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown) : kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Class", kUnknown) : kUnknown)
 
 				if inList(categories, "Cup")
-					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUndefined) : kUndefined)
+					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Category", kUndefined) : kUndefined)
 			}
 			else
-				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . A_Index . ".Category", kUnknown) : kUnknown)
+				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Category", kUnknown) : kUnknown)
 		}
 
 		return ((carCategory != kUndefined) ? (carClass . translate(" (") . carCategory . translate(")")) : carClass)
@@ -5410,7 +5409,6 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 		if (!names || inList(names, action)) {
 			definition := (inList(categories, "Custom") ? getMultiMapValue(configuration, type . target . ".Actions.Custom", action, false)
 														: false)
-
 
 			if (!definition && inList(categories, "Builtin"))
 				definition := getMultiMapValue(configuration, type . target . ".Actions.Builtin", action, false)

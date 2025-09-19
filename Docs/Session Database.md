@@ -54,18 +54,26 @@ The Race Assistants use several values from the race settings to calculate how m
 |------------------------------------------|------------------------------------|
 | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%208.jpg) | ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%209.jpg) |
 
-Below you find the order, in which the different combinations will be loaded. As you can see, setting values for a more concrete combination of car / track / weather will have precedence over those of a less specific combination.
+Below you find the order, in which the different combinations will be loaded. As you can see, setting values for a more concrete combination of *car* / *track* / *mode* / *weather* will have precedence over those of a less specific combination. A very special discriminator is *mode*, which you can use to differentiate between solo and team sessions.
 
-| Car      | Track    | Weather  |
-|----------|----------|----------|
-| All      | All      | All      |
-| Specific | All      | All      |
-| All      | Specific | All      |
-| All      | All      | Specific |
-| Specific | Specific | All      |
-| Specific | All      | Specific |
-| All      | Specific | Specific |
-| Specific | Specific | Specific |
+| Car      | Track    | Mode     | Weather  |
+|----------|----------|----------|----------|
+| All      | All      | All      | All      |
+| Specific | All      | All      | All      |
+| All      | Specific | All      | All      |
+| All      | All      | Specific | All      |
+| All      | All      | All      | Specific |
+| Specific | Specific | All      | All      |
+| Specific | All      | Specific | All      |
+| Specific | All      | All      | Specific |
+| All      | Specific | Specific | All      |
+| All      | Specific | All      | Specific |
+| All      | All      | Specific | Specific |
+| Specific | Specific | Specific | All      |
+| Specific | Specific | All      | Specific |
+| Specific | All      | Specific | Specific |
+| All      | Specific | Specific | Specific |
+| Specific | Specific | Specific | Specific |
 
 Important note: Some values underly a transformation between internal and external representations. For example, lap times are stored in a millisecond format in many places, **0** for tyre sets means "Auto" and so on. Therefore, when entering a new settings value, take a look at the supplied default value, and understand its meaning. And use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings. Additionally, you may find entries in the list of available settings for which no corresponding field in the "Race Settings" tool exist. These settings are for internal calculations in most cases, for example the correction factor for temperature based tyre pressure calculations. Be careful, when entering values for these settings, you may get funny results. The default values are generally the best choice here.
 

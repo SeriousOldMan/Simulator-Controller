@@ -361,7 +361,7 @@ class TeamCenter extends ConfigurationItem {
 					center.pushTask(ObjBindMethod(center, "updateReports", true))
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 				finally {
 					this.iRedraw := false
@@ -423,7 +423,7 @@ class TeamCenter extends ConfigurationItem {
 					this.iHTMLViewer.document.close()
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 				finally {
 					this.iRedraw := false
@@ -1992,7 +1992,7 @@ class TeamCenter extends ConfigurationItem {
 					FileCopy(setups, fileName, 1)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 			}
 		}
@@ -3769,7 +3769,7 @@ class TeamCenter extends ConfigurationItem {
 				FileCopy(fileName, directory . "\Setups.Data.CSV")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
@@ -3870,7 +3870,7 @@ class TeamCenter extends ConfigurationItem {
 					showMessage(translate("Setups has been saved for this Session."))
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 		else if verbose {
@@ -4314,7 +4314,7 @@ class TeamCenter extends ConfigurationItem {
 					showMessage(translate("Plan has been saved for this Session."))
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 		else if verbose {
@@ -4558,7 +4558,7 @@ class TeamCenter extends ConfigurationItem {
 				return true
 			}
 			else {
-				settings := SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, weather)
+				settings := SettingsDatabase().loadSettings(this.Simulator, this.Car, this.Track, "Team", weather)
 
 				correctionAir := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
 				correctionTrack := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
@@ -5235,7 +5235,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 	}
@@ -5512,9 +5512,7 @@ class TeamCenter extends ConfigurationItem {
 									this.selectStrategy(this.createStrategy(strategy, false, false), true)
 							}
 							catch Any as exception {
-								logError(exception)
-
-								folder := ""
+								logError(exception, true)
 							}
 						}
 						else {
@@ -5738,7 +5736,7 @@ class TeamCenter extends ConfigurationItem {
 					FileCopy(setups, fileName, 1)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 			}
 		}
@@ -6147,7 +6145,7 @@ class TeamCenter extends ConfigurationItem {
 								 , TyreCompounds: tyreCompounds, TyreCompoundColors: tyreCompoundColors, TyreSet:tyreSet})
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 			}
 
@@ -6885,7 +6883,7 @@ class TeamCenter extends ConfigurationItem {
 				this.Connector.DeleteSessionValue(session, "HasTelemetry")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 	}
@@ -7001,6 +6999,8 @@ class TeamCenter extends ConfigurationItem {
 						time := this.Connector.GetStintValue(identifier, "Time")
 					}
 					catch Any as exception {
+						logError(exception, true)
+
 						time := false
 					}
 
@@ -7016,6 +7016,8 @@ class TeamCenter extends ConfigurationItem {
 							newStint.ID := false
 					}
 					catch Any as exception {
+						logError(exception, true)
+
 						newStint.ID := false
 					}
 
@@ -7288,7 +7290,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 			catch Any as exception {
 				if (exception != "No data...")
-					logError(exception)
+					logError(exception, true)
 
 				if (lap.Nr > 1) {
 					pLap := this.getPreviousLap(lap)
@@ -7335,6 +7337,8 @@ class TeamCenter extends ConfigurationItem {
 					rawData := this.Connector.GetLapValue(identifier, "Data Update")
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					rawData := ""
 				}
 
@@ -7360,7 +7364,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 	}
@@ -7636,7 +7640,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 
 				return newData
 			}
@@ -7689,7 +7693,7 @@ class TeamCenter extends ConfigurationItem {
 						raceInfo := false
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 
 					raceInfo := false
 				}
@@ -7701,7 +7705,7 @@ class TeamCenter extends ConfigurationItem {
 					FileAppend(raceInfo, directory . "Race.data")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 
 			data := readMultiMap(directory . "Race.data")
@@ -7751,7 +7755,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 			catch Any as exception {
 				if (exception != "No data...")
-					logError(exception)
+					logError(exception, true)
 
 				if newData
 					writeMultiMap(directory . "Race.data", data)
@@ -7862,7 +7866,7 @@ class TeamCenter extends ConfigurationItem {
 							}
 						}
 						catch Any as exception {
-							logError(exception)
+							logError(exception, true)
 						}
 					}
 				}
@@ -7953,7 +7957,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					if (exception != "No data...")
-						logError(exception)
+						logError(exception, true)
 
 					if ((lap = lastLap) && (fails++ < 6))
 						return false
@@ -8226,7 +8230,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					if (exception != "No data...")
-						logError(exception)
+						logError(exception, true)
 
 					if ((lap = lastLap) && (fails++ < 6))
 						return false
@@ -8362,7 +8366,9 @@ class TeamCenter extends ConfigurationItem {
 				state := this.Connector.GetSessionValue(session, "Race Engineer State")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
+
+				state := false
 			}
 
 			if (state && (state != "")) {
@@ -8824,7 +8830,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 			catch Any as exception {
 				if (exception != "No data...")
-					logError(exception)
+					logError(exception, true)
 			}
 		}
 
@@ -8901,7 +8907,9 @@ class TeamCenter extends ConfigurationItem {
 								state := this.Connector.GetLapValue(this.Laps[nextLap].Identifier, "Race Engineer Pitstop State")
 							}
 							catch Any as exception {
-								logError(exception)
+								logError(exception, true)
+
+								state := false
 							}
 
 							if (state && (state != "")) {
@@ -9058,7 +9066,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 	}
 
@@ -9106,7 +9114,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 	}
 
@@ -9131,7 +9139,9 @@ class TeamCenter extends ConfigurationItem {
 						teamDrivers := this.Connector.GetSessionValue(session, "Team Drivers")
 					}
 					catch Any as exception {
-						teamDrivers := ""
+						logError(exception, true)
+
+						teamDrivers := false
 					}
 
 					if (teamDrivers && (teamDrivers != ""))
@@ -9148,7 +9158,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 	}
 
@@ -9194,7 +9204,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 	}
 
@@ -9252,7 +9262,7 @@ class TeamCenter extends ConfigurationItem {
 						this.initializeSimulator(simulator, car, track)
 					}
 					catch Any as exception {
-						logError(exception)
+						logError(exception, true)
 					}
 				}
 
@@ -9309,7 +9319,7 @@ class TeamCenter extends ConfigurationItem {
 									this.loadPitstopState(parseMultiMap(state))
 							}
 							catch Any as exception {
-								logError(exception)
+								logError(exception, true)
 							}
 						}
 
@@ -10071,7 +10081,7 @@ class TeamCenter extends ConfigurationItem {
 							writeMultiMap(folder . "\" . fileName . ".team", info)
 						}
 						catch Any as exception {
-							logError(exception)
+							logError(exception, true)
 						}
 					})
 			}
@@ -10512,7 +10522,7 @@ class TeamCenter extends ConfigurationItem {
 					this.Connector.ClearSession(session)
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 
 				this.initializeSession(true)
@@ -10602,7 +10612,7 @@ class TeamCenter extends ConfigurationItem {
 									folder := ""
 							}
 							catch Any as exception {
-								logError(exception)
+								logError(exception, true)
 
 								folder := ""
 							}
@@ -12115,7 +12125,7 @@ class TeamCenter extends ConfigurationItem {
 					}
 					catch Any as exception {
 						if (exception != "No data...")
-							logError(exception)
+							logError(exception, true)
 
 						standingsData := newMultiMap()
 					}
@@ -14417,11 +14427,10 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 
 				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) {
 					if arguments[1].Has("Pitstop.Planned.Tyre.Compound") {
-						tyreCompound := translate(arguments[1]["Pitstop.Planned.Tyre.Compound"] ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
-																										 , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
-																								: "-")
-
-						tyreChange := true
+						tyreChange := arguments[1]["Pitstop.Planned.Tyre.Compound"]
+						tyreCompound := translate(tyreChange ? compound(arguments[1]["Pitstop.Planned.Tyre.Compound"]
+																	  , arguments[1]["Pitstop.Planned.Tyre.Compound.Color"])
+															 : "-")
 
 						for index, tyre in wheels
 							tyreCompound%tyre% := tyreCompound
@@ -14815,7 +14824,7 @@ loadTeams(connector) {
 		}
 	}
 	catch Any as exception {
-		logError(exception)
+		logError(exception, true)
 	}
 
 	return teams
@@ -14833,7 +14842,7 @@ loadSessions(connector, team) {
 				sessions[session.Name] := session.Identifier
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 
@@ -14852,7 +14861,7 @@ loadDrivers(connector, team) {
 				drivers[driverName(driver.ForName, driver.SurName, driver.NickName)] := driver.Identifier
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, true)
 			}
 		}
 

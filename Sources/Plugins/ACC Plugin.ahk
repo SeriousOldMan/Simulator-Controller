@@ -160,7 +160,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	Car {
 		Set {
-			this.iImageSearch := kUndefined
+			if (this.Car != value)
+				this.iImageSearch := kUndefined
 
 			return (super.Car := value)
 		}
@@ -168,7 +169,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	Track {
 		Set {
-			this.iImageSearch := kUndefined
+			if (this.Track != value)
+				this.iImageSearch := kUndefined
 
 			return (super.Track := value)
 		}
@@ -211,7 +213,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			else
 				this.iOpenPitstopMFDHotkey := "Off"
 
-			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey = "Off"))
+			if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 				this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
 
 			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))

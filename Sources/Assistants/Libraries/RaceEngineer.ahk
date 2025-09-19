@@ -235,6 +235,9 @@ class ProposePitstopEvent extends EngineerEvent {
 		tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
 		repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
 
+		if (lap = "Now")
+			lap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
+
 		this.Provider.supportsTyreManagement(&mixedCompounds)
 
 		refuelRule := getMultiMapValue(instructions, "Rules"
@@ -272,6 +275,9 @@ class ProposePitstopEvent extends EngineerEvent {
 			refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
 			tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
 			repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
+
+			if (lap = "Now")
+				lap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
 
 			this.planPitstop(lap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
 								, repairs, repairs, repairs)
@@ -575,7 +581,7 @@ class RaceEngineer extends RaceAssistant {
 							this.setContinuation(ObjBindMethod(this, "planPitstop"))
 						}
 						else if this.supportsPitstop()
-							this.planPitstop()
+							this.proposePitstop()
 				}
 				else if this.hasPlannedPitstop() {
 					if this.Listener {
@@ -1754,7 +1760,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	planPitstopRecognized(words) {
-		this.planPitstop()
+		this.proposePitstop()
 	}
 
 	driverSwapRecognized(words) {
@@ -3681,8 +3687,7 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("Repeat")
 	}
 
-	proposePitstop(lap := kUndefined
-				 , refuelAmount := kUndefined, tyreChange := kUndefined, repairs := kUndefined) {
+	proposePitstop(lap := kUndefined, refuelAmount := kUndefined, tyreChange := kUndefined, repairs := kUndefined) {
 		if (this.AgentBooster && this.handledEvent("ProposePitstop") && this.findAction("plan_pitstop")) {
 			this.handleEvent("ProposePitstop", lap, refuelAmount, tyreChange, repairs)
 		}
@@ -4208,7 +4213,7 @@ class RaceEngineer extends RaceAssistant {
 						this.setContinuation(ObjBindMethod(this, "planPitstop"))
 					}
 					else
-						this.planPitstop()
+						this.proposePitstop()
 			}
 
 			return false
@@ -4571,8 +4576,10 @@ class RaceEngineer extends RaceAssistant {
 				if !this.confirmCommand(false)
 					return
 
-			this.planPitstop()
+			this.proposePitstop()
 		}
+		else if (arguments.Length = 0)
+			this.proposePitstop(lap)
 		else
 			this.planPitstop(lap, arguments*)
 	}
@@ -4595,6 +4602,8 @@ class RaceEngineer extends RaceAssistant {
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", lap, arguments*))
 				}
+				else if (arguments.Length = 0)
+					this.proposePitstop(lap)
 				else
 					this.planPitstop(lap, arguments*)
 		}
@@ -4874,10 +4883,10 @@ class RaceEngineer extends RaceAssistant {
 							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
 							}
 							else
-								this.planPitstop("Now")
+								this.proposePitstop("Now")
 						}
 						else if planPitstop {
 							if this.confirmAction("Pitstop.Fuel") {
@@ -4918,10 +4927,10 @@ class RaceEngineer extends RaceAssistant {
 							if this.confirmAction("Pitstop.Fuel") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
 							}
 							else
-								this.planPitstop("Now")
+								this.proposePitstop("Now")
 						}
 						else if planPitstop {
 							if this.confirmAction("Pitstop.Fuel") {
@@ -4967,10 +4976,10 @@ class RaceEngineer extends RaceAssistant {
 							if this.confirmAction("Pitstop.Tyre") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
 							}
 							else
-								this.planPitstop("Now")
+								this.proposePitstop("Now")
 						}
 						else if planPitstop {
 							if this.confirmAction("Pitstop.Tyre") {
@@ -5016,10 +5025,10 @@ class RaceEngineer extends RaceAssistant {
 							if this.confirmAction("Pitstop.Brake") {
 								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
 							}
 							else
-								this.planPitstop("Now")
+								this.proposePitstop("Now")
 						}
 						else if planPitstop {
 							if this.confirmAction("Pitstop.Brake") {
@@ -5084,7 +5093,7 @@ class RaceEngineer extends RaceAssistant {
 			knowledgeBase.setValue("Damage.Repair.Bodywork.Target", true)
 			knowledgeBase.setValue("Damage.Repair.Engine.Target", true)
 
-			this.planPitstop("Now")
+			this.proposePitstop("Now", kUndefined, kUndefined, true)
 		}
 
 		if (this.hasEnoughData(false) && knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
@@ -5107,7 +5116,7 @@ class RaceEngineer extends RaceAssistant {
 									this.setContinuation(repairPitstop)
 								}
 								else
-									this.planPitstop("Now")
+									this.proposePitstop("Now", kUndefined, kUndefined, true)
 						}
 						finally {
 							speaker.endTalk()
@@ -5167,10 +5176,10 @@ class RaceEngineer extends RaceAssistant {
 					if this.confirmAction("Pitstop.Weather") {
 						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+						this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now", kUndefined, true))
 					}
 					else
-						this.planPitstop("Now")
+						this.proposePitstop("Now", kUndefined, true)
 			}
 			finally {
 				speaker.endTalk()

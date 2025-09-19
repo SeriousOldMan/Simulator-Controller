@@ -220,6 +220,67 @@ class WeatherForecastEvent extends EngineerEvent {
 	}
 }
 
+class ProposePitstopEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		local lap, refuelAmount, tyreChange, repairs
+		local trigger, refuelRule, tyreRule, repairRule, mixedCompounds
+
+		static instructions := false
+
+		if !instructions
+			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instruction.en")
+
+		lap := (arguments.Has(1) ? arguments[1] : kUndefined)
+		refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
+		tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
+		repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
+
+		this.Provider.supportsTyreManagement(&mixedCompounds)
+
+		refuelRule := getMultiMapValue(instructions, "Rules"
+									 , (refuelAmount != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "RefuelRuleRequired"), {liter: refuelAmount})
+																	: getMultiMapValue(instructions, "Rules", "RefuelRuleTime"))
+
+		if ((tyreChange = kUndefined) || tyreChange) {
+			if (mixedCompounds = "Wheel")
+				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleWheel")
+			else if (mixedCompounds = "Axle")
+				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAxle")
+			else
+				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAll")
+		}
+		else
+			tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleNoChange")
+
+		if (repairs = kUndefined)
+			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleImpact")
+		else if repairs
+			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleRequired")
+		else
+			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleNoRepairs")
+
+		return substituteVariable(getMultiMapValue(instructions, "Instructions", "PitstopPropose")
+								, {refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
+								 , maxTyreWear: knowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
+	}
+
+	handleEvent(event, arguments*) {
+		local lap, refuelAmount, tyreChange, repairs
+
+		if !super.handleEvent(event, arguments*) {
+			lap := (arguments.Has(1) ? arguments[1] : kUndefined)
+			refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
+			tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
+			repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
+
+			this.planPitstop(lap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
+								, repairs, repairs, repairs)
+		}
+
+		return true
+	}
+}
+
 class RaceEngineer extends RaceAssistant {
 	iAdjustLapTime := true
 
@@ -3620,14 +3681,14 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("Repeat")
 	}
 
-	proposePitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined
-				 , tyreCompound := kUndefined, tyreCompoundColor := kUndefined) {
-		if this.AgentBooster {
-
+	proposePitstop(lap := kUndefined
+				 , refuelAmount := kUndefined, tyreChange := kUndefined, repairs := kUndefined) {
+		if (this.AgentBooster && this.handledEvent("ProposePitstop") && this.findAction("plan_pitstop")) {
+			this.handleEvent("ProposePitstop", lap, refuelAmount, tyreChange, repairs)
 		}
 		else
-			return this.planPitstop(optionsOrLap, refuelAmound, kUndefined, kUndefined
-								  , tyreCompound, tyreCompoundColor)
+			this.planPitstop(lap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
+								, repairs, repairs, repairs)
 	}
 
 	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined

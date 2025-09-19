@@ -2006,7 +2006,7 @@ class RaceAssistant extends ConfigurationItem {
 		return false
 	}
 
-	triggerAction(action, arguments*) {
+	findAction(action) {
 		findTool(tools, name) {
 			local ignore, candidate
 
@@ -2017,7 +2017,11 @@ class RaceAssistant extends ConfigurationItem {
 			return false
 		}
 
-		action := findTool(this.getTools("Agent"), action)
+		return findTool(this.getTools("Agent"), action)
+	}
+
+	triggerAction(action, arguments*) {
+		action := this.findAction(action)
 
 		if action
 			action.Callable.Call(arguments*)

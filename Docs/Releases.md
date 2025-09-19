@@ -22,7 +22,20 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.5.5.0
+
+#### Date: 09/26/25 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - Integrated the latest version of the API for *RaceRoom Racing Experience*, which was released on 24th September.
+    - This version of the API now exports information about the current state and selections of the Pitstop MFD. Therefore the search images are no longer needed. If you still want to use the image recognition method for whatever reason, use the new setting ["Pitstop: Image Search"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" for *RaceRoom Racing Experience*.
+	- Information about the remaining virtual energy is supported for all applications when running a hypercar-
+  - A new [event for pitstop planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) for the *Reasoning* booster has been defined for the Race Engineer. This event, if enabled, will route the request to plan an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM acting as a LAM (aka large action model) in this case, may come up with a better pitstop plan, especially for tyre changes, than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and use enable at your own risk. Please note, that this approach will not be used in all cases, for example, if the requests was created remotely in the "Team Center".
 
 # Release history
 

@@ -3591,6 +3591,16 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("Repeat")
 	}
 
+	proposePitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined
+				 , tyreCompound := kUndefined, tyreCompoundColor := kUndefined) {
+		if this.AgentBooster {
+
+		}
+		else
+			return this.planPitstop(optionsOrLap, refuelAmound, kUndefined, kUndefined
+								  , tyreCompound, tyreCompoundColor)
+	}
+
 	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined
 			  , changeTyres := kUndefined, tyreSet := kUndefined
 			  , tyreCompound := kUndefined, tyreCompoundColor := kUndefined, tyrePressures := kUndefined

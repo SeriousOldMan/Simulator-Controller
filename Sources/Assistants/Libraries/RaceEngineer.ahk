@@ -220,7 +220,7 @@ class WeatherForecastEvent extends EngineerEvent {
 	}
 }
 
-class ProposePitstopEvent extends EngineerEvent {
+class PlanPitstopEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		local lap, refuelAmount, tyreChange, repairs
 		local trigger, refuelRule, tyreRule, repairRule, mixedCompounds
@@ -262,7 +262,7 @@ class ProposePitstopEvent extends EngineerEvent {
 		else
 			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleNoRepairs")
 
-		return substituteVariable(getMultiMapValue(instructions, "Instructions", "PitstopPropose")
+		return substituteVariable(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
 								, {refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
 								 , maxTyreWear: knowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
 	}
@@ -578,7 +578,7 @@ class RaceEngineer extends RaceAssistant {
 						if this.Listener {
 							this.getSpeaker().speakPhrase("ConfirmPlan", {forYou: this.getSpeaker().Fragments["ForYou"]}, true)
 
-							this.setContinuation(ObjBindMethod(this, "planPitstop"))
+							this.setContinuation(ObjBindMethod(this, "proposePitstop"))
 						}
 						else if this.supportsPitstop()
 							this.proposePitstop()
@@ -689,7 +689,7 @@ class RaceEngineer extends RaceAssistant {
 
 		repairs := (isSet(repairs) ? repairs : kUndefined)
 
-		if (knowledgeBase && isSet(tyreCompound)) {
+		if (knowledgeBase && isSet(tyreCompounds)) {
 			availableCompounds := SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track)
 			compounds := []
 			compoundColors := []
@@ -697,7 +697,7 @@ class RaceEngineer extends RaceAssistant {
 			for ignore, compound in string2Values(",", tyreCompounds) {
 				compound := Trim(compound)
 
-				if (!compound || (compound = kFalse) || !inList(availableCompounds, compound)) {
+				if (!compound || (compound = kFalse) || (compound = "-") || !inList(availableCompounds, compound)) {
 					compounds.Push(false)
 					compoundColors.Push(false)
 				}
@@ -3688,7 +3688,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	proposePitstop(lap := kUndefined, refuelAmount := kUndefined, tyreChange := kUndefined, repairs := kUndefined) {
-		if (this.AgentBooster && this.handledEvent("ProposePitstop") && this.findAction("plan_pitstop")) {
+		if (this.AgentBooster && this.handledEvent("PlanPitstop") && this.findAction("plan_pitstop")) {
 			this.handleEvent("ProposePitstop", lap, refuelAmount, tyreChange, repairs)
 		}
 		else

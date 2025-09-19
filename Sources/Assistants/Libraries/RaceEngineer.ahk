@@ -221,14 +221,17 @@ class WeatherForecastEvent extends EngineerEvent {
 }
 
 class PlanPitstopEvent extends EngineerEvent {
+	Asynchronous {
+		Get {
+			return false
+		}
+	}
+
 	createTrigger(event, phrase, arguments) {
 		local lap, refuelAmount, tyreChange, repairs
 		local trigger, refuelRule, tyreRule, repairRule, mixedCompounds
 
-		static instructions := false
-
-		if !instructions
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instruction.en")
+		static instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
 
 		lap := (arguments.Has(1) ? arguments[1] : kUndefined)
 		refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
@@ -238,7 +241,7 @@ class PlanPitstopEvent extends EngineerEvent {
 		if (lap = "Now")
 			lap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
 
-		this.Provider.supportsTyreManagement(&mixedCompounds)
+		this.Assistant.Provider.supportsTyreManagement(&mixedCompounds)
 
 		refuelRule := getMultiMapValue(instructions, "Rules"
 									 , (refuelAmount != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "RefuelRuleRequired"), {liter: refuelAmount})
@@ -262,9 +265,9 @@ class PlanPitstopEvent extends EngineerEvent {
 		else
 			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleNoRepairs")
 
-		return substituteVariable(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
-								, {refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
-								 , maxTyreWear: knowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
+		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
+								 , {refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
+								  , maxTyreWear: this.Assistant.KnowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
 	}
 
 	handleEvent(event, arguments*) {
@@ -3688,9 +3691,8 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	proposePitstop(lap := kUndefined, refuelAmount := kUndefined, tyreChange := kUndefined, repairs := kUndefined) {
-		if (this.AgentBooster && this.handledEvent("PlanPitstop") && this.findAction("plan_pitstop")) {
-			this.handleEvent("ProposePitstop", lap, refuelAmount, tyreChange, repairs)
-		}
+		if (this.AgentBooster && this.handledEvent("PlanPitstop") && this.findAction("plan_pitstop"))
+			this.handleEvent("PlanPitstop", lap, refuelAmount, tyreChange, repairs)
 		else
 			this.planPitstop(lap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
 								, repairs, repairs, repairs)

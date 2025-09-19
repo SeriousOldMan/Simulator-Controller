@@ -171,8 +171,8 @@ class AssistantEvent extends AgentEvent {
 	}
 
 	createVariables(event, arguments) {
-		local data := assistant.getKnowledge("Agent", this.Options)
 		local assistant := this.Assistant
+		local data := assistant.getKnowledge("Agent", this.Options)
 
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
 			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")}

@@ -408,7 +408,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	normalizeConfiguration(configuration) {
 		local ignore, type, section, values, key, value
 
-		for ignore, type in ["Speaker", "Listener", "Conversation"]
+		for ignore, type in ["Speaker", "Listener", "Conversation", "Agent"]
 			for section, values in this.getInstructions(type, true)
 				for key, value in values
 					if (getMultiMapValue(configuration, section, key) = value)

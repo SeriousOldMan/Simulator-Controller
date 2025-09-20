@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.5.5
 
-Nothing to do.
+To get rid of all unnecessary language specific LLM instructions in the main configuration, which may slow things down a bit, open the configuration, 1. open the Assistant Booster editor for each Assistant and close it using "Ok" and 2. go to the Driving Coach configuration page, but do nothing there. Finally save the configuration.
 
 ***
 

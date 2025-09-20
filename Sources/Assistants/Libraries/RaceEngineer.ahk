@@ -231,7 +231,13 @@ class PlanPitstopEvent extends EngineerEvent {
 		local targetLap, refuelAmount, tyreChange, repairs
 		local trigger, targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
 
-		static instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
+		static instructions := false
+
+		if !instructions {
+			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
+
+			addMultiMapValues(instructions, kUserHomeDirectory . "Translations\Race Engineer.instructions.en")
+		}
 
 		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
 		refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)

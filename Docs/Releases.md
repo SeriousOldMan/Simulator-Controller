@@ -29,7 +29,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Fixed a couple of missing translations.
-  - Fixed several unnecessary language specific LLM instructions cluttering the main configuration file, thereby slowing things down a bit. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) for information, how to fix this in your configuration.
+  - Fixed several unnecessary language specific LLM instructions cluttering the main configuration file, which could have slowed things down a bit. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) for information, how to fix this in your configuration.
   
 #### Changes
 

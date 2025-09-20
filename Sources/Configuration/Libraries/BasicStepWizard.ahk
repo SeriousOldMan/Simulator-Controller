@@ -1049,8 +1049,8 @@ class BasicStepWizard extends StepWizard {
 		try {
 			this.saveSetup()
 
-			configuration := readMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
-
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+			
 			setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(kSimulatorConfiguration, "Conversation Booster"), false)
 
 			setup := this.assistantSetup(assistant)
@@ -1092,7 +1092,7 @@ class BasicStepWizard extends StepWizard {
 			configuration := AssistantBoosterEditor(assistant, configuration, availableBooster).editBooster(window)
 
 			if configuration {
-				writeMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini", configuration)
+				writeMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", configuration)
 
 				speakerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")
 									 , "Model", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Model")

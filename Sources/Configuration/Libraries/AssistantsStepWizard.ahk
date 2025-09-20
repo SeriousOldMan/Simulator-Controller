@@ -72,8 +72,12 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		super.saveToConfiguration(configuration)
 
 		setMultiMapValues(configuration, "Conversation Booster"
-									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
 														 , "Conversation Booster"), false)
+
+		setMultiMapValues(configuration, "Agent Booster"
+									   , getMultiMapValues(readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
+														 , "Agent Booster"), false)
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {

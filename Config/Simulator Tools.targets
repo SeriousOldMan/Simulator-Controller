@@ -36,6 +36,7 @@ Release 6.2.7=Release 6.2.6 -> updateConfigurationForV627
 Release 6.4.2=Release 6.2.7 -> updateConfigurationForV642
 Release 6.5.2=Release 6.4.2 -> updateConfigurationForV652
 Release 6.5.4=Release 6.5.2 -> updateConfigurationForV654
+Release 6.5.5=Release 6.5.4 -> updateConfigurationForV655
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

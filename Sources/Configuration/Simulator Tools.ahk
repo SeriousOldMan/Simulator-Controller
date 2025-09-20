@@ -1772,6 +1772,12 @@ updateInstallationForV500() {
 	}
 }
 
+updateConfigurationForV655() {
+	if FileExist(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
+		FileMove(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini"
+			   , kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", 1)
+}
+
 updateConfigurationForV654() {
 	local fileName := (kUserHomeDirectory . "Simulator Data\AC\Track Data.ini")
 	local settingsDB, ignore, code, entry, text

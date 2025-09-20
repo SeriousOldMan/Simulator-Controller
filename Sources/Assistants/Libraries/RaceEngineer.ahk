@@ -243,13 +243,16 @@ class PlanPitstopEvent extends EngineerEvent {
 
 		this.Assistant.Provider.supportsTyreManagement(&mixedCompounds)
 
-		targetLapRule := getMultiMapValue(instructions, "Rules"
-										, (targetLap != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed"), {targetLap: targetLap})
-																	: getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable"))
+		if (targetLap != kUndefined)
+			targetLapRule := substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed")
+											   , {targetLap: targetLap})
+		else
+			targetLapRule := getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable")
 
-		refuelRule := getMultiMapValue(instructions, "Rules"
-									 , (refuelAmount != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "RefuelRuleRequired"), {liter: refuelAmount})
-																	: getMultiMapValue(instructions, "Rules", "RefuelRuleTime"))
+		if (refuelAmount != kUndefined)
+			refuelRule := substituteVariables(getMultiMapValue(instructions, "Rules", "RefuelRuleRequired"), {liter: refuelAmount})
+		else
+			refuelRule := getMultiMapValue(instructions, "Rules", "RefuelRuleTime")
 
 		if ((tyreChange = kUndefined) || tyreChange) {
 			if (mixedCompounds = "Wheel")
@@ -271,7 +274,7 @@ class PlanPitstopEvent extends EngineerEvent {
 
 		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
 								 , {targetLapRule: targetLapRule, refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
-								  , maxTyreWear: this.Assistant.KnowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
+								  , minTyreTread: this.Assistant.KnowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
 	}
 
 	handleEvent(event, arguments*) {
@@ -708,8 +711,8 @@ class RaceEngineer extends RaceAssistant {
 				else {
 					splitCompound(compound, &tyreCompound, &tyreCompoundColor)
 
-					compounds.Push(false)
-					compoundColors.Push(false)
+					compounds.Push(tyreCompound)
+					compoundColors.Push(tyreCompoundColor)
 				}
 			}
 

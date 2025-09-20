@@ -617,6 +617,17 @@ class LLMConnector {
 			serviceKey := ""
 			model := "GPT 4.1 mini"
 		}
+
+		CreatePrompt(body, instructions, tools, question) {
+			if (InStr(this.Model, "GPT 5") || InStr(this.Model, "GPT-5")) {
+				body.max_completion_tokens := body.max_tokens
+
+				body.DeleteProp("max_tokens")
+				body.DeleteProp("temperature")
+			}
+
+			return super.CreatePrompt(body, instructions, tools, question)
+		}
 	}
 
 	class AzureConnector extends LLMConnector.OpenAIConnector {

@@ -228,6 +228,7 @@ class PlanPitstopEvent extends EngineerEvent {
 	}
 
 	createTrigger(event, phrase, arguments) {
+		local knowledgeBase := this.Assistant.KnowledgeBase
 		local targetLap, refuelAmount, tyreChange, repairs
 		local trigger, targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
 
@@ -280,7 +281,8 @@ class PlanPitstopEvent extends EngineerEvent {
 
 		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
 								 , {targetLapRule: targetLapRule, refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
-								  , minTyreTread: this.Assistant.KnowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
+								  , maxTyreWear: (100 - knowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning", 25))
+								  , lastService: knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5)})
 	}
 
 	handleEvent(event, arguments*) {

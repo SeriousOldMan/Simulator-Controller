@@ -28,7 +28,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed a couple of missing translations.
   
 #### Changes
 

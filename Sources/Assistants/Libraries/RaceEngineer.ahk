@@ -228,20 +228,24 @@ class PlanPitstopEvent extends EngineerEvent {
 	}
 
 	createTrigger(event, phrase, arguments) {
-		local lap, refuelAmount, tyreChange, repairs
-		local trigger, refuelRule, tyreRule, repairRule, mixedCompounds
+		local targetLap, refuelAmount, tyreChange, repairs
+		local trigger, targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
 
 		static instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
 
-		lap := (arguments.Has(1) ? arguments[1] : kUndefined)
+		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
 		refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
 		tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
 		repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
 
-		if (lap = "Now")
-			lap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
+		if (targetLap = "Now")
+			targetLap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
 
 		this.Assistant.Provider.supportsTyreManagement(&mixedCompounds)
+
+		targetLapRule := getMultiMapValue(instructions, "Rules"
+										, (targetLap != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed"), {targetLap: targetLap})
+																	: getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable"))
 
 		refuelRule := getMultiMapValue(instructions, "Rules"
 									 , (refuelAmount != kUndefined) ? substituteVariables(getMultiMapValue(instructions, "Rules", "RefuelRuleRequired"), {liter: refuelAmount})
@@ -266,24 +270,21 @@ class PlanPitstopEvent extends EngineerEvent {
 			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleNoRepairs")
 
 		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
-								 , {refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
+								 , {targetLapRule: targetLapRule, refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
 								  , maxTyreWear: this.Assistant.KnowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning")})
 	}
 
 	handleEvent(event, arguments*) {
-		local lap, refuelAmount, tyreChange, repairs
+		local targetLap, refuelAmount, tyreChange, repairs
 
 		if !super.handleEvent(event, arguments*) {
-			lap := (arguments.Has(1) ? arguments[1] : kUndefined)
+			targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
 			refuelAmount := (arguments.Has(2) ? arguments[2] : kUndefined)
 			tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
 			repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
 
-			if (lap = "Now")
-				lap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
-
-			this.planPitstop(lap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
-								, repairs, repairs, repairs)
+			this.planPitstop(targetLap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
+									  , repairs, repairs, repairs)
 		}
 
 		return true

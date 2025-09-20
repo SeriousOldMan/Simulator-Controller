@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.5.0-dev]() (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer.)
+[6.5.5.0-dev]() (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6550) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) of this version and all the versions you might have skipped, before installing and using this version.
 

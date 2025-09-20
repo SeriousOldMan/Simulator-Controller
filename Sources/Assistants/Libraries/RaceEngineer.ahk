@@ -237,7 +237,7 @@ class PlanPitstopEvent extends EngineerEvent {
 		if !instructions {
 			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
 
-			addMultiMapValues(instructions, kUserHomeDirectory . "Translations\Race Engineer.instructions.en")
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Engineer.instructions.en"))
 		}
 
 		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
@@ -294,8 +294,8 @@ class PlanPitstopEvent extends EngineerEvent {
 			tyreChange := (arguments.Has(3) ? arguments[3] : kUndefined)
 			repairs := (arguments.Has(4) ? arguments[4] : kUndefined)
 
-			this.planPitstop(targetLap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
-									  , repairs, repairs, repairs)
+			this.Assistant.planPitstop(targetLap, refuelAmount, tyreChange, kUndefined, kUndefined, kUndefined, kUndefined
+												, repairs, repairs, repairs)
 		}
 
 		return true

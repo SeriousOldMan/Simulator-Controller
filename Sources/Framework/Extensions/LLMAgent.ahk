@@ -86,6 +86,12 @@ class AgentBooster extends LLMBooster {
 		}
 	}
 
+	MaxTokens {
+		Get {
+			return false
+		}
+	}
+
 	Instructions[language?] {
 		Get {
 			local instructions, ignore, instrLanguage, directory, key, value

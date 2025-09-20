@@ -323,8 +323,11 @@ class LLMConnector {
 
 		Ask(question, instructions := false, tools := false, &calls?) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
-			local body := {model: this.Model, max_tokens: this.MaxTokens, temperature: this.Temperature}
+			local body := {model: this.Model, temperature: this.Temperature}
 			local toolCall := false
+
+			if this.MaxTokens
+				body.max_tokens := this.MaxTokens
 
 			if !instructions
 				instructions := this.GetInstructions()
@@ -620,9 +623,12 @@ class LLMConnector {
 
 		CreatePrompt(body, instructions, tools, question) {
 			if (InStr(this.Model, "GPT 5") || InStr(this.Model, "GPT-5")) {
-				body.max_completion_tokens := body.max_tokens
+				if body.HasProp("max_tokens") {
+					body.max_completion_tokens := body.max_tokens
 
-				body.DeleteProp("max_tokens")
+					body.DeleteProp("max_tokens")
+				}
+
 				body.DeleteProp("temperature")
 			}
 

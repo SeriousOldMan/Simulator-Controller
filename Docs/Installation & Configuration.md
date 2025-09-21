@@ -680,7 +680,7 @@ The conversations you have with your coach, will be transcribed to text files. Y
 
 #### Tab *Race Engineer*
 
-With the settings on this tab, the dynamic behaviour of the [AI Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer) and its integration with the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) can be customized. All options can be chosen independently for each configured simulation game.
+With the settings on this tab, the dynamic behavior of the [AI Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer) and its integration with the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) can be customized. All options can be chosen independently for each configured simulation game.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%208.JPG)
 
@@ -703,7 +703,7 @@ Good to know: The little button on the right side of the Simulator dropdown menu
 
 #### Tab *Race Strategist*
 
-Similar as with the tab for the *Race Engineer*, the dynamic behaviour of the [AI Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist) can be customized here. All options can be chosen independently for each configured simulation game.
+Similar as with the tab for the *Race Engineer*, the dynamic behavior of the [AI Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist) can be customized here. All options can be chosen independently for each configured simulation game.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%209.JPG)
 
@@ -716,7 +716,7 @@ Good to know: The little button on the right side of the Simulator dropdown menu
 
 #### Tab *Race Spotter*
 
-Similar as with the tab for the *Race Engineer* and for the *Race Strategist*, the dynamic behaviour of the [AI Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) can be customized here. All options can be chosen independently for each configured simulation game.
+Similar as with the tab for the *Race Engineer* and for the *Race Strategist*, the dynamic behavior of the [AI Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) can be customized here. All options can be chosen independently for each configured simulation game.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2011.JPG)
 
@@ -730,7 +730,7 @@ Good to know: The little button on the right side of the Simulator dropdown menu
 
 #### Going deeper into the rabbit hole
 
-After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behaviour of Simulator Controller available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+After creating the general configuration using "Simulator Setup" or "Simulator Configuration", Simulator Controller will be already ready to race. But there are many more settings to customize the behavior of Simulator Controller available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). These settings can be created for specific combinations of a simulator and a car and even track, thereby giving you great flexibility for the best possible experience. But there is a downside, you have to learn all these settings. Don't worry, all settings have a reasonable default, so you can start right away. Here is the documentation about all [available settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
 #### Special configuration options for optimizing overall performance
 

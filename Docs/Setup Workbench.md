@@ -325,7 +325,7 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 
   - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
   
-    Similar in behaviour to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed. *FloatHandler* can be used as well, as it is synonym to *DecimalHandler*.
+    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed. *FloatHandler* can be used as well, as it is synonym to *DecimalHandler*.
 	
 	Example:
 	

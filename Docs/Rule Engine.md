@@ -418,7 +418,7 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Syntax: option(*setting*, *value*)
 	
-	This is not a typical predicate, but can be used to alter the behaviour of the rule execution during runtime. *Setting* can be
+	This is not a typical predicate, but can be used to alter the behavior of the rule execution during runtime. *Setting* can be
 	
     - OccurCheck
   
@@ -438,7 +438,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
     - Trace
   
-	  Not really a change in behaviour, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalt, of course.
+	  Not really a change in behavior, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalt, of course.
     
 	option always succeeds, even if called with an unknown setting.
 

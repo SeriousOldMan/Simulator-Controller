@@ -152,7 +152,7 @@ If the Team Server is part of your configuration and if you have chosen "Team" a
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Startup%20Profiles%202.JPG)
 
-If you are the team manager, you can open up the [team management dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behaviour as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
+If you are the team manager, you can open up the [team management dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) by clicking on the "Manage..." button. When you have created and saved a new team session there it will be loaded into the startup profile automatically. Otherwise, if you participate as a driver in a team session, you can either use the application "Race Settings" to manage your driver credentials, or you can enter them directly into the startup profile by chosing "Save with Profile" in the *Credential* drop down. The input fields below have the same meaning and behavior as those in the ["Race Settings"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) application.
 
 On the last tab you can select or deselect several functions provided by the different plugins of Simulator Controller. What is available here, totally depends on your overall configuration.
 
@@ -264,9 +264,9 @@ This activates Jona, the Race Engineer, and immediately asks Jona to plan a pits
 1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").
 2. The combined phrase is only recognized, if the first word is the name of the Assistant. For example: "Hey Jona, can you plan a pitstop?" or "Can you plan a pitstop, Jona?" won't be recognized.
 
-#### Push-To-Talk Behaviour
+#### Push-To-Talk backgroud
 
-Beside the behaviour of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+Beside the behavior of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 	
 Please don't forget to press the *Push-To-Talk* button at the end of your speech, even if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
 
@@ -308,11 +308,11 @@ Normally you will use a standard configuration for voice control, which means, t
 
   3. No voice control for one or more Assistant(s)
   
-     You can disable voice input for one or more Assistants. It can either be done for all Assistants by disabling voice input on the voice control page in "Simulator Setup". Disabling it for an individual Assistant is also possible, but requires low level configuration in "Simulator Controller". When voice input is disabled, I recommand using the corresponding actions on a Button Box or a Stream Deck to interact with the Assistant. And you may want to configure the confirmation behaviour as described below.
+     You can disable voice input for one or more Assistants. It can either be done for all Assistants by disabling voice input on the voice control page in "Simulator Setup". Disabling it for an individual Assistant is also possible, but requires low level configuration in "Simulator Controller". When voice input is disabled, I recommand using the corresponding actions on a Button Box or a Stream Deck to interact with the Assistant. And you may want to configure the confirmation behavior as described below.
 
-  4. Confirmation behaviour
+  4. Confirmation behavior
   
-     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", with which you can customize the behaviour in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
+     This is more or less independent of the voice configuration. There are many cases, in which the Assistants ask you a question and wait then for your confirmation. In this case, you can either answer using a voice command or by pressing the "Accept" action button on your controller. But there are also a couple of [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", with which you can customize the behavior in case of a question/confirmation for different situations. For example, using the "Engineer: Confirm Pitstop Preparation", you can specify, how the Engineer should behave, when he wants to prepare a pitstop. Three options are available:
 	 
 	 | Setting Value | Description |
 	 |---------------|-------------|
@@ -384,7 +384,7 @@ Supported output routes are:
 | Race Engineer   | All voice output by the Race Engineer.                                                                               |
 | Race Strategist | All voice output by the Race Strategist.                                                                             |
 | Conversation    | The short sound that indicates that an answer is given by the *Conversation* booster.                                |
-| Reasoning       | The short sound that indicates that a given behaviour is triggered by the *Reasoning* booster.                       |
+| Reasoning       | The short sound that indicates that a given behavior is triggered by the *Reasoning* booster.                       |
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 

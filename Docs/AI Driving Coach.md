@@ -56,13 +56,13 @@ Remember, trail braking is a skill that takes time and practice to master. Be pa
 
 2. Pit stop execution: During the pit stop, the primary focus will be on refueling the car. Make sure to communicate effectively with your team to ensure a quick and efficient pit stop. Practice entering and exiting the pit lane smoothly to avoid any penalties or delays.
 
-3. Strategy adjustments: Depending on the characteristics of the track and the behaviour of your competitors, you may need to adjust your strategy during the race. Pay attention to any changes in track conditions, weather, or the performance of your competitors. This will help you make informed decisions about your pit stop timing or any necessary adjustments to your driving style.
+3. Strategy adjustments: Depending on the characteristics of the track and the behavior of your competitors, you may need to adjust your strategy during the race. Pay attention to any changes in track conditions, weather, or the performance of your competitors. This will help you make informed decisions about your pit stop timing or any necessary adjustments to your driving style.
 
 Remember, every race is unique, and it's important to adapt your strategy based on the specific circumstances. Analyzing telemetry data, working closely with your team, and staying aware of the race dynamics will help you make the best decisions for a successful race.
 
 **Driver:** Would an early pit stop or late pit stop be better?
 
-**Aiden:** Determining whether an early or late pit stop is better depends on various factors, including track conditions, tire degradation, and the behaviour of your competitors. Here are some considerations for both options:
+**Aiden:** Determining whether an early or late pit stop is better depends on various factors, including track conditions, tire degradation, and the behavior of your competitors. Here are some considerations for both options:
 
 Early Pit Stop:
 - Track position advantage: An early pit stop can give you the advantage of running in clean air without traffic. This can allow you to push harder and potentially gain positions before other competitors make their pit stops.
@@ -74,13 +74,13 @@ Late Pit Stop:
 - Overtaking opportunities: A late pit stop can offer opportunities for overtaking as other competitors make their pit stops. By staying out longer, you may benefit from fresher tires and potentially gain positions as others rejoin the track after their stops.
 - Track position preservation: If you have a good track position and are confident in your pace, a late pit stop can help you maintain that position without risking losing positions in the pits.
 
-Ultimately, the decision between an early or late pit stop should be based on careful analysis of the specific race circumstances, including tire wear, track conditions, and the behaviour of your competitors. It's also essential to consult with your team and analyze telemetry data to make an informed decision that best suits your race strategy.
+Ultimately, the decision between an early or late pit stop should be based on careful analysis of the specific race circumstances, including tire wear, track conditions, and the behavior of your competitors. It's also essential to consult with your team and analyze telemetry data to make an informed decision that best suits your race strategy.
 
 **Driver:** Can you shorten this answer?
 
 **Aiden**: Certainly! Here's a shorter version:
 
-The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behaviour. 
+The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behavior. 
 
 An early pit stop can give you a track position advantage, help manage tire wear, and potentially allow for an undercut strategy. 
 
@@ -338,7 +338,7 @@ Good to know: If no sections are defined for the current track, the Driving Coac
 
 Aiden can give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
-If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behaviour that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
+If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behavior that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
 Important: If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 

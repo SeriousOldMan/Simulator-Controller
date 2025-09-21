@@ -369,7 +369,7 @@ class SpeechBooster extends ConversationBooster {
 
 							DirCreate(directory)
 
-							FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . text . "`n`n" . translate("-- ") . translate("Rephrasing") . translate(" ---------")) . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+							FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . text . "`n`n" . translate("-- ") . translate("Rephrasing") . translate(" ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
 						}, 0, kLowPriority)
 
 						return answer

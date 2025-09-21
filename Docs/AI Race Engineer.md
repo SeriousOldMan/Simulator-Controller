@@ -218,7 +218,7 @@ The AI Race Engineer is handled by the "Race Engineer" plugin, which may be inte
 
 Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your session. 
 
-Important: In the default configuration, Jona will be activated in the first lap of a session. This is necessary, so that Jona can setup the initial knowledge (fuel, pressures, etc.). If you join a session later than during the first lap, Jona will refuse to work. This behaviour can be changed with the setting "Engineer: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behaviour of Jona may be somewhat confusing.
+Important: In the default configuration, Jona will be activated in the first lap of a session. This is necessary, so that Jona can setup the initial knowledge (fuel, pressures, etc.). If you join a session later than during the first lap, Jona will refuse to work. This behavior can be changed with the setting "Engineer: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behavior of Jona may be somewhat confusing.
 
 ### Race Settings
 
@@ -344,7 +344,7 @@ If "Load from Database" has been configured for the settings of all Race Assista
 
 Good to know: When the *Race.settings* file is changed while Jona or any other Assistant is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Race sessions. Please note, that only the driver who has control of the car can do this in a team session.
 
-Beside the session respectively race specific settings described in the previous sections, the general behaviour of the AI Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer).
+Beside the session respectively race specific settings described in the previous sections, the general behavior of the AI Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer).
 
 #### Tab *Strategy*
 
@@ -705,7 +705,7 @@ It has been reported, that the system sound volume gets sometimes significantly 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Microphon%20Properties.JPG)
 
-Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user *Documents* folder. If you think, that you have found a bug in Jonas behaviour, it would be very helpful for me, when you attach this file to any reported issue.
+Beside that, when you encounter false recommendations from Jona, you might take a look into the brain of Jona to see, why Jona arrived at those conclusions. You can do this by enabling "Debug" mode in the configuration. In the next run, Jona will periodically dump its knowledge to the file "Race Engineer.knowledge" in the folder *Simulator Controller\Temp* that resides in your user *Documents* folder. If you think, that you have found a bug in Jonas behavior, it would be very helpful for me, when you attach this file to any reported issue.
 
 And, last but not least, you might have a problem with the Shared Memory Reader for a simulation game. Please check, if files named "Race Engineer Lap X.Y.data" (where X and Y are consecutive running numbers) exists in the *Simulator Controller\Temp\XXX Data* folder (where XXX is the three letter short code for the simulation), which is located in your user *Documents* folder. Use a text editor to check whether these files have a content as shown a bove in the section about [telemetry integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). If these files do not exist or haven't a meaningful content, you might try a complete reinstall.
 

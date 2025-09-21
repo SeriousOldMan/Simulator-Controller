@@ -140,7 +140,7 @@ All these alerts and announcements can be individually configured or disabled wi
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%2011.JPG)
 
-Please note, that not every simulation will support all these capabilities and that the behaviour will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
+Please note, that not every simulation will support all these capabilities and that the behavior will be very different in each simulation. This is due to the fact, that the provided data differs heavily between the different simulations. Please see the section below for detailed information.
 
 ### Opponent and Delta Information
 

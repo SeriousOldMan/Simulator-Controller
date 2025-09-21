@@ -136,7 +136,7 @@ You may have already wondered what all the nonsense is about. There are differen
 2. When the pitstop settings are derived by the AI Race Engineer, the same applies.
 3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Team Center" also uses the available tyre compounds when preparing a pitstop or to store the driver specific car setups.
 
-As you have seen above, a tyre compound consists of a tyre category (Dry, Intermediate and Wet) and a suffix, which specifies the mixture or hardness of the compound. As you might expect, the tyre category is most important for the behaviour of the tyre in varying conditions, whereas the mixture determine properties like tyre life time.
+As you have seen above, a tyre compound consists of a tyre category (Dry, Intermediate and Wet) and a suffix, which specifies the mixture or hardness of the compound. As you might expect, the tyre category is most important for the behavior of the tyre in varying conditions, whereas the mixture determine properties like tyre life time.
 
 ### Weather and Tyre Compounds
 
@@ -167,7 +167,7 @@ where the number specifies the number of laps for which the corresponding tyre c
 
 ### Default Tyre Compound
 
-The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behaviour before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.
+The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behavior before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.
 
 ### Special notes for *Assetto Corsa Competizione*
 

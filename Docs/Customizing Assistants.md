@@ -10,7 +10,7 @@ The rule sets for the Race Assistants can be found in the *Resources\Rules* dire
 
 The [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach) is already different than the other Assistants, since the purpose of this Assistant is a natural conversation with you as a driver using a lot of real world knowledge about sim racing and motorsports in general. The Driving Coach therefore is based on the famous GPT (aka general pretrained transformer, a kind of neural network) technology using a large language model (also termed LLM).
 
-But is also possible to connect the rule based Assistants to an LLM to improve the cnversational capabilities or to alter or even extend the behaviour of them. This all can be achieved by configuring the so called Assistant Boosters. The following documentation will give you all information you need to setup the Assistant Boosters.
+But is also possible to connect the rule based Assistants to an LLM to improve the cnversational capabilities or to alter or even extend the behavior of them. This all can be achieved by configuring the so called Assistant Boosters. The following documentation will give you all information you need to setup the Assistant Boosters.
 
 Note: Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
 
@@ -374,13 +374,13 @@ The following short conversations demonstrate the potential of the *Conversation
 
 ### Reasoning Booster
 
-*Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behaviour of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* booster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
+*Reasoning* is the most complex and most capable booster, since it allows you to alter or extend the behavior of the Assistant. You can use predefined events or even define your own ones in the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) (as shown below), which then result in a request to the LLM (actually you can process events even without using the LLM directly in rule engine, but this is only half of the fun). Similar to the *Conversation* booster above, the LLM then can decide to activate one or more [predefined or custom actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#managing-booster-actions) to fulfill the request or react to the situation. To support its conclusion, the LLM will have full access to the same knowledge as in the *Conversation* booster.
 
 The *Reasoning* booster implements an LLM agent framework architecture also used by famous open-source agent development environments like [LangChain](https://python.langchain.com/). The difference here is the deep integration with the rule engine of the Assistants as the central instance for the LLM activation.
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence.
 	 
-Important: This booster directly alters the behaviour of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
 As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using an LLM. To do this, use the "Rules" provider. In this case, you must write rules for each event to be handled. These rules then can either handle the event directly or you can define actions and trigger them from the event rule by calling the "Assistant.Trigger" function / predicate as described below.
 
@@ -425,18 +425,20 @@ Below you find all instruction categories and the supported variables:
 |                |                   | %name%            | Specifies the name of the Assistant. |
 |                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
 |                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
-| Reasoning      | Character         | Scope             | This instruction is used when an event has been raised by the rule engine. The LLM must decide which of the provided actions shall be used to deal with the situaton. |
+| Reasoning (2)(3) | Character         | Scope             | This instruction is used when an event has been raised by the rule engine. The LLM must decide which of the provided actions shall be used to deal with the situaton. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
 |                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
 |                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 |                | Event             | Scope             | The event represents the main instruction for the LLM, which describes what just happened or how the situation has changed. |
 |                |                   | %event%           | This variable is substituted by the phrase which describes the event. Example: "It just started raining.". This phrase is defined by the event code for a predefined event or the event definition for a custom event. |
 |                | Goal              | Scope             | The goal supplies additional information to the LLM by some predefined events, which helps the LLM to come up with a good conclusion. |
-|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a predefined event. It cannot be provided for custom event definitions. |
+|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a predefined event. It cannot be provided for custom event definitions. |Notes
 
 ###### Notes
 
 (1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
+(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.
+(3) Some Assistants will have *internal* instructions for special behavior (for example the "Pitstop Planning" event of the Race Engineer. To inspect and/or modify this instructions, hold down the Control key when clicking on the "Instructions..." button.
 
 ## How it works
 
@@ -447,7 +449,7 @@ Since the control flow between the rule engine and the LLM especially for the *R
 1. It all starts with an event, typically signalled by the rule engine. An event will be in most cases a special condition in the state of the car or the session (fuel is running low, weather is changing, and so on). There are many predefined events available, which you can find below and you can define your own events, of course.
 2. The event will generate a command or information phrase for the LLM and this will be passed to the GPT service together with a complete representation of the current knowledge, as show above, and a list of available actions to call.
 3. The LLM can decide to *call* one or more of these actions, which then will be executed in parallel.
-4. An action can do almost anything. Typically it triggers a special behaviour of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, and so on. Using *Assistant.Raise* (see below for [more information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)), it can also raise additional events, even for other Assistants. These enables the LLM to create a complex chain of thought or collaborate with other Assistants.
+4. An action can do almost anything. Typically it triggers a special behavior of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) in Simulator Controller, or it can generate voice output, and so on. Using *Assistant.Raise* (see below for [more information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)), it can also raise additional events, even for other Assistants. These enables the LLM to create a complex chain of thought or collaborate with other Assistants.
 
 ### About hallucinations and other funny stuff
 
@@ -665,7 +667,7 @@ Another example, this time using arguments:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
-This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behaviour.
+This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behavior.
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
@@ -782,10 +784,10 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ### Connecting Events & Actions
 
-As usual, it depends on the capabilities of the LLM, which actions will be called as a result of a given event. Additionally, because of the inherent non-deterministic nature of LLMs, the behaviour may vary between invocations. You have to decide which events you will send to the LLM (i.e. are activated) and which events should be handled by the rule engine (i.e. are deactivated). Anyway, using the predefined events will not result in a very different behaviour than running an Assistant without the *Reasoning* booster, since in most cases the LLM will decide to connect an event to its natural corresponding action. Example: *Fuel Low* -> *Low Fuel Reporting*
+As usual, it depends on the capabilities of the LLM, which actions will be called as a result of a given event. Additionally, because of the inherent non-deterministic nature of LLMs, the behavior may vary between invocations. You have to decide which events you will send to the LLM (i.e. are activated) and which events should be handled by the rule engine (i.e. are deactivated). Anyway, using the predefined events will not result in a very different behavior than running an Assistant without the *Reasoning* booster, since in most cases the LLM will decide to connect an event to its natural corresponding action. Example: *Fuel Low* -> *Low Fuel Reporting*
 
 As LLMs become smarter, we will be able to rely more and more on the intelligence and the domain specific knowledge of the LLM. I have run some tests using some of the current high end models (GPT 4o, Claude 3.5 Sonnet, ...) by disabling all events and running only one very simple event:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%202.png)
 
-The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all predefined events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behaviour, for example a pitstop being planned twice.
+The results are very promising, but these models are still very expensive. If you want to use this approach, make sure, that you leave all predefined events "Active" but set their type to "Event Disabled", because otherwise they will be handled by the rule engine and you might end up with duplicate behavior, for example a pitstop being planned twice.

@@ -97,6 +97,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.iBoosters := boosters
 
 		super.__New(configuration)
+
+		deleteFile(kTempDirectory . this.Assistant . ".instructions.en")
 	}
 
 	createGui(configuration) {
@@ -173,7 +175,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		editInstructions(type, title, *) {
-			this.editInstructions(type, title)
+			if ((type = "Agent") && GetKeyState("Ctrl") && FileExist(kTranslationsDirectory . this.Assistant . ".instructions.en"))
+				this.editInstructions(this.Assistant, title)
+			else
+				this.editInstructions(type, title)
 		}
 
 		editEvents(*) {
@@ -890,6 +895,15 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		try {
 			if (this.iResult = kOk) {
+				if FileExist(kTempDirectory . this.Assistant . ".instructions.en")
+					try {
+						FileMove(kTempDirectory . this.Assistant . ".instructions.en"
+							   , kUserTranslationsDirectory . this.Assistant . ".instructions.en", 1)
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
 				configuration := newMultiMap()
 
 				this.saveToConfiguration(configuration)
@@ -1099,34 +1113,42 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	getInstructions(type, original := false) {
-		local instructions := newMultiMap()
-		local reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
-		local key, value, ignore, directory, configuration, language
+		local instructions, reference, key, value, ignore, directory, configuration, language
 
-		for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			loop Files (directory . reference . ".instructions.*") {
-				SplitPath A_LoopFilePath, , , &language
+		if (type = this.Assistant)
+			instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserTranslationsDirectory, kTranslationsDirectory))
+		else {
+			instructions := newMultiMap()
+			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
 
-				for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
-					setMultiMapValue(instructions, reference, "Instructions." . type . "." . key . "." . language, value)
-			}
+			for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+				loop Files (directory . reference . ".instructions.*") {
+					SplitPath A_LoopFilePath, , , &language
 
-		if !original
-			for ignore, configuration in [this.Configuration, this.iInstructions]
-				for key, value in getMultiMapValues(configuration, reference)
-					if (InStr(key, this.Assistant . ".Instructions." . type) = 1) {
-						key := StrReplace(key, this.Assistant . ".", "")
+					for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
+						setMultiMapValue(instructions, reference, "Instructions." . type . "." . key . "." . language, value)
+				}
 
-						setMultiMapValue(instructions, reference, key, value)
-					}
-					else if (InStr(key, "Instructions." . type) = 1)
-						setMultiMapValue(instructions, reference, key, value)
+			if !original
+				for ignore, configuration in [this.Configuration, this.iInstructions]
+					for key, value in getMultiMapValues(configuration, reference)
+						if (InStr(key, this.Assistant . ".Instructions." . type) = 1) {
+							key := StrReplace(key, this.Assistant . ".", "")
+
+							setMultiMapValue(instructions, reference, key, value)
+						}
+						else if (InStr(key, "Instructions." . type) = 1)
+							setMultiMapValue(instructions, reference, key, value)
+		}
 
 		return instructions
 	}
 
 	setInstructions(type, instructions) {
-		addMultiMapValues(this.iInstructions, instructions)
+		if (type = this.Assistant)
+			writeMultiMap(kTempDirectory . this.Assistant . ".instructions.en", instructions)
+		else
+			addMultiMapValues(this.iInstructions, instructions)
 	}
 
 	editInstructions(type, title) {
@@ -2647,26 +2669,37 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 			}
 	}
 	else if (editorOrCommand == "Load") {
-		for key, value in getMultiMapValues(instructions, reference)
-			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
-				instructionsGui["instructionEdit"].Value := value
+		if reference {
+			for key, value in getMultiMapValues(instructions, reference)
+				if (instructionsGui["instructionsDropDown"].Value = A_Index) {
+					instructionsGui["instructionEdit"].Value := value
 
-				break
-			}
+					break
+				}
+		}
+		else
+			instructionsGui["instructionEdit"].Value := printMultiMap(instructions)
 	}
 	else if (editorOrCommand == "Update") {
-		for key, value in getMultiMapValues(instructions, reference)
-			if (instructionsGui["instructionsDropDown"].Value = A_Index) {
-				setMultiMapValue(instructions, reference, key, instructionsGui["instructionEdit"].Value)
+		if reference {
+			for key, value in getMultiMapValues(instructions, reference)
+				if (instructionsGui["instructionsDropDown"].Value = A_Index) {
+					setMultiMapValue(instructions, reference, key, instructionsGui["instructionEdit"].Value)
 
-				break
-			}
+					break
+				}
+		}
+		else
+			instructions := parseMultiMap(instructionsGui["instructionEdit"].Value)
 	}
 	else {
-		reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
-
 		editor := editorOrCommand
 		result := false
+
+		if (type = editor.Assistant)
+			reference := false
+		else
+			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
 
 		instructions := originalInstructions.Clone()
 
@@ -2676,18 +2709,23 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 
 		choices := []
 
-		for key, value in getMultiMapValues(instructions, reference) {
-			key := ConfigurationItem.splitDescriptor(key)
-
-			choices.Push(translate(rephrase(key[3])) . translate(" (") . StrUpper(key[4]) . translate(")"))
-		}
-
 		instructionsGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Instructions"))
-		instructionsGui.Add("DropDownList", "x110 yp w180 vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
 
-		widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
-		widget1.OnEvent("Click", (*) => editInstructions("Reload"))
-		setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
+		if reference {
+			for key, value in getMultiMapValues(instructions, reference) {
+				key := ConfigurationItem.splitDescriptor(key)
+
+				choices.Push(translate(rephrase(key[3])) . translate(" (") . StrUpper(key[4]) . translate(")"))
+			}
+
+			instructionsGui.Add("DropDownList", "x110 yp w180 vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
+
+			widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
+			widget1.OnEvent("Click", (*) => editInstructions("Reload"))
+			setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
+		}
+		else
+			instructionsGui.Add("Text", "x110 yp w180 h23 +0x200", translate(type))
 
 		instructionEdit := instructionsGui.Add("Edit", "x110 yp+24 w360 h200 Multi vinstructionEdit")
 		instructionEdit.OnEvent("Change", (*) => editInstructions("Update"))
@@ -2699,7 +2737,8 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 
 		instructionsGui.Show("AutoSize Center")
 
-		instructionsGui["instructionsDropDown"].Choose(1)
+		if reference
+			instructionsGui["instructionsDropDown"].Choose(1)
 
 		editInstructions("Load")
 

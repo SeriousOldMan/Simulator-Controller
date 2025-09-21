@@ -1,6 +1,6 @@
 # Gui Classes
 
-The base framework provide a specialized subclass of *Gui*, which supports resizing rules, customizeable closing behaviour and also basic method for applying UI themes.
+The base framework provide a specialized subclass of *Gui*, which supports resizing rules, customizeable closing behavior and also basic method for applying UI themes.
 
 ## Window ([Gui.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Gui.ahk))
 
@@ -124,13 +124,13 @@ Called during resizing to redraw parts of the window. If you want the redraw to 
 
 # Collections Classes
 
-This part of the framework define a couple of convenience collection classes to achieve special behaviour when accessing collection elements. Some of this bahviour mimics that of the previous AutoHotkey language version, thereby preserving the functionality of the applications implementation.
+This part of the framework define a couple of convenience collection classes to achieve special behavior when accessing collection elements. Some of this bahviour mimics that of the previous AutoHotkey language version, thereby preserving the functionality of the applications implementation.
 
 ## CaseSenseMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
 Defines a hash map, that uses case sensitive keys. Actually the standard of the builtin *Map* class, but the name of the class documments this property.
 
 ## CaseInsenseMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
-Defines a hash map, that uses case insensitive keys, which was the dfault behaviour of the object properties in AutoHotkey V1.
+Defines a hash map, that uses case insensitive keys, which was the dfault behavior of the object properties in AutoHotkey V1.
 
 ## WeakArray ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
 Implements an array which returns an empty string, rather than throwing an error, when a non-existent index is accessed.

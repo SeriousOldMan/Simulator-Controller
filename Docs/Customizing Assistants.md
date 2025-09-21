@@ -425,18 +425,20 @@ Below you find all instruction categories and the supported variables:
 |                |                   | %name%            | Specifies the name of the Assistant. |
 |                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
 |                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
-| Reasoning      | Character         | Scope             | This instruction is used when an event has been raised by the rule engine. The LLM must decide which of the provided actions shall be used to deal with the situaton. |
+| Reasoning (2)(3) | Character         | Scope             | This instruction is used when an event has been raised by the rule engine. The LLM must decide which of the provided actions shall be used to deal with the situaton. |
 |                |                   | %assistant%       | The type or role of the current Assistant, for example "Race Engineer". |
 |                | Knowledge         | Scope             | This instruction is used to supply the current content of the knowledge base to the LLM. The content of the knowledge base depends on the type of the Assistant. |
 |                |                   | %knowledge%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 |                | Event             | Scope             | The event represents the main instruction for the LLM, which describes what just happened or how the situation has changed. |
 |                |                   | %event%           | This variable is substituted by the phrase which describes the event. Example: "It just started raining.". This phrase is defined by the event code for a predefined event or the event definition for a custom event. |
 |                | Goal              | Scope             | The goal supplies additional information to the LLM by some predefined events, which helps the LLM to come up with a good conclusion. |
-|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a predefined event. It cannot be provided for custom event definitions. |
+|                |                   | %goal%            | This variable is substituted by the phrase which instructs the LLM how to handle the given event. Example: "Check how to set up the car for wet onditions.". This phrase is defined by the event code for a predefined event. It cannot be provided for custom event definitions. |Notes
 
 ###### Notes
 
 (1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
+(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.
+(3) Some Assistants will have *internal* instructions for special behavior (for example the "Pitstop Planning" event of the Race Engineer. To inspect and/or modify this instructions, hold down the Control key when clicking on the "Instructions..." button.
 
 ## How it works
 

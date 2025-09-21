@@ -605,7 +605,7 @@ class LLMConnector {
 	class OpenAIConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
-				return ["GPT 4o mini", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o"]
+				return ["GPT 5 mini", "GPT 4.1 mini", "GPT 3.5 turbo", "GPT 4", "GPT 4 32k", "GPT 4 turbo", "GPT 4o", "GPT 5"]
 			}
 		}
 
@@ -618,7 +618,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://api.openai.com/v1/chat/completions"
 			serviceKey := ""
-			model := "GPT 4.1 mini"
+			model := "GPT 5 mini"
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
@@ -661,7 +661,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "__YOUR_AZURE_OPENAI_ENDPOINT__/openai/deployments/%model%/chat/completions?api-version=2023-05-15"
 			serviceKey := ""
-			model := "GPT 4.1 mini"
+			model := "GPT 5 mini"
 		}
 
 		CreateServiceURL(server) {

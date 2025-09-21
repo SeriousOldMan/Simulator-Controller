@@ -3638,7 +3638,7 @@ class RaceEngineer extends RaceAssistant {
 		local pressureFL, pressureFR, pressureRL, pressureRR
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
-		local tyreService, index, tyre, axle, first
+		local tyreService, index, tyre, axle, processed
 
 		this.clearContinuation()
 
@@ -3726,7 +3726,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if (tyreCompound != kUndefined) {
-					first := true
+					processed := false
 
 					if ((tyreService = "Wheel") && (tyreCompound.Length = 4)) {
 						processedTyres := true
@@ -3734,10 +3734,10 @@ class RaceEngineer extends RaceAssistant {
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound." . tyre, tyreCompound[index])
 
-							if (first && tyreCompound[index]) {
+							if (!processed && tyreCompound[index]) {
 								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound[index])
 
-								first := false
+								processed := true
 							}
 						}
 					}
@@ -3747,10 +3747,10 @@ class RaceEngineer extends RaceAssistant {
 						for index, axle in ["Front", "Rear"] {
 							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound." . axle, tyreCompound[index])
 
-							if (first && tyreCompound[index]) {
+							if (!processed && tyreCompound[index]) {
 								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound", tyreCompound[index])
 
-								first := false
+								processed := true
 							}
 						}
 					}
@@ -3773,7 +3773,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if (tyreCompoundColor != kUndefined) {
-					first := true
+					processed := false
 
 					if ((tyreService = "Wheel") && (tyreCompoundColor.Length = 4)) {
 						processedTyres := true
@@ -3781,10 +3781,10 @@ class RaceEngineer extends RaceAssistant {
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color." . tyre, tyreCompoundColor[index])
 
-							if (first && tyreCompoundColor[index]) {
+							if (!processed && tyreCompoundColor[index]) {
 								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor[index])
 
-								first := false
+								processed := true
 							}
 						}
 					}
@@ -3794,10 +3794,10 @@ class RaceEngineer extends RaceAssistant {
 						for index, axle in ["Front", "Rear"] {
 							knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color." . axle, tyreCompoundColor[index])
 
-							if (first && tyreCompoundColor[index]) {
+							if (!processed && tyreCompoundColor[index]) {
 								knowledgeBase.addFact("Pitstop.Plan.Tyre.Compound.Color", tyreCompoundColor[index])
 
-								first := false
+								processed := true
 							}
 						}
 					}

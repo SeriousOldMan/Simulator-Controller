@@ -293,7 +293,7 @@ class EventBooster extends AgentBooster {
 
 							DirCreate(directory)
 
-							FileAppend(translate("-- Event --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- " . translate("Reasoning") . " ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
+							FileAppend(translate("-- ") . translate("Event") . translate(" --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- ") . translate("Reasoning") . translate(" ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
 						}, 0, kLowPriority)
 
 						return true

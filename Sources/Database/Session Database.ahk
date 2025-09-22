@@ -2015,7 +2015,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPoint)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y627 w110 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y651 w110 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.2) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)

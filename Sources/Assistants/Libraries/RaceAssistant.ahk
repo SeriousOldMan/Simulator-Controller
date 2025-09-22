@@ -3476,7 +3476,7 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "Laps", knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 							 , "OverallPosition", this.getPosition(car, "Overall")
 							 , "ClassPosition", this.getPosition(car, "Class")
-							 , "DistanceIntoTrack", (convert("Length", (this.getRunning(car) * this.TrackLength)) . lengthUnit)
+							 , "DistanceIntoTrack", (Round(convert("Length", (this.getRunning(car) * this.TrackLength)), 1) . lengthUnit)
 							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 							 , "NumPitstops", numPitstops
 							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)

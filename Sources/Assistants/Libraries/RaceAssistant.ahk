@@ -4360,11 +4360,9 @@ class GridRaceAssistant extends RaceAssistant {
 				}
 
 			lastKnowledgeBase := (data ? false : knowledgeBase)
-
-			classes := getKeys(classes)
 		}
 
-		return classes
+		return getKeys(classes)
 	}
 
 	getNr(car := false, data := false) {

@@ -3906,7 +3906,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if fixed {
 			if isInteger(plannedLap) {
 				if plannedLap {
-					speaker.speakPhrase("PitstopLap", {lap: lap})
+					speaker.speakPhrase("PitstopLap", {lap: Max(lap, lastLap + 1)})
 
 					if hasEngineer {
 						speaker.speakPhrase("ConfirmInformEngineer", false, true)

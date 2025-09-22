@@ -350,19 +350,19 @@ class LLMConnector {
 			try {
 				if this.Certificate {
 					try {
-						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]
+						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 120000]
 												, Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server)
 																					 , body, headers, {Object: true, Encoding: "UTF-8"})
 					}
 					catch Any as exception {
 						logError(exception, true)
 
-						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server)
+						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 120000]}).POST(this.CreateServiceURL(this.Server)
 																						  , body, headers, {Object: true, Encoding: "UTF-8"})
 					}
 				}
 				else
-					answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 60000]}).POST(this.CreateServiceURL(this.Server)
+					answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 120000]}).POST(this.CreateServiceURL(this.Server)
 																					  , body, headers, {Object: true, Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300)) {

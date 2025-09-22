@@ -60,6 +60,27 @@ class PitstopUpcomingEvent extends StrategistEvent {
 	}
 }
 
+class WeatherForecastEvent extends StrategistEvent {
+	createTrigger(event, phrase, arguments) {
+		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
+
+		if (arguments.Has(4) && arguments[3])
+			return (trigger . A_Space . " We should plan a pitstop and mount " . arguments[4] . " tyres.")
+		else
+			return (trigger . " A tyre change will not be necessary.")
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			if (arguments.Has(4) && arguments[3])
+				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
+			else
+				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
+
+		return true
+	}
+}
+
 class RecommendPitstopEvent extends StrategistEvent {
 	Asynchronous {
 		Get {
@@ -82,11 +103,12 @@ class RecommendPitstopEvent extends StrategistEvent {
 		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
 
 		if (targetLap = "Now")
-			targetLap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
+			targetLap := (knowledgeBase.getValue("Lap", 0) + 1)
 
 		if (targetLap != kUndefined)
 			targetLapRule := substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed")
-											   , {targetLap: targetLap})
+											   , {targetLap: targetLap
+												, deltaLaps: knowledgeBase.getValue("Session.Settings.Standings.Extrapolation.Laps", 3)})
 		else
 			targetLapRule := getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable")
 
@@ -102,27 +124,6 @@ class RecommendPitstopEvent extends StrategistEvent {
 
 			this.Assistant.recommendPitstop(targetLap)
 		}
-
-		return true
-	}
-}
-
-class WeatherForecastEvent extends StrategistEvent {
-	createTrigger(event, phrase, arguments) {
-		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
-
-		if (arguments.Has(4) && arguments[3])
-			return (trigger . A_Space . " We should plan a pitstop and mount " . arguments[4] . " tyres.")
-		else
-			return (trigger . " A tyre change will not be necessary.")
-	}
-
-	handleEvent(event, arguments*) {
-		if !super.handleEvent(event, arguments*)
-			if (arguments.Has(4) && arguments[3])
-				this.Assistant.requestTyreChange(arguments[1], arguments[2], arguments[4])
-			else
-				this.Assistant.weatherForecast(arguments[1], arguments[2], arguments[3])
 
 		return true
 	}
@@ -1642,7 +1643,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		facts := combine(super.readSettings(simulator, car, track, &settings)
 					   , CaseInsenseMap("Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
-																												  , "Extrapolation.Laps", 2)
+																												  , "Extrapolation.Laps", 3)
 									  , "Session.Settings.Standings.Extrapolation.Overtake.Delta", Round(getMultiMapValue(settings
 																													    , "Strategy Settings"
 																													    , "Overtake.Delta", 1) * 1000)
@@ -1650,7 +1651,7 @@ class RaceStrategist extends GridRaceAssistant {
 																												  , "Traffic.Considered", 5) / 100)
 									  , "Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																								   , getMultiMapValue(settings, "Session Settings"
-																															, "Pitstop.Delta", 30))
+																															, "Pitstop.Delta", 60))
 									  , "Session.Settings.Pitstop.Service.Last", getMultiMapValue(settings, "Session Settings", "Pitstop.Service.Last", 5)
 									  , "Session.Settings.Pitstop.Service.Refuel.Rule", getMultiMapValue(settings, "Strategy Settings"
 																											     , "Service.Refuel.Rule", "Dynamic")

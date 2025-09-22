@@ -897,8 +897,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			if (this.iResult = kOk) {
 				if FileExist(kTempDirectory . this.Assistant . ".instructions.en")
 					try {
-						FileMove(kTempDirectory . this.Assistant . ".instructions.en"
-							   , kUserTranslationsDirectory . this.Assistant . ".instructions.en", 1)
+						if (FileRead(kTempDirectory . this.Assistant . ".instructions.en") = "Delete")
+							deleteFile(kUserTranslationsDirectory . this.Assistant . ".instructions.en")
+						else
+							FileMove(kTempDirectory . this.Assistant . ".instructions.en"
+								   , kUserTranslationsDirectory . this.Assistant . ".instructions.en", 1)
 					}
 					catch Any as exception {
 						logError(exception, true)
@@ -1115,8 +1118,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	getInstructions(type, original := false) {
 		local instructions, reference, key, value, ignore, directory, configuration, language
 
-		if (type = this.Assistant)
-			instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserTranslationsDirectory, kTranslationsDirectory))
+		if (type = this.Assistant) {
+			if original
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTranslationsDirectory))
+			else
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserTranslationsDirectory, kTranslationsDirectory))
+		}
 		else {
 			instructions := newMultiMap()
 			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
@@ -1145,8 +1152,15 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 	}
 
 	setInstructions(type, instructions) {
-		if (type = this.Assistant)
-			writeMultiMap(kTempDirectory . this.Assistant . ".instructions.en", instructions)
+		if (type = this.Assistant) {
+			if (printMultiMap(instructions) = printMultiMap(this.getInstructions(type, true))) {
+				deleteFile(kTempDirectory . this.Assistant . ".instructions.en")
+
+				FileAppend("Delete", kTempDirectory . this.Assistant . ".instructions.en")
+			}
+			else
+				writeMultiMap(kTempDirectory . this.Assistant . ".instructions.en", instructions)
+		}
 		else
 			addMultiMapValues(this.iInstructions, instructions)
 	}
@@ -2637,7 +2651,7 @@ class ActionsEditor extends CallbacksEditor {
 editInstructions(editorOrCommand, type := false, title := false, originalInstructions := false, owner := false) {
 	local choices, key, value, descriptor, reloadAll
 
-	static reference, editor, instructions, instructionsGui, result, instructionEdit
+	static reference, special, editor, instructions, instructionsGui, result, instructionEdit
 
 	rephrase(key) {
 		if (key = "RephraseTranslate")
@@ -2651,22 +2665,29 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 	else if (editorOrCommand == kCancel)
 		result := kCancel
 	else if (editorOrCommand == "Reload") {
-		reloadALL := GetKeyState("Ctrl")
+		if reference {
+			reloadALL := GetKeyState("Ctrl")
 
-		for key, value in getMultiMapValues(instructions, reference)
-			if (reloadAll || (instructionsGui["instructionsDropDown"].Value = A_Index)) {
-				descriptor := ConfigurationItem.splitDescriptor(key)
+			for key, value in getMultiMapValues(instructions, reference)
+				if (reloadAll || (instructionsGui["instructionsDropDown"].Value = A_Index)) {
+					descriptor := ConfigurationItem.splitDescriptor(key)
 
-				value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
+					value := editor.getOriginalInstruction(descriptor[4], descriptor[2], descriptor[3])
 
-				setMultiMapValue(instructions, reference, key, value)
+					setMultiMapValue(instructions, reference, key, value)
 
-				if (instructionsGui["instructionsDropDown"].Value = A_Index)
-					instructionsGui["instructionEdit"].Value := value
+					if (instructionsGui["instructionsDropDown"].Value = A_Index)
+						instructionsGui["instructionEdit"].Value := value
 
-				if !reloadAll
-					break
-			}
+					if !reloadAll
+						break
+				}
+		}
+		else {
+			instructions := editor.getInstructions(special, true)
+
+			instructionsGui["instructionEdit"].Value := printMultiMap(instructions)
+		}
 	}
 	else if (editorOrCommand == "Load") {
 		if reference {
@@ -2696,10 +2717,14 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 		editor := editorOrCommand
 		result := false
 
-		if (type = editor.Assistant)
+		if (type = editor.Assistant) {
 			reference := false
-		else
+			special := Type
+		}
+		else {
 			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
+			special := false
+		}
 
 		instructions := originalInstructions.Clone()
 
@@ -2719,13 +2744,13 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 			}
 
 			instructionsGui.Add("DropDownList", "x110 yp w180 vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
-
-			widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
-			widget1.OnEvent("Click", (*) => editInstructions("Reload"))
-			setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
 		}
 		else
-			instructionsGui.Add("Text", "x110 yp w180 h23 +0x200", translate(type))
+			instructionsGui.Add("Text", "x110 yp w180 h23 +0x200", translate(type) . translate(" (") . "EN" . translate(")"))
+
+		widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
+		widget1.OnEvent("Click", (*) => editInstructions("Reload"))
+		setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
 
 		instructionEdit := instructionsGui.Add("Edit", "x110 yp+24 w360 h200 Multi vinstructionEdit")
 		instructionEdit.OnEvent("Change", (*) => editInstructions("Update"))

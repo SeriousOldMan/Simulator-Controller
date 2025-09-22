@@ -60,6 +60,53 @@ class PitstopUpcomingEvent extends StrategistEvent {
 	}
 }
 
+class RecommendPitstopEvent extends StrategistEvent {
+	Asynchronous {
+		Get {
+			return false
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local knowledgeBase := this.Assistant.KnowledgeBase
+		local targetLap, targetLapRule
+
+		static instructions := false
+
+		if !instructions {
+			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+		}
+
+		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
+
+		if (targetLap = "Now")
+			targetLap := (this.Assistant.KnowledgeBase.getValue("Lap", 0) + 1)
+
+		if (targetLap != kUndefined)
+			targetLapRule := substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed")
+											   , {targetLap: targetLap})
+		else
+			targetLapRule := getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable")
+
+		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopRecommend")
+								 , {targetLapRule: targetLapRule})
+	}
+
+	handleEvent(event, arguments*) {
+		local targetLap, refuelAmount, tyreChange, repairs
+
+		if !super.handleEvent(event, arguments*) {
+			targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
+
+			this.Assistant.recommendPitstop(targetLap)
+		}
+
+		return true
+	}
+}
+
 class WeatherForecastEvent extends StrategistEvent {
 	createTrigger(event, phrase, arguments) {
 		local trigger := ("The weather will change to " . arguments[1] . " in " . arguments[2] . ".")
@@ -1357,7 +1404,7 @@ class RaceStrategist extends GridRaceAssistant {
 				lap := false
 		}
 
-		this.recommendPitstop(lap)
+		this.proposePitstop(lap)
 	}
 
 	confirmNextPitstop(pitstopLap, confirm := false) {
@@ -3796,7 +3843,14 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	recommendPitstop(lap := false) {
+	proposePitstop(lap := false) {
+		if (this.AgentBooster && this.handledEvent("RecommendPitstop") && this.findAction("recommend_pitstop"))
+			this.handleEvent("RecommendPitstop", lap)
+		else
+			this.recommendPitstop(lap)
+	}
+
+	recommendPitstop(lap := false, fixed := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local refuel := kUndefined
@@ -3831,27 +3885,50 @@ class RaceStrategist extends GridRaceAssistant {
 		if !lap
 			lap := strategyLap
 
-		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
+		if !fixed {
+			knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
 
-		if maxLap
-			knowledgeBase.setFact("Pitstop.Strategy.Lap.Max", maxLap)
+			if maxLap
+				knowledgeBase.setFact("Pitstop.Strategy.Lap.Max", maxLap)
 
-		knowledgeBase.produce()
+			knowledgeBase.produce()
 
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledgeBase(this.KnowledgeBase)
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(this.KnowledgeBase)
 
-		plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
+			plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
+		}
+		else
+			plannedLap := lap
 
 		hasEngineer := (ProcessExist("Race Engineer.exe") != 0)
 
-		if (plannedLap == kUndefined) {
-			if (hasEngineer && strategyLap) {
+		if fixed {
+			if isInteger(plannedLap) {
+				if plannedLap {
+					speaker.speakPhrase("PitstopLap", {lap: lap})
+
+					if hasEngineer {
+						speaker.speakPhrase("ConfirmInformEngineer", false, true)
+
+						this.setContinuation(ObjBindMethod(this, "planPitstop", lap))
+					}
+				}
+				else
+					speaker.speakPhrase("NoPitstopNeeded")
+			}
+			else
+				speaker.speakPhrase("NoPlannedPitstop")
+		}
+		else if (plannedLap == kUndefined) {
+			if strategyLap {
 				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)})
 
-				speaker.speakPhrase("ConfirmInformEngineer", false, true)
+				if hasEngineer {
+					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
+					this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
+				}
 			}
 			else
 				speaker.speakPhrase("NoPlannedPitstop")
@@ -4172,7 +4249,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if !this.confirmCommand(false)
 			return
 
-		this.recommendPitstop(lapNumber)
+		this.proposePitstop(lapNumber)
 	}
 
 	callRecommendStrategy() {

@@ -230,7 +230,7 @@ class PlanPitstopEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		local knowledgeBase := this.Assistant.KnowledgeBase
 		local targetLap, refuelAmount, tyreChange, repairs
-		local trigger, targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
+		local targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
 
 		static instructions := false
 
@@ -268,6 +268,11 @@ class PlanPitstopEvent extends EngineerEvent {
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAxle")
 			else
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAll")
+
+			if inList(SessionDatabase.getTyreCompounds(this.Assistant.Simulator, this.Assistant.Car, this.Assistant.Track)
+					, tyreChange)
+				tyreRule .= (A_Space . substituteVariables(getMultiMapValue(instructions, "Rules", "TyreRuleRestrict")
+														 , {tyreCompound: tyreChange}))
 		}
 		else
 			tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleNoChange")

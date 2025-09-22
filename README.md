@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/PvweZ8u4) (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage.)
+[6.5.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/PvweZ8u4) (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6550) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) of this version and all the versions you might have skipped, before installing and using this version.
 

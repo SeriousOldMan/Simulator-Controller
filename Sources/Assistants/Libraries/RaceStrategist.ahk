@@ -3942,28 +3942,22 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				pitstopOptions := []
 
-			speaker.beginTalk()
+			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 
-			try {
-				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+			if this.confirmAction("Strategy.Explain") {
+				speaker.speakPhrase("Explain", false, true)
 
-				if this.confirmAction("Strategy.Explain") {
-					speaker.speakPhrase("Explain", false, true)
-
-					if hasEngineer
-						this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
-																					 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions, true)
-																					 , false, "Okay"))
-					else
-						this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
-				}
-				else if hasEngineer
-					this.explainPitstopRecommendation(plannedLap, pitstopOptions, true)
+				if hasEngineer
+					this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
+																				 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions, true)
+																				 , false, "Okay"))
 				else
-					this.explainPitstopRecommendation(plannedLap)
+					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
 			}
-			finally {
-				speaker.endTalk()
+			else if hasEngineer
+				this.explainPitstopRecommendation(plannedLap, pitstopOptions, true)
+			else
+				this.explainPitstopRecommendation(plannedLap)
 			}
 		}
 	}

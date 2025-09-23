@@ -214,9 +214,37 @@ class AgentBooster extends LLMBooster {
 
 	connectorState(*) {
 	}
+
+	logInteraction(source, action, input, output) {
+		Task.startTask(() {
+			local directory
+
+			SplitPath(this.Transcript, , &directory)
+
+			DirCreate(directory)
+
+			FileAppend(translate("-- ") . translate(source) . translate(" --------") . "`n`n" . input . "`n`n" . translate("-- ") . translate(action) . translate(" ---------") . "`n`n" . output . "`n`n", this.Transcript, "UTF-16")
+		}, 0, kLowPriority)
+	}
+
+	logExplanation(explanation) {
+		Task.startTask(() {
+			local directory
+
+			SplitPath(this.Transcript, , &directory)
+
+			DirCreate(directory)
+
+			FileAppend(translate("-- ") . translate("Explanation") . translate(" --------") . explanation . "`n`n", this.Transcript, "UTF-16")
+		}, 0, kLowPriority)
+	}
 }
 
 class EventBooster extends AgentBooster {
+	logInteraction(input, output) {
+		super.logInteraction("Event", "Reasoning", input, output)
+	}
+
 	trigger(event, trigger, goal := false, options := false) {
 		local variables := false
 		local doTrigger, code, language, instruction, variables, target, answer, calls
@@ -286,15 +314,7 @@ class EventBooster extends AgentBooster {
 											   , false, &calls := [])
 
 					if (calls.Length > 0) {
-						Task.startTask(() {
-							local directory
-
-							SplitPath(this.Transcript, , &directory)
-
-							DirCreate(directory)
-
-							FileAppend(translate("-- ") . translate("Event") . translate(" --------") . "`n`n" . ((event.Name . ":" . event.Event) . " -> " . trigger) . "`n`n" . translate("-- ") . translate("Reasoning") . translate(" ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
-						}, 0, kLowPriority)
+						this.logInteraction((event.Name . ":" . event.Event) . " -> " . trigger, values2String("`n", collect(calls, printCall)*))
 
 						return true
 					}

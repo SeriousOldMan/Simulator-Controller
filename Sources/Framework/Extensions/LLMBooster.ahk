@@ -289,6 +289,30 @@ class ConversationBooster extends LLMBooster {
 
 		return answer
 	}
+
+	logInteraction(action, input, output) {
+		Task.startTask(() {
+			local directory
+
+			SplitPath(this.Transcript, , &directory)
+
+			DirCreate(directory)
+
+			FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . input . "`n`n" . translate("-- ") . translate(action) . translate(" ---------") . "`n`n" . output . "`n`n", this.Transcript, "UTF-16")
+		}, 0, kLowPriority)
+	}
+
+	logExplanation(explanation) {
+		Task.startTask(() {
+			local directory
+
+			SplitPath(this.Transcript, , &directory)
+
+			DirCreate(directory)
+
+			FileAppend(translate("-- ") . translate("Explanation") . translate(" --------") . explanation . "`n`n", this.Transcript, "UTF-16")
+		}, 0, kLowPriority)
+	}
 }
 
 class SpeechBooster extends ConversationBooster {
@@ -309,6 +333,10 @@ class SpeechBooster extends ConversationBooster {
 																, getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Probability", 0.5))
 		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".SpeakerTemperature"
 																, getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Temperature", 0.5))
+	}
+
+	logInteraction(input, output) {
+		super.logInteraction("Rephrasing", input, output)
 	}
 
 	speak(text, options := false) {
@@ -362,15 +390,7 @@ class SpeechBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() {
-							local directory
-
-							SplitPath(this.Transcript, , &directory)
-
-							DirCreate(directory)
-
-							FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . text . "`n`n" . translate("-- ") . translate("Rephrasing") . translate(" ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
-						}, 0, kLowPriority)
+						this.logInteraction(text, answer)
 
 						return answer
 					}
@@ -438,6 +458,10 @@ class RecognitionBooster extends ConversationBooster {
 		options["Active"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Listener", false)
 		options["Mode"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ListenerMode", "Unknown")
 		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".Temperature", 0.2)
+	}
+
+	logInteraction(input, output) {
+		super.logInteraction("Understanding", input, output)
 	}
 
 	setChoices(name, choices) {
@@ -531,15 +555,7 @@ class RecognitionBooster extends ConversationBooster {
 					else {
 						answer := string2Values("->", answer)[2]
 
-						Task.startTask(() {
-							local directory
-
-							SplitPath(this.Transcript, , &directory)
-
-							DirCreate(directory)
-
-							FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . text . "`n`n" . translate("-- ") . translate("Understanding") . translate(" ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
-						}, 0, kLowPriority)
+						this.logInteraction(text, answer)
 
 						return answer
 					}
@@ -589,6 +605,10 @@ class ChatBooster extends ConversationBooster {
 		options["MaxHistory"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationMaxHistory", 3)
 		options["Temperature"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationTemperature", 0.2)
 		options["Actions"] := getMultiMapValue(configuration, "Conversation Booster", descriptor . ".ConversationActions", false)
+	}
+
+	logInteraction(input, output) {
+		super.logInteraction("Conversation", input, output)
 	}
 
 	startBooster() {
@@ -660,18 +680,7 @@ class ChatBooster extends ConversationBooster {
 						answer := this.normalizeAnswer(answer)
 
 					if (answer && (answer != "")) {
-						Task.startTask(() {
-							local directory
-
-							SplitPath(this.Transcript, , &directory)
-
-							DirCreate(directory)
-
-							if (answer = true)
-								FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . question . "`n`n" . translate("-- ") . translate("Conversation") . translate(" ---------") . "`n`n" . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Transcript, "UTF-16")
-							else
-								FileAppend(translate("-- ") . translate("User") . translate(" --------") . "`n`n" . question . "`n`n" . translate("-- ") . translate("Conversation") . translate(" ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
-						}, 0, kLowPriority)
+						this.logInteraction(question, (answer == true) ? values2String("`n", collect(calls, printCall)*) : answer)
 
 						return answer
 					}

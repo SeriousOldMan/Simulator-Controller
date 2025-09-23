@@ -5476,7 +5476,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 		parameters := [LLMTool.Function.Parameter("explanation", "Your thoughts and conclusions that led to your last function call.", "String")]
 
 		tools.Push(LLMTool.Function("__explain_reasoning__"
-								  , "Call this function directly after another function has been called and provide an explanation of your thoughts and conclusions, if possible."
+								  , "Call __explain_reasoning__ additionally if you call any function and provide an explanation of your thoughts and conclusions, if possible."
 								  , parameters, callMethod.Bind("explain" . type . "Reasoning", false, false, parameters)))
 	}
 

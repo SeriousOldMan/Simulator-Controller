@@ -235,7 +235,7 @@ class AgentBooster extends LLMBooster {
 
 			DirCreate(directory)
 
-			FileAppend(translate("-- ") . translate("Explanation") . translate(" --------") . explanation . "`n`n", this.Transcript, "UTF-16")
+			FileAppend(translate("-- ") . translate("Explanation") . translate(" --------") . "`n`n" . explanation . "`n`n", this.Transcript, "UTF-16")
 		}, 0, kLowPriority)
 	}
 }

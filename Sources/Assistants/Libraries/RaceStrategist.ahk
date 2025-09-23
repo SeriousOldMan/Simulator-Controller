@@ -3958,7 +3958,6 @@ class RaceStrategist extends GridRaceAssistant {
 				this.explainPitstopRecommendation(plannedLap, pitstopOptions, true)
 			else
 				this.explainPitstopRecommendation(plannedLap)
-			}
 		}
 	}
 

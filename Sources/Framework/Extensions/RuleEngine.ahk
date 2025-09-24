@@ -53,8 +53,10 @@ global kNotFound := "__NotFound__"
 
 global kTraceFull := 1
 global kTraceMedium := 2
-global kTraceLight := 3
+global kTraceLite := 3
 global kTraceOff := 4
+
+global kTraceLevel := kTraceOff
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1896,8 +1898,8 @@ class ProductionRule extends Rule {
 	fire(knowledgeBase, variables) {
 		local ignore, theAction
 
-		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
-			knowledgeBase.RuleEngine.trace(kTraceLight, "Firing rule " . this.toString())
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLite)
+			knowledgeBase.RuleEngine.trace(kTraceLite, "Firing rule " . this.toString())
 
 		for ignore, theAction in this.Actions
 			theAction.execute(knowledgeBase, variables)
@@ -1906,8 +1908,8 @@ class ProductionRule extends Rule {
 	produce(knowledgeBase) {
 		local variables
 
-		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLight)
-			knowledgeBase.RuleEngine.trace(kTraceLight, "Trying rule " . this.toString())
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLite)
+			knowledgeBase.RuleEngine.trace(kTraceLite, "Trying rule " . this.toString())
 
 		variables := this.match(knowledgeBase)
 
@@ -2112,7 +2114,7 @@ class ResultSet {
 			this.iBindings[var] := oldValue
 
 		if (this.RuleEngine.TraceLevel <= kTraceFull)
-			this.RuleEngine.trace(kTraceFull, "Reset " . var.toString() . " to " . oldValue)
+			this.RuleEngine.trace(kTraceFull, "Reset " . ObjFromPtr(var).toString() . " to " . oldValue)
 	}
 
 	unify(choicePoint, termA, termB) {
@@ -2477,9 +2479,9 @@ class RulesChoicePoint extends ChoicePoint {
 
 				ruleEngine := resultSet.RuleEngine
 
-				if (ruleEngine.TraceLevel <= kTraceLight) {
-					ruleEngine.trace(kTraceLight, "Trying to prove " . goal.toString(resultSet))
-					ruleEngine.trace(kTraceLight, this.iReductions.Length . " rules selected for " . goal.toString(resultSet))
+				if (ruleEngine.TraceLevel <= kTraceLite) {
+					ruleEngine.trace(kTraceLite, "Trying to prove " . goal.toString(resultSet))
+					ruleEngine.trace(kTraceLite, this.iReductions.Length . " rules selected for " . goal.toString(resultSet))
 				}
 			}
 
@@ -2520,8 +2522,8 @@ class RulesChoicePoint extends ChoicePoint {
 
 				rule := this.iSubstitutedReductions[ObjPtr(rule)]
 
-				if (resultSet.RuleEngine.TraceLevel <= kTraceLight)
-					resultSet.RuleEngine.trace(kTraceLight, "Trying rule " . rule.toString())
+				if (resultSet.RuleEngine.TraceLevel <= kTraceLite)
+					resultSet.RuleEngine.trace(kTraceLite, "Trying rule " . rule.toString())
 
 				if resultSet.unify(this, this.Goal, rule.Head) {
 					this.addSubChoicePoints(rule.Tail)
@@ -2870,8 +2872,8 @@ class CutChoicePoint extends ChoicePoint {
 			if !candidate
 				return false
 
-			if (ruleEngine.TraceLevel <= kTraceLight)
-				ruleEngine.trace(kTraceLight, "Cutting " . candidate.Goal.toString(resultSet))
+			if (ruleEngine.TraceLevel <= kTraceLite)
+				ruleEngine.trace(kTraceLite, "Cutting " . candidate.Goal.toString(resultSet))
 
 			candidate.cut()
 
@@ -3733,7 +3735,7 @@ class RuleEngine {
 	iInitialProductions := []
 	iInitialReductions := []
 	iInitialIncludes := []
-	iTraceLevel := kTraceOff
+	iTraceLevel := kTraceLevel
 
 	InitialFacts {
 		Get {
@@ -3761,7 +3763,7 @@ class RuleEngine {
 
 	TraceLevel {
 		Get {
-			; return (isCritical() ? Min(kTraceLight, this.iTraceLevel) : this.iTraceLevel)
+			; return (isCritical() ? Min(kTraceLite, this.iTraceLevel) : this.iTraceLevel)
 
 			return this.iTraceLevel
 		}
@@ -5445,3 +5447,26 @@ execute(choicePoint, arguments*) {
 											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
 	}
 }
+
+initializeRuleEngine() {
+	global kTraceLevel
+
+	switch getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+						  , "Rules", "TraceLevel", "Off"), false {
+		case "Full":
+			kTraceLevel := kTraceFull
+		case "Medium":
+			kTraceLevel := kTraceMedium
+		case "Lite":
+			kTraceLevel := kTraceLite
+		default:
+			kTraceLevel := kTraceOff
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeRuleEngine()

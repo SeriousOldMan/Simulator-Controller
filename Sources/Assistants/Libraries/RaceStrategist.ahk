@@ -31,7 +31,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDebugStrategy := 4
+global kStrategyProtocol := 4
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -901,6 +901,8 @@ class RaceStrategist extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
+		local settings
+		
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
 													, recognizer, listener, listenerBooster, conversationBooster, agentBooster
 													, muted, voiceServer)
@@ -911,9 +913,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		DirCreate(kTempDirectory . "Race Strategist")
 
-		if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-						  , "Debug", "DebugStrategy", false)
-			this.setDebug(kDebugStrategy, true)
+		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+		
+		if getMultiMapValue(settings, "Strategy", "Protocol", getMultiMapValue(settings, "Debug", "DebugStrategy", false))
+			this.setDebug(kStrategyProtocol, true)
 
 		this.iLapsDatabaseDirectory := (kTempDirectory . "Race Strategist\")
 	}
@@ -1750,7 +1753,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					this.updateSessionValues({OriginalStrategy: theStrategy, Strategy: theStrategy})
 
-					if this.Debug[kDebugStrategy] {
+					if this.Debug[kStrategyProtocol] {
 						DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 						FileCopy(kUserConfigDirectory . "Race.strategy"
@@ -2737,7 +2740,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					writeMultiMap(fileName, configuration)
 
-					if (isDebug() || this.Debug[kDebugStrategy])
+					if (isDebug() || this.Debug[kStrategyProtocol])
 						try {
 							DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
@@ -2749,7 +2752,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					this.RemoteHandler.updateStrategy(fileName, newStrategy.Version)
 				}
-				else if (isDebug() || this.Debug[kDebugStrategy]) {
+				else if (isDebug() || this.Debug[kStrategyProtocol]) {
 					configuration := newMultiMap()
 
 					newStrategy.saveToConfiguration(configuration)
@@ -2757,7 +2760,7 @@ class RaceStrategist extends GridRaceAssistant {
 					writeMultiMap(kTempDirectory . "Race Strategist.strategy", configuration)
 				}
 
-				if this.Debug[kDebugStrategy] {
+				if this.Debug[kStrategyProtocol] {
 					DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 					FileCopy(kTempDirectory . "Race Strategist.strategy"
@@ -4070,7 +4073,7 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				messageSend(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", engineerPID)
 
-		if this.Debug[kDebugStrategy] {
+		if this.Debug[kStrategyProtocol] {
 			DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 			FileAppend("Lap: " . (plannedLap ? plannedLap : "?") . "`n"
@@ -4336,7 +4339,7 @@ class RaceStrategist extends GridRaceAssistant {
 				plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
 				if (plannedLap && (plannedLap != kUndefined)) {
-					if this.Debug[kDebugStrategy] {
+					if this.Debug[kStrategyProtocol] {
 						DirCreate(kTempDirectory . "Race Strategist\Strategy")
 
 						FileAppend("Original Lap: " . plannedPitstopLap . "`nNew lap: " . plannedLap

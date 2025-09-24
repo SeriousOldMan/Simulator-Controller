@@ -5022,6 +5022,8 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Reasoning.AudioDevice", false)
 	static reasoningSound := getFileName("Reasoning.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+	static explainReasoning := (isDebug() || getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+																		 , "Booster", "ExplainReasoning", false))
 
 	normalizeCall(&function, parameters, &arguments) {
 		local index, argument, ignore, parameter, callArguments, found, value
@@ -5472,7 +5474,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 			}
 		}
 
-	if isDebug() {
+	if explainReasoning {
 		parameters := [LLMTool.Function.Parameter("explanation", "Your thoughts and conclusions that led to your last function call.", "String")]
 
 		tools.Push(LLMTool.Function("__explain_reasoning__"

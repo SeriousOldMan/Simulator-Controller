@@ -15,10 +15,10 @@ Let's start with some very low system level settings.
 |------------|----------|---------|-------------|
 | Locations  | Temp     | %homePath%\Documents\Simulator Controller\Temp | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
 |            | Programs | %homePath%\Documents\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
-| Process  | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed by the watchdog. |
-|          | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
-|          | Memory.WatchDog | 10 | The number of seconds between each run of the memory watchdog. Low numbers may degrade system performance, but if the number is too high a process with a memory problem may be catched too late. *False* will disable the watchdog completely. |
-|          | Zombie.WatchDog | 10 | The number of seconds between each run of watchdog, that checks for processes, that are no longer needed. Low numbers may degrade system performance. *False* will disable the watchdog completely. |
+| Process    | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed by the watchdog. |
+|            | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
+|            | Memory.WatchDog | 10 | The number of seconds between each run of the memory watchdog. Low numbers may degrade system performance, but if the number is too high a process with a memory problem may be catched too late. *False* will disable the watchdog completely. |
+|            | Zombie.WatchDog | 10 | The number of seconds between each run of watchdog, that checks for processes, that are no longer needed. Low numbers may degrade system performance. *False* will disable the watchdog completely. |
 | Diagnostics | Critical | *True* | If this is *True* (which is the default), all internal erros and critical log messages get collected and are sent to the development team for further investigation. No private or personal data is transmitted, only the error messages and the stack information. This setting can be changed in the profile dialog of "Simulator Startup". |
 |             | Usage    | *True* | If this is *True* (which is the default), several statistical informations are collected about the usage pattern of Simulator Controller - which tools are used how often, what functions are used and so on. This information is sent to the development team to foster further development of Simulator Controller.  No private or personal data is included. This setting can be changed in the profile dialog of "Simulator Startup". |
 
@@ -50,10 +50,17 @@ The next group of settings is used mainly for development purposes. It allows to
 |----------|---------|---------|-------------|
 | Build    | Configuration | Production | Chooses the runtime mode (*Production* or *Development*) of the framework. This normaly determined during compile time, but it is possible to activate parts of the *Development* mode even for production code.  |
 | Debug    | Debug | *depending on configuration* | Specifies, whether the framework is running in a special debug mode. Default is *False* for a production (release) configuration and *True* for a development configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
-|      | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
-|      | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
-|      | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
-|      | DebugStrategy | False | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
+|          | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
+|          | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
+|          | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled, *False* otherwise. |
+
+Following are special debug settings that enable verbosity and diagnostic output of specific components and applications.
+
+| Category | Setting | Default | Description |
+|----------|---------|---------|-------------|
+| Strategy | Protocol | False | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
+| Rules    | TraceLevel | Off | This setting lets you enable special trace output for the integrated rule engine. Allowed values are *Off*, *Lite*, *Medium*, *Full*. Trace output will be written to the standard log file. Please note, that any tracing will slow things down considerably and with *Full*, you will be bring the system to halt. |
+| Booster  | ExplainReasoning | False | If *True*, a connected LLM is asked to provide an explanation of its thoughts and conclusions, whenever an action in the *Conversation* and/or *Reasoning* booster is invoked. Whether the LLM will indeed provide an explanation depends on its capabilities. The explanation will be written to the transcript in the *Logs* directory. Please note, that this setting defaults to *True*, when running in debug mode. |
 
 ### Voice Settings
 

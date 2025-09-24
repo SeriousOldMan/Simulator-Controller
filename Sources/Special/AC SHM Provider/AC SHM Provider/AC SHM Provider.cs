@@ -330,6 +330,17 @@ namespace ACSHMProvider
             */
         }
 
+        // Determine if the race is timed or lap based bceause AC doesn't provide this info correctly
+        public bool IsTimedRace()
+        {
+            bool isTimedBasedOnRemainingTime = graphics.SessionTimeLeft >= 0;
+
+            // Race may still be time based as at the end of a timed race the session time left goes negative
+            bool isTimedBasedOnTrackLength = GetRemainingLaps((long)graphics.SessionTimeLeft) <= -1;
+
+            return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;
+        }
+
         public void ReadData() {
             Console.WriteLine("[Session Data]");
 
@@ -350,6 +361,7 @@ namespace ACSHMProvider
                     session = "Finished";
                 else */
                     session = GetSession(graphics.Session);
+                staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
 
                 Console.Write("Session="); Console.WriteLine(session);
 

@@ -324,6 +324,17 @@ namespace SHMConnector
             return "";
         }
 
+        // Determine if the race is timed or lap based bceause AC doesn't provide this info correctly
+        public bool IsTimedRace()
+        {
+            bool isTimedBasedOnRemainingTime = graphics.SessionTimeLeft >= 0;
+
+            // Race may still be time based as at the end of a timed race the session time left goes negative
+            bool isTimedBasedOnTrackLength = GetRemainingLaps((long)graphics.SessionTimeLeft) <= -1;
+
+            return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;
+        }
+
         public string ReadData() {
             StringWriter strWriter = new StringWriter();
             string session = "";
@@ -335,8 +346,12 @@ namespace SHMConnector
             {
                 strWriter.Write("Paused="); strWriter.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
 
+                staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
+
                 if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0 &&
                     (graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
+                    session = "Finished";
+                else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
                 else
                     session = GetSession(graphics.Session);
@@ -398,7 +413,11 @@ namespace SHMConnector
             strWriter.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 
             for (int id = 0; id < cars.numVehicles; id++)
+            { 
+                if (cars.cars[id].isConnected == 0)
+                    continue;  
                 strWriter.WriteLine("Car." + (id + 1) + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+            }
 
             strWriter.WriteLine("[Weather Data]");
             strWriter.WriteLine("Temperature=" + physics.AirTemp);

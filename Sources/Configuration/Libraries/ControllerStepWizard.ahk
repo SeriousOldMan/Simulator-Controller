@@ -921,6 +921,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	iPendingFunctionRegistration := false
 	iPendingActionRegistration := false
 
+	iActionsListHeader := []
 	iActionsListView := false
 
 	iModes := CaseInsenseMap()
@@ -1046,6 +1047,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
+	ActionsListHeader {
+		Get {
+			return this.iActionsListHeader
+		}
+	}
+
 	ActionsListView {
 		Get {
 			return this.iActionsListView
@@ -1061,6 +1068,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	reset() {
 		super.reset()
 
+		this.iActionsListHeader := []
 		this.iActionsListView := false
 
 		this.clearActions()
@@ -1069,14 +1077,20 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	showPage(page) {
+		local ignore, widget
+
 		ActionsStepWizard.sCurrentActionsStep := this
 
 		super.showPage(page)
 
 		if this.SetupWizard.isModuleSelected("Controller")
 			this.loadActions(true)
-		else
+		else {
+			for ignore, widget in this.ActionsListHeader
+				widget.Visible := false
+
 			this.ActionsListView.Visible := false
+		}
 	}
 
 	hidePage(page) {
@@ -1126,7 +1140,8 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		throw "Virtual method ActionsStepWizard.saveActions must be implemented in a subclass..."
 	}
 
-	setActionsListView(actionsListView) {
+	setActionsListView(actionsListHeader, actionsListView) {
+		this.iActionsListHeader := actionsListHeader
 		this.iActionsListView := actionsListView
 	}
 

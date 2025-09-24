@@ -230,7 +230,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		this.iControllerWidgets := [widget7, widget8, widget9]
 
-		this.setActionsListView(widget9)
+		this.setActionsListView([widget7, widget8], widget9)
 
 		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10)
 	}

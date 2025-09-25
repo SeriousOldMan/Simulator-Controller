@@ -26,6 +26,11 @@
   - OpenAIs new high end model family *GPT 5* is now supported. *GPT 5* is the perfect candidate for the new LAM-based pitstop planning method mentioned above. From now on, I recommend *GPT 5 mini* as the best model in terms of price / performance ratio when you are using OpenAI. *GPT 5 mini* even masters the pitstop planning mentioned above quite well, but the precision of *GPT 5* is much better, of course.
   - [Expert] A new [core setting "GPT" -> "ExplainReasoning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings) asks a connected LLM to provide an explanation of its thoughts and conclusions, whenever an action in the *Conversation* and/or *Reasoning* booster is invoked. Whether the LLM will indeed provide an explanation depends on its capabilities. The explanation will be written to the transcript in the *Logs* directory.
   - [Expert] A new [core setting "Rules" -> "TraceLevel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings) let you enable special trace output for the integrated rule engine, that will be written to the standard log file.
+  - New and updated car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - Ligier JS P325
+      - Oreca 07 (added front and rear heave travel settings)
+	  - All hypercars (added differential coast and differential power settings)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655), if you want to get rid of all potential unnecessary instructions in the main configuration file.
 
@@ -217,7 +222,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Tweaked the priority of the different Spotter phrases a bit to get more up 2 date proximity alerts.
   - [Important] Updated the weather information retrieval for *Le Mans Ultimate* to work around a bug in the API of the game. Unfortunately the information now does not reflect the **current** weather precisely anymore.
   - [Important] The voice recognition system of Simulator Controller is using a special recognizer for the activation phrases. In the past, this recognizer was running the "Windows (Desktop)" recognizer engine as default. This can be changed using the "Activation Recognizer" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings). From now on, the default for this activation recognizer is to use the recognition engine, which has been configured in general. If you want to change it back to the previous setting, add the corresponding value in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings).
-  - New car models for "Setup Workbench":
+  - New and updated car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - Aston Martin Valkyrie
       - Mercedes-AMG LMGT3
@@ -837,7 +842,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   11. Updated car meta data for *RaceRoom Racing Experience* to the latest version.
   12. [Expert] "Simulator Startup" now supports the [integration of additional startup scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration) to customize your environment when starting up Simulator Controller.
   13. [Internal] Migrated to AHK 2.1-alpha.15.
-  14. New car models for "Setup Workbench":
+  14. New and updated car models for "Setup Workbench":
       - rFactor 2
 	    - Mercedes AMG GT3
 		- Porsche 911 GT3 R
@@ -859,7 +864,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
      **IMPORTANT**: The default for this setting is *False*, which is **different** from the previously implemented behavior.
   10. A new action "PitstopRequest" has been defined for the *Automobilista 2* plugin to request a pitstop manually.
-  11. New car models for "Setup Workbench":
+  11. New and updated car models for "Setup Workbench":
       - rFactor 2
         - Audi R8 LMS GT3 (Variante 2019)
 		- Bentley Continental GT3 (Variante 2020)
@@ -1740,7 +1745,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. The capabilities of the Driving Coach to discuss with you after a session your performance and possible handling issues of the car, has been greatly improved.
   11. The Stream Deck icons now show a small colored bar at their top for toggleable controller actions to indicate, whether the corresponding function has been activated.
   12. New modded cars, e.g. the Golf GTI MK2, some new RSS Formula cars and all TCR cars have been included in the car meta data DLC.
-  13. New car models for "Setup Workbench":
+  13. New and updated car models for "Setup Workbench":
       - Assetto Corsa Competizione
 	    - BMW M2 CS (fixed)
       - Assetto Corsa
@@ -1911,7 +1916,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   22. [Developer] The new function *withBlockedWindows* allows you to execute a function with all open windows blocked against interaction.
   23. [Internal] Migrated to AHK version 2.0.11.
   24. [Internal] The copyright information has been updated to 2024 in all parts of the software.
-  25. New car models for "Setup Workbench":
+  25. New and updated car models for "Setup Workbench":
       - Assetto Corsa
         - BMW M3 E30 (fixed)
 		- McLaren F1 GTR
@@ -2018,7 +2023,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation), when running a strategy simulation in the "Strategy Workbench".
   8. A runtime for large language models has been integrated into Simulator Controller, which allows you to run a LLM for the "Driving Coach" locally on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information about the configuration requirements.
   9. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Configuration" and "Simulator Setup" let you decide whether other applications will be terminated before working on the configuration.
-  10. New car models for "Setup Workbench":
+  10. New and updated car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo GTA (fixed)
 	    - BMW M3 E92
@@ -2155,7 +2160,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   10. [Internal] Improved the detection of outdated downloadable components.
   11. [Developer Only] A new library for HTTP REST calling has been implemented.
   12. [Developer Only] The speech recognition framework now also supports free text recognition in addition to pattern based text recognition.
-  13. New car models for "Setup Workbench":
+  13. New and updated car models for "Setup Workbench":
       - Assetto Corsa Competizione
         - McLaren 720s Evo (fixed)
       - Assetto Corsa
@@ -2273,11 +2278,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   8. The audio routing capabilities have been extended. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   9. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
   10. [Developer Only] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) for tyre pressures. The property "Pressures" was renamed to "HotPressures" and a new property "ColdPressures" is available now.
-  11. New car models for "Setup Workbench":
+  11. New and updated car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo 4C
-        - Alfa Romeo 33 Stradale (Fixed)
-        - Lamborghini Miura (Fixed)
+        - Alfa Romeo 33 Stradale (fixed)
+        - Lamborghini Miura (fixed)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-523).
   
@@ -2321,10 +2326,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   15. Updated *Automobilista 2* data integration to shared memory API version 13.
   16. The Standings info widget in "Session Monitor" now also shows the observed opponent, if one is currently observed by the Spotter.
   17. A new [plugin named "Integration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) is available, which exposes the internal state of the Race Assistants and many information about the current session to external applications using a JSON file, which is updated periodically, even when another driver is running the car in a team race. With this it is possible, for example, to create a dashboard for Simulator Controller in SimHub.
-  18. New car models for "Setup Workbench":
+  18. New and updated car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo 33 Stradale
-		- Alfa Romeo Giulietta QV Launch Edition 2014 (Fixed)
+		- Alfa Romeo Giulietta QV Launch Edition 2014 (fixed)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-521).
   

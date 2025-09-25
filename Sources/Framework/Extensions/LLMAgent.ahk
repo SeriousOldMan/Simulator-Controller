@@ -256,7 +256,12 @@ class EventBooster extends AgentBooster {
 				if !arguments.Has(A_Index)
 					arguments[A_Index] := ""
 
-			return ("Call: " . call[1].Name . "(" . values2String(", ", arguments*) . ")")
+			arguments := values2String(", ", arguments*)
+
+			if (StrLen(arguments) > 80)
+				arguments := (SubStr(arguments, 1, 80) . translate("..."))
+
+			return ("Call: " . call[1].Name . "(" . arguments . ")")
 		}
 
 		if (this.Model && this.Active) {

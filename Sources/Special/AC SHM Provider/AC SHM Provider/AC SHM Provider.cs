@@ -276,38 +276,45 @@ namespace ACSHMProvider
             {
                 Console.Write("Car.Count="); Console.WriteLine(cars.numVehicles);
 
+				int idx = 1;
+				
                 for (int i = 1; i <= cars.numVehicles; ++i)
                 {
                     ref AcCarInfo car = ref cars.cars[i - 1];
+					
+					if (car.isConnected == 0)
+						continue;
 
-					Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(car.carId);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+					Console.Write("Car."); Console.Write(idx); Console.Write(".ID="); Console.WriteLine(i);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Nr="); Console.WriteLine(car.carId);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(car.lapCount);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Laps="); Console.WriteLine(car.lapCount);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
                     int lapTime = car.lastLapTimeMS;
                     int sector1Time = 0;
                     int sector2Time = 0;
                     int sector3Time = 0;
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
                     string carModel = GetStringFromBytes(car.carModel);
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(normalizeName(carModel));
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Car="); Console.WriteLine(normalizeName(carModel));
 
                     string driverName = GetStringFromBytes(car.driverName);
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(driverName));
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(driverName));
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
 
-                    Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
-                    Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine((car.isCarInPit == 0) ? "false" : "true");
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".InPitLane="); Console.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".InPit="); Console.WriteLine((car.isCarInPit == 0) ? "false" : "true");
+					
+					idx += 1;
                 }
 
                 Console.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
@@ -353,14 +360,16 @@ namespace ACSHMProvider
             {
                 Console.Write("Paused="); Console.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
 
-                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0 &&
-                    (graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
-                    session = "Finished";
+                staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
+				
+                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0) {
+                    if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
+						session = "Finished";
+				}
                 else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
                 else
                     session = GetSession(graphics.Session);
-                staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
 
                 Console.Write("Session="); Console.WriteLine(session);
 
@@ -444,8 +453,14 @@ namespace ACSHMProvider
             Console.Write("Temperature="); Console.WriteLine(physics.RoadTemp);
             Console.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 
+			int index = 1;
+			
             for (int id = 0; id < cars.numVehicles; id++)
-                Console.WriteLine("Car." + (id + 1) + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+            { 
+                if (cars.cars[id].isConnected == 0)
+                    continue;
+                Console.WriteLine("Car." + index++ + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+            }
 
             Console.WriteLine("[Weather Data]");
 

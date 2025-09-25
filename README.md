@@ -117,7 +117,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
-28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by a LLM to create custom behavior or change existing behavior.
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
@@ -147,7 +147,7 @@ Simulator Controller comes with a set of AI Assistants to guide you throughout y
 
 Simulator Controller offers you a personal pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
 
-You can communicate with your crew members using voice and natural language. Voice commands are pattern-based but you can additionally connect each pit crew member (called Race Assistant in Simulator Controller) to a GPT service and use the natural language capabilities of an LLM (aka large language model) to boost the conversational expertise of the crew members.
+You can communicate with your crew members using voice and natural language. Voice commands are pattern-based but you can additionally connect each pit crew member (called Race Assistant in Simulator Controller) to a GPT service and use the natural language capabilities of a LLM (aka large language model) to boost the conversational expertise of the crew members.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
 

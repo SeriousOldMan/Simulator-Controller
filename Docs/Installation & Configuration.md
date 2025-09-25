@@ -455,7 +455,7 @@ Using *Activation Command* you can supply a keyword or a complete phrase to focu
 3. Once you have configured the *Push-To-Talk* button, you can start a *Test* mode by pressing the small button with the "Play" icon. The Assistants will start up and you can start a conversation with them. Please note, that depending on the chosen recognizer, the activation command mode must be initiated by a double-press. See the [documentation for voice commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 4. It is possible to configure multiple *Push-To-Talk* buttons, but you must enter the corresponding codes manually. Separate them either by ";" or by "|".
 
-##### Boosting conversation with an LLM
+##### Boosting conversation with a LLM
 
 The voice recognition for all Assistants except the Driving Coach is normally pattern-based. [Here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)), for example, you can find a documentation for the definition of the recognized commands of the Race Engineer and similar documentation is available for the other Assistants as well. The speech output of all Assistants is also preprogrammed with several different phrases for each message, to create at least a little variation.
 
@@ -463,7 +463,7 @@ Said this, it is clear, that the interaction with the Assistants, although alrea
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Speech%20Improvement.JPG)
 
-Improving and extending the Assistants using an LLM requires quite some dedication and knowledge, therefore I recommend to start without it. Once everything is running as expected and you think you are ready for this, take a look at the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
+Improving and extending the Assistants using a LLM requires quite some dedication and knowledge, therefore I recommend to start without it. Once everything is running as expected and you think you are ready for this, take a look at the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
 
 #### Tab *Plugins*
 

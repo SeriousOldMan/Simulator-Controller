@@ -14,7 +14,7 @@
 
   - Introduced more speech variations for the Spotter shout outs which are cached for performance reasons.
   - Completely rewritten the handling of track names and track layouts for *Assetto Corsa*. Track names and layouts are now much more human readable. The current "Track Data.ini" file in the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup in case you have edited or extended it already.
-  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of typical usable laps of a tyre compound will be available in the knowledge passed to an LLM for the Race Strategist.
+  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of typical usable laps of a tyre compound will be available in the knowledge passed to a LLM for the Race Strategist.
   - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". For example, if you want that the Engineer do **not** handle tyres in pitstop preparation in *Solo* races, but tyres should be managed by instructions given by the "Team Center" of course in *Team* races, this discriminator is your friend. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
   - [Expert] The Pitstop Planning action for the *Conversation* and *Reasoning* booster of the Engineer has been changed in preparation of the LAM integration. Individual tyre compounds for each wheel are now supported.
 
@@ -31,7 +31,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a couple of missing translations.
   - Fixed several unnecessary language specific LLM instructions cluttering the main configuration file, which could have slowed things down a bit. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) for information, how to fix this in your configuration.
   - Fixed a layout error in "Session Database" in the *Track & Automation* tab introduced with the last release.
-  - Fixed several rare bugs which prevented knowledge to be passed to an LLM by the Race Strategist.
+  - Fixed several rare bugs which prevented knowledge to be passed to a LLM by the Race Strategist.
   
 #### Changes
 
@@ -39,10 +39,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - This version of the API now exports information about the current state and selections of the Pitstop MFD. Therefore the image recognition method has been disabled and the small search images are no longer needed. If you still want to use the image recognition method for whatever reason, use the new setting ["Pitstop: Image Search"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" for *RaceRoom Racing Experience*.
 	- Information about the remaining virtual energy is supported for all applications when running a hypercar.
   - Thanks to a contribution of @EightOfFour, time based races are now supported from *Assetto Corsa*.
-  - A new [event for pitstop planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) has been defined for the Race Engineer for the *Reasoning* booster. This event, if enabled, will route the request to plan an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM, acting as an LAM (aka large action model) in this case, may come up with a better pitstop plan, especially for tyre changes, than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and enable this event at your own risk. Make sure to use a high end thinking model for the *Reasoning* booster, if you want to give this a try.
-    - Please note, that this approach will not be used in all cases, for example, if the requests was created remotely in the "Team Center".
+  - A new [event for pitstop planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) has been defined for the Race Engineer for the *Reasoning* booster. This event, if enabled, will route the request to plan an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM, acting as a LAM (aka large action model) in this case, may come up with a better pitstop plan, especially for tyre changes, than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and enable this event at your own risk. Make sure to use a high end thinking model for the *Reasoning* booster, if you want to give this a try.
+    - Please note, that this approach will not be used in all cases, for example, if the request was created remotely in the "Team Center".
     - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) let you inspect and modify the internal instructions for the Race Engineer, when holding down the Control key while clicking on the "Instructions..." button of the *Reasoning* booster.
-  - The *Reasoning* booster for the Race Strategist supports a new [event for pitstop recommendation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-strategist). Together with the also new counterpart action "Pitstop Recommend", this event, if enabled, will route the request to recommend the lap for an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM, acting as an LAM (aka large action model) in this case, may come up with a better lap for a pitstop with regards to undercut or overcut chances than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and enable this event at your own risk. Make sure to use a high end thinking model for the *Reasoning* booster, if you want to give this a try.
+  - The *Reasoning* booster for the Race Strategist supports a new [event for pitstop recommendation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-strategist). Together with the also new counterpart action "Pitstop Recommend", this event, if enabled, will route the request to recommend the lap for an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM, acting as a LAM (aka large action model) in this case, may come up with a better lap for a pitstop with regards to undercut or overcut chances than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and enable this event at your own risk. Make sure to use a high end thinking model for the *Reasoning* booster, if you want to give this a try.
     - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) let you inspect and modify the internal instructions for the Race Engineer, when holding down the Control key while clicking on the "Instructions..." button of the *Reasoning* booster.
   - OpenAIs new high end model family *GPT 5* is now supported. *GPT 5* is the perfect candidate for the new LAM-based pitstop planning method mentioned above. From now on, I recommend *GPT 5 mini* as the best model in terms of price / performance ratio when you are using OpenAI. *GPT 5 mini* even masters the pitstop planning mentioned above quite well, but the precision of *GPT 5* is much better, of course.
   - [Expert] A new [core setting "GPT" -> "ExplainReasoning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings) asks a connected LLM to provide an explanation of its thoughts and conclusions, whenever an action in the *Conversation* and/or *Reasoning* booster is invoked. Whether the LLM will indeed provide an explanation depends on its capabilities. The explanation will be written to the transcript in the *Logs* directory.
@@ -59,9 +59,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - LLM instructions for the Driving Coach will not be used anymore, if the corresponding data is not available at that exact moment.
-  - Fixed a bug, which prevented the pitstop history to be passed to an LLM in the *Conversation* and *Reasoning* boosters.
-  - Fixed another bug in the knowledge passed to an LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperatures.
-  - Fixed several rounding errors in the knowledge passed to an LLM in the *Conversation* and in the *Reasoning* booster.
+  - Fixed a bug, which prevented the pitstop history to be passed to a LLM in the *Conversation* and *Reasoning* boosters.
+  - Fixed another bug in the knowledge passed to a LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperatures.
+  - Fixed several rounding errors in the knowledge passed to a LLM in the *Conversation* and in the *Reasoning* booster.
   - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
   - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
@@ -87,7 +87,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The Strategist also refers to other cars by the name of the driver from time to time, when asked for gaps, positions, lap times and so on.
   - The tyre compound in the pitstop settings is now initialized from the strategy, if available, in the "Team Center", when using the command "Initialize from Session".
   - The number of driven laps for each tyre are now displayed on the *Session* tab in the "System Monitor".
-    - This information is also passed to an LLM in the *Conversation* and *Reasoning* booster of the Race Engineer.
+    - This information is also passed to a LLM in the *Conversation* and *Reasoning* booster of the Race Engineer.
     - [Developer] Also, the number of driven laps for each tyre are available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
   - The handling of the Assistant cool down phase has been optimized. You can now hold down Ctrl and LeftShift anytime to interrupt the cool down phase, even if the new session already has been started.
   - The session state management for *Le Mans Ultimate* has been updated to be more in line with the behavior of all other simulators. For example, if a session is restarted before the first lap has been completed, the Assistants will stay active.
@@ -187,8 +187,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - Combining the activation of an Assistant and the first command into one phrase like in "Jona, can you plan a pitstop?" is now supported for all voice recognition engines, which are not built into Windows itself. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#combining-activation-and-command) for more information.
-  - Values like fuel amount, tyre pressures, and so on are now passed in localized units to an LLM for coneration purposes.
-  - Additional information about car damage is passed to an LLM for conversation and reasoning.
+  - Values like fuel amount, tyre pressures, and so on are now passed in localized units to a LLM for coneration purposes.
+  - Additional information about car damage is passed to a LLM for conversation and reasoning.
   - [Expert] Support for a key logger style detection of keyboard presses for *Push-to-Talk* in those cases where the simulator consumes all key presses unconditionally. See the  [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#voice-settings) for more information.
   - [Internal] Optimized the loading times of driver names from the session database by implementing caching.
   - [Internal] Reorganized master download repository (once again).
@@ -285,7 +285,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - Suspension damage information is now available for *Le Mans Ultimate* and the Engineer considers this information when preparing a pitstop.
-  - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run an LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
+  - A new server has been added to Simulator Controller, which allows you to run the fabolous Whisper voice recognition on a second computer, if available. This provides a great alternative to using Azure or Google voice services and if Ollama is used to run a LLM on the same second PC, you will have a full self-contained AI system. For information how to install and setup the Whisper Server take a look at this [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server). Also see this [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime) for instructions how to connect to the Whisper Server.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639), if you have been running a custom livery and have collected wrong data in the session database, when using *Le Mans Ultimiate*.
 
@@ -300,7 +300,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
-  - Information about the last pitstop of each opponent is now available in the knowledge that is passed to an LLM for the Strategist.
+  - Information about the last pitstop of each opponent is now available in the knowledge that is passed to a LLM for the Strategist.
   - The default for the large language model of OpenAI has changed to "GPT 4.1 mini". You may want to review your model configuration as well, because "GPT 4o mini" will get deprecated soon.
   - The Engineer now observes virtual energy consumption in addition to fuel consumption when running *le Mans Ultimate*, and will warn you, if the available virtual energy will be depleted soon.
     - Information about the available virtual energy and also energy consumption is displayed in the "Fuel" widget in the "System Monitor".
@@ -602,7 +602,7 @@ As mentioned above, this version contains an all new simulator data interface. I
   - A filter has been integrated which removes characters from car names and track names, before these are stored in the session database. This can make exsiting database entries inaccessible. Please consult the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-637) on information how to restore your data.
   - The tyre meta data for *Automobilista 2* has been updated to reflect a recent change by Reiza in the naming of the Soft, Medium and Hard Slick tyre compounds.
   - [Expert] A new type of *Reasoning* booster named "Rules" has been introduced, which runs without a connected LLM. Only rules are allowed as event source, but all action types, including scripts defined in  [Lua](https://lua.org) are supported. Please read the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
-    - A new action function / predicate named *Assistant.Trigger* is available, which allows the event rules to trigger a defined action by name, rather than by using an LLM to select the action by the current situation, since no LLM is active when the "Rules" booster is selected.
+    - A new action function / predicate named *Assistant.Trigger* is available, which allows the event rules to trigger a defined action by name, rather than by using a LLM to select the action by the current situation, since no LLM is active when the "Rules" booster is selected.
   - [Expert] The "Assistant.Speak" function / predicate used in the Assistant booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
   - [Expert] Rules defined in the [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) can now use the *Execute* clause to [call scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) written in the script language [Lua](https://lua.org) introduced with the last release and vice-versa. This allows you to choose the language, which is best suited for a given task.
   
@@ -988,7 +988,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. New Stream Deck icon for the above "Interrupt" action.
   6. The telemetry importer has been improved to also read the lap time, sector times, and so on, if this information is available. This is useful, when importing lap telemetry data after a race from the telemetry collection of the Driving Coach, which is located in [Documents]\Simulator Controller\Temp\Driving Coach\Telemetry.
   7. A new convinience shortcut has been implemented in "Simulator Startup" to select the startup profile. Hold down the mouse button for at least a second when clicking on the "Startup" button to choose the profile for the next startup. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#notes) for more information.
-  8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm) when an LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
+  8. The Driving Coach now supplies a basic and somewhat [restricted on-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm) when a LLM for the Coach has not yet been configured. Since this is the default configuration for a fresh installation, the Coach is already usable to some extent without being fully configured.
   9. The automatic startup of the on-track coaching as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode) has been updated, so that the acquired knowledge does not get removed after the end of a session.
   10. "Session Database" now supports to open the documentation for the selected database category by holding down the Control key when clicking on the category. Or you can click on the small "Documentation" button in the upper right corner of the main window.
   11. [Internal] Optimized asynchronous speaking status of all Assistants. This gives the Driving Coach more room for the corner by corner instructions. 
@@ -1010,7 +1010,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   5. A new info popup shows important information about the nearest track section when clicking at a specific spot in the Telemetry Viewer or the assoiated track map. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer) for more information.
   6. The detection of click / drag of track points in the track map editor has been improved.
   7. The Spotter no longer informs about lap time delta which is actually zero.
-  8. [Expert] The *Reasoning* booster can now be used without an LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+  8. [Expert] The *Reasoning* booster can now be used without a LLM, if you only want to extend the rule base of an Assistant. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
 ## 5.9.9.0-release 11/22/24
   1. Minor bugfixes, as always
@@ -1339,9 +1339,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Renamed "Conversation Booster" to "Assistant Booster" throughout the documentation.
   4. All documentation regarding the different Assistant Boosters has been collected into a dedicated [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants).
   5. The knowledge made available to the different Assistant Boosters has been extended massively. A full history of recent laps is now included, which allow the LLM (if smart enough) to make very precise decisions.
-  6. A new Assistant Booster has been implemented, which let you integrate an LLM into the reasoning process of an Assistant.
+  6. A new Assistant Booster has been implemented, which let you integrate a LLM into the reasoning process of an Assistant.
 	 - This *Reasoning* booster can use a different GPT service and LLM than the other conversation-related Assistant Boosters.
-     - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to an LLM.
+     - Events raised by the rule system of an Assistant or by rules defined on your own can be used to create a request to a LLM.
 	 - The LLM then can use any of the predefined actions or actions defined on your own to handle this event or situation.
 	 - Actions triggered this way can raise other events, thereby creating a complex chain of thought for the LLM.
   7. A new syntax-coloring editor for source code has been implemented and is used in the Assistant Booster dialog when rules are being edited.
@@ -1477,7 +1477,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   14. The default instructions for the Conversation Boosters has been extended to include more personality and domain specific behavior. A full overview for all supported instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
   15. Many more announcements and messages by the Spotter can now be rephrased by the Conversation Booster. Only very urgent messages like proximity alerts are excluded, because of the additional latency introduced when calling a GPT service.
   16. The default "Character" instruction for the Driving Coach has been updated. Therefoe all instructions will be reset to their defaults. This is only necessary this time, see next item.
-  17. A method has been introduced, that checks whether you are using the default instructions for an LLM, so that you don't need to update them, when they have changed in the distribution package.
+  17. A method has been introduced, that checks whether you are using the default instructions for a LLM, so that you don't need to update them, when they have changed in the distribution package.
   18. It is now possible to manage teams, driver and sessions directly from "Simulator Startup", if you are using the Team Server. Please see the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#team-management) for more information.
   19. Renamed the "Team Server" tab in "Simulator Configuration" to "Team Management". Using this tab is not necessary anymore and it will eventually be removed, since the functionality is now provided from within "Simulator Startup".
   20. [*OpenRouter*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#openrouter) has been added to the list of supported GPT service providers.
@@ -1492,7 +1492,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Fixed calculation of remaining stint time, if driver time is less than stint time.
   5. The configuration of the *Push-To-Talk* button now supports a test mode, which starts two Assistants, so that you can play with the *Push-To-Talk* button. Depending on the chosen recognizer it might be necessary to use the double-press for activation commands, when using the test mode (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands) for more information).
   6. The Driving Coach now also has access to the car telemetry data from the general knowledge base. It therefore is theoretically able to correlate degrading lap times with over the top tyre temperatures, for example.
-  7. The default context window size for an LLM has been increased to 2k tokens in the Driving Coach configuration.
+  7. The default context window size for a LLM has been increased to 2k tokens in the Driving Coach configuration.
   8. The next feature of the AI-based booster for the Assistants now integrates a general conversation capability. Every voice command, that cannot be matched against the list of predefined, pattern-based commands, will be forwarded to the GPT service for a general conversation. The LLM has full access to the knowledge base of the Assistant, incl. telemetry data, standings and position data, and so on. The exact knowledge will vary with the type of the Assistant (Engineer, Strategist, ...). See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm) for more information.
   9. Configuration of the Conversation Booster is now also possible using "Simulator Configuration". See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   10. [*Mistral AI*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#mistral-ai) has been added to the list of supported GPT service providers.
@@ -1531,8 +1531,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Rearranged the priority of a couple of information announcements of the Spotter to make them more relevant and timely.
   5. Fine-tuning for some edge cases in the accident detection on tracks with extreme braking zones.
   6. The default models for OpenAI has been updated, since OpenAi introduced new models (always difficult to keep up with them). This relates to the Driving Coach configuration and also to the new speech improvement capabilities (see next topic). You may want to review your choice and update your model reference to the newest version, since they might even be cheaper.
-  7. "Simulator Setup" now supports configuration of LLM-based post-prcessing and rephrasing of voice messages issued by the Assistants. This is the first step in a series of enhancements for the Engineer, the Strategist and the Spotter using GPT technology. All this enhancements will be optional, since they either require a very powerful PC to run an LLM locally or you must buy some computing time from companies like OpenAI. Although very inexpensive, this is also not for everybody. Please take a look at the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
-  8. [Developer] Added a first GPT-based speech post-processor in preparation for the new Assistant GPT architecture. This post processor uses an LLM to randomly rephrase each message issued by the Assistants to bring in more variations. It can also be used to translate between different languages as long as the used LLM supports this.
+  7. "Simulator Setup" now supports configuration of LLM-based post-prcessing and rephrasing of voice messages issued by the Assistants. This is the first step in a series of enhancements for the Engineer, the Strategist and the Spotter using GPT technology. All this enhancements will be optional, since they either require a very powerful PC to run a LLM locally or you must buy some computing time from companies like OpenAI. Although very inexpensive, this is also not for everybody. Please take a look at the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm).
+  8. [Developer] Added a first GPT-based speech post-processor in preparation for the new Assistant GPT architecture. This post processor uses a LLM to randomly rephrase each message issued by the Assistants to bring in more variations. It can also be used to translate between different languages as long as the used LLM supports this.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-570), especially if you have configured and are using the Driving Coach.
 

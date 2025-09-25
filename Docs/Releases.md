@@ -32,6 +32,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed several unnecessary language specific LLM instructions cluttering the main configuration file, which could have slowed things down a bit. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) for information, how to fix this in your configuration.
   - Fixed a layout error in "Session Database" in the *Track & Automation* tab introduced with the last release.
   - Fixed several rare bugs which prevented knowledge to be passed to a LLM by the Race Strategist.
+  - Fixed the default Service URL for OpenRouter.
   
 #### Changes
 

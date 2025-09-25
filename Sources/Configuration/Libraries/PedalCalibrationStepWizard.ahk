@@ -148,7 +148,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		widget8.document.write(html)
 
-		this.setActionsListView(widget7)
+		this.setActionsListView([widget5, widget6], widget7)
 
 		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, pedalWidgets*)
 	}

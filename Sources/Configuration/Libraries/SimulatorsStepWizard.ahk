@@ -210,7 +210,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		window.SetFont("Bold", "Arial")
 
 		widget7 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden", translate("Actions"))
-		widget8 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
+		widget8 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 W:Grow Hidden")
 
 		window.SetFont("Norm", "Arial")
 
@@ -230,7 +230,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		this.iControllerWidgets := [widget7, widget8, widget9]
 
-		this.setActionsListView(widget9)
+		this.setActionsListView([widget7, widget8], widget9)
 
 		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10)
 	}

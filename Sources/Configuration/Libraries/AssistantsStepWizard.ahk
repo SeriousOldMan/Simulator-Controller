@@ -303,7 +303,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local widgets
+		local widgets, widget1, widget2
 		local page, assistant, labelWidth, labelX, labelY, label
 		local listX, listY, listWidth, info, html, configurator, colWidth, wddget
 
@@ -354,8 +354,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			window.SetFont("Bold", "Arial")
 
-			widgets.Push(window.Add("Text", "x" . listX . " yp+30 w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions")))
-			widgets.Push(window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden"))
+			widget1 := window.Add("Text", "x" . listX . " yp+30 w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
+			widget2 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden")
+
+			widgets.Push(widget1)
+			widgets.Push(widget2)
 
 			window.SetFont("Norm", "Arial")
 
@@ -366,7 +369,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			widgets.Push(widget)
 
-			this.iActionsListViews.Push(widget)
+			this.iActionsListViews.Push([[widget1, widget2], widget])
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
@@ -478,7 +481,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		this.iCurrentAssistant := this.Definition[page]
 
-		this.setActionsListView(this.iActionsListViews[page])
+		this.setActionsListView(this.iActionsListViews[page][1], this.iActionsListViews[page][2])
 
 		super.showPage(page)
 

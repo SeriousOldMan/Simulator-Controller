@@ -75,8 +75,8 @@ namespace ACSHMSpotter
 
         // since 1.7.2
         public float TrackSPlineLength;
-        [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 15)]
-        public string TrackConfiguration;
+        [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 33)]
+        public String TrackConfiguration;
 
         // since 1.10.2
         public float ErsMaxJ;

@@ -228,7 +228,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		widget18.document.write(html)
 
-		this.setActionsListView(widget17)
+		this.setActionsListView([widget15, widget16], widget17)
 
 		this.iMotionEffectsList := widget7
 

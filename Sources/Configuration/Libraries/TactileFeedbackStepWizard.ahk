@@ -180,7 +180,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		widget15.document.write(html)
 
-		this.setActionsListView(widget14)
+		this.setActionsListView([widget12, widget13], widget14)
 
 		this.iPedalEffectsList := widget7
 		this.iChassisEffectsList := widget10

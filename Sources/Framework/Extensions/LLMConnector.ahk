@@ -723,8 +723,8 @@ class LLMConnector {
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "http://localhost:11434/v1/chat/completions"
-			serviceKey := "ollma"
+			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
+			serviceKey := ""
 			model := ""
 		}
 	}

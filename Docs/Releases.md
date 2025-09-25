@@ -1,30 +1,8 @@
 # Latest stable release
 
-## 6.5.4.0
-
-#### Date: 09/19/25
-
-#### Fixes
-
-  - Fixed a critical bug introduced with the last release, when the Spotter wants to reference an opponent car by the name of the driver.
-  - Fixed internal car class descriptor for the active driver.
-  - Fixed calculation of driven laps per tyre in some rare cases in team races.
-  
-#### Changes
-
-  - Introduced more speech variations for the Spotter shout outs which are cached for performance reasons.
-  - Completely rewritten the handling of track names and track layouts for *Assetto Corsa*. Track names and layouts are now much more human readable. The current "Track Data.ini" file in the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup in case you have edited or extended it already.
-  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of typical usable laps of a tyre compound will be available in the knowledge passed to a LLM for the Race Strategist.
-  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". For example, if you want that the Engineer do **not** handle tyres in pitstop preparation in *Solo* races, but tyres should be managed by instructions given by the "Team Center" of course in *Team* races, this discriminator is your friend. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
-  - [Expert] The Pitstop Planning action for the *Conversation* and *Reasoning* booster of the Engineer has been changed in preparation of the LAM integration. Individual tyre compounds for each wheel are now supported.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654), if you have edited the "Track Data.ini" file for *Assetto Corsa*.
-
-# Upcoming release
-
 ## 6.5.5.0
 
-#### Date: 09/26/25 (planned)
+#### Date: 09/26/25
 
 #### Fixes
 
@@ -51,7 +29,31 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655), if you want to get rid of all potential unnecessary instructions in the main configuration file.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 6.5.4.0
+
+#### Date: 09/19/25
+
+#### Fixes
+
+  - Fixed a critical bug introduced with the last release, when the Spotter wants to reference an opponent car by the name of the driver.
+  - Fixed internal car class descriptor for the active driver.
+  - Fixed calculation of driven laps per tyre in some rare cases in team races.
+  
+#### Changes
+
+  - Introduced more speech variations for the Spotter shout outs which are cached for performance reasons.
+  - Completely rewritten the handling of track names and track layouts for *Assetto Corsa*. Track names and layouts are now much more human readable. The current "Track Data.ini" file in the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup in case you have edited or extended it already.
+  - When a strategy has been defined or if race rules has been actived in the "Race Settings", the number of typical usable laps of a tyre compound will be available in the knowledge passed to a LLM for the Race Strategist.
+  - [Important] It is now possible to select the session mode (either *Solo* or *Team*) as a discriminator for settings in the "Session Database". For example, if you want that the Engineer do **not** handle tyres in pitstop preparation in *Solo* races, but tyres should be managed by instructions given by the "Team Center" of course in *Team* races, this discriminator is your friend. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
+  - [Expert] The Pitstop Planning action for the *Conversation* and *Reasoning* booster of the Engineer has been changed in preparation of the LAM integration. Individual tyre compounds for each wheel are now supported.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654), if you have edited the "Track Data.ini" file for *Assetto Corsa*.
 
 ## 6.5.3.0
 

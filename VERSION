@@ -1,23 +1,20 @@
 [Development]
-Version=6.5.5.0-beta
+Version=6.5.5.0-release
 Target=6.5.5.0-release
-Date=09/25/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/n4W-LbZo
+Date=09/26/2025
+Download=https://cutt.ly/orNJ8ZH1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/EAwdT_n1;https://www.dropbox.com/scl/fi/kpsx6x5yh9ykd1cdzdxse/Simulator-Controller-6.5.5.0-release.zip?rlkey=xkqn13852ktxthqazmgvqfzhb&st=5pftd9u9&dl=1;http://%master%/Releases/Simulator Controller 6.5.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.5.0-release.zip
 Changes=Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, Support for AC timed races
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
-Version=6.5.4.0-release
-Date=09/19/2025
-Download=https://cutt.ly/brV3k0Jw;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/RhzXvKCi;https://www.dropbox.com/scl/fi/rzzg7s3rtpd4e40k1qy89/Simulator-Controller-6.5.4.0-release.zip?rlkey=yuojgorwovbv4ab91biq4zpq6&st=0vvvb5da&dl=1;http://%master%/Releases/Simulator Controller 6.5.4.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.4.0-release.zip
-Changes=Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter, Changed the Pitstop Planning action for Conversation and Reasoning booster for the Engineer
-Components=Media->5.6.1,Configuration->6.5.4,Utilities->6.4.1
+Version=6.5.5.0-release
+Date=09/26/2025
+Download=https://cutt.ly/orNJ8ZH1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/EAwdT_n1;https://www.dropbox.com/scl/fi/kpsx6x5yh9ykd1cdzdxse/Simulator-Controller-6.5.5.0-release.zip?rlkey=xkqn13852ktxthqazmgvqfzhb&st=5pftd9u9&dl=1;http://%master%/Releases/Simulator Controller 6.5.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.5.0-release.zip
+Changes=Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, Support for AC timed races
+Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.5.4.Path=Resources
-Configuration.6.5.4.Content=Setup
-Configuration.6.5.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/m-73Sz6d;https://www.dropbox.com/scl/fi/52hjh6d8jumrcuyidywik/Configuration-6.5.4.zip?rlkey=uz3nlqhkdciipowti3jnov7vh&st=hk75xo2w&dl=1;http://%master%/Components/Configuration 6.5.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.5.4.zip
 Configuration.6.5.5.Path=Resources
 Configuration.6.5.5.Content=Setup
 Configuration.6.5.5.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/7q55WHB0;https://www.dropbox.com/scl/fi/99gczarjkbbc716odq3g9/Configuration-6.5.5.zip?rlkey=h9paqd97fkge7i2ga3oc2ykfi&st=svk8rolq&dl=1;http://%master%/Components/Configuration 6.5.5.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.5.5.zip
@@ -25,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.5.5.0-beta
-Release=6.5.4.0-release
+Development=6.5.5.0-release
+Release=6.5.5.0-release

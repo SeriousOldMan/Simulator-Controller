@@ -90,7 +90,7 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
-#### Extending conversation and reasoning capabilities using an LLM
+#### Extending conversation and reasoning capabilities using a LLM
 
 Beside the builtin pattern-based voice recognition and the speech capabilities based on predefined phrases as described above, it is optionally possible to connect Cato to a GPT service like OpenAI or a locally hosted LLM, to dramatacilly improve the quality in conversation with the Assistant. And you can also extend the knowledge and reasoning capabilities. When the *Conversation* Booster or the *Reasoning* booster are configured (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the necessary configuration steps), the full knowledge about the car state will be supllied to the LLM. In detail, this includes tyre pressures, tyre temeperatures, tyre wear, brake temperatures, brake wear, fuel level, fuel consumption, damage, and so on. When a pitstop is planned, the plan is available and the pitstop history is also available.
 

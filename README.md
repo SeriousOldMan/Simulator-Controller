@@ -37,21 +37,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.5.4.0-release](https://cutt.ly/brV3k0Jw) (Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter, Changed the Pitstop Planning action for Conversation and Reasoning booster for the Engineer.)
+[6.5.5.0-release](https://cutt.ly/orNJ8ZH1) (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, Support for AC timed races, New car models for "Setup Workbench".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6540) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-654) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6550) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.5.3.0-release](https://cutt.ly/UrCa5Qbu) (Changes: Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry, Spotter fires events even if shout outs are disabled, New Spotter event "Focus Gap Update", Fixed positions in race reports for iRacing, Fixed loading of instructions in the *Reasoning* booster, Fixed session handling in LMU, Fixed pit menu handling in non-English UIs of LMU, Preserve instructions when a GPT service is changed in a booster, Fixed brake information in lap history for the LLM knowledge.)
+[6.5.4.0-release](https://cutt.ly/brV3k0Jw) (Changes: Usable tyre laps in knowledge of Strategist, New selection for session mode in "Session Database", Fixed internal car class descriptor for driver, Fixed calculation of driven laps per tyre in some rare cases in team races, Rework of track name handling in AC, Fixed driver name handling in Spotter, Changed the Pitstop Planning action for Conversation and Reasoning booster for the Engineer.)
 
-[6.5.2.0-release](https://cutt.ly/jrJR79yk) (Changes: Fixed handling of tyre sets in "Solo Center" for simulators w/o tyre set support, Fixed booster button availability on "Basic" setup page, Increased resilience of "Simulator Setup", Optimized weather related decisions at the end of the race, Fixed pitstop service time calculation in on-track strategy simulation, New local LLM Runtime, LLM Instructions are defined per Assistant.)
+[6.5.3.0-release](https://cutt.ly/UrCa5Qbu) (Changes: Suppress unavailable LLM instructions, Support telemetry collection without open Telemetry Viewer in "Solo Center", Driver names in many information phrases, Better handling of speech concurrency for the Spotter, Updated car meta data for R3E, Laps per tyre in "System Monitor", Laps per tyre in "Session State.json", Spotter can interrupt itself, Suppress car behind alert directly after proximity clearance, Spotter announces driver name in accident alerts, Fixed pitstop history in LLM knowledge, Coach can autosave reference telemetry, Spotter fires events even if shout outs are disabled, New Spotter event "Focus Gap Update", Fixed positions in race reports for iRacing, Fixed loading of instructions in the *Reasoning* booster, Fixed session handling in LMU, Fixed pit menu handling in non-English UIs of LMU, Preserve instructions when a GPT service is changed in a booster, Fixed brake information in lap history for the LLM knowledge.)
 
 #### Latest development build
 
-[6.5.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/PvweZ8u4) (Changes: Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New car models for "Setup Workbench".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6550) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 
@@ -117,7 +115,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 27. [Connecting Assistants to GPT](https://youtu.be/4tq-2bnEIXE) - We introduce the new GPT-based Conversation Booster for the Assistants. Using this booster you can create a very life-like communication with the Assistants.
 
-28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by an LLM to create custom behavior or change existing behavior.
+28. [Extending and customizing Assistants using GPT](https://youtu.be/IVlF7RrKfoI) - You will learn how to define your own events and actions to be used by a LLM to create custom behavior or change existing behavior.
 
 29. [Managing telemetry data](https://youtu.be/h_WOf4mpWiA) - This video demonstrates the telemetry data system and shows how the different applications collect telemetry and what you can do with it.
 
@@ -147,7 +145,7 @@ Simulator Controller comes with a set of AI Assistants to guide you throughout y
 
 Simulator Controller offers you a personal pit crew based on an AI powered chatbot engine. At the heart of this engine is hybrid rule engine coupled with voice recognition and voice synthesis. A rule engine is very suitable for the tasks of a typical pit crew, since all actions are event based and use large amounts of data.
 
-You can communicate with your crew members using voice and natural language. Voice commands are pattern-based but you can additionally connect each pit crew member (called Race Assistant in Simulator Controller) to a GPT service and use the natural language capabilities of an LLM (aka large language model) to boost the conversational expertise of the crew members.
+You can communicate with your crew members using voice and natural language. Voice commands are pattern-based but you can additionally connect each pit crew member (called Race Assistant in Simulator Controller) to a GPT service and use the natural language capabilities of a LLM (aka large language model) to boost the conversational expertise of the crew members.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
 

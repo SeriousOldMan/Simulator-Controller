@@ -40,7 +40,7 @@ The *Session* topic gives you access to the overall state of the current session
 | RemainingLaps | The number of laps in the current session. In "Time"-based session this value is based on the average lap time. |
 | RemainingTime | The remaining time of the current session. In "Laps"-based session this value is based on the average lap time. |
 | Data          | This property gives you access to the internal data represenation of the current session state. It is a string in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). Using this property is almost identical to calling the *read* function of the "Simulator" module, but since this information is processed asynchronously, it may be a few seconds *old*. |
-| Knowledge     | This property returns a JSON object, which is also passed to an LLM of a *Conversation* booster. An example for the structure and contents of this object can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster). |
+| Knowledge     | This property returns a JSON object, which is also passed to a LLM of a *Conversation* booster. An example for the structure and contents of this object can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster). |
 
 #### Stint
 

@@ -28,9 +28,9 @@
   - [Expert] A new [core setting "Rules" -> "TraceLevel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration#development-settings) let you enable special trace output for the integrated rule engine, that will be written to the standard log file.
   - New and updated car models for "Setup Workbench":
     - Le Mans Ultimate
-	  - Ligier JS P325
+      - Ligier JS P325
       - Oreca 07 (added front and rear heave travel settings)
-	  - All hypercars (added differential coast and differential power settings)
+      - All hypercars (added differential coast and differential power settings)
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-655), if you want to get rid of all potential unnecessary instructions in the main configuration file.
 

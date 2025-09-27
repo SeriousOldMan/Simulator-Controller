@@ -392,36 +392,6 @@ updateTargetPressureIncrement(?compound, ?tyreType) <=
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                           Tyre Wear Calculation                         ;;;
-;;;                                                                         ;;;
-;;; Calculate the average tyre wear per wheel.                              ;;;
-;;;-------------------------------------------------------------------------;;;
-
-priority: 5, [?Lap] => (Prove: averageTyreWear(?Lap))
-
-averageTyreWear(?lap) <= ?temp = ?lap - !Session.Settings.Lap.History.Considered, ?toLap = ?temp - 1
-						 averageTyreWear(?lap, ?toLap, [FL, FR, RL, RR], ?wears),
-						 averageTyreWears([FL, FR, RL, RR], ?wears, ?avgWears),
-						 setAverageTyreWear([FL, FR, RL, RR], ?avgWears)
-						 
-averageTyreWear(?lap, ?lap, ?, []) <= !
-averageTyreWear(?lap, ?, ?, []) <= ?lap =< 0, !
-averageTyreWear(?lap, ?toLap, ?tyres, [?wears | ?moreWears]) <=
-		averageTyreWear(?lap, ?tyres, ?wears), ?nextLap = ?lap - 1, averageTyreWear(?mextLap, ?toLap, ?tyres, ?moreWears)
-		
-averageTyreWear(?, [], []) <= !
-averageTyreWear(?lap, [?tyre | ?tyres], [?wear | ?wears]) <= lapTyreWear(?lap, ?tyre, ?wear), averageTyreWear(?lap, ?tyres, ?wears)
-
-averageTyreWears(?tyres, ?wears, ?avgWears) <= transpose(?wears, ?tWears), averageTyreWears(?tWears, ?avgWears)
-
-averageTyreWears([?wear | ?wears], [?avgWear | ?avgWears]) <=
-		length(?wear, ?length), sum(?wear, ?sumWear), ?avgWear = ?sumWear / ?length, averageTyreWears(?wears, ?avgWears)
- 
-setAverageTyreWear([], [])
-setAverageTyreWear([?tyre, ?tyres], [?wear | ?wears]) <= Set(Tyre.Wear.Average, ?tyre, ?wear), setAverageTyreWears(?tyres, ?wears)
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                        Repair Target Calculation                        ;;;
 ;;;                                                                         ;;;
 ;;; These rules check for current damage and suggest repairing based on     ;;;

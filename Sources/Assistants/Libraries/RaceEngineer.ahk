@@ -5108,9 +5108,9 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		repairPitstop() {
-			knowledgeBase.setValue("Damage.Repair.Suspension.Target", true)
-			knowledgeBase.setValue("Damage.Repair.Bodywork.Target", true)
-			knowledgeBase.setValue("Damage.Repair.Engine.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Suspension.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Bodywork.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Engine.Target", true)
 
 			this.proposePitstop("Now", kUndefined, kUndefined, true)
 		}

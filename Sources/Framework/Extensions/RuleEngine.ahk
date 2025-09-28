@@ -443,7 +443,7 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
 
 			resultSet.dispose()
 
@@ -603,15 +603,25 @@ class Variable extends Primary {
 	}
 
 	getValue(variablesFactsOrResultSet, default := kNotInitialized) {
-		local value
+		local value, nextValue
 
 		if (variablesFactsOrResultSet = kNotInitialized)
 			return this
 		else {
 			value := variablesFactsOrResultSet.getValue((isInstance(variablesFactsOrResultSet, Facts) || (isInstance(variablesFactsOrResultSet, Variables))) ? this : this.RootVariable)
 
-			if (isObject(value) && (isInstance(value, Variable) || isInstance(value, Literal) || isInstance(value, Fact)))
+			if (isObject(value) && (isInstance(value, Variable) || isInstance(value, Literal) || isInstance(value, Fact))) {
 				value := value.getValue(variablesFactsOrResultSet, value)
+
+				while (isInstance(value, Variable) || isInstance(value, Fact)) {
+					nextValue := value.getValue(variablesFactsOrResultSet, value)
+
+					if (nextValue = value)
+						break
+					else
+						value := nextValue
+				}
+			}
 
 			if (value != kNotInitialized)
 				return value
@@ -1071,14 +1081,14 @@ class ProveAction extends CallAction {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
 
 			if this.iProveAll
 				loop
 					if !resultSet.nextResult()
 						break
 					else
-						goal.doVariables(resultSet, ObjBindMethod(variables, "setValue"))
+						goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
 
 			resultSet.dispose()
 		}
@@ -2177,7 +2187,7 @@ class ResultSet {
 						ruleEngine.trace(kTraceMedium, "Query yields " . this.ChoicePoint.Goal.toString(this))
 
 					if (ruleEngine.TraceLevel <= kTraceMedium)
-						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+						ruleEngine.trace(kTraceMedium, "NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
 
 					return true
 				}
@@ -2189,7 +2199,7 @@ class ResultSet {
 					if (ruleEngine.TraceLevel <= kTraceMedium) {
 						ruleEngine.trace(kTraceMedium, "Query is exhausted")
 
-						showMessage("NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
+						ruleEngine.trace(kTraceMedium, "NextResult took " . (A_TickCount - tickCount) . " milliseconds...")
 					}
 
 					this.iExhausted := true
@@ -3104,7 +3114,7 @@ class KnowledgeBase {
 		}
 
 		if (this.RuleEngine.TraceLevel <= kTraceMedium)
-			showMessage("Produce took " . (A_TickCount - tickCount) . " milliseconds...")
+			this.RuleEngine.trace(kTraceMedium, "Produce took " . (A_TickCount - tickCount) . " milliseconds...")
 
 		return result
 	}
@@ -3117,7 +3127,7 @@ class KnowledgeBase {
 
 		if resultSet.nextResult() {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
-				showMessage("Prove took " . (A_TickCount - tickCount) . " milliseconds...")
+				this.RuleEngine.trace(kTraceMedium, "Prove took " . (A_TickCount - tickCount) . " milliseconds...")
 
 			return resultSet
 		}

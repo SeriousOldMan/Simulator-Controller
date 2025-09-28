@@ -920,7 +920,7 @@ adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=
 
 priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),
-		(Clear: Pitstop.Planned.Fuel),
+		(Clear: Pitstop.Planned.Fuel), (Clear: Pitstop.Planned.Laps.Remaining),
 		(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
 		(Clear: Pitstop.Planned.Tyre.Compound.Front), (Clear: Pitstop.Planned.Tyre.Compound.Color.Front),
 		(Clear: Pitstop.Planned.Tyre.Compound.FrontLeft), (Clear: Pitstop.Planned.Tyre.Compound.Color.FrontLeft),
@@ -988,7 +988,11 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 															  (Set: Pitstop.Planned.Repair.Bodywork, false),
 															  (Set: Pitstop.Planned.Repair.Engine, false)
 
-{All: [?Pitstop.Plan], [?Pitstop.Plan.Fuel.Amount], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Pitstop.Plan.Fuel.Amount)
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Lap],
+	  {None: [?Pitstop.Planned.Lap]}} => (Set: Pitstop.Planned.Lap, ?Pitstop.Plan.Lap)
+
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Fuel.Amount],
+	  {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Pitstop.Plan.Fuel.Amount)
 {All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Fuel.Amount]},
 	  [?Fuel.Amount.Target], {None: [?Pitstop.Planned.Fuel]}} => (Set: Pitstop.Planned.Fuel, ?Fuel.Amount.Target)
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change = false]} => (Set: Pitstop.Planned.Tyre.Compound, false),
@@ -1056,6 +1060,17 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 		(Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 
 {All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}, {None: [?Pitstop.Plan.Fuel.Amount]}} => (Set: Pitstop.Planned.Fuel, 0)
+
+{All: [?Pitstop.Plan], [?Pitstop.Planned.Lap > 0]} =>
+	(Let: ?lapsToGo = ?Pitstop.Planned.Lap - !Lap), (Prove: updatePitstopRemainingLaps(!Lap, ?lapsToGo, !Pitstop.Planned.Fuel))
+{All: [?Pitstop.Plan], {Any: {None: [?Pitstop.Planned.Lap]}, [?Pitstop.Planned.Lap = 0]}} =>
+	(Prove: updatePitstopRemainingLaps(!Lap, 0, !Pitstop.Planned.Fuel))
+
+updatePitstopRemainingLaps(?lap, ?lapsToGo, ?refuel) <=
+		lapRemainingFuel(?lap, ?remainingFuel), lapAvgFuelConsumption(?lap, ?avgConsumption),
+		?consumedFuel = ?lapsToGo * ?avgConsumption, ?fuel = ?remainigFuel - ?consumedFuel,
+		?availableFuel = ?fuel + ?refuel, ?laps = ?availableFuel / ?avgConsumption,
+		?remainingLaps = ?laps + ?lapsToGo, Set(Pitstop.Planned.Laps.Remaining, ?remainingLaps)
 	  
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.FL], [?Session.Settings.Tyre.Pressure.Correction.Pressure = true],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FL, ?Tyre.Pressure.Loss.FL)
@@ -1065,33 +1080,87 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RL, ?Tyre.Pressure.Loss.RL)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.RR], [?Session.Settings.Tyre.Pressure.Correction.Pressure = true],
 	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RR, ?Tyre.Pressure.Loss.RR)
-{All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target), (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
+	  
+{All: [?Pitstop.Plan], [?Tyre.Compound.Target],
+	  {None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]},
+	  {Prove: tyreChange(ALL, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color, ?tyreCompoundColor)
+
+tyreChange(ALL, ?remainingLaps, false, false) <= lapAvgTyreWears(!Lap, ?wears),
+												 tyreChange(ALL, [FL, FR, RL, RR], ?wears, ?remainingLaps), Call(messageBox, 1), !
+tyreChange(ALL, ?, !Tyre.Compound.Target, !Tyre.Compound.Color.Target)
+
+tyreChange(ALL, [], [], ?)
+tyreChange(ALL, [?tyre | ?tyres], [?avgWear | ?avgWears], ?remainingLaps) <=
+		lapTyreWear(!Lap, SUM, ?tyre, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold,
+		tyreChange(ALL, ?tyres, ?avgWears, ?remainingLaps)
 		
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.Front],
-	  {None: [?Pitstop.Planned.Tyre.Compound.Front], [?Pitstop.Planned.Tyre.Compound.Front = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.Front, ?Tyre.Compound.Target.Front),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.Front, !Tyre.Compound.Color.Target.Front)
+	  {None: [?Pitstop.Planned.Tyre.Compound.Front], [?Pitstop.Planned.Tyre.Compound.Front = false]},
+	  {Prove: tyreChange(AXLE, Front, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.Front, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.Front, ?tyreCompoundColor)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.Rear],
-	  {None: [?Pitstop.Planned.Tyre.Compound.Rear], [?Pitstop.Planned.Tyre.Compound.Rear = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.Rear, ?Tyre.Compound.Target.Rear),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.Rear, !Tyre.Compound.Color.Target.Rear)
+	  {None: [?Pitstop.Planned.Tyre.Compound.Rear], [?Pitstop.Planned.Tyre.Compound.Rear = false]},
+	  {Prove: tyreChange(AXLE, Rear, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.Rear, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.Rear, ?tyreCompoundColor)
+
+tyreChange(AXLE, Front, ?remainingLaps, false, false) <=
+		tyreChange(AXLE, FL, ?remainingLaps), tyreChange(AXLE, FR, ?remainingLaps), !
+tyreChange(AXLE, Front, ?, !Tyre.Compound.Target.Front, !Tyre.Compound.Color.Target.Front)
+
+tyreChange(AXLE, Rear, ?remainingLaps, false, false) <=
+		tyreChange(AXLE, RL, ?remainingLaps), tyreChange(AXLE, RR, ?remainingLaps), !
+tyreChange(AXLE, Rear, ?, !Tyre.Compound.Target.Rear, !Tyre.Compound.Color.Target.Rear)
+
+tyreChange(AXLE, ?tyre, ?remainingLaps) <=
+		lapAvgTyreWear(!Lap, ?tyre, ?avgWear), lapTyreWear(!Lap, SUM, ?tyre, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold
+
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.FrontLeft],
-	  {None: [?Pitstop.Planned.Tyre.Compound.FrontLeft], [?Pitstop.Planned.Tyre.Compound.FrontLeft = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, ?Tyre.Compound.Target.FrontLeft),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft)
+	  {None: [?Pitstop.Planned.Tyre.Compound.FrontLeft], [?Pitstop.Planned.Tyre.Compound.FrontLeft = false]},
+	  {Prove: tyreChange(WHEEL, FrontLeft, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, ?tyreCompoundColor)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.FrontRight],
-	  {None: [?Pitstop.Planned.Tyre.Compound.FrontRight], [?Pitstop.Planned.Tyre.Compound.FrontRight = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, ?Tyre.Compound.Target.FrontRight),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
+	  {None: [?Pitstop.Planned.Tyre.Compound.FrontRight], [?Pitstop.Planned.Tyre.Compound.FrontRight = false]},
+	  {Prove: tyreChange(WHEEL, FrontRight, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, ?tyreCompoundColor)
+
+tyreChange(WHEEL, FrontLeft, ?remainingLaps, false, false) <=
+		lapAvgTyreWear(!Lap, FL, ?avgWear), lapTyreWear(!Lap, SUM, FL, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+tyreChange(WHEEL, FrontLeft, ?, !Tyre.Compound.Target.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft)
+
+tyreChange(WHEEL, FrontRight, ?remainingLaps, false, false) <=
+		lapAvgTyreWear(!Lap, FR, ?avgWear), lapTyreWear(!Lap, SUM, FR, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+tyreChange(WHEEL, FrontRight, ?, !Tyre.Compound.Target.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
+
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.RearLeft],
-	  {None: [?Pitstop.Planned.Tyre.Compound.RearLeft], [?Pitstop.Planned.Tyre.Compound.RearLeft = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, ?Tyre.Compound.Target.RearLeft),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, !Tyre.Compound.Color.Target.RearLeft)
+	  {None: [?Pitstop.Planned.Tyre.Compound.RearLeft], [?Pitstop.Planned.Tyre.Compound.RearLeft = false]},
+	  {Prove: tyreChange(WHEEL, RearLeft, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, ?tyreCompoundColor)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.RearRight],
-	  {None: [?Pitstop.Planned.Tyre.Compound.RearRight], [?Pitstop.Planned.Tyre.Compound.RearRight = false]}} =>
-		(Set: Pitstop.Planned.Tyre.Compound.RearRight, ?Tyre.Compound.Target.RearRight),
-		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, !Tyre.Compound.Color.Target.RearRight)
+	  {None: [?Pitstop.Planned.Tyre.Compound.RearRight], [?Pitstop.Planned.Tyre.Compound.RearRight = false]},
+	  {Prove: tyreChange(WHEEL, RearRight, !Pitstop.Planned.Laps.Remaining, ?tyreCompound, ?tyreCompoundColor)}} =>
+		(Set: Pitstop.Planned.Tyre.Compound.RearRight, ?tyreCompound),
+		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, ?tyreCompoundColor)
+
+tyreChange(WHEEL, RearLeft, ?remainingLaps, false, false) <=
+		lapAvgTyreWear(!Lap, RL, ?avgWear), lapTyreWear(!Lap, SUM, RL, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+tyreChange(WHEEL, RearLeft, ?, !Tyre.Compound.Target.RearLeft, !Tyre.Compound.Color.Target.RearLeft)
+
+tyreChange(WHEEL, RearRight, ?remainingLaps, false, false) <=
+		lapAvgTyreWear(!Lap, RR, ?avgWear), lapTyreWear(!Lap, SUM, RR, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+tyreChange(WHEEL, RearRight, ?, !Tyre.Compound.Target.RearRight, !Tyre.Compound.Color.Target.RearRight)
 		
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)
@@ -1386,7 +1455,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Set: Damage.Engine.Reported, ?Pitstop.Clear),
 					(Clear: Tyre.Wear.Reported), (Clear: Brake.Wear.Reported),
 					(Clear: Pitstop.Planned.Lap),
-					(Clear: Pitstop.Planned.Fuel),
+					(Clear: Pitstop.Planned.Fuel), (Clear: Pitstop.Planned.Laps.Remaining),
 					(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
 					(Clear: Pitstop.Planned.Tyre.Compound.Front), (Clear: Pitstop.Planned.Tyre.Compound.Color.Front),
 					(Clear: Pitstop.Planned.Tyre.Compound.FrontLeft), (Clear: Pitstop.Planned.Tyre.Compound.Color.FrontLeft),

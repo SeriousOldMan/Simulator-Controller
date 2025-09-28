@@ -1062,13 +1062,13 @@ planPitstop() <= Set(Pitstop.Planned.Nr, 1)
 {All: [?Pitstop.Plan], {None: [?Fuel.Amount.Target]}, {None: [?Pitstop.Plan.Fuel.Amount]}} => (Set: Pitstop.Planned.Fuel, 0)
 
 {All: [?Pitstop.Plan], [?Pitstop.Planned.Lap > 0]} =>
-	(Let: ?lapsToGo = ?Pitstop.Planned.Lap - !Lap), (Prove: updatePitstopRemainingLaps(!Lap, ?lapsToGo, !Pitstop.Planned.Fuel))
+		(Let: ?lapsToGo = ?Pitstop.Planned.Lap - !Lap), (Prove: updatePitstopRemainingLaps(!Lap, ?lapsToGo, !Pitstop.Planned.Fuel))
 {All: [?Pitstop.Plan], {Any: {None: [?Pitstop.Planned.Lap]}, [?Pitstop.Planned.Lap = 0]}} =>
-	(Prove: updatePitstopRemainingLaps(!Lap, 0, !Pitstop.Planned.Fuel))
+		(Prove: updatePitstopRemainingLaps(!Lap, 0, !Pitstop.Planned.Fuel))
 
 updatePitstopRemainingLaps(?lap, ?lapsToGo, ?refuel) <=
 		lapRemainingFuel(?lap, ?remainingFuel), lapAvgFuelConsumption(?lap, ?avgConsumption),
-		?consumedFuel = ?lapsToGo * ?avgConsumption, ?fuel = ?remainigFuel - ?consumedFuel,
+		?consumedFuel = ?lapsToGo * ?avgConsumption, ?fuel = ?remainingFuel - ?consumedFuel,
 		?availableFuel = ?fuel + ?refuel, ?laps = ?availableFuel / ?avgConsumption,
 		?remainingLaps = ?laps + ?lapsToGo, Set(Pitstop.Planned.Laps.Remaining, ?remainingLaps)
 	  
@@ -1088,12 +1088,12 @@ updatePitstopRemainingLaps(?lap, ?lapsToGo, ?refuel) <=
 		(Set: Pitstop.Planned.Tyre.Compound.Color, ?tyreCompoundColor)
 
 tyreChange(ALL, ?remainingLaps, false, false) <= lapAvgTyreWears(!Lap, ?wears),
-												 tyreChange(ALL, [FL, FR, RL, RR], ?wears, ?remainingLaps), Call(messageBox, 1), !
+												 tyreChange(ALL, [FL, FR, RL, RR], ?wears, ?remainingLaps), !
 tyreChange(ALL, ?, !Tyre.Compound.Target, !Tyre.Compound.Color.Target)
 
 tyreChange(ALL, [], [], ?)
 tyreChange(ALL, [?tyre | ?tyres], [?avgWear | ?avgWears], ?remainingLaps) <=
-		lapTyreWear(!Lap, SUM, ?tyre, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		lapTyreWear(!Lap, FULL, ?tyre, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
 		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold,
 		tyreChange(ALL, ?tyres, ?avgWears, ?remainingLaps)
 		
@@ -1117,7 +1117,7 @@ tyreChange(AXLE, Rear, ?remainingLaps, false, false) <=
 tyreChange(AXLE, Rear, ?, !Tyre.Compound.Target.Rear, !Tyre.Compound.Color.Target.Rear)
 
 tyreChange(AXLE, ?tyre, ?remainingLaps) <=
-		lapAvgTyreWear(!Lap, ?tyre, ?avgWear), lapTyreWear(!Lap, SUM, ?tyre, ?wear), ?remainingWear = ?remainingLaps * avgWear,
+		lapAvgTyreWear(!Lap, ?tyre, ?avgWear), lapTyreWear(!Lap, FULL, ?tyre, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
 		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold
 
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.FrontLeft],
@@ -1132,13 +1132,15 @@ tyreChange(AXLE, ?tyre, ?remainingLaps) <=
 		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, ?tyreCompoundColor)
 
 tyreChange(WHEEL, FrontLeft, ?remainingLaps, false, false) <=
-		lapAvgTyreWear(!Lap, FL, ?avgWear), lapTyreWear(!Lap, SUM, FL, ?wear), ?remainingWear = ?remainingLaps * avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		lapAvgTyreWear(!Lap, FL, ?avgWear), lapTyreWear(!Lap, FULL, FL, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning,
+		Call(messageBox, ?avgWear, ?wear, ?targetWear, ?threshold),
+		?targetWear =< ?threshold, Call(messageBox, NoChange, FrontLeft), !
 tyreChange(WHEEL, FrontLeft, ?, !Tyre.Compound.Target.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft)
 
 tyreChange(WHEEL, FrontRight, ?remainingLaps, false, false) <=
-		lapAvgTyreWear(!Lap, FR, ?avgWear), lapTyreWear(!Lap, SUM, FR, ?wear), ?remainingWear = ?remainingLaps * avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		lapAvgTyreWear(!Lap, FR, ?avgWear), lapTyreWear(!Lap, FULL, FR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, Call(messageBox, NoChange, FrontRight), !
 tyreChange(WHEEL, FrontRight, ?, !Tyre.Compound.Target.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
 
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target.RearLeft],
@@ -1153,13 +1155,13 @@ tyreChange(WHEEL, FrontRight, ?, !Tyre.Compound.Target.FrontRight, !Tyre.Compoun
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, ?tyreCompoundColor)
 
 tyreChange(WHEEL, RearLeft, ?remainingLaps, false, false) <=
-		lapAvgTyreWear(!Lap, RL, ?avgWear), lapTyreWear(!Lap, SUM, RL, ?wear), ?remainingWear = ?remainingLaps * avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		lapAvgTyreWear(!Lap, RL, ?avgWear), lapTyreWear(!Lap, FULL, RL, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, Call(messageBox, NoChange, RearLeft), !
 tyreChange(WHEEL, RearLeft, ?, !Tyre.Compound.Target.RearLeft, !Tyre.Compound.Color.Target.RearLeft)
 
 tyreChange(WHEEL, RearRight, ?remainingLaps, false, false) <=
-		lapAvgTyreWear(!Lap, RR, ?avgWear), lapTyreWear(!Lap, SUM, RR, ?wear), ?remainingWear = ?remainingLaps * avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		lapAvgTyreWear(!Lap, RR, ?avgWear), lapTyreWear(!Lap, FULL, RR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, Call(messageBox, NoChange, RearRight), !
 tyreChange(WHEEL, RearRight, ?, !Tyre.Compound.Target.RearRight, !Tyre.Compound.Color.Target.RearRight)
 		
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>

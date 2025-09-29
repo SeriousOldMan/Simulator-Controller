@@ -2760,6 +2760,9 @@ class RaceEngineer extends RaceAssistant {
 				newSettings["Session.Settings.Tyre." . tyreCompound . "." . tyreCompoundColor . ".Laps.Max"] := tyreLife
 			}
 
+		newSettings["Session.Settings.Tyre.Change"] := "Laps"
+		newSettings["Session.Settings.Tyre.Dry.M.Laps.Max"] := 5
+
 		return newSettings
 	}
 

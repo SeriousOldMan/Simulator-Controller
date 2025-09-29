@@ -1101,8 +1101,8 @@ tyreChange(All, [?tyre | ?tyres], [?avgWear | ?avgWears], ?remainingLaps) <=
 		
 tyreChange(?, [], ?)
 tyreChange(?type, [?tyre | ?tyres], ?remainingLaps) <=
-		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(?type, ?tyre, ?maxLaps),
-		?laps = ?curLaps + ?remainingLaps, ?laps =< ?maxLaps, tyreChange(All, ?tyres, ?remainingLaps)
+		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(?type, ?tyre, ?maxLaps), 
+		?laps = ?curLaps + ?remainingLaps, ?laps =< ?maxLaps, tyreChange(?type, ?tyres, ?remainingLaps)
 
 tyreMaxLaps(All, ?tyre, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound, !Tyre.Compound.Color, Laps.Max, ?maxLaps)
 
@@ -1168,7 +1168,7 @@ tyreChange(Wheel, FrontRight, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Wear,
 		lapAvgTyreWear(!Lap, FR, ?avgWear), lapTyreWear(!Lap, FULL, FR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
 		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
-tyreChange(Wheel, FrontLeft, ?remainingLaps, false, false) <=
+tyreChange(Wheel, FrontRight, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps, tyreChange(Wheel, [FR], ?remainingLaps), !
 tyreChange(Wheel, FrontRight, ?, !Tyre.Compound.Target.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
 
@@ -1186,14 +1186,14 @@ tyreChange(Wheel, FrontRight, ?, !Tyre.Compound.Target.FrontRight, !Tyre.Compoun
 tyreChange(Wheel, RearLeft, ?remainingLaps, false, false) <=
 		lapAvgTyreWear(!Lap, RL, ?avgWear), lapTyreWear(!Lap, FULL, RL, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
 		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
-tyreChange(Wheel, FrontLeft, ?remainingLaps, false, false) <=
-		!Session.Settings.Tyre.Change = Laps, tyreChange(Wheel, [RL], ?remainingLaps), !
+tyreChange(Wheel, RearLeft, ?remainingLaps, false, false) <=
+		!Session.Settings.Tyre.Change = Laps, Call(messageBox, Laps_RL), tyreChange(Wheel, [RL], ?remainingLaps), Call(messageBox, Laps_RL), !
 tyreChange(Wheel, RearLeft, ?, !Tyre.Compound.Target.RearLeft, !Tyre.Compound.Color.Target.RearLeft)
 
 tyreChange(Wheel, RearRight, ?remainingLaps, false, false) <=
 		lapAvgTyreWear(!Lap, RR, ?avgWear), lapTyreWear(!Lap, FULL, RR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
 		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
-tyreChange(Wheel, FrontLeft, ?remainingLaps, false, false) <=
+tyreChange(Wheel, RearLeft, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps, tyreChange(Wheel, [RR], ?remainingLaps), !
 tyreChange(Wheel, RearRight, ?, !Tyre.Compound.Target.RearRight, !Tyre.Compound.Color.Target.RearRight)
 

@@ -2760,9 +2760,6 @@ class RaceEngineer extends RaceAssistant {
 				newSettings["Session.Settings.Tyre." . tyreCompound . "." . tyreCompoundColor . ".Laps.Max"] := tyreLife
 			}
 
-		newSettings["Session.Settings.Tyre.Change"] := "Laps"
-		newSettings["Session.Settings.Tyre.Dry.M.Laps.Max"] := 5
-
 		return newSettings
 	}
 
@@ -3789,7 +3786,7 @@ class RaceEngineer extends RaceAssistant {
 		local pressureFL, pressureFR, pressureRL, pressureRR
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold, ignore, suffix
-		local tyreService, index, tyre, axle, processed
+		local tyreService, tyreSets, index, tyre, axle, processed
 
 		this.clearContinuation()
 
@@ -3816,6 +3813,8 @@ class RaceEngineer extends RaceAssistant {
 		if (!force && !plannedLap)
 			if !this.hasEnoughData()
 				return false
+
+		this.Provider.supportsTyreManagement( , &tyreSets)
 
 		if !this.Provider.supportsPitstop( , &tyreService) {
 			if this.Speaker
@@ -4025,12 +4024,45 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("RefuelAdjustedLast")
 				}
 
-				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
-				color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false)
+				if (tyreService = "Wheel") {
+					compound := false
+					color := false
+
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . tyre, false)
+
+						if compound {
+							color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . tyre, false)
+
+							break
+						}
+					}
+				}
+				else if (tyreService = "Axle") {
+					compound := false
+					color := false
+
+					for index, axle in ["Front", "Rear"] {
+						compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . axle, false)
+
+						if compound {
+							color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . axle, false)
+
+							break
+						}
+					}
+				}
+				else {
+					compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
+					color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color", false)
+				}
 
 				if ((options == true) || (options.HasProp("Compound") && options.Compound)) {
 					if compound {
-						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", false)
+						if tyreSets
+							tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", false)
+						else
+							tyreSet := false
 
 						if (compound = "Dry")
 							speaker.speakPhrase(!tyreSet ? "DryTyresNoSet" : "DryTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})

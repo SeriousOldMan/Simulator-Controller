@@ -2525,7 +2525,7 @@ class RaceAssistant extends ConfigurationItem {
 		return data
 	}
 
-	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local sessionInfo := newMultiMap()
 		local tyreWear, brakeWear, duration, sessionTime, driverTime
@@ -3170,7 +3170,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	saveSessionInfo(lapNumber, simulator, car, track, sessionInfo) {
+	saveSessionInfo(simulator, car, track, lapNumber, sessionInfo) {
 		local fileName
 
 		if this.RemoteHandler {
@@ -4656,9 +4656,9 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 	}
 
-	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local sessionInfo := super.createSessionInfo(simulator, car, track, lapNumber, valid, data)
 		local driver, position, classPosition
 
 		if knowledgeBase {

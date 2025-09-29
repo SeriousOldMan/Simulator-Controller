@@ -46,7 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - The Race Engineer can now handled partial tyre changes based on tyre wear.
+  - The Race Engineer can now handled partial tyre changes based on tyre wear or based on the number of laps for this tyre.
     - A new setting has been added to "Race Settings".
 	- The same [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database", of course.
     - Please read the [new documentation](*) for more information.

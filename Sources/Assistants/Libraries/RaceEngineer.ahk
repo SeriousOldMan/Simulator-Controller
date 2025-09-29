@@ -262,7 +262,9 @@ class PlanPitstopEvent extends EngineerEvent {
 			refuelRule := getMultiMapValue(instructions, "Rules", "RefuelRuleTime")
 
 		if ((tyreChange = kUndefined) || tyreChange) {
-			if (mixedCompounds = "Wheel")
+			if (knowledgeBase.getValue("Session.Settings.Tyre.Change", "Wear") = "Always")
+				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAlways")
+			else if (mixedCompounds = "Wheel")
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleWheel")
 			else if (mixedCompounds = "Axle")
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAxle")
@@ -2693,6 +2695,7 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Damage.Bodywork.Repair.Threshold", bodyworkThreshold
 									, "Session.Settings.Damage.Engine.Repair", engineRepair
 									, "Session.Settings.Damage.Engine.Repair.Threshold", engineThreshold
+									, "Session.Settings.Tyre.Change", getMultiMapValue(settings, "Session Settings", "Tyre.Change", "Wear")
 									, "Session.Settings.Tyre.Compound.Change", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																										  , "Tyre.Compound.Change", "Never")
 									, "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"

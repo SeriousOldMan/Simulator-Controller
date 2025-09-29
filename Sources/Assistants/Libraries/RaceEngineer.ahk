@@ -3333,7 +3333,7 @@ class RaceEngineer extends RaceAssistant {
 		static pitstopHistory := false
 
 		if (lapNumber != lastLap) {
-			pitstopHistory := createPitstopHistory()
+			pitstopHistory := this.createPitstopHistory()
 
 			lastLap := lapNumber
 

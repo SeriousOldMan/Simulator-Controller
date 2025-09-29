@@ -355,14 +355,15 @@ namespace SHMConnector
 
                 staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
 
-                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0) {
-					if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
-						session = "Finished";
-				}
+                session = GetSession(graphics.Session);
+
+                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0)
+                {
+                    if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
+                        session = "Finished";
+                }
                 else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
-                else
-                    session = GetSession(graphics.Session);
 
                 strWriter.Write("Session="); strWriter.WriteLine(session);
 

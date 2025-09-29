@@ -448,29 +448,29 @@ Jona uses several statistical models to derive the data, on which the recommenda
 
 The following statistical models are currently implemented:
 
-  1. Tyre pressure development
-  
-     The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
-	 
-	 When planning and preparing a pitstop, Jona will consult the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
-
-  2. Tyre pressure loss
-
-     Beside looking at the *normal* tyre pressure development, the artificial intelligence also constantly observes and compares the pressures of all tyres in relation to each other. During the learning laps (see the ["Race Engineer" configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more information), a reference pressure is derived for each tyre. When the actual tyre pressure deviates more than other tyres from this reference pressure (actual the average of all deviations plus the standard deviation of all deviations is used as a correction factor for the configured threshold), than the artificial intelligence assumes that the tyre is loosing pressure, either by a sudden hit on a curb or slowly as a result of a puncture, and you will be informed about that by the Race Engineer. The pressure loss can alo be taken into account when planing and preparing the next pitstop, but you have to activate this feature in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings). Please always double-check the recommendation in this case, because the reported pressure loss could also have been a result of wrong cold pressures right from the start, which might give you even more underflated tyres at the end.
-
-  3. Refuel amount
+  1. Refuel amount
   
      Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation, so the remarks above on statistical window and damping factor are valid here as well.
 	 
 	 When using *Le Mans Ultimate*, the amount of fuel to be added depends on the virtual energy consumption and the so called fuel ratio. Make sure you have read the [special notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) which explains this aspect in detail. If you want to optimize the fuel ratio, once your fuel consumption is settled, you can use the voice command: "Can you recalculate the fuel ratio?"
 
-  4. Tyre change
+  2. Tyre change
   
 	 Jona decides for the next pitstop, whether a tyre change is necessary. Depending on the current simulator, all tyres must be changed together or tyres may be changed independendly for each axle or even for each wheel. Several settings influence the decision:
 	 
 	 Jona will decide depending on the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" or in the "Race Settings", whether a tyre change is necessary. When the current simulator provides tyre wear information in the API, using a wear based decision will be the best choice.
 	   - When deciding to change a tyre based on the expected tyre wear, Jona uses [setting "Engineer: Threshold value for tyre wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" to determine the maximum allowed tyre wear for a given tyre.
 	   - When *Laps* has been chosen for the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings), tyres will be changed depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the [race rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+
+  3. Tyre pressure development
+  
+     The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
+	 
+	 When planning and preparing a pitstop, Jona will consult the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
+
+  4. Tyre pressure loss
+
+     Beside looking at the *normal* tyre pressure development, the artificial intelligence also constantly observes and compares the pressures of all tyres in relation to each other. During the learning laps (see the ["Race Engineer" configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more information), a reference pressure is derived for each tyre. When the actual tyre pressure deviates more than other tyres from this reference pressure (actual the average of all deviations plus the standard deviation of all deviations is used as a correction factor for the configured threshold), than the artificial intelligence assumes that the tyre is loosing pressure, either by a sudden hit on a curb or slowly as a result of a puncture, and you will be informed about that by the Race Engineer. The pressure loss can alo be taken into account when planing and preparing the next pitstop, but you have to activate this feature in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings). Please always double-check the recommendation in this case, because the reported pressure loss could also have been a result of wrong cold pressures right from the start, which might give you even more underflated tyres at the end.
 	 
   5. Damage related lap time degration
   

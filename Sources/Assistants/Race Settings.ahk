@@ -1474,7 +1474,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", settingsGui["repairEngineThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Change"
-									, ["Always", "Wear"][settingsGui["changeTyresDropDown"].Value])
+									, ["Always", "Wear", "Laps"][settingsGui["changeTyresDropDown"].Value])
 
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change"
 									, ["Never", "Temperature", "Weather"][settingsGui["changeCompoundDropDown"].Value])
@@ -1831,8 +1831,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Change Tyres"))
 
-		choices := collect(["Always", "Wear"], translate)
-		chosen := inList(["Always", "Wear"], getMultiMapValue(settingsOrCommand, "Session Settings", "Tyre.Change", "Wear"))
+		choices := collect(["Always", "Wear", "Laps"], translate)
+		chosen := inList(["Always", "Wear", "Laps"], getMultiMapValue(settingsOrCommand, "Session Settings", "Tyre.Change", "Wear"))
 
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyresDropDown", choices)
 

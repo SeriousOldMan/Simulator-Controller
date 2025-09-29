@@ -27,6 +27,7 @@ global kBuildConfiguration := "Production"
 #Include "..\Framework\Startup.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
+#Include "..\Plugins\Simulator Providers.ahk"
 #Include "..\Assistants\Libraries\RaceEngineer.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
@@ -1117,7 +1118,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 3 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 21 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)
@@ -1486,6 +1487,38 @@ else {
 						engineer.updateLap(lap, &data)
 
 					if (isDebug() && (A_Index == 1))
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+			}
+		}
+		until done
+	}
+	else if (raceNr = 21) {
+		done := false
+
+		loop {
+			lap := A_Index
+
+			loop {
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
+
+				if (data.Count == 0) {
+					if (A_Index == 1)
+						done := true
+
+					break
+				}
+				else {
+					if (A_Index == 1) {
+						engineer.addLap(lap, &data)
+
+						if (lap = 3)
+							engineer.planPitstop()
+					}
+					else
+						engineer.updateLap(lap, &data)
+
+					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}

@@ -37,6 +37,41 @@ lapTyreTemperature(?lap, ?temperature) <= lapTyreTemperature(?lap, FL, ?flTemp),
 										  average([?flTemp, ?frTemp, ?rlTemp, ?rrTemp], ?temperature),
 										  Set(Lap, ?lap, Tyre.Temperature, ?temperature)
 
+lapTyreWear(?lap, ?tyreType, ?wear) <= lapTyreWear(?lap, LAP, ?tyreType, ?wear)
+
+lapTyreWear(1, ?, ?, 0)
+lapTyreWear(?lap, FULL, ?tyreType, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?tyreType, ?wear)
+lapTyreWear(?lap, LAP, ?tyreType, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?tyreType, ?cWear), ?lastLap = ?lap - 1,
+											Get(Lap, ?lastLap, Tyre.Wear, ?tyreType, ?lWear), ?wear = ?cWear - ?lWear
+
+lapTyreWear(?lap, ?wear) <= Get(Lap, ?lap, Tyre.Wear, ?wear), !
+lapTyreWear(?lap, ?wear) <= lapTyreWear(?lap, LAP, FL, ?flWear), lapTyreWear(?lap, LAP, FR, ?frWear),
+							lapTyreWear(?lap, LAP, RL, ?rlWear), lapTyreWear(?lap, LAP, RR, ?rrWear),
+							average([?flWear, ?frWear, ?rlWear, ?rrWear], ?wear), Set(Lap, ?lap, Tyre.Wear, ?wear)
+
+lapAvgTyreWear(?lap, ?tyreType, ?wear) <= lapAvgTyreWears(?lap, ?wears), lapAvgTyreWear(?tyreType, [FL, FR, RL, RR], ?wears, ?wear)
+
+lapAvgTyreWear(?tyreType, [?tyreType | ?], [?wear | ?], ?wear)
+lapAvgTyreWear(?tyreType, [? | ?tyreTypes], [? | ?wears], ?wear) <= lapAvgTyreWear(?tyreType, ?tyreTypes, ?wears, ?wear)
+
+lapAvgTyreWears(?lap, ?avgWears) <= ?temp = ?lap - !Session.Settings.Lap.History.Considered, ?toLap = ?temp - 1,
+									averageTyreWear(?lap, ?toLap, [FL, FR, RL, RR], ?wears),
+									averageTyreWears([FL, FR, RL, RR], ?wears, ?avgWears)
+						 
+averageTyreWear(?lap, ?lap, ?, []) <= !
+averageTyreWear(?lap, ?, ?, []) <= ?lap =< 0, !
+averageTyreWear(?lap, ?toLap, ?tyres, [?wears | ?moreWears]) <=
+		averageTyreWear(?lap, ?tyres, ?wears), ?nextLap = ?lap - 1, averageTyreWear(?nextLap, ?toLap, ?tyres, ?moreWears)
+		
+averageTyreWear(?, [], []) <= !
+averageTyreWear(?lap, [?tyre | ?tyres], [?wear | ?wears]) <= lapTyreWear(?lap, ?tyre, ?wear), averageTyreWear(?lap, ?tyres, ?wears)
+
+averageTyreWears(?tyres, ?wears, ?avgWears) <= transpose(?wears, ?tWears), averageTyreWears(?tWears, ?avgWears)
+
+averageTyreWears([], [])
+averageTyreWears([?wear | ?wears], [?avgWear | ?avgWears]) <=
+		length(?wear, ?length), sum(?wear, ?sumWear), ?avgWear = ?sumWear / ?length, averageTyreWears(?wears, ?avgWears)
+
 lapDamage(?lap, ?type, ?position, ?damage) <= Get(Lap, ?lap, Damage, ?type, ?position, ?damage)
 
 lapDamage(?lap, ?damageType, ?damage) <= Get(Lap, ?lap, Damage, ?damageType, ?damage), !
@@ -116,7 +151,6 @@ lapTyreTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTyre
 																		 ?nLap = ?fromLap + 1,
 																		 lapTyreTemperatures(?nlap, ?toLap, ?temperatures)
 
-recentLapTyreTemperatures(?lap, ?lap, []) <= !
 recentLapTyreTemperatures(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapTyreTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=
 		?tLap = ?lap - ?offset, lapTyreTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,
@@ -126,17 +160,24 @@ lapTyrePressures(?lap, ?lap, [?pressure]) <= lapTyrePressure(?lap, ?pressure), !
 lapTyrePressures(?fromLap, ?toLap, [?pressure | ?pressures]) <= lapTyrePressure(?fromLap, ?pressure),
 																?nLap = ?fromLap + 1, lapTyrePressures(?nlap, ?toLap, ?pressures)
 
-recentLapTyrePressures(?lap, ?lap, []) <= !
 recentLapTyrePressures(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapTyrePressures(?lap, ?offset, [?pressure | ?pressures]) <=
 		?tLap = ?lap - ?offset, lapTyrePressure(?tLap, ?pressure), ?nOffset = ?offset + 1,
 		recentLapTyrePressures(?lap, ?nOffset, ?pressures)
 
+lapTyreWears(?lap, ?lap, ?tyre, [?wear]) <= lapTyreWear(?lap, LAP, ?tyre, ?wear), !
+lapTyreWears(?fromLap, ?toLap, ?tyre, [?wear | ?wears]) <= lapTyreWear(?fromLap, LAP, ?tyre, ?wear),
+														   ?nLap = ?fromLap + 1, lapTyreWears(?nlap, ?toLap, ?wears)
+
+recentLapTyreWears(?, !Session.Settings.Lap.History.Considered, ?tyre, []) <= !
+recentLapTyreWears(?lap, ?offset, ?tyre, [?wear | ?wears]) <=
+		?tLap = ?lap - ?offset, lapTyreWear(?tLap, LAP, ?tyre, ?wear), ?nOffset = ?offset + 1,
+		recentLapTyreWears(?lap, ?nOffset, ?tyre, ?wears)
+		
 lapAirTemperatures(?lap, ?lap, [?temperature]) <= lapAirTemperature(?lap, ?temperature), !
 lapAirTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapAirTemperature(?fromLap, ?temperature),
 																		?nLap = ?fromLap + 1, lapAirTemperatures(?nlap, ?toLap, ?temperatures)
 
-recentLapAirTemperatures(?lap, ?lap, []) <= !
 recentLapAirTemperatures(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapAirTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=
 		?tLap = ?lap - ?offset, lapAirTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,
@@ -146,7 +187,6 @@ lapTrackTemperatures(?lap, ?lap, [?temperature]) <= lapTrackTemperature(?lap, ?t
 lapTrackTemperatures(?fromLap, ?toLap, [?temperature | ?temperatures]) <= lapTrackTemperature(?fromLap, ?temperature), ?nLap = ?fromLap + 1,
 																		  lapTrackTemperatures(?nlap, ?toLap, ?temperatures)
 
-recentLapTrackTemperatures(?lap, ?lap, []) <= !
 recentLapTrackTemperatures(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapTrackTemperatures(?lap, ?offset, [?temperature | ?temperatures]) <=
 		?tLap = ?lap - ?offset, lapTrackTemperature(?tLap, ?temperature), ?nOffset = ?offset + 1,
@@ -156,7 +196,6 @@ lapWeathers(?lap, ?lap, [?weather]) <= lapWeather(?lap, ?weather), !
 lapWeathers(?fromLap, ?toLap, [?weather | ?weathers]) <= lapWeather(?fromLap, ?weather), ?nLap = ?fromLap + 1,
 														 lapWeathers(?nlap, ?toLap, ?weathers)
 
-recentLapWeathers(?lap, ?lap, []) <= !
 recentLapWeathers(?, !Session.Settings.Lap.History.Considered, []) <= !
 recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=
 		?tLap = ?lap - ?offset, lapWeather(?tLap, ?tWeather), ?nOffset = ?offset + 1, recentLapWeathers(?lap, ?nOffset, ?weathers)

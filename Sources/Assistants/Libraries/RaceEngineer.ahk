@@ -3938,14 +3938,14 @@ class RaceEngineer extends RaceAssistant {
 		if (changeBrakes != kUndefined)
 			knowledgeBase.addFact("Pitstop.Plan.Brake.Change", changeBrakes)
 
+		knowledgeBase.setFact("Pitstop.Plan.Lap", plannedLap ? (plannedLap - 1) : false)
+
 		result := knowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(knowledgeBase)
 
 		pitstopNumber := knowledgeBase.getValue("Pitstop.Planned.Nr")
-
-		knowledgeBase.setFact("Pitstop.Planned.Lap", plannedLap ? (plannedLap - 1) : false)
 
 		if this.Speaker {
 			speaker := this.getSpeaker()
@@ -5108,9 +5108,9 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		repairPitstop() {
-			knowledgeBase.setValue("Damage.Repair.Suspension.Target", true)
-			knowledgeBase.setValue("Damage.Repair.Bodywork.Target", true)
-			knowledgeBase.setValue("Damage.Repair.Engine.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Suspension.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Bodywork.Target", true)
+			knowledgeBase.setFact("Damage.Repair.Engine.Target", true)
 
 			this.proposePitstop("Now", kUndefined, kUndefined, true)
 		}

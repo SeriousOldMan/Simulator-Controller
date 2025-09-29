@@ -309,7 +309,7 @@ The third tab, *Pitstop*, contains information that will be used to derive the p
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%202.JPG)
 
-The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact".
+The upper area with the dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact".
 
   - "Threshold" will allow you to enter a value, which defines a level of damage as seconds that will be needed to repair this damage during a pitstop. If the repair duration is above this value, Jona will advise to go for a repair on the next pitstop. The data APIs of the different simulators report damage differently. Typical are values between 0% and 100%, but *Assetto Corsa Competizione*, for example, report a meaningless, although linear rising number. To support a conversion to repair duration, you must set a conversion factor for a given simulator in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The conversion factor can be set independently for bodywork, suspension and engine repair, and I will provide a growing number of defaults for the different sims.
   
@@ -333,6 +333,8 @@ The following table shows, which simulator supports which damage type:
 ##### Notes
 
 (1) Supported but not reported in the data API.
+
+The choice in the "Change Tyres" dropdown menu tells Jona, how to decide, wether a given tyre should be changed at the next pitstop. *Wear*, which is the default, will change a tyre, when the expected tyre wear at the end of the next stint will exceed the maximum tyre as defined by the [setting "Engineer: Threshold value for tyre wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The choice *Laps* will ask Jona to change tyres depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the race rules (see above) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered around 85 Celsius and for wet tyres something around 50 Celsius. These values can be specified in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database"
 
@@ -446,23 +448,31 @@ Jona uses several statistical models to derive the data, on which the recommenda
 
 The following statistical models are currently implemented:
 
-  1. Tyre pressure development
+  1. Refuel amount
+  
+     Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation, so the remarks above on statistical window and damping factor are valid here as well.
+	 
+	 When using *Le Mans Ultimate*, the amount of fuel to be added depends on the virtual energy consumption and the so called fuel ratio. Make sure you have read the [special notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) which explains this aspect in detail. If you want to optimize the fuel ratio, once your fuel consumption is settled, you can use the voice command: "Can you recalculate the fuel ratio?"
+
+  2. Tyre change
+  
+	 Jona decides for the next pitstop, whether a tyre change is necessary. Depending on the current simulator, all tyres must be changed together or tyres may be changed independendly for each axle or even for each wheel. Several settings influence the decision:
+	 
+	 Jona will decide depending on the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" or in the "Race Settings", whether a tyre change is necessary. When the current simulator provides tyre wear information in the API, using a wear based decision will be the best choice.
+	   - When deciding to change a tyre based on the expected tyre wear, Jona uses [setting "Engineer: Threshold value for tyre wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" to determine the maximum allowed tyre wear for a given tyre.
+	   - When *Laps* has been chosen for the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings), tyres will be changed depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the [race rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+
+  3. Tyre pressure development
   
      The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
 	 
 	 When planning and preparing a pitstop, Jona will consult the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
 
-  2. Tyre pressure loss
+  4. Tyre pressure loss
 
      Beside looking at the *normal* tyre pressure development, the artificial intelligence also constantly observes and compares the pressures of all tyres in relation to each other. During the learning laps (see the ["Race Engineer" configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more information), a reference pressure is derived for each tyre. When the actual tyre pressure deviates more than other tyres from this reference pressure (actual the average of all deviations plus the standard deviation of all deviations is used as a correction factor for the configured threshold), than the artificial intelligence assumes that the tyre is loosing pressure, either by a sudden hit on a curb or slowly as a result of a puncture, and you will be informed about that by the Race Engineer. The pressure loss can alo be taken into account when planing and preparing the next pitstop, but you have to activate this feature in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings). Please always double-check the recommendation in this case, because the reported pressure loss could also have been a result of wrong cold pressures right from the start, which might give you even more underflated tyres at the end.
-
-  3. Refuel amount
-  
-     Depending on the number of remaining laps and average fuel comsumption, Jona derives the exact amount of fuel required for the next stint. As for the tyre pressures, the lap weight of past laps may be configured for the fuel average calculation, so the remarks above on statistical window and damping factor are valid here as well.
 	 
-	 When using *Le Mans Ultimate*, the amount of fuel to be added depends on the virtual energy consumption and the so called fuel ratio. Make sure you have read the [special notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-le-mans-ultimate) which explains this aspect in detail. If you want to optimize the fuel ratio, once your fuel consumption is settled, you can use the voice command: "Can you recalculate the fuel ratio?"
-	 
-  4. Damage related lap time degration
+  5. Damage related lap time degration
   
      After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap.
 	 
@@ -483,7 +493,7 @@ The following statistical models are currently implemented:
 	 
 	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as a damage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 
-  5. Repair recommendations
+  6. Repair recommendations
   
      Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
 	 
@@ -517,11 +527,11 @@ The following statistical models are currently implemented:
 	 
 	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
 	 
-  6. Tyre pressure gambling
+  7. Tyre pressure gambling
   
      Linear regression models are used here, depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby probably giving you a good compromise for the upcoming stint.
 	 
-  7. Weather trend analysis and tyre compound recommendation
+  8. Weather trend analysis and tyre compound recommendation
   
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *Automobilista 2* and *Project CARS 2* supply current weather information ranging from "Dry" up to full "Thunderstorm". *Le Mans Ultimate* and *Assetto Corsa Competizione* go even further and can supply a full weather forecast from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona will recommend a tyre change. This recomendation will be incorporated into the plan for an upcoming pitstop depending on the settings you have chosen in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings).
 	 

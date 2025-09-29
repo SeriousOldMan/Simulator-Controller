@@ -394,23 +394,23 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	updateChangeTyreState(*) {
-		local changeTyreDropDown := settingsGui["changeTyreDropDown"].Value
+		local changeCompoundDropDown := settingsGui["changeCompoundDropDown"].Value
 
-		if ((changeTyreDropDown == 1) || (changeTyreDropDown == 3)) {
+		if ((changeCompoundDropDown == 1) || (changeCompoundDropDown == 3)) {
 			settingsGui["changeTyreGreaterLabel"].Visible := false
 			settingsGui["changeTyreThresholdEdit"].Visible := false
 			settingsGui["changeTyreThresholdLabel"].Visible := false
 
 			settingsGui["changeTyreThresholdEdit"].Text := 0
 		}
-		else if (changeTyreDropDown == 2) {
+		else if (changeCompoundDropDown == 2) {
 			settingsGui["changeTyreGreaterLabel"].Visible := true
 			settingsGui["changeTyreThresholdEdit"].Visible := true
 			settingsGui["changeTyreThresholdLabel"].Visible := true
 
 			settingsGui["changeTyreThresholdLabel"].Text := translate("Degrees")
 		}
-		else if (changeTyreDropDown == 4) {
+		else if (changeCompoundDropDown == 4) {
 			settingsGui["changeTyreGreaterLabel"].Visible := true
 			settingsGui["changeTyreThresholdEdit"].Visible := true
 			settingsGui["changeTyreThresholdLabel"].Visible := true
@@ -1473,8 +1473,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 									, ["Never", "Always", "Threshold", "Impact"][settingsGui["repairEngineDropDown"].Value])
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", settingsGui["repairEngineThresholdEdit"].Text, 1))
 
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Change"
+									, ["Always", "Wear", "Laps"][settingsGui["changeTyresDropDown"].Value])
+
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change"
-									, ["Never", "Temperature", "Weather"][settingsGui["changeTyreDropDown"].Value])
+									, ["Never", "Temperature", "Weather"][settingsGui["changeCompoundDropDown"].Value])
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", settingsGui["changeTyreThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", settingsGui["tyrePressureDeviationEdit"].Text, 1))
@@ -1691,21 +1694,21 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 
 		if !gTestMode {
-			settingsGui.Add("Button", "x228 y499 w80 h23 Default", translate("Ok")).OnEvent("Click", editRaceSettings.Bind(&kOk))
-			settingsGui.Add("Button", "x316 y499 w80 h23", translate("&Cancel")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
+			settingsGui.Add("Button", "x228 y525 w80 h23 Default", translate("Ok")).OnEvent("Click", editRaceSettings.Bind(&kOk))
+			settingsGui.Add("Button", "x316 y525 w80 h23", translate("&Cancel")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
 		}
 		else
-			settingsGui.Add("Button", "x316 y499 w80 h23 Default", translate("Close")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
+			settingsGui.Add("Button", "x316 y525 w80 h23 Default", translate("Close")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
 
-		settingsGui.Add("Button", "x8 y499 w77 h23", translate("&Load...")).OnEvent("Click", editRaceSettings.Bind(&kLoad))
-		settingsGui.Add("Button", "x90 y499 w77 h23", translate("&Save...")).OnEvent("Click", editRaceSettings.Bind(&kSave))
+		settingsGui.Add("Button", "x8 y525 w77 h23", translate("&Load...")).OnEvent("Click", editRaceSettings.Bind(&kLoad))
+		settingsGui.Add("Button", "x90 y525 w77 h23", translate("&Save...")).OnEvent("Click", editRaceSettings.Bind(&kSave))
 
 		if gTeamMode
 			tabs := collect(["Session", "Rules", "Pitstop", "Strategy", "Team"], translate)
 		else
 			tabs := collect(["Session", "Rules", "Pitstop", "Strategy"], translate)
 
-		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h444", tabs)
+		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h470", tabs)
 
 		settingsTab.UseTab(2)
 
@@ -1751,7 +1754,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		w12 := (x11 + 60 - x7)
 
-		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h220 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
+		tyreSetListView := settingsGui.Add("ListView", "x" . x7 . " yp w" . w12 . " h246 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "O", "#"], translate))
 		tyreSetListView.OnEvent("Click", choosePSTyreSet)
 		tyreSetListView.OnEvent("DoubleClick", choosePSTyreSet)
 		tyreSetListView.OnEvent("ItemSelect", selectPSTyreSet)
@@ -1826,12 +1829,20 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		updateRepairEngineState()
 
-		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Change Compound"))
+		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Change Tyres"))
+
+		choices := collect(["Always", "Wear", "Laps"], translate)
+		chosen := inList(["Always", "Wear", "Laps"], getMultiMapValue(settingsOrCommand, "Session Settings", "Tyre.Change", "Wear"))
+
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyresDropDown", choices)
+
+		settingsGui.Add("Text", "x16 yp+26 w105 h23 +0x200", translate("Change Compound"))
 
 		choices := collect(["Never", "Tyre Temperature", "Weather"], translate)
 		chosen := inList(["Never", "Temperature", "Weather"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never"))
 
-		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeCompoundDropDown", choices).OnEvent("Change", updateChangeTyreState)
+
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VchangeTyreGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VchangeTyreThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1))

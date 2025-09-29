@@ -3792,9 +3792,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local sessionInfo := super.createSessionInfo(simulator, car, track, lapNumber, valid, data)
 		local position, classPosition
 
 		if knowledgeBase {
@@ -3914,9 +3914,9 @@ class RaceSpotter extends GridRaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
-												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-																		, data, simulator, car, track))
+		Task.startTask((*) => this.saveSessionInfo(simulator, car, track, lapNumber
+												 , this.createSessionInfo(simulator, car, track
+																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
 
 		return result
@@ -4010,9 +4010,9 @@ class RaceSpotter extends GridRaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
-												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-																		, data, simulator, car, track))
+		Task.startTask((*) => this.saveSessionInfo(simulator, car, track, lapNumber
+												 , this.createSessionInfo(simulator, car, track
+																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
 
 		return result

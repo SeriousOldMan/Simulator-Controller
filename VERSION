@@ -1,9 +1,9 @@
 [Development]
-Version=6.5.5.0-release
-Target=6.5.5.0-release
-Date=09/26/2025
-Download=https://cutt.ly/orNJ8ZH1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/EAwdT_n1;https://www.dropbox.com/scl/fi/kpsx6x5yh9ykd1cdzdxse/Simulator-Controller-6.5.5.0-release.zip?rlkey=xkqn13852ktxthqazmgvqfzhb&st=5pftd9u9&dl=1;http://%master%/Releases/Simulator Controller 6.5.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.5.0-release.zip
-Changes=Full support for the new R3E API, New (synthetical) event "plan_pitstop" for the *Reasoning* booster of the Race Engineer, Fixed missing translations, Fixed language specific instruction storage, New (synthetical) event "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, New internal action "recommend_pitstop" for the *Reasoning* booster of the Race Strategist, Support for AC timed races, New car models for "Setup Workbench"
+Version=6.5.6.0-dev
+Target=6.5.6.0-release
+Date=09/29/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IfmuOx-5
+Changes=Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database"
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.5.5.0-release
@@ -22,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.5.5.0-release
+Development=6.5.6.0-dev
 Release=6.5.5.0-release

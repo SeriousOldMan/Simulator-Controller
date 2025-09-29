@@ -1512,8 +1512,13 @@ else {
 					if (A_Index == 1) {
 						engineer.addLap(lap, &data)
 
-						if (lap = 3)
+						if (lap = 3) {
+							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
 							engineer.planPitstop()
+
+							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+						}
 					}
 					else
 						engineer.updateLap(lap, &data)

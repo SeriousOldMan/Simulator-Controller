@@ -112,8 +112,7 @@ class RecommendPitstopEvent extends StrategistEvent {
 		else
 			targetLapRule := getMultiMapValue(instructions, "Rules", "TargetLapRuleVariable")
 
-		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopRecommend")
-								 , {targetLapRule: targetLapRule})
+		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopRecommend"), {targetLapRule: targetLapRule})
 	}
 
 	handleEvent(event, arguments*) {
@@ -902,7 +901,7 @@ class RaceStrategist extends GridRaceAssistant {
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
 		local settings
-		
+
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
 													, recognizer, listener, listenerBooster, conversationBooster, agentBooster
 													, muted, voiceServer)
@@ -914,7 +913,7 @@ class RaceStrategist extends GridRaceAssistant {
 		DirCreate(kTempDirectory . "Race Strategist")
 
 		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-		
+
 		if getMultiMapValue(settings, "Strategy", "Protocol", getMultiMapValue(settings, "Debug", "DebugStrategy", false))
 			this.setDebug(kStrategyProtocol, true)
 
@@ -2022,9 +2021,9 @@ class RaceStrategist extends GridRaceAssistant {
 			return false
 	}
 
-	createSessionInfo(lapNumber, valid, data, simulator, car, track) {
+	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
-		local sessionInfo := super.createSessionInfo(lapNumber, valid, data, simulator, car, track)
+		local sessionInfo := super.createSessionInfo(simulator, car, track, lapNumber, valid, data)
 		local lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
 		local tyreLaps := false
 		local nextPitstop, pitstop, ignore, theFact
@@ -2112,6 +2111,34 @@ class RaceStrategist extends GridRaceAssistant {
 		setMultiMapValue(sessionInfo, "Tyres", "Laps", tyreLaps)
 
 		return sessionInfo
+	}
+
+	updateSession(simulator, car, track, lapNumber, validLap, data) {
+		local tyreSets, ignore, descriptor
+
+		static lastTyreSets := false
+
+		if this.Strategy {
+			tyreSets := []
+
+			for ignore, descriptor in this.TyreSets
+				if descriptor
+					tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
+
+			tyreSets := values2String("|", tyreSets*)
+
+			if (tyreSets != lastTyreSets) {
+				lastTyreSets := tyreSets
+
+				engineerPID := ProcessExist("Race Engineer.exe")
+
+				if engineerPID
+					messageSend(kFileMessage, "Race Engineer", "updateTyreUsage:" . tyreSets, engineerPID)
+			}
+		}
+
+		this.saveSessionInfo(simulator, car, track, lapNumber
+						   , this.createSessionInfo(simulator, car, track, lapNumber, validLap, data))
 	}
 
 	addLap(lapNumber, &data) {
@@ -2333,9 +2360,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if (this.GridPosition && knowledgeBase.getValue("Car.Count", false))
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
-		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
-												 , this.createSessionInfo(lapNumber, validLap, data, simulator, car, track))
-					 , 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000, kLowPriority)
 
 		return result
 	}
@@ -2387,10 +2412,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if (noGrid && this.GridPosition && (lapNumber < 5))
 			this.saveStandingsData(lapNumber, simulator, car, track)
 
-		Task.startTask((*) => this.saveSessionInfo(lapNumber, simulator, car, track
-												 , this.createSessionInfo(lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-																		, data, simulator, car, track))
-					 , 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber
+											   , knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+											   , data), 1000, kLowPriority)
 
 		return result
 	}

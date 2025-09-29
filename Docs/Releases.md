@@ -36,7 +36,21 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.5.6.0
+
+#### Date: 10/03/25 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The Race Engineer can now handled partial tyre changes based on tyre wear or based on the number of laps for this tyre.
+    - A new setting "Change Tyres" has been added to "Race Settings".
+	- The same [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) is available in the "Session Database", of course.
+    - Please read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) (item 2.) for more information.
+	- The current implementation is solely based on tyre wear and will be extended to be more intelligent in the next releases.
 
 # Release history
 

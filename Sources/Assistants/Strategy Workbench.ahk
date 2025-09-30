@@ -3256,7 +3256,15 @@ class StrategyWorkbench extends ConfigurationItem {
 						strategy := readMultiMap(fileName)
 
 						if (strategy.Count > 0) {
-							this.selectStrategy(this.createStrategy(strategy))
+							strategy := this.createStrategy(strategy)
+
+							if isDebug() {
+								deleteFile(kTempDirectory . "Strategy.json")
+
+								FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
+							}
+
+							this.selectStrategy(strategy)
 
 							if this.AutoInitialize
 								this.chooseSettingsMenu("Strategy")
@@ -3285,7 +3293,15 @@ class StrategyWorkbench extends ConfigurationItem {
 								strategy := sessionDB.readStrategy(simulator, car, track, fileName)
 
 								if (strategy && (strategy.Count > 0)) {
-									this.selectStrategy(this.createStrategy(strategy))
+									strategy := this.createStrategy(strategy)
+
+									if isDebug() {
+										deleteFile(kTempDirectory . "Strategy.json")
+
+										FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
+									}
+
+									this.selectStrategy(strategy)
 
 									if this.AutoInitialize
 										this.chooseSettingsMenu("Strategy")
@@ -3301,7 +3317,15 @@ class StrategyWorkbench extends ConfigurationItem {
 							strategy := readMultiMap(directory . "\" . fileName . ".strategy")
 
 							if (strategy.Count > 0) {
-								this.selectStrategy(this.createStrategy(strategy))
+								strategy := this.createStrategy(strategy)
+
+								if isDebug() {
+									deleteFile(kTempDirectory . "Strategy.json")
+
+									FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
+								}
+
+								this.selectStrategy(strategy)
 
 								if this.AutoInitialize
 									this.chooseSettingsMenu("Strategy")

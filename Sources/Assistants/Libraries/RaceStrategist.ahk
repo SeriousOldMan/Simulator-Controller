@@ -19,6 +19,7 @@
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\Database.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
@@ -116,13 +117,42 @@ class RecommendPitstopEvent extends StrategistEvent {
 	}
 
 	handleEvent(event, arguments*) {
-		local targetLap, refuelAmount, tyreChange, repairs
+		local targetLap
 
 		if !super.handleEvent(event, arguments*) {
 			targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
 
 			this.Assistant.recommendPitstop(targetLap)
 		}
+
+		return true
+	}
+}
+
+class RecommendStrategyEvent extends StrategistEvent {
+	Asynchronous {
+		Get {
+			return false
+		}
+	}
+
+	createTrigger(event, phrase, arguments) {
+		local knowledgeBase := this.Assistant.KnowledgeBase
+
+		static instructions := false
+
+		if !instructions {
+			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+		}
+
+		return substituteVariables(getMultiMapValue(instructions, "Instructions", "StrategyRecommend"), {})
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.recommendStrategy()
 
 		return true
 	}
@@ -2668,6 +2698,13 @@ class RaceStrategist extends GridRaceAssistant {
 			this.recommendStrategy({Pitstop: lap, Silent: true, Confirm: true})
 		else
 			this.recommendStrategy({Silent: true, Confirm: true})
+	}
+
+	updateStrategyAction(strategy) {
+		if !isObject(strategy)
+			strategy := JSON.parse(strategy)
+
+		logMessage(kLogCritical, "Not yet implemented: RaceStrategist.updateStrategyAction...")
 	}
 
 	recommendStrategy(options := {}) {

@@ -42,7 +42,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed brake duct handling in "Setup Workbench" for all cars in *Le Mans Ultimate* and *rFactor 2*.
   
 #### Changes
 

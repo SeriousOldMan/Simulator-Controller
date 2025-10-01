@@ -36,6 +36,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\JSON.ahk"
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Framework\Extensions\CodeEditor.ahk"
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
@@ -3256,15 +3257,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						strategy := readMultiMap(fileName)
 
 						if (strategy.Count > 0) {
-							strategy := this.createStrategy(strategy)
-
-							if isDebug() {
-								deleteFile(kTempDirectory . "Strategy.json")
-
-								FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
-							}
-
-							this.selectStrategy(strategy)
+							this.selectStrategy(this.createStrategy(strategy))
 
 							if this.AutoInitialize
 								this.chooseSettingsMenu("Strategy")
@@ -3293,12 +3286,25 @@ class StrategyWorkbench extends ConfigurationItem {
 								strategy := sessionDB.readStrategy(simulator, car, track, fileName)
 
 								if (strategy && (strategy.Count > 0)) {
+									if isDebug() {
+										deleteFile(kTempDirectory . "Before.strategy")
+
+										writeMultiMap(kTempDirectory . "Before.strategy", strategy)
+									}
+
 									strategy := this.createStrategy(strategy)
 
 									if isDebug() {
 										deleteFile(kTempDirectory . "Strategy.json")
+										deleteFile(kTempDirectory . "After.strategy")
 
 										FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
+
+										configuration := newMultiMap()
+
+										this.createStrategy(strategy.Descriptor).saveToConfiguration(configuration)
+
+										writeMultiMap(kTempDirectory . "After.strategy", configuration)
 									}
 
 									this.selectStrategy(strategy)
@@ -3317,15 +3323,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							strategy := readMultiMap(directory . "\" . fileName . ".strategy")
 
 							if (strategy.Count > 0) {
-								strategy := this.createStrategy(strategy)
-
-								if isDebug() {
-									deleteFile(kTempDirectory . "Strategy.json")
-
-									FileAppend(JSON.print(strategy.Descriptor, "  "), kTempDirectory . "Strategy.json")
-								}
-
-								this.selectStrategy(strategy)
+								this.selectStrategy(this.createStrategy(strategy))
 
 								if this.AutoInitialize
 									this.chooseSettingsMenu("Strategy")

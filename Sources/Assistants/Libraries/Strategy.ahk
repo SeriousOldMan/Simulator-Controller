@@ -1812,19 +1812,27 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		__New(strategy, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
+		__New(strategy, nrOrDescriptor, lap?, driver?, tyreCompound?, tyreCompoundColor?, configuration := false, adjustments := false) {
 			this.iStrategy := strategy
-			this.iNr := nr
-			this.iLap := lap
-			this.iDriver := driver
 
-			if driver
-				this.iDriverName := SessionDatabase.getDriverName(strategy.Simulator, driver)
+			if isSet(lap) {
+				this.iNr := nrOrDescriptor
+				this.iLap := lap
+				this.iDriver := driver
 
-			super.__New(configuration)
+				if driver
+					this.iDriverName := SessionDatabase.getDriverName(strategy.Simulator, driver)
 
-			if !configuration
-				this.initialize(tyreCompound, tyreCompoundColor, adjustments)
+				super.__New(configuration)
+
+				if !configuration
+					this.initialize(tyreCompound, tyreCompoundColor, adjustments)
+			}
+			else {
+				super.__New(configuration)
+
+				this.initializeFromDescriptor(nrOrDescriptor)
+			}
 		}
 
 		dispose() {
@@ -2026,6 +2034,42 @@ class Strategy extends ConfigurationItem {
 			this.iDuration := strategy.calcPitstopDuration(refuelAmount, this.TyreChange)
 		}
 
+		initializeFromDescriptor(descriptor) {
+			this.iNr := descriptor["Nr"]
+			this.iLap := descriptor["Lap"]
+
+			this.iTime := StrReplace(descriptor["Time"], " Seconds", "")
+			this.iDuration := StrReplace(descriptor["Duration"], " Seconds", "")
+
+			this.iDriver := descriptor["Stint"]["Driver"]["ID"]
+			this.iDriverName := descriptor["Stint"]["Driver"]["Name"]
+
+			this.iWeather := descriptor["Weather"]
+			this.iAirTemperature := StrReplace(descriptor["AirTemperature"], " C", "")
+			this.iTrackTemperature := StrReplace(descriptor["TrackTemperature"], " C", "")
+
+			this.iRefuelAmount := StrReplace(descriptor["Refuel"], " Liters", "")
+			this.iTyreChange := (descriptor["TyreChange"] != kFalse)
+
+			if this.iTyreChange {
+				this.iTyreCompound := compound(descriptor["TyreChange"]["TyreCompound"])
+				this.iTyreCompoundColor := compoundColor(descriptor["TyreChange"]["TyreCompound"])
+				this.iTyreSet := (descriptor["TyreChange"].Has("TyreSet") ? descriptor["TyreChange"]["TyreSet"]
+																		  : this.Strategy.TyreSet)
+			}
+
+			this.iStintLaps := descriptor["Stint"]["Laps"]
+
+			this.iMap := descriptor["Stint"]["ECUMap"]
+			this.iAvgLapTime := StrReplace(descriptor["Stint"]["AverageLapTime"], " Seconds", "")
+			this.iFuelConsumption := StrReplace(descriptor["Stint"]["FuelConsumption"], " Liters", "")
+
+			this.iRemainingSessionLaps := descriptor["Session"]["RemainingLaps"]
+			this.iRemainingSessionTime := StrReplace(descriptor["Session"]["RemainingTime"], " Seconds", "")
+			this.iRemainingTyreLaps := descriptor["Stint"]["RemainingTyreLaps"]
+			this.iRemainingFuel := StrReplace(descriptor["Stint"]["Fuel"], " Liters", "")
+		}
+
 		loadFromConfiguration(configuration) {
 			local lap := this.Lap
 
@@ -2130,17 +2174,21 @@ class Strategy extends ConfigurationItem {
 				}
 			}
 
-			return {Nr: this.Nr, Lap: this.Lap
-				  , Time: this.Time . " Seconds", Duration: this.Duration . " Seconds"
-				  , Refuel: Ceil(this.RefuelAmount) . " Liters"
-				  , TyreChange: tyreChange
-				  , Stint: {Nr: this.Nr + 1, Laps: this.StintLaps, Fuel: this.RemainingFuel . " Liters"
-					      , TyreCompound: tyreCompound, RemainingTyreLaps: this.RemainingTyreLaps
-						  , Driver: {ID: this.Driver, Name: this.DriverName}
-						  , Weather: this.Weather
-						  , AirTemperature: this.AirTemperature . " C", TrackTemperature: this.TrackTemperature . " C"
-						  , ECUMap: this.Map, AverageLapTime: this.AvgLapTime . " Seconds", FuelConsumption: this.FuelConsumption . " Liters"}
-				  , Session: {RemainingLaps: this.RemainingSessionLaps, RemainingTime: this.RemainingSessionTime . " Seconds"}}
+			return toMap({Nr: this.Nr, Lap: this.Lap
+					    , Time: this.Time . " Seconds", Duration: this.Duration . " Seconds"
+					    , Refuel: Ceil(this.RefuelAmount) . " Liters"
+					    , TyreChange: tyreChange
+					    , Stint: toMap({Nr: this.Nr + 1, Laps: this.StintLaps, Fuel: this.RemainingFuel . " Liters"
+									  , TyreCompound: tyreCompound, RemainingTyreLaps: this.RemainingTyreLaps
+									  , Driver: toMap({ID: this.Driver, Name: this.DriverName})
+									  , Weather: this.Weather
+									  , AirTemperature: this.AirTemperature . " C"
+									  , TrackTemperature: this.TrackTemperature . " C"
+									  , ECUMap: this.Map
+									  , AverageLapTime: this.AvgLapTime . " Seconds"
+									  , FuelConsumption: this.FuelConsumption . " Liters"})
+					  , Session: toMap({RemainingLaps: this.RemainingSessionLaps
+									  , RemainingTime: this.RemainingSessionTime . " Seconds"})})
 		}
 	}
 
@@ -2702,148 +2750,154 @@ class Strategy extends ConfigurationItem {
 		this.iStrategyManager := strategyManager
 		this.iDriver := driver
 
-		super.__New(configuration)
+		if (configuration && configuration.Has("Name"))
+			super.__New()
+		else
+			super.__New(configuration)
 
-		if !configuration {
-			simulator := false
-			car := false
-			track := false
-			weather := false
-			airTemperature := false
-			trackTemperature := false
-			sessionType := false
-			sessionLength := false
-			additionalLaps := 0
-			tyreCompound := false
-			tyreCompoundColor := false
-			tyrePressures := false
+		if configuration
+			if configuration.Has("Name")
+				this.initializeFromDescriptor(configuration)
+			else {
+				simulator := false
+				car := false
+				track := false
+				weather := false
+				airTemperature := false
+				trackTemperature := false
+				sessionType := false
+				sessionLength := false
+				additionalLaps := 0
+				tyreCompound := false
+				tyreCompoundColor := false
+				tyrePressures := false
 
-			this.StrategyManager.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
-												   , &sessionType, &sessionLength, &additionalLaps
-												   , &tyreCompound, &tyreCompoundColor, &tyrePressures)
+				this.StrategyManager.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
+													   , &sessionType, &sessionLength, &additionalLaps
+													   , &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
-			this.iSimulator := simulator
-			this.iCar := car
-			this.iTrack := track
-			this.iWeather := weather
-			this.iAirTemperature := airTemperature
-			this.iTrackTemperature := trackTemperature
+				this.iSimulator := simulator
+				this.iCar := car
+				this.iTrack := track
+				this.iWeather := weather
+				this.iAirTemperature := airTemperature
+				this.iTrackTemperature := trackTemperature
 
-			this.iSessionType := sessionType
-			this.iSessionLength := sessionLength
-			this.iAdditionalLaps := additionalLaps
+				this.iSessionType := sessionType
+				this.iSessionLength := sessionLength
+				this.iAdditionalLaps := additionalLaps
 
-			this.iTyreCompound := tyreCompound
-			this.iTyreCompoundColor := tyreCompoundColor
+				this.iTyreCompound := tyreCompound
+				this.iTyreCompoundColor := tyreCompoundColor
 
-			this.iTyrePressureFL := tyrePressures[1]
-			this.iTyrePressureFR := tyrePressures[2]
-			this.iTyrePressureRL := tyrePressures[3]
-			this.iTyrePressureRR := tyrePressures[4]
+				this.iTyrePressureFL := tyrePressures[1]
+				this.iTyrePressureFR := tyrePressures[2]
+				this.iTyrePressureRL := tyrePressures[3]
+				this.iTyrePressureRR := tyrePressures[4]
 
-			if driver
-				this.iDriverName := SessionDatabase.getDriverName(simulator, driver)
+				if driver
+					this.iDriverName := SessionDatabase.getDriverName(simulator, driver)
 
-			stintLength := false
-			formationLap := false
-			postRaceLap := false
-			fuelCapacity := false
-			safetyFuel := false
-			pitstopDelta := false
-			pitstopFuelService := false
-			pitstopTyreService := false
-			pitstopServiceOrder := "Simultaneous"
+				stintLength := false
+				formationLap := false
+				postRaceLap := false
+				fuelCapacity := false
+				safetyFuel := false
+				pitstopDelta := false
+				pitstopFuelService := false
+				pitstopTyreService := false
+				pitstopServiceOrder := "Simultaneous"
 
-			this.StrategyManager.getSessionSettings(&stintLength, &formationLap, &postRacelap, &fuelCapacity, &safetyFuel
-												  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
+				this.StrategyManager.getSessionSettings(&stintLength, &formationLap, &postRacelap, &fuelCapacity, &safetyFuel
+													  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
 
-			this.iStintLength := stintLength
-			this.iFormationLap := formationLap
-			this.iPostRaceLap := postRaceLap
-			this.iFuelCapacity := fuelCapacity
-			this.iSafetyFuel := safetyFuel
+				this.iStintLength := stintLength
+				this.iFormationLap := formationLap
+				this.iPostRaceLap := postRaceLap
+				this.iFuelCapacity := fuelCapacity
+				this.iSafetyFuel := safetyFuel
 
-			this.iPitstopDelta := pitstopDelta
-			this.iPitstopFuelService := pitstopFuelService
-			this.iPitstopTyreService := pitstopTyreService
-			this.iPitstopServiceOrder := pitstopServiceOrder
+				this.iPitstopDelta := pitstopDelta
+				this.iPitstopFuelService := pitstopFuelService
+				this.iPitstopTyreService := pitstopTyreService
+				this.iPitstopServiceOrder := pitstopServiceOrder
 
-			validator := false
-			pitstopRule := false
-			pitstopWindow := false
-			refuelRule := false
-			tyreChangeRule := false
-			tyreSets := false
+				validator := false
+				pitstopRule := false
+				pitstopWindow := false
+				refuelRule := false
+				tyreChangeRule := false
+				tyreSets := false
 
-			this.StrategyManager.getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets)
+				this.StrategyManager.getPitstopRules(&validator, &pitstopRule, &pitstopWindow, &refuelRule, &tyreChangeRule, &tyreSets)
 
-			this.iValidator := validator
-			this.iPitstopRule := pitstopRule
-			this.iPitstopWindow := pitstopWindow
-			this.iRefuelRule := refuelRule
-			this.iTyreChangeRule := tyreChangeRule
-			this.iTyreSets := tyreSets
+				this.iValidator := validator
+				this.iPitstopRule := pitstopRule
+				this.iPitstopWindow := pitstopWindow
+				this.iRefuelRule := refuelRule
+				this.iTyreChangeRule := tyreChangeRule
+				this.iTyreSets := tyreSets
 
-			useInitialConditions := false
-			useTelemetryData := false
-			consumptionVariation := false
-			initialFuelVariation := false
-			refuelVariation := false
-			tyreUsageVariation := false
-			tyreCompoundVariation := false
+				useInitialConditions := false
+				useTelemetryData := false
+				consumptionVariation := false
+				initialFuelVariation := false
+				refuelVariation := false
+				tyreUsageVariation := false
+				tyreCompoundVariation := false
 
-			this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
-													 , &consumptionVariation, &initialFuelVariation, &refuelVariation
-													 , &tyreUsageVariation, &tyreCompoundVariation
-													 , &firstStintWeight, &lastStintWeight)
+				this.StrategyManager.getSimulationSettings(&useInitialConditions, &useTelemetryData
+														 , &consumptionVariation, &initialFuelVariation, &refuelVariation
+														 , &tyreUsageVariation, &tyreCompoundVariation
+														 , &firstStintWeight, &lastStintWeight)
 
-			this.iUseInitialConditions := useInitialConditions
-			this.iUseTelemetryData := useTelemetryData
+				this.iUseInitialConditions := useInitialConditions
+				this.iUseTelemetryData := useTelemetryData
 
-			this.iConsumptionVariation := consumptionVariation
-			this.iInitialFuelVariation := initialFuelVariation
-			this.iRefuelVariation := refuelVariation
-			this.iTyreUsageVariation := tyreUsageVariation
-			this.iTyreCompoundVariation := tyreCompoundVariation
+				this.iConsumptionVariation := consumptionVariation
+				this.iInitialFuelVariation := initialFuelVariation
+				this.iRefuelVariation := refuelVariation
+				this.iTyreUsageVariation := tyreUsageVariation
+				this.iTyreCompoundVariation := tyreCompoundVariation
 
-			this.iFirstStintWeight := firstStintWeight
-			this.iLastStintWeight := lastStintWeight
+				this.iFirstStintWeight := firstStintWeight
+				this.iLastStintWeight := lastStintWeight
 
-			this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
-												  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
+				this.StrategyManager.getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
+													  , &initialTyreSet, &initialTyreLaps, &initialFuelAmount, &ecuMap, &fuelConsumption, &avgLapTime)
 
-			duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime)) + (additionalLaps * avgLapTime)
+				duration := ((sessionType = "Duration") ? sessionLength : (sessionLength * avgLapTime)) + (additionalLaps * avgLapTime)
 
-			forecast := []
-			weather := false
-			airTemperature := false
-			trackTemperature := false
-			lastWeather := this.Weather
-			lastAirTemperature := this.AirTemperature
-			lastTrackTemperature := this.TrackTemperature
+				forecast := []
+				weather := false
+				airTemperature := false
+				trackTemperature := false
+				lastWeather := this.Weather
+				lastAirTemperature := this.AirTemperature
+				lastTrackTemperature := this.TrackTemperature
 
-			loop {
-				minute := ((A_Index - 1) * 5)
+				loop {
+					minute := ((A_Index - 1) * 5)
 
-				if (minute > duration)
-					break
-				else {
-					this.StrategyManager.getSessionWeather(minute, &weather, &airTemperature, &trackTemperature)
+					if (minute > duration)
+						break
+					else {
+						this.StrategyManager.getSessionWeather(minute, &weather, &airTemperature, &trackTemperature)
 
-					if ((weather != lastWeather) || (airTemperature != lastAirTemperature) || (trackTemperature != lastTrackTemperature)) {
-						lastWeather := weather
-						lastAirTemperature := airTemperature
-						lastTrackTemperature := trackTemperature
+						if ((weather != lastWeather) || (airTemperature != lastAirTemperature) || (trackTemperature != lastTrackTemperature)) {
+							lastWeather := weather
+							lastAirTemperature := airTemperature
+							lastTrackTemperature := trackTemperature
 
-						forecast.Push(Array(minute, weather, airTemperature, trackTemperature))
+							forecast.Push(Array(minute, weather, airTemperature, trackTemperature))
+						}
 					}
 				}
+
+				this.iWeatherForecast := forecast
+
+				this.iFixedPitstops := this.StrategyManager.getFixedPitstops()
 			}
-
-			this.iWeatherForecast := forecast
-
-			this.iFixedPitstops := this.StrategyManager.getFixedPitstops()
-		}
 	}
 
 	dispose() {
@@ -2856,6 +2910,165 @@ class Strategy extends ConfigurationItem {
 
 	setVersion(version) {
 		this.iVersion := (version . "")
+	}
+
+	initializeFromDescriptor(descriptor) {
+		local fuelService, tyreSets, ignore, tyreSet, tyreCompound, tyreCompoundColor, laps
+		local fixedPitstops, fixedPitstop, pitstop
+
+		this.iName := descriptor["Name"]
+		this.iVersion := descriptor["Version"]
+
+		this.iSimulator := descriptor["Simulator"]
+		this.iCar := descriptor["Car"]["Name"]
+		this.iTrack := descriptor["Track"]
+
+		this.iWeather := descriptor["StartStint"]["Weather"]
+		this.iAirTemperature := StrReplace(descriptor["StartStint"]["AirTemperature"], " C", "")
+		this.iTrackTemperature := StrReplace(descriptor["StartStint"]["TrackTemperature"], " C", "")
+
+		if descriptor.Has("WeatherForecast")
+			this.iWeatherForecast := collect(descriptor["WeatherForecast"], (fc) {
+										 return [fc["Minute"], fc["Weather"]
+											   , fc["AirTemperature"], fc["TrackTemperature"]]
+									 })
+
+		this.iFuelCapacity := StrReplace(descriptor["Car"]["FuelCapacity"], " Liters", "")
+		this.iSafetyFuel := StrReplace(descriptor["Settings"]["SafetyFuel"], " Liters", "")
+
+		this.iSessionType := descriptor["Session"]["Type"]
+		this.iSessionLength := ((this.SessionType = "Duration") ? StrReplace(descriptor["Session"]["Duration"], " Minutes", "")
+																: descriptor["Session"]["Laps"])
+
+		if descriptor["Session"].Has("AdditionalLaps")
+			this.iAdditionalLaps := descriptor["Session"]["AdditionalLaps"]
+
+		this.iFormationLap := ((descriptor["Session"]["FormationLap"] == true) || (descriptor["Session"]["FormationLap"] = kTrue))
+		this.iPostRaceLap := ((descriptor["Session"]["PostRaceLap"] == true) || (descriptor["Session"]["PostRaceLap"] = kTrue))
+
+		this.iStintLength := StrReplace(descriptor["Rules"]["MaxStintDuration"], " Minutes", "")
+
+		this.iPitstopDelta := StrReplace(descriptor["Settings"]["Pitstop"]["PitlaneDelta"], " Seconds", "")
+
+		fuelService := descriptor["Settings"]["Pitstop"]["FuelService"]
+
+		if InStr(fuelService, "Seconds p. 10 Liters")
+			this.iPitstopFuelService := ["Dynamic", StrReplace(fuelService, " Seconds p. 10 Liters", "")]
+		else
+			this.iPitstopFuelService := ["Fixed", StrReplace(fuelService, " Seconds", "")]
+
+		this.iPitstopTyreService := StrReplace(descriptor["Settings"]["Pitstop"]["TyreService"], " Seconds", "")
+		this.iPitstopServiceOrder := descriptor["Settings"]["Pitstop"]["ServiceOrder"]
+
+		if descriptor["Settings"].Has("Validator")
+			this.iValidator := descriptor["Settings"]["Validator"]
+
+		this.iPitstopRule := descriptor["Rules"]["RequiredPitstops"]
+
+		if descriptor["Rules"].Has("PitstopFrom")
+			this.iPitstopWindow := [StrReplace(descriptor["Rules"]["PitstopFrom"], " Minute", "")
+								  , StrReplace(descriptor["Rules"]["PitstopTo"], " Minute", "")]
+
+		this.iRefuelRule := descriptor["Rules"]["Refuel"]
+		this.iTyreChangeRule := descriptor["Rules"]["TyreChange"]
+
+		if descriptor.Has("AvailableTyres") {
+			tyreSets := []
+
+			for ignore, tyreSet in descriptor["AvailableTyres"] {
+				splitCompound(tyreSet["Compound"], &tyreCompound, &tyreCompoundColor)
+
+				tyreSets.Push([tyreCompound, tyreCompoundColor, tyreSet["Sets"], tyreSet["UsableLaps"]])
+
+				if tyreSet.Has("Laps")
+					tyreSets[tyreSets.Length].Push(tyreSet["Laps"])
+				else {
+					laps := []
+
+					loop tyreSet["Sets"]
+						laps.Push(0)
+
+					tyreSets[tyreSets.Length].Push(laps)
+				}
+			}
+
+			this.iTyreSets := tyreSets
+		}
+
+		if descriptor["StartStint"].Has("Nr")
+			this.iStartStint := descriptor["StartStint"]["Nr"]
+
+		if descriptor["Session"].Has("StartLap")
+			this.iStartLap := descriptor["Session"]["StartLap"]
+
+		if descriptor["Session"].Has("StartFuel")
+			this.iStartFuel := StrReplace(descriptor["Session"]["StartFuel"], " Liters", "")
+
+		if descriptor["Session"].Has("StartTyreSet")
+			this.iStartTyreSet := descriptor["Session"]["StartTyreSet"]
+
+		if descriptor["Session"].Has("StartRemainingTyreLaps")
+			this.iStartTyreLaps := descriptor["Session"]["StartRemainingTyreLaps"]
+
+		if descriptor["Session"].Has("StartTime")
+			this.iSessionStartTime := StrReplace(descriptor["Session"]["StartTime"], " Seconds", "")
+
+		if descriptor["StartStint"].Has("StartTime")
+			this.iStintStartTime := StrReplace(descriptor["StartStint"]["StartTime"], " Seconds", "")
+
+		this.iFuelAmount := StrReplace(descriptor["StartStint"]["Fuel"], " Liters", "")
+		this.iTyreLaps := descriptor["StartStint"]["RemainingTyreLaps"]
+
+		splitCompound(descriptor["StartStint"]["TyreCompound"], &tyreCompund, &tyreCompoundColor)
+
+		this.iTyreCompound := tyreCompound
+		this.iTyreCompoundColor := tyreCompoundColor
+
+		if descriptor["StartStint"].Has("TyreSet")
+			this.iTyreSet := descriptor["StartStint"]["TyreSet"]
+
+		this.iTyrePressureFL := StrReplace(descriptor["StartStint"]["TyrePressures"]["FrontLeft"], " PSI", "")
+		this.iTyrePressureFR := StrReplace(descriptor["StartStint"]["TyrePressures"]["FrontRight"], " PSI", "")
+		this.iTyrePressureRL := StrReplace(descriptor["StartStint"]["TyrePressures"]["RearLeft"], " PSI", "")
+		this.iTyrePressureRR := StrReplace(descriptor["StartStint"]["TyrePressures"]["RearRight"], " PSI", "")
+
+		this.iStintLaps := descriptor["StartStint"]["Laps"]
+
+		this.iMap := decriptor["StartStint"]["ECUMap"]
+		this.iAvgLapTime := StrReplace(descriptor["StartStint"]["AverageLapTime"], " Seconds", "")
+		this.iFuelConsumption := StrReplace(descriptor["StartStint"]["FuelConsumption"], " Liters", "")
+
+		this.iDriver := descriptor["StartStint"]["Driver"]["ID"]
+		this.iDriverName := descriptor["StartStint"]["Driver"]["Name"]
+
+		this.iPitstops := collect(descriptor["Pitstops"], (d) => this.createPitstop(d))
+
+		this.iUseInitialConditions := ((descriptor["Settings"]["UseInitialConditions"] == true) || (descriptor["Settings"]["UseInitialConditions"] == kTrue))
+		this.iUseTelemetryData := ((descriptor["Settings"]["UseTelemetryData"] == true) || (descriptor["Settings"]["UseTelemetryData"] == kTrue))
+
+		this.iConsumptionVariation := descriptor["Settings"]["ConsumptionVariation"]
+		this.iInitialFuelVariation := descriptor["Settings"]["InitialFuelVariation"]
+		this.iRefuelVariation := descriptor["Settings"]["RefuelVariation"]
+		this.iTyreUsageVariation := descriptor["Settings"]["TyreUsageVariation"]
+		this.iTyreCompoundVariation := descriptor["Settings"]["TyreCompoundVariation"]
+
+		this.iFirstStintWeight := descriptor["Settings"]["FirstStintWeight"]
+		this.iLastStintWeight := descriptor["Settings"]["LastStintWeight"]
+
+		if descriptor["Settings"].Has("FixedPitstops") {
+			fixedPitstops := CaseInsenseMap()
+
+			for ignore, pitstop in descriptor["Settings"]["FixedPitstops"] {
+				fixedPitstop := {Lap: pitstop["Lap"], Compound: pitstop["TyreCompound"]}
+
+				if pitstop.Has("Refuel")
+					fixedPitstop.Refuel := pitstop["Refuel"]
+
+				fixedPitstops[Integer(pitstop["Nr"])] := fixedPitstop
+			}
+
+			this.iFixedPitstops := fixedPitstops
+		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -3193,112 +3406,120 @@ class Strategy extends ConfigurationItem {
 
 		if isObject(this.PitstopFuelService) {
 			if (this.PitstopFuelService[1] = "Dynamic")
-				fuelService := this.PitstopFuelService[2] . " Seconds p. Lap"
+				fuelService := this.PitstopFuelService[2] . " Seconds p. 10 Liters"
 			else
 				fuelService := this.PitstopFuelService[2] . " Seconds"
 		}
 		else
 			fuelService := this.PitstopFuelService . " Seconds"
 
-		descriptor := {Name: this.Name, Version: this.iVersion
-					 , Simulator: this.Simulator, Track: this.Track
-					 , Car: {Name: this.Car, FuelCapacity: this.FuelCapacity . " Liters"}
-					 , Session: {Type: this.SessionType
-							   , FormationLap: this.FormationLap ? kTrue : kFalse
-							   , PostRaceLap: this.PostRaceLap ? kTrue : kFalse}
-					 , Settings: {SafetyFuel: this.SafetyFuel . " Liters"
-								, Durations: {PitlaneDelta: this.PitstopDelta . " Seconds"
-											, FuelService: fuelService
-											, TyreService: this.PitstopTyreService . " Seconds"
-											, ServiceOrder: this.PitstopServiceOrder}
-								, UseInitialConditions: this.UseInitialConditions ? kTrue : kFalse
-								, UseTelemetryData: this.UseTelemetryData ? kTrue : kFalse
-								, ConsumptionVariation: this.ConsumptionVariation
-								, InitialFuelVariation: this.InitialFuelVariation
-								, RefuelVariation: this.RefuelVariation
-								, TyreUsageVariation: this.TyreUsageVariation
-								, TyreCompoundVariation: this.TyreCompoundVariation
-								, FirstStintWeight: this.FirstStintWeight
-								, LastStintWeight: this.LastStintWeight}
-					 , Rules: {RequiredPitstops: this.PitstopRule, Refuel: this.RefuelRule, TyreChange: this.TyreChangeRule
-							 , MaxStintDuration: this.StintLength . " Minutes"}
-					 , StartStint: {Nr: this.StartStint ? this.StartStint : 1
-								  , Laps: this.StintLaps, Fuel: this.RemainingFuel . " Liters"
-								  , TyreCompound: compound(this.TyreCompound, this.TyreCompoundColor)
-								  , RemainingTyreLaps: this.RemainingTyreLaps
-								  , TyrePressures: {FrontLeft: this.TyrePressureFL . " PSI", FrontRight: this.TyrePressureFR . " PSI"
-												  , RearLeft: this.TyrePressureRL . " PSI", RearRight: this.TyrePressureRR . " PSI"}
-								  , Driver: {ID: this.Driver, Name: this.DriverName}
-								  , Weather: this.Weather
-								  , AirTemperature: this.AirTemperature . " C", TrackTemperature: this.TrackTemperature . " C"
-								  , ECUMap: this.Map, AverageLapTime: this.AvgLapTime . " Seconds", FuelConsumption: this.FuelConsumption . " Liters"}
-					 , Pitstops: collect(this.Pitstops, (p) => p.Descriptor)}
+		descriptor := toMap({Name: this.Name, Version: this.iVersion
+						   , Simulator: this.Simulator, Track: this.Track
+						   , Car: toMap({Name: this.Car, FuelCapacity: this.FuelCapacity . " Liters"})
+						   , Session: toMap({Type: this.SessionType
+										   , FormationLap: this.FormationLap ? kTrue : kFalse
+										   , PostRaceLap: this.PostRaceLap ? kTrue : kFalse})
+						   , Settings: toMap({SafetyFuel: this.SafetyFuel . " Liters"
+											, Pitstop: toMap({PitlaneDelta: this.PitstopDelta . " Seconds"
+															, FuelService: fuelService
+															, TyreService: this.PitstopTyreService . " Seconds"
+															, ServiceOrder: this.PitstopServiceOrder})
+											, UseInitialConditions: this.UseInitialConditions ? kTrue : kFalse
+											, UseTelemetryData: this.UseTelemetryData ? kTrue : kFalse
+											, ConsumptionVariation: this.ConsumptionVariation
+											, InitialFuelVariation: this.InitialFuelVariation
+											, RefuelVariation: this.RefuelVariation
+											, TyreUsageVariation: this.TyreUsageVariation
+											, TyreCompoundVariation: this.TyreCompoundVariation
+											, FirstStintWeight: this.FirstStintWeight
+											, LastStintWeight: this.LastStintWeight})
+						   , Rules: toMap({RequiredPitstops: this.PitstopRule
+										 , Refuel: this.RefuelRule, TyreChange: this.TyreChangeRule
+										 , MaxStintDuration: this.StintLength . " Minutes"})
+						   , StartStint: toMap({Nr: this.StartStint ? this.StartStint : 1
+											  , Laps: this.StintLaps, Fuel: this.RemainingFuel . " Liters"
+											  , TyreCompound: compound(this.TyreCompound, this.TyreCompoundColor)
+											  , RemainingTyreLaps: this.RemainingTyreLaps
+											  , TyrePressures: toMap({FrontLeft: this.TyrePressureFL . " PSI"
+																	, FrontRight: this.TyrePressureFR . " PSI"
+																	, RearLeft: this.TyrePressureRL . " PSI"
+																	, RearRight: this.TyrePressureRR . " PSI"})
+											  , Driver: {ID: this.Driver, Name: this.DriverName}
+											  , Weather: this.Weather
+											  , AirTemperature: this.AirTemperature . " C", TrackTemperature: this.TrackTemperature . " C"
+											  , ECUMap: this.Map, AverageLapTime: this.AvgLapTime . " Seconds", FuelConsumption: this.FuelConsumption . " Liters"})
+						   , Pitstops: collect(this.Pitstops, (p) => p.Descriptor)})
 
 		if this.Validator
-			descriptor.Settings.Validator := this.Validator
+			descriptor["Settings"]["Validator"] := this.Validator
 
 		if this.TyreSet
-			descriptor.StartStint.TyreSet := this.TyreSet
+			descriptor["StartStint"]["TyreSet"] := this.TyreSet
 
 		if (this.SessionType = "Duration")
-			descriptor.Session.Duration := this.SessionLength . " Minutes"
+			descriptor["Session"]["Duration"] := this.SessionLength . " Minutes"
 		else
-			descriptor.Session.Laps := this.SessionLength
+			descriptor["Session"]["Laps"] := this.SessionLength
 
 		if this.StartLap
-			descriptor.Session.StartLap := this.StartLap
+			descriptor["Session"]["StartLap"] := this.StartLap
 
 		if this.SessionStartTime
-			descriptor.Session.StartTime := this.SessionStartTime . " Seconds"
+			descriptor["Session"]["StartTime"] := this.SessionStartTime . " Seconds"
 
 		if this.StartFuel
-			descriptor.Session.StartFuel := this.StartFuel . " Liters"
+			descriptor["Session"]["StartFuel"] := this.StartFuel . " Liters"
 
 		if this.StartTyreSet
-			descriptor.Session.StartTyreSet := this.StartTyreSet
+			descriptor["Session"]["StartTyreSet"] := this.StartTyreSet
 
 		if this.StartTyreLaps
-			descriptor.Session.StartRemainingTyreLaps := this.StartTyreLaps
+			descriptor["Session"]["StartRemainingTyreLaps"] := this.StartTyreLaps
 
 		if this.AdditionalLaps
-			descriptor.Session.AdditionalLaps := this.AdditionalLaps
+			descriptor["Session"]["AdditionalLaps"] := this.AdditionalLaps
 
 		if this.StintStartTime
-			descriptor.StartStint.StartTime := this.StintStartTime . " Seconds"
+			descriptor["StartStint"]["StartTime"] := this.StintStartTime . " Seconds"
 
 		if this.StartStint
-			descriptor.StartStint.Nr := this.StartStint
+			descriptor["StartStint"]["Nr"] := this.StartStint
 
 		if isObject(this.PitstopWindow) {
-			descriptor.Rules.PitstopFrom := (this.PitstopWindow[1] . " Minute")
-			descriptor.Rules.PitstopTo := (this.PitstopWindow[2] . " Minute")
+			descriptor["Rules"]["PitstopFrom"] := (this.PitstopWindow[1] . " Minute")
+			descriptor["Rules"]["PitstopTo"] := (this.PitstopWindow[2] . " Minute")
 		}
 
 		for ignore, tyreSet in this.TyreSets
-			if tyreSet
-				tyreSets.Push({Compound: compound(tyreSet[1], tyreSet[2]), Sets: tyreSet[3], UsableLaps: tyreSet[4]})
+			if tyreSet {
+				tyreSets.Push(toMap({Compound: compound(tyreSet[1], tyreSet[2]), Sets: tyreSet[3], UsableLaps: tyreSet[4]}))
+
+				if ((tyreSet.Length > 4) && exist(tyreSet[5], (laps) => laps != 0))
+					tyreSets[tyreSets.Length]["Laps"] := tyreSet[5]
+			}
 
 		if (tyreSets.Length > 0)
-			descriptor.AvailableTyres := tyreSets
+			descriptor["AvailableTyres"] := tyreSets
 
 		if (this.WeatherForecast.Length > 0)
-			descriptor.Conditions.Forecast := collect(this.WeatherForecast, (fc) => {Minute: fc[1]
-																				   , Weather: fc[2]
-																				   , AirTemperature: fc[3] . " C"
-																				   , TrackTemperature: fc[4] . " C"})
+			descriptor["WeatherForecast"] := collect(this.WeatherForecast
+												   , (fc) => {Minute: fc[1]
+															, Weather: fc[2]
+															, AirTemperature: fc[3] . " C"
+															, TrackTemperature: fc[4] . " C"})
 
 		if (this.FixedPitstops.Count > 0) {
 			fixedPitstops := []
 
 			for nr, fixedPitstop in this.FixedPitstops {
-				fixedPitstops.Push({Nr: nr, Lap: fixedPitstop.Lap
-								  , TyreCompound: fixedPitstop.Compound})
+				fixedPitstops.Push(toMap({Nr: nr, Lap: fixedPitstop.Lap
+										, TyreCompound: fixedPitstop.Compound}))
 
 				if fixedPitstop.HasProp("Refuel")
-					fixedPitstops[fixedPitstops.Length].Refuel := fixedPitstop.Refuel
+					fixedPitstops[fixedPitstops.Length]["Refuel"] := fixedPitstop.Refuel
 			}
 
-			descriptor.Settings.FixedPitstops := fixedPitstops
+			descriptor["Settings"]["FixedPitstops"] := fixedPitstops
 		}
 
 		return descriptor
@@ -3352,8 +3573,11 @@ class Strategy extends ConfigurationItem {
 		this.AvailableTyreSets := availableTyreSets
 	}
 
-	createPitstop(nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		return Strategy.Pitstop(this, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
+	createPitstop(nrOrDescriptor, lap?, driver?, tyreCompound?, tyreCompoundColor?, configuration := false, adjustments := false) {
+		if isSet(lap)
+			return Strategy.Pitstop(this, nrOrDescriptor, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
+		else
+			return Strategy.Pitstop(this, nrOrDescriptor)
 	}
 
 	setName(name) {
@@ -4360,9 +4584,14 @@ class TrafficStrategy extends Strategy {
 		}
 	}
 
-	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		local pitstop := TrafficStrategy.TrafficPitstop(this, id, lap, driver, tyreCompound, tyreCompoundColor
-													  , configuration, adjustments)
+	createPitstop(idOrDescriptor, lap?, driver?, tyreCompound?, tyreCompoundColor?, configuration := false, adjustments := false) {
+		local pitstop
+
+		if isSet(lap)
+			pitstop := TrafficStrategy.TrafficPitstop(this, idOrDescriptor, lap, driver, tyreCompound, tyreCompoundColor
+													, configuration, adjustments)
+		else
+			pitstop := TrafficStrategy.TrafficPitstop(this, idOrDescriptor)
 
 		if ((id == 1) && !this.TrafficScenario)
 			this.iTrafficScenario := this.StrategyManager.getTrafficScenario(this, pitstop)

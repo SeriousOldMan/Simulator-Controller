@@ -1443,7 +1443,7 @@ class RaceAssistant extends ConfigurationItem {
 		local temperatureUnit := ((type != "Agent") ? (A_Space . getUnit("Temperature")) : " Celsius")
 		local lapNumber, tyreSet, lapNr, laps, tyreSets, tyreCompound, weather, bestLapTime, stint, engine, value
 		local sessionFormat, additionalLaps, lap
-		local mixedCompounds, tyreSet, index, tyre, axle, unit
+		local mixedCompounds, tyreSets, index, tyre, axle, unit
 
 		static sessionTypes
 
@@ -1481,6 +1481,8 @@ class RaceAssistant extends ConfigurationItem {
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 			weather := knowledgeBase.getValue("Weather.Weather.Now")
+
+			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
 
 			if this.activeTopic(options, "Session")
 				try {
@@ -1537,6 +1539,9 @@ class RaceAssistant extends ConfigurationItem {
 					knowledge["Fuel"] := Map("Capacity", (convert("Volume", knowledgeBase.getValue("Session.Settings.Fuel.Max")) . volumeUnit)
 										   , "Remaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0)) . volumeUnit)
 										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
+
+					if knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined)
+						knowledge["Energy"]["Remaining"] := (knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining") . " %")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1565,8 +1570,33 @@ class RaceAssistant extends ConfigurationItem {
 												  , "Grip", knowledgeBase.getValue("Lap." . lapNr . ".Grip", "Fast"))
 									 , "Valid", (knowledgeBase.getValue("Lap." . lapNr . ".Valid") ? kTrue : kFalse))
 
+							if (mixedCompounds = "Wheel") {
+								for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+									lap["TyreCompound" . tyre]
+										:= compound(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound." . tyre, "Dry")
+												  , knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound.Color." . tyre, "Black"))
+							}
+							else if (mixedCompounds = "Axle") {
+								for index, axle in ["Front", "Rear"]
+									if knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound." . axle, false)
+										lap["TyreCompound" . axle]
+											:= compound(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound." . axle, "Dry")
+													  , knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound.Color." . axle, "Black"))
+							}
+							else
+								lap["TyreCompound"]
+									:= compound(knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound", "Dry")
+											  , knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Compound.Color", "Black"))
+
+							if tyreSets {
+								tyreSet := knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Set", kUndefined)
+
+								if ((tyreSet != kUndefined) && (tyreSet != 0))
+									lap["TyreSet"] := knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Set")
+							}
+
 							if knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining", kUndefined)
-								lap.EnergyRemaining := (knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining") . " %")
+								lap["EnergyRemaining"] := (knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining") . " %")
 
 							laps.Push(lap)
 						}
@@ -1603,37 +1633,31 @@ class RaceAssistant extends ConfigurationItem {
 
 			if this.activeTopic(options, "Tyres")
 				try {
-					if this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet) {
-						knowledge["Tyres"] := Map()
+					knowledge["Tyres"] := Map()
 
-						if (mixedCompounds = "Wheel") {
-							for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-								knowledge["Tyres"]["Compound" . tyre]
-									:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . tyre, "Dry")
-											  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . tyre, "Black"))
-						}
-						else if (mixedCompounds = "Axle") {
-							for index, axle in ["Front", "Rear"]
-								if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, false)
-									knowledge["Tyres"]["Compound" . axle]
-										:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, "Dry")
-												  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . axle, "Black"))
-						}
-						else
-							knowledge["Tyres"]["Compound"]
-								:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-										  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black"))
-
-						if tyreSet {
-							tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
-
-							if ((tyreSet != kUndefined) && (tyreSet != 0))
-								knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
-						}
+					if (mixedCompounds = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
+							knowledge["Tyres"]["Compound" . tyre]
+								:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . tyre, "Dry")
+										  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . tyre, "Black"))
+					}
+					else if (mixedCompounds = "Axle") {
+						for index, axle in ["Front", "Rear"]
+							if knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, false)
+								knowledge["Tyres"]["Compound" . axle]
+									:= compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound." . axle, "Dry")
+											  , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color." . axle, "Black"))
 					}
 					else
-						knowledge["Tyres"] := Map("Compound", compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-																	 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+						knowledge["Tyres"]["Compound"] := compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
+																 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+
+					if tyreSets {
+						tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)
+
+						if ((tyreSet != kUndefined) && (tyreSet != 0))
+							knowledge["Tyres"]["TyreSet"] := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set")
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)

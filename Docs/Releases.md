@@ -42,7 +42,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed brake duct handling in "Setup Workbench" for all cars in *Le Mans Ultimate* and *rFactor 2*.
+  - Fixed a bug, that caused data used by the Driving Coach to be translated to the language chosen for the UI and not for the language configured for the Coach.
   
 #### Changes
 
@@ -51,6 +52,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- The same [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) is available in the "Session Database", of course.
     - Please read the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) (item 2.) for more information.
 	- The current implementation is solely based on tyre wear or driven laps and will be extended using a machine learning model to be more intelligent in the next releases.
+  - Extensive internal preparations for GPT-based strategy planning. A first usable version will be released next week with version 6.5.7.
   - Updated car meta data for *RaceRoom Racing Experience* to the latest version.
 
 # Release history

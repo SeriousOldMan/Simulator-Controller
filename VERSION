@@ -1,9 +1,9 @@
 [Development]
 Version=6.5.6.0-dev
 Target=6.5.6.0-release
-Date=09/29/2025
+Date=10/02/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IfmuOx-5
-Changes=Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E
+Changes=Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.5.5.0-release

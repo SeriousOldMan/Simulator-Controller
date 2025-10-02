@@ -443,7 +443,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
-		local collector, issues, handling, ignore, type, speed, where, issue, index
+		local collector, issues, handling, ignore, type, speed, where, issue, index, language
 		local key, value, text, filter, telemetry, reference, command, data
 
 		static sessions := false
@@ -483,6 +483,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Stint":
 				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
+					language := this.Options["Language"]
 					position := this.getPosition(false, "Class")
 
 					if ((position != 0) && (this.Laps.Count > 0)) {
@@ -500,9 +501,9 @@ class DrivingCoach extends GridRaceAssistant {
 							}
 
 						if hasSectorTimes
-							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], translate)*) . "`n")
+							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Sector Times", "Lap Time"], (h) => translate(h, language))*) . "`n")
 						else
-							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Lap Time"], translate)*) . "`n")
+							lapData .= (values2String(";", collect(["Lap", "Position (Overall)", "Position (Class)", "Lap Time"], (h) => translate(h, language))*) . "`n")
 
 						for ignore, lap in laps {
 							carData := this.Laps[lap]
@@ -529,9 +530,9 @@ class DrivingCoach extends GridRaceAssistant {
 							}
 
 						if hasSectorTimes
-							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Sector Times", "Lap Time"], translate)*) . "`n")
+							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Sector Times", "Lap Time"], (h) => translate(h, language))*) . "`n")
 						else
-							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Lap Time"], translate)*) . "`n")
+							standingsData .= (values2String(";", collect(["Position (Overall)", "Position (Class)", "Race Number", "Class", "Lap Time"], (h) => translate(h, language))*) . "`n")
 
 						for ignore, carData in this.Standings {
 							if (A_Index > 1)

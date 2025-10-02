@@ -18,10 +18,9 @@
 
 #### Assistants
   1. Better answers by the Strategist, when a pitstop cannot be recommended
-  2. Support for partial tyre changes by the Engineer based on tyre wear, remaining laps, lap times, and so on
-  3. Approaching corner braking point countdown by the Coach
-  4. Shift beeps by the Coach
-  5. Configurable priority for voice output between Spotter and other Assistants
+  2. Approaching corner braking point countdown by the Coach
+  3. Shift beeps by the Coach
+  4. Configurable priority for voice output between Spotter and other Assistants
   
 #### Session Database
   1. Active validation of value ranges in settings definitions

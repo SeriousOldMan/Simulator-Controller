@@ -1,9 +1,9 @@
 [Conversation.Actions]
-Active=plan_pitstop,simulate_pitstop,update_strategy
+Active=plan_pitstop,simulate_pitstop,recommend_strategy
 [Conversation.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstop(%targetLap%)|false|true|1|Ask the Engineer to plan a pitstop.
 simulate_pitstop=Assistant.Method|recommendPitstop(%targetLap%)|false|true|1|Simulates the outcome of an upcoming pitstop. The traffic situation after the pitstop will be evaluated and the target lap will be optimized, if an undercut is possible.
-update_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
+recommend_strategy=Assistant.Method|recommendStrategy|true|true|0|Trigger a recalculation of the current race strategy.
 [Conversation.Actions.Parameters]
 plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
@@ -22,7 +22,7 @@ plan_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to t
 simulate_pitstop.1=targetLap|Integer||false|The planned lap for the car to come to the pit.
 recommend_pitstop.1=targetLap|Integer||true|The reommended lap for the upcoming pitstop.
 recommend_strategy.1=targetLap|Integer||false|An optional lap number for the next pitstop to check whether it is compliant with the current strategy and possibly might create an advantage.
-update_strategy.1=strategy|String||true|The new strategy object in JSON format.
+update_strategy.1=strategy|String||true|The new strategy object in textual JSON format.
 announce_upcoming_pitstop.1=plannedLap|Integer||true|The lap, when the pitstop is planned according to the strategy.
 report_weather_forecast.1=weather|String|Dry,Drizzle,LightRain,MediumRain,HeavyRain,Thunderstorm|true|A symbol that represents the upcoming weather.
 report_weather_forecast.2=minutes|Integer||true|The time in minutes when the weather will change.

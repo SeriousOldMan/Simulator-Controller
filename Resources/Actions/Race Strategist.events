@@ -5,7 +5,8 @@ Active=pitstop_upcoming,weather_forecast
 [Agent.LLM.Events.Builtin]
 pitstop_upcoming=Assistant.Class|PitstopUpcomingEvent|PitstopUpcoming||1|This event is triggered when the next pitstop according to the currently active strategy is upcoming.
 recommend_pitstop=Assistant.Class|RecommendPitstopEvent|RecommendPitstop||1|This is an internal event which triggers the LLM to recommend a lap for an upcoming pitstop. Activate on your own risk.
-recommend_strategy=Assistant.Class|RecommendStrategyEvent|RecommendStrategy||0|This is an internal event which triggers the LLM to recommend or update the current strategy. Activate on your own risk.
+recommend_strategy=Assistant.Class|RecommendStrategyEvent|RecommendStrategy||1|This is an internal event which triggers the LLM to recommend or update the current strategy. Activate on your own risk.
 [Agent.LLM.Events.Parameters]
 pitstop_upcoming.1=plannedLap|Integer||true|The lap, when the pitstop is planned according to the strategy.
-recommend_pitstop.1=targetLap|Integer||false|If supplied, indicates a lap for the pitstop to start with.
+recommend_pitstop.1=targetLap|Integer||false|If supplied, indicates a lap for the pitstop which was requested by the driver.
+recommend_strategy.1=targetLap|Integer||false|If supplied, indicates a lap for the next pitstop which was requested by the driver.

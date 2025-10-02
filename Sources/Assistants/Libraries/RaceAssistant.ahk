@@ -1982,14 +1982,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handledEvent(event) {
-		local ignore, candidate
-
-		if this.AgentBooster
-			for ignore, candidate in this.iEvents
-				if ((candidate = event) || (candidate.Event = event))
-					return candidate.handledEvent(event)
-
-		return false
+		return (this.findEvent(event) != false)
 	}
 
 	handleEvent(event, arguments*) {
@@ -2002,6 +1995,19 @@ class RaceAssistant extends ConfigurationItem {
 						return true
 					else if candidate.handleEvent(event, arguments*)
 						return true
+
+		return false
+	}
+
+	findEvent(event) {
+		local ignore, candidate
+
+		if this.AgentBooster
+			for ignore, candidate in this.iEvents
+				if (candidate = event)
+					return candidate
+				else if ((candidate.Event = event) && candidate.handledEvent(event))
+					return candidate
 
 		return false
 	}

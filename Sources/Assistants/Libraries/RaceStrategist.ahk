@@ -1220,7 +1220,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledge := super.getKnowledge(type, options)
 		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local strategy, nextPitstop, pitstop, pitstops
-		local fuelService, tyreService, tyreCompound, tyreCompoundColor, tcCandidate
+		local fuelService, tyreService, brakeService, repairService, supportTyreSets, tyreCompound, tyreCompoundColor, tcCandidate
 		local availableTyreSets, tyreSets, tyreSet, ignore
 
 		convert(unit, value, arguments*) {
@@ -1232,8 +1232,71 @@ class RaceStrategist extends GridRaceAssistant {
 				return value
 		}
 
+		getPastPitstop(pitstop) {
+			local tyreChange := false
+			local pastPitstop, repairs
+			local index, tyre, axle
+
+			try {
+				pastPitstop := Map("Nr", pitstop.Nr, "Lap", pitstop.Lap)
+
+				if fuelService
+					pastPitstop["Refuel"] := (pitstop["Refuel"] . " Liters")
+
+				if (repairService.Length > 0) {
+					repairs := (pitstop.RepairBodywork || pitstop.RepairSusension || pitstop.RepairEngine)
+
+					pastPitstop["Repairs"] := (repairs ? kTrue : kFalse)
+				}
+
+				if tyreService {
+					if (tyreService = "Wheel") {
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							pastPitstop["TyreChange" . tyre] := ((pitstop.%"TyreCompound" . tyre%) ? kTrue : kFalse)
+
+							if (pastPitstop["TyreChange" . tyre] = kTrue) {
+								tyreChange := true
+
+								pastPitstop["TyreCompound" . tyre] := compound(pitstop.%"TyreCompound" . tyre%, pitstop.%"TyreCompoundColor" . tyre%)
+							}
+						}
+					}
+					else if (tyreService = "Axle") {
+						for index, axle in ["Front", "Rear"] {
+							pastPitstop["TyreChange" . axle] := ((pitstop.%"TyreCompound" . axle%) ? kTrue : kFalse)
+
+							if (pastPitstop["TyreChange" . axle] = kTrue) {
+								tyreChange := true
+
+								pastPitstop["TyreCompound" . axle] := compound(pitstop.%"TyreCompound" . axle%, pitstop.%"TyreCompoundColor" . axle%)
+							}
+						}
+					}
+					else {
+						tyreChange := pitstop.TyreCompound
+
+						if tyreChange
+							pastPitstop["TyreCompound"] := compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)
+					}
+
+					pastPitstop["TyreChange"] := (tyreChange ? kTrue : kFalse)
+
+					if (tyreChange && supportTyreSets && pastPitstop.HasProp("TyreSet"))
+						pastPitstop["TyreSet"] := pastPitstop.TyreSet
+				}
+
+				return pastPitstop
+			}
+			catch Any as exception {
+				logError(exception)
+
+				return false
+			}
+		}
+
 		if knowledgeBase {
-			this.Provider.supportsPitstop(&fuelService, &tyreService)
+			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
+			this.Provider.supportsTyreManagement( , &supportTyreSets)
 
 			if (this.Strategy && this.activeTopic(options, "Session"))
 				try {
@@ -1303,20 +1366,41 @@ class RaceStrategist extends GridRaceAssistant {
 					logError(exception, true)
 				}
 
-			if this.activeTopic(options, "Pitstops")
-				try {
-					pitstops := []
+			if this.activeTopic(options, "Pitstops") {
+				pitstops := []
 
-					loop knowledgeBase.getValue("Pitstop.Last", 0)
-						if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
-							pitstops.Push(Map("Nr", pitstops.Length + 1
-											, "Lap", knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")))
+				if ((type = "Agent") && this.PitstopHistory) {
+					try {
+						pitstops := collect(this.PitstopHistory, getPastPitstop)
 
-					knowledge["Pitstops"] := pitstops
+						if (this.UsedTyreSets && (this.UsedTyreSets.Length > 0))
+							knowledge["TyreSets"] := collect(this.UsedTyreSets, (ts) {
+														 local tyreSet := Map("Laps", ts.Laps
+																			, "TyreCompound", compound(ts.Compound, ts.CompoundColor))
+
+														 if ts.HasProp("Set")
+															 tyreSet["Set"] := ts.Set
+
+														 return tyreSet
+													 })
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 				}
-				catch Any as exception {
-					logError(exception, true)
-				}
+				else
+					try {
+						loop knowledgeBase.getValue("Pitstop.Last", 0)
+							if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
+								pitstops.Push(Map("Nr", pitstops.Length + 1
+												, "Lap", knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")))
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+
+				knowledge["Pitstops"] := pitstops
+			}
 		}
 
 		return knowledge
@@ -4251,7 +4335,7 @@ class RaceStrategist extends GridRaceAssistant {
 							  , TyreLapsRearRight: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", 0)
 							  , RepairBodywork: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork", false)
 							  , RepairSuspension: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension", false)
-							  , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine")}
+							  , RepairEngine: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine", false)}
 
 					if tyreSet
 						pitstop.TyreSet := getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", false)
@@ -4301,7 +4385,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if tyreSet
 					tyreSets.Push({Laps: lapNumber
-								 , Set: knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", 1)
 								 , Compound: tyreCompound, CompoundColor: tyreCompoundColor})
 				else
 					tyreSets.Push({Laps: lapNumber, Compound: tyreCompound, CompoundColor: tyreCompoundColor})
@@ -4401,6 +4484,32 @@ class RaceStrategist extends GridRaceAssistant {
 			return
 
 		this.proposeStrategy({FullCourseYellow: true})
+	}
+
+	weatherChange(&weather, &minutes) {
+		local knowledgeBase := this.KnowledgeBase
+		local weatherNow
+
+		if knowledgeBase {
+			weatherNow := knowledgeBase.getValue("Weather.Weather.Now", "Dry")
+
+			if (weatherNow != knowledgeBase.getValue("Weather.Weather.10Min", "Dry")) {
+				weather := knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
+				minutes := 10
+
+				return true
+			}
+			else if (weatherNow != knowledgeBase.getValue("Weather.Weather.30Min", "Dry")) {
+				weather := knowledgeBase.getValue("Weather.Weather.30Min", "Dry")
+				minutes := 30
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			return false
 	}
 
 	weatherForecast(weather, minutes, changeTyres) {

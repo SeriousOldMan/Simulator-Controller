@@ -1650,7 +1650,7 @@ class RaceAssistant extends ConfigurationItem {
 					}
 					else
 						knowledge["Tyres"]["Compound"] := compound(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound", "Dry")
-																 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black")))
+																 , knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Compound.Color", "Black"))
 
 					if tyreSets {
 						tyreSet := knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Set", kUndefined)

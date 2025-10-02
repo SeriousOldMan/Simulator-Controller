@@ -165,6 +165,8 @@ Depending on the given car and track combination, and also depending on the pers
 
 where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.
 
+Important: If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values, though.
+
 ### Default Tyre Compound
 
 The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behavior before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.

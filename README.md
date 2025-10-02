@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.5.6.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IfmuOx-5) (Early build for 6.5.6. Changes: Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling.)
+[6.5.6.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IfmuOx-5) (Early build for 6.5.6. Changes: Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6560) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-656) of this version and all the versions you might have skipped, before installing and using this version.
 

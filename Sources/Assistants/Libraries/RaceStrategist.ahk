@@ -2856,6 +2856,12 @@ class RaceStrategist extends GridRaceAssistant {
 		if !isObject(strategy)
 			strategy := JSON.parse(strategy)
 
+		if isDebug() {
+			deleteFile(kTempDirectory . "Strategy.json")
+
+			FileAppend(JSON.print(strategy), "  ", kTempDirectory . "Strategy.json")
+		}
+
 		RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
 																  , options.HasProp("Confirm") && options.Confirm
 																  , options.HasProp("FullCourseYellow") && options.FullCourseYellow

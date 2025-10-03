@@ -951,15 +951,15 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
-	UsedTyreSets[compound?, tyreSet?] {
+	UsedTyreSets[compounds?, tyreSet?] {
 		Get {
 			local ignore, tyreInfo, found
 
-			if isSet(compound) {
+			if isSet(compounds) {
 				found := false
 
 				for ignore, tyreInfo in this.iUsedTyreSets
-					if (tyreInfo.Compound = compound)
+					if equalCompounds(tyreInfo.Compounds, compounds)
 						if (!isSet(tyreSet) || (tyreInfo.Nr = tyreSet))
 							found := tyreInfo
 
@@ -3090,7 +3090,7 @@ class SoloCenter extends ConfigurationItem {
 				if (run.Laps.Length > 0) {
 					lap := run.Laps[1]
 
-					if ((lap.Compounds[1] != "-") && !isNull(run.TyreSet)) {
+					if (exist(lap.Compounds, (c) => (c && (c != "-"))) && !isNull(run.TyreSet)) {
 						found := false
 
 						if (A_Index > 1) {
@@ -3099,7 +3099,7 @@ class SoloCenter extends ConfigurationItem {
 							if isDebug()
 								logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . lastTyreSet.Laps . " / " . run.TyreLaps . " (" . run.Laps.Length . ")")
 
-							if ((lap.TyreSet = "-") && (lastTyreSet.Nr = "-") && (lap.Compounds[1] = lastTyreSet.Compound)
+							if ((lap.TyreSet = "-") && (lastTyreSet.Nr = "-") && equalCompounds(lap.Compounds, lastTyreSet.Compounds)
 													&& (lastTyreSet.Laps <= run.TyreLaps)) {
 								lastTyreSet.Laps += run.Laps.Length
 
@@ -3108,7 +3108,8 @@ class SoloCenter extends ConfigurationItem {
 
 							if !found
 								for ignore, lastTyreSet in tyreSets
-									if ((lastTyreSet.Compound = lap.Compounds[1]) && isNumber(lastTyreSet.Nr) && (lastTyreSet.Nr = lap.TyreSet)) {
+									if (equalCompounds(lastTyreSet.Compounds, lap.Compounds) && isNumber(lastTyreSet.Nr)
+																							 && (lastTyreSet.Nr = lap.TyreSet)) {
 										lastTyreSet.Laps += run.Laps.Length
 
 										found := true
@@ -3121,7 +3122,7 @@ class SoloCenter extends ConfigurationItem {
 
 
 						if !found
-							tyreSets.Push({Nr: run.TyreSet, Compound: run.Compounds[1], Laps: this.getTyreLaps(run)})
+							tyreSets.Push({Nr: run.TyreSet, Compounds: run.Compounds, Laps: this.getTyreLaps(run)})
 					}
 				}
 			}
@@ -3129,7 +3130,7 @@ class SoloCenter extends ConfigurationItem {
 		this.iUsedTyreSets := tyreSets
 
 		for ignore, tyreSet in tyreSets
-			this.UsedTyreSetsListView.Add("", translate(tyreSet.Compound), tyreSet.Nr, tyreSet.Laps)
+			this.UsedTyreSetsListView.Add("", translate(first(tyreSet.Compounds, (c) => (c && (c != "-")))), tyreSet.Nr, tyreSet.Laps)
 
 		this.UsedTyreSetsListView.ModifyCol()
 
@@ -3143,21 +3144,14 @@ class SoloCenter extends ConfigurationItem {
 					   , AvgLapTime: "-", Potential: "-", RaceCraft: "-", Speed: "-", Consistency: "-", CarControl: "-"
 					   , StartPosition: "-", EndPosition: "-", Laps: [], Notes: ""}
 
-		if (newRun.Nr = 1) {
-			if (this.Control["tyreCompoundDropDown"].Value > 2)
-				newRun.TyreMode := "Manual"
-			else
+		switch this.Control["tyreCompoundDropDown"].Value {
+			case 1:
+				newRun.TyreMode := ((newRun.Nr = 1) ? "Auto" : false)
+			case 2:
 				newRun.TyreMode := "Auto"
+			default:
+				newRun.TyreMode := "Manual"
 		}
-		else
-			switch this.Control["tyreCompoundDropDown"].Value {
-				case 1:
-					newRun.TyreMode := false
-				case 2:
-					newRun.TyreMode := "Auto"
-				default:
-					newRun.TyreMode := "Manual"
-			}
 
 		this.Runs[newRun.Nr] := newRun
 
@@ -3179,7 +3173,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreSet := false
 		local driver := false
 		local laps, numLaps, lapTimes, airTemperatures, trackTemperatures, tyreSets
-		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row, theCompound
+		local ignore, lap, consumption, weather, fuelAmount, tyreInfo, row
 
 		run.FuelConsumption := 0.0
 		run.Accidents := 0
@@ -3230,52 +3224,62 @@ class SoloCenter extends ConfigurationItem {
 				driver := lap.Driver
 		}
 
-		if (this.SessionActive && (run.TyreMode = "Auto")) {
-			this.Provider.supportsTyreManagement( , &tyreSets)
+		if (run.Laps.Length > 0)
+			if (this.SessionActive && (run.TyreMode = "Auto")) {
+				this.Provider.supportsTyreManagement( , &tyreSets)
 
-			theCompound := first(tyreCompound, (c) => (c && (c != "-")))
+				if ((tyreCompound ? first(tyreCompound, (c) => (c && (c != "-"))) : false)
+				 && !exist(run.Compounds, (c) => (c && (c != "-"))))
+					run.Compounds := tyreCompound
 
-			if (theCompound && !exist(run.Compounds, (c) => (c && (c != "-"))))
-				run.Compounds := tyreCompound
+				for ignore, lap in run.Laps {
+					lap.Compounds := tyreCompound
+					lap.TyreSet := tyreSet
+				}
 
-			if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1) && (this.Control["tyreCompoundDropDown"].Value > 1)) {
-				run.Compounds := tyreCompound
-				run.TyreSet := tyreSet
+				if (tyreSet && (run.TyreSet != tyreSet) && (run.Laps.Length > 1) && (this.Control["tyreCompoundDropDown"].Value > 1)) {
+					this.updateUsedTyreSets()
 
-				run.Laps[1].Compounds := tyreCompound
-				run.Laps[1].TyreSet := tyreSet
+					run.Compounds := tyreCompound
+					run.TyreSet := tyreSet
 
-				this.updateUsedTyreSets()
+					tyreInfo := this.UsedTyreSets[tyreCompound, tyreSet]
 
-				tyreInfo := this.UsedTyreSets[theCompound, tyreSet]
+					if tyreInfo {
+						run.TyreLaps := Max(0, (tyreInfo.Laps - run.Laps.Length))
 
-				if tyreInfo {
-					run.TyreLaps := (tyreInfo.Laps - run.Laps.Length)
+						for ignore, lap in run.Laps {
+							row := sessionStore.query("Lap.Data", {Where: {Lap: lap.Nr}})
 
-					for ignore, lap in run.Laps {
-						row := sessionStore.query("Lap.Data", {Where: {Lap: lap.Nr}})
+							if (row.Length > 0) {
+								row := row[1]
 
-						if (row.Length > 0) {
-							row := row[1]
+								if (row["Tyre.Laps.Front.Left"] != (run.TyreLaps + A_Index)) {
+									row["Tyre.Laps.Front.Left"] := (run.TyreLaps + A_Index)
 
-							if (row["Tyre.Laps.Front.Left"] != (run.TyreLaps + A_Index)) {
-								row["Tyre.Laps.Front.Left"] := (run.TyreLaps + A_Index)
-
-								sessionStore.changed("Lap.Data")
+									sessionStore.changed("Lap.Data")
+								}
 							}
 						}
 					}
-				}
-				else
-					run.TyreLaps := 0
+					else
+						run.TyreLaps := 0
 
-				if isDebug()
-					logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
+					if isDebug()
+						logMessage(kLogDebug, "modifyRun - Run: " . run.Nr . "; TyreSet: " . tyreSet . "; TyreLaps: " . run.TyreLaps)
+				}
+				else {
+					run.Compounds := tyreCompound
+					run.TyreSet := tyreSet
+
+					if ((this.Control["tyreCompoundDropDown"].Value == 1)
+					  || (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)))
+						if equalCompounds(run.Compounds, this.Runs[run.Nr - 1].Compounds)
+							run.TyreLaps := this.getTyreLaps(this.Runs[run.Nr - 1])
+						else
+							run.TyreLaps := 0
+				}
 			}
-			else if ((this.Control["tyreCompoundDropDown"].Value == 1)
-				  || (!tyreSets && (run.Nr > 1) && (this.Control["tyreCompoundDropDown"].Value == 2)))
-				run.TyreLaps := this.getTyreLaps(this.Runs[run.Nr - 1])
-		}
 
 		if driver
 			run.Driver := driver
@@ -3398,7 +3402,7 @@ class SoloCenter extends ConfigurationItem {
 							if isNull(tyreSet)
 								tyreSet := false
 							else {
-								tyreInfo := this.UsedTyreSets[newRun.Compounds[1], tyreSet]
+								tyreInfo := this.UsedTyreSets[newRun.Compounds, tyreSet]
 
 								if tyreInfo
 									newRun.TyreLaps := tyreInfo.Laps
@@ -5153,7 +5157,8 @@ class SoloCenter extends ConfigurationItem {
 					 , StartTime: run["Time.Start"], EndTime: run["Time.End"], Notes: decode(run["Notes"])}
 
 			if (isNull(newRun.TyreLaps) || (newRun.TyreLaps == 0))
-				if (this.CurrentRun && isNumber(this.CurrentRun.TyreSet) && (this.CurrentRun.Compounds = newRun.Compounds)
+				if (this.CurrentRun && isNumber(this.CurrentRun.TyreSet)
+									&& equalCompounds(this.CurrentRun.Compounds, newRun.Compounds)
 									&& (this.CurrentRun.TyreSet = newRun.TyreSet))
 					newRun.TyreLaps := this.getTyreLaps(this.CurrentRun)
 				else

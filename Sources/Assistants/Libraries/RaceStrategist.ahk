@@ -2862,10 +2862,10 @@ class RaceStrategist extends GridRaceAssistant {
 			FileAppend(JSON.print(strategy), "  ", kTempDirectory . "Strategy.json")
 		}
 
-		RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
-																  , options.HasProp("Confirm") && options.Confirm
-																  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
-																  , options.HasProp("Pitstop") && options.Pitstop)
+		RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
+												  , options.HasProp("Confirm") && options.Confirm
+												  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
+												  , options.HasProp("Pitstop") && options.Pitstop).start()
 	}
 
 	proposeStrategy(options := {}) {

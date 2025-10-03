@@ -164,7 +164,15 @@ class RecommendStrategyEvent extends StrategistEvent {
 
 	handleEvent(event, arguments*) {
 		local targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
-		local options := (arguments.Has(2) ? arguments[1] : {})
+		local options
+
+		if arguments.Has(2) {
+			options := toObject(string2Map("|", "->", arguments[2]))
+
+			arguments.RemoveAt(2)
+		}
+		else
+			options := {}
 
 		if targetLap
 			options.Pitstop := targetLap
@@ -2301,7 +2309,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if this.Strategy {
 			tyreSets := []
 
-			for ignore, descriptor in this.TyreSets
+			for ignore, descriptor in this.Strategy.TyreSets
 				if descriptor
 					tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
 
@@ -2859,7 +2867,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if isDebug() {
 			deleteFile(kTempDirectory . "Strategy.json")
 
-			FileAppend(JSON.print(strategy, isDebug() ? "  " : ""), kTempDirectory . "Strategy.json")
+			FileAppend(JSON.print(strategy, "  "), kTempDirectory . "Strategy.json")
 		}
 
 		RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
@@ -2870,7 +2878,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	proposeStrategy(options := {}) {
 		if (this.AgentBooster && this.handledEvent("RecommendStrategy") && this.findAction("update_strategy"))
-			this.handleEvent("RecommendStrategy", options.HasProp("Pitstop") && options.Pitstop, options)
+			this.handleEvent("RecommendStrategy", options.HasProp("Pitstop") && options.Pitstop, map2String("|", "->", toMap(options)))
 		else
 			this.recommendStrategy(options)
 	}

@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.5.6.1
+
+#### Date: 10/03/25
+
+#### Fixes
+
+  - Fixed a critical in the session state handling of the Race Engineer
+
 ## 6.5.6.0
 
 #### Date: 10/03/25

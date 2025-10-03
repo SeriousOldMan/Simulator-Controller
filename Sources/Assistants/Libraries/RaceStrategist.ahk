@@ -2859,7 +2859,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if isDebug() {
 			deleteFile(kTempDirectory . "Strategy.json")
 
-			FileAppend(JSON.print(strategy), "  ", kTempDirectory . "Strategy.json")
+			FileAppend(JSON.print(strategy, isDebug() ? "  " : ""), kTempDirectory . "Strategy.json")
 		}
 
 		RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"

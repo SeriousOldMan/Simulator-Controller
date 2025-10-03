@@ -2859,6 +2859,9 @@ normalizeCompound(qualifiedCompound) {
 }
 
 equalCompounds(compounds1, compounds2) {
+	combineCompounds(&compounds1)
+	combineCompounds(&compounds2)
+
 	if (compounds1.Length != compounds2.Length)
 		return false
 	else

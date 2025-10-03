@@ -6,7 +6,7 @@
 
 #### Fixes
 
-  - Fixed a critical in the session state handling of the Race Engineer
+  - Fixed a critical in the session state handling of the Race Engineer.
 
 ## 6.5.6.0
 

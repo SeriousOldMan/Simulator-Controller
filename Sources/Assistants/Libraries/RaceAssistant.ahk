@@ -175,7 +175,7 @@ class AssistantEvent extends AgentEvent {
 		local data := assistant.getKnowledge("Agent", this.Options)
 
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
-			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")}
+			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data, isDebug() ? "  " : "") : "{}", "%", "\%")}
 	}
 
 	handledEvent(event) {
@@ -1395,7 +1395,7 @@ class RaceAssistant extends ConfigurationItem {
 						case "Knowledge":
 							data := this.getKnowledge(type)
 
-							return StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")
+							return StrReplace((data.Count > 0) ? JSON.print(data, isDebug() ? "  " : "") : "{}", "%", "\%")
 					}
 				case "Stint":
 					switch item, false {
@@ -1700,7 +1700,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data), "%", "\%")
+																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")
 																								   : "{}"}))
 
 				if text {

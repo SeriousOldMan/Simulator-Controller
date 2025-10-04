@@ -127,7 +127,7 @@ class RecommendPitstopEvent extends StrategistEvent {
 	}
 }
 
-class RecommendStrategyEvent extends StrategistEvent {
+class SimulateStrategyEvent extends StrategistEvent {
 	iStrategyOptions := false
 
 	StrategyOptions {
@@ -2869,7 +2869,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateStrategyAction(strategy?) {
-		local options := this.findEvent("RecommendStrategy").StrategyOptions
+		local options := this.findEvent("SimulateStrategy").StrategyOptions
 
 		if isSet(strategy) {
 			if !isObject(strategy)
@@ -2891,8 +2891,8 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	proposeStrategy(options := {}) {
-		if (this.AgentBooster && this.handledEvent("RecommendStrategy") && this.findAction("update_strategy"))
-			this.handleEvent("RecommendStrategy", options.HasProp("Pitstop") && options.Pitstop, map2String("|", "->", toMap(options)))
+		if (this.AgentBooster && this.handledEvent("SimulateStrategy") && this.findAction("update_strategy"))
+			this.handleEvent("SimulateStrategy", options.HasProp("Pitstop") && options.Pitstop, map2String("|", "->", toMap(options)))
 		else
 			this.recommendStrategy(options)
 	}

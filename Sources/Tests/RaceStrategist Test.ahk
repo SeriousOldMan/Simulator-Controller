@@ -535,10 +535,12 @@ else {
 			lap := A_Index
 
 			if (lap = 6) {
+				/*
 				strategist.recommendPitstop(17)
 
 				while !GetKeyState("RShift")
 					Sleep(1000)
+				*/
 
 				strategist.proposeStrategy()
 

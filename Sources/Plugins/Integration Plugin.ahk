@@ -918,7 +918,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			deleteFile(fileName)
 
-			FileAppend(JSON.print(sessionState, "`t"), fileName)
+			FileAppend(JSON.print(sessionState, "  "), fileName)
 
 			loop 10
 				try {

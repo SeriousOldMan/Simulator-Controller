@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.5.6.1
+
+#### Date: 10/03/25
+
+#### Fixes
+
+  - Fixed a critical in the session state handling of the Race Engineer.
+
 ## 6.5.6.0
 
 #### Date: 10/03/25
@@ -21,7 +29,20 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.0.0
+
+#### Date: 10/10/25 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The calculation of lap count of used tyre sets as shown in the list on the first page of "Solo Center" has been optimized for simulators where no tyre set information is available or when single tyres have been chenged at the last pitstop.
+  - The *Reasoning* booster for the Race Strategist supports a new [event for strategy simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-strategist). Together with the also new counterpart action "Strategy Update", this event, if enabled, will route the request to simulate a strategy and possibly updating the existing strategy to the LLM together with all available data about the session and car state, as well as a complete description of the currently active strategy. The LLM, acting as a LAM (aka large action model) in this case, may come up with a better strategy than the internal rule engine. But please note, that strategy simulation is the most thinkable complex reasoning task and running a strategy simulation therefore requires a very capable reasoning model like GPT-5 or Claude Sonnet 4.5. And even with these models, the request fails in some cases.
+
+Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "simulate_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist
 
 # Release history
 

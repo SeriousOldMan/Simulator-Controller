@@ -227,6 +227,10 @@ class PlanPitstopEvent extends EngineerEvent {
 		}
 	}
 
+	handledEvent(event) {
+		return (super.handledEvent(event) && this.Assistant.hasEnoughData(false))
+	}
+
 	createTrigger(event, phrase, arguments) {
 		local knowledgeBase := this.Assistant.KnowledgeBase
 		local targetLap, refuelAmount, tyreChange, repairs

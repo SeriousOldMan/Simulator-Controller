@@ -119,7 +119,7 @@ class LMURESTProvider {
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
 			if (data && lmuApplication.isRunning()) {
-				data := JSON.print(data, "  ")
+				data := JSON.print(data)
 
 				try {
 					tickCount := A_TickCount

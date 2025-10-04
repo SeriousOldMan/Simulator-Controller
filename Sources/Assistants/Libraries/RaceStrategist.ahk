@@ -89,6 +89,10 @@ class RecommendPitstopEvent extends StrategistEvent {
 		}
 	}
 
+	handledEvent(event) {
+		return (super.handledEvent(event) && this.Assistant.hasEnoughData(false))
+	}
+
 	createTrigger(event, phrase, arguments) {
 		local knowledgeBase := this.Assistant.KnowledgeBase
 		local targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)
@@ -132,6 +136,10 @@ class RecommendStrategyEvent extends StrategistEvent {
 		}
 	}
 
+	handledEvent(event) {
+		return (super.handledEvent(event) && this.Assistant.Strategy && this.Assistant.hasEnoughData(false))
+	}
+
 	createTrigger(event, phrase, arguments) {
 		local knowledgeBase := this.Assistant.KnowledgeBase
 		local options := this.StrategyOptions
@@ -159,7 +167,9 @@ class RecommendStrategyEvent extends StrategistEvent {
 		else
 			weatherRule := getMultiMapValue(instructions, "Rules", "WeatherRuleStable")
 
-		return substituteVariables(getMultiMapValue(instructions, "Instructions", "StrategyRecommend"), {pitstopRule: pitstopRule, weatherRule: weatherRule})
+		return substituteVariables(getMultiMapValue(instructions, "Instructions", "StrategyRecommend")
+								 , {pitstopRule: pitstopRule, weatherRule: weatherRule
+								  , strategy: JSON.print(this.Assistant.Strategy.Descriptor, isDebug() ? "  " : "")})
 	}
 
 	handleEvent(event, arguments*) {

@@ -3238,7 +3238,7 @@ class RaceAssistant extends ConfigurationItem {
 						   , Track: SessionDatabase.getTrackName(simulator, track)
 						   , Laps: laps, Started: startTime, Finished: A_Now}
 
-					FileAppend(JSON.print(info, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
+					FileAppend(JSON.print(info, "  "), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
 
 					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 
@@ -3263,7 +3263,7 @@ class RaceAssistant extends ConfigurationItem {
 				knowledge := this.createSessionKnowledge(lapNumber)
 
 				if (knowledge && ((isInstance(knowledge, Map) ? knowledge.Count : knowledge.Length) > 0))
-					FileAppend(JSON.print(knowledge, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
+					FileAppend(JSON.print(knowledge, "  "), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
 
 				lastLap += 1
 			}

@@ -2432,7 +2432,7 @@ class CallbacksEditor {
 
 		deleteFile(kTempDirectory . "LLM Callbacks.json")
 
-		FileAppend(JSON.print(collect(callbacks, (callback) => callback.Descriptor), "`t"), kTempDirectory . "LLM Callbacks.json")
+		FileAppend(JSON.print(collect(callbacks, (callback) => callback.Descriptor), "  "), kTempDirectory . "LLM Callbacks.json")
 
 		Run("notepad.exe `"" . kTempDirectory . "LLM Callbacks.json`"")
 	}

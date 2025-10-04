@@ -1,7 +1,7 @@
 [Development]
 Version=6.6.0.0-dev
 Target=6.6.0.0-release
-Date=10/03/2025
+Date=10/04/2025
 Download=
 Changes=Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "recommend_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1

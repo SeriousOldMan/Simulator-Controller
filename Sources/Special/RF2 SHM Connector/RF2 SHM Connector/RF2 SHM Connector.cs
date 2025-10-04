@@ -280,6 +280,14 @@ namespace SHMConnector {
 					}
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".FuelRemaining="); strWriter.WriteLine(Math.Round(telemetry.mFuel, 1));
+
+					string compound = GetStringFromBytes(telemetry.mFrontTireCompoundName);
+
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".TyreCompoundRaw="); strWriter.WriteLine(compound);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".TyreCompoundRawFront="); strWriter.WriteLine(compound);
+
+					compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".TyreCompoundRawRear="); strWriter.WriteLine(compound);
 				}
 			}
 			else

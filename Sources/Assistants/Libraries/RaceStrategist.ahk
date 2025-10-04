@@ -609,9 +609,9 @@ class RaceStrategist extends GridRaceAssistant {
 	class RaceStrategyUpdateTask extends RaceStrategist.RaceStrategyTask {
 		iStrategy := false
 
-		Simulation {
+		Strategy {
 			Get {
-				return this.iSimulation
+				return this.iStrategy
 			}
 		}
 
@@ -2868,22 +2868,26 @@ class RaceStrategist extends GridRaceAssistant {
 			this.proposeStrategy({Confirm: true})
 	}
 
-	updateStrategyAction(strategy) {
+	updateStrategyAction(strategy?) {
 		local options := this.findEvent("RecommendStrategy").StrategyOptions
 
-		if !isObject(strategy)
-			strategy := JSON.parse(strategy)
+		if isSet(strategy) {
+			if !isObject(strategy)
+				strategy := JSON.parse(strategy)
 
-		if isDebug() {
-			deleteFile(kTempDirectory . "Strategy.json")
+			if isDebug() {
+				deleteFile(kTempDirectory . "Strategy.json")
 
-			FileAppend(JSON.print(strategy, "  "), kTempDirectory . "Strategy.json")
+				FileAppend(JSON.print(strategy, "  "), kTempDirectory . "Strategy.json")
+			}
+
+			RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
+													  , options.HasProp("Confirm") && options.Confirm
+													  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
+													  , options.HasProp("Pitstop") && options.Pitstop).start()
 		}
-
-		RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
-												  , options.HasProp("Confirm") && options.Confirm
-												  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
-												  , options.HasProp("Pitstop") && options.Pitstop).start()
+		else if (this.Speaker && (!options.HasProp("Silent") || !options.Silent))
+			this.getSpeaker().speakPhrase("NoValidStrategy")
 	}
 
 	proposeStrategy(options := {}) {
@@ -3061,10 +3065,13 @@ class RaceStrategist extends GridRaceAssistant {
 
 		theTask := Task.CurrentTask
 
-		theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver
-																		   , theTask.Pitstops, theTask.FullCourseYellow, theTask.ForcedPitstop)
-										: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver
-																	, theTask.Pitstops, theTask.FullCourseYellow, theTask.ForcedPitstop))
+		if (isObject(nameOrConfiguration) && nameOrConfiguration.Has("Name"))
+			theStrategy := RaceStrategist.RaceStrategy(this, nameOrConfiguration, SessionDatabase.ID, [])
+		else
+			theStrategy := (this.UseTraffic ? RaceStrategist.TrafficRaceStrategy(this, nameOrConfiguration, driver
+																			   , theTask.Pitstops, theTask.FullCourseYellow, theTask.ForcedPitstop)
+											: RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver
+																		, theTask.Pitstops, theTask.FullCourseYellow, theTask.ForcedPitstop))
 
 		if (name && !isObject(name))
 			theStrategy.setName(name)

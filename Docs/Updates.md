@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.6.0
 
-Nothing to do.
+If you already have driven the Oreca 07 car in the ELMS series, wrong data may have been stored in the database. You can use the Administration -> Laps editor (double click) in the "Session Database" to remove entries with too fast lap times, you have recorded already.
 
 ***
 

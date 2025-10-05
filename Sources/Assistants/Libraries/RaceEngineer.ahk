@@ -4037,7 +4037,7 @@ class RaceEngineer extends RaceAssistant {
 						theCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . tyre, false)
 
 						if theCompound {
-							theCompoundColor := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . tyre, false)
+							theCompoundColor := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . tyre, false)
 
 							break
 						}
@@ -4051,7 +4051,7 @@ class RaceEngineer extends RaceAssistant {
 						theCompound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . axle, false)
 
 						if theCompound {
-							theCompoundColor := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound." . axle, false)
+							theCompoundColor := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color." . axle, false)
 
 							break
 						}
@@ -4077,9 +4077,9 @@ class RaceEngineer extends RaceAssistant {
 						*/
 
 						if (theCompoundColor = "Black")
-							compoundName := translate(theCompound)
+							compoundName := translate(theCompound, this.VoiceManager.Language)
 						else
-							compoundName := translate(compound(theCompound, theCompoundColor))
+							compoundName := translate(compound(theCompound, theCompoundColor), this.VoiceManager.Language)
 
 						speaker.speakPhrase(!tyreSet ? "TyreChangeNoSet" : "TyreChange", {compound: compoundName, set: tyreSet})
 					}

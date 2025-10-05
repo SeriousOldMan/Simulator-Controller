@@ -109,7 +109,7 @@ class RecommendPitstopEvent extends StrategistEvent {
 		if (targetLap = "Now")
 			targetLap := (knowledgeBase.getValue("Lap", 0) + 1)
 
-		if (targetLap != kUndefined)
+		if (targetLap && (targetLap != kUndefined))
 			targetLapRule := substituteVariables(getMultiMapValue(instructions, "Rules", "TargetLapRuleFixed")
 											   , {targetLap: targetLap
 												, deltaLaps: knowledgeBase.getValue("Session.Settings.Standings.Extrapolation.Laps", 3)})

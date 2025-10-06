@@ -68,9 +68,6 @@ class SpeechSynthesizer {
 
 	static sAudioRoutingInitialized := false
 
-	static sAudioDriver := false
-	static sAudioDevice := false
-
 	static sSampleFrequency := false
 
 	iSoundPlayer := false
@@ -207,6 +204,18 @@ class SpeechSynthesizer {
 	Speaking {
 		Get {
 			return this.isSpeaking()
+		}
+	}
+	
+	static AudioDevice {
+		Get {
+			return getAudioSetting(this.Routing)
+		}
+	}
+	
+	AudioDevice {
+		Get {
+			return SpeechSynthesizer.AudioDevice
 		}
 	}
 
@@ -406,9 +415,6 @@ class SpeechSynthesizer {
 				SpeechSynthesizer.sAudioRoutingInitialized := true
 
 				configuration := readMultiMap(kUserConfigDirectory . "Audio Settings.ini")
-
-				SpeechSynthesizer.sAudioDriver := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDriver", false)
-				SpeechSynthesizer.sAudioDevice := getMultiMapValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 		}
 
@@ -561,7 +567,7 @@ class SpeechSynthesizer {
 
 		if kSox {
 			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
-						   , SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
+						   , SpeechSynthesizer.AudioDevice ? ("`"" . SpeechSynthesizer.AudioDevice . "`"") : "")
 
 			if callback
 				callback.Call("Start")

@@ -60,8 +60,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iOilTemperature := [80, 90, 100]
 
 	iAcousticFeedback := true
-	static sAudioDevice := false
-
+	
 	iIssueCollector := false
 	iLastHandling := false
 	iLastTemperatures := false
@@ -322,7 +321,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 	static AudioDevice {
 		Get {
-			return GenericIssueAnalyzer.sAudioDevice
+			return getAudioSetting("Analyzer")
 		}
 	}
 
@@ -475,8 +474,6 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 
 		if first {
-			GenericIssueAnalyzer.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
-
 			registerMessageHandler("Analyzer", methodMessageHandler, GenericIssueAnalyzer)
 
 			first := false

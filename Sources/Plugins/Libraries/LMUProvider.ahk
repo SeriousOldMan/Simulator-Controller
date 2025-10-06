@@ -23,83 +23,11 @@ class LMUProvider extends Sector397Provider {
 	iDriversData := false
 	iGridData := false
 
+	iLastDriver := false
+
 	iStandingsData := false
 
 	iFuelRatio := false
-
-	class StandingsData extends LMURestProvider.StandingsData {
-		iCarIDs := false
-		iCarPositions := false
-
-		Position[carID] {
-			Get {
-				try {
-					return this.iCarPositions[inList(this.iCarIDs, carID)]
-				}
-				catch Any as exception {
-					logError(exception)
-
-					return false
-				}
-			}
-		}
-
-		Driver[carID] {
-			Get {
-				try {
-					return super.Driver[this.iCarPositions[inList(this.iCarIDs, carID)]]
-				}
-				catch Any as exception {
-					logError(exception)
-
-					return false
-				}
-			}
-		}
-
-		Class[carID] {
-			Get {
-				try {
-					return super.Class[this.iCarPositions[inList(this.iCarIDs, carID)]]
-				}
-				catch Any as exception {
-					logError(exception)
-
-					return false
-				}
-			}
-		}
-
-		Laps[carID] {
-			Get {
-				try {
-					return super.Laps[this.iCarPositions[inList(this.iCarIDs, carID)]]
-				}
-				catch Any as exception {
-					logError(exception)
-
-					return false
-				}
-			}
-		}
-
-		__New(standingsData) {
-			local ids := []
-			local positions := []
-
-			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-				ids.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID"))
-				positions.Push(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position"))
-			}
-
-			this.iCarIDs := ids
-			this.iCarPositions := positions
-
-			super.__New()
-
-			this.read()
-		}
-	}
 
 	Simulator {
 		Get {
@@ -245,15 +173,29 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
-		local standingsData, forName, surName, nickName
+		local teamSession := this.TeamData.TeamSession
+		local standingsData, forName, surName, nickName, id, team
+
+		this.iStandingsData := LMUProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 
-		this.iStandingsData := LMUProvider.StandingsData(standingsData)
-
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-			parseDriverName(this.StandingsData.Driver[getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")]
-						  , &forName, &surName, &nickName)
+			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+
+			if teamSession {
+				nr := this.TeamData.Nr[id]
+
+				if nr
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", nr)
+
+				team := this.TeamData.Team[id]
+
+				if team
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Team", team)
+			}
+
+			parseDriverName(this.StandingsData.Driver[id], &forName, &surName, &nickName)
 
 			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
 			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
@@ -270,7 +212,12 @@ class LMUProvider extends Sector397Provider {
 
 		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
 
+		if !driver
+			driver := this.iLastDriver
+
 		if driver {
+			this.iLastDriver := driver
+
 			forName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Forname")
 			surName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Surname")
 			nickName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Nickname")
@@ -428,18 +375,6 @@ class LMUProvider extends Sector397Provider {
 				default:
 					throw "Unknown session state detected in LMUProvider.readSessionData..."
 			}
-
-			/*
-			paused := sessionData.Paused
-
-			if paused {
-				setMultiMapValue(data, "Session Data", "Active", true)
-				setMultiMapValue(data, "Session Data", "Paused", true)
-			}
-
-			if (paused || getMultiMapValue(data, "Session Data", "Paused", false))
-				removeMultiMapValues(data, "Position Data")
-			*/
 
 			if !InStr(options, "Standings=true") {
 				if car

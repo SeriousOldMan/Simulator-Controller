@@ -1213,12 +1213,99 @@ class LMURESTProvider {
 	}
 
 	class TeamData extends LMURESTProvider.RESTData {
+		iTeamData := false
+
 		iCachedCar := false
 		iCachedTeam := false
+
+		class TeamData extends LMURESTProvider.RESTData {
+			iTeamSession := kUndefined
+
+			GETURL {
+				Get {
+					return "http://localhost:6397/rest/multiplayer/teams"
+				}
+			}
+
+			TeamSession {
+				Get {
+					if (this.iTeamSession = kUndefined)
+						this.iTeamSession := this.getTeamSession()
+
+					return this.iTeamSession
+				}
+			}
+
+			Nr[id] {
+				Get {
+					return this.getNr(id)
+				}
+			}
+
+			Team[id] {
+				Get {
+					return this.getTeam(id)
+				}
+			}
+
+			Drivers[id] {
+				Get {
+					return this.getDrivers(id)
+				}
+			}
+
+			getTeamSession(id) {
+				local data := this.Data
+
+				return (data && (date != kNull))
+			}
+
+			getNr(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return data["utid" . (id - 1)]["carNumber"]
+				else
+					return false
+			}
+
+			getTeam(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return data["utid" . (id - 1)]["name"]
+				else
+					return false
+			}
+
+			getDrivers(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return getKeys(data["utid" . (id - 1)]["drivers"])
+				else
+					return []
+			}
+		}
 
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/garage/UIScreen/CarSetupOverview"
+			}
+		}
+
+		TeamData {
+			Get {
+				if !this.iTeamData
+					this.iTeamData := LMURESTProvider.TeamData.TeamData()
+
+				return this.iTeamData
+			}
+		}
+
+		TeamSession {
+			Get {
+				return this.TeamData.TeamSession
 			}
 		}
 
@@ -1228,9 +1315,30 @@ class LMURESTProvider {
 			}
 		}
 
-		Team {
+		Nr[id?] {
 			Get {
-				return this.getTeam()
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Nr[id]
+				else
+					return this.getNr()
+			}
+		}
+
+		Team[id?] {
+			Get {
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Team[id]
+				else
+					return this.getTeam()
+			}
+		}
+
+		Drivers[id?] {
+			Get {
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Drivers[id]
+				else
+					return SessionDatabase.getUserName()
 			}
 		}
 
@@ -1239,6 +1347,10 @@ class LMURESTProvider {
 			this.iCachedTeam := false
 
 			super.reload()
+		}
+
+		getNr() {
+			return false
 		}
 
 		getCar() {
@@ -1547,81 +1659,6 @@ class LMURESTProvider {
 		}
 	}
 
-	/*
-	class StandingsData extends LMURESTProvider.RESTData {
-		iStandings := false
-
-		GETURL {
-			Get {
-				return "http://localhost:6397/rest/watch/standings/history"
-			}
-		}
-
-		Count {
-			Get {
-				if !this.iStandings
-					this.getCarDescriptor(1)
-
-				return (this.iStandings ? this.iStandings.Count : false)
-			}
-		}
-
-		Driver[position] {
-			Get {
-				return this.getDriver(position)
-			}
-		}
-
-		Class[position] {
-			Get {
-				return this.getClass(position)
-			}
-		}
-
-		Laps[position] {
-			Get {
-				return this.getLaps(position)
-			}
-		}
-
-		getCarDescriptor(position) {
-			local ignore, candidates, candidate, standings
-
-			if !this.iStandings && this.Data {
-				standings := Map()
-
-				for ignore, candidates in this.Data
-					for ignore, candidate in candidates
-						standings[Integer(candidate["position"])] := candidate
-
-				this.iStandings := standings
-			}
-
-			position := Integer(position)
-
-			return ((this.iStandings && this.iStandings.Has(position)) ? this.iStandings[position] : false)
-		}
-
-		getDriver(position) {
-			local car := this.getCarDescriptor(position)
-
-			return ((car && car.Has("driverName")) ? car["driverName"] : false)
-		}
-
-		getClass(position) {
-			local car := this.getCarDescriptor(position)
-
-			return ((car && car.Has("carClass")) ? car["carClass"] : false)
-		}
-
-		getLaps(position) {
-			local car := this.getCarDescriptor(position)
-
-			return ((car && car.Has("totalLaps")) ? car["totalLaps"] : false)
-		}
-	}
-	*/
-
 	class StandingsData extends LMURESTProvider.RESTData {
 		iStandings := false
 		iDriver := false
@@ -1641,71 +1678,67 @@ class LMURESTProvider {
 			}
 		}
 
-		Driver[position?] {
+		Driver[carID] {
 			Get {
-				return this.getDriver(position?)
+				return this.getDriver(carID)
 			}
 		}
 
-		Class[position?] {
+		Class[carID] {
 			Get {
-				return this.getClass(position?)
+				return this.getClass(carID)
 			}
 		}
 
-		Laps[position?] {
+		Laps[carID] {
 			Get {
-				return this.getLaps(position?)
+				return this.getLaps(carID)
 			}
 		}
 
-		Position[position?] {
+		Position[carID] {
 			Get {
-				return this.getPosition(position?)
+				return this.getPosition(carID)
 			}
 		}
 
-		getCarDescriptor(position) {
+		getCarDescriptor(id) {
 			local ignore, car, candidate, standings
 
 			if (!this.iStandings && this.Data) {
 				standings := Map()
 
-				for ignore, car in this.Data {
-					standings[Integer(car["position"])] := car
-
-					if car["player"]
-						this.iDriver := car
-				}
+				for ignore, car in this.Data
+					standings[Integer(car["slotID"] + 1)] := car
 
 				this.iStandings := standings
 			}
 
-			position := Integer(position)
+			id := Integer(id)
 
-			return ((this.iStandings && this.iStandings.Has(position)) ? this.iStandings[position] : false)
+			return (this.iStandings.Has(id) ? this.iStandings[id] : false)
 		}
 
-		getDriver(position?) {
-			local car := (isSet(position) ? this.getCarDescriptor(position) : this.iDriver)
+		getDriver(id) {
+			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("driverName")) ? car["driverName"] : false)
 		}
 
 		getClass(position) {
-			local car := (isSet(position) ? this.getCarDescriptor(position) : this.iDriver)
+			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("carClass")) ? car["carClass"] : false)
 		}
 
 		getLaps(position) {
-			local car := (isSet(position) ? this.getCarDescriptor(position) : this.iDriver)
+			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("lapsCompleted")) ? car["lapsCompleted"] : false)
 		}
 
 		getPosition(position) {
-			local car := (isSet(position) ? this.getCarDescriptor(position) : this.iDriver)
+			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("position")) ? car["position"] : false)
 		}

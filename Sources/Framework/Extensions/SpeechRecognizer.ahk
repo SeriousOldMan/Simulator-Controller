@@ -211,10 +211,6 @@ class SpeechRecognizer {
 
 	iCapturedAudioFile := false
 
-	static sAudioRoutingInitialized := false
-	static sRecognizerAudioDevice := false
-	static sDefaultAudioDevice := false
-
 	_grammarCallbacks := CaseInsenseMap()
 	_grammars := CaseInsenseMap()
 
@@ -327,6 +323,27 @@ class SpeechRecognizer {
 				return (inList(["Azure", "Google", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
+	
+	static AudioDevice[default := false] {
+		Get {
+			local device
+			
+			if default {
+				device := getAudioSetting("Default", "Input", "AudioDevice", kUndefined)
+				
+				if (device = kUndefined)
+					device := SpeechRecognizer.AudioDevice
+			}
+			else
+				return getAudioSetting(this.Routing, "Input")
+		}
+	}
+	
+	AudioDevice[default := false] {
+		Get {
+			return SpeechSynthesizer.AudioDevice[default]
+		}
+	}
 
 	Choices[name?] {
 		Get {
@@ -402,19 +419,10 @@ class SpeechRecognizer {
 
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
+			
+			audioDevice := SpeechRecognizer.AudioDevice
 
-			if !SpeechRecognizer.sAudioRoutingInitialized {
-				SpeechRecognizer.sAudioRoutingInitialized := true
-
-				configuration := readMultiMap(kUserConfigDirectory . "Audio Settings.ini")
-
-				SpeechRecognizer.sRecognizerAudioDevice := getMultiMapValue(configuration, "Input", this.Routing . ".AudioDevice", false)
-				SpeechRecognizer.sDefaultAudioDevice := getMultiMapValue(configuration, "Input", "Default.AudioDevice", SpeechRecognizer.sRecognizerAudioDevice)
-			}
-
-			if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
-				audioDevice := SpeechRecognizer.sRecognizerAudioDevice
-
+			if (audioDevice && kNirCmd)
 				try {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
@@ -427,7 +435,6 @@ class SpeechRecognizer {
 						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
-			}
 
 			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
 				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
@@ -653,9 +660,9 @@ class SpeechRecognizer {
 			this.iAPIKey := ""
 		}
 		finally {
-			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {
-				audioDevice := SpeechRecognizer.sDefaultAudioDevice
-
+			audioDevice := SpeechRecognizer.AudioDevice[true]
+			
+			if (audioDevice && kNirCmd) {
 				try {
 					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
@@ -778,7 +785,7 @@ class SpeechRecognizer {
 		local audioDevice
 
 		if this.Instance {
-			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
+			audioDevice := SpeechRecognizer.AudioDevice
 
 			if (audioDevice && kNirCmd) {
 				try {
@@ -834,7 +841,7 @@ class SpeechRecognizer {
 	stopRecognizer() {
 		global kNirCmd
 
-		local audioDevice := SpeechRecognizer.sDefaultAudioDevice
+		local audioDevice := SpeechRecognizer.AudioDevice[true]
 
 		try {
 			if (this.Instance ? ((InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))

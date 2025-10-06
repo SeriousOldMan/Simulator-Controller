@@ -1691,7 +1691,6 @@ class RaceAssistant extends ConfigurationItem {
 	handleVoiceText(grammar, text) {
 		local ignore, part, data
 
-		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Conversation.AudioDevice", false)
 		static conversationSound := getFileName("Conversation.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (grammar = "Text") {
@@ -1705,7 +1704,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				if text {
 					if (text != true) {
-						playSound("RASoundPlayer.exe", conversationSound, audioDevice)
+						playSound("RASoundPlayer.exe", conversationSound, getAudioSetting("Conversation"))
 
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
@@ -5050,7 +5049,6 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 	local activationIndex := 1
 	local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
-	static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Reasoning.AudioDevice", false)
 	static reasoningSound := getFileName("Reasoning.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 	static explainReasoning := (isDebug() || getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																		 , "Booster", "ExplainReasoning", false))
@@ -5153,7 +5151,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	runAction(enoughData, confirm) {
 		if chime
-			playSound("RASoundPlayer.exe", reasoningSound, audioDevice)
+			playSound("RASoundPlayer.exe", reasoningSound, getAudioSetting("Reasoning"))
 
 		if !assistant.KnowledgeBase
 			return assistant.hasEnoughData()

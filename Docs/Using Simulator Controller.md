@@ -423,12 +423,13 @@ All other input routes are typically set to the same input device, normally the 
 
 A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
 
-#### Activating audio routes by simulation and active session
+#### Activating audio routes by simulator and active session
 
-Additionally, it is possible to select audio routes depending on the currently running simulation and/or the active session. This can be helpful, if you are normally driving using a VR headset, but want to use your 5.1 sound system while outside a session to interact with the Driving Coach, for example.
+Additionally, it is possible to select audio routes depending on the currently running simulator and/or the active session. This can be helpful, if you are normally driving using a VR headset, but want to use your 5.1 sound system while outside a session to interact with the Driving Coach, for example.
 
 To create such a specific set of audio routes, precede the settings with "[Output.Le Mans Ultimate.Race]", for example. This will activate these settings, when you are in a race session in *Le Mans Ultimate* (works for *Input* as well, of course). The following session types are supported:
 
+	Default (in the simulator, but not in a session - for example in the main menu)
 	Other
 	Practice
 	Qualifying

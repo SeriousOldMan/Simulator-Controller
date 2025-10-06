@@ -1263,7 +1263,7 @@ class LMURESTProvider {
 			getNr(id) {
 				local data := this.Data
 
-				if (data && (date != kNull))
+				if (data && (data != kNull))
 					return data["utid" . (id - 1)]["carNumber"]
 				else
 					return false
@@ -1272,7 +1272,7 @@ class LMURESTProvider {
 			getTeam(id) {
 				local data := this.Data
 
-				if (data && (date != kNull))
+				if (data && (data != kNull))
 					return data["utid" . (id - 1)]["name"]
 				else
 					return false
@@ -1281,7 +1281,7 @@ class LMURESTProvider {
 			getDrivers(id) {
 				local data := this.Data
 
-				if (data && (date != kNull))
+				if (data && (data != kNull))
 					return getKeys(data["utid" . (id - 1)]["drivers"])
 				else
 					return []
@@ -1725,19 +1725,19 @@ class LMURESTProvider {
 			return ((car && car.Has("driverName")) ? car["driverName"] : false)
 		}
 
-		getClass(position) {
+		getClass(id) {
 			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("carClass")) ? car["carClass"] : false)
 		}
 
-		getLaps(position) {
+		getLaps(id) {
 			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("lapsCompleted")) ? car["lapsCompleted"] : false)
 		}
 
-		getPosition(position) {
+		getPosition(id) {
 			local car := this.getCarDescriptor(id)
 
 			return ((car && car.Has("position")) ? car["position"] : false)

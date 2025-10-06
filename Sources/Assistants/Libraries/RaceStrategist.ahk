@@ -1239,7 +1239,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local strategy, nextPitstop, pitstop, pitstops
 		local fuelService, tyreService, brakeService, repairService, supportTyreSets, tyreCompound, tyreCompoundColor, tcCandidate
-		local availableTyreSets, tyreSets, tyreSet, ignore
+		local availableTyreSets, tyreSets, tyreSet, ignore, tyreLife
 
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
@@ -1316,29 +1316,54 @@ class RaceStrategist extends GridRaceAssistant {
 			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &supportTyreSets)
 
-			if (this.Strategy && this.activeTopic(options, "Session"))
-				try {
-					availableTyreSets := this.Strategy.AvailableTyreSets
-					tyreSets := knowledge["Session"]["AvailableTyres"]
+			if this.activeTopic(options, "Session")
+				if this.Strategy {
+					try {
+						availableTyreSets := this.Strategy.AvailableTyreSets
+						tyreSets := knowledge["Session"]["AvailableTyres"]
 
-					for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
-						tcCandidate := tyreCompound
+						for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
+							tcCandidate := tyreCompound
 
-						tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tcCandidate))
+							tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tcCandidate))
 
-						if (tyreSet && availableTyreSets.Has(tyreCompound))
-							if (availableTyreSets[tyreCompound][2].Length > 0) {
-								tyreSet["Sets"] := availableTyreSets[tyreCompound][2].Length
+							if (tyreSet && availableTyreSets.Has(tyreCompound))
+								if (availableTyreSets[tyreCompound][2].Length > 0) {
+									tyreSet["Sets"] := availableTyreSets[tyreCompound][2].Length
 
-								tyreSet["Usable"] := (availableTyreSets[tyreCompound][1] . " Laps")
-							}
-							else
-								tyreSets.RemoveAt(inList(tyreSets, tyreSet))
+									tyreSet["UsableLaps"] := availableTyreSets[tyreCompound][1]
+								}
+								else
+									tyreSets.RemoveAt(inList(tyreSets, tyreSet))
+						}
+					}
+					catch Any as exception {
+						logError(exception, true)
 					}
 				}
-				catch Any as exception {
-					logError(exception, true)
-				}
+				else
+					try {
+						tyreSets := knowledge["Session"]["AvailableTyres"]
+
+						for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
+							tcCandidate := tyreCompound
+
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							tyreLife := knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . "." . tyreCompoundColor . ".Laps.Max"
+															 , kUndefined)
+
+							if (tyreLife != kUndefined) {
+								tyreSet := first(tyreSets, (ts) => (ts["Compound"] = tcCandidate))
+
+								if tyreSet
+									tyreSet["UsableLaps"] := tyreLife
+							}
+						}
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 
 			if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy"))
 				try {
@@ -1839,7 +1864,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	readSettings(simulator, car, track, &settings) {
-		local facts
+		local facts, compound, tyreLife, tyreCompound, tyreCompoundColor
 
 		facts := combine(super.readSettings(simulator, car, track, &settings)
 					   , CaseInsenseMap("Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
@@ -1865,6 +1890,13 @@ class RaceStrategist extends GridRaceAssistant {
 																													  , "Strategy.Window.Considered", 3)))
 
 		this.updateConfigurationValues({UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
+
+		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+			for compound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")) {
+				splitCompound(compound, &tyreCompound, &tyreCompoundColor)
+
+				facts["Session.Settings.Tyre." . tyreCompound . "." . tyreCompoundColor . ".Laps.Max"] := tyreLife
+			}
 
 		return facts
 	}

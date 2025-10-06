@@ -166,7 +166,7 @@ namespace RF2SHMProvider {
 				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
 				ref rF2VehicleTelemetry telemetry = ref GetPlayerTelemetry(vehicle.mID, ref this.telemetry);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(i);
+				Console.Write("Car."); Console.Write(i); Console.Write(".ID="); Console.WriteLine(vehicle.mID + 1);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);

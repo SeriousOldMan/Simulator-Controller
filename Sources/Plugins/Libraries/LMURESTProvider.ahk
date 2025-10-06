@@ -1213,12 +1213,99 @@ class LMURESTProvider {
 	}
 
 	class TeamData extends LMURESTProvider.RESTData {
+		iTeamData := false
+
 		iCachedCar := false
 		iCachedTeam := false
+
+		class TeamData extends LMURESTProvider.RESTData {
+			iTeamSession := kUndefined
+
+			GETURL {
+				Get {
+					return "http://localhost:6397/rest/multiplayer/teams"
+				}
+			}
+
+			TeamSession {
+				Get {
+					if (this.iTeamSession = kUndefined)
+						this.iTeamSession := this.getTeamSession()
+
+					return this.iTeamSession
+				}
+			}
+
+			Nr[id] {
+				Get {
+					return this.getNr(id)
+				}
+			}
+
+			Team[id] {
+				Get {
+					return this.getTeam(id)
+				}
+			}
+
+			Drivers[id] {
+				Get {
+					return this.getDrivers(id)
+				}
+			}
+
+			getTeamSession(id) {
+				local data := this.Data
+
+				return (data && (date != kNull))
+			}
+
+			getNr(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return data["utid" . (id - 1)]["carNumber"]
+				else
+					return false
+			}
+
+			getTeam(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return data["utid" . (id - 1)]["name"]
+				else
+					return false
+			}
+
+			getDrivers(id) {
+				local data := this.Data
+
+				if (data && (date != kNull))
+					return getKeys(data["utid" . (id - 1)]["drivers"])
+				else
+					return []
+			}
+		}
 
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/garage/UIScreen/CarSetupOverview"
+			}
+		}
+
+		TeamData {
+			Get {
+				if !this.iTeamData
+					this.iTeamData := LMURESTProvider.TeamData.TeamData()
+
+				return this.iTeamData
+			}
+		}
+
+		TeamSession {
+			Get {
+				return this.TeamData.TeamSession
 			}
 		}
 
@@ -1228,9 +1315,30 @@ class LMURESTProvider {
 			}
 		}
 
-		Team {
+		Nr[id?] {
 			Get {
-				return this.getTeam()
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Nr[id]
+				else
+					return this.getNr()
+			}
+		}
+
+		Team[id?] {
+			Get {
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Team[id]
+				else
+					return this.getTeam()
+			}
+		}
+
+		Drivers[id?] {
+			Get {
+				if (isSet(id) && this.TeamData.TeamSession)
+					return this.TeamData.Drivers[id]
+				else
+					return SessionDatabase.getUserName()
 			}
 		}
 
@@ -1239,6 +1347,10 @@ class LMURESTProvider {
 			this.iCachedTeam := false
 
 			super.reload()
+		}
+
+		getNr() {
+			return false
 		}
 
 		getCar() {

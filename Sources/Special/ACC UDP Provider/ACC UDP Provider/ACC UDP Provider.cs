@@ -413,9 +413,11 @@ namespace ACCUDPProvider {
 									else
 										outStream.WriteLine(".Time.Sectors=0,0,0");
 
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
 
-									DriverData currentDriver = car.CurrentDriver;
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Team="); outStream.WriteLine(car.TeamName);
+
+                                    DriverData currentDriver = car.CurrentDriver;
 
 									if (currentDriver != null)
 									{

@@ -554,7 +554,7 @@ class DrivingCoach extends GridRaceAssistant {
 					data := this.getKnowledge("Conversation")
 
 					if (data.Count > 0)
-						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data), "%", "\%")})
+						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")})
 				}
 			case "Handling":
 				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {

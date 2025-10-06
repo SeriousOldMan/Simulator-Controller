@@ -1,14 +1,14 @@
 [Development]
-Version=6.5.6.0-release
-Target=6.5.6.0-release
-Date=10/03/2025
-Download=https://cutt.ly/nr1PsZT0;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/qpFKGNQ6;https://www.dropbox.com/scl/fi/8qbnefqwbs04dwifdpg9n/Simulator-Controller-6.5.6.0-release.zip?rlkey=6cl4u96d5ds5f2fjbk4l0d1v2&st=xfpk0cf9&dl=1;http://%master%/Releases/Simulator Controller 6.5.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.6.0-release.zip
-Changes=Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach, Fixed some bugs in LMU team races
+Version=6.6.0.0-dev
+Target=6.6.0.0-release
+Date=10/04/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O7vc4LTp
+Changes=Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "simulate_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist, Engineer announces tyre compound with color, Identify "Oreca 07 ELMS" car in LMU, Fixed some bugs in LMU team races
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
-Version=6.5.6.0-release
+Version=6.5.6.1-release
 Date=10/03/2025
-Download=https://cutt.ly/nr1PsZT0;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/qpFKGNQ6;https://www.dropbox.com/scl/fi/8qbnefqwbs04dwifdpg9n/Simulator-Controller-6.5.6.0-release.zip?rlkey=6cl4u96d5ds5f2fjbk4l0d1v2&st=xfpk0cf9&dl=1;http://%master%/Releases/Simulator Controller 6.5.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.6.0-release.zip
+Download=https://cutt.ly/gr1NYmDD;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/xC2hgtKH;https://www.dropbox.com/scl/fi/oiff85k44ybrfunhs9lrb/Simulator-Controller-6.5.6.1-release.zip?rlkey=ukzqofo82otfjbccncxwhuewr&st=kx2nnu8j&dl=1:http://%master%/Releases/Simulator Controller 6.5.6.1-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.5.6.1-release.zip
 Changes=Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Components]
@@ -22,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.5.6.0-release
-Release=6.5.6.0-release
+Development=6.6.0.0-dev
+Release=6.5.6.1-release

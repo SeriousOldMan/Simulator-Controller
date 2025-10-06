@@ -23,6 +23,8 @@ class LMUProvider extends Sector397Provider {
 	iDriversData := false
 	iGridData := false
 
+	iLastDriver := false
+
 	iStandingsData := false
 
 	iFuelRatio := false
@@ -285,7 +287,12 @@ class LMUProvider extends Sector397Provider {
 
 		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
 
+		if !driver
+			driver := this.iLastDriver
+
 		if driver {
+			this.iLastDriver := driver
+
 			forName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Forname")
 			surName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Surname")
 			nickName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Nickname")

@@ -175,7 +175,7 @@ class AssistantEvent extends AgentEvent {
 		local data := assistant.getKnowledge("Agent", this.Options)
 
 		return {assistant: assistant.AssistantType, name: assistant.VoiceManager.Name
-			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")}
+			  , knowledge: StrReplace((data.Count > 0) ? JSON.print(data, isDebug() ? "  " : "") : "{}", "%", "\%")}
 	}
 
 	handledEvent(event) {
@@ -1395,7 +1395,7 @@ class RaceAssistant extends ConfigurationItem {
 						case "Knowledge":
 							data := this.getKnowledge(type)
 
-							return StrReplace((data.Count > 0) ? JSON.print(data) : "{}", "%", "\%")
+							return StrReplace((data.Count > 0) ? JSON.print(data, isDebug() ? "  " : "") : "{}", "%", "\%")
 					}
 				case "Stint":
 					switch item, false {
@@ -1541,7 +1541,7 @@ class RaceAssistant extends ConfigurationItem {
 										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
 
 					if knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined)
-						knowledge["Energy"]["Remaining"] := (knowledgeBase.getValue("Lap." . lapNr . ".Energy.Remaining") . " %")
+						knowledge["Energy"] := Map("Remaining", knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining") . " %")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1700,7 +1700,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
-																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data), "%", "\%")
+																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")
 																								   : "{}"}))
 
 				if text {
@@ -2006,14 +2006,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	handledEvent(event) {
-		local ignore, candidate
-
-		if this.AgentBooster
-			for ignore, candidate in this.iEvents
-				if ((candidate = event) || (candidate.Event = event))
-					return candidate.handledEvent(event)
-
-		return false
+		return (this.findEvent(event) != false)
 	}
 
 	handleEvent(event, arguments*) {
@@ -2026,6 +2019,19 @@ class RaceAssistant extends ConfigurationItem {
 						return true
 					else if candidate.handleEvent(event, arguments*)
 						return true
+
+		return false
+	}
+
+	findEvent(event) {
+		local ignore, candidate
+
+		if this.AgentBooster
+			for ignore, candidate in this.iEvents
+				if (candidate = event)
+					return candidate
+				else if ((candidate.Event = event) && candidate.handledEvent(event))
+					return candidate
 
 		return false
 	}
@@ -3232,7 +3238,7 @@ class RaceAssistant extends ConfigurationItem {
 						   , Track: SessionDatabase.getTrackName(simulator, track)
 						   , Laps: laps, Started: startTime, Finished: A_Now}
 
-					FileAppend(JSON.print(info, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
+					FileAppend(JSON.print(info, "  "), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\Session.json")
 
 					DirCreate(kUserHomeDirectory . "Diagnostics\Sessions\" . startTime)
 
@@ -3257,7 +3263,7 @@ class RaceAssistant extends ConfigurationItem {
 				knowledge := this.createSessionKnowledge(lapNumber)
 
 				if (knowledge && ((isInstance(knowledge, Map) ? knowledge.Count : knowledge.Length) > 0))
-					FileAppend(JSON.print(knowledge, "`t"), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
+					FileAppend(JSON.print(knowledge, "  "), kTempDirectory . this.AssistantType . "\Sessions\" . startTime . "\" . this.AssistantType . " Lap " . lapNumber . ".json")
 
 				lastLap += 1
 			}

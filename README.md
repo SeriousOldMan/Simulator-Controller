@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.5.6.0-release](https://cutt.ly/nr1PsZT0) (Changes: Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach.)
+[6.5.6.1-release](https://cutt.ly/gr1NYmDD) (Changes: Handling of partial tyre changes based on wear, Handling of partial tyre changes based on driven laps, New setting in "Race Settings", New setting in "Session Database", Updated car meta data for R3E, Fixed LMU/rF2 brake duct handling, Fixed data translation for the Driving Coach.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6560) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-656) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None at the moment...
+[6.6.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O7vc4LTp) (Early build for 6.6.0. Changes: Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "simulate_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist, Engineer announces tyre compound with color, Identify "Oreca 07 ELMS" car in LMU.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6600) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

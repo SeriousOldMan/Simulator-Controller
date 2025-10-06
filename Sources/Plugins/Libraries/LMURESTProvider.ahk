@@ -119,7 +119,7 @@ class LMURESTProvider {
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
 
 			if (data && lmuApplication.isRunning()) {
-				data := JSON.print(data, "  ")
+				data := JSON.print(data)
 
 				try {
 					tickCount := A_TickCount
@@ -1438,7 +1438,7 @@ class LMURESTProvider {
 		}
 
 		findCarDescriptor(car, retry := true) {
-			local ignore, candidate
+			local ignore, path, candidate
 
 			car := Trim(car)
 
@@ -1446,12 +1446,22 @@ class LMURESTProvider {
 				return this.iCachedCars[car]
 			else if this.Data
 				if (car != "")
-					for ignore, candidate in this.Data
-						if (Trim(string2Values(",", candidate["fullPathTree"])[candidate["fullPathTree"].Length]) = car) {
+					for ignore, candidate in this.Data {
+						path := string2Values(",", candidate["fullPathTree"])
+
+						if (car = "Oreca 07 ELMS") {
+							if ((Trim(path[path.Length]) = "Oreca 07") && (Trim(path[path.Length - 1]) = "LMP2_ELMS")) {
+								this.iCachedCars[car] := candidate
+
+								return candidate
+							}
+						}
+						else if (Trim(path[path.Length]) = car) {
 							this.iCachedCars[car] := candidate
 
 							return candidate
 						}
+					}
 
 			if retry {
 				this.reload()
@@ -1507,12 +1517,18 @@ class LMURESTProvider {
 			}
 
 			getCar(carId) {
-				local ignore, candidate, path
+				local ignore, candidate, path, car
 
 				if this.iCachedCars.Has(carId) {
 					path := string2Values(",", this.iCachedCars[carId]["fullPathTree"])
 
-					return Trim(path[path.Length])
+					car := Trim(path[path.Length])
+
+					if (car = "Oreca 07")
+						if (Trim(path[path.Length - 1]) = "LMP2_ELMS")
+							car := "Oreca 07 ELMS"
+
+					return car
 				}
 				else if this.Data
 					for ignore, candidate in this.Data

@@ -141,6 +141,7 @@ class Sector397Provider extends SimulatorProvider {
 		local carCategory := false
 		local driverCategory := false
 		local model := false
+		local team := false
 		local nr := false
 		local carRaw, carID, forName, surName, nickName
 
@@ -149,10 +150,13 @@ class Sector397Provider extends SimulatorProvider {
 
 			if (carRaw != kUndefined) {
 				this.parseCarName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
-								, carRaw, &model, &nr, &carCategory)
+								, carRaw, &model, &nr, &carCategory, &team)
 
 				if model
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", model)
+
+				if team
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Team", team)
 
 				if (A_Index != driver) {
 					if debug

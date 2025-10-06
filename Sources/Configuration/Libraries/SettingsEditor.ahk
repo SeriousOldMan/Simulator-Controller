@@ -11,6 +11,7 @@
 
 global kSave := "Save"
 global kContinue := "Continue"
+global kOk := "Ok"
 global kCancel := "Cancel"
 global kUpdate := "Update"
 global kEditModes := "Edit"
@@ -20,11 +21,59 @@ global kEditModes := "Edit"
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+editAudio(ownerOrCommand, *) {
+	static audioGui, result, audioEdit
+
+	if (ownerOrCommand == kOk)
+		result := kOk
+	else if (ownerOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		audioGui := Window({Options: "0x400000"}, translate("Audio"))
+
+		audioGui.SetFont("Norm", "Arial")
+
+		choices := []
+
+		audioGui.Add("Edit", "x16 y16 w334 h200 Multi vaudioEdit")
+
+		audioGui.Add("Button", "x100 yp+210 w80 h23 Default", translate("Ok")).OnEvent("Click", editAudio.Bind(kOk))
+		audioGui.Add("Button", "x186 yp w80 h23", translate("&Cancel")).OnEvent("Click", editAudio.Bind(kCancel))
+
+		audioGui.Opt("+Owner" . ownerOrCommand.Hwnd)
+
+		audioGui.Show("AutoSize Center")
+
+		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
+			audioGui["audioEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")
+
+		while !result
+			Sleep(100)
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				deleteFile(kUserConfigDirectory . "Audio Settings.ini")
+
+				FileAppend(audioGui["audioEdit"].Value, kUserConfigDirectory . "Audio Settings.ini")
+
+				return audioGui["audioEdit"].Value
+			}
+		}
+		finally {
+			audioGui.Destroy()
+		}
+	}
+}
+
 editModes(&settingsOrCommand, arguments*) {
 	global kSave, kCancel, kUpdate
 
 	local modes, row, thePlugin, pluginConfiguration, ignore, mode, simulator, options
-	Local defaultModes, pluginSimulators, x, y
+	Local defaultModes, pluginSimulators, x, y, w, h
 	local index, session
 
 	static newSettings
@@ -145,21 +194,31 @@ editModes(&settingsOrCommand, arguments*) {
 
 		setMultiMapValues(newSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
-		modesEditorGui := Window({Descriptor: "Simulator Settings.Automation", Options: "0x400000"})
+		modesEditorGui := Window({Descriptor: "Simulator Settings.Automation", Resizeable: true, Options: "0x400000"})
 
 		modesEditorGui.SetFont("Bold", "Arial")
 
-		modesEditorGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(modesEditorGui, "Simulator Settings.Automation"))
+		modesEditorGui.Add("Text", "w330 Center W:Grow", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(modesEditorGui, "Simulator Settings.Automation"))
 
 		modesEditorGui.SetFont("Norm", "Arial")
 
-		modesEditorGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Controller Automation")
+		modesEditorGui.Add("Documentation", "x108 YP+20 w130 Center W:Grow", translate("Controller Automation")
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings")
 
 		modesEditorGui.SetFont("Norm", "Arial")
 
-		modesEditorGui.Add("Button", "x85 y280 w80 h23 Default", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
-		modesEditorGui.Add("Button", "x175 y280 w80 h23", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
+		modesEditorGui.Add("Button", "x8 y280 w80 h23 Y:Move", translate("Audio") . translate("...")).OnEvent("Click", (*) {
+			modesEditorGui.Block()
+
+			try {
+				editAudio(modesEditorGui)
+			}
+			finally {
+				modesEditorGui.Unblock()
+			}
+		})
+		modesEditorGui.Add("Button", "x170 y280 w80 h23 Default Y:Move X:Move", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
+		modesEditorGui.Add("Button", "x260 y280 w80 h23 Y:Move X:Move", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
 
 		simulators := []
 
@@ -181,7 +240,7 @@ editModes(&settingsOrCommand, arguments*) {
 		modeSessionDropDown.OnEvent("Change", editModes.Bind(&kUpdate))
 
 		modesEditorGui.Add("Text", "x8 y108 w77 h23 +0x200", translate("Modes"))
-		modesListView := modesEditorGui.Add("ListView", "x85 y108 w255 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
+		modesListView := modesEditorGui.Add("ListView", "x85 y108 w255 h162 W:Grow H:Grow -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
 		modesListView.OnEvent("Click", noSelect)
 		modesListView.OnEvent("DoubleClick", noSelect)
 
@@ -208,6 +267,9 @@ editModes(&settingsOrCommand, arguments*) {
 			modesEditorGui.Show("x" . x . " y" . y . " w346")
 		else
 			modesEditorGui.Show("w346")
+
+		if getWindowSize("Simulator Settings.Automation", &w, &h)
+			modesEditorGui.Resize("Initialize", w, h)
 
 		modesEditorGui.Opt("+Owner" . arguments[1].Hwnd)
 

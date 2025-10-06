@@ -1170,7 +1170,6 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	startListening(retry := true) {
-		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Activation.AudioDevice", false)
 		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (this.iSpeechRecognizer && !this.Listening && this.ListenerActive) {
@@ -1184,7 +1183,7 @@ class VoiceManager extends ConfigurationItem {
 				if this.Interruptable
 					this.interrupt(true)
 
-				playSound("VMSoundPlayer.exe", talkSound, audioDevice)
+				playSound("VMSoundPlayer.exe", talkSound, getAudioSetting("Activation"))
 
 				this.iIsListening := true
 

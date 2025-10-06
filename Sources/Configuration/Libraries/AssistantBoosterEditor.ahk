@@ -2773,9 +2773,8 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 		try {
 			if (result == kCancel)
 				return false
-			else if (result == kOk) {
+			else if (result == kOk)
 				return instructions
-			}
 		}
 		finally {
 			instructionsGui.Destroy()

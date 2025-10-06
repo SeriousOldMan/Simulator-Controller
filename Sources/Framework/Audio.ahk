@@ -30,7 +30,7 @@ global gAudioConfigurationModeSession := false
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getAudioSetting(name, type, property := "AudioDevice", default := false) {
+getAudioSetting(name, type := "Output", property := "AudioDevice", default := false) {
 	global gAudioConfiguration, gAudioConfigurationModeSimulator, gAudioConfigurationModeSession, gAudioConfigurationModTime
 
 	local value := kUndefined
@@ -83,6 +83,9 @@ setAudioMode(simulator, session := false) {
 	global gAudioConfiguration
 
 	if requireAudioConfiguration() {
+		if (session = "Qualification")
+			session := "Qualifying"
+
 		if simulator {
 			setMultiMapValue(gAudioConfiguration, "General", "Simulator", simulator)
 			setMultiMapValue(gAudioConfiguration, "General", "Session", session ? session : "Default")

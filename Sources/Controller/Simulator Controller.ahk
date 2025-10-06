@@ -983,13 +983,13 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	acknowledgeVoiceCommand() {
-		static audioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Controller.AudioDevice", false)
 		static first := true
 
 		if first
 			first := false
 		else
-			playSound("SCSoundPlayer.exe", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"), audioDevice)
+			playSound("SCSoundPlayer.exe", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+										 , getAudioSetting("Controller"))
 	}
 
 	activationCommand(words*) {
@@ -1207,6 +1207,13 @@ class SimulatorController extends ConfigurationItem {
 	setModes(simulator := false, session := false) {
 		local modes := false
 		local ignore, theMode
+
+		if (simulator && session)
+			setAudioMode(simulator, session)
+		else if simulator
+			setAudioMode(simulator, "Default")
+		else
+			setAudioMode(false)
 
 		if !simulator
 			modes := getMultiMapValue(this.Settings, "Modes", "Default", "")

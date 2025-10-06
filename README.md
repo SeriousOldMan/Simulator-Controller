@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O7vc4LTp) (Early build for 6.6.0. Changes: Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "simulate_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist, Engineer announces tyre compound with color, Identify "Oreca 07 ELMS" car in LMU.)
+[6.6.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O7vc4LTp) (Early build for 6.6.0. Changes: Optimized tyre set documentation in "Solo Center", Renamed Agent action "update_strategy" to "recommend_strategy" for Race Strategist, New internal Agent action "simulate_strategy" for Race Strategist, New internal Agent action "update_strategy" for Race Strategist, New instructions for the *Reasoning* booster of the Race Strategist, Engineer announces tyre compound with color, Identify "Oreca 07 ELMS" car in LMU, Fixed some bugs in LMU team races, Switchable audio modes depending on simulator and session, Resizeable controller automation window.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6600) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -39,7 +39,6 @@ class IssueCollector {
 	iTrackWidth := false
 
 	iAcousticFeedback := true
-	static sAudioDevice := false
 
 	iDataFile := false
 	iCollectorPID := false
@@ -134,7 +133,7 @@ class IssueCollector {
 
 	static AudioDevice {
 		Get {
-			return IssueCollector.sAudioDevice
+			return getAudioSetting("Analyzer")
 		}
 	}
 
@@ -146,8 +145,6 @@ class IssueCollector {
 
 	__New(simulator, car, track, settings := {}, acousticFeedback := false) {
 		local setting, value
-
-		static first := true
 
 		this.iSimulator := SessionDatabase.getSimulatorName(simulator)
 		this.iCar := (car ? SessionDatabase.getCarName(simulator, car) : false)
@@ -162,12 +159,6 @@ class IssueCollector {
 				this.iSampleFrequency := value
 			else
 				this.i%setting% := value
-
-		if first {
-			IssueCollector.sAudioDevice := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Audio Settings.ini"), "Output", "Analyzer.AudioDevice", false)
-
-			first := false
-		}
 	}
 
 	loadFromSettings(settings := false, section := "Settigs") {

@@ -289,12 +289,14 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				{
 					"Compound": "Dry (Black)",
 					"Sets": 99,
-					"Weather": [ "Dry", "Drizzle" ]
+					"Weather": [ "Dry", "Drizzle" ],
+					"Usable": "40 Laps"
 				},
 				{
 					"Compound": "Wet (Black)",
 					"Sets": 99,
-					"Weather": [ "LightRain", "MediumRain", "HeavyRain", "Thunderstorm" ]
+					"Weather": [ "LightRain", "MediumRain", "HeavyRain", "Thunderstorm" ],
+					"Usable": "40 Laps"
 				}
 			]
 		},
@@ -331,13 +333,17 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 					"RearRight": "26.1 PSI"
 				}
 			},
-			"Temperatures": {
-				"Current": {
-					"FrontLeft": "84.4 Celsius",
-					"FrontRight": "73.4 Celsius",
-					"RearLeft": "88.2 Celsius",
-					"RearRight": "78.6 Celsius"
-				}
+			"Wear": {
+				"FrontLeft": "6.2 %",
+				"FrontRight": "4.8 %",
+				"RearLeft": "6.4 %",
+				"RearRight": "5.0 %"
+			},
+			"Laps": {
+				"FrontLeft": 6,
+				"FrontRight": 6,
+				"RearLeft": 6,
+				"RearRight": 6
 			}
 		},
 		"Weather": {

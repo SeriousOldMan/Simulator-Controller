@@ -323,25 +323,22 @@ class SpeechRecognizer {
 				return (inList(["Azure", "Google", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
-	
-	static AudioDevice[default := false] {
-		Get {
-			local device
-			
-			if default {
-				device := getAudioSetting("Default", "Input", "AudioDevice", kUndefined)
-				
-				if (device = kUndefined)
-					device := SpeechRecognizer.AudioDevice
-			}
-			else
-				return getAudioSetting(this.Routing, "Input")
-		}
-	}
-	
+
 	AudioDevice[default := false] {
 		Get {
-			return SpeechSynthesizer.AudioDevice[default]
+			local device
+
+			if default {
+				device := getAudioSetting("Default", "Input", "AudioDevice", kUndefined)
+
+				if (device = kUndefined)
+					device := getAudioSetting(this.Routing, "Input")
+			}
+			else
+				device := getAudioSetting(this.Routing, "Input")
+
+			return device
+
 		}
 	}
 
@@ -419,12 +416,12 @@ class SpeechRecognizer {
 
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
-			
-			audioDevice := SpeechRecognizer.AudioDevice
+
+			audioDevice := this.AudioDevice
 
 			if (audioDevice && kNirCmd)
 				try {
-					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+					RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -660,11 +657,11 @@ class SpeechRecognizer {
 			this.iAPIKey := ""
 		}
 		finally {
-			audioDevice := SpeechRecognizer.AudioDevice[true]
-			
+			audioDevice := this.AudioDevice[true]
+
 			if (audioDevice && kNirCmd) {
 				try {
-					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+					RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -785,11 +782,11 @@ class SpeechRecognizer {
 		local audioDevice
 
 		if this.Instance {
-			audioDevice := SpeechRecognizer.AudioDevice
+			audioDevice := this.AudioDevice
 
 			if (audioDevice && kNirCmd) {
 				try {
-					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+					RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -841,7 +838,7 @@ class SpeechRecognizer {
 	stopRecognizer() {
 		global kNirCmd
 
-		local audioDevice := SpeechRecognizer.AudioDevice[true]
+		local audioDevice := this.AudioDevice[true]
 
 		try {
 			if (this.Instance ? ((InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))
@@ -872,7 +869,7 @@ class SpeechRecognizer {
 		finally {
 			if (audioDevice && kNirCmd) {
 				try {
-					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+					RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
 					logError(exception, true)

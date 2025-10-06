@@ -206,16 +206,10 @@ class SpeechSynthesizer {
 			return this.isSpeaking()
 		}
 	}
-	
-	static AudioDevice {
-		Get {
-			return getAudioSetting(this.Routing)
-		}
-	}
-	
+
 	AudioDevice {
 		Get {
-			return SpeechSynthesizer.AudioDevice
+			return getAudioSetting(this.Routing)
 		}
 	}
 
@@ -405,7 +399,7 @@ class SpeechSynthesizer {
 
 		if !SpeechSynthesizer.sSampleFrequency {
 			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-			
+
 			SpeechSynthesizer.sSampleFrequency := getMultiMapValue(settings, "Voice", "ElevenLabs.Sample Frequency"
 																 , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
 		}
@@ -561,13 +555,15 @@ class SpeechSynthesizer {
 	playSound(soundFile, wait := true) {
 		global kNirCmd
 
-		local callback, pid, level
+		local callback, pid, level, audioDevice
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
+			audioDevice := this.AudioDevice
+
 			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
-						   , SpeechSynthesizer.AudioDevice ? ("`"" . SpeechSynthesizer.AudioDevice . "`"") : "")
+						   , audioDevice ? ("`"" . audioDevice . "`"") : "")
 
 			if callback
 				callback.Call("Start")

@@ -1254,10 +1254,10 @@ class LMURESTProvider {
 				}
 			}
 
-			getTeamSession(id) {
+			getTeamSession() {
 				local data := this.Data
 
-				return (data && (date != kNull))
+				return (data && (data != kNull))
 			}
 
 			getNr(id) {

@@ -230,7 +230,7 @@ class IssueCollector {
 
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
-		local pid, options, code, message
+		local pid, options, code, message, audioDevice
 
 		collectSamples() {
 			this.updateSamples()
@@ -271,8 +271,10 @@ class IssueCollector {
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
-					if this.AudioDevice
-						options .= (A_Space . "`"" . this.AudioDevice . "`"")
+					audioDevice := this.AudioDevice
+					
+					if audioDevice
+						options .= (A_Space . "`"" . audioDevice . "`"")
 				}
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
@@ -346,7 +348,9 @@ class IssueCollector {
 	}
 
 	static acousticFeedback(soundFile) {
-		playSound("SWSoundPlayer.exe", soundFile, (IssueCollector.AudioDevice ? IssueCollector.AudioDevice : "") . " echos 1 1 1 1")
+		local audioDevice := IssueCollector.AudioDevice
+		
+		playSound("SWSoundPlayer.exe", soundFile, (audioDevice ? audioDevice : "") . " echos 1 1 1 1")
 	}
 
 	getHandling() {

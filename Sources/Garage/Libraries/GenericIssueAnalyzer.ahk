@@ -319,18 +319,6 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
-	static AudioDevice {
-		Get {
-			return getAudioSetting("Analyzer")
-		}
-	}
-
-	AudioDevice {
-		Get {
-			return GenericIssueAnalyzer.AudioDevice
-		}
-	}
-
 	Handling {
 		Get {
 			if this.iIssueCollector

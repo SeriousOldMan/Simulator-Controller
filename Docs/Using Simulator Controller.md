@@ -366,17 +366,17 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 ### Audio Routing
 
-Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. To configure the audio routes, click on the "Audio..." button in the "Controller Automation" window.
+Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headset. To configure the audio routes, click on the "Audio..." button in the "Controller Automation" window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor%202.JPG)
 
 Audio routes must be defined as follows:
 
 	[Output]
-	Driving Coach.AudioDevice=Headphone
-	Race Spotter.AudioDevice=Headphone
-	Race Engineer.AudioDevice=Headphone
-	Race Strategist.AudioDevice=Headphone
+	Driving Coach.AudioDevice=Headset
+	Race Spotter.AudioDevice=Headset
+	Race Engineer.AudioDevice=Headset
+	Race Strategist.AudioDevice=Headset
 
 Supported output routes are:
 
@@ -392,18 +392,18 @@ Supported output routes are:
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 
-*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
+*Headset* is only an example for any configured audio device which is named "Headset" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 
 	[Input]
 	Default.AudioDevice=Streaming
-	Activation.AudioDevice=Headphone
-	Driving Coach.AudioDevice=Headphone
-	Race Spotter.AudioDevice=Headphone
-	Race Engineer.AudioDevice=Headphone
-	Race Strategist.AudioDevice=Headphone
-	Controller.AudioDevice=Headphone
+	Activation.AudioDevice=Headset
+	Driving Coach.AudioDevice=Headset
+	Race Spotter.AudioDevice=Headset
+	Race Engineer.AudioDevice=Headset
+	Race Strategist.AudioDevice=Headset
+	Controller.AudioDevice=Headset
 
 Supported input routes are:
 

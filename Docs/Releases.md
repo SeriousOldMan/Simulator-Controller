@@ -49,6 +49,7 @@
   - The ELMS LMP2 car is now identified as "Oreca 07 ELMS" to distinguish it from the normal "Oreca 07" car in *Le Mans Ultimate*. If you already have recorded some data with this splendid fast car, take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660).
   - The editor for Controller Automation is now resizeable.
   - It is now possible to configure multiple different audio routes depending on the currently running simulator and/or the current session type (race, qualifying and so on). See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
+  - When choosing a tyre compound on a specific wheel for the next pitstop in "Team Center", holding down the [Control key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will choose the same compound on the other wheels as well.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660), if you already have driven the faster Oreca 07 in the ELMS series and you want to remove the wrong data from the Oreca 07 data set.
 

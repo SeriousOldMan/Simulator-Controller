@@ -36,6 +36,7 @@
 #### Fixes
 
   - Fixed some additional problems for team races in *Le Mans Ultimate*.
+  - Fixed many DPI scaling issues when using different scaling factors for different monitors.
   
 #### Changes
 

@@ -440,14 +440,16 @@ To create such a specific set of audio routes, precede the settings with "[Outpu
 	
 You can use an asterisk ("*") for the simulation and also for the session type, which then acts as a wildcard. If no match for the current simulator and session type is found, the default "[Output]" or "[Input]" settings are used. If they are also not configured, the current devices of Windows are used. Examples:
 
-| Header                      | Description                                                             |
-|-----------------------------|-------------------------------------------------------------------------|
-| [Input]                     | Input configuration, when no simulator is running.                      |
-| [Output.Le Mans Ultimate.*] | Output configuration, which is used when *Le Mans Ultimate* is running. |
-| [Input.*.*]                 | Input configuration for all active simulators.                          |
-| [Output.*.Race]             | Output configuration, which used in race sessions in any simulator.     |
+| Header                       | Description                                                             |
+|------------------------------|-------------------------------------------------------------------------|
+| [Input]                      | Input configuration, when no simulator is running.                      |
+| [Output.Le Mans Ultimate.\*] | Output configuration, which is used when *Le Mans Ultimate* is running. |
+| [Input.\*.\*]                | Input configuration for all active simulators.                          |
+| [Output.\*.Race]             | Output configuration, which used in race sessions in any simulator.     |
 
 Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.*]" takes precedence over "[Output.*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "*" for both will be the most unspecific.
+
+Important: Using audio routes is only possible, if *NirCmd* has been installed.
 
 ### Keyboard shortcuts & modifiers
 

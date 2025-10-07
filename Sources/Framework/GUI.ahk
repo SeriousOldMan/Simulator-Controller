@@ -1379,7 +1379,7 @@ class Window extends Gui {
 			}
 
 		DllCall("SetThreadDpiAwarenessContext", "Ptr", -5, "Ptr")
-		
+
 		super.__New("", title, arguments*)
 
 		if !this.Theme
@@ -1399,6 +1399,8 @@ class Window extends Gui {
 			this.Opt("-DPIScale " . options)
 		else
 			this.Opt("-DPIScale")
+
+		this.SetFont("s8", "Arial")
 
 		this.InitializeTheme()
 	}

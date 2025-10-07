@@ -22,8 +22,9 @@
 
 global gAudioConfiguration := false
 global gAudioConfigurationModTime := false
-global gAudioConfigurationModeSimulator := false
-global gAudioConfigurationModeSession := false
+
+global gAudioConfigurationMode := false
+global gAudioConfigurationModeModTime := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -31,41 +32,41 @@ global gAudioConfigurationModeSession := false
 ;;;-------------------------------------------------------------------------;;;
 
 getAudioSetting(name, type := "Output", property := "AudioDevice", default := false) {
-	global gAudioConfiguration, gAudioConfigurationModeSimulator, gAudioConfigurationModeSession, gAudioConfigurationModTime
+	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode
 
-	local value := kUndefined
-	local key
+	local simulator, session, key, value
 
-	static settings := CaseInsenseMap()
+	static settings := false
 	static lastModTime := false
 
-	if (lastModTime != gAudioConfigurationModTime)
-		settings := CaseInsenseMap()
-
 	if requireAudioConfiguration() {
-		key := ((gAudioConfigurationModeSimulator ? (type . "." . gAudioConfigurationModeSimulator
-														  . "." . gAudioConfigurationModeSession)
-												  : type) . name . "." . property)
+		if (!settings || (lastModTime != gAudioConfigurationModTime))
+			settings := CaseInsenseMap()
+
+		simulator := (gAudioConfigurationMode ? gAudioConfigurationMode[1] : false)
+		session := (gAudioConfigurationMode ? gAudioConfigurationMode[2] : false)
+		key := ((simulator ? (type . "." . simulator . "." . session) : type) . name . "." . property)
 
 		if settings.Has(key)
 			return settings[key]
 		else {
-			if gAudioConfigurationModeSimulator {
-				value := getMultiMapValue(gAudioConfiguration, type . "." . gAudioConfigurationModeSimulator
-																	. "." . gAudioConfigurationModeSession
+			if simulator {
+				value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . "." . session
 															 , name . "." . property, kUndefined)
 
 				if (value == kUndefined)
-					value := getMultiMapValue(gAudioConfiguration, type . "." . gAudioConfigurationModeSimulator . ".*"
+					value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . ".*"
 																 , name . "." . property, kUndefined)
 
 				if (value == kUndefined)
-					value := getMultiMapValue(gAudioConfiguration, type . ".*." . gAudioConfigurationModeSession
+					value := getMultiMapValue(gAudioConfiguration, type . ".*." . session
 																 , name . "." . property, kUndefined)
 
 				if (value == kUndefined)
 					value := getMultiMapValue(gAudioConfiguration, type . "*.*", name . "." . property, kUndefined)
 			}
+			else
+				value := kUndefined
 
 			if (value == kUndefined)
 				value := getMultiMapValue(gAudioConfiguration, type, name . "." . property, default)
@@ -80,22 +81,26 @@ getAudioSetting(name, type := "Output", property := "AudioDevice", default := fa
 }
 
 setAudioMode(simulator, session := false) {
-	global gAudioConfiguration
+	global gAudioConfigurationMode
 
-	if requireAudioConfiguration() {
+	local curSimulator := (gAudioConfigurationMode ? gAudioConfigurationMode[1] : false)
+	local curSession := (gAudioConfigurationMode ? gAudioConfigurationMode[2] : false)
+
+	if simulator {
 		if (session = "Qualification")
 			session := "Qualifying"
+		else if !session
+			session := "Default"
+	}
+	else
+		session := false
 
-		if simulator {
-			setMultiMapValue(gAudioConfiguration, "General", "Simulator", simulator)
-			setMultiMapValue(gAudioConfiguration, "General", "Session", session ? session : "Default")
-		}
-		else {
-			setMultiMapValue(gAudioConfiguration, "General", "Simulator", false)
-			setMultiMapValue(gAudioConfiguration, "General", "Session", false)
-		}
+	if ((curSimulator != simulator) || (curSession != session)) {
+		deleteFile(kUserConfigDirectory . "Audio.mode")
 
-		writeMultiMap(kUserConfigDirectory . "Audio Settings.ini", gAudioConfiguration)
+		FileAppend(simulator . "->" . session, kUserConfigDirectory . "Audio.mode")
+
+		gAudioConfigurationMode := [simulator, session]
 	}
 }
 
@@ -167,15 +172,36 @@ playSound(player, wavFile, options := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 requireAudioConfiguration() {
-	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationModeSimulator, gAudioConfigurationModeSession
+	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode, gAudioConfigurationModeModTime
 
-	local fileName := (kUserConfigDirectory . "Audio Settings.ini")
+	local fileName
 
-	if (!gAudioConfiguration && FileExist(fileName)) {
-		gAudioConfiguration := readMultiMap(fileName)
-		gAudioConfigurationModTime := FileGetTime(fileName, "M")
-		gAudioConfigurationModeSimulator := getMultiMapValue(gAudioConfiguration, "General", "Simulator", false)
-		gAudioConfigurationModeSession := getMultiMapValue(gAudioConfiguration, "General", "Session", false)
+	try {
+		fileName := (kUserConfigDirectory . "Audio Settings.ini")
+
+		if (!gAudioConfiguration && FileExist(fileName)) {
+			gAudioConfigurationModTime := FileGetTime(fileName, "M")
+			gAudioConfiguration := readMultiMap(fileName)
+		}
+	}
+	catch Any as exception {
+		logError(exception)
+
+		gAudioConfiguration := false
+	}
+
+	try {
+		fileName := (kUserConfigDirectory . "Audio.mode")
+
+		if (!gAudioConfigurationMode && FileExist(fileName)) {
+			gAudioConfigurationModeModTime := FileGetTime(fileName, "M")
+			gAudioConfigurationMode := string2Values("->", FileRead(fileName))
+		}
+	}
+	catch Any as exception {
+		logError(exception)
+
+		gAudioConfigurationMode := false
 	}
 
 	return gAudioConfiguration
@@ -183,11 +209,26 @@ requireAudioConfiguration() {
 
 initializeAudioConfiguration() {
 	PeriodicTask(() {
-		global gAudioConfiguration, gAudioConfigurationModTime
+		global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode, gAudioConfigurationModeModTime
 
-		if (gAudioConfigurationModTime && (FileGetTime(kUserConfigDirectory . "Audio Settings.ini", "M") > gAudioConfigurationModTime)) {
-			gAudioConfiguration := false
-			gAudioConfigurationModTime := false
+		try {
+			if (gAudioConfigurationModTime && (FileGetTime(kUserConfigDirectory . "Audio Settings.ini", "M") > gAudioConfigurationModTime)) {
+				gAudioConfiguration := false
+				gAudioConfigurationModTime := false
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		try {
+			if (gAudioConfigurationModeModTime && (FileGetTime(kUserConfigDirectory . "Audio.mode", "M") > gAudioConfigurationModeModTime)) {
+				gAudioConfigurationMode := false
+				gAudioConfigurationModeModTime := false
+			}
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}, 2000, kLowPriority).start()
 }

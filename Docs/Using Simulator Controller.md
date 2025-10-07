@@ -429,14 +429,27 @@ Additionally, it is possible to select audio routes depending on the currently r
 
 To create such a specific set of audio routes, precede the settings with "[Output.Le Mans Ultimate.Race]", for example. This will activate these settings, when you are in a race session in *Le Mans Ultimate* (works for *Input* as well, of course). The following session types are supported:
 
-	Default (in the simulator, but not in a session - for example in the main menu)
+	Default (1)
 	Other
 	Practice
 	Qualifying
 	Race
 	Time Trial
 	
-You can use an asterisk ("*") for the simulation and also for the session type, which then acts as a wildcard. If no match for the current simulator and session type is found, the default "[Output]" or "[Input]" settings are used. If they are also not configured, the current devices of Windows are used.
+(1) Active, when the simulator is running, but no session has been started (yet).
+	
+You can use an asterisk ("*") for the simulation and also for the session type, which then acts as a wildcard. If no match for the current simulator and session type is found, the default "[Output]" or "[Input]" settings are used. If they are also not configured, the current devices of Windows are used. Examples:
+
+| Header                       | Description                                                             |
+|------------------------------|-------------------------------------------------------------------------|
+| [Input]                      | Input configuration, when no simulator is running.                      |
+| [Output.Le Mans Ultimate.\*] | Output configuration, which is used when *Le Mans Ultimate* is running. |
+| [Input.\*.\*]                | Input configuration for all active simulators.                          |
+| [Output.\*.Race]             | Output configuration, which used in race sessions in any simulator.     |
+
+Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.*]" takes precedence over "[Output.*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "*" for both will be the most unspecific.
+
+Important: Using audio routes is only possible, if *NirCmd* has been installed.
 
 ### Keyboard shortcuts & modifiers
 

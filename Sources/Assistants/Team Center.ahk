@@ -2001,6 +2001,19 @@ class TeamCenter extends ConfigurationItem {
 			center.withExceptionhandler(ObjBindMethod(center, "updateState"))
 		}
 
+		changePitstopCompound(tyre, *) {
+			local value, ignore, dropDown
+
+			if GetKeyState("Ctrl") {
+				value := centerGui["pitstopTyreCompound" . tyre . "DropDown"].Value
+
+				for ignore, tyre in ["FL", "FR", "RL", "RR"]
+					centerGui["pitstopTyreCompound" . tyre . "DropDown"].Choose(value)
+			}
+
+			this.updatetState()
+		}
+
 		copyPressures(*) {
 			local hasPitstops := false
 			local lap, driver, conditions, fuel, tyreCompounds, tyreCompoundColors, tyreCompound, tyreSet, pressures
@@ -2572,11 +2585,11 @@ class TeamCenter extends ConfigurationItem {
 
 		choices := collect(["No Change", normalizeCompound("Dry")], translate)
 
-		centerGui.Add("DropDownList", "x106 yp w78 Choose1 vpitstopTyreCompoundFLDropDown", choices).OnEvent("Change", updateState)
-		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundFRDropDown", choices).OnEvent("Change", updateState)
+		centerGui.Add("DropDownList", "x106 yp w78 Choose1 vpitstopTyreCompoundFLDropDown", choices).OnEvent("Change", changePitstopCompound.Bind("FL"))
+		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundFRDropDown", choices).OnEvent("Change", changePitstopCompound.Bind("FR"))
 
-		centerGui.Add("DropDownList", "x106 yp+24 w78 Choose1 vpitstopTyreCompoundRLDropDown", choices).OnEvent("Change", updateState)
-		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundRRDropDown", choices).OnEvent("Change", updateState)
+		centerGui.Add("DropDownList", "x106 yp+24 w78 Choose1 vpitstopTyreCompoundRLDropDown", choices).OnEvent("Change", changePitstopCompound.Bind("RL"))
+		centerGui.Add("DropDownList", "x185 yp w78 Choose1 vpitstopTyreCompoundRRDropDown", choices).OnEvent("Change", changePitstopCompound.Bind("RR"))
 
 		centerGui.Add("Text", "x24 yp+26 w80 h20", translate("Tyre Set"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit").OnEvent("Change", (*) => this.updateState())

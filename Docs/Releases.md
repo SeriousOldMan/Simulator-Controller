@@ -36,6 +36,7 @@
 #### Fixes
 
   - Fixed some additional problems for team races in *Le Mans Ultimate*.
+  - Fixed many DPI scaling issues when using different scaling factors for different monitors.
   
 #### Changes
 
@@ -47,7 +48,10 @@
   - The *Reasoning* booster for the Race Strategist supports a new [event for strategy simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-strategist). Together with the also new counterpart action "Strategy Update", this event, if enabled, will route the request to simulate a strategy and possibly updating the existing strategy to the LLM together with all available data about the session and car state, as well as a complete description of the currently active strategy. The LLM, acting as a LAM (aka large action model) in this case, may come up with a better strategy than the internal rule engine. But please note, that strategy simulation is the most thinkable complex reasoning task and running a strategy simulation therefore requires a very capable reasoning model like GPT-5 or Claude Sonnet 4.5. And even with these models, the request fails in some cases.
   - The ELMS LMP2 car is now identified as "Oreca 07 ELMS" to distinguish it from the normal "Oreca 07" car in *Le Mans Ultimate*. If you already have recorded some data with this splendid fast car, take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660).
   - The editor for Controller Automation is now resizeable.
+  - The editor for LLM instructions is now resizeable.
+  - When using the Push-To-Talk mode "Press & Talk", two different silent sounds will signal start of listening and end of listening. The corresponding sound files are located in *Resources\Sounds* in the installation folder and are named "Talk On.wav" and "Talk Off.wav".
   - It is now possible to configure multiple different audio routes depending on the currently running simulator and/or the current session type (race, qualifying and so on). See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
+  - When choosing a tyre compound on a specific wheel for the next pitstop in "Team Center", holding down the [Control key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will choose the same compound on the other wheels as well.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660), if you already have driven the faster Oreca 07 in the ELMS series and you want to remove the wrong data from the Oreca 07 data set.
 

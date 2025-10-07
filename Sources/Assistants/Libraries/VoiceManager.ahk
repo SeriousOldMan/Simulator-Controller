@@ -999,7 +999,7 @@ class VoiceManager extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if (listenTask && !this.Interruptable) {
+				if listenTask {
 					listen := true
 
 					listenTask.stop()
@@ -1184,8 +1184,9 @@ class VoiceManager extends ConfigurationItem {
 				if this.Interruptable
 					this.interrupt(true)
 
-				playSound("VMSoundPlayer.exe", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
-											 , getAudioSetting("Activation"))
+				if this.hasPushToTalk()
+					playSound("VMSoundPlayer.exe", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+												 , getAudioSetting("Activation"))
 
 				this.iIsListening := true
 
@@ -1202,7 +1203,7 @@ class VoiceManager extends ConfigurationItem {
 
 	stopListening(retry := false) {
 		static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
-		
+
 		if (this.iSpeechRecognizer && this.Listening) {
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
@@ -1211,9 +1212,9 @@ class VoiceManager extends ConfigurationItem {
 				return false
 			}
 			else {
-				if (this.PushToTalkMode = "Press")
+				if ((this.PushToTalkMode = "Press") && this.hasPushToTalk())
 					playSound("VMSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
-				
+
 				this.iIsListening := false
 
 				return true

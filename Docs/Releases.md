@@ -37,6 +37,7 @@
 
   - Fixed some additional problems for team races in *Le Mans Ultimate*.
   - Fixed many DPI scaling issues when using different scaling factors for different monitors.
+  - Fixed a bug causing the Push-To-Talk method "Press & Talk" to not work properly when speech interruption was enabled at the same time.
   
 #### Changes
 

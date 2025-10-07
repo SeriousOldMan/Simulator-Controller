@@ -610,7 +610,7 @@ class VoiceServer extends ConfigurationItem {
 
 		stopListening(retry := false) {
 			static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
-		
+
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
 					if retry
@@ -619,9 +619,9 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					if (this.VoiceServer.PushToTalkMode = "Press")
+					if ((this.VoiceServer.PushToTalkMode = "Press") && this.hasPushToTalk())
 						playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
-					
+
 					this.iListening := false
 
 					return true
@@ -1133,7 +1133,7 @@ class VoiceServer extends ConfigurationItem {
 
 		if toggle {
 			if pressed {
-				if (listenTask && !this.Interruptable) {
+				if listenTask {
 					listen := true
 
 					listenTask.stop()
@@ -1311,7 +1311,7 @@ class VoiceServer extends ConfigurationItem {
 
 	stopActivationListener(retry := false) {
 		static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
-		
+
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry
@@ -1320,9 +1320,9 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
-				if (this.PushToTalkMode = "Press")
+				if ((this.PushToTalkMode = "Press") && this.hasPushToTalk())
 					playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
-					
+
 				this.iListening := false
 
 				return true

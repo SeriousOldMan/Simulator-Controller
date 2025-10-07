@@ -1716,7 +1716,7 @@ class LMURESTProvider {
 
 			id := Integer(id)
 
-			return (this.iStandings.Has(id) ? this.iStandings[id] : false)
+			return ((this.iStandings && this.iStandings.Has(id)) ? this.iStandings[id] : false)
 		}
 
 		getDriver(id) {

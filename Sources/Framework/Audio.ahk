@@ -172,7 +172,7 @@ playSound(player, wavFile, options := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 requireAudioConfiguration() {
-	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationModeSimulator, gAudioConfigurationModeSession
+	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode, gAudioConfigurationModeModTime
 
 	local fileName
 
@@ -216,7 +216,12 @@ initializeAudioConfiguration() {
 				gAudioConfiguration := false
 				gAudioConfigurationModTime := false
 			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 
+		try {
 			if (gAudioConfigurationModeModTime && (FileGetTime(kUserConfigDirectory . "Audio.mode", "M") > gAudioConfigurationModeModTime)) {
 				gAudioConfigurationMode := false
 				gAudioConfigurationModeModTime := false

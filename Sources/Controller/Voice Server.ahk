@@ -588,6 +588,7 @@ class VoiceServer extends ConfigurationItem {
 
 		startListening(retry := true) {
 			static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+			static startTalkSound := getFileName("Talk On.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
@@ -598,7 +599,8 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else {
 					if this.VoiceServer.hasPushToTalk()
-						playSound("VSSoundPlayer.exe", talkSound, getAudioSetting("Activation"))
+						playSound("VSSoundPlayer.exe", (this.VoiceServer.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+													 , getAudioSetting("Activation"))
 
 					this.iListening := true
 
@@ -607,6 +609,8 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		stopListening(retry := false) {
+			static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
 					if retry
@@ -615,6 +619,9 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
+					if (this.VoiceServer.PushToTalkMode = "Press")
+						playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
+					
 					this.iListening := false
 
 					return true
@@ -1279,6 +1286,7 @@ class VoiceServer extends ConfigurationItem {
 
 	startActivationListener(retry := false) {
 		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		static startTalkSound := getFileName("Talk On.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
@@ -1292,7 +1300,8 @@ class VoiceServer extends ConfigurationItem {
 					this.interrupt(false, (this.Interruptable = "All"))
 
 				if this.hasPushToTalk()
-					playSound("VSSoundPlayer.exe", talkSound, getAudioSetting("Activation"))
+					playSound("VSSoundPlayer.exe", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+												 , getAudioSetting("Activation"))
 
 				this.iListening := true
 
@@ -1301,6 +1310,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	stopActivationListener(retry := false) {
+		static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
 				if retry
@@ -1309,6 +1320,9 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
+				if (this.PushToTalkMode = "Press")
+					playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
+					
 				this.iListening := false
 
 				return true

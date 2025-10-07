@@ -1171,6 +1171,7 @@ class VoiceManager extends ConfigurationItem {
 
 	startListening(retry := true) {
 		static talkSound := getFileName("Talk.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		static startTalkSound := getFileName("Talk On.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (this.iSpeechRecognizer && !this.Listening && this.ListenerActive) {
 			if !this.iSpeechRecognizer.startRecognizer() {
@@ -1183,7 +1184,8 @@ class VoiceManager extends ConfigurationItem {
 				if this.Interruptable
 					this.interrupt(true)
 
-				playSound("VMSoundPlayer.exe", talkSound, getAudioSetting("Activation"))
+				playSound("VMSoundPlayer.exe", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+											 , getAudioSetting("Activation"))
 
 				this.iIsListening := true
 
@@ -1199,6 +1201,8 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	stopListening(retry := false) {
+		static stopTalkSound := getFileName("Talk Off.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		
 		if (this.iSpeechRecognizer && this.Listening) {
 			if !this.iSpeechRecognizer.stopRecognizer() {
 				if retry
@@ -1207,6 +1211,9 @@ class VoiceManager extends ConfigurationItem {
 				return false
 			}
 			else {
+				if (this.PushToTalkMode = "Press")
+					playSound("VMSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
+				
 				this.iIsListening := false
 
 				return true

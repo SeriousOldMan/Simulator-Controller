@@ -144,6 +144,10 @@ class ACCUDPProvider {
 
 		this.iUDPConnection := udpConnection
 
+		try
+			FileCopy(kResourcesDirectory . "Simulator Data\ACC\broadcasting.json"
+				   , A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", 1)
+
 		if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json") {
 			try {
 				try {

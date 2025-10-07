@@ -195,8 +195,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		local accUdpConfig, udpConfig, udpConfigValid
-
 		if !ACCPlugin.kUnknown
 			ACCPlugin.kUnknown := translate("Unknown")
 

@@ -176,7 +176,7 @@ class LMUProvider extends Sector397Provider {
 		local teamSession := this.TeamData.TeamSession
 		local standingsData, forName, surName, nickName, id, team
 
-		this.iStandingsData := LMUProvider.StandingsData()
+		this.iStandingsData := LMURESTProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 

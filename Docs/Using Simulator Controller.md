@@ -366,17 +366,17 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 ### Audio Routing
 
-Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. To configure the audio routes, click on the "Audio..." button in the "Controller Automation" window.
+Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headset. To configure the audio routes, click on the "Audio..." button in the "Controller Automation" window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor%202.JPG)
 
 Audio routes must be defined as follows:
 
 	[Output]
-	Driving Coach.AudioDevice=Headphone
-	Race Spotter.AudioDevice=Headphone
-	Race Engineer.AudioDevice=Headphone
-	Race Strategist.AudioDevice=Headphone
+	Driving Coach.AudioDevice=Headset
+	Race Spotter.AudioDevice=Headset
+	Race Engineer.AudioDevice=Headset
+	Race Strategist.AudioDevice=Headset
 
 Supported output routes are:
 
@@ -392,18 +392,18 @@ Supported output routes are:
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 
-*Headphone* is only an example for any configured audio device which is named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
+*Headset* is only an example for any configured audio device which is named "Headset" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 
 	[Input]
 	Default.AudioDevice=Streaming
-	Activation.AudioDevice=Headphone
-	Driving Coach.AudioDevice=Headphone
-	Race Spotter.AudioDevice=Headphone
-	Race Engineer.AudioDevice=Headphone
-	Race Strategist.AudioDevice=Headphone
-	Controller.AudioDevice=Headphone
+	Activation.AudioDevice=Headset
+	Driving Coach.AudioDevice=Headset
+	Race Spotter.AudioDevice=Headset
+	Race Engineer.AudioDevice=Headset
+	Race Strategist.AudioDevice=Headset
+	Controller.AudioDevice=Headset
 
 Supported input routes are:
 
@@ -423,12 +423,13 @@ All other input routes are typically set to the same input device, normally the 
 
 A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
 
-#### Activating audio routes by simulation and active session
+#### Activating audio routes by simulator and active session
 
-Additionally, it is possible to select audio routes depending on the currently running simulation and/or the active session. This can be helpful, if you are normally driving using a VR headset, but want to use your 5.1 sound system while outside a session to interact with the Driving Coach, for example.
+Additionally, it is possible to select audio routes depending on the currently running simulator and/or the active session. This can be helpful, if you are normally driving using a VR headset, but want to use your 5.1 sound system while outside a session to interact with the Driving Coach, for example.
 
 To create such a specific set of audio routes, precede the settings with "[Output.Le Mans Ultimate.Race]", for example. This will activate these settings, when you are in a race session in *Le Mans Ultimate* (works for *Input* as well, of course). The following session types are supported:
 
+	Default (in the simulator, but not in a session - for example in the main menu)
 	Other
 	Practice
 	Qualifying

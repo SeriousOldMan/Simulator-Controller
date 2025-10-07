@@ -226,7 +226,7 @@ namespace SHMConnector {
 					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
 					ref rF2VehicleTelemetry telemetry = ref GetPlayerTelemetry(vehicle.mID, ref this.telemetry);
 
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(i);
+					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".ID="); strWriter.WriteLine(vehicle.mID + 1);
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Position="); strWriter.WriteLine(vehicle.mPlace);
 
 					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);

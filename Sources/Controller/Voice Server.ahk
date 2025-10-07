@@ -619,7 +619,7 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					if ((this.VoiceServer.PushToTalkMode = "Press") && this.hasPushToTalk())
+					if ((this.VoiceServer.PushToTalkMode != "Hold") && this.hasPushToTalk())
 						playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
 
 					this.iListening := false
@@ -1320,7 +1320,7 @@ class VoiceServer extends ConfigurationItem {
 				return false
 			}
 			else {
-				if ((this.PushToTalkMode = "Press") && this.hasPushToTalk())
+				if ((this.PushToTalkMode != "Hold") && this.hasPushToTalk())
 					playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
 
 				this.iListening := false

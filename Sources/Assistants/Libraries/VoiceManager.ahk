@@ -1212,7 +1212,7 @@ class VoiceManager extends ConfigurationItem {
 				return false
 			}
 			else {
-				if ((this.PushToTalkMode = "Press") && this.hasPushToTalk())
+				if ((this.PushToTalkMode != "Hold") && this.hasPushToTalk())
 					playSound("VMSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
 
 				this.iIsListening := false

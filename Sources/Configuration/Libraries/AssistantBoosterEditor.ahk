@@ -2728,7 +2728,7 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 
 		instructions := originalInstructions.Clone()
 
-		instructionsGui := Window({Options: "0x400000"}, title)
+		instructionsGui := Window({Descriptor: "Booster Editor.Instructions", Resizeable: true, Options: "0x400000"}, title)
 
 		instructionsGui.SetFont("Norm", "Arial")
 
@@ -2743,24 +2743,32 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 				choices.Push(translate(rephrase(key[3])) . translate(" (") . StrUpper(key[4]) . translate(")"))
 			}
 
-			instructionsGui.Add("DropDownList", "x110 yp w180 vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
+			instructionsGui.Add("DropDownList", "x110 yp w180 W:Grow(0.3) vinstructionsDropDown", choices).OnEvent("Change", (*) => editInstructions("Load"))
 		}
 		else
 			instructionsGui.Add("Text", "x110 yp w180 h23 +0x200", translate(type) . translate(" (") . "EN" . translate(")"))
 
-		widget1 := instructionsGui.Add("Button", "x447 yp w23 h23")
+		widget1 := instructionsGui.Add("Button", "x447 yp w23 h23 X:Move")
 		widget1.OnEvent("Click", (*) => editInstructions("Reload"))
 		setButtonIcon(widget1, kIconsDirectory . "Renew.ico", 1)
 
-		instructionEdit := instructionsGui.Add("Edit", "x110 yp+24 w360 h200 Multi vinstructionEdit")
+		instructionEdit := instructionsGui.Add("Edit", "x110 yp+24 w360 h200 W:Grow H:Grow Multi vinstructionEdit")
 		instructionEdit.OnEvent("Change", (*) => editInstructions("Update"))
 
-		instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default", translate("Ok")).OnEvent("Click", editInstructions.Bind(kOk))
-		instructionsGui.Add("Button", "x246 yp w80 h23", translate("&Cancel")).OnEvent("Click", editInstructions.Bind(kCancel))
+		instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editInstructions.Bind(kOk))
+		instructionsGui.Add("Button", "x246 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editInstructions.Bind(kCancel))
 
 		instructionsGui.Opt("+Owner" . owner.Hwnd)
 
 		instructionsGui.Show("AutoSize Center")
+
+		if getWindowPosition("Booster Editor.Instructions", &x, &y)
+			instructionsGui.Show("x" . x . " y" . y)
+		else
+			instructionsGui.Show("AutoSize Center")
+
+		if getWindowSize("Booster Editor.Instructions", &w, &h)
+			instructionsGui.Resize("Initialize", w, h)
 
 		if reference
 			instructionsGui["instructionsDropDown"].Choose(1)

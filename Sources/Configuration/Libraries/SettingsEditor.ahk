@@ -22,6 +22,8 @@ global kEditModes := "Edit"
 ;;;-------------------------------------------------------------------------;;;
 
 editAudio(ownerOrCommand, *) {
+	local x, y, w, h
+
 	static audioGui, result, audioEdit
 
 	if (ownerOrCommand == kOk)
@@ -31,20 +33,28 @@ editAudio(ownerOrCommand, *) {
 	else {
 		result := false
 
-		audioGui := Window({Options: "0x400000"}, translate("Audio"))
+		audioGui := Window({Descriptor: "Simulator Settings.Audio", Resizeable: true, Options: "0x400000"}, translate("Audio"))
 
 		audioGui.SetFont("Norm", "Arial")
 
 		choices := []
 
-		audioGui.Add("Edit", "x16 y16 w334 h200 Multi vaudioEdit")
+		audioGui.Add("Edit", "x16 y16 w334 h200 Multi vaudioEdit W:Grow H:Grow")
 
-		audioGui.Add("Button", "x100 yp+210 w80 h23 Default", translate("Ok")).OnEvent("Click", editAudio.Bind(kOk))
-		audioGui.Add("Button", "x186 yp w80 h23", translate("&Cancel")).OnEvent("Click", editAudio.Bind(kCancel))
+		audioGui.Add("Button", "x100 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editAudio.Bind(kOk))
+		audioGui.Add("Button", "x186 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editAudio.Bind(kCancel))
 
 		audioGui.Opt("+Owner" . ownerOrCommand.Hwnd)
 
 		audioGui.Show("AutoSize Center")
+
+		if getWindowPosition("Simulator Settings.Audio", &x, &y)
+			audioGui.Show("x" . x . " y" . y)
+		else
+			audioGui.Show("AutoSize Center")
+
+		if getWindowSize("Simulator Settings.Audio", &w, &h)
+			audioGui.Resize("Initialize", w, h)
 
 		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
 			audioGui["audioEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")

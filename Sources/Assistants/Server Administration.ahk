@@ -680,6 +680,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -698,6 +700,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			if !kSilentMode

@@ -320,6 +320,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 		logMessage(kLogInfo, translate("Database successfully uploaded"))
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
 	}
 }
@@ -416,6 +418,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 		logMessage(kLogInfo, translate("Database successfully downloaded"))
 	}
 	catch Any as exception {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Error while downloading database - please check your internet connection..."))
 	}
 }

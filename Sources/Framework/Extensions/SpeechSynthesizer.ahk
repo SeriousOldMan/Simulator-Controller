@@ -900,10 +900,10 @@ class SpeechSynthesizer {
 					if ((result.Status >= 200) && (result.Status < 300))
 						this.iSpeechSynthesizer.WriteAudio(result.JSON["audioContent"], fileName)
 					else
-						throw "Error while speech synthesizing..."
+						throw "Error during speech synthesis..."
 				}
 				else if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
-					throw "Error while speech synthesizing..."
+					throw "Error during speech synthesis..."
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -938,7 +938,7 @@ class SpeechSynthesizer {
 					file.Close()
 				}
 				else
-					throw "Error while speech synthesizing..."
+					throw "Error during speech synthesis..."
 			}
 			catch Any as exception {
 				logError(exception, true)

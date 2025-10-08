@@ -159,6 +159,8 @@ lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
 initializeScriptEngine() {
 	if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr") {
+		logError(exception, true)
+
 		logMessage(kLogCritical, translate("Error while initializing script engine - please rebuild the applications"))
 
 		if (!kSilentMode)

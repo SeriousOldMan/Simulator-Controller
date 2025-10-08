@@ -2835,6 +2835,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 				connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 			}
 			catch Any as exception {
+				logError(exception, true)
+
 				logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 				if !kSilentMode

@@ -204,6 +204,8 @@ class SessionDatabase extends ConfigurationItem {
 						connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
 					}
 					catch Any as exception {
+						logError(exception, true)
+
 						logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
 
 						if !kSilentMode

@@ -120,6 +120,8 @@ class TeamManagementPanel extends ConfiguratorPanel {
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			if !kSilentMode
@@ -204,6 +206,8 @@ class TeamManagementPanel extends ConfiguratorPanel {
 					window["teamServerPasswordEdit"].Text := firstPassword
 				}
 				catch Any as exception {
+					logError(exception, true)
+
 					errorMessage(translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 				}
 			}
@@ -1058,6 +1062,8 @@ class TeamManagementPanel extends ConfiguratorPanel {
 			return function.Call(arguments*)
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			local message := exception
 
 			if message.HasProp("Message")

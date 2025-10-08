@@ -1236,6 +1236,12 @@ class LMURESTProvider {
 				}
 			}
 
+			TeamID[driverName] {
+				Get {
+					return this.getTeamID(driverName)
+				}
+			}
+
 			Nr[id] {
 				Get {
 					return this.getNr(id)
@@ -1260,11 +1266,27 @@ class LMURESTProvider {
 				return (data && (data != kNull))
 			}
 
+			getTeamID(driverName) {
+				local data := this.Data
+				local parts := string2Values(A_Space, driverName)
+				local name, dName, driver
+
+				if (data && (data != kNull))
+					for name, driver in data["drivers"] {
+						dName := name
+
+						if ((name = driverName) || !first(parts, (p) => !InStr(dName, p)))
+							return driver["uniqueTeamID"]
+					}
+
+				return false
+			}
+
 			getNr(id) {
 				local data := this.Data
 
 				if (data && (data != kNull))
-					return data["utid" . (id - 1)]["carNumber"]
+					return data["teams"][id]["carNumber"]
 				else
 					return false
 			}
@@ -1273,7 +1295,7 @@ class LMURESTProvider {
 				local data := this.Data
 
 				if (data && (data != kNull))
-					return data["utid" . (id - 1)]["name"]
+					return data["teams"][id]["name"]
 				else
 					return false
 			}
@@ -1282,7 +1304,7 @@ class LMURESTProvider {
 				local data := this.Data
 
 				if (data && (data != kNull))
-					return getKeys(data["utid" . (id - 1)]["drivers"])
+					return getKeys(data["teams"][id]["drivers"])
 				else
 					return []
 			}
@@ -1306,6 +1328,12 @@ class LMURESTProvider {
 		TeamSession {
 			Get {
 				return this.TeamData.TeamSession
+			}
+		}
+
+		TeamID[driverName] {
+			Get {
+				return this.TeamData.TeamID[driverName]
 			}
 		}
 
@@ -1347,6 +1375,9 @@ class LMURESTProvider {
 			this.iCachedTeam := false
 
 			super.reload()
+		}
+
+		getTeamID(driverName) {
 		}
 
 		getNr() {

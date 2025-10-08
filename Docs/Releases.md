@@ -39,6 +39,7 @@
   - Fixed many DPI scaling issues when using different scaling factors for different monitors.
   - Fixed a bug causing the Push-To-Talk method "Press & Talk" to not work properly when speech interruption was enabled at the same time.
   - Added some missing translations.
+  - Fixed a bug in the wear- or lap-based tyre change decision by the Engineer introduced with the last rrelease, which prevented a change in compound, for example from dry to wet tyres, if the wear was good on the old tyres.
   
 #### Changes
 

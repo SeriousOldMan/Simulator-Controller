@@ -174,25 +174,32 @@ class LMUProvider extends Sector397Provider {
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
-		local standingsData, forName, surName, nickName, id, team
+		local standingsData, forName, surName, nickName, id, teamID
 
 		this.iStandingsData := LMURESTProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			forName := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname")
+			surName := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname")
+
 			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
 
 			if teamSession {
-				nr := this.TeamData.Nr[id]
+				teamID := this.TeamData.TeamID[forName . A_Space . surName]
 
-				if nr
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", nr)
+				if teamID {
+					nr := this.TeamData.Nr[teamID]
 
-				team := this.TeamData.Team[id]
+					if nr
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", nr)
 
-				if team
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Team", team)
+					team := this.TeamData.Team[teamID]
+
+					if team
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Team", team)
+				}
 			}
 
 			parseDriverName(this.StandingsData.Driver[id], &forName, &surName, &nickName)

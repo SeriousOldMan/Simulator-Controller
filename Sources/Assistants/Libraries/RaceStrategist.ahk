@@ -1238,7 +1238,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledge := super.getKnowledge(type, options)
 		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local strategy, nextPitstop, pitstop, pitstops
-		local fuelService, tyreService, brakeService, repairService, supportTyreSets, tyreCompound, tyreCompoundColor, tcCandidate
+		local fuelService, tyreService, brakeService, repairService, supportTyreSets
+		local tyreCompound, tyreCompoundColor, tcCandidate
 		local availableTyreSets, tyreSets, tyreSet, ignore, tyreLife
 
 		convert(unit, value, arguments*) {
@@ -1319,6 +1320,8 @@ class RaceStrategist extends GridRaceAssistant {
 			if this.activeTopic(options, "Session")
 				if this.Strategy {
 					try {
+						knowledge["Session"]["MaxStintDuration"] := (this.Strategy.StintLength . " Minutes")
+
 						availableTyreSets := this.Strategy.AvailableTyreSets
 						tyreSets := knowledge["Session"]["AvailableTyres"]
 

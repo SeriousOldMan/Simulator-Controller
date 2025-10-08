@@ -1154,7 +1154,9 @@ class SessionDatabase extends ConfigurationItem {
 		if (name == kUndefined)
 			name := normalizeFileName(car)
 		else if (!name || (name = ""))
-			name := car
+			name := normalizeFileName(car)
+		else
+			name := normalizeFileName(name)
 
 		return name
 	}
@@ -1171,6 +1173,8 @@ class SessionDatabase extends ConfigurationItem {
 			code := normalizeFileName(car)
 		else if (!code || (code = ""))
 			code := normalizeFileName(car)
+		else
+			code := normalizeFileName(code)
 
 		return code
 	}
@@ -1244,7 +1248,9 @@ class SessionDatabase extends ConfigurationItem {
 		if (name == kUndefined)
 			name := normalizeFileName(track)
 		else if (!name || (name = ""))
-			name := track
+			name := normalizeFileName(track)
+		else
+			name := normalizeFileName(name)
 
 		return StrTitle(name)
 	}
@@ -1261,6 +1267,8 @@ class SessionDatabase extends ConfigurationItem {
 			code := normalizeFileName(track)
 		else if (!code || (code = ""))
 			code := normalizeFileName(track)
+		else
+			code := normalizeFileName(code)
 
 		return code
 	}

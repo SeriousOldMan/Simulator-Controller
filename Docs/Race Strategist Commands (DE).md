@@ -41,7 +41,7 @@ Nachfolgend ist eine vollständige Liste aller von Cato, dem KI Rennstrategen, e
 
    Das erste Beispiel ist ein einzelner Satz, aber mit inneren Alternativen. Das zweite Beispiel definiert drei unabhängige Sätze für den Befehl, sogar mit inneren Wahlmöglichkeiten.
 
-## Befehle (gültig ab 4.2.2 und höher)
+## Befehle
 
 #### Vordefinierte Auswahlmöglichkeiten
 

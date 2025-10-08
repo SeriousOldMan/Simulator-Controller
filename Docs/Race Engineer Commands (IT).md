@@ -41,7 +41,7 @@ Di seguito troverai l'elenco completo di tutti i comandi vocali riconosciuti da 
 
    Il primo esempio è una frase singola, ma con scelte interiori (alternative). Il secondo esempio definisce tre frasi indipendenti per il comando, anche con scelte interne.
 
-## Comandi (validi per 4.2.2 e versioni successive)
+## Comandi
 
 #### Scelte predefinite
 

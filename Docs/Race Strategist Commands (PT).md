@@ -40,7 +40,7 @@ Abaixo você encontrará uma lista completa de todos os comandos de voz reconhec
 
    O primeiro exemplo é uma única frase, mas com escolhas internas (alternativas). O segundo exemplo define três frases independentes para o comando, mesmo com escolhas internas.
 
-## Comandos (válido para 4.2.2 e posteriores)
+## Comandos
 
 #### Predefined Choices
 

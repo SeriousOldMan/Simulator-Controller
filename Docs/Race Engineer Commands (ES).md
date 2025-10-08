@@ -40,7 +40,7 @@ A continuación encontrará una lista completa de todos los comandos de voz reco
 
    El primer ejemplo es una frase única, pero con opciones internas (alternativas). El segundo ejemplo define tres frases independientes para el comando, incluso con opciones internas.
 
-## Comandos (válidos para 4.2.2 y posteriores)
+## Comandos
 
 #### Opciones predefinidas
 

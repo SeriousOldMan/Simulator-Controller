@@ -41,7 +41,7 @@ Below you will find a complete list of all voice commands recognized by Elisa, t
 
    The first example is a single phrase, but with inner choices (alternatives). The second example defines three independent phrases for the command, even with inner choices.
 
-## Commands (valid for 4.2.2 and later)
+## Commands
 
 #### Predefined Choices
 

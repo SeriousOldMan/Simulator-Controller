@@ -40,7 +40,7 @@ Vous trouverez ci-dessous une liste complète de toutes les commandes vocales re
 
    Le premier exemple est une seule phrase, mais avec des choix intérieurs (alternatives). Le deuxième exemple définit deux phrases indépendantes pour la commande, même avec des choix internes.
 
-## Commandes (valables pour 4.2.2 et versions ultérieures)
+## Commandes
 
 #### Choix prédéfinis
 

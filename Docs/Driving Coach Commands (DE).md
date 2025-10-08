@@ -40,7 +40,7 @@ Nachfolgend ist eine vollständige Liste aller von Aiden, dem KI Fahrtrainer, er
 
    Das erste Beispiel ist ein einzelner Satz, aber mit inneren Alternativen. Das zweite Beispiel definiert drei unabhängige Sätze für den Befehl, sogar mit inneren Wahlmöglichkeiten.
 
-## Befehle (gültig ab 5.4.1 und höher)
+## Befehle
 
 #### Vordefinierte Auswahlmöglichkeiten
 

@@ -146,6 +146,9 @@ playSound(player, wavFile, options := false) {
 			options := ""
 
 		try {
+			if isDebug()
+				logMessage(kLogDebug, "Playing sound `"" . wavFile . "`" with player " . player . "...")
+
 			Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio " . options, workingDirectory, "HIDE", &pid)
 		}
 		catch Any as exception {

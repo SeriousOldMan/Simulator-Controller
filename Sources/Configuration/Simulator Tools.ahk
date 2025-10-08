@@ -3250,6 +3250,9 @@ runSpecialTargets(&buildProgress) {
 	if (StrLen(Trim(kMSBuildDirectory)) > 0)
 		try {
 			for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
+				if GetKeyState("Alt")
+					return
+
 				SetWorkingDir(directory)
 
 				for ignore, file in getFileNames("*.sln", directory . "\") {

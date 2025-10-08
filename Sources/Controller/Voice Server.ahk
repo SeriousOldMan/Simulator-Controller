@@ -619,7 +619,7 @@ class VoiceServer extends ConfigurationItem {
 					return false
 				}
 				else {
-					if ((this.VoiceServer.PushToTalkMode != "Hold") && this.hasPushToTalk())
+					if ((this.VoiceServer.PushToTalkMode != "Hold") && this.VoiceServer.hasPushToTalk())
 						playSound("VSSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
 
 					this.iListening := false

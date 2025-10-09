@@ -1237,10 +1237,11 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local knowledge := super.getKnowledge(type, options)
 		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
+		local percent := " %"
 		local strategy, nextPitstop, pitstop, pitstops
-		local fuelService, tyreService, brakeService, repairService, supportTyreSets
-		local tyreCompound, tyreCompoundColor, tcCandidate
 		local availableTyreSets, tyreSets, tyreSet, ignore, tyreLife, strategy, rules
+		local fuelService, tyreService, brakeService, repairService, supportTyreSets, tyreCompound, tyreCompoundColor, tcCandidate
+		local lapNumber, lap, lapNr, tyres, tyreWear, postfix, tyre
 
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
@@ -1418,6 +1419,46 @@ class RaceStrategist extends GridRaceAssistant {
 							pitstop["TyreChange"] := kFalse
 
 						strategy["NextPitstop"] := pitstop
+					}
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+			if (this.activeTopic(options, "Laps") && knowledge.Has("Laps"))
+				try {
+					for ignore, lap in knowledge["Laps"] {
+						lapNr := lap["Nr"]
+
+						if (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear.FL", kUndefined) != kUndefined) {
+							tyreWear := Map()
+
+							for postfix, tyre in Map("FL", "FrontLeft", "FR", "FrontRight"
+												   , "RL", "RearLeft", "RR", "RearRight")
+								tyreWear[tyre] := (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear." . postfix, 0) . percent)
+
+							tyres := Map()
+							tyres["Wear"] := tyreWear
+
+							lap["Tyres"] := tyres
+						}
+					}
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+			if this.activeTopic(options, "Tyres")
+				try {
+					lapNumber := knowledgeBase.getValue("Lap", 0)
+
+					if (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", kUndefined) != kUndefined) {
+						tyres := knowledge["Tyres"]
+
+						tyres["Wear"] := Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", 0) . percent)
+										   , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FR", 0) . percent)
+										   , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RL", 0) . percent)
+										   , "RearRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RR", 0) . percent))
 					}
 				}
 				catch Any as exception {

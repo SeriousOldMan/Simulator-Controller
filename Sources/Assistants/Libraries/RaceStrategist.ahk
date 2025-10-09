@@ -2000,11 +2000,12 @@ class RaceStrategist extends GridRaceAssistant {
 
 	loadRules(data) {
 		if ((this.Session == kSessionRace) && (getMultiMapValue(this.Settings, "Session Rules", "Strategy", "No") = "Yes")
-		 && !this.Strategy && !this.StrategyCreated && (getMultiMapValue(data, "Stint Data", "Laps", 0) < 5)
+		 && !this.Strategy && !this.StrategyCreated && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 10)
 		 && this.hasEnoughData(false)) {
 			this.recommendStrategy({Silent: true, Confirm: false, Request: "Rules"})
 
-			this.updateDynamicValues({StrategyCreated: true})
+			if this.Strategy
+				this.updateDynamicValues({StrategyCreated: true})
 		}
 	}
 
@@ -2916,10 +2917,18 @@ class RaceStrategist extends GridRaceAssistant {
 				FileAppend(JSON.print(strategy, "  "), kTempDirectory . "Strategy.json")
 			}
 
-			RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
-													  , options.HasProp("Confirm") && options.Confirm
-													  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
-													  , options.HasProp("Pitstop") && options.Pitstop).start()
+			try {
+				RaceStrategist.RaceStrategyUpdateTask(this, this.createStrategy(strategy), "User"
+														  , options.HasProp("Confirm") && options.Confirm
+														  , options.HasProp("FullCourseYellow") && options.FullCourseYellow
+														  , options.HasProp("Pitstop") && options.Pitstop).start()
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				if (this.Speaker && (!options.HasProp("Silent") || !options.Silent))
+					this.getSpeaker().speakPhrase("NoValidStrategy")
+			}
 		}
 		else if (this.Speaker && (!options.HasProp("Silent") || !options.Silent))
 			this.getSpeaker().speakPhrase("NoValidStrategy")

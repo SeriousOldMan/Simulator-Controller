@@ -161,10 +161,10 @@ The configuration map this item belongs to, or *false*, if the item wasn't creat
 
 ### Public Methods
 
-#### *__New(configuration :: ConfigurationMap := false)*
+#### *__New(configuration :: MultiMap := false)*
 If the optional configuration map has been supplied, the method loadFromConfiguration will be invoked automatically.
 
-#### *loadFromConfiguration(configuration :: ConfigurationMap)*
+#### *loadFromConfiguration(configuration :: MultiMap)*
 May be overriden by a subclass to read and initialize the item instance variables from the given configuration map. Implementations may generally look like this:
 
 	loadFromConfiguration(configuration) {
@@ -178,7 +178,7 @@ May be overriden by a subclass to read and initialize the item instance variable
 		}
 	}
 
-#### *saveToConfiguration(configuration :: ConfigurationMap)*
+#### *saveToConfiguration(configuration :: MultiMap)*
 Typically invoked by the configuration tool, this method needs to write the item state to the configuration map. Implementations may generally look like this:
 
 	saveToConfiguration(configuration) {
@@ -232,7 +232,7 @@ If the application is running and has been started by the *startup* method below
 
 ### Public Methods
 
-#### *__New(application :: String, configuration :: ConfigurationMap := false, exePath :: String := "", workingDirectory :: String := "", windowTitle :: String := "", specialStartup :: String := "", specialShutdown :: String := "", specialIsRunning :: String := "")*
+#### *__New(application :: String, configuration :: MultiMap := false, exePath :: String := "", workingDirectory :: String := "", windowTitle :: String := "", specialStartup :: String := "", specialShutdown :: String := "", specialIsRunning :: String := "")*
 Constructs a new configurable application item. If the configuration argument is not supplied or *false*, all properties may be set with corresponding arguments.
 
 #### *startup(special :: Boolean := true, wait :: Boolean := false, options :: String := "")*
@@ -274,13 +274,13 @@ Similar to the *Hotkeys* property, this property returns the defined actions. Th
 
 ### Public Methods
 
-#### *__New(functionNumber :: Integer, configuration :: ConfigurationMap := false, #rest hotkeyActions)*
+#### *__New(functionNumber :: Integer, configuration :: MultiMap := false, #rest hotkeyActions)*
 Constructs a new controller function. If *configuration* is not supplied, the hotkeys and actions must be supplied as string arguments for all triggers in the order returned by the *Trigger* property. The class factory method *createFunction* may be used to create an instance of a specific subclass.
 
 #### *fireAction(trigger)*
 Calls the action function defined for the given trigger, if any.
 
-#### [Class Factory Method] *createFunction(descriptor :: String, configuration :: ConfigurationMap := false, onHotkeys :: String := false, onAction :: String := false, offHotkeys :: String := false, offAction :: String := false)*
+#### [Class Factory Method] *createFunction(descriptor :: String, configuration :: MultiMap := false, onHotkeys :: String := false, onAction :: String := false, offHotkeys :: String := false, offAction :: String := false)*
 Creates an instance of a specific subclass of *Function* according to the given descriptor. If *configuration* is *false*, the additional arguments may be used to initialize hotkeys and triggerable actions in the order of the defined triggers returned by the property *Trigger*.
 
 ***
@@ -329,7 +329,7 @@ Returns a map of all arguments supplied to the plugin, or, if *asText* has been 
 
 ### Public Methods
 
-#### *__New(plugin :: String, configuration :: ConfigurationMap := false, active :: Boolean := false, simulators :: String := "", arguments :: String := "")*
+#### *__New(plugin :: String, configuration :: MultiMap := false, active :: Boolean := false, simulators :: String := "", arguments :: String := "")*
 Constructs a new plugin instance. If *configuration* has been supplied, the instance is initialized from the configuration. Otherwise the *simulators* may be a ","-delimited string of simulator names and arguments might supply all the plugin arguments also in their texutal representation, which follows the following format: "parameter1: value11, value12, value13; parameter2: value21, value22; ..."
 
 #### *hasArgument(parameter :: String)*
@@ -363,7 +363,7 @@ This property returns the short string, which is used by all AutoHotKey *Gui* co
 
 ### Public Methods
 
-#### *__New(development :: Boolean, configuration :: ConfigurationMap)*
+#### *__New(development :: Boolean, configuration :: MultiMap)*
 Constructs a new *ConfigurationEditor* instance. If *true* is passed for the first parameter, additional configuration options suitable for development tasks will be available in the first tab of the configuration editor. The second parameter is the configuration, which should be modified.
 
 #### *registerConfigurator(label :: String, configurator :: ConfigurationItem)*
@@ -390,7 +390,7 @@ After all configurators have been registered, *show* will open the editor window
 Makes the main editor window invisble, which might be useful, when a specialized or delegated editor will be opened by one of the plugins.
 
 #### *close()*
-Called at the end, after all modifications had been saved (by calling the inherited method [saveToConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#savetoconfigurationconfiguration--configurationmap)), to finally close and destroy the editor window.
+Called at the end, after all modifications had been saved (by calling the inherited method [saveToConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#savetoconfigurationconfiguration--MultiMap)), to finally close and destroy the editor window.
 
 #### *toggleKeyDetector(callback :: Func := false)*
 Calling *toggleKeyDetector* enables or disables a special tool to detect buttons and dials on connected hardware controlles. A small tooltip will follow the mouse and display information as long as these controls are activated. If you supply the *callback*, it will be called with the first pressed control in AutoHotkey [hotkey syntax](https://www.autohotkey.com/docs/KeyList.htm) and the key detector tool will be deactivated automatically.
@@ -498,11 +498,11 @@ Is *true*, if the startup process of the controller is complete, *false* before.
 
 ### Public Methods
 
-#### *__New(simulatorConfiguration :: ConfigurationMap, settings :: ConfigurationMap)*
+#### *__New(simulatorConfiguration :: MultiMap, settings :: MultiMap)*
 Constructs a new *SimulatorController* instance. Both configuration parameters are required. The first expects the general simulator configuration map (see [kSimulatorConfiguration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#global-configuration-map-constantsahk) for reference), the second is the small configuration map maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration) and stored in a configuration file referenced by [kSimulatorSettingsFile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#ksimulatorconfigurationfile-ksimulatorsettingsfile).
 Since *SimulatorController* is a singleton class, the single instance might be accessed after construction by referencing *SimulatorController.Instance*.
 
-#### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: ConfigurationMap)*
+#### [Factory Method] *createControllerFunction(descriptor :: String, configuration :: MultiMap)*
 Returns an instance of [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) according to the givven descriptor.
 
 #### *findFunctionController(function :: ControllerFunction)*
@@ -667,7 +667,7 @@ A list of all actions defined by this plugin. Only the actions defined directly 
 
 ### Public Methods
 
-#### *__New(controller :: SimulatorController, name :: String, configuration :: ConfigurationMap, register :: Boolean := true)*
+#### *__New(controller :: SimulatorController, name :: String, configuration :: MultiMap, register :: Boolean := true)*
 Constructs an instance of *ControllerPlugin*. The first three parameters are required. If the optional parameter *register* is supplied and *false*, the plugin is not registered automatically in the *controller*. This might be necessary in complex initialization scenarios. You can register the plugin anytime later by calling *registerPlugin* manually.
 
 #### *findMode(name :: String)*
@@ -824,7 +824,7 @@ The number of rotary dials of the controller. This is maintained by the [configu
 
 ### Public Methods
 
-#### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
+#### *__New(controller :: SimulatorController, configuration :: MultiMap := false)*
 Constructs a new represenation for a controller hardware. The controller is automatically registered for the given controller using [registerFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerfunctioncontrollercontroller--functioncontroller).
 
 #### *setControls(num1WayToggles :: Integer, num2WayToggles :: Integer, numButtons :: Integer, numDials :: Integer)*
@@ -866,7 +866,7 @@ The time in milliseconds, the controller may be visible after an action has been
 
 ### Public Methods
 
-#### *__New(controller :: SimulatorController, configuration :: ConfigurationMap := false)*
+#### *__New(controller :: SimulatorController, configuration :: MultiMap := false)*
 The constructor calls *createGui* automatically.
 	
 #### [Abstract] *createGui()*
@@ -934,7 +934,7 @@ A list of all supported session states supported by the given simulator (excludi
 
 ### Public Methods
 
-#### *__New(controller :: SimulatorController, name :: String, simulator :: String, configuration :: ConfigurationMap, register :: Boolean := true)*
+#### *__New(controller :: SimulatorController, name :: String, simulator :: String, configuration :: MultiMap, register :: Boolean := true)*
 The constructor adds the additional parameter *simulator* to the inherited *__New* method. The name of the game application, as configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration), must be supplied for the *simulator* parameter.
 
 #### *createPitstopAction(controller :: SimulatorController, action :: String, increaseFunction :: String, #rest moreArguments :: String)*
@@ -1025,16 +1025,19 @@ Requests new tyres at the given pitstop. *compound* will define the tyre categor
 #### *setPitstopTyrePressures(pitstopNumber :: Integer, pressureFL :: Float, pressureFR :: Float, pressureRL :: Float, pressureRR :: Float)*
 Dials the pressures in PSI, that has been selected previously by *setPitstopTyreCompound*. The default method handles internal state change.
 
+#### *setPitstopBrakeChange(pitstopNumber :: Integer, change :: Boolean, frontBrakePads :: Integer := false, rearBrakePads :: Integer := false)*
+Requests a change of brake pads. It depends on the simulator, whether specific pad compounds can be chosen.
+
 #### *requestPitstopRepairs(pitstopNumber :: Integer, repairSuspension :: Boolean, repairBodywork :: Boolean, repairEngine :: Boolean := false)*
 This method requests repairs for the different parts of the car at the pitstop. The default method handles internal state change.
 
 #### *requestPitstopDriver(pitstopNumber :: Integer, driver :: String)*
 This is the last method of the pitstop preparation cycle. It requests the next driver when swapping drivers in a team race. The default method handles internal state change.
 
-#### *updatePositionsData(data :: ConfigurationMap)*
-*updatePositionsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the AI Race Strategist. The implementation of *updatePositionsData* must add the position and timing information for all cars to the data object. See the documentation for the AI Race Strategist for more information about a [description of the corrsponding data fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#data-acquisition).
+#### *updateStandingsData(data :: MultiMap)*
+*updateStandingsData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the AI Race Strategist. The implementation of *updatePositionsData* must add the position and timing information for all cars to the data object. See the documentation for the AI Race Strategist for more information about a [description of the corrsponding data fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#data-acquisition).
 
-#### *updateSessionData(data :: ConfigurationMap)*
+#### *updateTelemetryData(data :: MultiMap)*
 *updateSessionData* is called after the [telemetry data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) has been loaded from the given simulation, but before the data is transferred to the AI Race Engineer. The implementation of *updateSessionData* might add some additional fields or change fields that has been provided by the simulation. See the [implementation of the *RaceRoom Racing Experience*](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/R3E%20Plugin.ahk) simulation for an example, where the name of the current car is read from an external JSON database file.
 
 ## PitstopMode extends [ControllerMode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) ([SimulatorPlugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Libraries/SimulatorPlugin.ahk))

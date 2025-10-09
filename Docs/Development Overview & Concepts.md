@@ -222,15 +222,15 @@ The protocol, a configurator object has to implement, is quite simple:
 	class MyConfigurator extends ConfigurationItem {
 		createGui(editor :: ConfigurationEditor, x :: Integer, y :: Integer, width :: Integer, height :: Integer) { ... }
 
-		loadFromConfiguration(configuration :: ConfigurationMap) { ... }
+		loadFromConfiguration(configuration :: MultiMap) { ... }
 
-		saveToConfiguration(configuration :: ConfigurationMap) { ... }
+		saveToConfiguration(configuration :: MultiMap) { ... }
 	}
 	
 The method *createGui* is called by the *editor* to create the controls for the configuration plugin. All controls must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
 *loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration*, will be called, whenever the user wants to save the current state of the configuration tool.
 
-Please take a look at the documentation of [ConfigurationEditor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-configurationeditor-extends-configurationitem-simulator-multimapahk) and [ConfigurationItemList](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitemlist-extends-configurationitem-simulator-multimapahk) in the classes reference on [Configuration Editor Classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) for more information. Especially, if your configuration has multiple items or aspects and you want to present them using a list, the abstract class *ConfigurationItemList* will be very helpful as a building block.
+Please take a look at the documentation of [ConfigurationEditor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-configurationeditor-extends-configurationitem-simulator-configurationahk) and [ConfigurationItemList](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitemlist-extends-configurationitem-simulator-configurationahk) in the classes reference on [Configuration Editor Classes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) for more information. Especially, if your configuration has multiple items or aspects and you want to present them using a list, the abstract class *ConfigurationItemList* will be very helpful as a building block.
 
 ## Localization and Translation
 

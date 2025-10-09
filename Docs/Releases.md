@@ -54,6 +54,7 @@
   - The editor for Controller Automation is now resizeable.
   - The editor for LLM instructions is now resizeable.
   - When using the Push-To-Talk mode "Press & Talk", two different silent sounds will signal start of listening and end of listening. The corresponding sound files are located in *Resources\Sounds* in the installation folder and are named "Talk On.wav" and "Talk Off.wav".
+  - If a LLM is called when processing a *Conversation* booster or *Reasoning* booster, two silent sounds will signal the start and the end of the LLM processing. Especially when using the *higher* LAM events and actions introduced in the last and in this release, which can take some time to process, this is very helpful. The sounds are now called "Conversation Begin.wav", "Conversation End.wav", "Reasoning Begin.wav" and "Reasoning End.wav". As always, you can replace those sounds with your own ones and even mute them altogether.
   - It is now possible to configure multiple different audio routes depending on the currently running simulator and/or the current session type (race, qualifying and so on). See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   - When choosing a tyre compound on a specific wheel for the next pitstop in "Team Center", holding down the [Control key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will choose the same compound on the other wheels as well.
 

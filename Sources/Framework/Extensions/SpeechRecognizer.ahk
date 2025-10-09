@@ -911,7 +911,7 @@ class SpeechRecognizer {
 						this._onTextCallback(result["results"][1]["alternatives"][1]["transcript"])
 				}
 				else
-					throw "Error during speech recognition..."
+					throw ("Error during speech recognition (Status code: " . result.Status . "...")
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -989,7 +989,7 @@ class SpeechRecognizer {
 							this._onTextCallback(result["text"])
 					}
 					else
-						throw "Error during speech recognition..."
+						throw ("Error during speech recognition (Status code: " . result.Status . "...")
 				}
 				catch Any as exception {
 					logError(exception, true)

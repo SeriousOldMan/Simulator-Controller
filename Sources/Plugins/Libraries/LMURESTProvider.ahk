@@ -1220,6 +1220,7 @@ class LMURESTProvider {
 
 		class TeamData extends LMURESTProvider.RESTData {
 			iTeamSession := kUndefined
+			iCachedTeams := CaseInsenseMap()
 
 			GETURL {
 				Get {
@@ -1267,46 +1268,51 @@ class LMURESTProvider {
 			}
 
 			getTeamID(driverName) {
-				local data := this.Data
-				local parts := string2Values(A_Space, driverName)
-				local name, dName, driver
+				local data, parts, name, driver, dName, team
 
-				if (data && (data != kNull))
-					for name, driver in data["drivers"] {
-						dName := name
+				if this.iCachedTeams.Has(driverName)
+					return this.iCachedTeams[driverName]
+				else {
+					data := this.Data
 
-						if ((name = driverName) || !first(parts, (p) => !InStr(dName, p)))
-							return driver["uniqueTeamID"]
-					}
+					if (data && (data != kNull))
+						if data["drivers"].Has(driverName)
+							team := data["teams"][data["drivers"][driverName]["uniqueTeamID"]]
+						else {
+							team := false
+							parts := string2Values(A_Space, driverName)
+
+							for name, driver in data["drivers"] {
+								dName := name
+
+								if ((name = driverName) || !first(parts, (p) => !InStr(dName, p))) {
+									team := data["teams"][driver["uniqueTeamID"]]
+
+									break
+								}
+							}
+
+							if team {
+								this.iCachedTeams[driverName] := team
+
+								return team
+							}
+						}
+				}
 
 				return false
 			}
 
-			getNr(id) {
-				local data := this.Data
-
-				if (data && (data != kNull))
-					return data["teams"][id]["carNumber"]
-				else
-					return false
+			getNr(team) {
+				return (team ? team["carNumber"] : false)
 			}
 
-			getTeam(id) {
-				local data := this.Data
-
-				if (data && (data != kNull))
-					return data["teams"][id]["name"]
-				else
-					return false
+			getTeam(team) {
+				return (team ? team["name"] : false)
 			}
 
-			getDrivers(id) {
-				local data := this.Data
-
-				if (data && (data != kNull))
-					return getKeys(data["teams"][id]["drivers"])
-				else
-					return []
+			getDrivers(team) {
+				return (team ? getKeys(team["drivers"]) : [])
 			}
 		}
 

@@ -363,7 +363,7 @@ class LLMConnector {
 				}
 				else
 					answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]}).POST(this.CreateServiceURL(this.Server)
-																					  , body, headers, {Object: true, Encoding: "UTF-8"})
+																					   , body, headers, {Object: true, Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					this.Manager.connectorState("Active")

@@ -1553,7 +1553,7 @@ The content of the JSON file looks like this (depending on the current situation
 				"Right": 0.0,
 				"Rear": 2.72,
 				"All": 3.06
-			}
+			},
 			"Suspension": {
 				"FrontLeft": 0.0,
 				"FrontRight": 0.0,
@@ -1575,7 +1575,7 @@ The content of the JSON file looks like this (depending on the current situation
 			"AvgFuelConsumption": 4.1,
 			"LastFuelConsumption": 4.1,
 			"RemainingFuel": 36.9,
-			"RemainingFuelLaps": 9
+			"RemainingFuelLaps": 9,
 			"AvgEnergyConsumption": 3.2,
 			"LastEnergyConsumption": 3.0,
 			"RemainingEnergy": 26.7,
@@ -1638,8 +1638,8 @@ The content of the JSON file looks like this (depending on the current situation
 			"Laps": 2,
 			"LastTime": "2:21,3",
 			"BestTime": "2:20,7",
-			"LastSpeed": 270,8
-			"BestSpeed": 272,1
+			"LastSpeed": 270.8,
+			"BestSpeed": 272.1,
 			"Position": 1
 		},
 		"Strategy": {
@@ -1685,9 +1685,9 @@ The content of the JSON file looks like this (depending on the current situation
 			],
 			"PressureLosses": [
 				0.0,
-				- 0.1,
+				-0.1,
 				0.0,
-				- 0.2
+				-0.2
 			],
 			"Temperatures": [
 				80.6,
@@ -1707,11 +1707,11 @@ The content of the JSON file looks like this (depending on the current situation
 				2,
 				2
 			],
-			"TyreCompound": "Dry (M)"
-			"TyreCompoundFrontLeft": "Dry (M)"
-			"TyreCompoundFrontRight": "Dry (S)"
-			"TyreCompoundRearLeft": "Dry (M)"
-			"TyreCompoundRearRight": "Dry (M)"
+			"TyreCompound": "Dry (M)",
+			"TyreCompoundFrontLeft": "Dry (M)",
+			"TyreCompoundFrontRight": "Dry (S)",
+			"TyreCompoundRearLeft": "Dry (M)",
+			"TyreCompoundRearRight": "Dry (M)",
 			"TyreSet": 3
 		},
 		"Instructions": {

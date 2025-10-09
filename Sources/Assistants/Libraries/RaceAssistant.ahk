@@ -186,6 +186,10 @@ class AssistantEvent extends AgentEvent {
 		local booster := this.Assistant.AgentBooster
 
 		triggerEvent() {
+			static reasoningStartSound := getFileName("Reasoning Begin.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+
+			playSound("RASoundPlayer.exe", reasoningStartSound, getAudioSetting("Reasoning"))
+
 			return booster.trigger(this, this.createTrigger(this.Event, this.Phrase, arguments)
 								 , this.createGoal(this.Goal, arguments)
 								 , Map("Variables", this.createVariables(event, arguments)))
@@ -1691,20 +1695,23 @@ class RaceAssistant extends ConfigurationItem {
 	handleVoiceText(grammar, text) {
 		local ignore, part, data
 
-		static conversationSound := getFileName("Conversation.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		static conversationStartSound := getFileName("Conversation Begin.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+		static conversationStopSound := getFileName("Conversation End.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
 		if (grammar = "Text") {
 			if this.ConversationBooster {
 				data := this.getKnowledge("Conversation")
 
-				text := this.ConversationBooster.Ask(text
+				playSound("RASoundPlayer.exe", conversationStartSound, getAudioSetting("Conversation"))
+
+				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
 																	 , knowledge: (data.Count > 0) ? StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")
 																								   : "{}"}))
 
 				if text {
 					if (text != true) {
-						playSound("RASoundPlayer.exe", conversationSound, getAudioSetting("Conversation"))
+						playSound("RASoundPlayer.exe", conversationStopSound, getAudioSetting("Conversation"))
 
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
@@ -5049,7 +5056,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 	local activationIndex := 1
 	local ignore, action, definition, parameters, parameter, enumeration, handler, enoughData, confirm, required
 
-	static reasoningSound := getFileName("Reasoning.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+	static reasoningStopSound := getFileName("Reasoning End.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 	static explainReasoning := (isDebug() || getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																		 , "Booster", "ExplainReasoning", false))
 
@@ -5151,7 +5158,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	runAction(enoughData, confirm) {
 		if chime
-			playSound("RASoundPlayer.exe", reasoningSound, getAudioSetting("Reasoning"))
+			playSound("RASoundPlayer.exe", reasoningStopSound, getAudioSetting("Reasoning"))
 
 		if !assistant.KnowledgeBase
 			return assistant.hasEnoughData()

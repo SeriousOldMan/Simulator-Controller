@@ -338,7 +338,6 @@ class SpeechRecognizer {
 				device := getAudioSetting(this.Routing, "Input")
 
 			return device
-
 		}
 	}
 

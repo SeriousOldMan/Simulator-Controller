@@ -563,7 +563,7 @@ class SpeechSynthesizer {
 			audioDevice := this.AudioDevice
 
 			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
-						   , audioDevice ? ("`"" . audioDevice . "`"") : "")
+						   , audioDevice ? audioDevice : false)
 
 			if callback
 				callback.Call("Start")

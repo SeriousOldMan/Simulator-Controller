@@ -134,6 +134,12 @@ requireSoundPlayer(player) {
 playSound(player, wavFile, options := false) {
 	local workingDirectory, pid
 
+	if !options
+		options := ""
+
+	if InStr(options, kNull)
+		return false
+
 	if (player = "System")
 		player := false
 	else
@@ -141,9 +147,6 @@ playSound(player, wavFile, options := false) {
 
 	if player {
 		SplitPath(kSox, , &workingDirectory)
-
-		if !options
-			options := ""
 
 		try {
 			if isDebug()

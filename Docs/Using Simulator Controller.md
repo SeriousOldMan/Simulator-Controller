@@ -387,8 +387,8 @@ Supported output routes are:
 | Race Spotter    | All voice output by the Race Spotter.                                                                                |
 | Race Engineer   | All voice output by the Race Engineer.                                                                               |
 | Race Strategist | All voice output by the Race Strategist.                                                                             |
-| Conversation    | The short sounds that indicate that an answer is given by the LLM of a *Conversation* booster.                                |
-| Reasoning       | The short sounds that indicate that a given behavior is triggered by the LLM of a *Reasoning* booster.                        |
+| Conversation    | The short sounds that indicate that an answer is given by the LLM of a *Conversation* booster.                       |
+| Reasoning       | The short sounds that indicate that a given behavior is triggered by the LLM of a *Reasoning* booster.               |
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
 

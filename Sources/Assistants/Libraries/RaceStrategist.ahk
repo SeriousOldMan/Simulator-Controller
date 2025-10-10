@@ -1324,7 +1324,7 @@ class RaceStrategist extends GridRaceAssistant {
 					try {
 						rules := {RequiredPitstops: strategy.PitstopRule
 								, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
-								, MaxStintDuration: strategy.StintLength . " Minutes"})
+								, MaxStintDuration: strategy.StintLength . " Minutes"}
 
 						if isObject(strategy.PitstopWindow) {
 							rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
@@ -2390,7 +2390,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					rules := {RequiredPitstops: strategy.PitstopRule
 							, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
-							, MaxStintDuration: strategy.StintLength . " Minutes"})
+							, MaxStintDuration: strategy.StintLength . " Minutes"}
 
 					if isObject(strategy.PitstopWindow) {
 						rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")

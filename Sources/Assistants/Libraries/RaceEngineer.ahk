@@ -323,6 +323,8 @@ class RaceEngineer extends RaceAssistant {
 	iHasPressureData := false
 	iSessionDataActive := false
 
+	iRaceRules := false
+
 	iPitstopOptionsFile := false
 	iPitstopAdjustments := false
 	iPitstopFillUp := false
@@ -505,6 +507,7 @@ class RaceEngineer extends RaceAssistant {
 		super.updateSessionValues(values)
 
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
+			this.iRaceRules := false
 			this.iPitstopAdjustments := false
 			this.iPitstopFillUp := false
 
@@ -1111,6 +1114,9 @@ class RaceEngineer extends RaceAssistant {
 
 			if this.activeTopic(options, "Session")
 				try {
+					if this.iRaceRules
+						knowledge["Session"]["Rules"] := this.iRaceRules
+
 					tyreSets := knowledge["Session"]["AvailableTyres"]
 
 					for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
@@ -3352,6 +3358,22 @@ class RaceEngineer extends RaceAssistant {
 
 			knowledgeBase.setFact("Session.Settings.Tyre." . tyreSet[1] . "." . tyreSet[2] . ".Laps.Max", tyreSet[4])
 		}
+	}
+
+	updateRaceRules(raceRules) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if !isObject(raceRules)
+			try {
+				raceRules := JSON.parse(FileRead(raceRules))
+
+				deleteFile(raceRules)
+			}
+			catch Any {
+				raceRules := false
+			}
+
+		this.iRaceRules := raceRules
 	}
 
 	updateSession(simulator, car, track, lapNumber, data) {

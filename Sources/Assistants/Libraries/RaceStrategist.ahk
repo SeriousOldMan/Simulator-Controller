@@ -1240,7 +1240,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local strategy, nextPitstop, pitstop, pitstops
 		local fuelService, tyreService, brakeService, repairService, supportTyreSets
 		local tyreCompound, tyreCompoundColor, tcCandidate
-		local availableTyreSets, tyreSets, tyreSet, ignore, tyreLife
+		local availableTyreSets, tyreSets, tyreSet, ignore, tyreLife, strategy, rules
 
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
@@ -1317,12 +1317,23 @@ class RaceStrategist extends GridRaceAssistant {
 			this.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 			this.Provider.supportsTyreManagement( , &supportTyreSets)
 
-			if this.activeTopic(options, "Session")
-				if this.Strategy {
-					try {
-						knowledge["Session"]["MaxStintDuration"] := (this.Strategy.StintLength . " Minutes")
+			if this.activeTopic(options, "Session") {
+				strategy := this.Strategy
 
-						availableTyreSets := this.Strategy.AvailableTyreSets
+				if strategy {
+					try {
+						rules := {RequiredPitstops: strategy.PitstopRule
+								, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
+								, MaxStintDuration: strategy.StintLength . " Minutes"})
+
+						if isObject(strategy.PitstopWindow) {
+							rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
+							rules.PitstopTo := (strategy.PitstopWindow[2] . " Minute")
+						}
+
+						knowledge["Session"]["Rules"] := toMap(rules)
+
+						availableTyreSets := strategy.AvailableTyreSets
 						tyreSets := knowledge["Session"]["AvailableTyres"]
 
 						for ignore, tyreCompound in SessionDatabase.getTyreCompounds(this.Simulator, this.Car, this.Track) {
@@ -1367,6 +1378,7 @@ class RaceStrategist extends GridRaceAssistant {
 					catch Any as exception {
 						logError(exception, true)
 					}
+			}
 
 			if (knowledgeBase.getValue("Strategy.Name", false) && this.activeTopic(options, "Strategy"))
 				try {
@@ -2348,26 +2360,47 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateSession(simulator, car, track, lapNumber, validLap, data) {
-		local tyreSets, ignore, descriptor
+		local strategy := this.Strategy
+		local engineerPID, tyreSets, ignore, descriptor, filename
 
 		static lastTyreSets := false
+		static lastStrategy := false
 
-		if this.Strategy {
-			tyreSets := []
+		if strategy {
+			engineerPID := ProcessExist("Race Engineer.exe")
 
-			for ignore, descriptor in this.Strategy.TyreSets
-				if descriptor
-					tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
+			if engineerPID {
+				tyreSets := []
 
-			tyreSets := values2String("|", tyreSets*)
+				for ignore, descriptor in strategy.TyreSets
+					if descriptor
+						tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
 
-			if (tyreSets != lastTyreSets) {
-				lastTyreSets := tyreSets
+				tyreSets := values2String("|", tyreSets*)
 
-				engineerPID := ProcessExist("Race Engineer.exe")
+				if (tyreSets != lastTyreSets) {
+					lastTyreSets := tyreSets
 
-				if engineerPID
 					messageSend(kFileMessage, "Race Engineer", "updateTyreUsage:" . tyreSets, engineerPID)
+				}
+
+				if (strategy != lastStrategy) {
+					lastStrategy := strategy
+					fileName := temporaryFilename("Race Rules", "json")
+
+					rules := {RequiredPitstops: strategy.PitstopRule
+							, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
+							, MaxStintDuration: strategy.StintLength . " Minutes"})
+
+					if isObject(strategy.PitstopWindow) {
+						rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
+						rules.PitstopTo := (strategy.PitstopWindow[2] . " Minute")
+					}
+
+					FileAppend(JSON.print(rules, isDebug() ? "  " : ""), fileName)
+
+					messageSend(kFileMessage, "Race Engineer", "updateRaceRules:" . fileName, engineerPID)
+				}
 			}
 		}
 

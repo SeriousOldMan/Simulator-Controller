@@ -1,5 +1,5 @@
 {
-    "updListenerPort": 9000,
+    "udpListenerPort": 9000,
     "connectionPassword": "asd",
     "commandPassword": ""
 }

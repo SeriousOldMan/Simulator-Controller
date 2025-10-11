@@ -203,13 +203,8 @@ class ACCUDPProvider {
 				udpConfigValid := false
 			}
 
-			if !udpConfigValid {
+			if !udpConfigValid
 				logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
-
-				if !kSilentMode
-					showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
 		}
 	}
 

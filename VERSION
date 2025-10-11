@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.1.0-dev
 Target=6.6.1.0-release
-Date=10/10/2025
+Date=10/11/2025
 Download=
-Changes=Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction"
+Changes=Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction", Fixed standings in LLM knowledge after the first car pitted
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.0.0-release

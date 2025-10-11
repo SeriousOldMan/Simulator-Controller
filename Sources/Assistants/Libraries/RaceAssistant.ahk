@@ -3527,9 +3527,9 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[carID][numPitstops].Lap) : kNull)
 							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
-				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", 0)
+				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", false)
 
-				if (fuelRemaining > 0)
+				if fuelRemaining
 					carData["RemainingFuel"] := (convert("Volume", fuelRemaining) . volumeUnit)
 
 				if isSet(type)

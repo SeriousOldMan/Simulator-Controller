@@ -218,8 +218,6 @@ namespace RF2SHMProvider {
 					Console.Write("Driver.Car=");
 					Console.WriteLine(i);
 				}
-
-				Console.Write("Car."); Console.Write(i); Console.Write(".FuelRemaining="); Console.WriteLine(Math.Round(telemetry.mFuel, 1));
 			}
 		}
 

@@ -614,7 +614,7 @@ class SpeechRecognizer {
 				else if ((recognizer == true) && language) {
 					for ignore, recognizerDescriptor in this.getRecognizerList()
 						if (((recognizerDescriptor.Language = language) || (recognizerDescriptor.Language = "*"))
-						 && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_short"))) {
+						 && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_long"))) {
 							recognizer := recognizerDescriptor.ID
 
 							found := true

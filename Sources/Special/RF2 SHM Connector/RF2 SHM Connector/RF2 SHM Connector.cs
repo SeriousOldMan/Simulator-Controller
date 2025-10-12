@@ -278,8 +278,6 @@ namespace SHMConnector {
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(i);
 					}
-
-					strWriter.Write("Car."); strWriter.Write(i); strWriter.Write(".FuelRemaining="); strWriter.WriteLine(Math.Round(telemetry.mFuel, 1));
 				}
 			}
 			else

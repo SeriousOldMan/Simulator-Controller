@@ -2361,15 +2361,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 	updateSession(simulator, car, track, lapNumber, validLap, data) {
 		local strategy := this.Strategy
-		local engineerPID, tyreSets, ignore, descriptor, filename
+		local engineerPID := ProcessExist("Race Engineer.exe")
+		local tyreSets, ignore, descriptor, filename
 
 		static lastTyreSets := false
 		static lastStrategy := false
 
-		if strategy {
-			engineerPID := ProcessExist("Race Engineer.exe")
-
-			if engineerPID {
+		if engineerPID {
+			if strategy {
 				tyreSets := []
 
 				for ignore, descriptor in strategy.TyreSets
@@ -2402,6 +2401,11 @@ class RaceStrategist extends GridRaceAssistant {
 					messageSend(kFileMessage, "Race Engineer", "updateRaceRules:" . fileName, engineerPID)
 				}
 			}
+
+			if this.TeamSession
+				messageSend(kFileMessage, "Race Engineer"
+										, "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+										, engineerPID)
 		}
 
 		this.saveSessionInfo(simulator, car, track, lapNumber
@@ -4553,14 +4557,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateDynamicValues({RejectedStrategy: false})
 
-		engineerPID := ProcessExist("Race Engineer.exe")
+		if !this.TeamSession {
+			engineerPID := ProcessExist("Race Engineer.exe")
 
-		if engineerPID
-			Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
-														 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
-														 , engineerPID)
-						 , (this.TeamSession ? (this.BestLapTime ? (this.BestLapTime * 2) : 240000) : 60000)
-						 , kLowPriority)
+			if engineerPID
+				Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
+															 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+															 , engineerPID)
+							 , 60000, kLowPriority)
+		}
 
 		return result
 	}

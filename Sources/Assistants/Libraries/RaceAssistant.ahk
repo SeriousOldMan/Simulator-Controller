@@ -2500,7 +2500,8 @@ class RaceAssistant extends ConfigurationItem {
 				if stateFile {
 					sessionState := readMultiMap(stateFile)
 
-					deleteFile(stateFile)
+					if !isDebug()
+						deleteFile(stateFile)
 
 					this.loadSessionState(sessionState)
 				}
@@ -2508,7 +2509,8 @@ class RaceAssistant extends ConfigurationItem {
 				if settingsFile {
 					sessionSettings := readMultiMap(settingsFile)
 
-					deleteFile(settingsFile)
+					if !isDebug()
+						deleteFile(settingsFile)
 
 					this.loadSessionSettings(sessionSettings)
 				}

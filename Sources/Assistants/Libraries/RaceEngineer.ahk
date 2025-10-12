@@ -4933,7 +4933,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 						}
 
-						if first {
+						if !tyreChange {
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", false)
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", false)
 						}
@@ -4968,7 +4968,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 						}
 
-						if first {
+						if !tyreChange {
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", false)
 							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", false)
 						}
@@ -4978,6 +4978,8 @@ class RaceEngineer extends RaceAssistant {
 						tyreLapsFR := 0
 						tyreLapsRL := 0
 						tyreLapsRR := 0
+
+						tyreChange := true
 					}
 					else {
 						tyreLapsFL += pitstopLaps

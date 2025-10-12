@@ -5465,8 +5465,13 @@ class TeamCenter extends ConfigurationItem {
 			else
 				dirName := ""
 		}
-		else
+		else {
+			simulator := false
+			car := false
+			track := false
+
 			dirName := ""
+		}
 
 		switch line {
 			case 3:

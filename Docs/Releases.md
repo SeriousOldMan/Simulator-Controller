@@ -45,6 +45,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed Google voice recognition for French language.
   - Another fix for the ACC UDP configuration.
   - Fixed the pitstop history in team races. This bug caused the calculation of driven laps for a given tyre to be wrong in team races und control of the Team Server.
+  - Fixed a rare bug which prevented a driver change in team races in *Le Mans Ultimate*.
   
 #### Changes
 

@@ -31,8 +31,6 @@ global kLMUPlugin := "LMU"
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUPlugin extends Sector397Plugin {
-	iSelectedDriver := false
-
 	iLastFuelAmount := 0
 	iRemainingFuelAmount := 0
 
@@ -446,8 +444,6 @@ class LMUPlugin extends Sector397Plugin {
 	performPitstop(lapNumber, options) {
 		super.performPitstop(lapNumber, options)
 
-		this.iSelectedDriver := false
-
 		this.iRemainingFuelAmount := 0
 		this.iLastFuelAmount := 0
 
@@ -537,22 +533,8 @@ class LMUPlugin extends Sector397Plugin {
 	requestPitstopDriver(pitstopNumber, driver) {
 		local nextDriver, currentDriver, delta
 
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			driver := string2Values("|", driver)
-
-			nextDriver := string2Values(":", driver[2])
-			currentDriver := string2Values(":", driver[1])
-
-			if !this.iSelectedDriver
-				this.iSelectedDriver := currentDriver[2]
-
-			delta := (nextDriver[2] - this.iSelectedDriver)
-
-			loop Abs(delta)
-				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
-
-			this.iSelectedDriver := nextDriver[2]
-		}
+		if (this.OpenPitstopMFDHotkey != "Off")
+			this.getOptionHandler("Driver").Call("Set", string2Values(":", string2Values("|", driver)[2])[1])
 	}
 
 	finishPitstopSetup(pitstopNumber) {

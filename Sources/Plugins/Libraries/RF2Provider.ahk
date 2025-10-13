@@ -134,6 +134,8 @@ class Sector397Provider extends SimulatorProvider {
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local debug := isDebug()
+		local simulator := this.Simulator
+		local track := this.Track
 		local standingsData := super.acquireStandingsData(telemetryData, finished)
 		local driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", 0)
 		local numbers := Map()
@@ -143,7 +145,7 @@ class Sector397Provider extends SimulatorProvider {
 		local model := false
 		local team := false
 		local nr := false
-		local carRaw, carID, forName, surName, nickName
+		local carRaw, carID, forName, surName, nickName, car, tyreCompound
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			carRaw := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
@@ -191,6 +193,35 @@ class Sector397Provider extends SimulatorProvider {
 					duplicateNrs := true
 				else
 					numbers[nr] := true
+			}
+
+			car := setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Unknown")
+
+			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRaw", kUndefined)
+
+			if (tyreCompound != kUndefined) {
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+				if tyreCompound
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompound", tyreCompound)
+			}
+
+			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawFront", kUndefined)
+
+			if (tyreCompound != kUndefined) {
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+				if tyreCompound
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundFront", tyreCompound)
+			}
+
+			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawRear", kUndefined)
+
+			if (tyreCompound != kUndefined) {
+				tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+				if tyreCompound
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRear", tyreCompound)
 			}
 		}
 

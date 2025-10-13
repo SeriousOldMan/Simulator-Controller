@@ -3509,7 +3509,7 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		getCar(car, type?) {
-			local carID, carData, numPitstops
+			local carID, carData, numPitstops, ignore, position, found, tyreCompound
 
 			try {
 				carID := knowledgeBase.getValue("Car." . car . ".ID")
@@ -3534,14 +3534,23 @@ class GridRaceAssistant extends RaceAssistant {
 				if fuelRemaining
 					carData["RemainingFuel"] := (convert("Volume", fuelRemaining) . volumeUnit)
 
-				tyreCompoundRaw := knowledgeBase.getValue("Car." . car . ".TyreCompoundRaw", "")
-				
-				if tyreCompoundRaw {
-					tyreCompound := SessionDatabase.getTyreCompoundName(this.Simulator, this.Car, this.Track, tyreCompoundRaw, false)
+				found := false
 
-					if tyreCompound {
-						carData["TyreCompound"] := tyreCompound
+				for ignore, position in ["FrontLeft", "FrontRight", "RearLeft", "RearRight", "Front", "Rear"] {
+					tyreCompound := knowledgeBase.getValue("Car." . car . ".TyreCompound" . position, kUndefined)
+
+					if (tyreCompound != kUndefined) {
+						carData["TyreCompound" . position] := tyreCompound
+
+						found := true
 					}
+				}
+
+				if !found {
+					tyreCompound := knowledgeBase.getValue("Car." . car . ".TyreCompound", kUndefined)
+
+					if (tyreCompound != kUndefined)
+						carData["TyreCompound"] := tyreCompound
 				}
 
 				if isSet(type)

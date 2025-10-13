@@ -326,18 +326,18 @@ class SpeechRecognizer {
 
 	AudioDevice[default := false] {
 		Get {
-			local device
+			local settings
 
 			if default {
-				device := getAudioSetting("Default", "Input", "AudioDevice", kUndefined)
+				settings := getAudioSettings("Default", "Input", kUndefined)
 
-				if (device = kUndefined)
-					device := getAudioSetting(this.Routing, "Input")
+				if (settings = kUndefined)
+					settings := getAudioSettings(this.Routing, "Input")
 			}
 			else
-				device := getAudioSetting(this.Routing, "Input")
+				settings := getAudioSettings(this.Routing, "Input")
 
-			return device
+			return (settings ? settings.AudioDevice : false)
 		}
 	}
 

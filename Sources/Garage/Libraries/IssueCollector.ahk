@@ -131,15 +131,15 @@ class IssueCollector {
 		}
 	}
 
-	static AudioDevice {
+	static AudioSettings {
 		Get {
-			return getAudioSetting("Analyzer")
+			return getAudioSettings("Analyzer")
 		}
 	}
 
-	AudioDevice {
+	AudioSettings {
 		Get {
-			return IssueCollector.AudioDevice
+			return IssueCollector.AudioSettings
 		}
 	}
 
@@ -271,7 +271,7 @@ class IssueCollector {
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
 
-					audioDevice := this.AudioDevice
+					audioDevice := this.AudioSettings.AudioDevice
 					
 					if audioDevice
 						options .= (A_Space . "`"" . audioDevice . "`"")
@@ -348,9 +348,9 @@ class IssueCollector {
 	}
 
 	static acousticFeedback(soundFile) {
-		local audioDevice := IssueCollector.AudioDevice
+		local audioSettings := IssueCollector.AudioSettings
 		
-		playSound("SWSoundPlayer.exe", soundFile, (audioDevice ? audioDevice : "") . " echos 1 1 1 1")
+		playSound("SWSoundPlayer.exe", soundFile, (audioSettings ? audioSettings : false), "echos 1 1 1 1")
 	}
 
 	getHandling() {

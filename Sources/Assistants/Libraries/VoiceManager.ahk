@@ -1186,7 +1186,7 @@ class VoiceManager extends ConfigurationItem {
 
 				if this.hasPushToTalk()
 					playSound("VMSoundPlayer.exe", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
-												 , getAudioSetting("Activation"))
+												 , getAudioSettings("Activation"))
 
 				this.iIsListening := true
 
@@ -1213,7 +1213,7 @@ class VoiceManager extends ConfigurationItem {
 			}
 			else {
 				if ((this.PushToTalkMode != "Hold") && this.hasPushToTalk())
-					playSound("VMSoundPlayer.exe", stopTalkSound, getAudioSetting("Activation"))
+					playSound("VMSoundPlayer.exe", stopTalkSound, getAudioSettings("Activation"))
 
 				this.iIsListening := false
 

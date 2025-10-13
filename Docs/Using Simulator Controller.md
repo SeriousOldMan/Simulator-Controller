@@ -394,7 +394,19 @@ Supported output routes are:
 
 *Headset* is only an example for any configured audio device which is named "Headset" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 
-Good to know: You can mute a given sound completely by supplying "null" as the given audio device. This can be very helpful, if the *Conversation* or *Reasoning* sounds are not wanted, for example.
+Additionally, relative and absolute volume control is supported in the audio routing. Example:
+
+	[Output]
+	Race Spotter.AudioDevice=Headset
+	Race Spotter.Volume=0.5
+	Race Engineer.AudioDevice=Loudspeaker
+	Race Engineer.Volume=1.2
+	Race Strategist.AudioDevice=Loudspeaker
+	Race Strategist.Volume=1.2
+
+This routing will send the speech of the Spotter to the headset with a somewhat reduced volume level, whereas the Engineer and Strategist will talk through the loadspeaker and since you have a headset mounted their volume is increased to be still be understandable.
+
+Good to know: You can mute a given sound completely by supplying "null" as the given audio device or setting the volume to **0**, of course. This can be very helpful, if the *Conversation* or *Reasoning* sounds are not wanted, for example.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 

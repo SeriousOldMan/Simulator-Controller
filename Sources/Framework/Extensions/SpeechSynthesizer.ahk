@@ -207,9 +207,9 @@ class SpeechSynthesizer {
 		}
 	}
 
-	AudioDevice {
+	AudioSettings {
 		Get {
-			return getAudioSetting(this.Routing)
+			return getAudioSettings(this.Routing)
 		}
 	}
 
@@ -555,15 +555,12 @@ class SpeechSynthesizer {
 	playSound(soundFile, wait := true) {
 		global kNirCmd
 
-		local callback, pid, level, audioDevice
+		local callback, pid, level
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
-			audioDevice := this.AudioDevice
-
-			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile
-						   , audioDevice ? audioDevice : false)
+			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile, this.AudioSettings)
 
 			if callback
 				callback.Call("Start")

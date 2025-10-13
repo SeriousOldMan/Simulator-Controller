@@ -31,13 +31,42 @@ global gAudioConfigurationModeModTime := false
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getAudioSetting(name, type := "Output", property := "AudioDevice", default := false) {
-	global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode
+getAudioSettings(name, type := "Output", default := false) {
+	global gAudioConfigurationModTime, gAudioConfigurationMode
 
-	local simulator, session, key, value
+	local simulator, session, key, audioDevice, volume
 
 	static settings := false
 	static lastModTime := false
+
+	getValue(property, default) {
+		global gAudioConfiguration
+
+		local value
+
+		if simulator {
+			value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . "." . session
+														 , name . "." . property, kUndefined)
+
+			if (value == kUndefined)
+				value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . ".*"
+															 , name . "." . property, kUndefined)
+
+			if (value == kUndefined)
+				value := getMultiMapValue(gAudioConfiguration, type . ".*." . session
+															 , name . "." . property, kUndefined)
+
+			if (value == kUndefined)
+				value := getMultiMapValue(gAudioConfiguration, type . "*.*", name . "." . property, kUndefined)
+		}
+		else
+			value := kUndefined
+
+		if (value == kUndefined)
+			value := getMultiMapValue(gAudioConfiguration, type, name . "." . property, default)
+
+		return value
+	}
 
 	if requireAudioConfiguration() {
 		if (!settings || (lastModTime != gAudioConfigurationModTime))
@@ -45,35 +74,25 @@ getAudioSetting(name, type := "Output", property := "AudioDevice", default := fa
 
 		simulator := (gAudioConfigurationMode ? gAudioConfigurationMode[1] : false)
 		session := (gAudioConfigurationMode ? gAudioConfigurationMode[2] : false)
-		key := ((simulator ? (type . "." . simulator . "." . session) : type) . name . "." . property)
+		key := ((simulator ? (type . "." . simulator . "." . session) : type) . name)
 
 		if settings.Has(key)
 			return settings[key]
 		else {
-			if simulator {
-				value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . "." . session
-															 , name . "." . property, kUndefined)
+			if (type = "Output") {
+				audioDevice := getValue("AudioDevice", kUndefined)
+				volume := getValue("Volume", 1.0)
 
-				if (value == kUndefined)
-					value := getMultiMapValue(gAudioConfiguration, type . "." . simulator . ".*"
-																 , name . "." . property, kUndefined)
-
-				if (value == kUndefined)
-					value := getMultiMapValue(gAudioConfiguration, type . ".*." . session
-																 , name . "." . property, kUndefined)
-
-				if (value == kUndefined)
-					value := getMultiMapValue(gAudioConfiguration, type . "*.*", name . "." . property, kUndefined)
+				if ((audioDevice != kUndefined) || (volume != 1.0))
+					return (settings[key] := {AudioDevice: ((audioDevice != kUndefined) ? audioDevice : false)
+											, Volume: volume})
 			}
-			else
-				value := kUndefined
+			else {
+				audioDevice := getValue("AudioDevice", kUndefined)
 
-			if (value == kUndefined)
-				value := getMultiMapValue(gAudioConfiguration, type, name . "." . property, default)
-
-			settings[key] := value
-
-			return value
+				if (audioDevice != kUndefined)
+					return (settings[key] := {AudioDevice: audioDevice})
+			}
 		}
 	}
 	else
@@ -131,19 +150,25 @@ requireSoundPlayer(player) {
 	return false
 }
 
-playSound(player, wavFile, options := false) {
-	local workingDirectory, pid
-
-	if !options
-		options := ""
-
-	if InStr(options, kNull)
-		return false
+playSound(player, wavFile, settings := false, options := false) {
+	local workingDirectory, pid, audioDevice, volume
 
 	if (player = "System")
 		player := false
 	else
 		player := requireSoundPlayer(player)
+
+	if settings {
+		audioDevice := settings.AudioDevice
+		volume := settings.Volume
+	}
+	else {
+		audioDevice := false
+		volume := 1.0
+	}
+
+	if (audioDevice = kNull)
+		return false
 
 	if player {
 		SplitPath(kSox, , &workingDirectory)
@@ -152,7 +177,10 @@ playSound(player, wavFile, options := false) {
 			if isDebug()
 				logMessage(kLogDebug, "Playing sound `"" . wavFile . "`" with player " . player . "...")
 
-			Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio " . options, workingDirectory, "HIDE", &pid)
+			Run("`"" . player . "`" `"" . wavFile . "`" -t waveaudio" . (audioDevice ? (A_Space . "`"" . audioDevice . "`"") : "")
+																	  . (options ? (A_Space . options) : "")
+																	  . ((volume != 1.0) ? (A_Space . "vol " . volume) : "")
+			  , workingDirectory, "HIDE", &pid)
 		}
 		catch Any as exception {
 			logError(exception)

@@ -1095,6 +1095,46 @@ class PitstopHandling extends Assert {
 	}
 }
 
+class PitstopHistory extends Assert {
+	LastPitstopTest() {
+		global vFuelWarnings
+
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+
+		data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap 1.data")
+
+		engineer.addLap(1, &data)
+
+		setDebug(true)
+
+		engineer.restoreSessionState(false, kSourcesDirectory . "Tests\Test Data\Pitstop\Pitstop 1.data")
+
+		if engineer.Debug[kDebugKnowledgeBase]
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+		state := engineer.createPitstopHistory()
+
+		this.AssertEqual(0, getMultiMapValue(state, "Pitstops", "3.TyreLapsFrontLeft"), "Expected FL tyre laps to be 0...")
+		this.AssertEqual(0, getMultiMapValue(state, "Pitstops", "3.TyreLapsFrontRight"), "Expected FR tyre laps to be 0...")
+		this.AssertEqual(0, getMultiMapValue(state, "Pitstops", "3.TyreLapsRearLeft"), "Expected RL tyre laps to be 0...")
+		this.AssertEqual(0, getMultiMapValue(state, "Pitstops", "3.TyreLapsRearRight"), "Expected RR tyre laps to be 0...")
+
+		engineer.restoreSessionState(false, kSourcesDirectory . "Tests\Test Data\Pitstop\Pitstop 2.data")
+
+		if engineer.Debug[kDebugKnowledgeBase]
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+		state := engineer.createPitstopHistory()
+
+		this.AssertEqual(32, getMultiMapValue(state, "Pitstops", "3.TyreLapsFrontLeft"), "Expected FL tyre laps to be 32...")
+		this.AssertEqual(32, getMultiMapValue(state, "Pitstops", "3.TyreLapsFrontRight"), "Expected FR tyre laps to be 32...")
+		this.AssertEqual(32, getMultiMapValue(state, "Pitstops", "3.TyreLapsRearLeft"), "Expected RL tyre laps to be 32...")
+		this.AssertEqual(32, getMultiMapValue(state, "Pitstops", "3.TyreLapsRearRight"), "Expected RR tyre laps to be 32...")
+
+		engineer.finishSession(false)
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
@@ -1112,6 +1152,7 @@ if !GetKeyState("Ctrl") {
 	AHKUnit.AddTestClass(DamageReporting)
 	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
+	AHKUnit.AddTestClass(PitstopHistory)
 
 	AHKUnit.Run()
 

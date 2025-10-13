@@ -2500,7 +2500,8 @@ class RaceAssistant extends ConfigurationItem {
 				if stateFile {
 					sessionState := readMultiMap(stateFile)
 
-					deleteFile(stateFile)
+					if !isDebug()
+						deleteFile(stateFile)
 
 					this.loadSessionState(sessionState)
 				}
@@ -2508,7 +2509,8 @@ class RaceAssistant extends ConfigurationItem {
 				if settingsFile {
 					sessionSettings := readMultiMap(settingsFile)
 
-					deleteFile(settingsFile)
+					if !isDebug()
+						deleteFile(settingsFile)
 
 					this.loadSessionSettings(sessionSettings)
 				}
@@ -3497,7 +3499,7 @@ class GridRaceAssistant extends RaceAssistant {
 		local lengthUnit := ((type != "Agent") ? (A_Space . getUnit("Length")) : " Meters")
 		local volumeUnit := ((type != "Agent") ? (A_Space . getUnit("Volume")) : " Liters")
 		local keys, ignore, car, carData, sectorTimes
-		local positions, position, classPosition, car, numPitstops, fuelRemaining
+		local positions, position, classPosition, car, fuelRemaining
 
 		convert(unit, value, arguments*) {
 			if (type != "Agent")
@@ -3507,10 +3509,11 @@ class GridRaceAssistant extends RaceAssistant {
 		}
 
 		getCar(car, type?) {
-			local carData
+			local carID, carData, numPitstops
 
 			try {
-				numPitstops := this.Pitstops[knowledgeBase.getValue("Car." . car . ".ID")].Length
+				carID := knowledgeBase.getValue("Car." . car . ".ID")
+				numPitstops := this.Pitstops[carID].Length
 
 				carData := Map("Nr", this.getNr(car)
 							 , "DriverName", driverName(knowledgeBase.getValue("Car." . car . ".Driver.Forname")
@@ -3523,12 +3526,12 @@ class GridRaceAssistant extends RaceAssistant {
 							 , "DistanceIntoTrack", (Round(convert("Length", (this.getRunning(car) * this.TrackLength)), 1) . lengthUnit)
 							 , "LapTime", (Round(knowledgeBase.getValue("Car." . car . ".Time", 0) / 1000, 1) . " Seconds")
 							 , "NumPitstops", numPitstops
-							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[numPitstops].Lap) : kNull)
+							 , "LastPitstop", ((numPitstops > 0) ? ("Lap " . this.Pitstops[carID][numPitstops].Lap) : kNull)
 							 , "InPit", (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false)) ? kTrue : kFalse)
 
-				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", 0)
+				fuelRemaining := knowledgeBase.getValue("Car." . car . ".FuelRemaining", false)
 
-				if (fuelRemaining > 0)
+				if fuelRemaining
 					carData["RemainingFuel"] := (convert("Volume", fuelRemaining) . volumeUnit)
 
 				tyreCompoundRaw := knowledgeBase.getValue("Car." . car . ".TyreCompoundRaw", "")

@@ -929,7 +929,9 @@ class VoiceServer extends ConfigurationItem {
 						if (Trim(engine) = "*")
 							engine := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Recognizer", "Desktop")
 
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine, true, this.Language, true)
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine
+																					   , getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Listener", true)
+																					   , this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length = 0)
 							throw "Activation Recognizer engine not installed..."

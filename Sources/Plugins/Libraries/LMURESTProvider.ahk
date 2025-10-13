@@ -674,15 +674,20 @@ class LMURESTProvider {
 
 		setDriver(name) {
 			local driver := this.lookup("DRIVER:")
-			local index, candidate, forName, surName, cForName, cSurName, ignore
+			local index, candidate, forName, surName, cForName, cSurName, ignore, length, cLength
 
 			if driver {
 				parseDriverName(name, &forName, &surName, &ignore)
 
+				length := StrLen(forName)
+
 				for index, candidate in driver["settings"] {
 					parseDriverName(candidate["text"], &cForName, &cSurName, &ignore)
 
-					if ((forName = cForName) && (surName = cSurName)) {
+					cLength := StrLen(cForName)
+
+					if ((surName = cSurName) && ((length > cLength) ? (SubStr(forName, 1, cLength) = cForName)
+																	: (forName = SubStr(cForName, 1, length)))) {
 						driver["currentSetting"] := (index - 1)
 
 						break
@@ -1268,16 +1273,29 @@ class LMURESTProvider {
 			}
 
 			getTeamID(driverName) {
-				local data, parts, name, driver, dName, team
+				local data, parts, name, driver, dName, team, ids
 
 				if this.iCachedTeams.Has(driverName)
 					return this.iCachedTeams[driverName]
 				else {
 					data := this.Data
+					team := false
 
 					if (data && (data != kNull))
-						if data["drivers"].Has(driverName)
-							team := data["teams"][data["drivers"][driverName]["uniqueTeamID"]]
+						if data["drivers"].Has(driverName) {
+							try {
+								driver := data["drivers"][driverName]
+								ids := getKeys(data["teams"])
+
+								team := data["teams"][ids[inList(ids, driver["uniqueTeamID"])]]
+
+								if team {
+									this.iCachedTeams[driverName] := team
+
+									return team
+								}
+							}
+						}
 						else {
 							team := false
 							parts := string2Values(A_Space, driverName)

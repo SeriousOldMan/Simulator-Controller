@@ -169,8 +169,9 @@ class ACCUDPProvider {
 					}
 				}
 				catch Any {
-					accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-														 , "`r`n", "`n"))
+					try
+						accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+															 , "`r`n", "`n"))
 				}
 			}
 			catch Any as exception {
@@ -203,13 +204,8 @@ class ACCUDPProvider {
 				udpConfigValid := false
 			}
 
-			if !udpConfigValid {
-				logMessage(kLogCritical, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
-
-				if !kSilentMode
-					showMessage(translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin") . translate("...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-			}
+			if !udpConfigValid
+				logMessage(kLogInfo, translate("The UDP configuration for Assetto Corsa Competizione is not valid - please consult the documentation for the ACC plugin"))
 		}
 	}
 

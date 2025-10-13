@@ -219,8 +219,6 @@ namespace RF2SHMProvider {
 					Console.WriteLine(i);
 				}
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".FuelRemaining="); Console.WriteLine(Math.Round(telemetry.mFuel, 1));
-
 				string compound = GetStringFromBytes(telemetry.mFrontTireCompoundName);
 				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRaw="); Console.WriteLine(compound);
 				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRawFront="); Console.WriteLine(compound);

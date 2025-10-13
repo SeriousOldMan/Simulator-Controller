@@ -1325,7 +1325,7 @@ class RaceStrategist extends GridRaceAssistant {
 					try {
 						rules := {RequiredPitstops: strategy.PitstopRule
 								, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
-								, MaxStintDuration: strategy.StintLength . " Minutes"})
+								, MaxStintDuration: strategy.StintLength . " Minutes"}
 
 						if isObject(strategy.PitstopWindow) {
 							rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
@@ -2401,16 +2401,18 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateSession(simulator, car, track, lapNumber, validLap, data) {
-		local strategy := this.Strategy
-		local engineerPID, tyreSets, ignore, descriptor, filename
+		local knowledgeBase := this.KnowledgeBase
+		local engineerPID := ProcessExist("Race Engineer.exe")
+		local strategy, tyreSets, ignore, descriptor, filename
 
 		static lastTyreSets := false
 		static lastStrategy := false
+		static lastPitstop := false
 
-		if strategy {
-			engineerPID := ProcessExist("Race Engineer.exe")
+		if (knowledgeBase && engineerPID) {
+			strategy := this.Strategy
 
-			if engineerPID {
+			if strategy {
 				tyreSets := []
 
 				for ignore, descriptor in strategy.TyreSets
@@ -2431,7 +2433,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 					rules := {RequiredPitstops: strategy.PitstopRule
 							, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
-							, MaxStintDuration: strategy.StintLength . " Minutes"})
+							, MaxStintDuration: strategy.StintLength . " Minutes"}
 
 					if isObject(strategy.PitstopWindow) {
 						rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
@@ -2442,6 +2444,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 					messageSend(kFileMessage, "Race Engineer", "updateRaceRules:" . fileName, engineerPID)
 				}
+			}
+
+			if (this.TeamSession && (lastPitstop != knowledgeBase.getValue("Pitstop.Last", false))) {
+				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
+				Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
+															 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+															 , engineerPID)
+											   , 60000, kLowPriority)
 			}
 		}
 
@@ -4594,14 +4605,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateDynamicValues({RejectedStrategy: false})
 
-		engineerPID := ProcessExist("Race Engineer.exe")
+		if !this.TeamSession {
+			engineerPID := ProcessExist("Race Engineer.exe")
 
-		if engineerPID
-			Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
-														 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
-														 , engineerPID)
-						 , (this.TeamSession ? (this.BestLapTime ? (this.BestLapTime * 2) : 240000) : 60000)
-						 , kLowPriority)
+			if engineerPID
+				Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
+															 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+															 , engineerPID)
+							 , 60000, kLowPriority)
+		}
 
 		return result
 	}

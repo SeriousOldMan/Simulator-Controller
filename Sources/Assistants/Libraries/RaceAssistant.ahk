@@ -3534,6 +3534,16 @@ class GridRaceAssistant extends RaceAssistant {
 				if fuelRemaining
 					carData["RemainingFuel"] := (convert("Volume", fuelRemaining) . volumeUnit)
 
+				tyreCompoundRaw := knowledgeBase.getValue("Car." . car . ".TyreCompoundRaw", "")
+				
+				if tyreCompoundRaw {
+					tyreCompound := SessionDatabase.getTyreCompoundName(this.Simulator, this.Car, this.Track, tyreCompoundRaw, false)
+
+					if tyreCompound {
+						carData["TyreCompound"] := tyreCompound
+					}
+				}
+
 				if isSet(type)
 					carData["Delta"] := (Round(knowledgeBase.getValue("Position.Standings.Class." . type . ".Delta", 0) / 1000, 1) . " Seconds")
 				else

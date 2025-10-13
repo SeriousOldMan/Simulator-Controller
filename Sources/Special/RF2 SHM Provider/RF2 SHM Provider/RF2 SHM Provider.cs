@@ -153,11 +153,11 @@ namespace RF2SHMProvider {
             }
         }
 
-        public void ReadStandings()
-        {
-            ref rF2VehicleScoring playerVehicle = ref GetPlayerScoring(ref scoring);
+		public void ReadStandings()
+		{
+			ref rF2VehicleScoring playerVehicle = ref GetPlayerScoring(ref scoring);
 
-            Console.WriteLine("[Position Data]");
+			Console.WriteLine("[Position Data]");
 
 			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
 
@@ -218,10 +218,16 @@ namespace RF2SHMProvider {
 					Console.Write("Driver.Car=");
 					Console.WriteLine(i);
 				}
-			}
-		}
 
-		public void ReadData() {
+				string compound = GetStringFromBytes(telemetry.mFrontTireCompoundName);
+				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRaw="); Console.WriteLine(compound);
+				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRawFront="); Console.WriteLine(compound);
+
+				compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
+				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRawRear="); Console.WriteLine(compound);
+			}
+		}		
+	public void ReadData() {
 			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 

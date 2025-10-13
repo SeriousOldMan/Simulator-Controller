@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
----   Modular Simulator Controller System - Action Callbacks Script         ---
+---   Modular Simulator Controller System - Assistants Control Script       ---
 ---                                                                         ---
 ---   Author:     Oliver Juwig (TheBigO)                                    ---
 ---   License:    (2025) Creative Commons - BY-NC-SA                        ---
@@ -9,52 +9,21 @@
 ---                           Public Modules Section                        ---
 -------------------------------------------------------------------------------
 
-Assistant = {}
-Controller = {}
-Function = {}
-Rules = {}
+Reasoning = {}
 
 
 -------------------------------------------------------------------------------
 ---                          Public Functions Section                       ---
 -------------------------------------------------------------------------------
 
-
-Assistant.Ask = __Assistant_Ask
-
-function Assistant.Speak(message, ...)
+function Reasoning.RaiseEvent(raceAssistant, event, ...)
 	local arguments = table.pack(...)
 	
-	assert(#arguments == 0 or (#arguments == 1 and type(arguments[1]) == "boolean"))
-	
-	return __Assistant_Speak(message, table.unpack(arguments))
+	return extern("raiseEvent")(raceAssistant, event, table.unpack(arguments))
 end
 
-Assistant.Call = __Assistant_Call
-
-Controller.Call = __Controller_Call
-
-Function.Call = __Function_Call
-
-function Rules.GetValue(name, ...)
+function Reasoning.TriggerAction(raceAssistant, action, ...)
 	local arguments = table.pack(...)
-	local value = __Rules_GetValue(name)
 	
-	assert(#arguments <= 1)
-	
-	if #arguments == 1 then
-		if value == nil then
-			value = arguments[1]
-		elseif (value == __NotInitialized or value == __Undefined) then
-			value = arguments[1]
-		end
-	elseif #arguments == 0 and (value == __NotInitialized or value == __Undefined) then
-		value = nil
-	end
-		
-	return value
+	return extern("triggerAction")(raceAssistant, action, table.unpack(arguments))
 end
-
-Rules.SetValue = __Rules_SetValue
-
-Rules.Execute = __Rules_Execute

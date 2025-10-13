@@ -58,5 +58,3 @@ end
 Rules.SetValue = __Rules_SetValue
 
 Rules.Execute = __Rules_Execute
-
-foreign = __Foreign

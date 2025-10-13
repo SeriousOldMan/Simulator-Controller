@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+---   Modular Simulator Controller System - Assistants Control Script       ---
+---                                                                         ---
+---   Author:     Oliver Juwig (TheBigO)                                    ---
+---   License:    (2025) Creative Commons - BY-NC-SA                        ---
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+---                           Public Modules Section                        ---
+-------------------------------------------------------------------------------
+
+Reasoning = {}
+
+
+-------------------------------------------------------------------------------
+---                          Public Functions Section                       ---
+-------------------------------------------------------------------------------
+
+function Reasoning.RaiseEvent(raceAssistant, event, ...)
+	local arguments = table.pack(...)
+	
+	return extern("raiseEvent")(raceAssistant, event, table.unpack(arguments))
+end
+
+function Reasoning.TriggerAction(raceAssistant, action, ...)
+	local arguments = table.pack(...)
+	
+	return extern("triggerAction")(raceAssistant, action, table.unpack(arguments))
+end

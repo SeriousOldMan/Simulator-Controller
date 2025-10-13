@@ -6,7 +6,7 @@ After the module references, several examples are provided which demonstrate som
 
 ## Module *Simulator*
 
-This module defines two functions, which alloes you to read data from the simulation and also send some data to the simulator or activate commands for the simulator, if supported.
+This module defines two functions, which allows you to read data from the simulation and also send some data to the simulator or activate commands for the simulator, if supported.
 
 ### Topics
 
@@ -70,11 +70,11 @@ This topic gives you access to the current standings including information about
 | Position        | Synonymous for *OverallPosition*. |
 | Standings       | Returns the full table of standings, sorted by the overall position. It contains objects for each car with the following properties::<br><br>1.*overallPosition* = the current overall position<br>2.*classPosition* = the current position with regards to the class-specific standings<br>3.*car* = the car in this position<br>4.*nr* = the race number of the car in this position<br>5.*driver* = the name of the driver in this position<br>6.*laps* = the number of laps the car in this position already has driven<br>7.*time* = the last lap time of the car in this position |
 
-## Examples
+### Examples
 
 Following you will find several examples which demonstrate the usage of the "Session" module.
 
-### Controlling the fuel ratio in *Le Mans Ultimate*
+#### Controlling the fuel ratio in *Le Mans Ultimate*
 
 This example demonstrates a conversation action which let you control the fuel ratio using a voice command like "Can you set the fuel ratio to 94 percent."
 
@@ -141,7 +141,7 @@ This example demonstrates many techniques to interface to a simulator. *Le Mans 
 		Assistant.Speak("Are you kidding?")
 	end
 
-### Choosing service for selected tyres / axles
+#### Choosing service for selected tyres / axles
 
 This example demonstrates simulator specific coding of pitstop service requests. It represents an action which can be used to fulfill a driver command to the Engineer like "Do not change the tyres at the front axle." As you can see by the script, support is available for *Le Mans Ultimate*, *rFactor 2* and *iRacing*. A similar action for controlling the change of the rear tyres can be defined accordingly.
 
@@ -187,3 +187,15 @@ This example demonstrates simulator specific coding of pitstop service requests.
 		Assistant.Speak("Are you kidding?")
 	end
 
+## Module Assistants
+
+The "Assistants" module which can be used in scripts started from the controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) or started as action in the currently active [track automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations).
+
+### Topics
+
+Only one topic is defined, which is named "Reasoning". It defines the following functions:
+
+| Function      | Arguments                                  | Description |
+|---------------|--------------------------------------------|-------------|
+| RaiseEvent    | assistant, event, [Optional] arguments...  | Raises *event* in the *Reasoning* booster of the given *assistant*. Any number of arguments can be supplied as defined for the given *event*. See the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information. |
+| TriggerAction | assistant, action, [Optional] arguments... | Triggers *action* in the *Reasoning* booster of the given *assistant*. Any number of arguments can be supplied as defined for the given *action*. See the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information. |

@@ -1687,6 +1687,7 @@ renewConsent() {
 	}
 }
 
+/*
 updateInstallationForV586() {
 	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
@@ -1771,6 +1772,7 @@ updateInstallationForV500() {
 		}
 	}
 }
+*/
 
 updateConfigurationForV655() {
 	if FileExist(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
@@ -1975,6 +1977,7 @@ updateConfigurationForV602() {
 	}
 }
 
+/*
 updateConfigurationForV593() {
 	local ignore, assistant, extension, type, fileName, configuration, name, definition
 
@@ -2512,7 +2515,6 @@ updateConfigurationForV500() {
 	deleteDirectory(kUserHomeDirectory . "Advisor")
 }
 
-/*
 updateConfigurationForV463() {
 	local text
 
@@ -3015,6 +3017,7 @@ updatePluginsForV613() {
 	}
 }
 
+/*
 updatePluginsForV561() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -3100,7 +3103,6 @@ updatePluginsForV5091() {
 	}
 }
 
-/*
 updatePluginsForV426() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -3174,7 +3176,7 @@ updatePluginsForV402() {
 }
 */
 
-updateToV400() {
+updateToV500() {
 	OnMessage(0x44, translateOkButton)
 	withBlockedWindows(MsgBox, translate("Your installed version is too old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
 	OnMessage(0x44, translateOkButton, 0)

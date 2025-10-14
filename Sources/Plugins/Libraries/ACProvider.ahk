@@ -17,6 +17,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class ACProvider extends SimulatorProvider {
+	iCarMetaData := CaseInsenseMap()
+
+	static sCarData := false
+
 	Simulator {
 		Get {
 			return "Assetto Corsa"
@@ -41,6 +45,42 @@ class ACProvider extends SimulatorProvider {
 
 	supportsTrackMap() {
 		return true
+	}
+
+	__New(car, track) {
+		super.__New(car, track)
+
+		if !ACProvider.sCarData
+			Task.startTask(ObjBindMethod(ACProvider, "requireCarDatabase"), 1000, kLowPriority)
+	}
+
+	static requireCarDatabase() {
+		if !ACProvider.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+
+			if FileExist(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini"))
+
+			ACProvider.sCarData := data
+		}
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		local simulator := this.Simulator
+		local standingsData := super.acquireStandingsData(telemetryData, finished)
+		local car
+
+		ACProvider.requireCarDatabase()
+
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			car := SessionDatabase.getCarCode(simulator
+											, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car"))
+
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+						   , getMultiMapValue(ACProvider.sCarData, "Car Classes", car, "Unknown"))
+		}
+
+		return standingsData
 	}
 
 	acquireTelemetryData() {

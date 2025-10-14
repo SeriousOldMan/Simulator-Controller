@@ -53,6 +53,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Thanks to some additions in the *Le Mans Ultimate* API, car numbers are now displayed correctly in almost all session categories.
   - Race rules are now included in the LLM knowledge of the Race Engineer and the Race Strategist, when running a session under strategy control.
   - Using audio routing it is now possible to control the sound volume of all audio ouput depending on the different audio configurations. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
+  - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
   - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
   - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
 

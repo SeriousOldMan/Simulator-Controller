@@ -385,11 +385,11 @@ Please note, that the range of supported pitstop services depends on the specifi
 
 ##### Notes
 
-(1) The Engineer will always change *All* four tyres or none, but manual adjustments are possible.
+(1) Depending on the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings), the Engineer will always change *All* four tyres or will decide based on wear or driven laps individually for each tyre, whether it need to be changed. Manual changes are possible additionally, of course.
 
-(2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible.
+(2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible. Using the *Reasoning* booster with a LLM can make this decision more intelligent. See the documentation chapter about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
 
-(3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section about the pitstop settings.
+(3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section above about the pitstop settings.
 
 (4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
 

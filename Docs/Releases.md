@@ -49,7 +49,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - Thanks to a contribution of @neophyte many cars in *Assetto Corsa* now have the information about their car classes in the meta data.
+  - Thanks to a contribution of @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
+  - The Spotter no longer gives you information about pitstops of cars in other classes.
   - The LLM knowledge of the Race Strategist about the state of the tyres has been extended.
   - Thanks to some additions in the *Le Mans Ultimate* API, car numbers are now displayed correctly in almost all session categories.
   - Race rules are now included in the LLM knowledge of the Race Engineer and the Race Strategist, when running a session under strategy control.

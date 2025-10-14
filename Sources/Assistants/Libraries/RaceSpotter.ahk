@@ -2298,17 +2298,19 @@ class RaceSpotter extends GridRaceAssistant {
 						try {
 							fastSpeaker.speakFast(opponentType . "Faster")
 
-							driverPitstops := this.DriverCar.Pitstops.Length
-							carPitstops := trackBehind.Car.Pitstops.Length
+							if (this.getClass() = trackBehind.Car.Class) {
+								driverPitstops := this.DriverCar.Pitstops.Length
+								carPitstops := trackBehind.Car.Pitstops.Length
 
-							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
-								fastSpeaker.speakFast("MorePitstops", {conjunction: speaker.Fragments["But"]
-																	 , pitstops: carPitstops - driverPitstops})
-							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
-								fastSpeaker.speakFast("LessPitstops", {conjunction: speaker.Fragments["But"]
-																	 , pitstops: driverPitstops - carPitstops})
-							else if !trackBehind.isFaster(sector, 0.75)
-								fastSpeaker.speakFast("Slipstream")
+								if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
+									fastSpeaker.speakFast("MorePitstops", {conjunction: speaker.Fragments["But"]
+																		 , pitstops: carPitstops - driverPitstops})
+								else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
+									fastSpeaker.speakFast("LessPitstops", {conjunction: speaker.Fragments["But"]
+																		 , pitstops: driverPitstops - carPitstops})
+								else if !trackBehind.isFaster(sector, 0.75)
+									fastSpeaker.speakFast("Slipstream")
+							}
 						}
 						finally {
 							fastSpeaker.endTalk({Rephrase: false})
@@ -2654,7 +2656,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if (opponentType = "LapDown") {
 					speaker.speakPhrase("LapDownDriver")
 
-					if (driverPitstops < carPitstops)
+					if ((this.getClass() = trackAhead.Car.Class) && (driverPitstops < carPitstops))
 						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
 
 					trackAhead.Reported := true
@@ -2664,10 +2666,11 @@ class RaceSpotter extends GridRaceAssistant {
 				else if (opponentType = "LapUp") {
 					speaker.speakPhrase("LapUpDriver")
 
-					if (driverPitstops < carPitstops)
-						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
-					else if (driverPitstops > carPitstops)
-						speaker.speakPhrase("LessPitstops", {conjunction: "", pitstops: driverPitstops - carPitstops})
+					if (this.getClass() = trackAhead.Car.Class)
+						if (driverPitstops < carPitstops)
+							speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
+						else if (driverPitstops > carPitstops)
+							speaker.speakPhrase("LessPitstops", {conjunction: "", pitstops: driverPitstops - carPitstops})
 
 					trackAhead.Reported := true
 

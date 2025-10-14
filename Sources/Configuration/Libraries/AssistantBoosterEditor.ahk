@@ -1458,9 +1458,9 @@ class CallbacksEditor {
 
 		this.iCallbacksListView := editorGui.Add("ListView", "x16 y+10 w832 h140 W:Grow H:Grow(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr"
 											   , collect([InStr(this.Type, "Actions") ? "Action" : "Event", "Active", "Description"], translate))
-
 		this.iCallbacksListView.OnEvent("Click", chooseCallback)
 		this.iCallbacksListView.OnEvent("DoubleClick", chooseCallback)
+		this.iCallbacksListView.OnEvent("ItemSelect", chooseCallback)
 
 		editorGui.Add("Text", "x16 yp+146 w90 h23 +0x200 Y:Move(0.25) Hidden", translate("Assistant"))
 		editorGui.Add("Text", "x113 yp w200 h23 +0x200 Y:Move(0.25) Hidden", translate(this.Editor.Assistant))
@@ -1532,6 +1532,7 @@ class CallbacksEditor {
 		this.iParametersListView := editorGui.Add("ListView", "x430 ys w418 h96 X:Move(0.34) W:Grow(0.66) Y:Move(0.25) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Parameter", "Description"], translate))
 		this.iParametersListView.OnEvent("Click", chooseParameter)
 		this.iParametersListView.OnEvent("DoubleClick", chooseParameter)
+		this.iParametersListView.OnEvent("ItemSelect", chooseParameter)
 
 		editorGui.Add("Button", "x800 yp+100 w23 h23 Center +0x200 X:Move Y:Move(0.25) vaddParameterButton").OnEvent("Click", (*) => this.addParameter())
 		setButtonIcon(editorGui["addParameterButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")

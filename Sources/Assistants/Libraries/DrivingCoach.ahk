@@ -1358,8 +1358,12 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				if (sectorTimes && (Trim(sectorTimes) != ""))
+				if (sectorTimes && (Trim(sectorTimes) != "")) {
 					sectorTimes := string2Values(",", sectorTimes)
+					
+					if !first(sectorTimes, (s) => (s != 0))
+						sectorTimes := false
+				}
 				else
 					sectorTimes := false
 

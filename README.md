@@ -30,7 +30,7 @@ Simply download and run [Simulator Controller.exe](https://simulatorcontroller.s
 
 Here is a short video which shows how to configure Simulator Controller for the first time with a few clicks:
 
-[![](https://img.youtube.com/vi/qLMYz1FkEGs/0.jpg)](https://youtu.be/qLMYz1FkEGs)
+[![](https://img.youtube.com/vi/B1oKlzKIAbs/0.jpg)](https://youtu.be/B1oKlzKIAbs)
 
 #### Latest release build
 
@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/GrE4Lsgf) (Early build for 6.6.1. Changes: Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction", Fixed standings in LLM knowledge after the first car pitted, Fixed Google voice recognition for French, Fixed ACC UDP configuration, Fixed pitstop history in team races, Fixed driver swap in LMU, Extended LLM knowledge of the Strategist about tyre state, Support for volume control in audio routing, New "Assistants" script module, Removed automatic update procedures before 6.0, Updated AC car meta data DLC.)
+[6.6.1.0-beta]() (Test build for 6.6.1. Changes: Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction", Fixed standings in LLM knowledge after the first car pitted, Fixed Google voice recognition for French, Fixed ACC UDP configuration, Fixed pitstop history in team races, Fixed driver swap in LMU, Extended LLM knowledge of the Strategist about tyre state, Support for volume control in audio routing, New "Assistants" script module, Added AC car classes, Removed automatic update procedures before 6.0, No pitstop information for cars in other classes by the Spotter, No wrong session format announcement by Spotter in AC, Updated AC car meta data DLC.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6610) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -63,7 +63,7 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 Beside the quite extensive documentation (more than 500 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
 
-1. [Quick start guide](https://youtu.be/qLMYz1FkEGs) - This video shows you how to create your first running configuration with a few clicks.
+1. [Quick start guide](https://youtu.be/B1oKlzKIAbs) - This video shows you how to create your first running configuration with a few clicks.
 
 2. [Setup and Configuration](https://youtu.be/1XFvWhg2cPw) - You will learn a lot about the general setup and configuration of the Simulator Controller suite. The Setup Wizard "Simulator Setup" is introduced, but we will also take a look at the low level configuration tool "Simulator Configuration".
 

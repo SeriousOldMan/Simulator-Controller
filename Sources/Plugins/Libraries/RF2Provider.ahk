@@ -195,7 +195,7 @@ class Sector397Provider extends SimulatorProvider {
 					numbers[nr] := true
 			}
 
-			car := setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Unknown")
+			car := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Unknown")
 
 			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRaw", kUndefined)
 

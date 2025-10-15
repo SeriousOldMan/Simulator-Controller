@@ -17,6 +17,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class ACProvider extends SimulatorProvider {
+	iCarMetaData := CaseInsenseMap()
+
+	static sCarData := false
+
 	Simulator {
 		Get {
 			return "Assetto Corsa"
@@ -43,6 +47,42 @@ class ACProvider extends SimulatorProvider {
 		return true
 	}
 
+	__New(car, track) {
+		super.__New(car, track)
+
+		if !ACProvider.sCarData
+			Task.startTask(ObjBindMethod(ACProvider, "requireCarDatabase"), 1000, kLowPriority)
+	}
+
+	static requireCarDatabase() {
+		if !ACProvider.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini")
+
+			if FileExist(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini"))
+
+			ACProvider.sCarData := data
+		}
+	}
+
+	acquireStandingsData(telemetryData, finished := false) {
+		local simulator := this.Simulator
+		local standingsData := super.acquireStandingsData(telemetryData, finished)
+		local car
+
+		ACProvider.requireCarDatabase()
+
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			car := SessionDatabase.getCarCode(simulator
+											, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car"))
+
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+						   , getMultiMapValue(ACProvider.sCarData, "Car Classes", car, "Unknown"))
+		}
+
+		return standingsData
+	}
+
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
@@ -50,6 +90,12 @@ class ACProvider extends SimulatorProvider {
 		local layout := getMultiMapValue(data, "Session Data", "Layout", "")
 		local extension := ""
 		local forName, surName, nickName, name
+
+		if ((getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
+		 && (getMultiMapValue(data, "Session Data", "SessionFormat", "Laps") = "Time")) {
+			setMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+			setMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+		}
 
 		if (track != "") {
 			setMultiMapValue(data, "Session Data", "Track", track . "-" . layout)

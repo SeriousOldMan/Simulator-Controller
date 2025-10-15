@@ -80,8 +80,12 @@ class RaceReportViewer extends RaceReportReader {
 	static lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
-		if isNumber(lapTime)
-			return displayValue("Time", lapTime)
+		if isNumber(lapTime) {
+			if (lapTime = 0)
+				return "-"
+			else
+				return displayValue("Time", lapTime)
+		}
 		else
 			return lapTime
 	}

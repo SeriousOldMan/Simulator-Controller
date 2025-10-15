@@ -1002,12 +1002,16 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	installObject(car) {
 		local carName := getMultiMapValue(this.Definition, car, "Name")
 		local carCode := getMultiMapValue(this.Definition, car, "Code")
+		local carClass := getMultiMapValue(this.Definition, car, "Class", false)
 		local carData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
 		local tyreData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini")
 		local setting
 
 		setMultiMapValue(carData, "Car Codes", carName, carCode)
 		setMultiMapValue(carData, "Car Names", carCode, carName)
+
+		if carClass
+			setMultiMapValue(carData, "Car Classes", carCode, carClass)
 
 		loop {
 			setting := getMultiMapValue(this.Definition, car, "Pitstop Settings." . A_Index, kUndefined)

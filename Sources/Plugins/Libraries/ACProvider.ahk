@@ -91,6 +91,12 @@ class ACProvider extends SimulatorProvider {
 		local extension := ""
 		local forName, surName, nickName, name
 
+		if ((getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
+		 && (getMultiMapValue(data, "Session Data", "SessionFormat", "Laps") = "Time")) {
+			setMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+			setMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+		}
+
 		if (track != "") {
 			setMultiMapValue(data, "Session Data", "Track", track . "-" . layout)
 

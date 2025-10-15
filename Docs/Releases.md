@@ -46,10 +46,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Another fix for the ACC UDP configuration.
   - Fixed the pitstop history in team races. This bug caused the calculation of driven laps for a given tyre to be wrong in team races und control of the Team Server.
   - Fixed a rare bug which prevented a driver change in team races in *Le Mans Ultimate*.
+  - The Spotter no longer announces the race length in *Assetto Corsa*. This is a *fix*, cause *Assetto Corsa* does not report the session format (Time vs. Laps) correctly.
   
 #### Changes
 
   - Thanks to a contribution of @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
+    - The cars in the DLC for modded cars of *Assetto Corsa* has also been updated to include class information. Take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661) for information, how to include the updated information into your database.
   - The Spotter no longer gives you information about pitstops of cars in other classes.
   - The LLM knowledge of the Race Strategist about the state of the tyres has been extended.
   - Thanks to some additions in the *Le Mans Ultimate* API, car numbers are now displayed correctly in almost all session categories.
@@ -58,6 +60,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
   - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
   - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661), if you are using the DLC for modded cars in *Assetto Corsa*.
 
 # Release history
 

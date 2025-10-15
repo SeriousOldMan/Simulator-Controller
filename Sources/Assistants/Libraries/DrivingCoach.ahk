@@ -1132,7 +1132,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryAvailable(laps) {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
-		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
+		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
 			if (this.Speaker[false] && !this.OnTrackCoaching)

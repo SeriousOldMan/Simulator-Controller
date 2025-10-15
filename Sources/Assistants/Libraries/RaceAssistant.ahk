@@ -4634,8 +4634,8 @@ class GridRaceAssistant extends RaceAssistant {
 					break
 				}
 
-				if (sectorTimes && !first(sectorTimes, (s) => (s != 0)))
-					sectorTimes := false
+			if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+				sectorTimes := false
 		}
 		else
 			sectorTimes := false

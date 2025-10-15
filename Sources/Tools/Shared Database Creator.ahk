@@ -227,7 +227,8 @@ class DatabaseCreator {
 					setMultiMapValue(newInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
 
 				if getMultiMapValue(info, "Lap", "SectorTimes", false)
-					setMultiMapValue(newInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
+					if first(string2Values(",", getMultiMapValue(info, "Lap", "SectorTimes")), (s) => (isNumber(s) && (s != 0)))
+						setMultiMapValue(newInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
 
 				SplitPath(telemetryFile, &telemetryFile)
 

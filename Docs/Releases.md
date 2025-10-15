@@ -46,6 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Another fix for the ACC UDP configuration.
   - Fixed the pitstop history in team races. This bug caused the calculation of driven laps for a given tyre to be wrong in team races und control of the Team Server.
   - Fixed a rare bug which prevented a driver change in team races in *Le Mans Ultimate*.
+  - The Spotter no longer announces the race length in *Assetto Corsa*. This is a *fix*, cause *Assetto Corsa* does not report the session format (Time vs. Laps) correctly.
   
 #### Changes
 

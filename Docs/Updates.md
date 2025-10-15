@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.6.1
 
-Nothing to do.
+If you are using some of the additional car meta data supplied in the DLC for *Assetto Corsa* you have to update it for included information about car classes. Open "Simulator Setup", go to the presets page and remove the DLC for the car meta data. Then include the cars you are interested in again.
 
 ***
 

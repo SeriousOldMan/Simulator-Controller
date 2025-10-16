@@ -307,10 +307,6 @@ Here you define, what should happen, when you arrive at this specific location o
    
    Note: You can use the [Trigger Detector Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#trigger-detector-tool) to find out, which hotkey string corresponds to a given keyboard command. This hotkey string will be placed in the Clipboard and can be pasted to the input field after closing the trigger detector tool.
 
-2. Command
-
-   In this case, you can selected every script or application, which is executable by Windows. Use the "..." button to locate the executable.
-
 3. Action(s)
 
    You can call any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) here. Multiple action calls can be given, separated by "|" or by ";". Example:
@@ -318,6 +314,10 @@ Here you define, what should happen, when you arrive at this specific location o
        raiseEvent("Race Strategist", "UndercutSimulation")
 	   
    This will trigger the user-defined event "UndercutSimulation" in the *Reasoning* booster of the Race Strategist at the given point on the track.
+
+3. Command
+
+   In this case, you can selected every script or application, which is executable by Windows. Use the "..." button to locate the executable.
 
 4. Speech
 

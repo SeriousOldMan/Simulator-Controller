@@ -1,5 +1,41 @@
 # Latest stable release
 
+## 6.6.1.0
+
+#### Date: 10/17/25
+
+#### Fixes
+
+  - Fixed standings in the LLM knowledge of the Race Strategist after the first car pitted.
+  - Fixed Google voice recognition for French language.
+  - Another fix for the ACC UDP configuration.
+  - Fixed the pitstop history in team races. This bug caused the calculation of driven laps for a given tyre to be wrong in team races und control of the Team Server.
+  - Fixed a rare bug which prevented a driver change in team races in *Le Mans Ultimate*.
+  - The Spotter no longer announces the race length in *Assetto Corsa*. This is a *fix*, cause *Assetto Corsa* does not report the session format (Time vs. Laps) correctly.
+  
+#### Changes
+
+  - Thanks to a contribution by @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
+    - The cars in the DLC for modded cars of *Assetto Corsa* has also been updated to include class information. Take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661) for information, how to include the updated information into your database.
+  - Additonally many more car names have been added to the car meta data file for *Assetto Corsa* by @neophyte.
+  - The Spotter no longer gives you information about pitstops of cars in other classes.
+  - The LLM knowledge of the Race Strategist about the state of the tyres has been extended.
+  - Thanks to some additions in the *Le Mans Ultimate* API, car numbers are now displayed correctly in almost all session categories.
+  - Race rules are now included in the LLM knowledge of the Race Engineer and the Race Strategist, when running a session under strategy control.
+  - Using audio routing it is now possible to control the sound volume of all audio ouput depending on the different audio configurations. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
+  - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
+  - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
+  - [Expert] A new action type "Action" is supplid in the track automation. This allows you to trigger any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) depending on the current position on the track. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for more information.
+  - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661), if you are using the DLC for modded cars in *Assetto Corsa*.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.6.0.0
 
 #### Date: 10/10/25
@@ -32,40 +68,6 @@
   - When choosing a tyre compound on a specific wheel for the next pitstop in "Team Center", holding down the [Control key](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will choose the same compound on the other wheels as well.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-660), if you already have driven the faster Oreca 07 in the ELMS series and you want to remove the wrong data from the Oreca 07 data set.
-
-# Upcoming release
-
-## 6.6.1.0
-
-#### Date: 10/17/25 (planned)
-
-#### Fixes
-
-  - Fixed standings in the LLM knowledge of the Race Strategist after the first car pitted.
-  - Fixed Google voice recognition for French language.
-  - Another fix for the ACC UDP configuration.
-  - Fixed the pitstop history in team races. This bug caused the calculation of driven laps for a given tyre to be wrong in team races und control of the Team Server.
-  - Fixed a rare bug which prevented a driver change in team races in *Le Mans Ultimate*.
-  - The Spotter no longer announces the race length in *Assetto Corsa*. This is a *fix*, cause *Assetto Corsa* does not report the session format (Time vs. Laps) correctly.
-  
-#### Changes
-
-  - Thanks to a contribution by @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
-    - The cars in the DLC for modded cars of *Assetto Corsa* has also been updated to include class information. Take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661) for information, how to include the updated information into your database.
-  - Additonally many more car names have been added to the car meta data file for *Assetto Corsa* by @neophyte.
-  - The Spotter no longer gives you information about pitstops of cars in other classes.
-  - The LLM knowledge of the Race Strategist about the state of the tyres has been extended.
-  - Thanks to some additions in the *Le Mans Ultimate* API, car numbers are now displayed correctly in almost all session categories.
-  - Race rules are now included in the LLM knowledge of the Race Engineer and the Race Strategist, when running a session under strategy control.
-  - Using audio routing it is now possible to control the sound volume of all audio ouput depending on the different audio configurations. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
-  - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
-  - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
-  - [Expert] A new action type named "Action" is available for track automations. This action type allows you to trigger any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) depending on the current position on the track. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for more information.
-  - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661), if you are using the DLC for modded cars in *Assetto Corsa*.
-
-# Release history
 
 ## 6.5.6.1
 

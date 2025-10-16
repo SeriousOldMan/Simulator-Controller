@@ -250,7 +250,7 @@
     - [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#opponent-and-delta-information)
   - [Simulator Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#simulator-integration)
   - [Track Mapping](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-mapping)
-  - [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations)
+  - [Track Automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation)
 
 [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants)
 ------

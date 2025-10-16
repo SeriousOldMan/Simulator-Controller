@@ -311,11 +311,19 @@ Here you define, what should happen, when you arrive at this specific location o
 
    In this case, you can selected every script or application, which is executable by Windows. Use the "..." button to locate the executable.
 
-3. Speech
+3. Action(s)
+
+   You can call any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) here. Multiple action calls can be given, separated by "|" or by ";". Example:
+   
+       raiseEvent("Race Strategist", "UndercutSimulation")
+	   
+   This will trigger the user-defined event "UndercutSimulation" in the *Reasoning* booster of the Race Strategist at the given point on the track.
+
+4. Speech
 
    In this case, you define a phrase, which should be spoken at the given point on the track. The Speech uses the [default voice synthesizer configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
    
-4. Audio
+5. Audio
 
    Plays a sound file (WAV, MP3, ...) at the given point on the track.
    

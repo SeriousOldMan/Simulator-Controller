@@ -2153,6 +2153,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										positionInfo := translate(InStr(currentAction.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
 									case "Command":
 										positionInfo := translate("Command: ")
+									case "Action":
+										positionInfo := translate((InStr(currentAction.Action, "|") || InStr(currentAction.Action, ";"))
+																	   ? "Action(s): " : "Action: ")
 									case "Speech":
 										positionInfo := translate("Speech: ")
 									case "Audio":
@@ -3529,7 +3532,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if (this.TrackEditorMode = "Automations") {
 			if this.SelectedTrackAutomation {
-				action := actionDialog(x, y)
+				this.Window.Block()
+
+				try {
+					action := actionDialog(x, y)
+				}
+				finally {
+					this.Window.Unblock()
+				}
 
 				if action {
 					action.X := coordinateX
@@ -3564,7 +3574,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		CoordMode("Mouse", oldCoordMode)
 
-		action := actionDialog(x, y, action)
+		this.Window.Block()
+
+		try {
+			action := actionDialog(x, y, action)
+		}
+		finally {
+			this.Window.Unblock()
+		}
 
 		if action
 			this.updateTrackAction(action)
@@ -4108,6 +4125,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						actionInfo := translate(InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ")
 					case "Command":
 						actionInfo := translate("Command: ")
+					case "Action":
+						actionInfo := translate((InStr(action, "|") || InStr(action.Action, ";")) ? "Action(s): " : "Action: ")
 					case "Speech":
 						actionInfo := translate("Speech: ")
 					case "Audio":
@@ -6611,7 +6630,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialog("Update")
 	}
 	else if (xOrCommand = "Update") {
-		actionLabel.Text := translate(["Hotkey(s)", "Command", "Speech", "Audio"][actionTypeDropDown.Value])
+		actionLabel.Text := translate(["Hotkey(s)", "Command", "Action(s)", "Speech", "Audio"][actionTypeDropDown.Value])
 
 		commandChooserButton.Enabled := ((actionTypeDropDown.Value = 2) || (actionTypeDropDown.Value = 4))
 	}
@@ -6638,7 +6657,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 		actionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Action"))
 
 		if action {
-			chosen := inList(["Hotkey", "Command", "Speech", "Audio"], action.Type)
+			chosen := inList(["Hotkey", "Command", "Action", "Speech", "Audio"], action.Type)
 
 			actionEdit := action.Action
 		}
@@ -6648,7 +6667,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 			actionEdit := ""
 		}
 
-		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Speech", "Audio"], translate))
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command", "Action(s)", "Speech", "Audio"], translate))
 		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
 		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))
@@ -6685,7 +6704,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 				else
 					action := Object()
 
-				action.Type := ["Hotkey", "Command", "Speech", "Audio"][actionTypeDropDown.Value]
+				action.Type := ["Hotkey", "Command", "Action", "Speech", "Audio"][actionTypeDropDown.Value]
 				action.Action := actionEdit.Text
 
 				return action

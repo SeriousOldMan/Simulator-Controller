@@ -75,7 +75,7 @@ Once you have created all your custom action functions, you can define one or mo
 
 ##### Example
 
-We want to define a mode where it is possibe to switch between different [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations). First you have to define a couple of custom functions like this:
+We want to define a mode where it is possibe to switch between different [track automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation). First you have to define a couple of custom functions like this:
 
 	Custom.18.Call.Action=selectTrackAutomation(Wet)
 	Custom.19.Call.Action=selectTrackAutomation(Dry)
@@ -481,7 +481,7 @@ With *speaker* and *listener* you can customize the natural language interface (
 
 All Race Assistants can be temporarily instructed with a couple of voice commands to be quite. If you want Elisa to start muted, you can request that by supplying *true* for the *muted* parameter. If you want Elisa to become active again later on, you can request this using the voice command "You can talk again." or the "Unmute" trigger below.
 
-With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Very similar is the parameter *trackMapping* which lets you enable or disable track mapping. Default is *On* here. Using a controller function to manually handle this might be very useful when mapping non-closed tracks like Rally stages or hill climb tracks.
+With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action. Very similar is the parameter *trackMapping* which lets you enable or disable track mapping. Default is *On* here. Using a controller function to manually handle this might be very useful when mapping non-closed tracks like Rally stages or hill climb tracks.
 
 Similar as for Cato, you can use the following parameters to trigger some of Elisas service without using voice commands:
 

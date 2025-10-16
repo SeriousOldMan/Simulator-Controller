@@ -59,6 +59,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Using audio routing it is now possible to control the sound volume of all audio ouput depending on the different audio configurations. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
   - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
+  - [Expert] A new action type "Action" is supplid in the track automation. This allows you to trigger any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) depending on the current position on the track. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for more information.
   - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661), if you are using the DLC for modded cars in *Assetto Corsa*.
@@ -1325,7 +1326,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Significant performance improvement for the "Dark" UI theme.
   4. The last choices for the configuration of the various graphs are now remembered by the "Strategy Workbench".
   5. Using a new setting in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) you can specify in the "Session Database" for *Assetto Corsa*, *iRacing* and *Automobilista 2* the type of a track (Circuit, Rally, Hill, Street). When set to other than "Circuit", track mapping will create a non-closed track. In this case, mapping of the track will start immediately, when the car moves for the first time and will stop, when the car stops. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-types) for more information.
-  6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
+  6. The documentation for [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) has been extended to reflect the new "Speech" and "Audio" actions, which can be used to create pace notes and other acoustical hints for open tracks.
   7. Automatic track mapping can now be enabled or disabled in various ways, whichever suits your working style best. Default is "On" as before, but this is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
      - The Tray menu of the "Simulator Controller" background process now contains an item for *Track Mapping*.
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
@@ -1673,7 +1674,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. The detection speed of controller trigger (buttons, dials, and so on) has been greatly increased. Dials are now also detected very reliable and fast.
   10. Key presses on the keyboard are now also detected during trigger detection in "Simulator Setup" and "Simulator Configuration".
   11. The hotkey string (e.g. 2Joy7 or <^<!A) for a detected trigger is now placed in the clipboard for further usage.
-  12. The Trigger Detector Tool is now also available when building [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automations).
+  12. The Trigger Detector Tool is now also available when building [Track Automations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation).
   13. Added "24H Nürburgring" to the track name file for *Assetto Corsa Competizione*.
 
 ## 5.6.5.0-release 04/05/24

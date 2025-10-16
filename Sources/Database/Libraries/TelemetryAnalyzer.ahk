@@ -970,6 +970,7 @@ class Telemetry {
 											  , MaxSpeed: (nullRound(this.MaxSpeed) . " km/h")
 											  , MaxGear: this.MaxGear, MaxRPM: this.MaxRPM
 											  , Sections: collect(this.Sections, (s) => s.Descriptor)}
+			local sectorTimes
 
 			if this.Driver
 				descriptor.Driver := this.Driver
@@ -977,8 +978,12 @@ class Telemetry {
 			if this.LapTime
 				descriptor.LapTime := (Round(this.LapTime, 2) . " Seconds")
 
-			if this.SectorTimes
-				descriptor.SectorTimes := collect(this.SectorTimes, (t) => Round(t, 2))
+			if this.SectorTimes {
+				sectorTimes := collect(this.SectorTimes, (t) => Round(t, 2))
+
+				if first(sectorTimes, (s) => (s != 0))
+					descriptor.SectorTimes := sectorTimes
+			}
 
 			return descriptor
 		}
@@ -1003,7 +1008,7 @@ class Telemetry {
 		this.iDriver := driver
 		this.iLapTime := lapTime
 
-		if (sectorTimes && (sectorTimes.Length > 0))
+		if (sectorTimes && (sectorTimes.Length > 0) && first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 			this.iSectorTimes := sectorTimes
 
 		this.iSections := this.createSections(data)

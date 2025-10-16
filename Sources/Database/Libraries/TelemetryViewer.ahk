@@ -1457,16 +1457,23 @@ class TelemetryViewer {
 			}
 
 			if telemetry {
+				if theSectorTimes {
+					theSectorTimes := string2Values(",", theSectorTimes)
+
+					if !first(theSectorTimes, (s) => (isNumber(s) && (s != 0)))
+						theSectorTimes := false
+				}
+
 				if info
 					lap := [name, theDriver ? theDriver
 											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
 						  , theLapTime ? theLapTime : "-"
-						  , theSectorTimes ? string2Values(",", theSectorTimes) : []
+						  , theSectorTimes ? theSectorTimes : []
 						  , telemetry]
 				else
 					lap := [name, theDriver ? theDriver : "John Doe (JD)"
 						  , theLapTime ? theLapTime : "-"
-						  , theSectorTimes ? string2Values(",", theSectorTimes) : []
+						  , theSectorTimes ? theSectorTimes : []
 						  , telemetry]
 
 				this.ImportedLaps.Push(lap)
@@ -1594,7 +1601,7 @@ class TelemetryViewer {
 								if (lapTime && (lapTime != "-"))
 									setMultiMapValue(info, "Lap", "LapTime", lapTime)
 
-								if (sectorTimes && (sectorTimes.Length > 0) && (sectorTimes[1] != "-"))
+								if (sectorTimes && (sectorTimes.Length > 0) && first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 									setMultiMapValue(info, "Lap", "SectorTimes", values2String(",", sectorTimes*))
 							}
 							else {
@@ -1603,7 +1610,7 @@ class TelemetryViewer {
 								if (lap[3] && (lap[3] != "-"))
 									setMultiMapValue(info, "Lap", "LapTime", lap[3])
 
-								if (lap[4].Length > 0)
+								if ((lap[4].Length > 0) && first(lap[4], (s) => (isNumber(s) && (s != 0))))
 									setMultiMapValue(info, "Lap", "SectorTimes", values2String(",", lap[4]*))
 							}
 
@@ -1743,6 +1750,9 @@ class TelemetryViewer {
 				sectorTimes := lap[4]
 			}
 
+			if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+				sectorTimes := false
+
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
 			if (analyzer.TrackSections.Length = 0)
@@ -1764,6 +1774,9 @@ class TelemetryViewer {
 					lapTime := ((referenceLap[3] != "-") ? referenceLap[3] : false)
 					sectorTimes := referenceLap[4]
 				}
+
+				if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+					sectorTimes := false
 
 				referenceTelemetry := analyzer.createTelemetry(0, this.SelectedReferenceLap[true], driver, lapTime, sectorTimes)
 			}
@@ -1789,7 +1802,7 @@ class TelemetryViewer {
 			if ((lapTime = "-") || isNull(lapTime))
 				return "-"
 			else if isNumber(lapTime)
-				return displayValue("Time", lapTime)
+				return ((lapTime = 0) ? "-" : displayValue("Time", lapTime))
 			else
 				return lapTime
 		}
@@ -1807,8 +1820,11 @@ class TelemetryViewer {
 			sectorTimes := lap[4]
 		}
 
+		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+			sectorTimes := false
+
 		if (lapTime != "-")
-			return (theLap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . ((sectorTimes.Length > 0) ? (A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]")) : ""))
+			return (theLap . translate(":") . A_Space . driver . translate(" - ") . lapTimeDisplayValue(lapTime) . (sectorTimes ? (A_Space . translate("[") . values2String(", ", collect(sectorTimes, lapTimeDisplayValue)*) . translate("]")) : ""))
 		else if !InStr(driver, "John Doe")
 			return (theLap . translate(":") . A_Space . driver)
 		else
@@ -2546,6 +2562,9 @@ class TrackMap {
 							lapTime := ((lap[3] != "-") ? lap[3] : false)
 							sectorTimes := lap[4]
 						}
+
+						if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+							sectorTimes := false
 
 						telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
 

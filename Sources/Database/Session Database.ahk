@@ -6006,7 +6006,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local name := this.TelemetryListView.GetText(row, 2)
 		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
-		local viewer, telemetryData, size, telemetryInfo
+		local viewer, telemetryData, size, telemetryInfo, sectorTimes
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareTelemetryWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
@@ -6049,7 +6049,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if getMultiMapValue(info, "Lap", "LapTime", false)
 				setMultiMapValue(telemetryInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
 
-			if getMultiMapValue(info, "Lap", "SectorTimes", false)
+			sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes", false)
+
+			if sectorTimes {
+				sectorTimes := string2Values(",", sectorTimes)
+
+				if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+					sectorTimes := false
+			}
+
+			if sectorTimes
 				setMultiMapValue(telemetryInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
 
 			writeMultiMap(fileName . ".info", telemetryInfo)
@@ -6235,7 +6244,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if lapTime
 							setMultiMapValue(info, "Lap", "LapTime", lapTime)
 
-						if sectorTimes
+						if (sectorTimes && first(string2Values(",", sectorTimes), (s) => (isNumber(s) && (s != 0))))
 							setMultiMapValue(info, "Lap", "SectorTimes", sectorTimes)
 
 						this.SessionDatabase.writeTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, info)

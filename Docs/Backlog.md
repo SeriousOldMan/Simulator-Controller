@@ -12,6 +12,7 @@
   3. Support for new and also historic simulators
   4. Work around the jumping lap counter in *rFactor 2* and *Le Mans Ultimate* after an RTG in practice
   5. Support for Time *or* Laps session format
+  6. Sector time approximation for *Assetto Corsa*.
 
 #### Plugins
   1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data

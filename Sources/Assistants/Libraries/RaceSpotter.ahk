@@ -4134,6 +4134,9 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						sectorTimes := false
 
+					if (sectorTimes && !first(sectorTimes, (s) => (s != 0)))
+						sectorTimes := false
+
 					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr", "-")
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)

@@ -1132,7 +1132,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryAvailable(laps) {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
-		local ignore, lap, candidate, sessionDB, info, lapTime, size, telemetry
+		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry
 
 		if (this.AvailableTelemetry.Count = 0) {
 			if (this.Speaker[false] && !this.OnTrackCoaching)
@@ -1193,7 +1193,16 @@ class DrivingCoach extends GridRaceAssistant {
 							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getUserName()))
 							setMultiMapValue(info, "Info", "LapTime", bestLapTime)
 
-							if getMultiMapValue(bestInfo, "Lap", "SectorTimes", false)
+							sectorTimes := getMultiMapValue(bestInfo, "Lap", "SectorTimes", false)
+
+							if sectorTimes {
+								sectorTimes := string2Values(",", sectorTimes)
+
+								if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+									sectorTimes := false
+							}
+
+							if sectorTimes
 								setMultiMapValue(info, "Info", "SectorTimes", getMultiMapValue(bestInfo, "Lap", "SectorTimes"))
 
 							writeMultiMap(kTempDirectory . "Driving Coach\Telemetry\Reference.telemetry.info", info)
@@ -1358,8 +1367,12 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				if (sectorTimes && (Trim(sectorTimes) != ""))
+				if (sectorTimes && (Trim(sectorTimes) != "")) {
 					sectorTimes := string2Values(",", sectorTimes)
+
+					if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+						sectorTimes := false
+				}
 				else
 					sectorTimes := false
 

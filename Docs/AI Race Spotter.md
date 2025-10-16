@@ -285,7 +285,7 @@ A special case when recording the track coordinates is *iRacing*. This simulator
 
 As you can see, the yaw angle is the most important value in this calculation, therefore drive smoothly.
 
-## Track Automations
+## Track Automation
 
 When a track map is available, the Race Spotter is able to trigger special actions at any location of the track. Using this actions, you can send commands to the running simulator to switch between car settings, for example the traction control.
 

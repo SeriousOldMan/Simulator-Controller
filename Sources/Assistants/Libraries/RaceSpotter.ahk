@@ -1488,13 +1488,13 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	computeTrackPositions(positionInfos) {
-		local trackPositions := collect(positionInfos, (c) => c.Car)
+		local cars := getValues(this.OtherCars)
 
-		trackPositions.Push(this.DriverCar)
+		cars.Push(this.DriverCar)
 
-		bubblesort(&trackPositions, (c1, c2) => (c1.Running > c2.Running))
+		bubblesort(&cars, (c1, c2) => (c1.Running > c2.Running))
 
-		return trackPositions
+		return cars
 	}
 
 	updatePositionInfos(lastLap, sector, positions) {
@@ -3252,7 +3252,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updatePositionInfos(lastLap, sector, positions)
 
 			if this.MultiClass
-				this.iTrackPositions := this.computeTrackPositions(this.PositionInfos)
+				this.iTrackPositions := this.computeTrackPositions()
 		}
 
 		if (this.DriverCar && !this.DriverCar.InPit && update && this.Enabled) {

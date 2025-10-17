@@ -550,6 +550,10 @@ class CarInfo {
 
 		return (b > 0)
 	}
+
+	inFight(otherCar) {
+		return false
+	}
 }
 
 class PositionInfo {
@@ -1494,6 +1498,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if debug
 			FileAppend("`n---------------------------------`n`n", kTempDirectory . "Race Spotter.positions")
+	}
+
+	getCarsAhead() {
+		return []
+	}
+
+	getCarsBehind() {
+		return []
 	}
 
 	getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, inpit := false) {
@@ -2571,6 +2583,81 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
+	multiClassWarning(lastLap, sector, positions, regular, method) {
+		local class := this.getClass()
+		local carsBehind := collect(this.getCarsBehind()
+								  , (c) => ((c.Car.Class != class) && c.isFaster(sector)))
+		local fastSpeaker, classLeader, ignore, carIndex, otherIndex, carsAhead
+		local carBehind, otherCarBehind, carAhead, otherCarAhead
+
+		if (carsBehind.Length > 0) {
+			fastSpeaker := this.getSpeaker(true)
+
+			if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+				fastSpeaker := RaceSpotter.NullSpeaker()
+
+			classLeader := first(carsBehind, (c) => (c.Car.Position["Class"] = 1))
+
+			if classLeader {
+				fastSpeaker.speakPhrase("ClassLeaderBehind", {class: classLeader.Car.Class})
+
+				return true
+			}
+
+			for index, carBehind in carsBehind {
+				carIndex := index
+				carBehind := carsBehind.Car
+
+				for otherIndex, otherCarBehind in carsBehind {
+					otherCarBehind := otherCarBehind.Car
+
+					if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+											 && (carBehind.Class = otherCarBehind.Class)
+											 && carBehind.inFight(otherCarBehind)) {
+						fastSpeaker.speakPhrase("PositionFightBehind", {class: carBehind.Class})
+
+						return true
+					}
+				}
+			}
+
+			fastSpeaker.speakPhrase("FasterClassBehind", {class: carsBehind[1].Car.Class})
+
+			return true
+		}
+
+		carsAhead := reverse(collect(this.getCarsAhead()
+						   , (c) => ((c.Car.Class != class) && c.isSlower(sector))))
+
+		if (carsAhead.Length > 0) {
+			if !fastSpeaker {
+				fastSpeaker := this.getSpeaker(true)
+
+				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+					fastSpeaker := RaceSpotter.NullSpeaker()
+			}
+
+			for index, carAhead in carsAhead {
+				carIndex := index
+				carAhead := carAhead.Car
+
+				for otherIndex, otherCarAhead in carsAhead {
+					otherCarAhead := otherCarAhead.Car
+
+					if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+											 && (carAhead.Class = otherCarAhead.Class)
+											 && otherCarAhead.inFight(carAhead)) {
+						fastSpeaker.speakPhrase("PositionFightAhead", {class: carAhead.Class})
+
+						return true
+					}
+				}
+			}
+		}
+
+		return false
+	}
+
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
@@ -2629,6 +2716,9 @@ class RaceSpotter extends GridRaceAssistant {
 			behindGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Min", 2)
 			behindGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Max", 3600)
 		}
+
+		if (this.MultiClass && this.multiClassWarning(lastLap, sector, positions, regular, method))
+			return true
 
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 

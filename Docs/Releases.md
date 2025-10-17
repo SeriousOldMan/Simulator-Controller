@@ -15,7 +15,7 @@
   
 #### Changes
 
-  - Thanks to a contribution of @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
+  - Thanks to a contribution by @neophyte many cars in *Assetto Corsa* now provide information about their car classes in the meta data.
     - The cars in the DLC for modded cars of *Assetto Corsa* has also been updated to include class information. Take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661) for information, how to include the updated information into your database.
   - Additonally many more car names have been added to the car meta data file for *Assetto Corsa* by @neophyte.
   - The Spotter no longer gives you information about pitstops of cars in other classes.

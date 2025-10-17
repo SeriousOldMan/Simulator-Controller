@@ -1,9 +1,9 @@
 [Development]
-Version=6.6.1.0-release
+Version=6.6.2.0-dev
 Target=6.6.1.0-release
 Date=10/17/2025
-Download=https://cutt.ly/lr3sACZ2;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/xj-jmi3o;https://www.dropbox.com/scl/fi/n43n755woi3h6g7ke416y/Simulator-Controller-6.6.1.0-release.zip?rlkey=em1comeunpfnuvyocwns7kny7&st=ou6egp61&dl=1;http://%master%/Releases/Simulator Controller 6.6.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.1.0-release.zip
-Changes=Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction", Fixed standings in LLM knowledge after the first car pitted, Fixed Google voice recognition for French, Fixed ACC UDP configuration, Fixed pitstop history in team races, Fixed driver swap in LMU, Extended LLM knowledge of the Strategist about tyre state, Support for volume control in audio routing, New "Assistants" script module, Added AC car classes, Removed automatic update procedures before 6.0, No pitstop information for cars in other classes by the Spotter, No wrong session format announcement by Spotter in AC, Updated AC car meta data DLC, Updated car names for AC, New action type "Action" in track automation
+Download=
+Changes=Rearrangement of the Settings editor gor audio routing, Optimized Spotter information for cars in the same class
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.1.0-release
@@ -22,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.6.1.0-release
+Development=6.6.2.0-dev
 Release=6.6.1.0-release

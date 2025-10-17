@@ -59,7 +59,7 @@ Some applications of Simulator Controller show you the progress of long-running 
 
 ### Configuration of the Controller Mode automation
 
-If you click on then button "Controller Automation...", a new dialog will open up, where you can select predefined Modes for your connected hardware controller.
+If you click on the button "Controller...", a new dialog will open up, where you can select predefined Modes for your connected hardware controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor.JPG)
 
@@ -366,7 +366,7 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 
 ### Audio Routing
 
-Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) is installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headset. To configure the audio routes, click on the "Audio..." button in the "Controller Automation" window.
+Simulator Controller allows you to direct sound output (for example the voices of the different Race Assistants) to different audio devices, as long as the additional software [SoX](http://sox.sourceforge.net/) and [NirCmd](https://www.nirsoft.net/utils/nircmd.html) are installed and configured. This is mainly of interest to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headset. To configure the audio routes, click on the "Audio..." button in the [Settings window](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor%202.JPG)
 

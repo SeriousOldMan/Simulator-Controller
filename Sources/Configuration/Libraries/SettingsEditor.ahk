@@ -14,37 +14,49 @@ global kContinue := "Continue"
 global kOk := "Ok"
 global kCancel := "Cancel"
 global kUpdate := "Update"
-global kEditModes := "Edit"
+global kEditModes := "Modes"
+global kEditAudio := "Audio"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editAudio(ownerOrCommand, *) {
+editAudio(&settingsOrCommand, arguments*) {
+	global kOk, kCancel
+
 	local x, y, w, h
 
 	static audioGui, result, audioEdit
 
-	if (ownerOrCommand == kOk)
+	if (settingsOrCommand == kOk)
 		result := kOk
-	else if (ownerOrCommand == kCancel)
+	else if (settingsOrCommand == kCancel)
 		result := kCancel
 	else {
 		result := false
 
-		audioGui := Window({Descriptor: "Simulator Settings.Audio", Resizeable: true, Options: "0x400000"}, translate("Audio"))
+		audioGui := Window({Descriptor: "Simulator Settings.Audio", Resizeable: true, Options: "0x400000"})
+
+		audioGui.SetFont("Bold", "Arial")
+
+		audioGui.Add("Text", "w330 Center W:Grow", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(audioGui, "Simulator Settings.Audio"))
+
+		audioGui.SetFont("Norm", "Arial")
+
+		audioGui.Add("Documentation", "x108 YP+20 w130 Center W:Grow", translate("Audio Routing")
+				   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing")
 
 		audioGui.SetFont("Norm", "Arial")
 
 		choices := []
 
-		audioGui.Add("Edit", "x16 y16 w334 h200 Multi vaudioEdit W:Grow H:Grow")
+		audioGui.Add("Edit", "x16 y60 w334 h200 Multi vaudioEdit W:Grow H:Grow")
 
-		audioGui.Add("Button", "x100 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editAudio.Bind(kOk))
-		audioGui.Add("Button", "x186 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editAudio.Bind(kCancel))
+		audioGui.Add("Button", "x100 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editAudio.Bind(&kOk))
+		audioGui.Add("Button", "x186 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editAudio.Bind(&kCancel))
 
-		audioGui.Opt("+Owner" . ownerOrCommand.Hwnd)
+		audioGui.Opt("+Owner" . arguments[1].Hwnd)
 
 		audioGui.Show("AutoSize Center")
 
@@ -59,8 +71,17 @@ editAudio(ownerOrCommand, *) {
 		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
 			audioGui["audioEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")
 
-		while !result
-			Sleep(100)
+		arguments[1].Block()
+
+		try {
+			loop
+				Sleep(200)
+			until result
+		}
+		finally {
+			arguments[1].Unblock()
+			arguments[1].Show("NoActivate")
+		}
 
 		try {
 			if (result == kCancel)
@@ -216,19 +237,8 @@ editModes(&settingsOrCommand, arguments*) {
 						 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings")
 
 		modesEditorGui.SetFont("Norm", "Arial")
-
-		modesEditorGui.Add("Button", "x8 y280 w80 h23 Y:Move", translate("Audio") . translate("...")).OnEvent("Click", (*) {
-			modesEditorGui.Block()
-
-			try {
-				editAudio(modesEditorGui)
-			}
-			finally {
-				modesEditorGui.Unblock()
-			}
-		})
-		modesEditorGui.Add("Button", "x170 y280 w80 h23 Default Y:Move X:Move", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
-		modesEditorGui.Add("Button", "x260 y280 w80 h23 Y:Move X:Move", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
+		modesEditorGui.Add("Button", "x85 y280 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
+		modesEditorGui.Add("Button", "x175 y280 w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
 
 		simulators := []
 
@@ -308,7 +318,7 @@ editModes(&settingsOrCommand, arguments*) {
 ;;;-------------------------------------------------------------------------;;;
 
 editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetup := false, x := kUndefined, y := kUndefined) {
-	global kSave, kCancel, kContinue, kUpdate, kEditModes
+	global kSave, kCancel, kContinue, kUpdate, kEditModes, kEditAudio
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
 	local descriptor, value, simulators, margin, choices, chosen, splashScreens, uiThemes
@@ -497,6 +507,9 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	else if (settingsOrCommand == kEditModes) {
 		editModes(&modeSettings, settingsEditorGui, configuration)
 	}
+	else if (settingsOrCommand == kEditAudio) {
+		editAudio(&modeSettings, settingsEditorGui, configuration)
+	}
 	else if (settingsOrCommand = "Restart")
 		restart := true
 	else {
@@ -648,10 +661,14 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 		popupPosition := settingsEditorGui.Add("DropDownList", "X120 YP-5 w100 Choose" . chosen, collect(choices, translate))
 
-		if fromSetup
-			settingsEditorGui.Add("Button", "X10 Y+15 w220 Disabled", translate("Controller Automation..."))
-		else
-			settingsEditorGui.Add("Button", "X10 Y+15 w220", translate("Controller Automation...")).OnEvent("Click", editSettings.Bind(&kEditModes))
+		if fromSetup {
+			settingsEditorGui.Add("Button", "X10 Y+15 w105 Disabled", translate("Controller") . translate("..."))
+			settingsEditorGui.Add("Button", "XP+115 YP w105 Disabled", translate("Audio") . translate("..."))
+		}
+		else {
+			settingsEditorGui.Add("Button", "X10 Y+15 w105", translate("Controller") . translate("...")).OnEvent("Click", editSettings.Bind(&kEditModes))
+			settingsEditorGui.Add("Button", "XP+115 YP w105", translate("Audio") . translate("...")).OnEvent("Click", editSettings.Bind(&kEditAudio))
+		}
 
 		uiTheme := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", Theme.CurrentTheme.Descriptor)
 

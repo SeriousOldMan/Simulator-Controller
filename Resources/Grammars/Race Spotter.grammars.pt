@@ -178,10 +178,14 @@ MorePitstops.3=%conjunction% ele tem mais paradas do que você.
 FasterClassBehind.1=Um %class% está vindo de trás. Cuidado.
 FasterClassBehind.2=Atenção, um %class% está vindo de trás.
 FasterClassBehind.3=Fique de olho no espelho, um %class% está atrás de você.
-FasterClassBehind.4=Um %class% está atrás de você. Mantenha a linha.
-PositionFightAhead.1=Os carros à sua frente estão brigando. Cuidado ao ultrapassar.
-PositionFightAhead.2=Cuidado, os carros à sua frente estão brigando por posição.
+FasterClassBehind.4=Um %class% está atrás de você. Mantenham a linha.
+ClassLeaderBehind.1=O líder da classe %class% está atrás de você. Cuidado.
+ClassLeaderBehind.2=O líder da classe %class% está vindo de trás. Mantenham a linha.
+PositionFightAhead.1=Os carros %class% à sua frente estão brigando. Cuidado ao ultrapassar.
+PositionFightAhead.2=Cuidado, os carros %class% à sua frente estão brigando por posição.
 PositionFightAhead.3=Há uma briga por posição à sua frente. Cuidado.
+PositionFightBehind.1=Os carros %class% atrás de você estão brigando por posição. Fique longe deles.
+PositionFightBehind.2=Cuidado, os carros mais rápidos no seu retrovisor estão brigando por posição.
 // Warnings and Penalties //
 Cut.1=Fique na pista %driver%.
 Cut.2=Não exagere %driver%.

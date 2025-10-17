@@ -179,9 +179,13 @@ FasterClassBehind.1=A %class% car is coming up from behind. Be on your guard.
 FasterClassBehind.2=Attention, a %class% is coming up from behind.
 FasterClassBehind.3=Keep an eye on the mirror, a %class% is behind you.
 FasterClassBehind.4=A %class% is behind you, keep your line.
-PositionFightAhead.1=The cars ahead are in a fight. Be carful when you overtake them.
-PositionFightAhead.2=Be carful, the cars ahead are fighting for position.
-PositionFightAhead.3=There is a fight for position ahead, be your guard.
+ClassLeaderBehind.1=The leader of the %class% class is behind you. Take care.
+ClassLeaderBehind.2=The %class% class leader is coming up behind you. Keep your line.
+PositionFightAhead.1=The %class% cars ahead are in a fight. Be carful when you overtake them.
+PositionFightAhead.2=Be carful, the %class% cars ahead are fighting for position.
+PositionFightAhead.3=There is a fight for position ahead, be on your guard.
+PositionFightBehind.1=The %class% cars coming up from behind are in a fight. Stay out of trouble.
+PositionFightBehind.2=Be careful, the faster cars in your mirror are fighting for position.
 // Warnings and Penalties //
 Cut.1=Stay on the track %driver%.
 Cut.2=Don't overdo it %driver%.

@@ -606,7 +606,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Start")
 
-				playSound("System", soundFile, "Wait")
+				playSound("System", soundFile, false, "Wait")
 
 				if callback
 					callback.Call("Stop")

@@ -2660,13 +2660,19 @@ class RaceSpotter extends GridRaceAssistant {
 		local class := this.getClass()
 		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster(sector)))
 		local fastSpeaker, classLeader, ignore, otherIndex, carsAhead
-		local carBehind, otherCarBehind, carAhead, otherCarAhead
+		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		if (carsBehind.Length > 0) {
 			fastSpeaker := this.getSpeaker(true)
 
 			if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
 				fastSpeaker := RaceSpotter.NullSpeaker()
+
+			carBehind := carsBehind[1]
+			position := carBehind.Position["Class"]
+
+			if ((position > 1) && (position <= 5))
+				fastSpeaker.speakPhrase("ClassCarBehind", {class: classLeader.Class, position: position})
 
 			classLeader := first(carsBehind, (c) => (c.Position["Class"] = 1))
 
@@ -2698,6 +2704,20 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
 					fastSpeaker := RaceSpotter.NullSpeaker()
+
+				carAhead := carsAhead[1]
+				position := carAhead.Position["Class"]
+
+				if ((position > 1) && (position <= 5))
+					fastSpeaker.speakPhrase("ClassCarAhead", {class: classLeader.Class, position: position})
+
+				classLeader := first(carsBehind, (c) => (c.Position["Class"] = 1))
+
+				if classLeader {
+					fastSpeaker.speakPhrase("ClassLeaderAhead", {class: classLeader.Class})
+
+					return true
+				}
 
 				for index, carAhead in carsAhead
 					for otherIndex, otherCarAhead in carsAhead

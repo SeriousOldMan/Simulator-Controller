@@ -1416,14 +1416,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local activeCars := CaseInsenseMap()
 		local driver, otherCars, car, carNr, cInfo, carLaps
-
-		cleanup(otherCars, activeCars) {
-			local ignore, carID
-
-			for ignore, carID in getKeys(otherCars)
-				if !activeCars.Has(carID)
-					otherCars.Delete(carID)
-		}
+		local ignore, carID
 
 		if (lastLap > 0) {
 			driver := positions["Driver"]
@@ -1466,7 +1459,9 @@ class RaceSpotter extends GridRaceAssistant {
 						this.PositionInfos[cInfo.ID].reset(sector, true, true)
 			}
 
-			Task.startTask(cleanup.Bind(otherCars, activeCars), 1000, kLowPriority)
+			for ignore, carID in getKeys(otherCars)
+				if !activeCars.Has(carID)
+					otherCars.Delete(carID)
 		}
 	}
 
@@ -2495,23 +2490,28 @@ class RaceSpotter extends GridRaceAssistant {
 
 				for index, carBehind in carsBehind
 					for otherIndex, otherCarBehind in carsBehind
-						if ((otherIndex > index) && inList(reportedCarsBehind, carBehind)
-												 && inList(reportedCarsBehind, otherCarBehind)
-												 && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+						if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
 												 && (carBehind.Class = otherCarBehind.Class)
+												 && !inList(reportedCarsBehind, carBehind)
+												 && !inList(reportedCarsBehind, otherCarBehind)
 												 && carBehind.inFight(otherCarBehind)) {
 							reportedCarsBehind.Push(carBehind)
+							reportedCarsBehind.Push(otherCarBehind)
 
 							fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
 							return true
 						}
 
-				reportedCarsBehind.Push(carsBehind[1])
+				carBehind := carsBehind[1]
 
-				fastSpeaker.speakNormal("FasterClassBehind", {class: carsBehind[1].Class})
+				if !inList(reportedCarsBehind, carBehind) {
+					reportedCarsBehind.Push(carBehind)
 
-				return true
+					fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
+
+					return true
+				}
 			}
 			finally {
 				reportedCarsBehind := choose(reportedCarsBehind, (c) => inList(carsBehind, c))
@@ -2552,11 +2552,14 @@ class RaceSpotter extends GridRaceAssistant {
 
 					for index, carAhead in carsAhead
 						for otherIndex, otherCarAhead in carsAhead
-							if ((otherIndex > index) && inList(reportedCarsAhead, carAhead)
-													 && inList(reportedCarsAhead, otherCarAhead)
-													 && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+							if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
 													 && (carAhead.Class = otherCarAhead.Class)
+													 && !inList(reportedCarsAhead, carAhead)
+													 && !inList(reportedCarsAhead, otherCarAhead)
 													 && carAhead.inFight(otherCarAhead)) {
+								reportedCarsAhead.Push(carAhead)
+								reportedCarsAhead.Push(otherCarAhead)
+
 								fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
 								return true

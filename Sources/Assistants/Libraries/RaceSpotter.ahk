@@ -124,6 +124,8 @@ class CarInfo {
 	iOverallPosition := false
 	iClassPosition := false
 
+	iRunning := false
+
 	iInPit := false
 
 	iLapTimes := []
@@ -386,6 +388,12 @@ class CarInfo {
 		}
 	}
 
+	Running {
+		Get {
+			return this.iRunning
+		}
+	}
+
 	Valid {
 		Get {
 			return this.iValid
@@ -444,7 +452,7 @@ class CarInfo {
 
 	update(driver, overallPosition, classPosition, lastLap, sector, lapTime, sectorTimes
 		 , delta, trackAheadDelta, trackBehindDelta
-		 , validLap, invalid, invalidLaps, incidents, inPit) {
+		 , validLap, invalid, invalidLaps, incidents, inPit, running) {
 		local avgLapTime := this.AvgLapTime
 		local pitted := (inPit || this.hasPitted(lastLap))
 		local valid := true
@@ -489,6 +497,7 @@ class CarInfo {
 		this.iValid := !invalid
 		this.iInvalidLaps := invalidLaps
 		this.iIncidents := incidents
+		this.iRunning := running
 
 		if (sector != this.iLastSector) {
 			this.iLastSector := sector
@@ -549,6 +558,20 @@ class CarInfo {
 		linRegression(xValues, yValues, &a, &b)
 
 		return (b > 0)
+	}
+
+	isSlower(sector) {
+		return !this.isFaster(sector)
+	}
+
+	inFight(otherCar) {
+		static frontAttackDelta := getMultiMapValue(this.Spotter.Settings, "Assistant.Spotter", "Front.Attack.Threshold", 0.8)
+		static behindAttackDelta := getMultiMapValue(this.Spotter.Settings, "Assistant.Spotter", "Behind.Attack.Threshold", 0.8)
+
+		if (this.Running > otherCar.Running)
+			return (((this.Running - otherCar.Running) * this.AvgLapTime) < frontAttackDelta)
+		else
+			return (((otherCar.Running - this.Running) * this.AvgLapTime) < behindAttackDelta)
 	}
 }
 
@@ -870,6 +893,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iDriverCar := false
 	iOtherCars := CaseInsenseMap()
+	iAllCars := []
 	iPositions := CaseInsenseWeakMap()
 
 	iFocusedCar := kUndefined
@@ -1110,6 +1134,15 @@ class RaceSpotter extends GridRaceAssistant {
 	Positions[key?] {
 		Get {
 			return (isSet(key) ? this.iPositions[key] : this.iPositions)
+		}
+	}
+
+	AllCars[key?] {
+		Get {
+			if !this.iAllCars
+				this.iAllCars := this.computeAllCars()
+
+			return (isSet(key) ? this.iAllCars[key] : this.iAllCars)
 		}
 	}
 
@@ -1448,13 +1481,23 @@ class RaceSpotter extends GridRaceAssistant {
 				if !cInfo.update(car[4], car[5], car[6], carLaps, sector
 							   , Round(car[9] / 1000, 1), car[18]
 							   , Round(car[10] / 1000, 1), Round(car[11] / 1000, 1), Round(car[12] / 1000, 1)
-							   , car[13], car[19], (carLaps - car[14]), car[15], car[16])
+							   , car[13], car[19], (carLaps - car[14]), car[15], car[16], car[20])
 					if ((A_Index != driver) && this.PositionInfos.Has(cInfo.ID))
 						this.PositionInfos[cInfo.ID].reset(sector, true, true)
 			}
 
 			Task.startTask(cleanup.Bind(otherCars, activeCars), 1000, kLowPriority)
 		}
+	}
+
+	computeAllCars() {
+		local cars := getValues(this.OtherCars)
+
+		cars.Push(this.DriverCar)
+
+		bubblesort(&cars, (c1, c2) => (c1.Running > c2.Running))
+
+		return cars
 	}
 
 	updatePositionInfos(lastLap, sector, positions) {
@@ -1494,6 +1537,49 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if debug
 			FileAppend("`n---------------------------------`n`n", kTempDirectory . "Race Spotter.positions")
+	}
+
+	getCarsAhead() {
+		local allCars := this.AllCars
+		local index := inList(allCars, this.DriverCar)
+		local running := this.DriverCar.Running
+		local carsAhead := []
+		local maxRunning, carAhead, count
+
+		static trafficAheadDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Ahead.Delta", 6.0)
+
+		maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
+		count := allCars.Length
+
+		while (++index <= count) {
+			carAhead := allCars[index]
+
+			if (carAhead.Running <= maxRunning)
+				carsAhead.Push(carAhead)
+		}
+
+		return carsAhead
+	}
+
+	getCarsBehind() {
+		local allCars := this.AllCars
+		local index := inList(allCars, this.DriverCar)
+		local running := this.DriverCar.Running
+		local carsBehind := []
+		local minRunning, carBehind
+
+		static trafficBehindDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Behind.Delta", 6.0)
+
+		minRunning := (running - ((trafficBehindDelta / this.DriverCar.AvgLapTime) * running))
+
+		while (--index > 0) {
+			carBehind := allCars[index]
+
+			if (carBehind.Running >= minRunning)
+				carsBehind.Push(carBehind)
+		}
+
+		return carsBehind
 	}
 
 	getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused, inpit := false) {
@@ -2390,6 +2476,84 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
+	multiClassWarning(lastLap, sector, positions) {
+		local class := this.getClass()
+		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster(sector)))
+		local fastSpeaker, ignore, otherIndex, carsAhead
+		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
+
+		if (carsBehind.Length > 0) {
+			fastSpeaker := this.getSpeaker(true)
+
+			if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+				fastSpeaker := RaceSpotter.NullSpeaker()
+
+			carBehind := carsBehind[1]
+			position := carBehind.Position["Class"]
+
+			if (position = 1) {
+				fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
+
+				return true
+			}
+			else if (position <= 5) {
+				fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
+
+				return true
+			}
+
+			for index, carBehind in carsBehind
+				for otherIndex, otherCarBehind in carsBehind
+					if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+											 && (carBehind.Class = otherCarBehind.Class)
+											 && carBehind.inFight(otherCarBehind)) {
+						fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
+
+						return true
+					}
+
+			fastSpeaker.speakNormal("FasterClassBehind", {class: carsBehind[1].Class})
+
+			return true
+		}
+		else {
+			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower(sector)))
+
+			if (carsAhead.Length > 0) {
+				fastSpeaker := this.getSpeaker(true)
+
+				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+					fastSpeaker := RaceSpotter.NullSpeaker()
+
+				carAhead := carsAhead[1]
+				position := carAhead.Position["Class"]
+
+				if (position = 1) {
+					fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
+
+					return true
+				}
+				else if (position <= 5) {
+					fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+
+					return true
+				}
+
+				for index, carAhead in carsAhead
+					for otherIndex, otherCarAhead in carsAhead
+						if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+												 && (carAhead.Class = otherCarAhead.Class)
+												 && carAhead.inFight(otherCarAhead)) {
+							fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
+
+							return true
+						}
+			}
+		}
+
+		return false
+	}
+
 	standingsGapToAhead(speaker) {
 		local knowledgeBase := this.KnowledgeBase
 		local talking := false
@@ -3081,28 +3245,38 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	updateDriver(lastLap, sector, update, newSector, positions) {
-		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
+		local racing := ((this.Session = kSessionRace) && (lastLap > 2))
+		local raceInfo := (this.hasEnoughData(false) && racing)
 		local hadInfo := false
 		local deltaInformation
 
 		static sessionInfo := true
 
-		if ((lastLap > 1) || (this.Session = kSessionQualification))
+		if ((lastLap > 1) || (this.Session = kSessionQualification)) {
 			this.updatePositionInfos(lastLap, sector, positions)
+
+			if this.MultiClass
+				this.iAllCars := this.computeAllCars()
+		}
 
 		if (this.DriverCar && !this.DriverCar.InPit && update && this.Enabled) {
 			if isDebug()
 				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
-			deltaInformation := this.Announcements["DeltaInformation"]
+			if (racing && this.MultiClass && this.Announcements["TacticalAdvices"] && this.multiClassWarning(lastLap, sector, positions))
+				hadInfo := true
 
-			if (raceInfo && (newSector || (deltaInformation = "A"))) {
-				if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-					this.iLastDeltaInformationLap := lastLap
+			if !hadInfo {
+				deltaInformation := this.Announcements["DeltaInformation"]
 
-				hadInfo := this.deltaInformation(lastLap, sector, positions
-											   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
-											   , this.Announcements["DeltaInformationMethod"])
+				if (raceInfo && (newSector || (deltaInformation = "A"))) {
+					if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+						this.iLastDeltaInformationLap := lastLap
+
+					hadInfo := this.deltaInformation(lastLap, sector, positions
+												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
+												   , this.Announcements["DeltaInformationMethod"])
+				}
 			}
 
 			if sessionInfo {
@@ -3581,6 +3755,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.iDriverCar := false
 		this.OtherCars := CaseInsenseMap()
 		this.PositionInfos := CaseInsenseMap()
+		this.iAllCars := []
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
 
@@ -4152,7 +4327,8 @@ class RaceSpotter extends GridRaceAssistant {
 											   , inPit
 											   , getMultiMapValue(data, "Position Data", prefix . ".ID", carIndex)
 											   , sectorTimes
-											   , !getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
+											   , !getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true)
+											   , getMultiMapValue(data, "Position Data", prefix . ".Lap.Running"))
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)

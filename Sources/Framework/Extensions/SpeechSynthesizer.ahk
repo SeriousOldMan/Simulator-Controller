@@ -655,8 +655,6 @@ class SpeechSynthesizer {
 		if (Trim(Text) = "")
 			return
 
-		this.wait()
-
 		if (cache && (cache == true))
 			cache := text
 
@@ -667,6 +665,8 @@ class SpeechSynthesizer {
 				cacheFileName := this.cacheFileName(cache)
 
 			if FileExist(cacheFileName) {
+				this.wait()
+
 				if (wait || !cache)
 					this.playSound(cacheFileName, true)
 				else {
@@ -786,6 +786,8 @@ class SpeechSynthesizer {
 					if (this.Synthesizer = "Windows")
 						this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 				}
+
+				this.wait()
 
 				if (wait || !cache)
 					this.playSound(temp2Name, true)

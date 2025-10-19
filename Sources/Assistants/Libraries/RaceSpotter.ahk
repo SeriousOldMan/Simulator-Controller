@@ -949,9 +949,6 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			speakNormal(phrase, variables := false, focus := false, cache := false, options := false) {
-				if this.Awaitable
-					this.wait()
-
 				this.speakPhrase(phrase, variables, focus, cache, options)
 			}
 
@@ -961,9 +958,6 @@ class RaceSpotter extends GridRaceAssistant {
 						options := {Rephrase: false}
 					else if !options.Has("Rephrase")
 						options.rephrase := false
-
-				if this.Awaitable
-					this.wait()
 
 				this.speakPhrase(phrase, variables, focus, cache, options)
 			}

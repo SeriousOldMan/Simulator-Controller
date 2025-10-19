@@ -3,7 +3,7 @@ Version=6.6.2.0-dev
 Target=6.6.1.0-release
 Date=10/19/2025
 Download=
-Changes=Rearrangement of the Settings editor gor audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance
+Changes=Rearrangement of the Settings editor gor audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.1.0-release

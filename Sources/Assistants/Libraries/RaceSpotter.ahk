@@ -542,26 +542,12 @@ class CarInfo {
 		return this.Problem
 	}
 
-	isFaster(sector) {
-		local xValues := []
-		local yValues := []
-		local index, delta, a, b
-
-		for index, delta in this.Deltas[sector] {
-			xValues.Push(index)
-			yValues.Push(delta)
-		}
-
-		a := false
-		b := false
-
-		linRegression(xValues, yValues, &a, &b)
-
-		return (b > 0)
+	isFaster() {
+		return (this.AvgLapTime < this.Spotter.DriverCar.AvgLapTime)
 	}
 
 	isSlower(sector) {
-		return !this.isFaster(sector)
+		return !this.isFaster()
 	}
 
 	inFight(otherCar) {
@@ -931,7 +917,7 @@ class RaceSpotter extends GridRaceAssistant {
 		iFastSpeechSynthesizer := false
 
 		class FastSpeaker extends VoiceManager.LocalSpeaker {
-			iIsBoostable := false
+			iIsBoostable := true
 			iIsSpeaking := false
 			iSpotter := false
 
@@ -2478,7 +2464,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
-		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster(sector)))
+		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 		local fastSpeaker, ignore, otherIndex, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
@@ -2517,7 +2503,7 @@ class RaceSpotter extends GridRaceAssistant {
 			return true
 		}
 		else {
-			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower(sector)))
+			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower()))
 
 			if (carsAhead.Length > 0) {
 				fastSpeaker := this.getSpeaker(true)
@@ -4055,6 +4041,8 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		result := super.addLap(lapNumber, &data)
+
+		knowledgeBase := this.KnowledgeBase
 
 		if !this.MultiClass
 			this.adjustGaps(data)

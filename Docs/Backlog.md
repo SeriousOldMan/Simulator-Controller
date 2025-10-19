@@ -5,6 +5,8 @@
   1. Integration of local TTS engines for voice generation
   2. Support automatic language translation when using Whisper voice recognition
   3. New GPT booster that supports automatic translation to a different language for voice generation
+  4. OpenAI compatible TTS service connector
+  5. OpenAI compatible STT service connector
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -12,7 +14,7 @@
   3. Support for new and also historic simulators
   4. Work around the jumping lap counter in *rFactor 2* and *Le Mans Ultimate* after an RTG in practice
   5. Support for Time *or* Laps session format
-  6. Sector time approximation for *Assetto Corsa*.
+  6. Sector time approximation for *Assetto Corsa*
 
 #### Plugins
   1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data

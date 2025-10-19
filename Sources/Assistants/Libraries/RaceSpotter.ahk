@@ -879,7 +879,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iDriverCar := false
 	iOtherCars := CaseInsenseMap()
-	iAllCars := []
+	iAllCars := false
 	iPositions := CaseInsenseWeakMap()
 
 	iFocusedCar := kUndefined
@@ -2161,6 +2161,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local fastSpeaker := this.getSpeaker(true)
 		local speaking := this.VoiceManager.Speaking[true]
+		local driverClass := this.DriverCar.Class
 		local speak := true
 		local standingsAhead := false
 		local standingsBehind := false
@@ -2324,7 +2325,8 @@ class RaceSpotter extends GridRaceAssistant {
 			if (regular && trackAhead && trackAhead.inRange(sector, true) && !trackAhead.isFaster(sector)
 			 && standingsBehind && (standingsBehind == trackBehind) && !trackAhead.Car.InPit
 			 && standingsBehind.hasGap(sector) && trackAhead.hasGap(sector)
-			 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)) {
+			 && standingsBehind.inDelta(sector) && standingsBehind.isFaster(sector)
+			 && (trackAhead.Car.Class = driverClass)) {
 				situation := ("ProtectSlower " . trackAhead.Car.ID . A_Space . trackBehind.Car.ID)
 
 				if !this.TacticalAdvices.Has(situation) {
@@ -2340,11 +2342,10 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (regular && trackBehind && trackBehind.hasGap(sector) && !trackBehind.Car.InPit
 			 && trackBehind.isFaster(sector) && trackBehind.inRange(sector, true)
-			 && (this.getClass() = trackBehind.Car.Class))
+			 && (trackBehind.Car.Class = driverClass))
 				if (standingsBehind && (trackBehind != standingsBehind)
 				 && standingsBehind.hasGap(sector) && standingsBehind.inDelta(sector, 4.0)
-				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")
-				 && (this.getClass() = trackBehind.Car.Class)) {
+				 && standingsBehind.isFaster(sector) && (opponentType = "LapDown")) {
 					situation := ("ProtectFaster " . trackBehind.Car.ID . A_Space . standingsBehind.Car.ID)
 
 					if !this.TacticalAdvices.Has(situation) {
@@ -2400,7 +2401,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if (regular && (Random(1, 10) < 5)) {
 				driverPosition := this.DriverCar.Position["Class"]
-				driverClass := this.DriverCar.Class
 				driverLapTime := this.DriverCar.AvgLapTime
 				slowerCar := false
 
@@ -3225,50 +3225,52 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	updateDriver(lastLap, sector, update, newSector, positions) {
-		local racing := ((this.Session = kSessionRace) && (lastLap > 2))
-		local raceInfo := (this.hasEnoughData(false) && racing)
+		local session := this.Session
+		local isRace := ((session = kSessionRace) && (lastLap > 2))
 		local hadInfo := false
 		local deltaInformation
 
 		static sessionInfo := true
 
-		if ((lastLap > 1) || (this.Session = kSessionQualification)) {
+		if ((lastLap > 1) || (session = kSessionQualification)) {
 			this.updatePositionInfos(lastLap, sector, positions)
 
-			if this.MultiClass
-				this.iAllCars := this.computeAllCars()
+			this.iAllCars := false
 		}
 
-		if (this.DriverCar && !this.DriverCar.InPit && update && this.Enabled) {
-			if isDebug()
-				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
+		if isDebug()
+			logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . isRace)
 
-			if (racing && this.MultiClass && this.Announcements["TacticalAdvices"] && this.multiClassWarning(lastLap, sector, positions))
+		if (this.DriverCar && !this.DriverCar.InPit && this.Enabled) {
+			if (isRace && this.MultiClass && this.Announcements["TacticalAdvices"]
+					   && this.multiClassWarning(lastLap, sector, positions))
 				hadInfo := true
 
-			if !hadInfo {
-				deltaInformation := this.Announcements["DeltaInformation"]
+			if update {
+				if !hadInfo {
+					deltaInformation := this.Announcements["DeltaInformation"]
 
-				if (raceInfo && (newSector || (deltaInformation = "A"))) {
-					if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-						this.iLastDeltaInformationLap := lastLap
+					if (isRace && this.hasEnoughData(false) && (newSector || (deltaInformation = "A"))) {
+						if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+							this.iLastDeltaInformationLap := lastLap
 
-					hadInfo := this.deltaInformation(lastLap, sector, positions
-												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
-												   , this.Announcements["DeltaInformationMethod"])
+						hadInfo := this.deltaInformation(lastLap, sector, positions
+													   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
+													   , this.Announcements["DeltaInformationMethod"])
+					}
 				}
+
+				if sessionInfo {
+					hadInfo := this.sessionInformation(lastLap, sector, positions, !hadInfo)
+
+					if hadInfo
+						sessionInfo := false
+				}
+				else
+					sessionInfo := true
+
+				this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 			}
-
-			if sessionInfo {
-				hadInfo := this.sessionInformation(lastLap, sector, positions, !hadInfo)
-
-				if hadInfo
-					sessionInfo := false
-			}
-			else
-				sessionInfo := true
-
-			this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 		}
 	}
 
@@ -3735,7 +3737,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.iDriverCar := false
 		this.OtherCars := CaseInsenseMap()
 		this.PositionInfos := CaseInsenseMap()
-		this.iAllCars := []
+		this.iAllCars := false
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
 

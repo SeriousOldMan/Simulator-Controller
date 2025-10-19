@@ -2476,6 +2476,84 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
+	multiClassWarning(lastLap, sector, positions) {
+		local class := this.getClass()
+		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster(sector)))
+		local fastSpeaker, ignore, otherIndex, carsAhead
+		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
+
+		if (carsBehind.Length > 0) {
+			fastSpeaker := this.getSpeaker(true)
+
+			if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+				fastSpeaker := RaceSpotter.NullSpeaker()
+
+			carBehind := carsBehind[1]
+			position := carBehind.Position["Class"]
+
+			if (position = 1) {
+				fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
+
+				return true
+			}
+			else if (position <= 5) {
+				fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
+
+				return true
+			}
+
+			for index, carBehind in carsBehind
+				for otherIndex, otherCarBehind in carsBehind
+					if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+											 && (carBehind.Class = otherCarBehind.Class)
+											 && carBehind.inFight(otherCarBehind)) {
+						fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
+
+						return true
+					}
+
+			fastSpeaker.speakNormal("FasterClassBehind", {class: carsBehind[1].Class})
+
+			return true
+		}
+		else {
+			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower(sector)))
+
+			if (carsAhead.Length > 0) {
+				fastSpeaker := this.getSpeaker(true)
+
+				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+					fastSpeaker := RaceSpotter.NullSpeaker()
+
+				carAhead := carsAhead[1]
+				position := carAhead.Position["Class"]
+
+				if (position = 1) {
+					fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
+
+					return true
+				}
+				else if (position <= 5) {
+					fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+
+					return true
+				}
+
+				for index, carAhead in carsAhead
+					for otherIndex, otherCarAhead in carsAhead
+						if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+												 && (carAhead.Class = otherCarAhead.Class)
+												 && carAhead.inFight(otherCarAhead)) {
+							fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
+
+							return true
+						}
+			}
+		}
+
+		return false
+	}
+
 	standingsGapToAhead(speaker) {
 		local knowledgeBase := this.KnowledgeBase
 		local talking := false
@@ -2656,84 +2734,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	multiClassWarning(lastLap, sector, positions, regular, method) {
-		local class := this.getClass()
-		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster(sector)))
-		local fastSpeaker, classLeader, ignore, otherIndex, carsAhead
-		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
-
-		if (carsBehind.Length > 0) {
-			fastSpeaker := this.getSpeaker(true)
-
-			if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
-				fastSpeaker := RaceSpotter.NullSpeaker()
-
-			carBehind := carsBehind[1]
-			position := carBehind.Position["Class"]
-
-			if ((position > 1) && (position <= 5))
-				fastSpeaker.speakPhrase("ClassCarBehind", {class: classLeader.Class, position: position})
-
-			classLeader := first(carsBehind, (c) => (c.Position["Class"] = 1))
-
-			if classLeader {
-				fastSpeaker.speakPhrase("ClassLeaderBehind", {class: classLeader.Class})
-
-				return true
-			}
-
-			for index, carBehind in carsBehind
-				for otherIndex, otherCarBehind in carsBehind
-					if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
-											 && (carBehind.Class = otherCarBehind.Class)
-											 && carBehind.inFight(otherCarBehind)) {
-						fastSpeaker.speakPhrase("PositionFightBehind", {class: carBehind.Class})
-
-						return true
-					}
-
-			fastSpeaker.speakPhrase("FasterClassBehind", {class: carsBehind[1].Class})
-
-			return true
-		}
-		else {
-			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower(sector)))
-
-			if (carsAhead.Length > 0) {
-				fastSpeaker := this.getSpeaker(true)
-
-				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
-					fastSpeaker := RaceSpotter.NullSpeaker()
-
-				carAhead := carsAhead[1]
-				position := carAhead.Position["Class"]
-
-				if ((position > 1) && (position <= 5))
-					fastSpeaker.speakPhrase("ClassCarAhead", {class: classLeader.Class, position: position})
-
-				classLeader := first(carsBehind, (c) => (c.Position["Class"] = 1))
-
-				if classLeader {
-					fastSpeaker.speakPhrase("ClassLeaderAhead", {class: classLeader.Class})
-
-					return true
-				}
-
-				for index, carAhead in carsAhead
-					for otherIndex, otherCarAhead in carsAhead
-						if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
-												 && (carAhead.Class = otherCarAhead.Class)
-												 && carAhead.inFight(otherCarAhead)) {
-							fastSpeaker.speakPhrase("PositionFightAhead", {class: carAhead.Class})
-
-							return true
-						}
-			}
-		}
-
-		return false
-	}
-
 	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
@@ -2792,9 +2792,6 @@ class RaceSpotter extends GridRaceAssistant {
 			behindGapMin := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Min", 2)
 			behindGapMax := getMultiMapValue(settings, "Assistant.Spotter", "Behind.Observe.Range.Max", 3600)
 		}
-
-		if (this.MultiClass && this.multiClassWarning(lastLap, sector, positions, regular, method))
-			return true
 
 		this.getPositionInfos(&standingsAhead, &standingsBehind, &trackAhead, &trackBehind, &leader, &focused)
 
@@ -3248,7 +3245,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	updateDriver(lastLap, sector, update, newSector, positions) {
-		local raceInfo := (this.hasEnoughData(false) && (this.Session = kSessionRace) && (lastLap > 2))
+		local racing := ((this.Session = kSessionRace) && (lastLap > 2))
+		local raceInfo := (this.hasEnoughData(false) && racing)
 		local hadInfo := false
 		local deltaInformation
 
@@ -3265,15 +3263,20 @@ class RaceSpotter extends GridRaceAssistant {
 			if isDebug()
 				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . raceInfo)
 
-			deltaInformation := this.Announcements["DeltaInformation"]
+			if (racing && this.MultiClass && this.Announcements["TacticalAdvices"] && this.multiClassWarning(lastLap, sector, positions))
+				hadInfo := true
 
-			if (raceInfo && (newSector || (deltaInformation = "A"))) {
-				if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
-					this.iLastDeltaInformationLap := lastLap
+			if !hadInfo {
+				deltaInformation := this.Announcements["DeltaInformation"]
 
-				hadInfo := this.deltaInformation(lastLap, sector, positions
-											   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
-											   , this.Announcements["DeltaInformationMethod"])
+				if (raceInfo && (newSector || (deltaInformation = "A"))) {
+					if (isNumber(deltaInformation) && (lastLap >= (this.iLastDeltaInformationLap + deltaInformation)))
+						this.iLastDeltaInformationLap := lastLap
+
+					hadInfo := this.deltaInformation(lastLap, sector, positions
+												   , (deltaInformation = "A") ? "A" : ((deltaInformation = "S") ? "S" : (lastLap = this.iLastDeltaInformationLap))
+												   , this.Announcements["DeltaInformationMethod"])
+				}
 			}
 
 			if sessionInfo {

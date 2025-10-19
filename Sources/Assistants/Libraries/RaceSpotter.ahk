@@ -2453,15 +2453,16 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
-		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
-		local fastSpeaker, ignore, otherIndex, carsAhead
+		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		static reportedCarsAhead := []
 		static reportedCarsBehind := []
 
-		if (carsBehind.Length > 0) {
-			try {
+		carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
+
+		try {
+			if (carsBehind.Length > 0) {
 				fastSpeaker := this.getSpeaker(true)
 
 				if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
@@ -2469,23 +2470,10 @@ class RaceSpotter extends GridRaceAssistant {
 
 				carBehind := carsBehind[1]
 
-				if !inList(reportedCarsBehind, carBehind) {
-					position := carBehind.Position["Class"]
+				if ((carBehind.Position["Class"] = 1) && !inList(reportedCarsBehind, carBehind)) {
+					fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
 
-					if (position = 1) {
-						reportedCarsBehind.Push(carBehind)
-
-						fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
-
-						return true
-					}
-					else if (position <= 5) {
-						reportedCarsBehind.Push(carBehind)
-
-						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
-
-						return true
-					}
+					return true
 				}
 
 				for index, carBehind in carsBehind
@@ -2495,9 +2483,6 @@ class RaceSpotter extends GridRaceAssistant {
 												 && !inList(reportedCarsBehind, carBehind)
 												 && !inList(reportedCarsBehind, otherCarBehind)
 												 && carBehind.inFight(otherCarBehind)) {
-							reportedCarsBehind.Push(carBehind)
-							reportedCarsBehind.Push(otherCarBehind)
-
 							fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
 							return true
@@ -2506,71 +2491,67 @@ class RaceSpotter extends GridRaceAssistant {
 				carBehind := carsBehind[1]
 
 				if !inList(reportedCarsBehind, carBehind) {
-					reportedCarsBehind.Push(carBehind)
+					position := carBehind.Position["Class"]
 
-					fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
+					if (position <= 5) {
+						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
 
-					return true
+						return true
+					}
+					else {
+						fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
+
+						return true
+					}
 				}
 			}
-			finally {
-				reportedCarsBehind := choose(reportedCarsBehind, (c) => inList(carsBehind, c))
-			}
-		}
-		else {
-			reportedCarsBehind := []
+			else {
+				carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower()))
 
-			carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower()))
-
-			if (carsAhead.Length > 0) {
 				try {
-					fastSpeaker := this.getSpeaker(true)
+					if (carsAhead.Length > 0) {
+						fastSpeaker := this.getSpeaker(true)
 
-					if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
-						fastSpeaker := RaceSpotter.NullSpeaker()
+						if (!this.Speaker[false] || !this.Announcements["DeltaInformation"])
+							fastSpeaker := RaceSpotter.NullSpeaker()
 
-					carAhead := carsAhead[1]
+						carAhead := carsAhead[1]
 
-					if !inList(reportedCarsAhead, carAhead) {
-						position := carAhead.Position["Class"]
-
-						if (position = 1) {
-							reportedCarsAhead.Push(carAhead)
-
+						if ((carAhead.Position["Class"] = 1) && !inList(reportedCarsAhead, carAhead)) {
 							fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
 
 							return true
 						}
-						else if (position <= 5) {
-							reportedCarsAhead.Push(carAhead)
 
+						for index, carAhead in carsAhead
+							for otherIndex, otherCarAhead in carsAhead
+								if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+														 && (carAhead.Class = otherCarAhead.Class)
+														 && !inList(reportedCarsAhead, carAhead)
+														 && !inList(reportedCarsAhead, otherCarAhead)
+														 && carAhead.inFight(otherCarAhead)) {
+									fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
+
+									return true
+								}
+
+						carAhead := carsAhead[1]
+						position := carAhead.Position["Class"]
+
+						if ((position <= 5) && !inList(reportedCarsAhead, carAhead)) {
 							fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
 
 							return true
 						}
 					}
-
-					for index, carAhead in carsAhead
-						for otherIndex, otherCarAhead in carsAhead
-							if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
-													 && (carAhead.Class = otherCarAhead.Class)
-													 && !inList(reportedCarsAhead, carAhead)
-													 && !inList(reportedCarsAhead, otherCarAhead)
-													 && carAhead.inFight(otherCarAhead)) {
-								reportedCarsAhead.Push(carAhead)
-								reportedCarsAhead.Push(otherCarAhead)
-
-								fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
-
-								return true
-							}
 				}
 				finally {
-					reportedCarsAhead := choose(reportedCarsAhead, (c) => inList(carsAhead, c))
+					reportedCarsAhead := carsAhead
 				}
 			}
-			else
-				reportedCarsAhead := []
+		}
+		finally {
+			reportedCarsBehind := carsBehind
 		}
 
 		return false

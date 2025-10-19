@@ -546,7 +546,7 @@ class CarInfo {
 		return (this.AvgLapTime < this.Spotter.DriverCar.AvgLapTime)
 	}
 
-	isSlower(sector) {
+	isSlower() {
 		return !this.isFaster()
 	}
 

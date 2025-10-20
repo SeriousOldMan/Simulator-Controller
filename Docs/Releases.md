@@ -32,7 +32,24 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.2.0
+
+#### Date: 10/24/25 (planned)
+
+#### Fixes
+
+  - The detection of a Steam installation of *Rennsport* is now detected correctly by "Simulator Setup".
+  - The latest update of *RaceRoom Racing Experience* prevented the detection of the game executable by "Simulator Setup". This has been fixed.
+  - Also, the internal data acquisition of the Spotter has been broken by the latest update of *RaceRoom Racing Experience*. This has been fixed as well and the Spotter is working again.
+  
+#### Changes
+
+  - The layout of the settings dialog of "Simulator Startup" has been changed a bit, so that the audio routing settings are more easily accessible.
+  - The Spotter announcements for cars in other classes has been reworked, so that irrelevant information is no longer given.
+  - Additional warnings for multiclass events has been implemented for the Spotter. For example, the Spotter will tell you now, that two GT3s are in a position fight, if you come up from behind in your Hypercar.
+    - Two new settings ["Spotter: Forward traffic observation" and "Spotter: Rearward traffic observation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you specify the part of the track relative to your lap time, where the Spooter looks for traffic of faster or slower cars of other classes. Default for both settings is 6 seconds. 
+    - Important: To make the most out of this new information shout outs, check the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" and set it to the lowest possible value, which can be handled by your sytem. Something like 2 seconds will be possible for most current Gaming PCs.
+  - More non-critical shout outs of the Spotter will now be processed by the *Rephrasing* booster, if configured.
 
 # Release history
 

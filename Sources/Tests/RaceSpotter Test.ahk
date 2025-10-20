@@ -109,7 +109,7 @@ if (raceNr == 22) {
 				else
 					spotter.updateLap(lap, &data)
 
-				if (isDebug() && (A_Index == 1))
+				if (A_Index == 1)
 					showMessage("Data " lap . "." . A_Index . " loaded...")
 			}
 		}

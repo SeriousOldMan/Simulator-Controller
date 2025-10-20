@@ -409,7 +409,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 		settingsEditorGui.Block()
 
 		try {
-			RunWait(kBinariesDirectory . "Simulator Configuration.exe")
+			RunWait(kBinariesDirectory . (GetKeyState("Ctrl") ? "Simulator Configuration.exe" : "Simulator Setup.exe"))
 
 			editSettings(&restart)
 		}

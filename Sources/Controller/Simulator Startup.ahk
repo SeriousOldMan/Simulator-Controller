@@ -1035,15 +1035,20 @@ launchPad(command := false, arguments*) {
 	modifySettings(launchPadGui, *) {
 		local settings := readMultiMap(kSimulatorSettingsFile)
 		local restart := false
+		local lastModified
 
 		launchPadGui.Block()
 
 		try {
+			lastModified := FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")
+
 			if (editSettings(&settings, launchPadGui) == kSave) {
 				writeMultiMap(kSimulatorSettingsFile, settings)
 
 				restart := true
 			}
+			else if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M"))
+				restart := true
 		}
 		finally {
 			launchPadGui.Unblock()

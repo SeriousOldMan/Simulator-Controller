@@ -41,7 +41,7 @@ Before starting up, "Simulator Startup" checks the configuration information. If
 
 With this editor, which can also be opened by clicking on the small button with the cog wheel icon in the upper right corner of the window of "Simulator Startup", you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
-Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
+Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This open "Simulator Setup" or, if the Control key is pressed, "Simulator Configuration", which let you fix any configuration problems.
 
 ### Customizing Startup Configuration
 
@@ -59,11 +59,15 @@ Some applications of Simulator Controller show you the progress of long-running 
 
 ### Configuration of the Controller Mode automation
 
-If you click on the button "Controller...", a new dialog will open up, where you can select predefined Modes for your connected hardware controller.
+If you click on the button "Controller...", a new dialog will open up where you can select predefined Modes for your connected hardware controller.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Automation%20Editor.JPG)
 
 You can choose the context with the first two dropdown menus, for example 1. when no simulation is running or 2. when you are in a given simulator and there in a practice session. Then you select the *Modes* (see the documentation for [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information), which will be automatically activated for this context. Please note, that more than one mode will only make sense, if you have more than one hardware controller connected, and when each mode only use one of these hardware controllers exclusively.
+
+### Configuration of Audio Routing
+
+If you click on the button "Audio...", a new dialog will open up where you have full control over audio related input and output settings. This is a complex topic and is only needed in very special configurations, like VR headsets, streaming setups. See the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
 
 ### Themes & Colors
 

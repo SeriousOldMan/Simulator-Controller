@@ -141,12 +141,6 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
-			Awaitable {
-				Get {
-					return false
-				}
-			}
-
 			VoiceClient {
 				Get {
 					return this.iVoiceClient

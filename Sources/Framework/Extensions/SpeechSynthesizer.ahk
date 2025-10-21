@@ -844,7 +844,7 @@ class SpeechSynthesizer {
 	speakToFile(fileName, text) {
 		local oldStream, stream, ssml, name, voice, request, result, header, file, id
 
-		this.stop()
+		; this.stop()
 
 		if (this.Synthesizer = "Windows") {
 			oldStream := this.iSpeechSynthesizer.AudioOutputStream

@@ -2536,12 +2536,20 @@ class RaceSpotter extends GridRaceAssistant {
 								}
 
 						carAhead := carsAhead[1]
-						position := carAhead.Position["Class"]
 
-						if ((position <= 5) && !inList(reportedCarsAhead, carAhead)) {
-							fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+						if !inList(reportedCarsAhead, carAhead) {
+							position := carAhead.Position["Class"]
 
-							return true
+							if (position <= 5) {
+								fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+
+								return true
+							}
+							else {
+								fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
+
+								return true
+							}
 						}
 					}
 				}

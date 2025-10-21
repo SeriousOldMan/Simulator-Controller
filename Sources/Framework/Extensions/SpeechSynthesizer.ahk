@@ -676,16 +676,16 @@ class SpeechSynthesizer {
 				sClickVolume := Round(0.6 * 80 / 100, 2)
 			}
 
-			if !isInteger(overDriveGain)
+			if !isInteger(sOverDriveGain)
 				sOverDriveGain := 20
 
-			if !isInteger(overDriveColor)
+			if !isInteger(sOverDriveColor)
 				sOverDriveColor := 20
 
-			if !isInteger(filterHighpass)
+			if !isInteger(sFilterHighpass)
 				sFilterHighpass := 800
 
-			if !isInteger(filterLowpass)
+			if !isInteger(sFilterLowpass)
 				sFilterLowpass := 1800
 		}
 

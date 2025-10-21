@@ -2167,7 +2167,6 @@ class RaceSpotter extends GridRaceAssistant {
 	tacticalAdvice(lastLap, sector, positions, regular) {
 		local speaker := this.getSpeaker()
 		local fastSpeaker := this.getSpeaker(true)
-		local speaking := this.VoiceManager.Speaking[true]
 		local driverClass := this.DriverCar.Class
 		local speak := true
 		local standingsAhead := false
@@ -2179,7 +2178,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local situation, opponentType, driverPitstops, carPitstops, carInfo, indicator
 		local driverPosition, driverLapTime, slowerCar, carNr, carPosition, delta, lapTimeDifference, key
 
-		if (speaking || !this.Speaker[false] || !this.Announcements["TacticalAdvices"]) {
+		if (!this.Speaker[false] || !this.Announcements["TacticalAdvices"]) {
 			speaker := RaceSpotter.NullSpeaker()
 			fastSpeaker := speaker
 
@@ -3285,10 +3284,10 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iAllCars := false
 		}
 
-		if isDebug()
-			logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . isRace)
+		if (!this.VoiceManager.Speaking[true] && this.DriverCar && !this.DriverCar.InPit && this.Enabled) {
+			if isDebug()
+				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . isRace)
 
-		if (this.DriverCar && !this.DriverCar.InPit && this.Enabled) {
 			if (isRace && this.MultiClass && this.Announcements["TacticalAdvices"]
 					   && this.multiClassWarning(lastLap, sector, positions))
 				hadInfo := true

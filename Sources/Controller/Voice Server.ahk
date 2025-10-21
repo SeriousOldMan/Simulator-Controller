@@ -141,6 +141,12 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
+			Awaitable {
+				Get {
+					return false
+				}
+			}
+
 			VoiceClient {
 				Get {
 					return this.iVoiceClient
@@ -150,6 +156,12 @@ class VoiceServer extends ConfigurationItem {
 			Booster {
 				Get {
 					return this.iBooster
+				}
+			}
+
+			Awaitable {
+				Get {
+					return false
 				}
 			}
 

@@ -647,7 +647,47 @@ class SpeechSynthesizer {
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
+		static sOverdriveGain := kUndefined
+		static sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
+
 		static counter := 1
+
+		if (sOverDriveGain = kUndefined) {
+			sOverdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
+			sOverdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
+			sFilterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
+			sFilterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+
+			try {
+				sNoiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				sNoiseVolume := Round(0.3 * 66 / 100, 2)
+			}
+
+			try {
+				sClickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				sClickVolume := Round(0.6 * 80 / 100, 2)
+			}
+
+			if !isInteger(overDriveGain)
+				sOverDriveGain := 20
+
+			if !isInteger(overDriveColor)
+				sOverDriveColor := 20
+
+			if !isInteger(filterHighpass)
+				sFilterHighpass := 800
+
+			if !isInteger(filterLowpass)
+				sFilterLowpass := 1800
+		}
 
 		if (options && !isInstance(options, Map))
 			options := toMap(options)
@@ -667,7 +707,7 @@ class SpeechSynthesizer {
 			if FileExist(cacheFileName) {
 				this.wait()
 
-				if (wait || !cache)
+				if (wait || !this.Awaitable)
 					this.playSound(cacheFileName, true)
 				else {
 					this.playSound(cacheFileName, false)
@@ -708,22 +748,10 @@ class SpeechSynthesizer {
 			}
 
 			if (!options || !options.Has("Distort") || options["Distort"]) {
-				overdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
-				overdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
-				filterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
-				filterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
-
-				if !isInteger(overDriveGain)
-					overDriveGain := 20
-
-				if !isInteger(overDriveColor)
-					overDriveColor := 20
-
-				if !isInteger(filterHighpass)
-					filterHighpass := 800
-
-				if !isInteger(filterLowpass)
-					filterLowpass := 1800
+				overdriveGain := sOverDriveGain
+				overdriveColor := sOverdriveColor
+				filterHighpass := sFilterHighpass
+				filterLowpass := sFilterLowpass
 			}
 			else {
 				overdriveGain := 0
@@ -732,29 +760,15 @@ class SpeechSynthesizer {
 				filterLowpass := 10800
 			}
 
-			try {
-				if (!options || !options.Has("Noise") || options["Noise"])
-					noiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
-				else
-					noiseVolume := 0
-			}
-			catch Any as exception {
-				logError(exception, true)
+			if (!options || !options.Has("Noise") || options["Noise"])
+				noiseVolume := sNoiseVolume
+			else
+				noiseVolume := 0
 
-				noiseVolume := Round(0.3 * 66 / 100, 2)
-			}
-
-			try {
-				if (!options || !options.Has("Click") || options["Click"])
-					clickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
-				else
-					clickVolume := 0
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				clickVolume := Round(0.6 * 66 / 100, 2)
-			}
+			if (!options || !options.Has("Click") || options["Click"])
+				clickVolume := sClickVolume
+			else
+				clickVolume := 0
 
 			try {
 				try {
@@ -789,7 +803,7 @@ class SpeechSynthesizer {
 
 				this.wait()
 
-				if (wait || !cache)
+				if (wait || !this.Awaitable)
 					this.playSound(temp2Name, true)
 				else {
 					this.playSound(temp2Name, false)

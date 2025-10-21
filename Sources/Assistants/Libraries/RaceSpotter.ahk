@@ -921,6 +921,8 @@ class RaceSpotter extends GridRaceAssistant {
 			iIsSpeaking := false
 			iSpotter := false
 
+			iClearAlerts := false
+
 			Spotter {
 				Get {
 					return this.iSpotter
@@ -939,8 +941,15 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 				Set {
+					if (!value && (this.iClearAlerts == true))
+						this.iClearAlerts := (A_TickCount + 2000)
+
 					return (this.iIsSpeaking := value)
 				}
+			}
+
+			clearAlerts() {
+				this.iClearAlerts := true
 			}
 
 			speak(text, focus := false, cache := false, options := false) {
@@ -966,8 +975,6 @@ class RaceSpotter extends GridRaceAssistant {
 				local assistant := this.VoiceManager.RaceAssistant
 				local oldBoostable := this.iIsBoostable
 
-				this.iIsBoostable := !cache
-
 				if !this.Talking
 					if !options {
 						options := {Rephrase: false}
@@ -975,16 +982,21 @@ class RaceSpotter extends GridRaceAssistant {
 					else if !options.Has("Rephrase")
 						options.rephrase := false
 
+				if this.Awaitable
+					this.wait()
+
+				if assistant.skipAlert(phrase) {
+					assistant.cleanupAlerts(phrase)
+
+					return
+				}
+
+				if (A_TickCount < this.iClearAlerts)
+					return
+
+				this.iIsBoostable := !cache
+
 				try {
-					if this.Awaitable
-						this.wait()
-
-					if assistant.skipAlert(phrase) {
-						assistant.cleanupAlerts(phrase)
-
-						return
-					}
-
 					this.speakPhrase(phrase, variables, focus, cache, options)
 				}
 				finally {
@@ -2453,6 +2465,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
+		local spoken := false
 		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
@@ -2473,7 +2486,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if ((carBehind.Position["Class"] = 1) && !inList(reportedCarsBehind, carBehind)) {
 					fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
 
-					return true
+					return (spoken := true)
 				}
 
 				for index, carBehind in carsBehind
@@ -2485,7 +2498,7 @@ class RaceSpotter extends GridRaceAssistant {
 												 && carBehind.inFight(otherCarBehind)) {
 							fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
-							return true
+							return (spoken := true)
 						}
 
 				carBehind := carsBehind[1]
@@ -2496,12 +2509,12 @@ class RaceSpotter extends GridRaceAssistant {
 					if (position <= 5) {
 						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
 
-						return true
+						return (spoken := true)
 					}
 					else {
 						fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
 
-						return true
+						return (spoken := true)
 					}
 				}
 			}
@@ -2520,7 +2533,7 @@ class RaceSpotter extends GridRaceAssistant {
 						if ((carAhead.Position["Class"] = 1) && !inList(reportedCarsAhead, carAhead)) {
 							fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
 
-							return true
+							return (spoken := true)
 						}
 
 						for index, carAhead in carsAhead
@@ -2532,16 +2545,24 @@ class RaceSpotter extends GridRaceAssistant {
 														 && carAhead.inFight(otherCarAhead)) {
 									fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
-									return true
+									return (spoken := true)
 								}
 
 						carAhead := carsAhead[1]
-						position := carAhead.Position["Class"]
 
-						if ((position <= 5) && !inList(reportedCarsAhead, carAhead)) {
-							fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+						if !inList(reportedCarsAhead, carAhead) {
+							position := carAhead.Position["Class"]
 
-							return true
+							if (position <= 5) {
+								fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+
+								return (spoken := true)
+							}
+							else {
+								fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
+
+								return (spoken := true)
+							}
 						}
 					}
 				}
@@ -2552,6 +2573,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 		finally {
 			reportedCarsBehind := carsBehind
+
+			if (spoken && fastSpeaker.Awaitable)
+				fastSpeaker.clearAlerts()
 		}
 
 		return false
@@ -3369,21 +3393,30 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	cleanupAlerts(alert) {
-		local nextAlert := this.nextAlert()
+		local nextAlert
 
-		switch alert, false {
-			case "Left":
-				if ((nextAlert = "ClearLeft") || (nextAlert = "ClearAll"))
-					this.popAlert()
-			case "ClearLeft":
-				if (nextAlert = "Left")
-					this.popAlert()
-			case "Right":
-				if ((nextAlert = "ClearRight") || (nextAlert = "ClearAll"))
-					this.popAlert()
-			case "ClearRight":
-				if (nextAlert = "Right")
-					this.popAlert()
+		if (alert == true) {
+			this.iPendingAlerts.Length := 0
+
+			this.iHadAlerts := false
+		}
+		else {
+			nextAlert := this.nextAlert()
+
+			switch alert, false {
+				case "Left":
+					if ((nextAlert = "ClearLeft") || (nextAlert = "ClearAll"))
+						this.popAlert()
+				case "ClearLeft":
+					if (nextAlert = "Left")
+						this.popAlert()
+				case "Right":
+					if ((nextAlert = "ClearRight") || (nextAlert = "ClearAll"))
+						this.popAlert()
+				case "ClearRight":
+					if (nextAlert = "Right")
+						this.popAlert()
+			}
 		}
 	}
 

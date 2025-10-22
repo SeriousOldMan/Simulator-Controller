@@ -153,6 +153,12 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
+			Awaitable {
+				Get {
+					return false
+				}
+			}
+
 			__New(voiceClient, arguments*) {
 				local booster
 

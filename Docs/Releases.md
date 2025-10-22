@@ -50,7 +50,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Two new settings ["Spotter: Forward traffic observation" and "Spotter: Rearward traffic observation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you specify the part of the track relative to your lap time, where the Spooter looks for traffic of faster or slower cars of other classes. Default for both settings is 6 seconds. 
     - Important: To make the most out of this new information shout outs, check the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" and set it to the lowest possible value, which can be handled by your sytem. Something like 2 seconds will be possible for most current Gaming PCs.
   - More non-critical shout outs of the Spotter will now be processed by the *Rephrasing* booster, if configured.
-  - Changed the behavior of the "Configuration..." button in the settings editor of "Simulator Startup".
+  - Changed the behavior of the "Configuration..." button in the settings editor of "Simulator Startup". It will now open "Simulator Setup" by default or "Simulator Configuration", if the Control key is pressed.
+  - [Internal] Added an auto correction for the Azure Speech services endpoint, so that it is no longer necessary to add "/sts/v1.0/issuetoken" to the official endpoint.
 
 # Release history
 
@@ -1415,13 +1416,13 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. The lap history data supplied to the LLMs has been extended.
   7. The "Practice Center" can now save practice session recordings to the session database.
      - The file format of sessions has been changed to support this.
-	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
+	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the Control key while selecting "Load Session..." to load an *old* session.
 	 - See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#saving-and-loading-sessions) for more information.
   8. An *Auto Save* setting has been added to the "Practice Center".
   9. Saving sessions locally has also changed for the "Race Center".
      - Default location is also the session database.
      - The file format of sessions has also been changed to support this.
-	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the control key while selecting "Load Session..." to load an *old* session.
+	 - Sessions saved in the *old* format can still be loaded using the "Load Sessions..." command from the "Session" menu. Hold the Control key while selecting "Load Session..." to load an *old* session.
      - See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#session-data-management) for more information.
   10. Support for practice and race sessions has been added to "Session Database".
       - Data can be browsed in the "Administration" tab.
@@ -2009,7 +2010,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. [Expert] Clarified several aspects in the documentation about [car meta data definition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) for "Setup Workbench".
   8. [Expert] New [EnumerationHandler](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for car meta data definition in "Setup Workbench".
   9. "Simulator Startup" now supports the so-called startup profiles, which let you manage and activate the most important configuration settings for solo and team races in a matter of seconds. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for more information.
-  10. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look at the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
+  10. New [Control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Startup" allow you to quickly open the startup profiles editor and run the startup process automatically when closing the editor. Some of the former keyboard modifiers for "Simulator Startup" have changed, therefore take a close look at the [list of modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers).
   11. Some presets, that were used to disable voice handling completely or to start the Assistants muted, has been deprecated in "Simulator Setup". The functionality is now available in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
   12. A new preset has been added to "Simulator Setup" that installs a set of predefined startup profiles for you.
   13. Information about the active startup profile has been added to the "System Monitor".
@@ -2130,7 +2131,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Superfluous proximity alerts for cars that are actually behind a wall and driving in another direction or are not moving at all, are now supressed.
   7. You can now specify [a preference for an early or a late first pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation), when running a strategy simulation in the "Strategy Workbench".
   8. A runtime for large language models has been integrated into Simulator Controller, which allows you to run a LLM for the "Driving Coach" locally on your PC, without installing additional software or creating an OpenAI account. Please note that this increases the performance and memory requirements for the "Driving Coach" dramatically, but if your PC can handle it, then it is a great alternative to OpenAI and Co. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information about the configuration requirements.
-  9. New [control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Configuration" and "Simulator Setup" let you decide whether other applications will be terminated before working on the configuration.
+  9. New [Control key modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for "Simulator Configuration" and "Simulator Setup" let you decide whether other applications will be terminated before working on the configuration.
   10. New and updated car models for "Setup Workbench":
       - Assetto Corsa
         - Alfa Romeo GTA (fixed)
@@ -2622,7 +2623,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - New tyre wear model based on data generated by machine learning have been included in the "Strategy Workbench". Will be active, if the *Tyre Usage* optimization is enabled in the strategy optimizer. The new approach gives the "Strategy Workbench" the ability to double-stint a tyre set, if necessary.
   8. The strategy scripting language has been extended with new functions and predicates. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#scenario-validation) for more information.
   9. Long running strategy simulations can now be canceled by pressing the ESC key.
-  10. The data refresh frequency of the "Race Center" can now be configured, when holding down the control key and select the ["Synchronize"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) item in the "Session" menu.
+  10. The data refresh frequency of the "Race Center" can now be configured, when holding down the Control key and select the ["Synchronize"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) item in the "Session" menu.
   11. Fixed handling of *No tyre change* in pitstop preparation in "Race Center".
   12. Fixed handling of pitstop preparation in "Race Center", when no strategy has been selected.
   13. Fixed saving of tyre pressure data at the end of a solo session.

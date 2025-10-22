@@ -225,7 +225,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName, configuration
-		local settings
+		local settings, endpoint
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -304,10 +304,16 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
 				synthesizer := string2Values("|", synthesizer, 3)
+				
+				endpoint := Trim(synthesizer[2])
+				
+				if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken") {
+					endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
+																			   : "/sts/v1.0/issuetoken")
 
 				this.iAPIKey := synthesizer[3]
 
-				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
+				if !this.iSpeechSynthesizer.Connect(endpoint, synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 

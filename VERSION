@@ -3,7 +3,7 @@ Version=6.6.2.0-dev
 Target=6.6.2.0-release
 Date=10/20/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f9-QAS3X
-Changes=Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog
+Changes=Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog, Auto correction for Azure Speech services endpoint
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.1.0-release

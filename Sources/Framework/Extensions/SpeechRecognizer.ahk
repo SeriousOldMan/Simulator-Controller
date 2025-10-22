@@ -389,7 +389,7 @@ class SpeechRecognizer {
 		global kNirCmd
 
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
-		local whisperServerURL
+		local whisperServerURL, endpoint
 
 		if (engine = "Whisper")
 			engine := "Whisper Local"
@@ -441,10 +441,16 @@ class SpeechRecognizer {
 
 				if (engine != "Compiler") {
 					engine := string2Values("|", engine, 3)
+					
+					endpoint := Trim(engine[2])
+					
+					if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken") {
+						endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
+																				   : "/sts/v1.0/issuetoken")
 
 					this.iAPIKey := engine[3]
 
-					if !instance.Connect(engine[2], engine[3], ObjBindMethod(this, "_onTextCallback")) {
+					if !instance.Connect(endpoint, engine[3], ObjBindMethod(this, "_onTextCallback")) {
 						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 

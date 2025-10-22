@@ -441,10 +441,10 @@ class SpeechRecognizer {
 
 				if (engine != "Compiler") {
 					engine := string2Values("|", engine, 3)
-					
+
 					endpoint := Trim(engine[2])
-					
-					if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken") {
+
+					if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken"))
 						endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
 																				   : "/sts/v1.0/issuetoken")
 

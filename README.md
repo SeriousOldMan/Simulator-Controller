@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f9-QAS3X) (Early build for 6.6.2. Changes: Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog.)
+[6.6.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/303OGMJ2/Releases/Simulator%20Controller%206.6.2.0-beta.zip) (Test build for 6.6.2. Changes: Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6620) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-662) of this version and all the versions you might have skipped, before installing and using this version.
 

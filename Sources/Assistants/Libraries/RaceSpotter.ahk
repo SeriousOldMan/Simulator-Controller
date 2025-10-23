@@ -935,6 +935,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			Awaitable {
+				Get {
+					return false
+				}
+			}
+
 			Speaking {
 				Get {
 					return this.iIsSpeaking
@@ -982,8 +988,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else if !options.Has("Rephrase")
 						options.rephrase := false
 
-				if this.Awaitable
-					this.wait()
+				this.wait()
 
 				if assistant.skipAlert(phrase) {
 					assistant.cleanupAlerts(phrase)
@@ -1530,19 +1535,22 @@ class RaceSpotter extends GridRaceAssistant {
 		local allCars := this.AllCars
 		local index := inList(allCars, this.DriverCar)
 		local running := this.DriverCar.Running
+		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsAhead := []
 		local maxRunning, carAhead, count
 
 		static trafficAheadDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Ahead.Delta", 6.0)
 
-		maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
-		count := allCars.Length
+		if (avgLapTime > 0) {
+			maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
+			count := allCars.Length
 
-		while (++index <= count) {
-			carAhead := allCars[index]
+			while (++index <= count) {
+				carAhead := allCars[index]
 
-			if (carAhead.Running <= maxRunning)
-				carsAhead.Push(carAhead)
+				if (carAhead.Running <= maxRunning)
+					carsAhead.Push(carAhead)
+			}
 		}
 
 		return carsAhead
@@ -1552,18 +1560,21 @@ class RaceSpotter extends GridRaceAssistant {
 		local allCars := this.AllCars
 		local index := inList(allCars, this.DriverCar)
 		local running := this.DriverCar.Running
+		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsBehind := []
 		local minRunning, carBehind
 
 		static trafficBehindDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Behind.Delta", 6.0)
 
-		minRunning := (running - ((trafficBehindDelta / this.DriverCar.AvgLapTime) * running))
+		if (avgLapTime > 0) {
+			minRunning := (running - ((trafficBehindDelta / avgLapTime) * running))
 
-		while (--index > 0) {
-			carBehind := allCars[index]
+			while (--index > 0) {
+				carBehind := allCars[index]
 
-			if (carBehind.Running >= minRunning)
-				carsBehind.Push(carBehind)
+				if (carBehind.Running >= minRunning)
+					carsBehind.Push(carBehind)
+			}
 		}
 
 		return carsBehind
@@ -2464,14 +2475,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
+		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 		local spoken := false
-		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
+		local fastSpeaker, ignore, otherIndex, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		static reportedCarsAhead := []
 		static reportedCarsBehind := []
-
-		carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
+		static nextFightAheadWarning := false
+		static nextFightBehindWarning := false
 
 		try {
 			if (carsBehind.Length > 0) {
@@ -2488,17 +2500,20 @@ class RaceSpotter extends GridRaceAssistant {
 					return (spoken := true)
 				}
 
-				for index, carBehind in carsBehind
-					for otherIndex, otherCarBehind in carsBehind
-						if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
-												 && (carBehind.Class = otherCarBehind.Class)
-												 && !inList(reportedCarsBehind, carBehind)
-												 && !inList(reportedCarsBehind, otherCarBehind)
-												 && carBehind.inFight(otherCarBehind)) {
-							fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
+				if (A_TickCount > nextFightBehindWarning)
+					for index, carBehind in carsBehind
+						for otherIndex, otherCarBehind in carsBehind
+							if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+													 && (carBehind.Class = otherCarBehind.Class)
+													 && !inList(reportedCarsBehind, carBehind)
+													 && !inList(reportedCarsBehind, otherCarBehind)
+													 && carBehind.inFight(otherCarBehind)) {
+								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
-							return (spoken := true)
-						}
+								nextFightBehindWarning := (A_TickCount + 20000)
+
+								return (spoken := true)
+							}
 
 				carBehind := carsBehind[1]
 
@@ -2535,17 +2550,20 @@ class RaceSpotter extends GridRaceAssistant {
 							return (spoken := true)
 						}
 
-						for index, carAhead in carsAhead
-							for otherIndex, otherCarAhead in carsAhead
-								if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
-														 && (carAhead.Class = otherCarAhead.Class)
-														 && !inList(reportedCarsAhead, carAhead)
-														 && !inList(reportedCarsAhead, otherCarAhead)
-														 && carAhead.inFight(otherCarAhead)) {
-									fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
+						if (A_TickCount > nextFightAheadWarning)
+							for index, carAhead in carsAhead
+								for otherIndex, otherCarAhead in carsAhead
+									if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+															 && (carAhead.Class = otherCarAhead.Class)
+															 && !inList(reportedCarsAhead, carAhead)
+															 && !inList(reportedCarsAhead, otherCarAhead)
+															 && carAhead.inFight(otherCarAhead)) {
+										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
-									return (spoken := true)
-								}
+										nextFightAheadWarning := (A_TickCount + 20000)
+
+										return (spoken := true)
+									}
 
 						carAhead := carsAhead[1]
 

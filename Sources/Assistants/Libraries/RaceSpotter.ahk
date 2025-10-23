@@ -956,6 +956,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 			speakNormal(phrase, variables := false, focus := false, cache := false, options := false) {
 				this.speakPhrase(phrase, variables, focus, cache, options)
+
+				if !this.Talking
+					this.Spotter.clearAlerts()
 			}
 
 			speakFast(phrase, variables := false, focus := false, cache := false, options := false) {
@@ -966,6 +969,9 @@ class RaceSpotter extends GridRaceAssistant {
 						options.rephrase := false
 
 				this.speakPhrase(phrase, variables, focus, cache, options)
+
+				if !this.Talking
+					this.Spotter.clearAlerts()
 			}
 
 			speakAlert(phrase, variables := false, focus := false, cache := false, options := false) {
@@ -995,6 +1001,12 @@ class RaceSpotter extends GridRaceAssistant {
 				finally {
 					this.iIsBoostable := oldBoostable
 				}
+			}
+
+			endTalk(options?) {
+				super.endTalk(options?)
+
+				this.Spotter.clearAlerts()
 			}
 
 			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
@@ -2578,9 +2590,6 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 		finally {
 			reportedCarsBehind := carsBehind
-
-			if spoken
-				this.clearAlerts()
 		}
 
 		return false

@@ -935,6 +935,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			Awaitable {
+				Get {
+					return false
+				}
+			}
+
 			Speaking {
 				Get {
 					return this.iIsSpeaking
@@ -982,8 +988,7 @@ class RaceSpotter extends GridRaceAssistant {
 					else if !options.Has("Rephrase")
 						options.rephrase := false
 
-				if this.Awaitable
-					this.wait()
+				this.wait()
 
 				if assistant.skipAlert(phrase) {
 					assistant.cleanupAlerts(phrase)
@@ -2477,6 +2482,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		static reportedCarsAhead := []
 		static reportedCarsBehind := []
+		static nextFightAheadWarning := false
+		static nextFightBehindWarning := false
 
 		try {
 			if (carsBehind.Length > 0) {
@@ -2493,17 +2500,20 @@ class RaceSpotter extends GridRaceAssistant {
 					return (spoken := true)
 				}
 
-				for index, carBehind in carsBehind
-					for otherIndex, otherCarBehind in carsBehind
-						if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
-												 && (carBehind.Class = otherCarBehind.Class)
-												 && !inList(reportedCarsBehind, carBehind)
-												 && !inList(reportedCarsBehind, otherCarBehind)
-												 && carBehind.inFight(otherCarBehind)) {
-							fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
+				if (A_TickCount > nextFightBehindWarning)
+					for index, carBehind in carsBehind
+						for otherIndex, otherCarBehind in carsBehind
+							if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
+													 && (carBehind.Class = otherCarBehind.Class)
+													 && !inList(reportedCarsBehind, carBehind)
+													 && !inList(reportedCarsBehind, otherCarBehind)
+													 && carBehind.inFight(otherCarBehind)) {
+								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
-							return (spoken := true)
-						}
+								nextFightBehindWarning := (A_TickCount + 10000)
+
+								return (spoken := true)
+							}
 
 				carBehind := carsBehind[1]
 
@@ -2540,17 +2550,20 @@ class RaceSpotter extends GridRaceAssistant {
 							return (spoken := true)
 						}
 
-						for index, carAhead in carsAhead
-							for otherIndex, otherCarAhead in carsAhead
-								if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
-														 && (carAhead.Class = otherCarAhead.Class)
-														 && !inList(reportedCarsAhead, carAhead)
-														 && !inList(reportedCarsAhead, otherCarAhead)
-														 && carAhead.inFight(otherCarAhead)) {
-									fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
+						if (A_TickCount > nextFightAheadWarning)
+							for index, carAhead in carsAhead
+								for otherIndex, otherCarAhead in carsAhead
+									if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
+															 && (carAhead.Class = otherCarAhead.Class)
+															 && !inList(reportedCarsAhead, carAhead)
+															 && !inList(reportedCarsAhead, otherCarAhead)
+															 && carAhead.inFight(otherCarAhead)) {
+										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
-									return (spoken := true)
-								}
+										nextFightAheadWarning := (A_TickCount + 10000)
+
+										return (spoken := true)
+									}
 
 						carAhead := carsAhead[1]
 

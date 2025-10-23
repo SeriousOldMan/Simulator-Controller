@@ -1,15 +1,15 @@
 [Development]
-Version=6.6.2.0-beta
+Version=6.6.2.0-release
 Target=6.6.2.0-release
-Date=10/21/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/303OGMJ2/Releases/Simulator%20Controller%206.6.2.0-beta.zip
+Date=10/24/2025
+Download=https://cutt.ly/6r84GfCq;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r5TtmQYB/Releases/Simulator%20Controller%206.6.2.0-release.zip;https://www.dropbox.com/scl/fi/s9fx17wz5v8eqm4xl9ea9/Simulator-Controller-6.6.2.0-release.zip?rlkey=skb0t5p0bahuc5ipcnydjpw6f&st=zalb5v0m&dl=1;http://%master%/Releases/Simulator Controller 6.6.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.2.0-release.zip
 Changes=Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog, Improved concurrency in handling in Spotter shout outs, Auto correction for Azure Speech services endpoint
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
-Version=6.6.1.0-release
-Date=10/17/2025
-Download=https://cutt.ly/lr3sACZ2;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/xj-jmi3o;https://www.dropbox.com/scl/fi/n43n755woi3h6g7ke416y/Simulator-Controller-6.6.1.0-release.zip?rlkey=em1comeunpfnuvyocwns7kny7&st=ou6egp61&dl=1;http://%master%/Releases/Simulator Controller 6.6.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.1.0-release.zip
-Changes=Included race rules in LLM knowledge for Strategist and Engineer, New controller action functions "raiseEvent" and "triggerAction", Fixed standings in LLM knowledge after the first car pitted, Fixed Google voice recognition for French, Fixed ACC UDP configuration, Fixed pitstop history in team races, Fixed driver swap in LMU, Extended LLM knowledge of the Strategist about tyre state, Support for volume control in audio routing, New "Assistants" script module, Added AC car classes, Removed automatic update procedures before 6.0, No pitstop information for cars in other classes by the Spotter, No wrong session format announcement by Spotter in AC, Updated AC car meta data DLC, Updated car names for AC, New action type "Action" in track automation
+Version=6.6.2.0-release
+Date=10/24/2025
+Download=https://cutt.ly/6r84GfCq;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r5TtmQYB/Releases/Simulator%20Controller%206.6.2.0-release.zip;https://www.dropbox.com/scl/fi/s9fx17wz5v8eqm4xl9ea9/Simulator-Controller-6.6.2.0-release.zip?rlkey=skb0t5p0bahuc5ipcnydjpw6f&st=zalb5v0m&dl=1;http://%master%/Releases/Simulator Controller 6.6.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.2.0-release.zip
+Changes=Rearrangement of the Settings editor for audio routing, Optimized Spotter information for cars in the same class, Added several multi class related warnings for the Spotter, New settings in "Session Database" to control traffic observation distance, Support for rephrasing in more non-critical messages by the Spotter, Fixed Rennsport detection if installed from Steam, Fixed R3E detection if installed from Steam, Changed behavior of "Configuration..." buton in settings dialog, Improved concurrency in handling in Spotter shout outs, Auto correction for Azure Speech services endpoint
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.6.2.0-beta
-Release=6.6.1.0-release
+Development=6.6.2.0-release
+Release=6.6.2.0-release

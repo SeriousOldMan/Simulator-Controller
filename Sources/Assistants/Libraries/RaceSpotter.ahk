@@ -3432,10 +3432,6 @@ class RaceSpotter extends GridRaceAssistant {
 			return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 	}
 
-	clearAlerts() {
-		this.iPendingAlerts.Length := 0
-	}
-
 	nextAlert() {
 		return ((this.iPendingAlerts.Length > 0) ? this.iPendingAlerts[1] : false)
 	}

@@ -1535,19 +1535,22 @@ class RaceSpotter extends GridRaceAssistant {
 		local allCars := this.AllCars
 		local index := inList(allCars, this.DriverCar)
 		local running := this.DriverCar.Running
+		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsAhead := []
 		local maxRunning, carAhead, count
 
 		static trafficAheadDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Ahead.Delta", 6.0)
 
-		maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
-		count := allCars.Length
+		if (avgLapTime > 0) {
+			maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
+			count := allCars.Length
 
-		while (++index <= count) {
-			carAhead := allCars[index]
+			while (++index <= count) {
+				carAhead := allCars[index]
 
-			if (carAhead.Running <= maxRunning)
-				carsAhead.Push(carAhead)
+				if (carAhead.Running <= maxRunning)
+					carsAhead.Push(carAhead)
+			}
 		}
 
 		return carsAhead
@@ -1557,18 +1560,21 @@ class RaceSpotter extends GridRaceAssistant {
 		local allCars := this.AllCars
 		local index := inList(allCars, this.DriverCar)
 		local running := this.DriverCar.Running
+		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsBehind := []
 		local minRunning, carBehind
 
 		static trafficBehindDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Behind.Delta", 6.0)
 
-		minRunning := (running - ((trafficBehindDelta / this.DriverCar.AvgLapTime) * running))
+		if (avgLapTime > 0) {
+			minRunning := (running - ((trafficBehindDelta / avgLapTime) * running))
 
-		while (--index > 0) {
-			carBehind := allCars[index]
+			while (--index > 0) {
+				carBehind := allCars[index]
 
-			if (carBehind.Running >= minRunning)
-				carsBehind.Push(carBehind)
+				if (carBehind.Running >= minRunning)
+					carsBehind.Push(carBehind)
+			}
 		}
 
 		return carsBehind
@@ -2469,16 +2475,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
+		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 		local spoken := false
-		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
+		local fastSpeaker, ignore, otherIndex, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		static reportedCarsAhead := []
 		static reportedCarsBehind := []
 		static nextFightAheadWarning := false
 		static nextFightBehindWarning := false
-
-		carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 
 		try {
 			if (carsBehind.Length > 0) {

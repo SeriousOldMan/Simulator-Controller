@@ -2505,7 +2505,7 @@ class RaceSpotter extends GridRaceAssistant {
 													 && carBehind.inFight(otherCarBehind)) {
 								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
-								nextFightBehindWarning := (A_TickCount + 10000)
+								nextFightBehindWarning := (A_TickCount + 20000)
 
 								return (spoken := true)
 							}
@@ -2555,7 +2555,7 @@ class RaceSpotter extends GridRaceAssistant {
 															 && carAhead.inFight(otherCarAhead)) {
 										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
-										nextFightAheadWarning := (A_TickCount + 10000)
+										nextFightAheadWarning := (A_TickCount + 20000)
 
 										return (spoken := true)
 									}

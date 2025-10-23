@@ -921,8 +921,6 @@ class RaceSpotter extends GridRaceAssistant {
 			iIsSpeaking := false
 			iSpotter := false
 
-			iClearAlerts := false
-
 			Spotter {
 				Get {
 					return this.iSpotter
@@ -947,15 +945,8 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 				Set {
-					if (!value && (this.iClearAlerts == true))
-						this.iClearAlerts := (A_TickCount + 2000)
-
 					return (this.iIsSpeaking := value)
 				}
-			}
-
-			clearAlerts() {
-				this.iClearAlerts := true
 			}
 
 			speak(text, focus := false, cache := false, options := false) {
@@ -995,9 +986,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 					return
 				}
-
-				if (A_TickCount < this.iClearAlerts)
-					return
 
 				this.iIsBoostable := !cache
 
@@ -2591,8 +2579,8 @@ class RaceSpotter extends GridRaceAssistant {
 		finally {
 			reportedCarsBehind := carsBehind
 
-			if (spoken && fastSpeaker.Awaitable)
-				fastSpeaker.clearAlerts()
+			if spoken
+				this.clearAlerts()
 		}
 
 		return false
@@ -3442,6 +3430,10 @@ class RaceSpotter extends GridRaceAssistant {
 			return this.iHadAlerts
 		else
 			return (InStr(alert, "AccidentBehind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+	}
+
+	clearAlerts() {
+		this.iPendingAlerts.Length := 0
 	}
 
 	nextAlert() {

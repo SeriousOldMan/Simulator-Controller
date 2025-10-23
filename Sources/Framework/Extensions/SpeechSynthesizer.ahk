@@ -304,10 +304,10 @@ class SpeechSynthesizer {
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechSynthesizer")
 
 				synthesizer := string2Values("|", synthesizer, 3)
-				
+
 				endpoint := Trim(synthesizer[2])
-				
-				if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken") {
+
+				if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken"))
 					endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
 																			   : "/sts/v1.0/issuetoken")
 

@@ -1548,7 +1548,7 @@ class RaceSpotter extends GridRaceAssistant {
 			while (++index <= count) {
 				carAhead := allCars[index]
 
-				if (carAhead.Running <= maxRunning)
+				if ((carAhead.Running <= maxRunning) && !carAhead.InPit && (carAhead.AvgLapTime > 0))
 					carsAhead.Push(carAhead)
 			}
 		}
@@ -1572,7 +1572,7 @@ class RaceSpotter extends GridRaceAssistant {
 			while (--index > 0) {
 				carBehind := allCars[index]
 
-				if (carBehind.Running >= minRunning)
+				if ((carBehind.Running >= minRunning) && !carBehind.InPit && (carBehind.AvgLapTime > 0))
 					carsBehind.Push(carBehind)
 			}
 		}

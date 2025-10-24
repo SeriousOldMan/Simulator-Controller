@@ -81,7 +81,7 @@ class TestRaceSpotter extends RaceSpotter {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-raceNr := 22
+raceNr := 23  ; (22, 23)
 
 spotter := TestRaceSpotter(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Spotter.settings")
 						   , false, "Peter", "EN", true, true, false, true, true, true, true, true, true)
@@ -99,6 +99,34 @@ if (raceNr == 22) {
 
 			if (data.Count == 0) {
 				if (lap == 9)
+					done := true
+
+				break
+			}
+			else {
+				if (A_Index == 1)
+					spotter.addLap(lap, &data)
+				else
+					spotter.updateLap(lap, &data)
+
+				if (A_Index == 1)
+					showMessage("Data " lap . "." . A_Index . " loaded...")
+			}
+		}
+	}
+	until done
+}
+else if (raceNr == 23) {
+	done := false
+
+	loop {
+		lap := A_Index
+
+		loop {
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Spotter Lap " . lap . "." . A_Index . ".data")
+
+			if (data.Count == 0) {
+				if (lap == 37)
 					done := true
 
 				break

@@ -3,6 +3,7 @@
 ## 6.6.2.0
 
 #### Date: 10/24/25
+
 #### Fixes
 
   - The detection of a Steam installation of *Rennsport* is now detected correctly by "Simulator Setup".

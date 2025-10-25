@@ -161,11 +161,21 @@ class ACCUDPProvider {
 							}
 						}
 						catch Any {
-							accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
+							try {
+								accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8"))
+							}
+							catch Any {
+								accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-8-RAW"))
+							}
 						}
 					}
 					catch Any {
-						accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
+						try {
+							accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16"))
+						}
+						catch Any {
+							accUdpConfig := parseConfig(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "`n UTF-16-RAW"))
+						}
 					}
 				}
 				catch Any {

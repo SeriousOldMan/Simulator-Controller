@@ -169,9 +169,8 @@ class ACCUDPProvider {
 					}
 				}
 				catch Any {
-					try
-						accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
-															 , "`r`n", "`n"))
+					accUdpConfig := parseConfig(StrReplace(StrGet(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Config\broadcasting.json", "Raw"))
+														 , "`r`n", "`n"))
 				}
 			}
 			catch Any as exception {

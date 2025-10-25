@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.3.0-dev
 Target=6.6.3.0-release
-Date=10/24/2025
+Date=10/25/2025
 Download=
-Changes=Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings
+Changes=Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again)
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.2.0-release

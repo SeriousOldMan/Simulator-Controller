@@ -2951,7 +2951,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-							if ((remaining > 0) && (lapTimeDifference > 0))
+							if ((remaining > 0) && (lapTimeDifference > 0) && (this.DriverCar.LapTime[true] > 0))
 								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
 									speaker.speakPhrase("CanDoIt")
 								else
@@ -3166,7 +3166,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-							if ((remaining > 0) && (lapTimeDifference > 0))
+							if ((remaining > 0) && (lapTimeDifference > 0) && (this.DriverCar.LapTime[true] > 0))
 								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
 									speaker.speakPhrase("CanDoIt")
 								else

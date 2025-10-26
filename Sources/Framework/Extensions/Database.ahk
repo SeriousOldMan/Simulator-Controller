@@ -178,11 +178,11 @@ class Database {
 	}
 
 	static decode(value) {
-		return StrReplace(StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";"), Chr(0xFEFF), "")
+		return StrReplace(StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";"), Chr(65279), "")
 	}
 
 	decode(value) {
-		return StrReplace(StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";"), Chr(0xFEFF), "")
+		return StrReplace(StrReplace(StrReplace(StrReplace(value, "##b##", "|"), "##n##", "`n"), "##c##", ";"), Chr(65279), "")
 	}
 
 	lock(name := false, wait := true) {

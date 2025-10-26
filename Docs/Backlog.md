@@ -28,6 +28,7 @@
   
 #### Session Database
   1. Active validation of value ranges in settings definitions
+  2. Zoom feature for Track Map
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

@@ -7,6 +7,7 @@
   3. New GPT booster that supports automatic translation to a different language for voice generation
   4. OpenAI compatible TTS service connector
   5. OpenAI compatible STT service connector
+  6. Integrate support for SAPI voices
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

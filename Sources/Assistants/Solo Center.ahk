@@ -39,6 +39,7 @@
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Math.ahk"
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SessionDatabaseBrowser.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -1603,24 +1604,26 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		updateTelemetry(*) {
-			centerGui["practiceCenterTabView"].Redraw()
+			Task.startTask(() {
+				centerGui["practiceCenterTabView"].Redraw()
 
-			if (centerGui["practiceCenterTabView"].Value = 4) {
-				center.FuelDataListView.Redraw()
-				center.TyreDataListView.Redraw()
+				if (centerGui["practiceCenterTabView"].Value = 4) {
+					center.FuelDataListView.Redraw()
+					center.TyreDataListView.Redraw()
 
-				center.FuelDataListView.ModifyCol()
+					center.FuelDataListView.ModifyCol()
 
-				loop center.FuelDataListView.GetCount("Col")
-					center.FuelDataListView.ModifyCol(A_Index, "AutoHdr")
+					loop center.FuelDataListView.GetCount("Col")
+						center.FuelDataListView.ModifyCol(A_Index, "AutoHdr")
 
-				center.TyreDataListView.ModifyCol()
+					center.TyreDataListView.ModifyCol()
 
-				loop center.TyreDataListView.GetCount("Col")
-					center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
-			}
+					loop center.TyreDataListView.GetCount("Col")
+						center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
+				}
 
-			this.analyzeTelemetry()
+				this.analyzeTelemetry()
+			}, 100, kLowPriority)
 		}
 
 		updateNotes(*) {

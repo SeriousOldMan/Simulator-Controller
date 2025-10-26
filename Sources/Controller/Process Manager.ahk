@@ -161,7 +161,7 @@ startupProcessManager() {
 	A_IconTip := "Process Manager"
 
 	if getMultiMapValue(settings, "Process", "Memory.WatchDog", 10)
-		PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(settings, "Process", "Memory.Max", 1024))
+		PeriodicTask(checkProcessMemory.Bind(getMultiMapValue(settings, "Process", "Memory.Max", 2048))
 				   , getMultiMapValue(settings, "Process", "Memory.WatchDog", 10) * 1000, kHighPriority).start()
 
 	Sleep(4000)

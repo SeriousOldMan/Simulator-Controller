@@ -408,6 +408,8 @@ class SpeechRecognizer {
 				loop
 					try {
 						this.initialize(engine, recognizer, language, true, mode)
+
+						break
 					}
 					catch Any as exception {
 						if (tries-- <= 0)

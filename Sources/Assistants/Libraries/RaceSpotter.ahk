@@ -1548,7 +1548,7 @@ class RaceSpotter extends GridRaceAssistant {
 			while (++index <= count) {
 				carAhead := allCars[index]
 
-				if (carAhead.Running <= maxRunning)
+				if ((carAhead.Running <= maxRunning) && !carAhead.InPit && (carAhead.AvgLapTime > 0))
 					carsAhead.Push(carAhead)
 			}
 		}
@@ -1572,7 +1572,7 @@ class RaceSpotter extends GridRaceAssistant {
 			while (--index > 0) {
 				carBehind := allCars[index]
 
-				if (carBehind.Running >= minRunning)
+				if ((carBehind.Running >= minRunning) && !carBehind.InPit && (carBehind.AvgLapTime > 0))
 					carsBehind.Push(carBehind)
 			}
 		}
@@ -2951,7 +2951,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-							if ((remaining > 0) && (lapTimeDifference > 0))
+							if ((remaining > 0) && (lapTimeDifference > 0) && (this.DriverCar.LapTime[true] > 0))
 								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
 									speaker.speakPhrase("CanDoIt")
 								else
@@ -3166,7 +3166,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-							if ((remaining > 0) && (lapTimeDifference > 0))
+							if ((remaining > 0) && (lapTimeDifference > 0) && (this.DriverCar.LapTime[true] > 0))
 								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
 									speaker.speakPhrase("CanDoIt")
 								else

@@ -105,7 +105,7 @@ initializeDebugging() {
 	global gDebug, gLogLevel, gDiagnosticsCritical
 
 	local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 1024) / 100)
+	local criticalMemory := ((getMultiMapValue(settings, "Process", "Memory.Max", 2048) / 100)
 						   * getMultiMapValue(settings, "Process", "Memory.Critical", 80) * 1024 * 1024)
 
 	gDebug := getMultiMapValue(settings, "Debug", "Debug", (kBuildConfiguration = "Development") && !A_IsCompiled)

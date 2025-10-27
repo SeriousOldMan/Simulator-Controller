@@ -3,6 +3,7 @@
 ## 6.6.2.0
 
 #### Date: 10/24/25
+
 #### Fixes
 
   - The detection of a Steam installation of *Rennsport* is now detected correctly by "Simulator Setup".
@@ -23,7 +24,22 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.3.0
+
+#### Date: 10/31/25 (planned)
+
+#### Fixes
+
+  - *Fixed* sporadic initialization problems with the "Windows (Server)" speech recognition by implementing a retry mechanism.
+  - Non-active cars, which are part of the entry list, but are virtually in the garage, are now ignored by the Race Spotter for *Le Mans Ultimate*.
+  - Fixed the handling of the ACC UDP configuration file ("broadcasting.json") after the latest updates by *SimHub* and *Assetto Corsa Competizione* itself.
+  - Triggered a redraw of the complete window of "Solo Center" on tab changes to work around the redraw problems of the data lists in the fourth tab.
+  - Potentially fixed premature end of the session in team races in *Le Mans Ultimate* when jumping back to the "Standings" screen after watching a replay.
+  - Fixed many corrupted entries in the session database, where the byte order mark in UTF-16 files was interpreted as a valid part of the first field of the first row.
+  
+#### Changes
+
+  - Increased default max memory limit for all applications from 1024 MB to 2048 MB to allow for complex data situations, for example, browsing telemetry data for the *Nordschleife*.
 
 # Release history
 

@@ -386,268 +386,36 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
-		global kNirCmd
+		local tries := 3
+		local audioDevice := this.AudioDevice
 
-		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
-		local whisperServerURL, endpoint
+		if (audioDevice && kNirCmd)
+			try {
+				RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+			}
+			catch Any as exception {
+				logError(exception, true)
 
-		if (engine = "Whisper")
-			engine := "Whisper Local"
+				kNirCmd := false
 
-		if !InStr(engine, "Whisper") {
-			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
-			dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
-		}
-
-		this.iEngine := engine
-		this.Instance := false
-		this.RecognizerList := []
-		this.iMode := mode
-
-		if !language
-			language := "en"
-
-		this.iLanguage := language
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
 
 		try {
-			if (!InStr(engine, "Whisper") && !FileExist(dllFile)) {
-				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
-
-				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
-			}
-
-			audioDevice := this.AudioDevice
-
-			if (audioDevice && kNirCmd)
-				try {
-					RunWait("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					kNirCmd := false
-
-					if !kSilentMode
-						showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-
-			if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
-				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
-
-				this.Instance := instance
-
-				this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine, 2)[1])
-
-				if (engine != "Compiler") {
-					engine := string2Values("|", engine, 3)
-
-					endpoint := Trim(engine[2])
-
-					if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken"))
-						endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
-																				   : "/sts/v1.0/issuetoken")
-
-					this.iAPIKey := engine[3]
-
-					if !instance.Connect(endpoint, engine[3], ObjBindMethod(this, "_onTextCallback")) {
-						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
-
-						throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+			if (engine = "Server") {
+				loop
+					try {
+						this.initialize(engine, recognizer, language, true, mode)
 					}
-				}
-
-				choices := []
-
-				loop 101
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Number", choices)
-
-				choices := []
-
-				loop 10
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Digit", choices)
-			}
-			else if (InStr(engine, "Google|") == 1) {
-				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.GoogleSpeechRecognizer")
-
-				this.Instance := instance
-
-				this.iEngine := "Google"
-
-				engine := string2Values("|", engine, 2)
-
-				if (this.iGoogleMode = "RPC")
-					EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])
-				else
-					this.iAPIKey := engine[2]
-
-				if !instance.Connect(this.iGoogleMode, engine[2], ObjBindMethod(this, "_onTextCallback")) {
-					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
-
-					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
-				}
-
-				choices := []
-
-				loop 101
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Number", choices)
-
-				choices := []
-
-				loop 10
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Digit", choices)
-			}
-			else if ((engine = "Server") || (engine = "Desktop")) {
-				instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
-
-				this.Instance := instance
-
-				instance.SetEngine(engine)
-			}
-			else if InStr(engine, "Whisper") {
-				if (InStr(engine, "Whisper Server|") = 1) {
-					engine := string2Values("|", engine)
-
-					whisperServerURL := engine[2]
-					this.iAPIKey := whisperServerURL
-
-					engine := engine[1]
-				}
-
-				if (!isDebug() && (engine = "Whisper Local") && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
-					throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
-
-				this.iEngine := engine
-
-				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
-
-				if (engine = "Whisper Server") {
-					this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")
-
-					this.Instance.Connector.Initialize(whisperServerURL, this.Language)
-				}
-
-				choices := []
-
-				loop 101
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Number", choices)
-
-				choices := []
-
-				loop 10
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Digit", choices)
-			}
-			else if InStr(engine, "ElevenLabs|") {
-				engine := string2Values("|", engine)
-
-				this.iEngine := engine[1]
-
-				this.iAPIKey := engine[2]
-
-				this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
-
-				choices := []
-
-				loop 101
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Number", choices)
-
-				choices := []
-
-				loop 10
-					choices.Push((A_Index - 1) . "")
-
-				this.setChoices("Digit", choices)
+					catch Any as exception {
+						if (tries-- <= 0)
+							throw exception
+					}
 			}
 			else
-				throw Exception("Unsupported engine detected in SpeechRecognizer.__New...")
-
-			this.setMode(mode)
-
-			if (engine != "Compiler") {
-				if (!InStr(this.Engine, "Whisper") && (this.Engine != "ElevenLabs") && (this.Instance.OkCheck() != "OK")) {
-					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
-
-					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
-				}
-
-				this.RecognizerList := this.createRecognizerList()
-
-				if (this.RecognizerList.Length == 0) {
-					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
-
-					if (!silent && !kSilentMode)
-						showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
-
-				found := false
-
-				if InStr(this.Engine, "Whisper") {
-					found := true
-
-					if ((recognizer == true) && (language = "en"))
-						recognizer := "medium.en"
-					else if (recognizer == true)
-						recognizer := "medium"
-					else if (recognizer && !inList(kWhisperModels, recognizer))
-						recognizer := "medium"
-				}
-				else if (this.Engine = "ElevenLabs") {
-					found := true
-
-					if (recognizer == true)
-						recognizer := "scribe_v1"
-					else if (recognizer && !inList(kElevenLabsModels, recognizer))
-						recognizer := "scribe_v1"
-				}
-				else if ((recognizer == true) && language) {
-					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if (((recognizerDescriptor.Language = language) || (recognizerDescriptor.Language = "*"))
-						 && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_long"))) {
-							recognizer := recognizerDescriptor.ID
-
-							found := true
-
-							break
-						}
-				}
-				else if (recognizer && (recognizer != true))
-					for ignore, recognizerDescriptor in this.getRecognizerList()
-						if (recognizerDescriptor.Name = recognizer) {
-							recognizer := recognizerDescriptor.ID
-
-							found := true
-
-							break
-						}
-
-				if !found
-					if InStr(this.Engine, "Whisper")
-						recognizer := "medium"
-					else if (this.Engine = "ElevenLabs")
-						recognizer := "scribe_v1"
-					else
-						recognizer := 0
-
-				this.initialize(recognizer)
-			}
+				this.initialize(engine, recognizer, language, silent, mode)
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -678,6 +446,254 @@ class SpeechRecognizer {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}
+		}
+	}
+
+	initialize(engine, recognizer, language, silent, mode) {
+		global kNirCmd
+
+		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration
+		local whisperServerURL, endpoint
+
+		if (engine = "Whisper")
+			engine := "Whisper Local"
+
+		if !InStr(engine, "Whisper") {
+			dllName := ((InStr(engine, "Google|") = 1) ? "Google.Speech.Recognizer.dll" : "Microsoft.Speech.Recognizer.dll")
+			dllFile := (kBinariesDirectory . ((InStr(engine, "Google|") = 1) ? "Google\" : "Microsoft\") . dllName)
+		}
+
+		this.iEngine := engine
+		this.Instance := false
+		this.RecognizerList := []
+		this.iMode := mode
+
+		if !language
+			language := "en"
+
+		this.iLanguage := language
+
+		if (!InStr(engine, "Whisper") && !FileExist(dllFile)) {
+			logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
+
+			throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+		}
+
+		if ((InStr(engine, "Azure|") == 1) || (engine = "Compiler")) {
+			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
+
+			this.Instance := instance
+
+			this.iEngine := ((engine = "Compiler") ? "Compiler" : string2Values("|", engine, 2)[1])
+
+			if (engine != "Compiler") {
+				engine := string2Values("|", engine, 3)
+
+				endpoint := Trim(engine[2])
+
+				if ((endpoint != "") && !InStr(endpoint, "sts/v1.0/issuetoken"))
+					endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "sts/v1.0/issuetoken"
+																			   : "/sts/v1.0/issuetoken")
+
+				this.iAPIKey := engine[3]
+
+				if !instance.Connect(endpoint, engine[3], ObjBindMethod(this, "_onTextCallback")) {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				}
+			}
+
+			choices := []
+
+			loop 101
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Number", choices)
+
+			choices := []
+
+			loop 10
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Digit", choices)
+		}
+		else if (InStr(engine, "Google|") == 1) {
+			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.GoogleSpeechRecognizer")
+
+			this.Instance := instance
+
+			this.iEngine := "Google"
+
+			engine := string2Values("|", engine, 2)
+
+			if (this.iGoogleMode = "RPC")
+				EnvSet("GOOGLE_APPLICATION_CREDENTIALS", engine[2])
+			else
+				this.iAPIKey := engine[2]
+
+			if !instance.Connect(this.iGoogleMode, engine[2], ObjBindMethod(this, "_onTextCallback")) {
+				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+			}
+
+			choices := []
+
+			loop 101
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Number", choices)
+
+			choices := []
+
+			loop 10
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Digit", choices)
+		}
+		else if ((engine = "Server") || (engine = "Desktop")) {
+			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.MicrosoftSpeechRecognizer")
+
+			this.Instance := instance
+
+			instance.SetEngine(engine)
+		}
+		else if InStr(engine, "Whisper") {
+			if (InStr(engine, "Whisper Server|") = 1) {
+				engine := string2Values("|", engine)
+
+				whisperServerURL := engine[2]
+				this.iAPIKey := whisperServerURL
+
+				engine := engine[1]
+			}
+
+			if (!isDebug() && (engine = "Whisper Local") && !FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
+				throw "Unsupported engine detected in SpeechRecognizer.initialize..."
+
+			this.iEngine := engine
+
+			this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
+
+			if (engine = "Whisper Server") {
+				this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Whisper Server Connector.dll").CreateInstance("WhisperServer.WhisperServerConnector")
+
+				this.Instance.Connector.Initialize(whisperServerURL, this.Language)
+			}
+
+			choices := []
+
+			loop 101
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Number", choices)
+
+			choices := []
+
+			loop 10
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Digit", choices)
+		}
+		else if InStr(engine, "ElevenLabs|") {
+			engine := string2Values("|", engine)
+
+			this.iEngine := engine[1]
+
+			this.iAPIKey := engine[2]
+
+			this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
+
+			choices := []
+
+			loop 101
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Number", choices)
+
+			choices := []
+
+			loop 10
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Digit", choices)
+		}
+		else
+			throw "Unsupported engine detected in SpeechRecognizer.initialize..."
+
+		this.setMode(mode)
+
+		if (engine != "Compiler") {
+			if (!InStr(this.Engine, "Whisper") && (this.Engine != "ElevenLabs") && (this.Instance.OkCheck() != "OK")) {
+				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+
+				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+			}
+
+			this.RecognizerList := this.createRecognizerList()
+
+			if (this.RecognizerList.Length == 0) {
+				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
+
+				if (!silent && !kSilentMode)
+					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+
+			found := false
+
+			if InStr(this.Engine, "Whisper") {
+				found := true
+
+				if ((recognizer == true) && (language = "en"))
+					recognizer := "medium.en"
+				else if (recognizer == true)
+					recognizer := "medium"
+				else if (recognizer && !inList(kWhisperModels, recognizer))
+					recognizer := "medium"
+			}
+			else if (this.Engine = "ElevenLabs") {
+				found := true
+
+				if (recognizer == true)
+					recognizer := "scribe_v1"
+				else if (recognizer && !inList(kElevenLabsModels, recognizer))
+					recognizer := "scribe_v1"
+			}
+			else if ((recognizer == true) && language) {
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (((recognizerDescriptor.Language = language) || (recognizerDescriptor.Language = "*"))
+					 && ((this.Engine != "Google") || (recognizerDescriptor.Model = "latest_long"))) {
+						recognizer := recognizerDescriptor.ID
+
+						found := true
+
+						break
+					}
+			}
+			else if (recognizer && (recognizer != true))
+				for ignore, recognizerDescriptor in this.getRecognizerList()
+					if (recognizerDescriptor.Name = recognizer) {
+						recognizer := recognizerDescriptor.ID
+
+						found := true
+
+						break
+					}
+
+			if !found
+				if InStr(this.Engine, "Whisper")
+					recognizer := "medium"
+				else if (this.Engine = "ElevenLabs")
+					recognizer := "scribe_v1"
+				else
+					recognizer := 0
+
+			this.setRecognizer(recognizer)
 		}
 	}
 
@@ -747,7 +763,7 @@ class SpeechRecognizer {
 		return recognizerList
 	}
 
-	initialize(id) {
+	setRecognizer(id) {
 		local recognizer
 
 		; MsgBox id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)

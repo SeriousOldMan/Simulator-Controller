@@ -2013,7 +2013,7 @@ class TeamCenter extends ConfigurationItem {
 					centerGui["pitstopTyreCompound" . tyre . "DropDown"].Choose(value)
 			}
 
-			this.updatetState()
+			this.updateState()
 		}
 
 		copyPressures(*) {

@@ -15,7 +15,7 @@ Let's start with some very low system level settings.
 |------------|----------|---------|-------------|
 | Locations  | Temp     | %homePath%\Documents\Simulator Controller\Temp | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
 |            | Programs | %homePath%\Documents\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
-| Process    | Memory.Max | 1024 | The max memory in MB a process may consume, before it get killed by the watchdog. |
+| Process    | Memory.Max | 2048 | The max memory in MB a process may consume, before it get killed by the watchdog. |
 |            | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
 |            | Memory.WatchDog | 10 | The number of seconds between each run of the memory watchdog. Low numbers may degrade system performance, but if the number is too high a process with a memory problem may be catched too late. *False* will disable the watchdog completely. |
 |            | Zombie.WatchDog | 10 | The number of seconds between each run of watchdog, that checks for processes, that are no longer needed. Low numbers may degrade system performance. *False* will disable the watchdog completely. |

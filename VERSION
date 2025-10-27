@@ -3,7 +3,7 @@ Version=6.6.3.0-dev
 Target=6.6.3.0-release
 Date=10/27/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/gSwhEVBq/Releases/Simulator Controller 6.6.3.0-dev.zip
-Changes=Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again), Fixed redraw of data tab in "Solo Center", Fixed premature end in team races in LMU, Added missing translations, Increased max memory limit to 2048 MB, Fixed corrupted driver IDs in session database
+Changes=Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again), Fixed redraw of data tab in "Solo Center", Fixed premature end in team races in LMU, Added missing translations, Increased max memory limit to 2048 MB, Fixed corrupted driver IDs in session database, Added support for scrollable windows
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
 [Release]
 Version=6.6.2.0-release

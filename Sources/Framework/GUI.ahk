@@ -906,6 +906,7 @@ class Window extends Gui {
 
 	iCloseable := false
 	iResizeable := false
+	iScrollable := false
 
 	iOrigWidth := 0
 	iOrigHeight := 0
@@ -936,6 +937,324 @@ class Window extends Gui {
 
 	iCurrentFont := false
 	iCurrentFontOptions := false
+
+	class ScrollBar {
+		iWindow := false
+		iScrollInfo := Window.Scrollbar.ScrollInfo()
+
+		class ScrollInfo {
+			iScrollInfo := Buffer(28, 0)
+
+			Ptr {
+				Get {
+					return this.iScrollInfo.Ptr
+				}
+			}
+
+			CBSize {
+				Get {
+					return NumGet(this.iScrollInfo, "UInt")
+				}
+			}
+
+			FMask {
+				Get => NumGet(this.iScrollInfo, 4, "uint")
+				Set => NumPut("UInt", value, this.iScrollInfo, 4)
+			}
+
+			Min {
+				Get => NumGet(this.iScrollInfo, 8, "Int")
+				Set => NumPut("Int", value, this.iScrollInfo, 8)
+			}
+
+			Max {
+				Get => NumGet(this.iScrollInfo, 12, "Int")
+				Set => NumPut("Int", value, this.iScrollInfo, 12)
+			}
+
+			Page {
+				Get => NumGet(this.iScrollInfo, 16, "uint")
+				Set => NumPut("uint", value, this.iScrollInfo, 16)
+			}
+
+			Pos {
+				Get => NumGet(this.iScrollInfo, 20, "Int")
+				Set => NumPut("ptr", value, this.iScrollInfo, 20)
+			}
+
+			TrackPos {
+				Get => NumGet(this.iScrollInfo, 24, "Int")
+				Set => NumPut("ptr", value, this.iScrollInfo, 24)
+			}
+
+			__New() {
+				NumPut("UInt", this.iScrollInfo.Size, this.iScrollInfo)
+			}
+		}
+
+		WM_HSCROLL => 0x114
+		WM_VSCROLL => 0x115
+
+		SB_HORZ => 0
+		SB_VERT => 1
+		SB_BOTH => 3
+
+		SIF_RANGE => 1
+		SIF_PAGE => 2
+		SIF_POS => 4
+		SIF_TRACKPOS => 16
+		SIF_ALL => (this.SIF_RANGE | this.SIF_PAGE | this.SIF_POS | this.SIF_TRACKPOS)
+
+		SB_LINELEFT => 0
+		SB_LINEUP => 0
+		SB_LINERIGHT => 1
+		SB_LINEDOWN => 1
+
+		SB_PAGELEFT => 2
+		SB_PAGEUP => 2
+		SB_PAGERIGHT => 3
+		SB_PAGEDOWN => 3
+
+		SB_THUMBPOSITION => 4
+		SB_THUMBTRACK => 5
+
+		SB_LEFT => 6
+		SB_TOP => 6
+		SB_RIGHT => 7
+		SB_BOTTOM => 7
+
+		SB_ENDSCROLL => 8
+
+		Rect := Buffer(16)
+
+		FixedControls := []
+
+		Window {
+			Get {
+				return this.iWindow
+			}
+		}
+
+		__New(window, width, height) {
+			local left, right, top, bottom, scrollHeight, scrollWidth
+
+			if (window is Gui) {
+				this.iWindow := window
+
+				this.ShowScrollBar(this.SB_BOTH, true)
+
+				OnMessage(this.WM_HSCROLL, ObjBindMethod(this, 'ScrollMsg'))
+				OnMessage(this.WM_VSCROLL, ObjBindMethod(this, 'ScrollMsg'))
+
+				this.Window.OnEvent('Size', (*) => this.UpdateScrollBars())
+
+				this.GetEdges(&left, &right, &top, &bottom)
+
+				scrollHeight := (bottom - top)
+				scrollWidth := (right - left)
+
+				if (IsNumber(width) && IsNumber(height) && (width > 0) && (height > 0)) {
+					this.iScrollInfo.Max := scrollHeight
+					this.iScrollInfo.Page := height
+
+					this.iScrollInfo.Mask := (this.SIF_RANGE | this.SIF_PAGE)
+
+					this.SetScrollInfo(this.SB_VERT, true)
+
+					this.iScrollInfo.Max := scrollWidth
+					this.iScrollInfo.Page := width
+
+					this.SetScrollInfo(this.SB_HORZ, true)
+
+					this.iScrollInfo.Mask := this.SIF_ALL
+				}
+				else
+					throw "Width and height must be valid numbers in Window.Scrollbar.__New..."
+			}
+			else
+				throw "Parent is not a Window in Window.Scrollbar.__New..."
+		}
+
+		UpdateFixedControlsPosition() {
+			local ignore, control
+
+			for ignore, control in this.FixedControls
+				control.Move(control.StartX, control.StartY)
+		}
+
+		AddFixedControls(controls) {
+			local ignore, control
+
+			for ignore, control in controls {
+				control.GetPos(&controlX, &controlY)
+				control.StartX := controlX
+				control.StartY := controlY
+
+				this.FixedControls.Push(control)
+			}
+		}
+
+		UpdateScrollBars() {
+			local x := 0
+			local y := 0
+			local left, right, top, bottom, scrollHeight, scrollWidth
+
+			this.GetEdges(&left, &right, &top, &bottom)
+
+			scrollWidth := (right - left)
+			scrollHeight := (bottom - top)
+
+			this.iScrollInfo.Mask := (this.SIF_RANGE | this.SIF_PAGE)
+
+			this.iScrollInfo.Max := scrollHeight
+			this.iScrollInfo.Page := this.GetHeight()
+
+			this.SetScrollInfo(this.SB_VERT, true)
+
+			this.iScrollInfo.Max := scrollWidth
+			this.iScrollInfo.Page := this.GetWidth()
+
+			this.SetScrollInfo(this.SB_HORZ, true)
+
+			if ((left < 0) && (right < this.GetWidth()))
+				x := ((Abs(left) > this.GetWidth() - right) ? (this.GetWidth() - right) : Abs(left))
+
+			if ((top < 0) && (bottom < this.GetHeight()))
+				y := ((Abs(top) > this.GetHeight() - bottom) ? (this.GetHeight() - bottom) : Abs(top))
+
+			if (x || y)
+				DllCall("ScrollWindow", "Ptr", this.Window.Hwnd, "Int", x, "Int", y, "UInt", 0, "UInt", 0)
+
+			this.iScrollInfo.Mask := this.SIF_ALL
+		}
+
+		HiWord(wParam) {
+			Return (wParam >> 16)
+		}
+
+		LoWord(wParam) {
+			Return (wParam & 0xFFFF)
+		}
+
+		ScrollMsg(wParam, lParam, msg, hwnd) {
+			switch msg {
+				case this.WM_HSCROLL:
+					this.ScrollAction(this.SB_HORZ, wParam)
+
+					this.ScrollWindow(this.OldPos - this.iScrollInfo.Pos, 0)
+
+					this.UpdateFixedControlsPosition()
+				case this.WM_VSCROLL:
+					this.ScrollAction(this.SB_VERT, wParam)
+
+					this.ScrollWindow(0, this.OldPos - this.iScrollInfo.Pos)
+
+					this.UpdateFixedControlsPosition()
+			}
+		}
+
+		ScrollAction(typeOfScrollBar, wParam) {
+			local minPos, maxPos, maxThumbPos
+
+			this.GetScrollInfo(typeOfScrollBar)
+
+			this.OldPos := this.iScrollInfo.Pos
+
+			this.GetScrollRange(typeOfScrollBar, &minPos, &maxPos)
+
+			maxThumbPos := (this.iScrollInfo.Max - this.iScrollInfo.Min + 1 - this.iScrollInfo.Page)
+
+			switch this.LoWord(wParam) {
+				case this.SB_LINELEFT, this.SB_LINEUP:
+					this.iScrollInfo.Pos := max(this.iScrollInfo.Pos - 15, minPos)
+				case this.SB_PAGELEFT, this.SB_PAGEUP:
+					this.iScrollInfo.Pos := max(this.iScrollInfo.Pos - this.iScrollInfo.Page, minPos)
+				case this.SB_LINERIGHT, this.SB_LINEDOWN:
+					this.iScrollInfo.Pos := min(this.iScrollInfo.Pos + 15, maxThumbPos)
+				case this.SB_PAGERIGHT, this.SB_PAGEDOWN:
+					this.iScrollInfo.Pos := min(this.iScrollInfo.Pos + this.iScrollInfo.Page, maxThumbPos)
+				case this.SB_THUMBTRACK:
+					this.iScrollInfo.Pos := this.HiWord(wParam)
+				default:
+					return
+			}
+
+			this.SetScrollInfo(typeOfScrollBar, true)
+		}
+
+		GetClientRect() {
+			return DllCall("GetClientRect", "uint", this.Window.Hwnd, "ptr", this.Rect.Ptr)
+		}
+
+		GetHeight() {
+			this.GetClientRect()
+
+			return NumGet(this.Rect, 12, "Int")
+		}
+
+		GetWidth() {
+			this.GetClientRect()
+
+			return NumGet(this.Rect, 8, "Int")
+		}
+
+		GetEdges(&left?, &right?, &top?, &bottom?) {
+			local ignore, control, cX, cY, cW, cH
+
+			left := top := 9999
+			right := bottom := 0
+
+			for ignore, control in WinGetControls(this.Window.Hwnd) {
+				this.Window[control].GetPos(&cX, &cY, &cW, &cH)
+
+				if (cX < left)
+					left := cX
+
+				if (cY < top)
+					top := cY
+
+				if ((cX + cW) > right)
+					right := (cX + cW)
+
+				if ((cY + cH) > bottom)
+					bottom := (cY + cH)
+			}
+
+			/*
+			left -= 8
+			top -= 8
+			right += 8
+			bottom += 8
+			*/
+		}
+
+		ShowScrollBar(typeOfScrollBar, bool) {
+			return DllCall("ShowScrollBar", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int", bool)
+		}
+
+		GetScrollInfo(typeOfScrollBar) {
+			return DllCall("GetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr)
+		}
+
+		SetScrollInfo(typeOfScrollBar, redraw) {
+			return DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
+		}
+
+		GetScrollRange(typeOfScrollBar, &minPos, &maxPos) {
+			local minnn := Buffer(4)
+			local maxxx := Buffer(4)
+			local r := DllCall("GetScrollRange", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", minnn.Ptr, "Ptr", maxxx.Ptr)
+
+			minPos := NumGet(minnn, "Int")
+			maxPos := NumGet(maxxx, "Int")
+
+			return r
+		}
+
+		ScrollWindow(xAmount, yAmount) {
+			return DllCall("ScrollWindow", "Ptr", this.Window.Hwnd, "Int", xAmount, "Int", yAmount, "Ptr", 0, "Ptr", 0, "Int")
+		}
+	}
 
 	class Resizer {
 		iWindow := false
@@ -1189,6 +1508,12 @@ class Window extends Gui {
 		}
 	}
 
+	Scrollable {
+		Get {
+			return this.iScrollable
+		}
+	}
+
 	OrigWidth {
 		Get {
 			return this.iOrigWidth
@@ -1369,6 +1694,8 @@ class Window extends Gui {
 					this.iCloseable := argument
 				case "Resizeable":
 					this.iResizeable := argument
+				case "Scrollable":
+					this.iScrollable := argument
 				case "Descriptor":
 					this.iDescriptor := argument
 
@@ -1545,6 +1872,9 @@ class Window extends Gui {
 
 			this.iMinWidth := width
 			this.iMinHeight := height
+
+			if this.Scrollable
+				Window.Scrollbar(this, width, height)
 
 			if Window.sConstrainWindow
 				this.Opt("MinSize" . cWidth . "x" . cHeight)

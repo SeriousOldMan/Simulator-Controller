@@ -40,6 +40,7 @@
 #### Changes
 
   - Increased default max memory limit for all applications from 1024 MB to 2048 MB to allow for complex data situations, for example, browsing telemetry data for the *Nordschleife*.
+  - [Developer] Added support for scrollable windows in GUI base library.
 
 # Release history
 

@@ -101,7 +101,9 @@ substituteVariables(text, values := false) {
 
 							logError(exception, true)
 
-							value := ""
+							value := ("%" . variable . "%")
+
+							startPos := (endPos + 2)
 						}
 
 					result := StrReplace(result, "%" . variable . "%", value)

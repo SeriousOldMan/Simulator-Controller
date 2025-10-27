@@ -1622,6 +1622,9 @@ class SoloCenter extends ConfigurationItem {
 						center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 
 					WinRedraw(centerGui)
+
+					center.ChartViewer.Resized()
+					center.DetailsViewer.Resized()
 				}
 
 				this.analyzeTelemetry()

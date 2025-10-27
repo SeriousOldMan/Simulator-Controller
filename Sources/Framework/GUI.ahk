@@ -1053,7 +1053,7 @@ class Window extends Gui {
 				scrollHeight := (bottom - top)
 				scrollWidth := (right - left)
 
-				if (IsNumber(width) && IsNumber(height) && (width > 0) && (height > 0)) {
+				if (isNumber(width) && isNumber(height) && (width > 0) && (height > 0)) {
 					this.iScrollInfo.Max := scrollHeight
 					this.iScrollInfo.Page := height
 
@@ -1204,21 +1204,22 @@ class Window extends Gui {
 			left := top := 9999
 			right := bottom := 0
 
-			for ignore, control in WinGetControls(this.Window.Hwnd) {
-				this.Window[control].GetPos(&cX, &cY, &cW, &cH)
+			for ignore, control in WinGetControls(this.Window.Hwnd)
+				try {
+					this.Window[control].GetPos(&cX, &cY, &cW, &cH)
 
-				if (cX < left)
-					left := cX
+					if (cX < left)
+						left := cX
 
-				if (cY < top)
-					top := cY
+					if (cY < top)
+						top := cY
 
-				if ((cX + cW) > right)
-					right := (cX + cW)
+					if ((cX + cW) > right)
+						right := (cX + cW)
 
-				if ((cY + cH) > bottom)
-					bottom := (cY + cH)
-			}
+					if ((cY + cH) > bottom)
+						bottom := (cY + cH)
+				}
 
 			/*
 			left -= 8

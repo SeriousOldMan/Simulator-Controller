@@ -386,7 +386,7 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
-		local tries := 3
+		local tries := 5
 		local audioDevice := this.AudioDevice
 
 		if (audioDevice && kNirCmd)
@@ -407,13 +407,15 @@ class SpeechRecognizer {
 			if (engine = "Server") {
 				loop
 					try {
-						this.initialize(engine, recognizer, language, true, mode)
+						this.initialize(engine, recognizer, language, (tries > 1) ? true : silent, mode, (tries > 1))
 
 						break
 					}
 					catch Any as exception {
-						if (tries-- <= 0)
+						if (--tries <= 0)
 							throw exception
+						else
+							Sleep(100)
 					}
 			}
 			else
@@ -451,7 +453,7 @@ class SpeechRecognizer {
 		}
 	}
 
-	initialize(engine, recognizer, language, silent, mode) {
+	initialize(engine, recognizer, language, silent, mode, log := true) {
 		global kNirCmd
 
 		local dllName, dllFile, instance, choices, found, ignore, recognizerDescriptor, configuration
@@ -476,7 +478,8 @@ class SpeechRecognizer {
 		this.iLanguage := language
 
 		if (!InStr(engine, "Whisper") && !FileExist(dllFile)) {
-			logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
+			if log
+				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
 			throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 		}
@@ -500,8 +503,10 @@ class SpeechRecognizer {
 				this.iAPIKey := engine[3]
 
 				if !instance.Connect(endpoint, engine[3], ObjBindMethod(this, "_onTextCallback")) {
-					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+					if log {
+						logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+						logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+					}
 
 					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
@@ -536,8 +541,10 @@ class SpeechRecognizer {
 				this.iAPIKey := engine[2]
 
 			if !instance.Connect(this.iGoogleMode, engine[2], ObjBindMethod(this, "_onTextCallback")) {
-				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				if log {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				}
 
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
@@ -630,8 +637,10 @@ class SpeechRecognizer {
 
 		if (engine != "Compiler") {
 			if (!InStr(this.Engine, "Whisper") && (this.Engine != "ElevenLabs") && (this.Instance.OkCheck() != "OK")) {
-				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				if log {
+					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
+				}
 
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
@@ -639,7 +648,8 @@ class SpeechRecognizer {
 			this.RecognizerList := this.createRecognizerList()
 
 			if (this.RecognizerList.Length == 0) {
-				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
+				if log
+					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
 				if (!silent && !kSilentMode)
 					showMessage(translate("No languages found while initializing speech recognition system - please install the speech recognition software") . translate("...")
@@ -695,7 +705,7 @@ class SpeechRecognizer {
 				else
 					recognizer := 0
 
-			this.setRecognizer(recognizer)
+			this.setRecognizer(recognizer, log)
 		}
 	}
 
@@ -765,7 +775,7 @@ class SpeechRecognizer {
 		return recognizerList
 	}
 
-	setRecognizer(id) {
+	setRecognizer(id, log := true) {
 		local recognizer
 
 		; MsgBox id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)
@@ -793,7 +803,8 @@ class SpeechRecognizer {
 					return this.Instance.Initialize(id)
 				}
 				catch Any as exception {
-					logError(exception, true)
+					if log
+						logError(exception, true)
 
 					throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 				}

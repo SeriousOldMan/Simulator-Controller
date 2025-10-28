@@ -2006,8 +2006,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		chosen := inList(["Sections", "Automations"], this.TrackEditorMode)
 
-		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose" . chosen . " vtrackEditorTypeDropDown"
+		editorGui.Add("DropDownList", "xp+90 yp w246 X:Move(0.2) W:Grow(0.8) Choose" . chosen . " vtrackEditorTypeDropDown"
 					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorMode)
+		editorGui.Add("Button", "xp+247 yp w23 h23 X:Move Center +0x200 vexplodeTrackMap").OnEvent("Click", (*) => false)
+		setButtonIcon(editorGui["explodeTrackMap"], kIconsDirectory . "Fold Out.ico", 1)
 
 		this.iTrackDisplayArea := [297, 263, 358, 326]
 
@@ -2735,6 +2737,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			for ignore, widget in this.iTrackSectionsWidgets
 				widget.Visible := false
+
+			window["explodeTrackMap"].Enabled := false
 		}
 		else {
 			for ignore, widget in this.iTrackAutomationsWidgets
@@ -2742,6 +2746,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			for ignore, widget in this.iTrackSectionsWidgets
 				widget.Visible := true
+
+			window["explodeTrackMap"].Enabled := true
 		}
 
 		if this.SelectedTrackAutomation {

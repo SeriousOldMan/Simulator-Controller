@@ -1268,7 +1268,7 @@ class TelemetryViewer {
 		else {
 			this.Manager.getSessionInformation(&simulator, &car, &track)
 
-			this.iTrackMap := TrackMap(this, simulator, track)
+			this.iTrackMap := TrackMap(simulator, track, this)
 
 			this.TrackMap.show()
 		}
@@ -2331,6 +2331,8 @@ class TrackMap {
 
 	iEditorTask := false
 
+	iClosed := false
+
 	class TrackMapWindow extends Window {
 		iMap := false
 
@@ -2438,14 +2440,19 @@ class TrackMap {
 		}
 	}
 
-	__New(telemetryViewer, simulator, track) {
+	__New(simulator, track, telemetryViewer := false) {
 		this.iTelemetryViewer := telemetryViewer
 
 		this.iSimulator := simulator
 		this.iTrack := track
+
+		if !telemetryViewer
+			this.iTrackMapMode := "Sections"
 	}
 
 	createGui() {
+		local mapGui
+
 		selectTrackPosition(*) {
 			local coordinateX := false
 			local coordinateY := false
@@ -2464,9 +2471,8 @@ class TrackMap {
 			moved := false
 
 			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
-				if (this.TrackMapMode = "Position") {
+				if (this.TrackMapMode = "Position")
 					this.trackClicked(coordinateX, coordinateY)
-				}
 				else {
 					section := this.findTrackSection(coordinateX, coordinateY)
 
@@ -2526,7 +2532,7 @@ class TrackMap {
 
 		toggleMode(*) {
 			if (this.TrackMapMode = "Position") {
-				this.iTrackMapMode := "Edit"
+				this.iTrackMapMode := "Sections"
 
 				this.Control["editButton"].Text := translate("Save")
 
@@ -2542,6 +2548,16 @@ class TrackMap {
 
 				this.updateTrackMap(this.Simulator, this.Track)
 			}
+		}
+
+		save(*) {
+			this.updateTrackSections(true, false)
+
+			this.close()
+		}
+
+		cancel(*) {
+			this.close()
 		}
 
 		autoSections(*) {
@@ -2593,8 +2609,8 @@ class TrackMap {
 			}
 		}
 
-		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map"
-													 , Closeable: true, Resizeable:  "Deferred", Scrollable: true})
+		mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map"
+											   , Closeable: true, Resizeable:  "Deferred", Scrollable: true})
 
 		this.iWindow := mapGui
 
@@ -2615,15 +2631,21 @@ class TrackMap {
 		mapGui.Add("UpDown", "xp+32 yp w18 h20 X:Move(0) Range100-400 vzoomUpDown", 100)
 		mapGui.Add("Text", "x122 yp+2 w60 X:Move(0) vzoomPercent", translate("%"))
 
-		mapGui.Add("Button", "x415 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
-		mapGui.Add("Button", "x499 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
+		if this.TelemetryViewer {
+			mapGui.Add("Button", "x415 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
+			mapGui.Add("Button", "x499 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
+		}
+		else {
+			mapGui.Add("Button", "x415 yp h20 w80 Center +0x200 X:Move vsaveButton", translate("Save")).OnEvent("Click", save)
+			mapGui.Add("Button", "x499 yp h20 w80 Center +0x200 X:Move vcancelButton", translate("Cancel")).OnEvent("Click", cancel)
+		}
 
 		mapGui.Add("Text", "x8 yp+29 w580 W:Grow 0x10 vdividerLine")
 
 		mapGui.Add(TrackMap.TrackMapResizer(this))
 	}
 
-	show() {
+	show(wait := false) {
 		local sessionDB := SessionDatabase()
 		local x, y, w, h
 
@@ -2720,6 +2742,9 @@ class TrackMap {
 
 		this.createGui()
 
+		if isInstance(wait, Window)
+			this.Window.Opt("+Owner" . wait.Hwnd)
+
 		if getWindowPosition("Telemetry Browser.Track Map", &x, &y)
 			this.Window.Show("x" . x . " y" . y)
 		else
@@ -2727,8 +2752,13 @@ class TrackMap {
 
 		this.Window.Scrollbar.AddFixedControls(collect(["headerBackground", "trackNameDisplay"
 													  , "zoomLabel", "zoomEdit", "zoomUpDown", "zoomPercent"
-													  , "scanButton", "editButton", "dividerLine"]
+													  , "dividerLine"]
 													 , (c) => this.Window[c])*)
+
+		if this.TelemetryViewer
+			this.Window.Scrollbar.AddFixedControls(collect(["scanButton", "editButton"], (c) => this.Window[c])*)
+		else
+			this.Window.Scrollbar.AddFixedControls(collect(["saveButton", "cancelButton"], (c) => this.Window[c])*)
 
 		if getWindowSize("Telemetry Browser.Track Map", &w, &h)
 			this.Window.Resize("Initialize", w, h)
@@ -2736,17 +2766,23 @@ class TrackMap {
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
 						, sessionDB.getTrackImage(this.Simulator, this.Track))
 
-		this.iEditorTask := PeriodicTask(() {
-								if (this.TrackMapMode = "Edit")
-									this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
+		if this.TelemetryViewer {
+			this.iEditorTask := PeriodicTask(() {
+									if (this.TrackMapMode = "Sections")
+										this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
 
-								if WinActive(this.Window)
-									OnMessage(0x0200, showPositionInfo)
-								else
-									OnMessage(0x0200, showPositionInfo, 0)
-							}, 100, kHighPriority)
+									if WinActive(this.Window)
+										OnMessage(0x0200, showPositionInfo)
+									else
+										OnMessage(0x0200, showPositionInfo, 0)
+								}, 100, kHighPriority)
 
-		this.iEditorTask.start()
+			this.iEditorTask.start()
+		}
+
+		if wait
+			while !this.iClosed
+				Sleep(100)
 	}
 
 	close() {
@@ -2756,9 +2792,12 @@ class TrackMap {
 			this.iEditorTask := false
 		}
 
-		this.TelemetryViewer.closedTrackMap()
+		if this.TelemetryViewer
+			this.TelemetryViewer.closedTrackMap()
 
 		this.Window.Destroy()
+
+		this.iClosed := true
 	}
 
 	getSelectedTrackPosition(&x, &y) {
@@ -2777,7 +2816,7 @@ class TrackMap {
 		local candidate, deltaX, deltaY, dX, dY
 		local index, section
 
-		if ((this.TrackMapMode = "Edit") && trackMap) {
+		if ((this.TrackMapMode = "Sections") && trackMap) {
 			candidate := false
 			deltaX := false
 			deltaY := false
@@ -2868,9 +2907,11 @@ class TrackMap {
 
 		this.createTrackMap()
 
-		this.Control["editButton"].Enabled := true
-		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
-		this.Control["editButton"].Text := translate("Edit")
+		if this.TelemetryViewer {
+			this.Control["editButton"].Enabled := true
+			this.Control["scanButton"].Visible := ((this.TrackMapMode = "Sections") && !!this.TelemetryViewer.SelectedLap)
+			this.Control["editButton"].Text := translate("Edit")
+		}
 	}
 
 	unloadTrackMap() {
@@ -2917,7 +2958,8 @@ class TrackMap {
 			else
 				this.createTrackMap()
 
-		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
+		if this.TelemetryViewer
+			this.Control["scanButton"].Visible := ((this.TrackMapMode = "Sections") && !!this.TelemetryViewer.SelectedLap)
 	}
 
 	updateTrackSections(save := false, async := true) {
@@ -2981,7 +3023,8 @@ class TrackMap {
 
 			SessionDatabase().updateTrackMap(this.Simulator, this.Track, this.TrackMap)
 
-			this.TelemetryViewer.trackMapChanged(this.TrackMap)
+			if this.TelemetryViewer
+				this.TelemetryViewer.trackMapChanged(this.TrackMap)
 		}
 
 		sections := this.TrackSections
@@ -3018,7 +3061,8 @@ class TrackMap {
 				this.createTrackMap()
 		}
 
-		this.Control["scanButton"].Visible := ((this.TrackMapMode = "Edit") && !!this.TelemetryViewer.SelectedLap)
+		if this.TelemetryViewer
+			this.Control["scanButton"].Visible := ((this.TrackMapMode = "Sections") && !!this.TelemetryViewer.SelectedLap)
 	}
 
 	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {

@@ -2605,20 +2605,20 @@ class TrackMap {
 		this.iTrackDisplay := mapGui.Add("Picture", "x579 y479 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
 
-		mapGui.Add("Text", "x0 y0 w579 h32 W:Grow vheaderBackground")
+		mapGui.Add("Text", "x0 y0 w579 h40 W:Grow vheaderBackground")
 
-		mapGui.Add("Text", "x138 y2 w306 H:Center Center vtrackNameDisplay")
+		mapGui.Add("Text", "x138 y6 w306 H:Center Center vtrackNameDisplay")
 
-		mapGui.Add("Text", "x8 yp w60 vzoomLabel", translate("Zoom"))
+		mapGui.Add("Text", "x8 yp w60 X:Move(0) vzoomLabel", translate("Zoom"))
 
-		mapGui.Add("Edit", "x70 yp-2 w50 Number Limit3 vzoomEdit", 100).OnEvent("Change", (*) => this.updateTrackMap())
-		mapGui.Add("UpDown", "xp+32 yp w18 h20 Range100-400 vzoomUpDown", 100)
-		mapGui.Add("Text", "x122 yp+2 w60 vzoomPercent", translate("%"))
+		mapGui.Add("Edit", "x70 yp-2 w50 X:Move(0) Number Limit3 vzoomEdit", 100).OnEvent("Change", (*) => this.updateTrackMap())
+		mapGui.Add("UpDown", "xp+32 yp w18 h20 X:Move(0) Range100-400 vzoomUpDown", 100)
+		mapGui.Add("Text", "x122 yp+2 w60 X:Move(0) vzoomPercent", translate("%"))
 
 		mapGui.Add("Button", "x415 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
 		mapGui.Add("Button", "x499 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
 
-		mapGui.Add("Text", "x8 yp+25 w580 W:Grow 0x10 vdividerLine")
+		mapGui.Add("Text", "x8 yp+29 w580 W:Grow 0x10 vdividerLine")
 
 		mapGui.Add(TrackMap.TrackMapResizer(this))
 	}
@@ -3380,7 +3380,7 @@ class TrackMap {
 
 		this.iTrackDisplay.Opt("+Redraw")
 
-		this.Window.Scrollbar.UpdateScrollBars(w, h + 32)
+		this.Window.Scrollbar.UpdateScrollBars(w, h + 40)
 
 		WinRedraw(this.Window)
 	}

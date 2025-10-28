@@ -40,6 +40,7 @@
 #### Changes
 
   - Increased default max memory limit for all applications from 1024 MB to 2048 MB to allow for complex data situations, for example, browsing telemetry data for the *Nordschleife*.
+  - The track map window in the Telemetry Viewer now supports zooming into the map, which is very helpful for tracks like the Nordschleife.
   - [Developer] Added support for scrollable windows in GUI base library.
 
 # Release history

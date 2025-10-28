@@ -2080,7 +2080,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			static lastDocumentation := false
 
-			if (documentation != lastDocumentation) {
+			if (WinActive(this.Window) && (documentation != lastDocumentation)) {
 				lastDocumentation := documentation
 
 				if documentation {

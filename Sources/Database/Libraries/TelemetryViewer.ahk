@@ -2273,7 +2273,6 @@ class SectionInfoViewer {
 			}
 		}
 		else {
-
 			if (section.HasProp("Name") && section.Name)
 				name := (A_Space . section.Name)
 			else
@@ -2594,21 +2593,32 @@ class TrackMap {
 			}
 		}
 
-		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map", Closeable: true, Resizeable:  "Deferred"})
+		local mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map"
+													 , Closeable: true, Resizeable:  "Deferred", Scrollable: true})
 
 		this.iWindow := mapGui
 
 		this.iTrackDisplayArea := [480, 480, 480, 380]
 
-		mapGui.Add("Text", "x88 y2 w306 H:Center Center vtrackNameDisplay")
+		mapGui.Add("Picture", "x0 y50 w579 h479 W:Grow H:Grow vtrackDisplayArea")
 
-		mapGui.Add("Button", "x8 yp h20 w80 Center +0x200 vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
-		mapGui.Add("Button", "x399 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
-
-		mapGui.Add("Picture", "x0 y25 w479 h379 W:Grow H:Grow vtrackDisplayArea")
-
-		this.iTrackDisplay := mapGui.Add("Picture", "x479 y379 BackgroundTrans vtrackDisplay")
+		this.iTrackDisplay := mapGui.Add("Picture", "x579 y479 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
+
+		mapGui.Add("Text", "x0 y0 w579 h32 W:Grow vheaderBackground")
+
+		mapGui.Add("Text", "x138 y2 w306 H:Center Center vtrackNameDisplay")
+
+		mapGui.Add("Text", "x8 yp w60 vzoomLabel", translate("Zoom"))
+
+		mapGui.Add("Edit", "x70 yp-2 w50 Number Limit3 vzoomEdit", 100).OnEvent("Change", (*) => this.updateTrackMap())
+		mapGui.Add("UpDown", "xp+32 yp w18 h20 Range100-400 vzoomUpDown", 100)
+		mapGui.Add("Text", "x122 yp+2 w60 vzoomPercent", translate("%"))
+
+		mapGui.Add("Button", "x415 yp h20 w80 Center +0x200 X:Move vscanButton Hidden", translate("Scan")).OnEvent("Click", autoSections)
+		mapGui.Add("Button", "x499 yp h20 w80 Center +0x200 X:Move veditButton", translate("Edit")).OnEvent("Click", toggleMode)
+
+		mapGui.Add("Text", "x8 yp+25 w580 W:Grow 0x10 vdividerLine")
 
 		mapGui.Add(TrackMap.TrackMapResizer(this))
 	}
@@ -2714,6 +2724,11 @@ class TrackMap {
 			this.Window.Show("x" . x . " y" . y)
 		else
 			this.Window.Show()
+
+		this.Window.Scrollbar.AddFixedControls(collect(["headerBackground", "trackNameDisplay"
+													  , "zoomLabel", "zoomEdit", "zoomUpDown", "zoomPercent"
+													  , "scanButton", "editButton", "dividerLine"]
+													 , (c) => this.Window[c])*)
 
 		if getWindowSize("Telemetry Browser.Track Map", &w, &h)
 			this.Window.Resize("Initialize", w, h)
@@ -3236,13 +3251,14 @@ class TrackMap {
 	createTrackMap(posX?, posY?) {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
+		local zoom := (this.Window["zoomEdit"].Value / 100)
 		local scale := getMultiMapValue(trackMap, "Map", "Scale")
 		local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
 		local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
 		local marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
 		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
-		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
-		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale * zoom)
+		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale * zoom)
 		local x, y, w, h, imgScale, deltaX, deltaY
 		local token, bitmap, graphics, brush, r, imgX, imgY, trackImage
 
@@ -3351,15 +3367,22 @@ class TrackMap {
 		x := Round(x + deltaX)
 		y := Round(y + deltaY)
 
+		w := w * zoom
+		h := h * zoom
+
 		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
 
 		this.iTrackDisplay.Opt("-Redraw")
 
 		ControlMove(x, y, w, h, this.iTrackDisplay)
 
-		this.iTrackDisplay.Value := ("*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage)
+		this.iTrackDisplay.Value := ("*w" . (imgWidth * zoom) . " *h" . (imgHeight * zoom) . A_Space . trackImage)
 
 		this.iTrackDisplay.Opt("+Redraw")
+
+		this.Window.Scrollbar.UpdateScrollBars(w, h + 32)
+
+		WinRedraw(this.Window)
 	}
 }
 

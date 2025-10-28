@@ -377,7 +377,6 @@ class LMUProvider extends Sector397Provider {
 					setMultiMapValue(data, "Session Data", "Active", true)
 					setMultiMapValue(data, "Session Data", "Paused", true)
 				case "Disabled":
-					; setMultiMapValue(data, "Session Data", "Active", false)
 					setMultiMapValue(data, "Session Data", "Paused", false)
 				default:
 					throw "Unknown session state detected in LMUProvider.readSessionData..."

@@ -2774,7 +2774,7 @@ class TrackMap {
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
 						, sessionDB.getTrackImage(this.Simulator, this.Track))
 
-		if this.TelemetryViewer
+		if this.TelemetryViewer {
 			this.iEditorTask := PeriodicTask(() {
 									if (this.TrackMapMode = "Sections")
 										this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
@@ -2784,21 +2784,21 @@ class TrackMap {
 									else
 										OnMessage(0x0200, showPositionInfo, 0)
 								}, 100, kHighPriority)
-		else
-			this.iEditorTask := PeriodicTask(() {
-									if GetKeyState("WheelUp") {
-										this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
-										this.updateTrackMap()
-									}
-									else if GetKeyState("WheelDown") {
-										this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
+			this.iEditorTask.start()
+		}
 
-										this.updateTrackMap()
-									}
-								}, 100, kInterruptPriority)
+		HotKey("WheelUp", (*) {
+			this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
-		this.iEditorTask.start()
+			this.updateTrackMap()
+		})
+
+		HotKey("WheelDown", (*) {
+			this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
+
+			this.updateTrackMap()
+		})
 
 		if wait
 			while !this.iClosed
@@ -2811,6 +2811,9 @@ class TrackMap {
 
 			this.iEditorTask := false
 		}
+
+		HotKey("WheelUp", "Off")
+		HotKey("WheelDown", "Off")
 
 		if this.TelemetryViewer
 			this.TelemetryViewer.closedTrackMap()

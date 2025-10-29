@@ -2343,7 +2343,10 @@ class TrackMap {
 		}
 
 		Close(*) {
-			this.iMap.close()
+			if !this.iMap.TelemetryViewer
+				return true
+			else
+				this.iMap.close()
 		}
 	}
 
@@ -2553,7 +2556,7 @@ class TrackMap {
 		save(*) {
 			this.updateTrackSections(true, false)
 
-			this.close()
+			this.close(true)
 		}
 
 		cancel(*) {
@@ -2610,7 +2613,8 @@ class TrackMap {
 		}
 
 		mapGui := TrackMap.TrackMapWindow(this, {Descriptor: "Telemetry Browser.Track Map"
-											   , Closeable: true, Resizeable:  "Deferred", Scrollable: true})
+											   , Closeable: (this.TelemetryViewer != false)
+											   , Resizeable:  "Deferred", Scrollable: true})
 
 		this.iWindow := mapGui
 
@@ -2785,7 +2789,7 @@ class TrackMap {
 				Sleep(100)
 	}
 
-	close() {
+	close(saved := false) {
 		if this.iEditorTask {
 			this.iEditorTask.stop()
 
@@ -2797,7 +2801,13 @@ class TrackMap {
 
 		this.Window.Destroy()
 
-		this.iClosed := true
+		this.iClosed := (saved ? "Save" : "Cancel")
+	}
+
+	editSections(owner := false) {
+		this.show(owner ? owner : true)
+
+		return (this.iClosed = "Save")
 	}
 
 	getSelectedTrackPosition(&x, &y) {

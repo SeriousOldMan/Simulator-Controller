@@ -95,9 +95,14 @@ This page offers two different editors. The first one allows you to divide the t
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2020.jpg)
 
+##### Editing Track Sections
 To start a new section, simply click on a position on the track and choose whether the following section is considered a corner or a straight. You can also move section starting points around using the mouse. If you want to delete a section starting point, click on it and choose "Delete" from section popup menu. Lastly, you can give the section a name by opening the section menu again and selecting the "Corner..." or the "Straight..." menu item. By the way, the small gray dot marks the start/finish line as recorded by the track mapper.
 
 When defining sections and you want to work with telemetry data or use the on-track coaching of the Driving Coach, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
+
+It is possible to open the track map in an external, zoomable window, which makes editing sections of very long tracks like the Nordschleife much more easy. To open this window click on the small button to the right of the "Edit" drop down menu.
+
+##### Editing Track Automations
 
 With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) in the documentation of the AI Race Spotter, which shows how to setup and use track automations.
 
@@ -155,7 +160,7 @@ Important: This functionality may not be available when using *WebView2* as the 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
-For very long tracks like the Nordschleife, it can be necessary to focus on parts of the track. This can be done by changing the zoom factor in the upper left corner of the window.
+For very long tracks like the Nordschleife, it can be necessary to focus on parts of the track. This can be done by changing the zoom factor in the upper left corner of the window, or by using the mouse wheel, if available, tom zoom in and out.
 
 Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation). When in "Edit" mode, you can either save the edited track sections by clicking on the "Save" button, or you can hold down the Control key and click on the "Cancel" button to discard all changes. Lastly, beside adding all sections by yourself, you can use the "Scan" button to create sections based on the currently selected lap telemetry data. But check the sections after they have been created, because the scanning method may have taken some wrong decisions.
 

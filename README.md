@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.3.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/gSwhEVBq/Releases/Simulator%20Controller%206.6.3.0-dev.zip) (Early build for 6.6.3. Changes: Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again), Fixed redraw of data tab in "Solo Center", Fixed premature end in team races in LMU, Added missing translations, Increased max memory limit to 2048 MB, Fixed corrupted driver IDs in session database, Added support for scrollable windows, Support zoom factor in track map in the Telemetry Viewer.)
+[6.6.3.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/gSwhEVBq/Releases/Simulator%20Controller%206.6.3.0-dev.zip) (Early build for 6.6.3. Changes: Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again), Fixed redraw of data tab in "Solo Center", Fixed premature end in team races in LMU, Added missing translations, Increased max memory limit to 2048 MB, Fixed corrupted driver IDs in session database, Added support for scrollable windows, Support zoom factor in track map in the Telemetry Viewer, Fly out window for track maps in "Session Database".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6630) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-663) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1156,20 +1156,21 @@ class Window extends Gui {
 		}
 
 		ScrollMsg(wParam, lParam, msg, hwnd) {
-			switch msg {
-				case this.WM_HSCROLL:
-					this.ScrollAction(this.SB_HORZ, wParam)
+			try
+				switch msg {
+					case this.WM_HSCROLL:
+						this.ScrollAction(this.SB_HORZ, wParam)
 
-					this.ScrollWindow(this.OldPos - this.iScrollInfo.Pos, 0)
+						this.ScrollWindow(this.OldPos - this.iScrollInfo.Pos, 0)
 
-					this.UpdateFixedControlsPosition()
-				case this.WM_VSCROLL:
-					this.ScrollAction(this.SB_VERT, wParam)
+						this.UpdateFixedControlsPosition()
+					case this.WM_VSCROLL:
+						this.ScrollAction(this.SB_VERT, wParam)
 
-					this.ScrollWindow(0, this.OldPos - this.iScrollInfo.Pos)
+						this.ScrollWindow(0, this.OldPos - this.iScrollInfo.Pos)
 
-					this.UpdateFixedControlsPosition()
-			}
+						this.UpdateFixedControlsPosition()
+				}
 		}
 
 		ScrollOrigin() {
@@ -1277,6 +1278,8 @@ class Window extends Gui {
 			this.iScrollInfo.Mask := this.SIF_ALL
 
 			DllCall("GetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr)
+
+			this.iScrollInfo.Pos := DllCall("GetScrollPos", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int")
 
 			return this.iScrollInfo
 		}

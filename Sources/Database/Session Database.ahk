@@ -1621,6 +1621,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 
+		editTrackSections(*) {
+			this.Window.Block()
+
+			try {
+				if TrackMap(this.SelectedSimulator, this.SelectedTrack).editSections(this.Window)
+					this.selectTrack("Sections")
+			}
+			finally {
+				this.Window.Unblock()
+			}
+		}
+
 		testSettings(*) {
 			local exePath := kBinariesDirectory . "Race Settings.exe"
 			local fileName := kTempDirectory . "Temp.settings"
@@ -2008,7 +2020,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("DropDownList", "xp+90 yp w246 X:Move(0.2) W:Grow(0.8) Choose" . chosen . " vtrackEditorTypeDropDown"
 					, collect(["Sections", "Automations"], translate)).OnEvent("Change", chooseTrackEditorMode)
-		editorGui.Add("Button", "xp+247 yp w23 h23 X:Move Center +0x200 vexplodeTrackMap").OnEvent("Click", (*) => false)
+		editorGui.Add("Button", "xp+247 yp w23 h23 X:Move Center +0x200 vexplodeTrackMap").OnEvent("Click", editTrackSections)
 		setButtonIcon(editorGui["explodeTrackMap"], kIconsDirectory . "Fold Out.ico", 1)
 
 		this.iTrackDisplayArea := [297, 263, 358, 326]
@@ -3595,16 +3607,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	sectionClicked(coordinateX, coordinateY, section) {
 		local oldCoordMode := A_CoordModeMouse
-		local x, y, newSection
-
-		CoordMode("Mouse", "Screen")
-
-		MouseGetPos(&x, &y)
-
-		x := screen2Window(x)
-		y := screen2Window(y)
-
-		CoordMode("Mouse", oldCoordMode)
+		local newSection
 
 		newSection := this.chooseTrackSectionType(section)
 

@@ -2459,6 +2459,9 @@ class TrackMap {
 		selectTrackPosition(*) {
 			local coordinateX := false
 			local coordinateY := false
+			local scrollbar := this.Window.Scrollbar
+			local scrollX := scrollbar.GetScrollInfo(scrollbar.SB_HORZ).Pos
+			local scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
 			local action := false
 			local section := false
 			local x, y, moved, startX, startY, originalX, originalY, currentX, currentY, msgResult
@@ -2473,7 +2476,7 @@ class TrackMap {
 
 			moved := false
 
-			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY)
+			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 				if (this.TrackMapMode = "Position")
 					this.trackClicked(coordinateX, coordinateY)
 				else {
@@ -2531,6 +2534,7 @@ class TrackMap {
 					else
 						this.trackClicked(coordinateX, coordinateY)
 				}
+			}
 		}
 
 		toggleMode(*) {
@@ -2770,7 +2774,7 @@ class TrackMap {
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
 						, sessionDB.getTrackImage(this.Simulator, this.Track))
 
-		if this.TelemetryViewer {
+		if this.TelemetryViewer
 			this.iEditorTask := PeriodicTask(() {
 									if (this.TrackMapMode = "Sections")
 										this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
@@ -2780,9 +2784,21 @@ class TrackMap {
 									else
 										OnMessage(0x0200, showPositionInfo, 0)
 								}, 100, kHighPriority)
+		else
+			this.iEditorTask := PeriodicTask(() {
+									if GetKeyState("WheelUp") {
+										this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
-			this.iEditorTask.start()
-		}
+										this.updateTrackMap()
+									}
+									else if GetKeyState("WheelDown") {
+										this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
+
+										this.updateTrackMap()
+									}
+								}, 100, kInterruptPriority)
+
+		this.iEditorTask.start()
 
 		if wait
 			while !this.iClosed
@@ -3078,8 +3094,15 @@ class TrackMap {
 	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
+		local zoom := (this.Window["zoomEdit"].Value / 100)
+		local scrollbar := this.Window.Scrollbar
+		local scrollX := scrollbar.GetScrollInfo(scrollbar.SB_HORZ).Pos
+		local scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
 		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
 		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		x += scrollX
+		y += scrollY
 
 		if (trackMap && trackImage) {
 			scale := getMultiMapValue(trackMap, "Map", "Scale")
@@ -3140,17 +3163,7 @@ class TrackMap {
 	}
 
 	trackClicked(coordinateX, coordinateY) {
-		local oldCoordMode := A_CoordModeMouse
-		local x, y, action, section
-
-		CoordMode("Mouse", "Screen")
-
-		MouseGetPos(&x, &y)
-
-		x := screen2Window(x)
-		y := screen2Window(y)
-
-		CoordMode("Mouse", oldCoordMode)
+		local action, section
 
 		if (this.TrackMapMode = "Position") {
 			this.TelemetryViewer.TelemetryChart.selectPosition(coordinateX, coordinateY)
@@ -3170,17 +3183,7 @@ class TrackMap {
 	}
 
 	sectionClicked(coordinateX, coordinateY, section) {
-		local oldCoordMode := A_CoordModeMouse
-		local x, y, newSection
-
-		CoordMode("Mouse", "Screen")
-
-		MouseGetPos(&x, &y)
-
-		x := screen2Window(x)
-		y := screen2Window(y)
-
-		CoordMode("Mouse", oldCoordMode)
+		local newSection
 
 		newSection := this.chooseTrackSectionType(section)
 
@@ -3313,6 +3316,9 @@ class TrackMap {
 		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale * zoom)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale * zoom)
+		local scrollbar := this.Window.Scrollbar
+		local scrollX := scrollbar.GetScrollInfo(scrollbar.SB_HORZ).Pos
+		local scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
 		local x, y, w, h, imgScale, deltaX, deltaY
 		local token, bitmap, graphics, brush, r, imgX, imgY, trackImage
 
@@ -3337,7 +3343,7 @@ class TrackMap {
 
 				brush := Gdip_BrushCreateSolid(0xff00ff00)
 
-				r := Round(15 / (imgScale * 3))
+				r := Round((15 / (imgScale * 3)) / zoom)
 
 				imgX := Round((marginX + offsetX + posX) * scale)
 				imgY := Round((marginX + offsetY + posY) * scale)
@@ -3366,7 +3372,7 @@ class TrackMap {
 
 			Gdip_SetSmoothingMode(graphics, 4)
 
-			r := Round(15 / (imgScale * 3))
+			r := Round((15 / (imgScale * 3)) / zoom)
 
 			if (isSet(posX) && isSet(posY)) {
 				brush := Gdip_BrushCreateSolid(0xffB0B0B0)
@@ -3424,7 +3430,7 @@ class TrackMap {
 		w := w * zoom
 		h := h * zoom
 
-		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
+		this.iTrackDisplayArea := [x + scrollX, y + scrollY, w, h]
 
 		this.iTrackDisplay.Opt("-Redraw")
 

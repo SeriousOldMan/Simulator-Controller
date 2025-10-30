@@ -492,6 +492,8 @@ class TelemetryChart {
 		local row := false
 		local coordX, coordY, dx, dy, deltaX, deltaY, row
 
+		threshold /= (this.Window["zoomEdit"].Value / 100)
+
 		if ((data.Length > 0) && data[1].Length > 11) {
 			loop data.Length {
 				coordX := data[A_Index][12]
@@ -2774,8 +2776,10 @@ class TrackMap {
 		this.loadTrackMap(sessionDB.getTrackMap(this.Simulator, this.Track)
 						, sessionDB.getTrackImage(this.Simulator, this.Track))
 
-		if this.TelemetryViewer {
-			this.iEditorTask := PeriodicTask(() {
+		this.iEditorTask := PeriodicTask(() {
+								local scrollbar, scrollInfo, scrollX, scrollY
+
+								if this.TelemetryViewer {
 									if (this.TrackMapMode = "Sections")
 										this.Control["editButton"].Text := translate(GetKeyState("Ctrl") ? "Cancel" : "Save")
 
@@ -2783,10 +2787,22 @@ class TrackMap {
 										OnMessage(0x0200, showPositionInfo)
 									else
 										OnMessage(0x0200, showPositionInfo, 0)
-								}, 100, kHighPriority)
+								}
 
-			this.iEditorTask.start()
-		}
+								if GetKeyState("MButton") {
+									scrollbar := this.Window.Scrollbar
+
+									scrollX := scrollbar.GetScrollInfo(scrollbar.SB_HORZ).Pos
+									scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
+
+									trackMouse("MButton", (startX, startY, newX, newY) {
+										scrollbar.ScrollTo(scrollbar.SB_HORZ, scrollX + (newX - startX))
+										scrollbar.ScrollTo(scrollbar.SB_VERT, scrollY + (newY - startY))
+									})
+								}
+							}, 100, kHighPriority)
+
+		this.iEditorTask.start()
 
 		HotKey("WheelUp", (*) {
 			this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
@@ -2845,6 +2861,8 @@ class TrackMap {
 		local candidate, deltaX, deltaY, dX, dY
 		local index, section
 
+		threshold /= (this.Window["zoomEdit"].Value / 100)
+
 		if ((this.TrackMapMode = "Sections") && trackMap) {
 			candidate := false
 			deltaX := false
@@ -2874,6 +2892,8 @@ class TrackMap {
 		local trackMap := this.TrackMap
 		local index := false
 		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
+
+		threshold /= (this.Window["zoomEdit"].Value / 100)
 
 		if trackMap {
 			candidateX := kUndefined
@@ -3106,6 +3126,8 @@ class TrackMap {
 
 		x += scrollX
 		y += scrollY
+
+		threshold /= (this.Window["zoomEdit"].Value / 100)
 
 		if (trackMap && trackImage) {
 			scale := getMultiMapValue(trackMap, "Map", "Scale")

@@ -1056,7 +1056,7 @@ class Window extends Gui {
 				if (isNumber(width) && isNumber(height) && (width > 0) && (height > 0)) {
 					scrollInfo := this.iScrollInfo
 
-					scrollInfo.Min := 1
+					scrollInfo.Min := 0
 					scrollInfo.Max := scrollHeight
 					scrollInfo.Page := height
 
@@ -1064,7 +1064,7 @@ class Window extends Gui {
 
 					this.SetScrollInfo(this.SB_VERT, true)
 
-					scrollInfo.Min := 1
+					scrollInfo.Min := 0
 					scrollInfo.Max := scrollWidth
 					scrollInfo.Page := width
 
@@ -1116,7 +1116,7 @@ class Window extends Gui {
 
 			scrollInfo.Mask := (this.SIF_RANGE | this.SIF_PAGE)
 
-			scrollInfo.Min := 1
+			scrollInfo.Min := 0
 			scrollInfo.Max := scrollHeight
 			scrollInfo.Page := this.GetHeight()
 
@@ -1124,7 +1124,7 @@ class Window extends Gui {
 
 			scrollInfo := this.GetScrollInfo(this.SB_HORZ)
 
-			scrollInfo.Min := 1
+			scrollInfo.Min := 0
 			scrollInfo.Max := scrollWidth
 			scrollInfo.Page := this.GetWidth()
 
@@ -1141,61 +1141,71 @@ class Window extends Gui {
 			if (x || y)
 				DllCall("ScrollWindow", "Ptr", this.Window.Hwnd, "Int", x, "Int", y, "UInt", 0, "UInt", 0)
 
-			DllCall("SetScrollRange", "Ptr", this.Window.Hwnd, "Int", this.SB_VERT, "Int", 1, "Int", scrollHeight, "Int", false)
-			DllCall("SetScrollRange", "Ptr", this.Window.Hwnd, "Int", this.SB_HORZ, "Int", 1, "Int", scrollWidth, "Int", false)
+			DllCall("SetScrollRange", "Ptr", this.Window.Hwnd, "Int", this.SB_VERT, "Int", 0, "Int", scrollHeight, "Int", false)
+			DllCall("SetScrollRange", "Ptr", this.Window.Hwnd, "Int", this.SB_HORZ, "Int", 0, "Int", scrollWidth, "Int", false)
 
 			scrollInfo.Mask := this.SIF_ALL
 		}
 
-		HiWord(wParam) {
-			Return (wParam >> 16)
-		}
-
-		LoWord(wParam) {
-			Return (wParam & 0xFFFF)
-		}
-
 		ScrollMsg(wParam, lParam, msg, hwnd) {
-			try
-				switch msg {
-					case this.WM_HSCROLL:
-						this.ScrollAction(this.SB_HORZ, wParam)
+			switch msg {
+				case this.WM_HSCROLL:
+					this.ScrollAction(this.SB_HORZ, wParam)
 
-						this.ScrollWindow(this.OldPos - this.iScrollInfo.Pos, 0)
+					this.ScrollWindow(this.OldPos - this.iScrollInfo.Pos, 0)
 
-						this.UpdateFixedControlsPosition()
-					case this.WM_VSCROLL:
-						this.ScrollAction(this.SB_VERT, wParam)
+					this.UpdateFixedControlsPosition()
+				case this.WM_VSCROLL:
+					this.ScrollAction(this.SB_VERT, wParam)
 
-						this.ScrollWindow(0, this.OldPos - this.iScrollInfo.Pos)
+					this.ScrollWindow(0, this.OldPos - this.iScrollInfo.Pos)
 
-						this.UpdateFixedControlsPosition()
-				}
+					this.UpdateFixedControlsPosition()
+			}
 		}
 
 		ScrollOrigin() {
-			this.ScrollTo(this.SB_VERT, 1)
-			this.ScrollTo(this.SB_HORZ, 1)
-
-			this.UpdateScrollBars()
+			this.ScrollTo(this.SB_VERT, 0)
+			this.ScrollTo(this.SB_HORZ, 0)
 		}
 
 		ScrollTo(typeOfScrollBar, position) {
 			local scrollInfo := this.GetScrollInfo(typeOfScrollBar)
+			local delta
 
 			position := Max(scrollInfo.Min, Min(scrollInfo.Max, position))
+			delta := (position - scrollInfo.Pos)
 
-			scrollInfo.Pos := position
-			scrollInfo.TrackPos := position
+			if (delta != 0) {
+				scrollInfo.Pos := position
+				scrollInfo.TrackPos := position
 
-			this.SetScrollInfo(typeOfScrollBar, true)
+				this.SetScrollInfo(typeOfScrollBar, true)
 
-			DllCall("SetScrollPos", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int", position, "Int", true)
+				DllCall("SetScrollPos", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int", position, "Int", true)
+
+				if (typeOfScrollBar = this.SB_HORZ)
+					this.ScrollWindow(delta, 0)
+				else
+					this.ScrollWindow(0, delta)
+
+				this.UpdateFixedControlsPosition()
+
+				this.UpdateScrollBars()
+			}
 		}
 
 		ScrollAction(typeOfScrollBar, wParam) {
 			local scrollInfo := this.GetScrollInfo(typeOfScrollBar)
 			local minPos, maxPos, maxThumbPos
+
+			HiWord(wParam) {
+				return (wParam >> 16)
+			}
+
+			LoWord(wParam) {
+				return (wParam & 0xFFFF)
+			}
 
 			this.OldPos := scrollInfo.Pos
 
@@ -1203,7 +1213,7 @@ class Window extends Gui {
 
 			maxThumbPos := (scrollInfo.Max - scrollInfo.Min + 1 - scrollInfo.Page)
 
-			switch this.LoWord(wParam) {
+			switch LoWord(wParam) {
 				case this.SB_LINELEFT, this.SB_LINEUP:
 					scrollInfo.Pos := Max(scrollInfo.Pos - 15, minPos)
 				case this.SB_PAGELEFT, this.SB_PAGEUP:
@@ -1213,7 +1223,7 @@ class Window extends Gui {
 				case this.SB_PAGERIGHT, this.SB_PAGEDOWN:
 					scrollInfo.Pos := Min(scrollInfo.Pos + scrollInfo.Page, maxThumbPos)
 				case this.SB_THUMBTRACK:
-					scrollInfo.Pos := this.HiWord(wParam)
+					scrollInfo.Pos := HiWord(wParam)
 				default:
 					return
 			}
@@ -1275,11 +1285,18 @@ class Window extends Gui {
 		}
 
 		GetScrollInfo(typeOfScrollBar) {
+			local minPos, maxPos
+
 			this.iScrollInfo.Mask := this.SIF_ALL
 
 			DllCall("GetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr)
 
 			this.iScrollInfo.Pos := DllCall("GetScrollPos", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int")
+
+			this.GetScrollRange(typeOfScrollBar, &minPos, &maxPos)
+
+			this.iScrollInfo.Min := minPos
+			this.iScrollInfo.Max := maxPos
 
 			return this.iScrollInfo
 		}
@@ -2255,52 +2272,56 @@ window2Screen := (value) => Round(value * kScreenResolution / 96)
 
 screen2Window := (value) => Round(value / kScreenResolution * 96)
 
-moveByMouse(window, descriptor := false, *) {
+trackMouse(button, tracker) {
 	local curCoordMode := A_CoordModeMouse
-	local anchorX, anchorY, winX, winY, x, y, newX, newY, settings
+	local startX, startY, x, y
 
 	CoordMode("Mouse", "Screen")
 
 	try {
-		MouseGetPos(&anchorX, &anchorY)
-		WinGetPos(&winX, &winY, , , window)
+		MouseGetPos(&startX, &startY)
 
-		anchorX := screen2Window(anchorX)
-		anchorY := screen2Window(anchorY)
-		winX := screen2Window(winX)
-		winY := screen2Window(winY)
+		startX := screen2Window(startX)
+		startY := screen2Window(startY)
 
-		newX := winX
-		newY := winY
-
-		while GetKeyState("LButton") {
+		while GetKeyState(button) {
 			MouseGetPos(&x, &y)
 
-			x := screen2Window(x)
-			y := screen2Window(y)
-
-			newX := winX + (x - anchorX)
-			newY := winY + (y - anchorY)
-
-			WinMove(newX, newY, , , window)
-		}
-
-		WinGetPos(&winX, &winY, , , window)
-
-		winX := screen2Window(winX)
-		winY := screen2Window(winY)
-
-		if descriptor {
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Window Positions", descriptor . ".X", winX)
-			setMultiMapValue(settings, "Window Positions", descriptor . ".Y", winY)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			tracker.Call(startX, startY, screen2Window(x), screen2Window(y))
 		}
 	}
 	finally {
 		CoordMode("Mouse", curCoordMode)
+	}
+}
+
+moveByMouse(window, descriptor := false, *) {
+	local winX, winY, settings
+
+	WinGetPos(&winX, &winY, , , window)
+
+	winX := screen2Window(winX)
+	winY := screen2Window(winY)
+
+	trackMouse("LButton", (startX, startY, newX, newY) {
+		newX := (winX + (newX - startX))
+		newY := (winY + (newY - startY))
+
+		WinMove(newX, newY, , , window)
+	})
+
+	WinGetPos(&winX, &winY, , , window)
+
+	winX := screen2Window(winX)
+	winY := screen2Window(winY)
+
+	if descriptor {
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		setMultiMapValue(settings, "Window Positions", descriptor . ".X", winX)
+		setMultiMapValue(settings, "Window Positions", descriptor . ".Y", winY)
+
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 	}
 }
 

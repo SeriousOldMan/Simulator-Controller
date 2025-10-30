@@ -942,6 +942,8 @@ class Window extends Gui {
 
 	class ScrollBar {
 		iWindow := false
+		iScrollCallback := false
+
 		iScrollInfo := Window.Scrollbar.ScrollInfo()
 
 		class ScrollInfo {
@@ -1045,8 +1047,10 @@ class Window extends Gui {
 
 				this.ShowScrollBar(this.SB_BOTH, true)
 
-				OnMessage(this.WM_HSCROLL, ObjBindMethod(this, 'ScrollMsg'))
-				OnMessage(this.WM_VSCROLL, ObjBindMethod(this, 'ScrollMsg'))
+				this.iScrollCallback := ObjBindMethod(this, 'ScrollMsg')
+
+				OnMessage(this.WM_HSCROLL, this.iScrollCallback)
+				OnMessage(this.WM_VSCROLL, this.iScrollCallback)
 
 				this.GetEdges(&left, &right, &top, &bottom)
 
@@ -1079,6 +1083,15 @@ class Window extends Gui {
 			}
 			else
 				throw "Parent is not a Window in Window.Scrollbar.__New..."
+		}
+
+		__Delete() {
+			OnMessage(this.WM_HSCROLL, this.iScrollCallback, 0)
+			OnMessage(this.WM_VSCROLL, this.iScrollCallback, 0)
+		}
+
+		Dispose() {
+			this.__Delete()
 		}
 
 		UpdateFixedControlsPosition() {
@@ -1255,22 +1268,21 @@ class Window extends Gui {
 			left := top := 9999
 			right := bottom := 0
 
-			for ignore, control in WinGetControls(this.Window.Hwnd)
-				try {
-					this.Window[control].GetPos(&cX, &cY, &cW, &cH)
+			for ignore, control in WinGetControls(this.Window.Hwnd) {
+				this.Window[control].GetPos(&cX, &cY, &cW, &cH)
 
-					if (cX < left)
-						left := cX
+				if (cX < left)
+					left := cX
 
-					if (cY < top)
-						top := cY
+				if (cY < top)
+					top := cY
 
-					if ((cX + cW) > right)
-						right := (cX + cW)
+				if ((cX + cW) > right)
+					right := (cX + cW)
 
-					if ((cY + cH) > bottom)
-						bottom := (cY + cH)
-				}
+				if ((cY + cH) > bottom)
+					bottom := (cY + cH)
+			}
 
 			/*
 			left -= 8
@@ -1807,6 +1819,16 @@ class Window extends Gui {
 		this.SetFont("s8", "Arial")
 
 		this.InitializeTheme()
+	}
+
+	Destroy() {
+		if this.Scrollbar {
+			this.Scrollbar.Dispose()
+
+			this.iScrollbar := false
+		}
+
+		super.Destroy()
 	}
 
 	static DefineCustomControl(type, constructor) {

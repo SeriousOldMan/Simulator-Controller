@@ -2808,13 +2808,13 @@ class TrackMap {
 			this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
 			this.updateTrackMap()
-		})
+		}, "On")
 
 		HotKey("WheelDown", (*) {
 			this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
 
 			this.updateTrackMap()
-		})
+		}, "On")
 
 		if wait
 			while !this.iClosed

@@ -2631,7 +2631,7 @@ class TrackMap {
 		this.iTrackDisplay := mapGui.Add("Picture", "x579 y479 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackPosition)
 
-		mapGui.Add("Text", "x0 y0 w579 h40 W:Grow vheaderBackground")
+		mapGui.Add("Text", "x0 y0 w588 h40 W:Grow vheaderBackground")
 
 		mapGui.Add("Text", "x138 y6 w306 H:Center Center vtrackNameDisplay")
 
@@ -2796,8 +2796,8 @@ class TrackMap {
 									scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
 
 									trackMouse("MButton", (startX, startY, newX, newY) {
-										scrollbar.ScrollTo(scrollbar.SB_HORZ, scrollX + (newX - startX))
-										scrollbar.ScrollTo(scrollbar.SB_VERT, scrollY + (newY - startY))
+										scrollbar.ScrollTo(scrollbar.SB_HORZ, scrollX + (startX - newX))
+										scrollbar.ScrollTo(scrollbar.SB_VERT, scrollY + (startY - newY))
 									})
 								}
 							}, 100, kHighPriority)

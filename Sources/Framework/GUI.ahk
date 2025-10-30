@@ -1198,13 +1198,11 @@ class Window extends Gui {
 				DllCall("SetScrollPos", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Int", position, "Int", true)
 
 				if (typeOfScrollBar = this.SB_HORZ)
-					this.ScrollWindow(delta, 0)
+					this.ScrollWindow(-delta, 0)
 				else
-					this.ScrollWindow(0, delta)
+					this.ScrollWindow(0, -delta)
 
 				this.UpdateFixedControlsPosition()
-
-				this.UpdateScrollBars()
 			}
 		}
 

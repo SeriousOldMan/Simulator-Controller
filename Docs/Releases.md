@@ -1,5 +1,33 @@
 # Latest stable release
 
+## 6.6.3.0
+
+#### Date: 10/31/25
+
+#### Fixes
+
+  - *Fixed* sporadic initialization problems with the "Windows (Server)" speech recognition by implementing a retry mechanism.
+  - Non-active cars, which are part of the entry list, but are virtually in the garage, are now ignored by the Race Spotter for *Le Mans Ultimate*.
+  - Fixed the handling of the ACC UDP configuration file ("broadcasting.json") after the latest updates by *SimHub* and *Assetto Corsa Competizione* itself.
+  - Triggered a redraw of the complete window of "Solo Center" on tab changes to work around the redraw problems of the data lists in the fourth tab.
+  - Potentially fixed premature end of the session in team races in *Le Mans Ultimate* when jumping back to the "Standings" screen after watching a replay.
+  - Fixed many corrupted entries in the session database, where the byte order mark in UTF-16 files was interpreted as a valid part of the first field of the first row.
+  
+#### Changes
+
+  - Increased default max memory limit for all applications from 1024 MB to 2048 MB to allow for complex data situations, for example, browsing telemetry data for the *Nordschleife*.
+  - The track map window in the Telemetry Viewer now supports zooming in and out of the track map, which is very helpful for tracks like the Nordschleife.
+    - The zoom factor can be controlled by entering a zoom factor between 100% and 400% and it can be cntrolled by turning the mouse wheel.
+	- The track map can be moved by holding down the middle mouse button.
+  - It is now possible to open the track map in "Session Database" in an external, zoomable window, when editing tack sections.
+  - [Developer] Added support for scrollable windows in GUI base library.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.6.2.0
 
 #### Date: 10/24/25
@@ -21,31 +49,7 @@
   - The concurrency handling of the different types of Spotter shout outs has been optimized.
   - Changed the behavior of the "Configuration..." button in the settings editor of "Simulator Startup". It will now open "Simulator Setup" by default or "Simulator Configuration", if the Control key is pressed.
   - [Internal] Added an auto correction for the Azure Speech services endpoint, so that it is no longer necessary to add "/sts/v1.0/issuetoken" to the official endpoint.
-
-# Upcoming release
-
-## 6.6.3.0
-
-#### Date: 10/31/25 (planned)
-
-#### Fixes
-
-  - *Fixed* sporadic initialization problems with the "Windows (Server)" speech recognition by implementing a retry mechanism.
-  - Non-active cars, which are part of the entry list, but are virtually in the garage, are now ignored by the Race Spotter for *Le Mans Ultimate*.
-  - Fixed the handling of the ACC UDP configuration file ("broadcasting.json") after the latest updates by *SimHub* and *Assetto Corsa Competizione* itself.
-  - Triggered a redraw of the complete window of "Solo Center" on tab changes to work around the redraw problems of the data lists in the fourth tab.
-  - Potentially fixed premature end of the session in team races in *Le Mans Ultimate* when jumping back to the "Standings" screen after watching a replay.
-  - Fixed many corrupted entries in the session database, where the byte order mark in UTF-16 files was interpreted as a valid part of the first field of the first row.
   
-#### Changes
-
-  - Increased default max memory limit for all applications from 1024 MB to 2048 MB to allow for complex data situations, for example, browsing telemetry data for the *Nordschleife*.
-  - The track map window in the Telemetry Viewer now supports zooming in and out of the track map, which is very helpful for tracks like the Nordschleife.
-  - It is now possible to open the track map in "Session Database" in an external, zoomable window, when editing tack sections.
-  - [Developer] Added support for scrollable windows in GUI base library.
-
-# Release history
-
 ## 6.6.1.0
 
 #### Date: 10/17/25

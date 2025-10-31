@@ -1348,6 +1348,19 @@ class SettingsImport extends NamedPreset {
 
 				Sleep(500)
 			}
+
+		loop Files (directory . "*.export"), "F" {
+			try {
+				RunWait(kBinariesDirectory . "Session Database.exe -Import `"" . A_LoopFilePath . "`"", kBinariesDirectory)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
+
+			showProgress({progress: (progress += Round(100 / count))})
+
+			Sleep(500)
+		}
 	}
 }
 

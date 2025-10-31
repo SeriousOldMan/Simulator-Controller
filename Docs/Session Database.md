@@ -85,7 +85,7 @@ A detailed overview and description for all available settings and their usage c
 
 You can use the "Export..." button below the settings list to export a set of settings to an external location on your PC, for example, to share them with your team mates. Normally, only the current list of visible settings will be exported, but if you hold down the Control key, all settings from your database will be exported.
 
-When clicking on "Import...", you can select a folder with recently exported settings. A window will open up, which let you choose the settings you want to import into your database.
+When clicking on "Import...", you can select an export file with recently exported settings. A window will open up, which let you choose the settings you want to import into your database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2017.jpg)
 
@@ -272,9 +272,7 @@ Attention: Depending on the given data constellation, the command "Cleanup..." c
 
 ##### Exporting and Importing Data
 
-You can export data that has been checked by clicking on "Export...". You will be prompted to identify the target directory, where a directory containing all the selected data will be created. This export directory will be automatically named "Export_XXYYZZ", where *XXYYZZ* represents the current date and time. You may change the name afterwards, but make sure that you always pass the complete export directory to the target PC, where the data will be imported again.
-
-If you click on "Import..." you will be requested to locate this export directory. When you located a valid export directory, a window opens where you can select all data or only a fraction of the data available in the export package to be imported.
+You can export data that has been checked by clicking on "Export...". If you click on "Import..." you will be requested to locate this export file. When you loaded a valid export file, a window opens where you can select all data or only a fraction of the data available in the export package to be imported.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2011.jpg)
 

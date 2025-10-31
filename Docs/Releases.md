@@ -25,7 +25,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.4.0
+
+#### Date: 11/07/25 (planned)
+
+#### Fixes
+
+  - Fixed header color in Consistencs reports when using the dark UI mode.
+  - Fixed export and import of session in the "Session Database".
+  - Fixed export and import of car/track specific settings in the "Session Database".
+
+#### Changes
+
+  - Reduced the frequency of multiclass specific warnings in multiclass races to give other information shout outs a chance.
+  - Changed the file format of settings and data export in the "Session Database" for better handling.
+    - The team manager package supports the new file formats, but the old *directory* package type is still supported for backward compatibility.
 
 # Release history
 

@@ -12,6 +12,7 @@
   - Triggered a redraw of the complete window of "Solo Center" on tab changes to work around the redraw problems of the data lists in the fourth tab.
   - Potentially fixed premature end of the session in team races in *Le Mans Ultimate* when jumping back to the "Standings" screen after watching a replay.
   - Fixed many corrupted entries in the session database, where the byte order mark in UTF-16 files was interpreted as a valid part of the first field of the first entry.
+  - Added some missing translations.
   
 #### Changes
 

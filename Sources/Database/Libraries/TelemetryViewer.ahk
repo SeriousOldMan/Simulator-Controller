@@ -2692,61 +2692,66 @@ class TrackMap {
 			coordinateX := false
 			coordinateY := false
 
-			if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-				previousAction := false
+			try {
+				if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+					previousAction := false
 
-				currentSection := this.findTrackSection(coordinateX, coordinateY)
+					currentSection := this.findTrackSection(coordinateX, coordinateY)
 
-				if !currentSection
-					currentSection := (coordinateX . ";" . coordinateY)
+					if !currentSection
+						currentSection := (coordinateX . ";" . coordinateY)
 
-				if (currentSection && (currentSection != previousSection)) {
-					ToolTip()
+					if (currentSection && (currentSection != previousSection)) {
+						ToolTip()
 
-					if isObject(currentSection) {
-						if currentSection.HasProp("Nr") {
-							if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
-								positionInfo := (translate(" (") . currentSection.Name . translate(")"))
-							else
-								positionInfo := ""
+						if isObject(currentSection) {
+							if currentSection.HasProp("Nr") {
+								if (currentSection.HasProp("Name") && currentSection.Name && (Trim(currentSection.Name) != ""))
+									positionInfo := (translate(" (") . currentSection.Name . translate(")"))
+								else
+									positionInfo := ""
 
-							switch currentSection.Type, false {
-								case "Corner":
-									positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
-								case "Straight":
-									positionInfo := (translate("Straight") . A_Space . currentSection.Nr . positionInfo . translate(": "))
-								default:
-									throw "Unknown section type detected in SessionDatabaseEditor.show..."
+								switch currentSection.Type, false {
+									case "Corner":
+										positionInfo := (translate("Corner") . A_Space . currentSection.Nr . positionInfo . translate(": "))
+									case "Straight":
+										positionInfo := (translate("Straight") . A_Space . currentSection.Nr . positionInfo . translate(": "))
+									default:
+										throw "Unknown section type detected in SessionDatabaseEditor.show..."
+								}
+
+								positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
 							}
-
-							positionInfo .= (Round(currentSection.X, 3) . translate(", ") . Round(currentSection.Y, 3))
+							else
+								return
 						}
 						else
-							return
+							positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))
+
+						SetTimer(removeToolTip, 0)
+						SetTimer(displayToolTip, 1000)
+
+						previousSection := currentSection
 					}
-					else
-						positionInfo := (Round(string2Values(";", currentSection)[1], 3) . translate(", ") . Round(string2Values(";", currentSection)[2], 3))
+					else if !currentSection {
+						ToolTip()
 
-					SetTimer(removeToolTip, 0)
-					SetTimer(displayToolTip, 1000)
+						SetTimer(removeToolTip, 0)
 
-					previousSection := currentSection
+						previousSection := false
+					}
 				}
-				else if !currentSection {
+				else {
 					ToolTip()
 
 					SetTimer(removeToolTip, 0)
 
+					previousAction := false
 					previousSection := false
 				}
 			}
-			else {
-				ToolTip()
-
-				SetTimer(removeToolTip, 0)
-
-				previousAction := false
-				previousSection := false
+			catch Any {
+				OnMessage(0x0200, showPositionInfo, 0)
 			}
 		}
 
@@ -2789,7 +2794,7 @@ class TrackMap {
 										OnMessage(0x0200, showPositionInfo, 0)
 								}
 
-								if GetKeyState("MButton") {
+								if (GetKeyState("MButton") && WinActive(this.Window)) {
 									scrollbar := this.Window.Scrollbar
 
 									scrollX := scrollbar.GetScrollInfo(scrollbar.SB_HORZ).Pos
@@ -2805,15 +2810,19 @@ class TrackMap {
 		this.iEditorTask.start()
 
 		HotKey("WheelUp", (*) {
-			this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
+			if WinActive(this.Window) {
+				this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
-			this.updateTrackMap()
+				this.updateTrackMap()
+			}
 		}, "On")
 
 		HotKey("WheelDown", (*) {
-			this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
+			if WinActive(this.Window) {
+				this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
 
-			this.updateTrackMap()
+				this.updateTrackMap()
+			}
 		}, "On")
 
 		if wait

@@ -2482,8 +2482,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		static reportedCarsAhead := []
 		static reportedCarsBehind := []
-		static nextFightAheadWarning := false
-		static nextFightBehindWarning := false
+		static nextGeneralWarning := false
+		static nextPodiumWarning := false
+		static nextFightWarning := false
 
 		try {
 			if (carsBehind.Length > 0) {
@@ -2500,7 +2501,7 @@ class RaceSpotter extends GridRaceAssistant {
 					return (spoken := true)
 				}
 
-				if (A_TickCount > nextFightBehindWarning)
+				if (A_TickCount > nextFightWarning)
 					for index, carBehind in carsBehind
 						for otherIndex, otherCarBehind in carsBehind
 							if ((otherIndex > index) && (Abs(carBehind.Position["Class"] - otherCarBehind.Position["Class"]) = 1)
@@ -2510,7 +2511,7 @@ class RaceSpotter extends GridRaceAssistant {
 													 && carBehind.inFight(otherCarBehind)) {
 								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
-								nextFightBehindWarning := (A_TickCount + 20000)
+								nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 								return (spoken := true)
 							}
@@ -2520,16 +2521,28 @@ class RaceSpotter extends GridRaceAssistant {
 				if !inList(reportedCarsBehind, carBehind) {
 					position := carBehind.Position["Class"]
 
-					if (position <= 5) {
+					if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
 
-						return (spoken := true)
-					}
-					else {
-						fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
+						nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 						return (spoken := true)
 					}
+					else if (A_TickCount > nextGeneralWarning)
+						if (position <= 5) {
+							fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
+
+							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+							return (spoken := true)
+						}
+						else {
+							fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
+
+							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+							return (spoken := true)
+						}
 				}
 			}
 			else {
@@ -2550,7 +2563,7 @@ class RaceSpotter extends GridRaceAssistant {
 							return (spoken := true)
 						}
 
-						if (A_TickCount > nextFightAheadWarning)
+						if (A_TickCount > nextFightWarning)
 							for index, carAhead in carsAhead
 								for otherIndex, otherCarAhead in carsAhead
 									if ((otherIndex > index) && (Abs(carAhead.Position["Class"] - otherCarAhead.Position["Class"]) = 1)
@@ -2560,7 +2573,7 @@ class RaceSpotter extends GridRaceAssistant {
 															 && carAhead.inFight(otherCarAhead)) {
 										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
-										nextFightAheadWarning := (A_TickCount + 20000)
+										nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 										return (spoken := true)
 									}
@@ -2570,26 +2583,40 @@ class RaceSpotter extends GridRaceAssistant {
 						if !inList(reportedCarsAhead, carAhead) {
 							position := carAhead.Position["Class"]
 
-							if (position <= 5) {
+							if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 								fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
 
-								return (spoken := true)
-							}
-							else {
-								fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
+								nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 								return (spoken := true)
 							}
+							else if (A_TickCount > nextGeneralWarning)
+								if (position <= 5) {
+									fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
+
+									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+									return (spoken := true)
+								}
+								else {
+									fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
+
+									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+									return (spoken := true)
+								}
 						}
 					}
 				}
 				finally {
-					reportedCarsAhead := carsAhead
+					if spoken
+						reportedCarsAhead := carsAhead
 				}
 			}
 		}
 		finally {
-			reportedCarsBehind := carsBehind
+			if spoken
+				reportedCarsBehind := carsBehind
 		}
 
 		return false

@@ -103,6 +103,8 @@ When defining sections and you want to work with telemetry data or use the on-tr
 
 It is possible to open the track map in an external, zoomable window, which makes editing sections of very long tracks like the Nordschleife much more easy. To open this window click on the small button to the right of the "Edit" drop down menu. Beside using the control in the upper left corner of the window to control the zoom factor, you can use the mouse wheel to zoom and out. Furthermore, the track map can be moved with the mouse by holding down the middle mouse button.
 
+Good to know: Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.
+
 ##### Editing Track Automations
 
 With the second editor you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) in the documentation of the AI Race Spotter, which shows how to setup and use track automations.

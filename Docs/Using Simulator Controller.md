@@ -229,7 +229,7 @@ In many cases all drivers in a given team want to share the same configuration. 
    - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings). Hint: Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
    - You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database".
    
-   Put all the export folders into the folder of the team package.
+   Put all the export files into the folder of the team package.
    
 The content of a typical folder of common team settings should look like this:
 

@@ -1023,7 +1023,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				series := ", series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}"
 
-				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
+				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false, color: '" . this.Window.Theme.TextColor . "'}, ")
 			}
 
 			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#" . this.Window.AltBackColor . "', legend: {textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")

@@ -12,6 +12,7 @@
   - Triggered a redraw of the complete window of "Solo Center" on tab changes to work around the redraw problems of the data lists in the fourth tab.
   - Potentially fixed premature end of the session in team races in *Le Mans Ultimate* when jumping back to the "Standings" screen after watching a replay.
   - Fixed many corrupted entries in the session database, where the byte order mark in UTF-16 files was interpreted as a valid part of the first field of the first entry.
+  - Added some missing translations.
   
 #### Changes
 
@@ -24,7 +25,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.4.0
+
+#### Date: 11/07/25 (planned)
+
+#### Fixes
+
+  - Fixed header color in Consistencs reports when using the dark UI mode.
+  - Fixed export and import of session in the "Session Database".
+  - Fixed export and import of car/track specific settings in the "Session Database".
+
+#### Changes
+
+  - Reduced the frequency of multiclass specific warnings in multiclass races to give other information shout outs a chance.
+  - Changed the file format of settings and data export in the "Session Database" for better handling.
+    - The team manager package supports the new file formats, but the old *directory* package type is still supported for backward compatibility.
 
 # Release history
 

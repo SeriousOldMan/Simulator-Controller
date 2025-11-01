@@ -1311,26 +1311,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		exportData(*) {
-			local folder
+			local fileName := ""
 
 			editor.Window.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translateSelectCancelButtons)
-			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select target folder..."))
-			OnMessage(0x44, translateSelectCancelButtons, 0)
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Export") . translate("..."), "Data (*.export)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
 
-			if (folder != "")
-				editor.exportData(folder . "\Export_" . A_Now)
+			if (fileName != "") {
+				if !InStr(fileName, ".export")
+					fileName .= ".export"
+
+				editor.exportData(fileName)
+			}
 		}
 
 		importData(*) {
-			local folder, info, selection
+			local folder, info, selection, fileName
 
 			editorGui.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translateSelectCancelButtons)
-			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select export folder..."))
-			OnMessage(0x44, translateSelectCancelButtons, 0)
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import") . translate("..."), "Data (*.export)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				withTask(ProgressTask(translate("Importing data")), () {
+					try {
+						folder := temporaryFileName("Data", "export")
+
+						FileCopy(fileName, fileName . ".zip", 1)
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+					}
+					catch Any {
+						folder := ""
+					}
+				})
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {
@@ -1371,26 +1389,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		exportSettings(*) {
 			local full := GetKeyState("Ctrl")
-			local folder
+			local fileName := ""
 
 			editor.Window.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translateSelectCancelButtons)
-			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select target folder..."))
-			OnMessage(0x44, translateSelectCancelButtons, 0)
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Export") . translate("..."), "Settings (*.export)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
 
-			if (folder != "")
-				editor.exportSettings(folder . "\Export_" . A_Now, full || GetKeyState("Ctrl"))
+			if (fileName != "") {
+				if !InStr(fileName, ".export")
+					fileName .= ".export"
+
+				editor.exportSettings(fileName, full || GetKeyState("Ctrl"))
+			}
 		}
 
 		importSettings(*) {
-			local folder, info, selection
+			local folder, info, selection, fileName
 
 			editorGui.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translateSelectCancelButtons)
-			folder := withBlockedWindows(FileSelect, "D1", kDatabaseDirectory, translate("Select export folder..."))
-			OnMessage(0x44, translateSelectCancelButtons, 0)
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import") . translate("..."), "Settings (*.export)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				withTask(ProgressTask(translate("Importing settings")), () {
+					try {
+						folder := temporaryFileName("Settings", "export")
+
+						FileCopy(fileName, fileName . ".zip", 1)
+
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+					}
+					catch Any {
+						folder := ""
+					}
+				})
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {
@@ -3107,15 +3143,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	exportSettings(directory, full := false) {
+	exportSettings(fileName, full := false) {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Blue", title: translate("Exporting Settings")})
 		local settings := newMultiMap()
+		local directory := temporaryFileName("Settings", "export")
 		local progress := 0
 		local count := 0
 		local overall, simulator, ignore, car, track, mode, weather, section, key, value
 
-		directory := normalizeDirectoryPath(directory)
+		DirCreate(directory)
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
 		window.Block()
@@ -3176,6 +3213,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 
+			showProgress({message: translate("Exporting settings") . translate("...")})
+
 			info := newMultiMap()
 
 			setMultiMapValue(info, "General", "Type", "Settings")
@@ -3186,6 +3225,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			writeMultiMap(directory . "\Export.info", info)
 
 			writeMultiMap(directory . "\Export.settings", settings)
+
+			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . fileName . ".zip'", , "Hide")
+
+			FileMove(fileName . ".zip", fileName, 1)
 		}
 		catch Any as exception {
 			logError(exception)
@@ -4377,15 +4420,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.selectData()
 	}
 
-	exportData(directory) {
+	exportData(fileName) {
 		local window := this.Window
+		local directory := temporaryFileName("Data", "export")
+		local targetFileName := fileName
 		local progressWindow := showProgress({color: "Green", title: translate("Exporting Data")})
 		local simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
-		local targetDirectory, sourceDB, targetDB, ignore, type, entry, code, candidate
+		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
-		local type, ext, folder, fileName
+		local ext, folder
 
-		directory := normalizeDirectoryPath(directory)
+		DirCreate(directory)
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
 		window.Block()
@@ -4481,7 +4526,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									try {
 										FileCopy(A_LoopFileFullPath, targetDirectory . type . "\" . A_LoopFileName)
-										FileCopy(folder . "\" . fileName . ".session", targetDirectory . type . "\" . fileName . ".session")
+										FileCopy(folder . "\" . fileName . ".data", targetDirectory . type . "\" . fileName . ".data")
 									}
 									catch Any as exception {
 										logError(exception)
@@ -4551,6 +4596,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				row := this.AdministrationListView.GetNext(row, "C")
 			}
 
+			showProgress({message: translate("Exporting data") . translate("...")})
+
 			info := newMultiMap()
 
 			setMultiMapValue(info, "General", "Type", "Data")
@@ -4565,6 +4612,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				setMultiMapValue(info, "Schema", schema, values2String(",", fields*))
 
 			writeMultiMap(directory . "\Export.info", info)
+
+			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . targetFileName . ".zip'", , "Hide")
+
+			FileMove(targetFileName . ".zip", targetFileName, 1)
 		}
 		catch Any as exception {
 			logError(exception)
@@ -6829,7 +6880,6 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 				for section, values in readMultiMap(directory . "\Export.settings") {
 					section := string2Values(" | ", section)
 
-					section := section[1]
 					car := section[2]
 					track := section[3]
 
@@ -6841,6 +6891,8 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 						mode := "*"
 						weather := section[4]
 					}
+
+					section := section[1]
 
 					showProgress({Progress: Min(A_Index, 100)})
 
@@ -8369,7 +8421,7 @@ startupSessionDatabase() {
 	local requestorPID := false
 	local import := false
 	local index := 1
-	local editor, selection, info
+	local editor, selection, info, folder, fileName
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Session Database"
@@ -8421,7 +8473,21 @@ startupSessionDatabase() {
 
 	try {
 		if import {
-			import := (normalizeDirectoryPath(import) . "\")
+			if InStr(FileExist(import), "D")
+				import := (normalizeDirectoryPath(import) . "\")
+			else {
+				folder := temporaryFileName("Export", "export")
+
+				DirCreate(folder)
+
+				SplitPath(import, &fileName)
+				FileCopy(import, kTempDirectory . fileName . ".zip", 1)
+
+				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+				import := (folder . "\")
+			}
+
 			info := readMultiMap(import . "Export.info")
 
 			editor := SessionDatabaseEditor(getMultiMapValue(info, "General", "Simulator", "Unknown"))

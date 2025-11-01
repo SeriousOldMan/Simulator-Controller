@@ -96,6 +96,10 @@ class SpeechSynthesizer {
 		dLength		: i32
 
 		__New(rate := 16000, bits := 16, channels := 1) {
+			this.initialize(rate, bits, channels)
+		}
+
+		initialize(rate := 16000, bits := 16, channels := 1) {
 			encodeDWORD(string) {
 				local result := 0
 
@@ -108,22 +112,18 @@ class SpeechSynthesizer {
 				return result
 			}
 
-			this.initialize()
-
-			this.nChans := channels
-			this.sRate := rate
-			this.bytesPerSec := (rate * (bits / 8) * channels)
-			this.bytesPerSmp := ((bits / 8) * channels)
-			this.bitsPerSmp	:= bits
-		}
-
-		initialize() {
 			this.riff := encodeDWORD("FFIR")
 			this.wave := encodeDWORD("EVAW")
 			this.fmt := encodeDWORD(" tmf")
 
 			this.fSize := 16
 			this.fTag := 1
+
+			this.nChans := channels
+			this.sRate := rate
+			this.bytesPerSec := (rate * (bits / 8) * channels)
+			this.bytesPerSmp := ((bits / 8) * channels)
+			this.bitsPerSmp	:= bits
 
 			this.data := encodeDWORD("atad")
 		}
@@ -762,15 +762,10 @@ class SpeechSynthesizer {
 			cacheFileName := false
 
 		if kSoX {
-			if (this.Synthesizer = "OpenAI")
-				temp1Name := temporaryFileName("temp1", "wav")
-			else
-				temp1Name := temporaryFileName("temp1", "wav")
+			temp1Name := temporaryFileName("temp1", "wav")
 
 			if cacheFileName
 				temp2Name := cacheFileName
-			else if (this.Synthesizer = "OpenAI")
-				temp2Name := temporaryFileName("temp2", "wav")
 			else
 				temp2Name := temporaryFileName("temp2", "wav")
 
@@ -890,7 +885,8 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
-		local oldStream, stream, ssml, name, model, voice, request, result, header, file, id, extension
+		local oldStream, stream, ssml, name, model, voice, request, result, header, file, id
+		local tempFileName
 
 		if (this.Synthesizer = "Windows") {
 			oldStream := this.iSpeechSynthesizer.AudioOutputStream
@@ -979,36 +975,27 @@ class SpeechSynthesizer {
 				voice := model[2]
 				model := model[1]
 
-				SplitPath(fileName, , , &extension)
-
 				result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/speech"
 											  , JSON.print(Map("model", model, "voice", voice, "input", text
-															 , "repsonse_format", extension
+															 , "repsonse_format", "mp3"
 															 , "speed", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
 											  , Map("Authorization", ("Bearer " . this.iAPIKey)
 												  , "Content-Type", "application/json")
 											  , {Raw: true})
 
 				if ((result.Status >= 200) && (result.Status < 300)) {
-					file := FileOpen(fileName, "w")
+					tempFileName := temporaryFileName("Audio", "mp3")
+
+					file := FileOpen(tempFileName, "w")
 
 					file.RawWrite(result.Raw)
 
-					file := FileOpen(fileName, "w")
-
-					file.Pos := 0
-
-					header := SpeechSynthesizer.WAVHeader(SpeechSynthesizer.sOpenAISampleFrequency)
-
-					file.RawRead(ObjGetDataPtr(header), ObjGetDataSize(header))
-
-					header.initialize()
-
-					file.Pos := 0
-
-					file.RawWrite(ObjGetDataPtr(header), ObjGetDataSize(header))
-
 					file.Close()
+
+					RunWait("`"" . kBinariesDirectory . "Audio Capture\ffmpeg.exe`" -i `"" . tempFileName . "`" -acodec pcm_s16le -ac 1 -ar 16000 `"" . fileName . "`"", , "Hide")
+
+					if !isDebug()
+						deleteFile(tempFileName)
 				}
 				else
 					throw "Error during speech synthesis..."

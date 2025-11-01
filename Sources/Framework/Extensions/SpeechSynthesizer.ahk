@@ -475,20 +475,8 @@ class SpeechSynthesizer {
 			else
 				return []
 		}
-		else if (this.Synthesizer = "OpenAI") {
-			voices := []
-
-			if (Trim(this.iAPIKey) != "") {
-				result := WinHttpRequest().GET(this.iServerURL . "/v1/models?task=text-to-speech", ""
-											 , Map("Authorization", ("Bearer " . this.iAPIKey)), {Encoding: "UTF-8"})
-
-				if ((result.Status >= 200) && (result.Status < 300))
-					for ignore, element in result.JSON["data"]
-						voices.Push(element["id"])
-			}
-
-			return voices
-		}
+		else if (this.Synthesizer = "OpenAI")
+			return []
 		else if (this.Synthesizer = "ElevenLabs") {
 			voices := []
 

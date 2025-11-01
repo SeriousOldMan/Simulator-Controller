@@ -50,6 +50,7 @@ global kAzureVoices := Map("de", [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de
 class SpeechSynthesizer {
 	iSynthesizer := "Windows"
 
+	iServerURL := ""
 	iAPIKey := ""
 
 	iSpeechSynthesizer := false
@@ -68,7 +69,8 @@ class SpeechSynthesizer {
 
 	static sAudioRoutingInitialized := false
 
-	static sSampleFrequency := false
+	static sElevenLabsSampleFrequency := false
+	static sOpenAISampleFrequency := false
 
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
@@ -142,7 +144,7 @@ class SpeechSynthesizer {
 		Get {
 			local voices, voice, lcid, ignore, candidate, name
 
-			if (!language || (this.Synthesizer = "ElevenLabs"))
+			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI"))
 				return this.iVoices
 			else {
 				voices := []
@@ -380,11 +382,20 @@ class SpeechSynthesizer {
 										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
-		else if (InStr(synthesizer, "ElevenLabs|") == 1) {
-			this.iSynthesizer := "ElevenLabs"
+		else if ((InStr(synthesizer, "ElevenLabs|") == 1) || (InStr(synthesizer, "OpenAI|") == 1)) {
+			this.iSynthesizer := ((InStr(synthesizer, "OpenAI|") == 1) ? "OpenAI" : "ElevenLabs")
 
 			try {
-				this.iAPIKey := string2Values("|", synthesizer, 2)[2]
+				if (this.Synthesizer = "OpenAI") {
+					this.iServerURL := Trim(string2Values("|", synthesizer, 3)[2])
+					this.iAPIKey := string2Values("|", synthesizer, 3)[3]
+
+					if (this.iServerURL != "")
+						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
+							this.iServerURL := SubStr(this.iServerURL, 1, StrLen(this.iServerURL) - 1)
+				}
+				else
+					this.iAPIKey := string2Values("|", synthesizer, 2)[2]
 
 				this.iVoices := this.getVoices()
 
@@ -403,11 +414,13 @@ class SpeechSynthesizer {
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
-		if !SpeechSynthesizer.sSampleFrequency {
+		if !SpeechSynthesizer.sElevenLabsSampleFrequency {
 			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
-			SpeechSynthesizer.sSampleFrequency := getMultiMapValue(settings, "Voice", "ElevenLabs.Sample Frequency"
-																 , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
+			SpeechSynthesizer.sElevenLabsSampleFrequency := getMultiMapValue(settings, "Voice", "ElevenLabs.Sample Frequency"
+																		   , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
+			SpeechSynthesizer.sOpenAISampleFrequency := getMultiMapValue(settings, "Voice", "OpenAI.Sample Frequency"
+																	   , getMultiMapValue(settings, "Voice", "Sample Frequency", 24000))
 		}
 
 		if kSox {
@@ -424,7 +437,7 @@ class SpeechSynthesizer {
 	}
 
 	getVoices() {
-		local result, voices, languageCode, voiceInfos, ignore, voiceInfo
+		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
 		if (this.Synthesizer = "Windows") {
 			result := []
@@ -454,6 +467,20 @@ class SpeechSynthesizer {
 			}
 			else
 				return []
+		}
+		else if (this.Synthesizer = "OpenAI") {
+			voices := []
+
+			if (Trim(this.iAPIKey) != "") {
+				result := WinHttpRequest().GET(this.iServerURL . "/v1/models?task=text-to-speech", ""
+											 , Map("Authorization", ("Bearer " . this.iAPIKey)), {Encoding: "UTF-8"})
+
+				if ((result.Status >= 200) && (result.Status < 300))
+					for ignore, element in result.JSON["data"]
+						voices.Push(element["id"])
+			}
+
+			return voices
 		}
 		else if (this.Synthesizer = "ElevenLabs") {
 			voices := []
@@ -565,7 +592,7 @@ class SpeechSynthesizer {
 
 		callback := this.SpeechStatusCallback
 
-		if kSox {
+		if (kSox && (this.Synthesizer != "OpenAI")) {
 			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile, this.AudioSettings)
 
 			if callback
@@ -728,10 +755,15 @@ class SpeechSynthesizer {
 			cacheFileName := false
 
 		if kSoX {
-			temp1Name := temporaryFileName("temp1", "wav")
+			if (this.Synthesizer = "OpenAI")
+				temp1Name := temporaryFileName("temp1", "wav")
+			else
+				temp1Name := temporaryFileName("temp1", "wav")
 
 			if cacheFileName
 				temp2Name := cacheFileName
+			else if (this.Synthesizer = "OpenAI")
+				temp2Name := temporaryFileName("temp2", "wav")
 			else
 				temp2Name := temporaryFileName("temp2", "wav")
 
@@ -780,6 +812,9 @@ class SpeechSynthesizer {
 				try {
 					RunWait("`"" . kSoX . "`" `"" . temp1Name . "`" `"" . temp2Name . "`" rate 16k channels 1 overdrive " . overdriveGain . A_Space . overdriveColor
 																					. " highpass " . filterHighpass . " lowpass " . filterLowpass . " Norm", , "Hide")
+
+					if !FileExist(temp2Name)
+						temp2Name := temp1Name
 
 					if (noiseVolume > 0)
 						RunWait("`"" . kSoX . "`" -m -v " . noiseVolume . " `"" . kResourcesDirectory . "Sounds\Noise.wav`" `""
@@ -832,7 +867,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-		else if inList(["dotNet", "Azure", "Google", "ElevenLabs"], this.Synthesizer) {
+		else if inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs"], this.Synthesizer) {
 			tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 			this.speakToFile(tempName, text)
@@ -848,7 +883,7 @@ class SpeechSynthesizer {
 	}
 
 	speakToFile(fileName, text) {
-		local oldStream, stream, ssml, name, voice, request, result, header, file, id
+		local oldStream, stream, ssml, name, model, voice, request, result, header, file, id
 
 		; this.stop()
 
@@ -933,19 +968,56 @@ class SpeechSynthesizer {
 					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
+		else if (this.Synthesizer = "OpenAI") {
+			try {
+				model := string2Values("/", this.Voice)
+				voice := model[2]
+				model := model[1]
+
+				result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/speech"
+											  , JSON.print(Map("model", model, "voice", voice, "input", text
+															 , "repsonse_format", "wav"
+															 , "speed", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
+											  , Map("Authorization", ("Bearer " . this.iAPIKey)
+												  , "Content-Type", "application/json")
+											  , {Raw: true})
+
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					/*
+					header := SpeechSynthesizer.WAVHeader(SpeechSynthesizer.sOpenAISampleFrequency)
+
+					header.setLength(result.Raw.Size)
+					*/
+
+					file := FileOpen(fileName, "w")
+
+					; file.RawWrite(ObjGetDataPtr(header), ObjGetDataSize(header))
+					file.RawWrite(result.Raw)
+
+					file.Close()
+				}
+				else
+					throw "Error during speech synthesis..."
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI. Maybe your contingent is exhausted.")
+			}
+		}
 		else if (this.Synthesizer = "ElevenLabs") {
 			try {
 				id := (InStr(this.Voice, "(") ? StrReplace(string2Values("(", this.Voice)[2], ")", "") : this.Voice)
 
 				result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/text-to-speech/" . id
-											  . "?output_format=pcm_" . SpeechSynthesizer.sSampleFrequency
+											  . "?output_format=pcm_" . SpeechSynthesizer.sElevenLabsSampleFrequency
 											  , JSON.print(Map("text", text))
 											  , Map("xi-api-key", this.iAPIKey
 												  , "Content-Type", "application/json")
 											  , {Raw: true})
 
 				if ((result.Status >= 200) && (result.Status < 300)) {
-					header := SpeechSynthesizer.WAVHeader(SpeechSynthesizer.sSampleFrequency)
+					header := SpeechSynthesizer.WAVHeader(SpeechSynthesizer.sElevenLabsSampleFrequency)
 
 					header.setLength(result.Raw.Size)
 
@@ -1039,7 +1111,7 @@ class SpeechSynthesizer {
 
 			return true
 		}
-		else if (this.iPlaysCacheFile || inList(["dotNet", "Azure", "Google", "ElevenLabs"], this.Synthesizer)) {
+		else if (this.iPlaysCacheFile || inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs"], this.Synthesizer)) {
 			try
 				playSound("System", "NonExistent.avi")
 
@@ -1143,7 +1215,7 @@ class SpeechSynthesizer {
 					voice := availableVoices[1]
 			}
 		}
-		else if (this.Synthesizer = "ElevenLabs") {
+		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs")) {
 			if (voice == true) {
 				count := availableVoices.Length
 
@@ -1154,7 +1226,7 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
-			else if (voice && InStr(voice, "("))
+			else if (voice && (InStr(voice, "(") || InStr(voice, "/")))
 				return voice
 		}
 
@@ -1194,7 +1266,7 @@ class SpeechSynthesizer {
 			this.iVoice := name[1]
 			this.iLocale := StrReplace(name[2], ")", "")
 		}
-		else if (this.Synthesizer = "ElevenLabs") {
+		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs")) {
 			this.iLanguage := language
 			this.iVoice := name
 		}

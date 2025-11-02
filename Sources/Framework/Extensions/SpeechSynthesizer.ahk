@@ -52,6 +52,7 @@ class SpeechSynthesizer {
 
 	iServerURL := ""
 	iAPIKey := ""
+	iInstructions := ""
 
 	iSpeechSynthesizer := false
 	iVoices := []
@@ -396,6 +397,7 @@ class SpeechSynthesizer {
 				if (this.Synthesizer = "OpenAI") {
 					this.iServerURL := Trim(string2Values("|", synthesizer, 4)[2])
 					this.iAPIKey := string2Values("|", synthesizer, 4)[3]
+					this.iInstructions := StrReplace(string2Values("|", synthesizer, 4)[4], "\n", A_Space)
 
 					if (this.iServerURL != "")
 						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
@@ -966,7 +968,7 @@ class SpeechSynthesizer {
 				result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/speech"
 											  , JSON.print(Map("model", model, "voice", voice, "input", text
 															 , "repsonse_format", "mp3"
-															 , "instructions", "Whisper silently."
+															 , "instructions", this.iInstructions
 															 , "speed", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
 											  , Map("Authorization", ("Bearer " . this.iAPIKey)
 												  , "Content-Type", "application/json")

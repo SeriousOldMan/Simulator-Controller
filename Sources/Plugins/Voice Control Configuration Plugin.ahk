@@ -428,13 +428,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		window.SetFont()
 
-		widget15 := window.Add("Edit", "x" . x1 . " yp-19 w" . w2 . " h21 W:Grow VsoXPathEdit Hidden")
+		widget15 := window.Add("Edit", "x" . x1 . " yp-19 w" . (w2 + 3) . " h21 W:Grow VsoXPathEdit Hidden")
 		widget15.OnEvent("Change", updateConfigurationButton)
 
-		widget16 := window.Add("Button", "x" . x3 . " yp w23 h23 X:Move VsoXPathButton Hidden", translate("..."))
+		widget16 := window.Add("Button", "x" . (x3 + 3) . " yp w23 h23 X:Move VsoXPathButton Hidden", translate("..."))
 		widget16.OnEvent("Click", chooseSoXPath)
 
-		widget17 := window.Add("Button", "x" . x5 . " yp w23 h23 X:Move Disabled VsoXConfigurationButton Hidden")
+		widget17 := window.Add("Button", "x" . (x5 + 3) . " yp w23 h23 X:Move Disabled VsoXConfigurationButton Hidden")
 		widget17.OnEvent("Click", editSoXConfiguration)
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)

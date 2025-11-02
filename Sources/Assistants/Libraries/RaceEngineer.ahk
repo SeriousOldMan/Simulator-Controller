@@ -3383,34 +3383,36 @@ class RaceEngineer extends RaceAssistant {
 		static lastLap := 0
 		static pitstopHistory := false
 
-		if (lapNumber != lastLap) {
-			pitstopHistory := this.createPitstopHistory()
+		if knowledgeBase {
+			if (lapNumber != lastLap) {
+				pitstopHistory := this.createPitstopHistory()
 
-			lastLap := lapNumber
+				lastLap := lapNumber
 
-			lastPitstop := getMultiMapValue(pitstopHistory, "Pitstops", "Count", false)
+				lastPitstop := getMultiMapValue(pitstopHistory, "Pitstops", "Count", false)
 
-			if lastPitstop {
-				knowledgeBase.setFact("Tyre.FL.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft"))
-				knowledgeBase.setFact("Tyre.FR.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight"))
-				knowledgeBase.setFact("Tyre.RL.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft"))
-				knowledgeBase.setFact("Tyre.RR.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight"))
+				if lastPitstop {
+					knowledgeBase.setFact("Tyre.FL.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft"))
+					knowledgeBase.setFact("Tyre.FR.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontRight"))
+					knowledgeBase.setFact("Tyre.RL.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearLeft"))
+					knowledgeBase.setFact("Tyre.RR.Laps", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsRearRight"))
+				}
+				else {
+					knowledgeBase.setFact("Tyre.FL.Laps", lapNumber)
+					knowledgeBase.setFact("Tyre.FR.Laps", lapNumber)
+					knowledgeBase.setFact("Tyre.RL.Laps", lapNumber)
+					knowledgeBase.setFact("Tyre.RR.Laps", lapNumber)
+				}
 			}
 			else {
-				knowledgeBase.setFact("Tyre.FL.Laps", lapNumber)
-				knowledgeBase.setFact("Tyre.FR.Laps", lapNumber)
-				knowledgeBase.setFact("Tyre.RL.Laps", lapNumber)
-				knowledgeBase.setFact("Tyre.RR.Laps", lapNumber)
+				setMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
 			}
-		}
-		else {
-			setMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
-		}
 
-		this.saveSessionInfo(simulator, car, track, lapNumber
-						   , this.createSessionInfo(simulator, car, track
-												  , lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-												  , data, pitstopHistory))
+			this.saveSessionInfo(simulator, car, track, lapNumber
+							   , this.createSessionInfo(simulator, car, track
+													  , lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
+													  , data, pitstopHistory))
+		}
 	}
 
 	addLap(lapNumber, &data) {

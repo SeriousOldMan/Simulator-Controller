@@ -532,7 +532,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 										 , [window["googleSpeakerLabel"], window["googleSpeakerDropDown"], widget40]]
 		this.iGoogleRecognizerWidgets := [[window["googleAPIKeyFileLabel"], window["googleAPIKeyFileEdit"], widget37]]
 
-
 		widget49 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VopenAISpeakerServerURLLabel Hidden", translate("Server URL"))
 		widget50 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VopenAISpeakerServerURLEdit Hidden")
 
@@ -544,20 +543,31 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		halfWidth := (Floor((w1 - 48) / 2) - 2)
 
 		widget54 := window.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VopenAISpeakerModelEdit Hidden")
-		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth + 1) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
+		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 3) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
 
 		widget56 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
 		widget56.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget56, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
-		widget57 := window.Add("Button", "x" . (x1 + 24) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
-		setButtonIcon(widget57, kIconsDirectory . "Gear.ico", 1, "L4 T4 R4 B4")
+		widget57 := window.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		setButtonIcon(widget57, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
+
+		widget58 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VopenAIRecognizerServerURLLabel Hidden", translate("Server URL"))
+		widget59 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VopenAIRecognizerServerURLEdit Hidden")
+
+		widget60 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VopenAIRecognizerAPIKeyLabel Hidden", translate("Service Key"))
+		widget61 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VopenAIRecognizerAPIKeyEdit Hidden")
+
+		widget62 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VopenAIListenerLabel Hidden", translate("Model"))
+		widget63 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VopenAIListenerModelEdit Hidden")
 
 		this.iOpenAISynthesizerWidgets := [[window["openAISpeakerServerURLLabel"], window["openAISpeakerServerURLEdit"]]
 										 , [window["openAISpeakerAPIKeyLabel"], window["openAISpeakerAPIKeyEdit"]]
 										 , [window["openAISpeakerLabel"], window["openAISpeakerModelEdit"]
 										  , window["openAISpeakerVoiceEdit"], widget56, widget57]]
-		this.iOpenAIRecognizerWidgets := []
+		this.iOpenAIRecognizerWidgets := [[window["openAIRecognizerServerURLLabel"], window["openAIRecognizerServerURLEdit"]]
+										 , [window["openAIRecognizerAPIKeyLabel"], window["openAIRecognizerAPIKeyEdit"]]
+										 , [window["openAIListenerLabel"], window["openAIListenerModelEdit"]]]
 
 		widget44 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VelevenLabsAPIKeyLabel Hidden", translate("Service Key"))
 		widget45 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VelevenLabsAPIKeyEdit Hidden")
@@ -584,7 +594,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateLanguage(false)
 
-		loop 57
+		loop 63
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -671,7 +681,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "Azure.TokenIssuer"
 																			, getMultiMapValue(configuration, "Voice Control", "TokenIssuer", ""))
 
-			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "APIKeyFile", "")
+			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "Google.APIKeyFile"
+																			, getMultiMapValue(configuration, "Voice Control"
+																											, "APIKeyFile", ""))
 
 			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
@@ -791,7 +803,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
 										  , "OpenAI|" . Trim(this.Control["openAISpeakerServerURLEdit"].Text) . "|"
 													  . Trim(this.Control["openAISpeakerAPIKeyEdit"].Text) . "|"
-													  . StrReplace(Trim(this.Value["openAISpeakerInstructions"].Text), "`"", "\n"))
+													  . StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`"", "\n"))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
@@ -1791,24 +1803,27 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local titleBarHeight := this.Window.TitleBarHeight
 		local delta
 
-		if !this.iTopOpenAICredentialsVisible {
+		; if !this.iTopOpenAICredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if this.iTopAzureCredentialsVisible
+				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
 					delta := 9
 				else
 					delta := 7
 
 				this.transposeControls(this.iOpenAIRecognizerWidgets, (24 * delta) - 3, titleBarHeight)
 				this.showControls(this.iOpenAIRecognizerWidgets)
-				this.transposeControls(this.iBottomWidgets, 24 * this.iOpenAIRecognizerWidgets.Length, titleBarHeight)
+				this.transposeControls(this.iBottomWidgets, 24 * (this.iOpenAIRecognizerWidgets.Length - 1), titleBarHeight)
+
+				this.Control["listenerLabel"].Visible := false
+				this.Control["listenerDropDown"].Visible := false
 			}
 			else
 				throw "Internal error detected in VoiceControlConfigurator.showOpenAIRecognizerEditor..."
 
 			this.iBottomOpenAICredentialsVisible := true
-		}
+		; }
 
 		this.iRecognizerMode := "OpenAI"
 	}
@@ -1817,25 +1832,27 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local titleBarHeight := this.Window.TitleBarHeight
 		local delta
 
-		if !this.iTopOpenAICredentialsVisible {
+		; if !this.iTopOpenAICredentialsVisible {
 			if (this.iRecognizerMode == "OpenAI") {
 				this.hideControls(this.iOpenAIRecognizerWidgets)
 
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if this.iTopAzureCredentialsVisible
+				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
 					delta := 9
 				else
 					delta := 7
 
 				this.transposeControls(this.iOpenAIRecognizerWidgets, (-24 * delta) + 3, titleBarHeight)
-				this.transposeControls(this.iBottomWidgets, -24 * this.iOpenAIRecognizerWidgets.Length, titleBarHeight)
+				this.transposeControls(this.iBottomWidgets, -24 * (this.iOpenAIRecognizerWidgets.Length - 1), titleBarHeight)
+
+				this.Control["listenerLabel"].Visible := true, this.Control["listenerDropDown"].Visible := true
 			}
 			else if (this.iRecognizerMode != "Init")
 				throw "Internal error detected in VoiceControlConfigurator.hideOpenAIRecognizerEditor..."
 
 			this.iBottomOpenAICredentialsVisible := false
-		}
+		; }
 
 		this.iRecognizerMode := false
 	}

@@ -1475,6 +1475,9 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
+			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
+			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
+			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Google.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control", "APIKey", ""))
@@ -1482,10 +1485,6 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
-
-			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
-			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
-			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 
 			if this.Configuration
 				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
@@ -1583,6 +1582,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", Trim(this.Control["basicOpenAISpeakerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["basicOpenAISpeakerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`n", "\n"))
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
@@ -1608,6 +1609,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.Control["basicOpenAISpeakerServerURLEdit"].Text := this.Value["openAISpeakerServerURL"]
 		this.Control["basicOpenAISpeakerAPIKeyEdit"].Text := this.Value["openAISpeakerAPIKey"]
+		this.Control["basicOpenAISpeakerModelEdit"].Text := this.Value["openAISpeakerModel"]
+		this.Control["basicOpenAISpeakerVoiceEdit"].Text := this.Value["openAISpeakerVoice"]
 
 		this.Control["basicElevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
 

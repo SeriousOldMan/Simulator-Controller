@@ -687,8 +687,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
+			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
+			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
+			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "")
 			this.Value["openAIRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", "")
+			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", "")
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control"
@@ -709,10 +713,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["pushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 			this.Value["pushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 			this.Value["activationCommand"] := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
-
-			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
-			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
-			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 
 			if (this.Value["pushToTalk"] = false)
 				this.Value["pushToTalk"] := ""
@@ -830,10 +830,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", Trim(this.Control["openAISpeakerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["openAISpeakerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["openAISpeakerModelEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`n", "\n"))
 
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", Trim(this.Control["openAIRecognizerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", Trim(this.Control["openAIListenerModelEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "ElevenLaps.APIKey", Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
@@ -928,8 +931,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.Control["openAISpeakerServerURLEdit"].Text := this.Value["openAISpeakerServerURL"]
 		this.Control["openAISpeakerAPIKeyEdit"].Text := this.Value["openAISpeakerAPIKey"]
+		this.Control["openAISpeakerModelEdit"].Text := this.Value["openAISpeakerModel"]
+		this.Control["openAISpeakerVoiceEdit"].Text := this.Value["openAISpeakerVoice"]
 		this.Control["openAIRecognizerServerURLEdit"].Text := this.Value["openAIRecognizerServerURL"]
 		this.Control["openAIRecognizerAPIKeyEdit"].Text := this.Value["openAIRecognizerAPIKey"]
+		this.Control["openAIListenerModelEdit"].Text := this.Value["openAIListenerModel"]
 
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 

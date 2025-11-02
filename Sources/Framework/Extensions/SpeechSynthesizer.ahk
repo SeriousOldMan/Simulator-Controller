@@ -394,8 +394,8 @@ class SpeechSynthesizer {
 
 			try {
 				if (this.Synthesizer = "OpenAI") {
-					this.iServerURL := Trim(string2Values("|", synthesizer, 3)[2])
-					this.iAPIKey := string2Values("|", synthesizer, 3)[3]
+					this.iServerURL := Trim(string2Values("|", synthesizer, 4)[2])
+					this.iAPIKey := string2Values("|", synthesizer, 4)[3]
 
 					if (this.iServerURL != "")
 						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")

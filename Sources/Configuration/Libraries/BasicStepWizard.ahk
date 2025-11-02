@@ -1382,13 +1382,13 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		halfWidth := (Floor((w1 - 48) / 2) - 2)
 
 		widget35 := editorGui.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VbasicOpenAISpeakerModelEdit Hidden")
-		widget36 := editorGui.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 3) . " X:Move(0.5) W:Grow(0.5) VbasicOpenAISpeakerVoiceEdit Hidden")
+		widget36 := editorGui.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 1) . " X:Move(0.5) W:Grow(0.5) VbasicOpenAISpeakerVoiceEdit Hidden")
 
 		widget37 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
 		widget37.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget37, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
-		widget38 := editorGui.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget38 := editorGui.Add("Button", "x" . (x1 + 24 + 5) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
 		setButtonIcon(widget38, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
 		this.iOpenAISynthesizerWidgets := [[editorGui["basicOpenAISpeakerServerURLLabel"], editorGui["basicOpenAISpeakerServerURLEdit"]]

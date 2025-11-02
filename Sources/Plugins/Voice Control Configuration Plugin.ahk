@@ -543,13 +543,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		halfWidth := (Floor((w1 - 48) / 2) - 2)
 
 		widget54 := window.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VopenAISpeakerModelEdit Hidden")
-		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 3) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
+		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 1) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
 
 		widget56 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
 		widget56.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget56, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
-		widget57 := window.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget57 := window.Add("Button", "x" . (x1 + 24 + 5) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
 		setButtonIcon(widget57, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
 		widget58 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VopenAIRecognizerServerURLLabel Hidden", translate("Server URL"))

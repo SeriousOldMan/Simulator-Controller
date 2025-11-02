@@ -966,6 +966,7 @@ class SpeechSynthesizer {
 				result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/speech"
 											  , JSON.print(Map("model", model, "voice", voice, "input", text
 															 , "repsonse_format", "mp3"
+															 , "instructions", "Whisper silently."
 															 , "speed", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
 											  , Map("Authorization", ("Bearer " . this.iAPIKey)
 												  , "Content-Type", "application/json")

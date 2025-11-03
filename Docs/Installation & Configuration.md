@@ -375,7 +375,9 @@ If you choose "OpenAI API", you can connect to any server, which implements the 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20OpenAI%20API.JPG)
 
-For OpenAI itself, use the https://api.openai.com as *Server URL* and enter the API key, which you have created in OpenAI portal. Then decide which of the available models and which voice you want to use and enter them into the corresponding fields. You can also use these services for speech recognition, if required.
+For OpenAI itself, use the https://api.openai.com as *Server URL* and enter the API key, which you have created in OpenAI portal. Then decide which of the available models and which voice you want to use and enter them into the corresponding fields. Depending on the capabilities of the chosen model, instructions can be used to control aspects of the voice, such as tone of voice, pronunciation, pitch, etc. To provide those instructions click on the small button with the "Gear" icon to the right of the *Voice* input field.
+
+You can also use these services for speech recognition, if required.
 
 Beside the services of OpenAI itself, you can use any OpenAI compatible speech service provider. There are also solutions available, which can be hosted and run locally, for example on your own private AI server. https://speaches.ai, for example,  has become famous recently for providing a great solutiion for local speech services, but there are also other good solutions available on GitHub.
 

@@ -428,13 +428,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		window.SetFont()
 
-		widget15 := window.Add("Edit", "x" . x1 . " yp-19 w" . w2 . " h21 W:Grow VsoXPathEdit Hidden")
+		widget15 := window.Add("Edit", "x" . x1 . " yp-19 w" . (w2 + 3) . " h21 W:Grow VsoXPathEdit Hidden")
 		widget15.OnEvent("Change", updateConfigurationButton)
 
-		widget16 := window.Add("Button", "x" . x3 . " yp w23 h23 X:Move VsoXPathButton Hidden", translate("..."))
+		widget16 := window.Add("Button", "x" . (x3 + 3) . " yp w23 h23 X:Move VsoXPathButton Hidden", translate("..."))
 		widget16.OnEvent("Click", chooseSoXPath)
 
-		widget17 := window.Add("Button", "x" . x5 . " yp w23 h23 X:Move Disabled VsoXConfigurationButton Hidden")
+		widget17 := window.Add("Button", "x" . (x5 + 3) . " yp w23 h23 X:Move Disabled VsoXConfigurationButton Hidden")
 		widget17.OnEvent("Click", editSoXConfiguration)
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)
@@ -543,13 +543,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		halfWidth := (Floor((w1 - 48) / 2) - 2)
 
 		widget54 := window.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VopenAISpeakerModelEdit Hidden")
-		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 3) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
+		widget55 := window.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 1) . " X:Move(0.5) W:Grow(0.5) VopenAISpeakerVoiceEdit Hidden")
 
 		widget56 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
 		widget56.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget56, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
-		widget57 := window.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget57 := window.Add("Button", "x" . (x1 + 24 + 5) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
 		widget57.OnEvent("Click", (*) => this.editInstructions())
 		setButtonIcon(widget57, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
@@ -688,8 +688,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
+			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
+			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
+			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "")
 			this.Value["openAIRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", "")
+			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", "")
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control"
@@ -710,10 +714,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["pushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 			this.Value["pushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 			this.Value["activationCommand"] := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
-
-			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
-			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
-			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 
 			if (this.Value["pushToTalk"] = false)
 				this.Value["pushToTalk"] := ""
@@ -831,10 +831,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", Trim(this.Control["openAISpeakerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["openAISpeakerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["openAISpeakerModelEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`n", "\n"))
 
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", Trim(this.Control["openAIRecognizerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", Trim(this.Control["openAIListenerModelEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "ElevenLaps.APIKey", Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
@@ -929,8 +932,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.Control["openAISpeakerServerURLEdit"].Text := this.Value["openAISpeakerServerURL"]
 		this.Control["openAISpeakerAPIKeyEdit"].Text := this.Value["openAISpeakerAPIKey"]
+		this.Control["openAISpeakerModelEdit"].Text := this.Value["openAISpeakerModel"]
+		this.Control["openAISpeakerVoiceEdit"].Text := this.Value["openAISpeakerVoice"]
 		this.Control["openAIRecognizerServerURLEdit"].Text := this.Value["openAIRecognizerServerURL"]
 		this.Control["openAIRecognizerAPIKeyEdit"].Text := this.Value["openAIRecognizerAPIKey"]
+		this.Control["openAIListenerModelEdit"].Text := this.Value["openAIListenerModel"]
 
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 

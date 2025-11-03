@@ -386,6 +386,8 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false, mode := "Grammar") {
+		global kNirCmd
+
 		local tries := 5
 		local audioDevice := this.AudioDevice
 

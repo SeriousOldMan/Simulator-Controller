@@ -397,7 +397,9 @@ class SpeechSynthesizer {
 				if (this.Synthesizer = "OpenAI") {
 					this.iServerURL := Trim(string2Values("|", synthesizer, 4)[2])
 					this.iAPIKey := string2Values("|", synthesizer, 4)[3]
-					this.iInstructions := StrReplace(string2Values("|", synthesizer, 4)[4], "\n", A_Space)
+
+					try
+						this.iInstructions := StrReplace(string2Values("|", synthesizer, 4)[4], "\n", A_Space)
 
 					if (this.iServerURL != "")
 						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
@@ -953,10 +955,19 @@ class SpeechSynthesizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				if (this.Synthesizer = "Azure")
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
-				else if (this.Synthesizer = "Google")
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+				try {
+					if (this.Synthesizer = "Azure")
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+					else if (this.Synthesizer = "Google")
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						if (this.Synthesizer = "Azure")
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+						else if (this.Synthesizer = "Google")
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
 			}
 		}
 		else if (this.Synthesizer = "OpenAI") {
@@ -967,7 +978,7 @@ class SpeechSynthesizer {
 
 				result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/speech"
 											  , JSON.print(Map("model", model, "voice", voice, "input", text
-															 , "repsonse_format", "mp3"
+															 , "response_format", "mp3"
 															 , "instructions", this.iInstructions
 															 , "speed", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
 											  , Map("Authorization", ("Bearer " . this.iAPIKey)
@@ -994,7 +1005,13 @@ class SpeechSynthesizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI. Maybe your contingent is exhausted.")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+				}
 			}
 		}
 		else if (this.Synthesizer = "ElevenLabs") {
@@ -1026,7 +1043,12 @@ class SpeechSynthesizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+				}
 			}
 		}
 	}

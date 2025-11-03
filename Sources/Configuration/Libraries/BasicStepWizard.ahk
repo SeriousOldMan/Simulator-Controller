@@ -758,7 +758,7 @@ class BasicStepWizard extends StepWizard {
 
 	loadVoices(assistant := false, editor := true) {
 		local assistants := (assistant ? [assistant] : this.Definition)
-		local voices, language, ignore, dropDown, index
+		local voices, language, ignore, dropDown, index, voice
 
 		for ignore, assistant in assistants {
 			language := this.assistantLanguage(assistant, editor)
@@ -771,11 +771,14 @@ class BasicStepWizard extends StepWizard {
 			dropDown.Add((voices.Length > 0) ? concatenate(collect(["Deactivated", "Random"], translate), voices) : [translate("Deactivated")])
 			dropDown.Choose((voices.Length > 0) ? 2 : 1)
 
-			if (!editor && (voices.Length > 1)) {
-				voice := this.SetupWizard.getModuleValue(assistant, "Voice", true)
+			voice := this.SetupWizard.getModuleValue(assistant, "Voice", true)
 
-				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
+			if ((voices.Length = 0) && voice && (voice != true)) {
+				dropDown.Add([voice])
+				dropDown.Choose(2)
 			}
+			else if (!editor && (voices.Length > 1))
+				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
 		}
 	}
 

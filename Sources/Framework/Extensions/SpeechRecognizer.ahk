@@ -892,7 +892,21 @@ class SpeechRecognizer {
 				}
 			}
 			else if !InStr(this.Engine, "Whisper")
-				return this.Instance.StartRecognizer()
+				try {
+					return this.Instance.StartRecognizer()
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					if (this.Engine = "Azure")
+						try {
+							SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+						}
+						catch Any {
+							try
+								SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+						}
+				}
 			else
 				return false
 		}
@@ -928,7 +942,16 @@ class SpeechRecognizer {
 				return false
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
+
+			if (this.Engine = "Azure")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+				}
 		}
 		finally {
 			if (audioDevice && kNirCmd) {
@@ -981,7 +1004,13 @@ class SpeechRecognizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
 			}
 		}
 		else if this.Model {
@@ -1060,7 +1089,13 @@ class SpeechRecognizer {
 				catch Any as exception {
 					logError(exception, true)
 
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI. Maybe your contingent is exhausted.")
+					try {
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+					}
+					catch Any {
+						try
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+					}
 				}
 			}
 			else if (this.Engine = "ElevenLabs") {
@@ -1084,7 +1119,13 @@ class SpeechRecognizer {
 				catch Any as exception {
 					logError(exception, true)
 
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					try {
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					}
+					catch Any {
+						try
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					}
 				}
 			}
 		}

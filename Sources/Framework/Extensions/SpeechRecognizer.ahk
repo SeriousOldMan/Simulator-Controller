@@ -866,14 +866,11 @@ class SpeechRecognizer {
 				}
 			}
 
-			if ((this.Engine = "Google") || (InStr(this.Engine, "Whisper") && this.Model)) {
+			if (this.Engine = "Google") {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
-					if InStr(this.Engine, "Whisper")
-						return this.Instance.AudioRecorder.StartRecognizer(this.iCapturedAudioFile)
-					else
-						return this.Instance.StartRecognizer(this.iCapturedAudioFile)
+					return this.Instance.StartRecognizer(this.iCapturedAudioFile)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -881,7 +878,7 @@ class SpeechRecognizer {
 					return false
 				}
 			}
-			else if ((this.Engine = "OpenAI") || (this.Engine = "ElevenLabs")) {
+			else if ((this.Engine = "OpenAI") || (this.Engine = "ElevenLabs") || (InStr(this.Engine, "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {

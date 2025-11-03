@@ -73,6 +73,8 @@ class SpeechSynthesizer {
 	static sElevenLabsSampleFrequency := false
 	static sOpenAISampleFrequency := false
 
+	static sInitializePostProcessing := true
+
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
@@ -447,6 +449,10 @@ class SpeechSynthesizer {
 		this.setPitch(0)
 	}
 
+	static initializePostProcessing(configuration) {
+		SpeechSynthesizer.sInitializePostProcessing := true
+	}
+
 	getVoices() {
 		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
@@ -679,12 +685,13 @@ class SpeechSynthesizer {
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
-		static sOverdriveGain := kUndefined
-		static sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
+		static sOverdriveGain, sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
 
 		static counter := 1
 
-		if (sOverDriveGain = kUndefined) {
+		if SpeechSynthesizer.sInitializePostProcessing {
+			SpeechSynthesizer.sInitializePostProcessing := false
+
 			sOverdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
 			sOverdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
 			sFilterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)

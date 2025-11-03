@@ -2163,6 +2163,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		kSimulatorConfiguration := configuration
 
+		SpeechSynthesizer.initializePostProcessing(kSimulatorConfiguration)
+
 		try {
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 			language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
@@ -2178,6 +2180,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration
+
+			SpeechSynthesizer.initializePostProcessing(kSimulatorConfiguration)
 		}
 	}
 

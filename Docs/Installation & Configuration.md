@@ -369,6 +369,18 @@ As an alternative to the Azure cloud services, corresponding Google services are
 
 IMPORTANT: It is necessary to use one of the cloud based speech recognition services or the Whisper Runtime described below, if you want to talk to Aiden, the AI Driving Coach. This is necessary, since the interaction with Aiden does not use pattern based commands, for which the builtin speech recognition engines of Windows are optimized for (the *Desktop* engine can actually handle a bit of free speech, but not very well). The aforementioned speech recognition services of Azure, Google or the free Whisper are way better, when it comes to free speech.
 
+###### OpenAI API
+
+If you choose "OpenAI API", you can connect to any server, which implements the standard OpenAI audio API.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20OpenAI%20API.JPG)
+
+For OpenAI itself, use the https://api.openai.com as *Server URL* and enter the API key, which you have created in OpenAI portal. Then decide which of the available models and which voice you want to use and enter them into the corresponding fields. Depending on the capabilities of the chosen model, instructions can be used to control aspects of the voice, such as tone of voice, pronunciation, pitch, etc. To provide those instructions click on the small button with the "Gear" icon to the right of the *Voice* input field.
+
+You can also use these services for speech recognition, if required.
+
+Beside the services of OpenAI itself, you can use any OpenAI compatible speech service provider. There are also solutions available, which can be hosted and run locally, for example on your own private AI server. [Speaches.ai](https://speaches.ai), for example,  has become famous recently for providing a great solutiion for local speech services, but there are also other good solutions available on GitHub.
+
 ###### ElevenLabs
 
 ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs allows you to create new voices by using an AI to analyze the voice of any speaker. Voices can also be shared with the community, so the list of available voices is extremely huge, although many of them are of poor quality. Anyway, if you want the Race Spotter to talk with your favorite Crew Chief voice or with the voice of a well-known celebrity, give it a go. ElevenLabs can also be used for voice recognition. The recognition quality is extremely good, comparable to Whisper, and support free conversation.

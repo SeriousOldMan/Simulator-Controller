@@ -255,7 +255,7 @@ As said, this way to initiate an activation command is *only* required for the v
 
 ##### Combining activation and command
 
-If the chosen voice recognizer supports arbitrary phrases, which is the case for Azure, Google, ElevenLabs, Whisper and so on, you can combine activation and command into one phrase. To do this, precede the normal command phrase with the name of the Assistant you wand to address.
+If the chosen voice recognizer supports arbitrary phrases, which is the case for Azure, Google, OpenAI (and compatible), ElevenLabs, Whisper and so on, you can combine activation and command into one phrase. To do this, precede the normal command phrase with the name of the Assistant you wand to address.
 
 Example: "Jona, can you plan a pitstop?"
 

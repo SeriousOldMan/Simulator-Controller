@@ -4,7 +4,7 @@ Target=6.6.4.0-release
 Date=11/03/2025
 Download=
 Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode
-Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
+Components=Media->5.6.1,Configuration->6.6.4,Utilities->6.4.1
 [Release]
 Version=6.6.3.0-release
 Date=10/31/2025
@@ -21,6 +21,9 @@ Configuration.6.5.5.Download=https://fileshare.impresion3d.pro/filebrowser/api/p
 Utilities.6.4.1.Path=.
 Utilities.6.4.1.Content=Utilities
 Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
+Utilities.6.6.4.Path=.
+Utilities.6.6.4.Content=Utilities
+Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
 Type=Development
 [Version]

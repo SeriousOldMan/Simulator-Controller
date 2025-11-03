@@ -151,7 +151,7 @@ You can communicate with your crew members using voice and natural language. Voi
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
 
-According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are somewhere between level 3 (Assistance) and 4 (Autonomy). They observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
+According to the maturity scale of *attractive.ai* (one of several hundreds maturity models that can be found on the net), the Race Assistants of Simulator Controller are somewhere around Level 4 (Autonomy). They observe your racing, can give recommendations and take responsibilty for certain tasks like strategy management and pitstop planning and preparation.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/AI%20Maturity%20Levels.png)
 

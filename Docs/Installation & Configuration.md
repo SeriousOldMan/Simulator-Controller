@@ -379,7 +379,10 @@ For OpenAI itself, use the https://api.openai.com as *Server URL* and enter the 
 
 You can also use these services for speech recognition, if required.
 
-Beside the services of OpenAI itself, you can use any OpenAI compatible speech service provider. There are also solutions available, which can be hosted and run locally, for example on your own private AI server. [Speaches.ai](https://speaches.ai), for example,  has become famous recently for providing a great solutiion for local speech services, but there are also other good solutions available on GitHub.
+Beside the services of OpenAI itself, you can use any OpenAI compatible speech service provider. There are also solutions available, which can be hosted and run locally, for example on your own private AI server. [Speaches.ai](https://speaches.ai), for example, has become famous recently for providing a great solutiion for local speech services, but there are also other good solutions available on GitHub, like:
+
+  - https://github.com/matatonic/openedai-speech
+  - https://github.com/remsky/Kokoro-FastAPI
 
 ###### ElevenLabs
 

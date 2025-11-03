@@ -710,7 +710,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["soXPath"] := getMultiMapValue(configuration, "Voice Control", "SoX Path", "")
 
 			this.Value["listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", true)
-			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Listener.OpenAI", "")
 			this.Value["pushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 			this.Value["pushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 			this.Value["activationCommand"] := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
@@ -866,8 +865,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 													  . Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))
 
 			listener := Trim(this.Control["openAIListenerModelEdit"].Text)
-
-			setMultiMapValue(configuration, "Voice Control", "Listener.OpenAI", listener)
 		}
 		else if (this.Control["voiceRecognizerDropDown"].Value == 6)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
@@ -2262,7 +2259,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		kSimulatorConfiguration := configuration
 
-		SpeechSynthesizer.initializePostProcessing(kSimulatorConfiguration)
+		SpeechSynthesizer.initializePostProcessing()
 
 		try {
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
@@ -2280,7 +2277,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration
 
-			SpeechSynthesizer.initializePostProcessing(kSimulatorConfiguration)
+			SpeechSynthesizer.initializePostProcessing()
 		}
 	}
 

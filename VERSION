@@ -4,7 +4,7 @@ Target=6.6.4.0-release
 Date=11/03/2025
 Download=
 Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode
-Components=Media->5.6.1,Configuration->6.6.4,Utilities->6.4.1
+Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.3.0-release
 Date=10/31/2025

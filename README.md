@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.4.0-dev]() (Early build for 6.6.4. Changes: Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode.)
+[6.6.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0kTZw0mB/Releases/Simulator%20Controller%206.6.4.0-dev.zip) (Early build for 6.6.4. Changes: Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6640) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-664) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1389,6 +1389,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		setButtonIcon(widget37, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget38 := editorGui.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget38.OnEvent("Click", (*) => this.editInstructions())
 		setButtonIcon(widget38, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
 		this.iOpenAISynthesizerWidgets := [[editorGui["basicOpenAISpeakerServerURLLabel"], editorGui["basicOpenAISpeakerServerURLEdit"]]
@@ -1457,7 +1458,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
-			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.doNET", true)
+			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			this.Value["openAISpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
@@ -1476,7 +1477,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
 
-			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Google.APIKey"
+			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control", "APIKey", ""))
 
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
@@ -1486,6 +1487,32 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
 			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
 			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
+
+			this.Value[synthesizer . "Speaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker"
+																				 , this.Value[synthesizer . "Speaker"])
+
+			switch synthesizer, false {
+				case "Azure":
+					this.Value["azureSubscriptionKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+					this.Value["azureAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
+				case "Google":
+					this.Value["googleAPIKeyFile"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+				case "OpenAI":
+					this.Value["openAISpeakerServerURL"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+					this.Value["openAISpeakerAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
+
+					try
+						this.Value["openAISpeakerModel"] := string2Values("/", getMultiMapValue(configuration, "Voice Control", "Speaker"
+																											 , this.Value["openAISpeakerModel"] . "/"))[1]
+
+					try
+						this.Value["openAISpeakerVoice"] := string2Values("/", getMultiMapValue(configuration, "Voice Control", "Speaker"
+																											 , "/" . this.Value["openAISpeakerVoice"]))[2]
+
+					this.Value["openAISpeakerInstructions"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[4]
+				case "ElevenLabs":
+					this.Value["elevenLabsAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+			}
 
 			if this.Configuration
 				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
@@ -1556,7 +1583,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
 										  , "OpenAI|" . Trim(this.Control["basicOpenAISpeakerServerURLEdit"].Text) . "|"
 													  . Trim(this.Control["basicOpenAISpeakerAPIKeyEdit"].Text) . "|"
-													  . StrReplace(Trim(this.Value["basicOpenAISpeakerInstructions"]), "`"", "\n"))
+													  . StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`"", "\n"))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
@@ -2141,6 +2168,62 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration
+		}
+	}
+
+	editInstructions(command := false, *) {
+		local x, y, w, h, instructionsGui
+
+		static result
+
+		if (command == kOk)
+			result := kOk
+		else if (command == kCancel)
+			result := kCancel
+		else {
+			result := false
+
+			instructionsGui := Window({Descriptor: "Voice Synthesizer Editor.Instructions", Resizeable: true, Options: "0x400000"}
+									, translate("Instructions"))
+
+			instructionsGui.SetFont("Norm", "Arial")
+
+			instructionsGui.Add("Edit", "x16 y16 w454 h200 W:Grow H:Grow Multi vinstructionEdit", this.Value["openAISpeakerInstructions"])
+
+			instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kOk))
+			instructionsGui.Add("Button", "x246 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kCancel))
+
+			instructionsGui.Opt("+Owner" . this.Window.Hwnd)
+
+			this.Window.Block()
+
+			try {
+				instructionsGui.Show("AutoSize Center")
+
+				if getWindowPosition("Voice Synthesizer Editor.Instructions", &x, &y)
+					instructionsGui.Show("x" . x . " y" . y)
+				else
+					instructionsGui.Show("AutoSize Center")
+
+				if getWindowSize("Voice Synthesizer Editor.Instructions", &w, &h)
+					instructionsGui.Resize("Initialize", w, h)
+
+				while !result
+					Sleep(100)
+
+				try {
+					if (result == kCancel)
+						return false
+					else if (result == kOk)
+						return (this.Value["openAISpeakerInstructions"] := instructionsGui["instructionEdit"].Text)
+				}
+				finally {
+					instructionsGui.Destroy()
+				}
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 	}
 }

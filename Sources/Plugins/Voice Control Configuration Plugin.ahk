@@ -550,6 +550,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setButtonIcon(widget56, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget57 := window.Add("Button", "x" . (x1 + 24 + 3) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget57.OnEvent("Click", (*) => this.editInstructions())
 		setButtonIcon(widget57, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
 		widget58 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VopenAIRecognizerServerURLLabel Hidden", translate("Server URL"))
@@ -2270,6 +2271,62 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration
+		}
+	}
+
+	editInstructions(command := false, *) {
+		local x, y, w, h, instructionsGui
+
+		static result
+
+		if (command == kOk)
+			result := kOk
+		else if (command == kCancel)
+			result := kCancel
+		else {
+			result := false
+
+			instructionsGui := Window({Descriptor: "Voice Control Configuration.Instructions", Resizeable: true, Options: "0x400000"}
+									, translate("Instructions"))
+
+			instructionsGui.SetFont("Norm", "Arial")
+
+			instructionsGui.Add("Edit", "x16 y16 w454 h200 W:Grow H:Grow Multi vinstructionEdit", this.Value["openAISpeakerInstructions"])
+
+			instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kOk))
+			instructionsGui.Add("Button", "x246 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kCancel))
+
+			instructionsGui.Opt("+Owner" . this.Window.Hwnd)
+
+			this.Window.Block()
+
+			try {
+				instructionsGui.Show("AutoSize Center")
+
+				if getWindowPosition("Voice Control Configuration.Instructions", &x, &y)
+					instructionsGui.Show("x" . x . " y" . y)
+				else
+					instructionsGui.Show("AutoSize Center")
+
+				if getWindowSize("Voice Control Configuration.Instructions", &w, &h)
+					instructionsGui.Resize("Initialize", w, h)
+
+				while !result
+					Sleep(100)
+
+				try {
+					if (result == kCancel)
+						return false
+					else if (result == kOk)
+						return (this.Value["openAISpeakerInstructions"] := instructionsGui["instructionEdit"].Text)
+				}
+				finally {
+					instructionsGui.Destroy()
+				}
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 	}
 }

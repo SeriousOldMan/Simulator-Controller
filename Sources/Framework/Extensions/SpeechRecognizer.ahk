@@ -201,6 +201,7 @@ class SpeechRecognizer {
 	iLanguage := "en"
 	iModel := false
 
+	iServerURL := ""
 	iAPIKey := ""
 
 	iChoices := CaseInsenseMap()
@@ -320,7 +321,7 @@ class SpeechRecognizer {
 			if InStr(this.Engine, "Whisper")
 				return "Text"
 			else
-				return (inList(["Azure", "Google", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
+				return (inList(["Azure", "Google", "OpenAI", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -607,11 +608,37 @@ class SpeechRecognizer {
 
 			this.setChoices("Digit", choices)
 		}
-		else if InStr(engine, "ElevenLabs|") {
-			engine := string2Values("|", engine)
+		else if InStr(engine, "OpenAI|") {
+			engine := string2Values("|", engine, 3)
 
 			this.iEngine := engine[1]
+			this.iServerURL := Trim(engine[2])
+			this.iAPIKey := engine[3]
 
+			if (this.iServerURL != "")
+				while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
+					this.iServerURL := SubStr(this.iServerURL, 1, StrLen(this.iServerURL) - 1)
+
+			this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
+
+			choices := []
+
+			loop 101
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Number", choices)
+
+			choices := []
+
+			loop 10
+				choices.Push((A_Index - 1) . "")
+
+			this.setChoices("Digit", choices)
+		}
+		else if InStr(engine, "ElevenLabs|") {
+			engine := string2Values("|", engine, 2)
+
+			this.iEngine := engine[1]
 			this.iAPIKey := engine[2]
 
 			this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
@@ -636,7 +663,9 @@ class SpeechRecognizer {
 		this.setMode(mode)
 
 		if (engine != "Compiler") {
-			if (!InStr(this.Engine, "Whisper") && (this.Engine != "ElevenLabs") && (this.Instance.OkCheck() != "OK")) {
+			if (!InStr(this.Engine, "Whisper") && (this.Engine != "OpenAI")
+											   && (this.Engine != "ElevenLabs")
+											   && (this.Instance.OkCheck() != "OK")) {
 				if log {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
@@ -647,7 +676,7 @@ class SpeechRecognizer {
 
 			this.RecognizerList := this.createRecognizerList()
 
-			if (this.RecognizerList.Length == 0) {
+			if ((this.RecognizerList.Length == 0) && (this.Engine != "OpenAI")) {
 				if log
 					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
@@ -702,7 +731,7 @@ class SpeechRecognizer {
 					recognizer := "medium"
 				else if (this.Engine = "ElevenLabs")
 					recognizer := "scribe_v1"
-				else
+				else if ((this.Engine != "OpenAI") || (recognizer == true))
 					recognizer := 0
 
 			this.setRecognizer(recognizer, log)
@@ -753,6 +782,8 @@ class SpeechRecognizer {
 			if (Trim(this.iAPIKey) != "")
 				recognizerList := kWhisperModels
 		}
+		else if (this.Engine = "OpenAI")
+			recognizerList := []
 		else if (this.Engine = "ElevenLabs") {
 			if (Trim(this.iAPIKey) != "")
 				recognizerList := kElevenLabsModels
@@ -794,7 +825,7 @@ class SpeechRecognizer {
 
 				this.Instance.Connector.SetModel(id)
 			}
-			else if ((this.Engine = "Whisper Local") || (this.Engine = "ElevenLabs"))
+			else if ((this.Engine = "Whisper Local") || (this.Engine = "OpenAI") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -848,7 +879,7 @@ class SpeechRecognizer {
 					return false
 				}
 			}
-			else if (this.Engine = "ElevenLabs") {
+			else if ((this.Engine = "OpenAI") || (this.Engine = "ElevenLabs")) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
@@ -861,7 +892,21 @@ class SpeechRecognizer {
 				}
 			}
 			else if !InStr(this.Engine, "Whisper")
-				return this.Instance.StartRecognizer()
+				try {
+					return this.Instance.StartRecognizer()
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					if (this.Engine = "Azure")
+						try {
+							SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+						}
+						catch Any {
+							try
+								SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+						}
+				}
 			else
 				return false
 		}
@@ -873,15 +918,14 @@ class SpeechRecognizer {
 		global kNirCmd
 
 		local audioDevice := this.AudioDevice[true]
+		local httpService := (InStr(this.Engine, "Whisper") || (this.Engine = "OpenAI")
+															|| (this.Engine = "ElevenLabs"))
 
 		try {
-			if (this.Instance ? ((InStr(this.Engine, "Whisper") || (this.Engine = "ElevenLabs"))
-									? this.Instance.AudioRecorder.StopRecognizer()
-									: this.Instance.StopRecognizer())
+			if (this.Instance ? (httpService ? this.Instance.AudioRecorder.StopRecognizer()
+											 : this.Instance.StopRecognizer())
 							  : false) {
-				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || InStr(this.Engine, "Whisper")
-																			   || (this.Engine = "ElevenLabs"))
-				 && this.iCapturedAudioFile)
+				if ((((this.Engine = "Google") && (this.iGoogleMode = "HTTP")) || httpService) && this.iCapturedAudioFile)
 					try {
 						this.processAudio(this.iCapturedAudioFile)
 					}
@@ -898,7 +942,16 @@ class SpeechRecognizer {
 				return false
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
+
+			if (this.Engine = "Azure")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your contingent is exhausted.")
+				}
 		}
 		finally {
 			if (audioDevice && kNirCmd) {
@@ -951,7 +1004,13 @@ class SpeechRecognizer {
 			catch Any as exception {
 				logError(exception, true)
 
-				SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your monthly contingent is exhausted.")
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Google Speech Services. Maybe your contingent is exhausted.")
+				}
 			}
 		}
 		else if this.Model {
@@ -1008,6 +1067,37 @@ class SpeechRecognizer {
 					logError(exception)
 				}
 			}
+			else if (this.Engine = "OpenAI") {
+				try {
+					result := WinHttpRequest().POST(this.iServerURL . "/v1/audio/transcriptions"
+												  , Map("model", this.Model
+													  , "language", StrLower(this.Language)
+													  , "file", {fileName: audioFile})
+												  , Map("Authorization", ("Bearer " . this.iAPIKey)
+													  , "Content-Type", "application/json")
+												  , {Multipart: true, Encoding: "UTF-8"})
+
+					if ((result.Status >= 200) && (result.Status < 300)) {
+						result := result.JSON
+
+						if result.Has("text")
+							this._onTextCallback(result["text"])
+					}
+					else
+						throw ("Error during speech recognition (Status code: " . result.Status . "...")
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					try {
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+					}
+					catch Any {
+						try
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling OpenAI API. Maybe your contingent is exhausted.")
+					}
+				}
+			}
 			else if (this.Engine = "ElevenLabs") {
 				try {
 					result := WinHttpRequest().POST("https://api.elevenlabs.io/v1/speech-to-text"
@@ -1029,7 +1119,13 @@ class SpeechRecognizer {
 				catch Any as exception {
 					logError(exception, true)
 
-					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					try {
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					}
+					catch Any {
+						try
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
+					}
 				}
 			}
 		}
@@ -1052,7 +1148,8 @@ class SpeechRecognizer {
 		if isSet(name) {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
-			else if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine)
+			else if inList(["Azure", "Google", "Compiler"
+						  , "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -1082,7 +1179,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -1097,7 +1194,7 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -1108,7 +1205,7 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine)
+		if inList(["Azure", "Google", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -1134,7 +1231,7 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "ElevenLabs"], this.Engine) {
+		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

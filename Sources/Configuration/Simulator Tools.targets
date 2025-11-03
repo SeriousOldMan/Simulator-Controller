@@ -69,6 +69,7 @@ Speech Interface.15=%kBinariesDirectory%Google\ <- %kSourcesDirectory%Special\Go
 Speech Interface.16=%kBinariesDirectory%Google\ <- %kSourcesDirectory%Special\Google Speech Recognizer\Release\\net472\\NAudio.*
 Speech Interface.17=%kBinariesDirectory%Google\ <- %kSourcesDirectory%Special\Google Speech Recognizer\Release\\net472\System.*
 Speech Interface.18=%kBinariesDirectory%Audio Capture <- %kSourcesDirectory%Special\Audio Capture\Audio Capture\bin\Release
+Speech Interface.19=%kBinariesDirectory%Audio Capture\ffmpeg.exe <- %kHomeDirectory%Utilities\3rd Party\Sound Processing\ffmpeg.exe
 Stream Deck Interface.1=%kBinariesDirectory%Connectors\SimulatorControllerPluginConnector.dll <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\SimulatorControllerPluginConnector.dll
 Stream Deck Interface.2=%kHomeDirectory%Utilities\Plugins\de.thebigo.simulatorcontroller.sdPlugin <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\de.thebigo.simulatorcontroller.sdPlugin
 Code Editor.1=%kBinariesDirectory%Code Editor\ <- %kHomeDirectory%Utilities\3rd Party\Code Editor\*.dll

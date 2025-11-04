@@ -2210,11 +2210,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local ignore, widget, widgetPart
 
 		for ignore, widget in widgets
-			for ignore, widgetPart in widget
-				if !inList(exclude, widgetPart) {
-					widgetPart.Enabled := true
-					widgetPart.Visible := true
-				}
+			for ignore, widgetPart in widget {
+				widgetPart.Enabled := true
+				widgetPart.Visible := !inList(exclude, widgetPart)
+			}
 
 		if (this.Control["soXPathEdit"].Text = "")
 			this.Control["soXConfigurationButton"].Enabled := false

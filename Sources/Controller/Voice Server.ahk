@@ -939,13 +939,15 @@ class VoiceServer extends ConfigurationItem {
 																					   , getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Listener", true)
 																					   , this.Language, true)
 
-						if (this.iSpeechRecognizer.Recognizers.Length = 0)
+						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
 					}
 					catch Any as exception {
+						logError(exception, true)
+
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
-						if (this.iSpeechRecognizer.Recognizers.Length = 0)
+						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
 					}
 				}

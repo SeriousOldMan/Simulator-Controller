@@ -486,10 +486,10 @@ class SpeechSynthesizer {
 		if !isInteger(SpeechSynthesizer.sOverDriveColor)
 			SpeechSynthesizer.sOverDriveColor := 20
 
-		if !isInteger(sFilterHighpass)
+		if !isInteger(SpeechSynthesizer.sFilterHighpass)
 			SpeechSynthesizer.sFilterHighpass := 800
 
-		if !isInteger(sFilterLowpass)
+		if !isInteger(SpeechSynthesizer.sFilterLowpass)
 			SpeechSynthesizer.sFilterLowpass := 1800
 	}
 

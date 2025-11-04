@@ -31,10 +31,11 @@
 
 #### Fixes
 
-  - Fixed header color in Consistencs reports when using the dark UI mode.
-  - Fixed export and import of session in the "Session Database".
+  - Fixed header color in Consistency reports when using the dark UI mode.
+  - Fixed export and import of sessions in the "Session Database".
   - Fixed export and import of car/track specific settings in the "Session Database".
   - Fixed several minor bugs in the speech synthesizer.
+  - Fixed a bug in the *Reasoning* booster when a language other than English is used and a booster action tries to interact with the user by voice.
 
 #### Changes
 

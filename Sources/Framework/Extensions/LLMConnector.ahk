@@ -335,19 +335,19 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			if isDebug()
-				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
-			else
-				body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "LLM.request")
-
-				try
-					FileAppend(body, kTempDirectory . "LLM.request")
-			}
-
 			try {
+				if isDebug()
+					body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
+				else
+					body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
+
+				if isDebug() {
+					deleteFile(kTempDirectory . "LLM.request")
+
+					try
+						FileAppend(body, kTempDirectory . "LLM.request")
+				}
+
 				if this.Certificate {
 					try {
 						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]

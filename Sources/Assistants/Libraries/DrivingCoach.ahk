@@ -121,18 +121,18 @@ class DrivingCoach extends GridRaceAssistant {
 				templates := CaseInsenseMap()
 
 				for code, ignore in availableLanguages() {
-					fileName := getFileName("Driving Coach.instructions." . code, kTranslationsDirectory)
+					fileName := getFileName("Driving Coach.instructions." . code, kResourcesDirectory . "Instructions\")
 
 					if FileExist(fileName) {
 						templates[code] := readMultiMap(fileName)
 
-						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+						fileName := getFileName("Driving Coach.instructions." . code, kUserHomeDirectory . "Instructions\")
 
 						if FileExist(fileName)
 							addMultiMapValues(templates[code], readMultiMap(fileName))
 					}
 					else {
-						fileName := getFileName("Driving Coach.instructions." . code, kUserTranslationsDirectory)
+						fileName := getFileName("Driving Coach.instructions." . code, kUserHomeDirectory . "Instructions\")
 
 						if FileExist(fileName)
 							templates[code] := readMultiMap(fileName)

@@ -239,9 +239,9 @@ class PlanPitstopEvent extends EngineerEvent {
 		static instructions := false
 
 		if !instructions {
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Engineer.instructions.en")
+			instructions := readMultiMap(kResourcesDirectory . "Instructions\Race Engineer.instructions.en")
 
-			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Engineer.instructions.en"))
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Instructions\Race Engineer.instructions.en"))
 		}
 
 		targetLap := (arguments.Has(1) ? arguments[1] : kUndefined)

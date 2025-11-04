@@ -201,7 +201,8 @@ Note: You can cancel a build run anytime by pressing the Escape key.
 
 ## Customizing the Configuration Tool
 
-The [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) provides a plugin mechanism to allow developers to create specialized configuration editors that are integrated in the configuration tool. Each plugin cam define one or more tabs to be integrated into the configuration tool tabbed editor view.
+The [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) provides a plugin mechanism to allow developers to create specialized configuration editors
+ that are integrated in the configuration tool. Each plugin cam define one or more tabs to be integrated into the configuration tool tabbed editor view.
 
 When the configuration tool starts up, in a first step a single file in the [Sources/Plugins](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Plugins) folder will be included using the AutoHotkey #Include directive: [Configuration Plugins.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Configuration%20Plugins.ahk). This will load all the plugins for the configuration tool that are part of the standard distribution of Simulator Controller. To allow you to create and include your own plugins without needing to modify the above file, a second initially empty *Configuration Plugins.ahk* will be included from the special location *Simulator Controller\Plugins* folder, which is located in your *Documents* folder. This special location has been created by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) and will not be overwritten by future distributions of Simulator Controller. So feel free to include your own plugins from this second *Configuration Plugins.ahk* file.
 
@@ -374,7 +375,7 @@ You may have noticed, that the grammar files support a kind of include mechanism
 
 ### Instructions for the GPT-based Driving Coach
 
-The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Instructions* in the programm installation folder. They are named 
 
 	Driving Coach.instructions.LC
 
@@ -382,7 +383,7 @@ where *LC* stands for the language code.
 
 ### Instructions for the GPT-based Assistant Boosters
 
-Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Instructions* in the programm installation folder. They are named 
 
 	Conversation Booster.instructions.LC
 	

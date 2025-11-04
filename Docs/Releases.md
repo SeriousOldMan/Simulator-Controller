@@ -45,6 +45,7 @@
   - A re-sync button has been added to the zoomable track map editor introduced with the last release, which can be used in rare cases, when zooming and scrolling get out of sync.
   - Changes to the audio post processing settings will be reflected live, when using the speech output test mode.
   - A new speech synthesizer as well as a new voice recognition engine has been added, which can work with all OpenAI compatible speech APIs. This allows also for local neural network based speech generation and recognition, when using [Speaches.ai](https://speaches.ai), for example. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#openai-api) for more information.
+  - [Internal] Refactored all LLM instructions into a separate *Instructions* folder.
 
 # Release history
 

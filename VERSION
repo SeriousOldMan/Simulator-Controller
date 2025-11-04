@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.4.0-dev
 Target=6.6.4.0-release
-Date=11/03/2025
+Date=11/04/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0kTZw0mB/Releases/Simulator Controller 6.6.4.0-dev.zip
-Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode
+Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode, Refactored instructions into separate folder
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.3.0-release

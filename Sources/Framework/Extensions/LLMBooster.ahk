@@ -166,7 +166,7 @@ class ConversationBooster extends LLMBooster {
 			if !this.iInstructions {
 				instructions := CaseInsenseMap()
 
-				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+				for ignore, directory in [kResourcesDirectory . "Instructions\", kUserHomeDirectory . "Instructions\"]
 					loop Files (directory . "Conversation Booster.instructions.*") {
 						SplitPath A_LoopFilePath, , , &instrLanguage
 

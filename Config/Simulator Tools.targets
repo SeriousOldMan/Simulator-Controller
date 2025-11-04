@@ -13,6 +13,7 @@ Release 6.4.2=Release 6.2.7 -> updateConfigurationForV642
 Release 6.5.2=Release 6.4.2 -> updateConfigurationForV652
 Release 6.5.4=Release 6.5.2 -> updateConfigurationForV654
 Release 6.5.5=Release 6.5.4 -> updateConfigurationForV655
+Release 6.6.4=Release 6.5.5 -> updateConfigurationForV664
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -141,7 +142,7 @@ Race Assistant Configuration.22=%kGrammarsDirectory% <- %kSourcesDirectory%Assis
 Race Assistant Configuration.23=%kGrammarsDirectory% <- %kSourcesDirectory%Assistants\Grammars\Grid.*
 Race Assistant Configuration.24=%kGrammarsDirectory% <- %kSourcesDirectory%Assistants\Grammars\Weather.*
 Race Assistant Configuration.25=%kGrammarsDirectory% <- %kSourcesDirectory%Assistants\Grammars\Fragments.*
-Race Assistant Configuration.26=%kResourcesDirectory%Translations\ <- %kSourcesDirectory%Assistants\Instructions\*.*
+Race Assistant Configuration.26=%kResourcesDirectory%Instructions\ <- %kSourcesDirectory%Assistants\Instructions\*.*
 Race Assistant Configuration.27=%kResourcesDirectory%Actions\ <- %kSourcesDirectory%Assistants\Actions\*.*
 Race Engineer Configuration.1=%kResourcesDirectory%Rules\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules
 Race Engineer Configuration.2=%kResourcesDirectory%Templates\Race Engineer.rules <- %kSourcesDirectory%Assistants\Rules\Race Engineer.rules

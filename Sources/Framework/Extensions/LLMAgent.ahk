@@ -99,9 +99,9 @@ class AgentBooster extends LLMBooster {
 			if !this.iInstructions {
 				instructions := CaseInsenseMap()
 
-				for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+				for ignore, directory in [kResourcesDirectory . "Instructions\", kUserHomeDirectory . "Instructions\"]
 					loop Files (directory . "Agent Booster.instructions.*") {
-						SplitPath(A_LoopFilePath, , , &instrLanguage)
+						SplitPath A_LoopFilePath, , , &instrLanguage
 
 						if !instructions.Has(instrLanguage)
 							instructions[instrLanguage] := newMultiMap()
@@ -144,8 +144,6 @@ class AgentBooster extends LLMBooster {
 			if isSet(language) {
 				if this.iInstructions.Has(language)
 					return this.iInstructions[language]
-				else if this.iInstructions.Has("en")
-					return this.iInstructions["en"]
 				else
 					return newMultiMap()
 			}

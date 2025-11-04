@@ -101,9 +101,9 @@ class RecommendPitstopEvent extends StrategistEvent {
 		static instructions := false
 
 		if !instructions {
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+			instructions := readMultiMap(kResourcesDirectory . "Instructions\Race Strategist.instructions.en")
 
-			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Instructions\Race Strategist.instructions.en"))
 		}
 
 		if (targetLap = "Now")
@@ -150,9 +150,9 @@ class SimulateStrategyEvent extends StrategistEvent {
 		static instructions := false
 
 		if !instructions {
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+			instructions := readMultiMap(kResourcesDirectory . "Instructions\Race Strategist.instructions.en")
 
-			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Instructions\Race Strategist.instructions.en"))
 		}
 
 		if fullCourseYellow

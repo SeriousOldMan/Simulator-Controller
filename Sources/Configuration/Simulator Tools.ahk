@@ -1774,6 +1774,12 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV664() {
+	loop Files, kUserTranslationsDirectory . "*.*", "F"
+		if InStr(A_LoopFileFullPath, "instructions")
+			FileMove(A_LoopFileFullPath, kUserHomeDirectory . "Instructions", 1)
+}
+
 updateConfigurationForV655() {
 	if FileExist(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini")
 		FileMove(kUserHomeDirectory . "Setup\Conversation Booster Configuration.ini"

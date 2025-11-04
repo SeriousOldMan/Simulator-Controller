@@ -1148,7 +1148,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else
 			throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Windows"
 	}
@@ -1230,7 +1230,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Azure"
 	}
@@ -1347,7 +1347,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Google"
 	}
@@ -1464,7 +1464,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "OpenAI"
 	}
@@ -1582,7 +1582,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "ElevenLabs"
 	}
@@ -1850,7 +1850,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.transposeControls(this.iOpenAIRecognizerWidgets, (-24 * delta) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * (this.iOpenAIRecognizerWidgets.Length - 1), titleBarHeight)
 
-				this.Control["listenerLabel"].Visible := true, this.Control["listenerDropDown"].Visible := true
+				this.Control["listenerLabel"].Visible := true
+				this.Control["listenerDropDown"].Visible := true
 			}
 			else if (this.iRecognizerMode != "Init")
 				throw "Internal error detected in VoiceControlConfigurator.hideOpenAIRecognizerEditor..."
@@ -2199,14 +2200,21 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 	}
 
-	showControls(widgets) {
+	showOtherControls() {
+		this.showControls(this.iOtherWidgets
+						, (this.iRecognizerMode = "OpenAI") ? [this.Control["listenerLabel"], this.Control["listenerDropDown"]]
+															: [])
+	}
+
+	showControls(widgets, exclude := []) {
 		local ignore, widget, widgetPart
 
 		for ignore, widget in widgets
-			for ignore, widgetPart in widget {
-				widgetPart.Enabled := true
-				widgetPart.Visible := true
-			}
+			for ignore, widgetPart in widget
+				if !inList(exclude, widgetPart) {
+					widgetPart.Enabled := true
+					widgetPart.Visible := true
+				}
 
 		if (this.Control["soXPathEdit"].Text = "")
 			this.Control["soXConfigurationButton"].Enabled := false

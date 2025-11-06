@@ -397,7 +397,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget4 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
 		widget4.LastValue := chosen
 		widget4.OnEvent("Change", chooseVoiceSynthesizer)
-		widget64 := window.Add("Text", "x" . (x1 + 163) . " yp w180 h23 +0x200 X:Move(0.3) Section Hidden", translate("(Not for Assistants)"))
+		widget64 := window.Add("Text", "x" . (x1 + 163) . " yp w180 h23 +0x200 X:Move(0.3) Section Hidden", translate("(not for Assistants)"))
 
 		this.iTopWidgets := [[widget1, widget2], [widget3, widget4, widget64]]
 

@@ -397,8 +397,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget4 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
 		widget4.LastValue := chosen
 		widget4.OnEvent("Change", chooseVoiceSynthesizer)
+		widget64 := window.Add("Text", "x" . (x1 + 163) . " yp w180 h23 +0x200 X:Move(0.3) Section Hidden", translate("(not for Assistants)"))
 
-		this.iTopWidgets := [[widget1, widget2], [widget3, widget4]]
+		this.iTopWidgets := [[widget1, widget2], [widget3, widget4, widget64]]
 
 		voices := [translate("Random"), translate("Deactivated")]
 
@@ -803,7 +804,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
 										  , "OpenAI|" . Trim(this.Control["openAISpeakerServerURLEdit"].Text) . "|"
 													  . Trim(this.Control["openAISpeakerAPIKeyEdit"].Text) . "|"
-													  . StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`"", "\n"))
+													  . StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
@@ -832,7 +833,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["openAISpeakerAPIKeyEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["openAISpeakerModelEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["openAISpeakerVoiceEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`n", "\n"))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions"
+									  , StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
 
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", Trim(this.Control["openAIRecognizerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))

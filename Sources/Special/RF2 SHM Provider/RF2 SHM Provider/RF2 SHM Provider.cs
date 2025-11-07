@@ -426,8 +426,10 @@ namespace RF2SHMProvider {
                     grip = "Wet";
                 else if (scoring.mScoringInfo.mAvgPathWetness >= 0.05)
                     grip = "Damp";
-                else if (scoring.mScoringInfo.mAvgPathWetness > 0.0)
+                else if (scoring.mScoringInfo.mAvgPathWetness > 0.02)
 					grip = "Greasy";
+                else if (scoring.mScoringInfo.mAvgPathWetness > 0.0)
+					grip = "Green";
                 else
                     grip = "Fast";
 

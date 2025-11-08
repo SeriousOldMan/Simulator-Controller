@@ -1,6 +1,6 @@
 #include Weather.events
 [Agent.LLM.Events]
-Active=fuel_low,energy_low,tyre_wear,brake_wear,damage_detected,damage_time_loss,pressure_loss,weather_forecast
+Active=fuel_low,energy_low,grip_low,tyre_wear,brake_wear,damage_detected,damage_time_loss,pressure_loss,weather_forecast
 [Agent.LLM.Events.Builtin]
 fuel_low=Assistant.Class|FuelLowEvent|FuelLow||2|This event is triggered when the car is running low on fuel.
 energy_low=Assistant.Class|EnergyLowEvent|EnergyLow||2|This event is triggered when the car is running low on virtual energy.

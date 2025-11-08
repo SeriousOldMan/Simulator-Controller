@@ -809,15 +809,15 @@ priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: L
 ;;; planned and prepared, the driver is called to the pit in time.          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-{All: [?Session.Settings.Tyre.Service = All], [?Pitstop.Prepared],
+{All: [?Session.Settings.Tyre.Service = All], {Any: [?Pitstop.Planned], [?Pitstop.Prepared]},
 	  {None: [?Pitstop.Tyre.Compound.Reported]},
 	  [?Pitstop.Planned.Tyre.Compound != false],
 	  [?Pitstop.Planned.Tyre.Compound != !Tyre.Compound],
 	  {Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound)}} =>
 		(Set: Pitstop.Tyre.Compound.Reported, !Lap),
-		(Prove: tyreCompoundWarning(!Lap, ?Pitstop.Planned.Tyre.Compound))
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound))
 
-{All: [?Session.Settings.Tyre.Service = Axle], [?Pitstop.Prepared],
+{All: [?Session.Settings.Tyre.Service = Axle], {Any: [?Pitstop.Planned], [?Pitstop.Prepared]},
 	  {None: [?Pitstop.Tyre.Compound.Reported]},
 	  {Any: [?Pitstop.Planned.Tyre.Compound.Front != false], [?Pitstop.Planned.Tyre.Compound.Rear != false]},
 	  {All: {Any: [?Pitstop.Planned.Tyre.Compound.Front = false],
@@ -827,9 +827,9 @@ priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: L
 				  {All: [?Pitstop.Planned.Tyre.Compound.Rear != !Tyre.Compound.Rear],
 						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.Rear)}}}}} =>
 		(Set: Pitstop.Tyre.Compound.Reported, !Lap),
-		(Prove: tyreCompoundWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.Front, ?Pitstop.Planned.Tyre.Compound.Rear))
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.Front, ?Pitstop.Planned.Tyre.Compound.Rear))
 
-{All: [?Session.Settings.Tyre.Service = Axle], [?Pitstop.Prepared],
+{All: [?Session.Settings.Tyre.Service = Axle], {Any: [?Pitstop.Planned], [?Pitstop.Prepared]},
 	  {None: [?Pitstop.Tyre.Compound.Reported]},
 	  {Any: [?Pitstop.Planned.Tyre.Compound.FrontLeft != false], [?Pitstop.Planned.Tyre.Compound.FrontRight != false],
 			[?Pitstop.Planned.Tyre.Compound.RearLeft != false], [?Pitstop.Planned.Tyre.Compound.RearRight != false]},
@@ -846,19 +846,19 @@ priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: L
 				  {All: [?Pitstop.Planned.Tyre.Compound.RearRight != !Tyre.Compound.RearRight],
 						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.RearRight)}}}}} =>
 		(Set: Pitstop.Tyre.Compound.Reported, !Lap),
-		(Prove: tyreCompoundWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.FrontLeft, ?Pitstop.Planned.Tyre.Compound.FrontRight,
-										  ?Pitstop.Planned.Tyre.Compound.RearLeft, ?Pitstop.Planned.Tyre.Compound.RearRight))
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.FrontLeft, ?Pitstop.Planned.Tyre.Compound.FrontRight,
+									 ?Pitstop.Planned.Tyre.Compound.RearLeft, ?Pitstop.Planned.Tyre.Compound.RearRight))
 
-tyreCompoundWarning(?lap, ?compound) <= Call(raiseEvent, ChangeCompound, ?compound), !
-tyreCompoundWarning(?lap, ?compound) <= Call(tyreCompoundWarning, ?compound)
+lowGripWarning(?lap, ?compound) <= Call(raiseEvent, GripLow, ?compound), !
+lowGripWarning(?lap, ?compound) <= Call(lowGripWarning, ?compound)
 
-tyreCompoundWarning(?lap, ?frontCompound, ?rearCompound) <= Call(raiseEvent, ChangeCompound, ?frontCompound, ?rearCompound), !
-tyreCompoundWarning(?lap, ?frontCompound, ?rearCompound) <= Call(tyreCompoundWarning, ?frontCompound, ?rearCompound)
+lowGripWarning(?lap, ?frontCompound, ?rearCompound) <= Call(raiseEvent, GripLow, ?frontCompound, ?rearCompound), !
+lowGripWarning(?lap, ?frontCompound, ?rearCompound) <= Call(lowGripWarning, ?frontCompound, ?rearCompound)
 
-tyreCompoundWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
-		Call(raiseEvent, ChangeCompound, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound), !
-tyreCompoundWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
-		Call(tyreCompoundWarning, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound)
+lowGripWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
+		Call(raiseEvent, GripLow, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound), !
+lowGripWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
+		Call(lowGripWarning, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound)
 
 
 ;;;-------------------------------------------------------------------------;;;

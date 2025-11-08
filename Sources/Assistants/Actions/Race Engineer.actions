@@ -17,6 +17,7 @@ plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %ty
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
 report_low_energy=Assistant.Method|lowEnergyWarning(%remainingEnergy%, %remainingLaps%)|false|false|2|Reports that the car is running low on virtual energy.
+report_low_grip=Assistant.Method|lowGripWarning()|false|false|0|Reports the grip is low and that it is time now for the planned tyre compound change.
 report_tyre_wear=Assistant.Method|tyreWearWarning(%tyre%, %wear%)|false|false|2|Reports a high tread wear on one of the tyres.
 report_brake_wear=Assistant.Method|brakeWearWarning(%wheel%, %wear%)|false|false|2|Reports a high wear on one of the brake pads.
 report_damage=Assistant.Method|damageWarning(%suspensionDamage%, %bodyworkDamage%, %engineDamage%)|false|false|3|Reports recent damage to the car to the driver.

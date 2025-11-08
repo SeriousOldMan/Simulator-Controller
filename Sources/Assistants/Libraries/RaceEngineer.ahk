@@ -63,6 +63,19 @@ class EnergyLowEvent extends EngineerEvent {
 	}
 }
 
+class GripLowEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		return "The tyres are running out of grip. The planned tire change should now be carried out."
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.lowGripWarning(arguments*)
+
+		return true
+	}
+}
+
 class TyreWearEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static wheels := false
@@ -5120,6 +5133,34 @@ class RaceEngineer extends RaceAssistant {
 			}
 	}
 
+	lowGripWarning(tyreCompounds*) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker
+
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.supportsPitstop())
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+
+				try {
+					this.getSpeaker().speak("LowGrip")
+
+					if !this.hasPreparedPitstop()
+						if this.confirmAction("Pitstop.Tyre") {
+							speaker.speakPhrase("ConfirmPrepare", false, true)
+
+							this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+						}
+						else
+							this.preparePitstop()
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+	}
+
 	tyreWearWarning(tyre, wear, planPitstop := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
@@ -5340,8 +5381,8 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																											  : "WeatherDryChange"
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "TrackRainChange"
+																											  : "TrackDryChange"
 								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 				if (this.hasEnoughData(false) && this.supportsPitstop())
@@ -5440,6 +5481,12 @@ lowFuelWarning(context, remainingFuel, remainingLaps) {
 
 lowEnergyWarning(context, remainingEnergy, remainingLaps) {
 	context.KnowledgeBase.RaceAssistant.lowEnergyWarning(Round(remainingEnergy, 1), Floor(remainingLaps))
+
+	return true
+}
+
+lowGripWarning(context, tyreCompounds*) {
+	context.KnowledgeBase.RaceAssistant.lowGripWarning(tyreCompounds*)
 
 	return true
 }

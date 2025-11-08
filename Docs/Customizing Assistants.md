@@ -698,6 +698,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Damage Impact Recalculation | -                 | Yes | No | "Can you recalculate the time loss caused by the damage?" |
 | Low Fuel Reporting          | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that fuel is getting low and the pitstop will be needed. |
 | Low Energy Reporting        | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | No | Yes | This action informs the driver that virtual energy is getting low and the pitstop will be needed. Only used in *Le Mans Ultimate* at the time of this writing. |
+| Low Grip Reporting          | - | No | Yes | This action informs the driver that the grip is getting low and that it is time now for the planned tyre compound change. |
 | Tyre Wear Reporting         | 1. [Required] tyre<br>2. [Required] wear | No | Yes | Informs the driver that the tread of at least one of the tyres may be worn out and a tyre change should be planned. *tyre* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
 | Brake Wear Reporting        | 1. [Required] wheel<br>2. [Required] wear | No | Yes | Informs the driver that at least one of the brake pads may be worn out and a change of brake pads should be planned. *wheel* must be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear in percentage. |
 | Damage Reporting            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | No | Yes | This action informs the driver that some damage has been collected in the last accident. |
@@ -716,6 +717,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 |-----------------------------|-------------------|-------------|
 | Fuel Low                    | 1. [Required] remainingFuel<br>2. [Required] remainingLaps | When the car is running low on fuel, this event is signalled. |
 | Energy Low                  | 1. [Required] remainingEnergy<br>2. [Required] remainingLaps | When the car is running low on virtual energy, this event is signalled. Only used in *Le Mans Ultimate* at the time of this writing. |
+| Grip Low                    | - | When a pitstop for tyre compound change had been planned and the grip is getting low, this event is signalled. |
 | Tyre Wear                   | 1. [Required] tyre<br>2. [Required] wear | When a tyre is almost worn out, this event is signalled. *tyre* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of the tread of this tyre in percentage. |
 | Brake Wear                   | 1. [Required] wheel<br>2. [Required] wear | When one of the brake pads is almost worn out, this event is signalled. *wheel* will be one of "FL", "FR", "RL" and "RR" and *wear* is the current wear of this brake pad in percentage. |
 | Damage Collected            | 1. [Required] suspensionDamage<br>2. [Required] bodyworkDamage<br>3. [Required] engineDamage | This event is signalled, if new damage is detected for a part of the car. The parameters accept *Boolean* values to indicate where the damage occured. |

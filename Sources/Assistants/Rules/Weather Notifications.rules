@@ -23,72 +23,87 @@ priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Inde
 
 updateWeatherIndex(?time) <= Get(Weather.Weather, ?time, ?weather), weatherIndex(?weather, ?index), Set(Weather.Weather, ?time, Index, ?index)
 
+priority: 5, {Any: [?Track.Grip], {None: [?Track.Grip.Index]}} => (Prove: updateGripIndex())
+
+updateGripIndex() <= gripIndex(!Track.Grip, ?index), Set(Track.Grip.Index, ?index)
+
+[Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm]
+[Optimum, Fast, Green, Greasy, Damp, Wet, Flooded]
+
+
 priority: 2,
 	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]}} =>
 		(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
+	{All: [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
 		  {Prove: availableTyreCompound(Intermediate, ?)},
-		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain]}} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Intermediate))
+		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain]}
+		  [?Track.Grip.Index > 2]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Intermediate))
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
+	{All: [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
 		  {Prove: availableTyreCompound(Wet, ?)},
-		  [?Weather.Weather.10Min = LightRain], {None: {Prove: availableTyreCompound(Intermediate, ?)}}} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Wet))
+		  [?Weather.Weather.10Min != Dry], [?Track.Grip.Index > 3],
+		  {None: {Prove: availableTyreCompound(Intermediate, ?)}}} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Wet))
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
-		  {Prove: availableTyreCompound(Wet, ?)}, [?Weather.Weather.10Min.Index >= 4]} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Wet))
-priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Dry],
-		  {Any: [?Weather.Weather.10Min = Dry],
-				{All: [?Weather.Weather.10Min = Drizzle], {None: {Prove: availableTyreCompound(Intermediate, ?)}}},
-				{All: {None: {Prove: availableTyreCompound(Intermediate, ?)}}, {None: {Prove: availableTyreCompound(Wet, ?)}}}}} =>
-			(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
+	{All: [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
+		  {Prove: availableTyreCompound(Wet, ?)}, [?Weather.Weather.10Min.Index >= 4],
+		  [?Track.Grip.Index > 3]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Wet))
+; priority: 1,
+;	{All: [?Tyre.Compound = Dry],
+;		  {Any: [?Weather.Weather.10Min = Dry],
+;				{All: [?Weather.Weather.10Min = Drizzle], {None: {Prove: availableTyreCompound(Intermediate, ?)}}},
+;				{All: {None: {Prove: availableTyreCompound(Intermediate, ?)}}, {None: {Prove: availableTyreCompound(Wet, ?)}}}}} =>
+;			(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 
 priority: 2,
-	{All: [?Lap], [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]}} =>
+	{All: [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]}} =>
 		(Set: Weather.Tyre.Compound.Target, Intermediate), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)		
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]},
-		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry]} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Dry))
+	{All: [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]},
+		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry]
+		  [?Track.Grip.Index < 5]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Dry))
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]},
-		  {Prove: availableTyreCompound(Wet, ?)}, [?Weather.Weather.10Min.Index >= 4]} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Wet))
-priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Intermediate],
-		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain],
-				{All: [?Weather.Weather.10Min = Dry], {None: {Prove: availableTyreCompound(Dry, ?)}}},
-				{All: [?Weather.Weather.10Min.Index >= 4],
-					  {None: {Prove: availableTyreCompound(Wet, ?)}}}}} =>
-			(Set: Weather.Tyre.Compound.Target, Intermediate), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
+	{All: [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]},
+		  {Prove: availableTyreCompound(Wet, ?)}, [?Weather.Weather.10Min.Index >= 4],
+		  [?Track.Grip.Index > 4]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Wet))
+; priority: 1,
+;	{All: [?Tyre.Compound = Intermediate],
+;		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain],
+;				{All: [?Weather.Weather.10Min = Dry], {None: {Prove: availableTyreCompound(Dry, ?)}}},
+;				{All: [?Weather.Weather.10Min.Index >= 4],
+;					  {None: {Prove: availableTyreCompound(Wet, ?)}}}}} =>
+;			(Set: Weather.Tyre.Compound.Target, Intermediate), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 
 priority: 2,
-	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]}} =>
+	{All: [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]}} =>
 		(Set: Weather.Tyre.Compound.Target, Wet), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)		
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
-		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry]} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Dry))
+	{All: [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
+		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry],
+		  [?Track.Grip.Index < 6]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Dry))
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
+	{All: [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
 		  {Prove: availableTyreCompound(Intermediate, ?)},
-		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain]}} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Intermediate))
+		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain],
+		  [?Track.Grip.Index < 6]}} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Intermediate))
 priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
+	{All: [?Tyre.Compound = Wet], {None: [?Weather.Tyre.Change.Recommended]},
 		  {None: {Prove: availableTyreCompound(Intermediate, ?)}},
-		  [?Weather.Weather.10Min = Drizzle]} =>
-		(Prove: weatherTyreChangeRecommendation(?Lap, ?Weather.Weather.10Min, 10, Dry))
-priority: 1,
-	{All: [?Lap], [?Tyre.Compound = Wet],
-		  {Any: [?Weather.Weather.10Min.Index >= 4],
-		        {All: {None: {Prove: availableTyreCompound(Intermediate, ?)}}, [?Weather.Weather.10Min = LightRain]},
-				{All: {None: {Prove: availableTyreCompound(Dry, ?)}}, {None: {Prove: availableTyreCompound(Intermediate, ?)}}}}} =>
-		(Set: Weather.Tyre.Compound.Target, Wet), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
+		  [?Weather.Weather.10Min = Drizzle], [?Track.Grip.Index < 5]} =>
+		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Dry))
+; priority: 1,
+;	{All: [?Tyre.Compound = Wet],
+;		  {Any: [?Weather.Weather.10Min.Index >= 4],
+;		        {All: {None: {Prove: availableTyreCompound(Intermediate, ?)}}, [?Weather.Weather.10Min = LightRain]},
+;				{All: {None: {Prove: availableTyreCompound(Dry, ?)}}, {None: {Prove: availableTyreCompound(Intermediate, ?)}}}}} =>
+;		(Set: Weather.Tyre.Compound.Target, Wet), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 
 {All: [?Lap > 1], [?Tyre.Compound = Dry],
 	  {Any: {All: {None: [?Weather.Change.Notified]}, [?Weather.Weather.Now.Index <= 2], [?Weather.Weather.30Min.Index >= 3]},
@@ -104,9 +119,6 @@ priority: 1,
 	  {Any: {All: {None: [?Weather.Change.Notified]}, [?Weather.Weather.Now.Index >= 3], [?Weather.Weather.30Min.Index <= 2]},
 			[?Weather.Change.Notified > ?Weather.Weather.30Min.Index]}} =>
 		(Prove: weatherForecastNotification(?Lap, !Weather.Weather.30Min, 30))
-		
-updateWeatherTyreCompoundColorTarget(?compound) <= availableTyreCompounds(?compound, ?compoundColor),
-												   Set(Weather.Tyre.Compound.Color.Target, ?compoundColor)
 
 priority: -10, [?Pitstop.Lap = ?Lap] => (Prove: clearWeatherTyreChangeNotification(?Lap)),
 										(Clear: Weather.Tyre.Compound.Target), (Clear: Weather.Tyre.Compound.Color.Target)

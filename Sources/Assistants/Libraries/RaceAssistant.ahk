@@ -2166,6 +2166,7 @@ class RaceAssistant extends ConfigurationItem {
 	createKnowledgeBase(facts := false) {
 		local compiler := RuleCompiler()
 		local includes := []
+		local availableCompounds := []
 		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 
 		rules := FileRead(getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory))
@@ -2205,6 +2206,12 @@ class RaceAssistant extends ConfigurationItem {
 			compoundColor := false
 
 			splitCompound(compound, &compound, &compoundColor)
+
+			if !inList(availableCompounds, compound) {
+				availableCompounds.Push(compound)
+
+				knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . ")"))
+			}
 
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}

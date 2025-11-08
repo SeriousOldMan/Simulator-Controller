@@ -60,12 +60,15 @@ gripIndex(?grip, ?index) <= index([Optimum, Fast, Green, Greasy, Damp, Wet, Floo
 
 gripSymbol(?index, ?grip) <= gripIndex(?grip, ?index)
 
-optimalTyreCompound(Optimum, Dry)
-optimalTyreCompound(Fast, Dry)
-optimalTyreCompound(Green, Dry)
-optimalTyreCompound(Greasy, Dry)
-optimalTyreCompound(Greasy, Intermediate)
-optimalTyreCompound(Damp, Wet)
-optimalTyreCompound(Damp, Intermediate)
-optimalTyreCompound(Wet, Wet)
-optimalTyreCompound(Flooded, Wet)
+optimalTyreCompound(?grip, Dry) <= availableTyreCompound(Intermediate), !, any?(?grip, [Optimum, Fast, Green])
+optimalTyreCompound(?grip, Dry) <= availableTyreCompound(Wet), !, any?(?grip, [Optimum, Fast, Green, Greasy])
+optimalTyreCompound(?, Dry)
+
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Dry), availableTyreCompound(Wet), !, any?(?grip, [Damp, Greasy])
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Dry), !, any?(?grip, [Greasy, Damp, Wet, Flooded])
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Wet), !, any?(?grip, [Optimum, Fast, Green, Greasy, Damp, Greasy])
+optimalTyreCompound(?, Intermediate)
+
+optimalTyreCompound(?grip, Wet) <= availableTyreCompound(Intermediate), !, any?(?grip, [Wet, Flooded])
+optimalTyreCompound(?grip, Wet) <= availableTyreCompound(Dry), !, any?(?grip, [Damp, Wet, Flooded])
+optimalTyreCompound(?, Wet)

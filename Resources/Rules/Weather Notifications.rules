@@ -27,17 +27,13 @@ priority: 5, {Any: [?Track.Grip], {None: [?Track.Grip.Index]}} => (Prove: update
 
 updateGripIndex() <= gripIndex(!Track.Grip, ?index), Set(Track.Grip.Index, ?index)
 
-[Dry, Drizzle, LightRain, MediumRain, HeavyRain, Thunderstorm]
-[Optimum, Fast, Green, Greasy, Damp, Wet, Flooded]
-
-
 priority: 2,
 	{All: [?Lap], [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]}} =>
 		(Set: Weather.Tyre.Compound.Target, Dry), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)
 priority: 1,
 	{All: [?Tyre.Compound = Dry], {None: [?Weather.Tyre.Change.Recommended]},
 		  {Prove: availableTyreCompound(Intermediate, ?)},
-		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain]}
+		  {Any: [?Weather.Weather.10Min = Drizzle], [?Weather.Weather.10Min = LightRain]},
 		  [?Track.Grip.Index > 2]} =>
 		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Intermediate))
 priority: 1,
@@ -63,7 +59,7 @@ priority: 2,
 		(Set: Weather.Tyre.Compound.Target, Intermediate), (Set: Weather.Tyre.Compound.Color.Target, !Tyre.Compound.Color)		
 priority: 1,
 	{All: [?Tyre.Compound = Intermediate], {None: [?Weather.Tyre.Change.Recommended]},
-		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry]
+		  {Prove: availableTyreCompound(Dry, ?)}, [?Weather.Weather.10Min = Dry],
 		  [?Track.Grip.Index < 5]} =>
 		(Prove: weatherTyreChangeRecommendation(!Lap, ?Weather.Weather.10Min, 10, Dry))
 priority: 1,

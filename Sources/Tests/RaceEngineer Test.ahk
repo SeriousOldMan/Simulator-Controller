@@ -1159,7 +1159,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 21 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)
@@ -1534,7 +1534,7 @@ else {
 		}
 		until done
 	}
-	else if (raceNr = 21) {
+	else if ((raceNr = 21) || (raceNr = 24)) {
 		done := false
 
 		loop {
@@ -1552,6 +1552,9 @@ else {
 				else {
 					if (A_Index == 1) {
 						engineer.addLap(lap, &data)
+
+						if ((lap = 1) && (raceNr = 24))
+							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Compound.Change", "Weather")
 
 						if (lap = 3) {
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)

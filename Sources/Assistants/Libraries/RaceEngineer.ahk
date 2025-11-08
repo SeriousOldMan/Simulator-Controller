@@ -5144,7 +5144,7 @@ class RaceEngineer extends RaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					this.getSpeaker().speak("LowGrip")
+					this.getSpeaker().speakPhrase("LowGrip")
 
 					if !this.hasPreparedPitstop()
 						if this.confirmAction("Pitstop.Tyre") {

@@ -115,11 +115,6 @@ priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: L
 ;;; weather trends and weather forecast information (as far as available).  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Weather.Weather.10Min], {None: [?Weather.Weather.10Min.Index]}} => (Prove: updateWeatherIndex(10Min))
-priority: 5, {Any: [?Weather.Weather.30Min], {None: [?Weather.Weather.30Min.Index]}} => (Prove: updateWeatherIndex(30Min))
-
-updateWeatherIndex(?time) <= Get(Weather.Weather, ?time, ?weather), weatherIndex(?weather, ?index), Set(Weather.Weather, ?time, Index, ?index)
-
 [?Lap > 5] => (Prove: updateWeatherTrend(?Lap))
 
 updateWeatherTrend(?lap) <= firstStintLap(?startlap), ?deltaLaps = ?lap - ?startlap,

@@ -70,13 +70,13 @@ transpose(?matrix, [?row | ?rows]) <= transposeFirst(?matrix, ?row, ?restMatrix)
 transposeFirst([], [], [])
 transposeFirst([[?h | ?t] | ?rows], [?h | ?hs], [?t | ?ts]) <= transposeFirst(?rows, ?hs, ?ts)
 
-index(?list, ?element, ?index) <= index(?list, ?element, 0, ?index)
+index(?list, ?element, ?index) <= index(?list, ?element, 1, ?index)
 
 index([?element], ?element, ?index, ?index) <= !
 index([?head | ?tail], ?head, ?index, ?index) <= !
 index([?head | ?tail], ?element, ?running, ?index) <= ?nRunning = ?running + 1, index(?tail, ?element, ?nRunning, ?index)
 
-element(?list, ?index, ?element) <= element(?list, 0, ?index, ?element)
+element(?list, ?index, ?element) <= element(?list, 1, ?index, ?element)
 
 element([?element], ?index, ?index, ?element)
 element([?head | ?tail], ?index, ?index, ?head) <= !

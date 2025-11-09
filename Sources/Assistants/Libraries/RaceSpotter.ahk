@@ -3957,7 +3957,8 @@ class RaceSpotter extends GridRaceAssistant {
 	startSession(settings, data) {
 		local configuration := this.Configuration
 		local joined := false
-		local simulatorName, configuration, saveSettings, facts
+		local simulatorName, configuration, saveSettings, facts, speaker, fragments
+		local weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min
 
 		if !this.Prepared
 			joined := true
@@ -3967,8 +3968,51 @@ class RaceSpotter extends GridRaceAssistant {
 		if this.Debug[kDebugPositions]
 			deleteFile(kTempDirectory . "Race Spotter.positions")
 
-		if (joined && this.Speaker[false])
-			this.getSpeaker().speakPhrase("GreetingIntro")
+		if (joined && this.Speaker[false]) {
+			speaker := this.getSpeaker()
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("GreetingIntro")
+				fragments := speaker.Fragments
+
+				airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
+				trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
+
+				if (airTemperature = 0)
+					airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
+
+				if (trackTemperature = 0)
+					trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
+
+				weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+				weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
+				weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
+
+				if (weatherNow = "Dry") {
+					if ((weather10Min = "Dry") || (weather30Min = "Dry"))
+						weather := fragments["GreetingDry"]
+					else
+						weather := fragments["GreetingDry2Wet"]
+				}
+				else {
+					if ((weather10Min = "Dry") || (weather30Min = "Dry"))
+						weather := fragments["GreetingWet2Dry"]
+					else
+						weather := fragments["GreetingWet"]
+				}
+
+				speaker.speakPhrase("GreetingWeather", {weather: weather
+													  , air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+													  , grip: translate(getMultiMapValue(data, "Track Data", "Grip", "Optimum"), this.VoiceManager.Language)
+													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+													  , unit: fragments[getUnit("Temperature")]})
+			}
+			finally {
+				speaker.endTalk()
+			}
+		}
 
 		simulatorName := this.Simulator
 

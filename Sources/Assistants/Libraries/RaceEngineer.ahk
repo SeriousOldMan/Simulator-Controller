@@ -5146,14 +5146,25 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					this.getSpeaker().speakPhrase("LowGrip")
 
-					if !this.hasPreparedPitstop()
-						if this.confirmAction("Pitstop.Tyre") {
-							speaker.speakPhrase("ConfirmPrepare", false, true)
+					if this.hasPlannedPitstop() {
+						if !this.hasPreparedPitstop()
+							if this.confirmAction("Pitstop.Tyre") {
+								speaker.speakPhrase("ConfirmPrepare", false, true)
 
-							this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
-						}
-						else
-							this.preparePitstop()
+								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+							}
+							else
+								this.preparePitstop()
+					}
+					else if this.hasPreparedPitstop()
+						speaker.speakPhrase("ComeIn")
+					else if this.confirmAction("Pitstop.Tyre") {
+						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+
+						this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+					}
+					else
+						this.proposePitstop("Now")
 				}
 				finally {
 					speaker.endTalk()

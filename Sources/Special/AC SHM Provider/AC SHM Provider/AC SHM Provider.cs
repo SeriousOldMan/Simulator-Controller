@@ -364,12 +364,14 @@ namespace ACSHMProvider
 
                 session = GetSession(graphics.Session);
 
+				/*
                 if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0) {
                     if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
 						session = "Finished";
                 }
                 else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
+				*/
 
                 Console.Write("Session="); Console.WriteLine(session);
 

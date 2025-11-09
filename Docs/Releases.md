@@ -30,7 +30,7 @@
 
 #### Fixes
 
-  - None this time...
+  - Reduced probability of premature session end in timed races for *Assetto Corsa*.
 
 #### Changes
 

@@ -464,7 +464,7 @@ namespace SHMConnector {
 					grip = "Flooded";
 				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.15)
 					grip = "Wet";
-				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.05)
+				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.075)
 					grip = "Damp";
 				else if (scoring.mScoringInfo.mAvgPathWetness > 0.02)
 					grip = "Greasy";

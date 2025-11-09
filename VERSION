@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.5.0-dev
 Target=6.6.4.0-release
-Date=11/08/2025
+Date=11/09/2025
 Download=
-Changes=Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster
+Changes=Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster, Changed Damp threshold for rF2 and LMU, Spotter intro now includes track grip
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.4.0-release

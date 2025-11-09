@@ -3911,6 +3911,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 					speaker.speakPhrase("GreetingWeather", {weather: weather
 														  , air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+														  , grip: translate(getMultiMapValue(data, "Track Data", "Grip", "Optimum"), this.VoiceManager.Language)
 														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
 														  , unit: fragments[getUnit("Temperature")]})
 

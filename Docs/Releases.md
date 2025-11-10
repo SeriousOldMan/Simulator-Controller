@@ -32,6 +32,7 @@
 
   - Fixed a critical bug **not fixed** with the last release 6.6.4 (actually, fix code was removed accidently in the final merge process), which prevented the *Reasoning* booster to work in non-English settings.
   - Reduced probability of premature session end in timed races for *Assetto Corsa*.
+  - Fixed a couple translations in the "Setup Workbench".
 
 #### Changes
 

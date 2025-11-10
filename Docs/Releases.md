@@ -24,7 +24,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.5.0
+
+#### Date: 11/14/25 (planned)
+
+#### Fixes
+
+  - Reduced probability of premature session end in timed races for *Assetto Corsa*.
+
+#### Changes
+
+  - The threshold between greasy and damp track conditions has been tweaked for *Le Mans Ultimate* and *rFactor 2*. This will result in more precise tyre change information (see next topic).
+  - The tyre compound recommendation rule set based upon weather information has been extended by a component which takes the track grip into account. These rules are used by the Strategist and the Engineer, when preparing a pitstop and when to call you to the pit. All this results in almost perfect pitstop timing.
+  - The Engineer now calls you to the pit after a pitstop has been planned for a tyre change to handle an upcoming weather change, and the grip has become too worse to continue the race on the current tyre compound.
+  - A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
+  - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
 
 # Release history
 

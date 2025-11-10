@@ -357,6 +357,7 @@ namespace SHMConnector
 
                 session = GetSession(graphics.Session);
 
+				/*
                 if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0)
                 {
                     if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
@@ -364,6 +365,7 @@ namespace SHMConnector
                 }
                 else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                     session = "Finished";
+				*/
 
                 strWriter.Write("Session="); strWriter.WriteLine(session);
 

@@ -4693,8 +4693,8 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																											  : "WeatherDryChange"
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "TrackRainChange"
+																											  : "TrackDryChange"
 								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 				if this.hasEnoughData(false)

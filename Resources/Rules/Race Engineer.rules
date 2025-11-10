@@ -802,6 +802,70 @@ priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: L
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                            Low Grip Warning                             ;;;
+;;;                                                                         ;;;
+;;; These rules periodically check, whether the currently mounted tyres     ;;;
+;;; are suitable for the current weather and track grip conditions. If a    ;;;
+;;; pitstop has already been planned, the driver is called to the pit in    ;;;
+;;; time.                                                                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+{All: [?Session.Settings.Tyre.Service = All],
+	  {Any: [?Lap > ?Pitstop.Planned], [?Lap > ?Pitstop.Prepared]},
+	  {None: [?Grip.Low.Reported]},
+	  [?Pitstop.Planned.Tyre.Compound != false],
+	  [?Pitstop.Planned.Tyre.Compound != !Tyre.Compound],
+	  {Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound)}} =>
+		(Set: Grip.Low.Reported, !Lap),
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound))
+
+{All: [?Session.Settings.Tyre.Service = Axle],
+	  {Any: [?Lap > ?Pitstop.Planned], [?Lap > ?Pitstop.Prepared]},
+	  {None: [?Grip.Low.Reported]},
+	  {Any: [?Pitstop.Planned.Tyre.Compound.Front != false], [?Pitstop.Planned.Tyre.Compound.Rear != false]},
+	  {All: {Any: [?Pitstop.Planned.Tyre.Compound.Front = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.Front != !Tyre.Compound.Front],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.Front)}}},
+			{Any: [?Pitstop.Planned.Tyre.Compound.Rear = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.Rear != !Tyre.Compound.Rear],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.Rear)}}}}} =>
+		(Set: Grip.Low.Reported, !Lap),
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.Front, ?Pitstop.Planned.Tyre.Compound.Rear))
+
+{All: [?Session.Settings.Tyre.Service = Wheel],
+	  {Any: [?Lap > ?Pitstop.Planned], [?Lap > ?Pitstop.Prepared]},
+	  {None: [?Grip.Low.Reported]},
+	  {Any: [?Pitstop.Planned.Tyre.Compound.FrontLeft != false], [?Pitstop.Planned.Tyre.Compound.FrontRight != false],
+			[?Pitstop.Planned.Tyre.Compound.RearLeft != false], [?Pitstop.Planned.Tyre.Compound.RearRight != false]},
+	  {All: {Any: [?Pitstop.Planned.Tyre.Compound.FrontLeft = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.FrontLeft != !Tyre.Compound.FrontLeft],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.FrontLeft)}}},
+			{Any: [?Pitstop.Planned.Tyre.Compound.FrontRight = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.FrontRight != !Tyre.Compound.FrontRight],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.FrontRight)}}},
+			{Any: [?Pitstop.Planned.Tyre.Compound.RearLeft = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.RearLeft != !Tyre.Compound.RearLeft],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.RearLeft)}}},
+			{Any: [?Pitstop.Planned.Tyre.Compound.RearRight = false],
+				  {All: [?Pitstop.Planned.Tyre.Compound.RearRight != !Tyre.Compound.RearRight],
+						{Prove: optimalTyreCompound(!Track.Grip, ?Pitstop.Planned.Tyre.Compound.RearRight)}}}}} =>
+		(Set: Grip.Low.Reported, !Lap),
+		(Prove: lowGripWarning(!Lap, ?Pitstop.Planned.Tyre.Compound.FrontLeft, ?Pitstop.Planned.Tyre.Compound.FrontRight,
+									 ?Pitstop.Planned.Tyre.Compound.RearLeft, ?Pitstop.Planned.Tyre.Compound.RearRight))
+
+lowGripWarning(?lap, ?compound) <= Call(raiseEvent, GripLow, ?compound), !
+lowGripWarning(?lap, ?compound) <= Call(lowGripWarning, ?compound)
+
+lowGripWarning(?lap, ?frontCompound, ?rearCompound) <= Call(raiseEvent, GripLow, ?frontCompound, ?rearCompound), !
+lowGripWarning(?lap, ?frontCompound, ?rearCompound) <= Call(lowGripWarning, ?frontCompound, ?rearCompound)
+
+lowGripWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
+		Call(raiseEvent, GripLow, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound), !
+lowGripWarning(?lap, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound) <=
+		Call(lowGripWarning, ?frontLeftCompound, ?frontRightCompound, ?rearLeftCompound, ?rearRightCompound)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                Weather & Tyre Temperature Trend Projection              ;;;
 ;;;                                                                         ;;;
 ;;; The rules in this section try to derive future weather data on past     ;;;
@@ -919,7 +983,7 @@ adjustTargetPressures([?tyreType | ?tyreTypes], [?correction | ?corrections]) <=
 		adjustTargetPressures(?tyreTypes, ?corrections)
 
 priority: 20, [?Pitstop.Plan = true] =>
-		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap),
+		(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Lap), (Clear: Pitstop.Planned.Planned),
 		(Clear: Pitstop.Planned.Fuel), (Clear: Pitstop.Planned.Laps.Remaining),
 		(Clear: Pitstop.Planned.Tyre.Compound), (Clear: Pitstop.Planned.Tyre.Compound.Color),
 		(Clear: Pitstop.Planned.Tyre.Compound.Front), (Clear: Pitstop.Planned.Tyre.Compound.Color.Front),
@@ -941,7 +1005,7 @@ priority: 20, [?Pitstop.Plan = true] =>
 		(Clear: Pitstop.Planned.Repair.Suspension), (Clear: Pitstop.Planned.Repair.Bodywork), (Clear: Pitstop.Planned.Repair.Engine),
 		(Clear: Pitstop.Planned.Time.Pitlane), (Clear: Pitstop.Planned.Time.Box),
 		(Clear: Pitstop.Planned.Time.Service), (Clear: Pitstop.Planned.Time.Repairs),
-		(Clear: Pitstop.Prepared)
+		(Clear: Pitstop.Prepared), (Clear: Grip.Low.Reported)
 priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 
 planPitstop() <= lastPitstop(?last), ?nr = ?last + 1, Set(Pitstop.Planned.Nr, ?nr)
@@ -1384,7 +1448,8 @@ computePitstopDamages(?damages) <=
 		computeDamages([!Pitstop.Planned.Repair.Bodywork, !Pitstop.Planned.Repair.Suspension, !Pitstop.Planned.Repair.Engine],
 					   [!Damage.Bodywork, !Damage.Suspension, !Damage.Engine], ?damages)
 
-priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan), (Clear: Pitstop.Plan.Lap),
+priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned, !Lap),
+								  (Clear: Pitstop.Plan), (Clear: Pitstop.Plan.Lap),
 								  (Clear: Pitstop.Plan.Fuel.Amount), (Clear: Pitstop.Plan.Tyre.Change), (Clear: Pitstop.Plan.Tyre.Set),
 								  (Clear: Pitstop.Plan.Tyre.Compound), (Clear: Pitstop.Plan.Tyre.Compound.Color),
 								  (Clear: Pitstop.Plan.Tyre.Compound.Front), (Clear: Pitstop.Plan.Tyre.Compound.Color.Front),
@@ -1411,7 +1476,7 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),
 {All: [?Pitstop.Planned], [?Pitstop.Prepare],
 	  {None: [?InPitlane = true], [?InPit = true]}} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr)), (Set: Pitstop.Set)
 priority: -20, [?Pitstop.Set] => (Clear: Pitstop.Planned), (Clear: Pitstop.Planned.Adjusted),
-								 (Clear: Pitstop.Prepare), (Clear: Pitstop.Set), (Set: Pitstop.Prepared)
+								 (Clear: Pitstop.Prepare), (Clear: Pitstop.Set), (Set: Pitstop.Prepared, !Lap)
 
 preparePitstop(?pitstopNumber) <= Call(startPitstopSetup, ?pitstopNumber)
 preparePitstop(?pitstopNumber) <= setRefuelAmount(?pitstopNumber),
@@ -1565,6 +1630,7 @@ priority: -10, [?Pitstop.Lap] => (Set: Pitstop.Clear, ?Pitstop.Lap)
 					(Clear: Pitstop.Planned.Time.Pitlane), (Clear: Pitstop.Planned.Time.Box),
 					(Clear: Pitstop.Planned.Time.Service), (Clear: Pitstop.Planned.Time.Repairs),
 					(Clear: Pitstop.Lap), (Clear: Pitstop.Planned), (Clear: Pitstop.Prepared),
+					(Clear: Grip.Low.Reported),
 					(Clear: Pitstop.Planned.Nr), (Clear: Pitstop.Planned.Adjusted)
 
 priority: -20, [?Pitstop.Clear] => (Clear: Pitstop.Clear)

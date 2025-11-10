@@ -2202,9 +2202,7 @@ class RaceAssistant extends ConfigurationItem {
 		for ignore, compound in SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
 															   , knowledgeBase.getValue("Session.Car")
 															   , knowledgeBase.getValue("Session.Track")) {
-			compoundColor := false
-
-			splitCompound(compound, &compound, &compoundColor)
+			splitCompound(compound, &compound, &compoundColor := false)
 
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}

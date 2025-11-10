@@ -11,12 +11,13 @@ plan_pitstop.3=tyreCompounds|String||false|If a tyre change is requested the com
 plan_pitstop.4=repairDamage|Boolean||false|Indicates whether all damages should be repaired.
 plan_pitstop.5=swapDriver|Boolean||false|Indicates in a team race whether the next driver according to the stint plan should take the car.
 [Agent.LLM.Actions]
-Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_low_energy,report_tyre_wear,report_brake_wear,report_pressure_loss
+Active=plan_pitstop,cancel_pitstop,report_damage,report_time_loss,report_no_time_loss,report_weather_forecast,report_low_fuel,report_low_energy,report_low_grip,report_tyre_wear,report_brake_wear,report_pressure_loss
 [Agent.LLM.Actions.Builtin]
 plan_pitstop=Assistant.Method|planPitstopAction(%targetLap%, %refuelAmount%, %tyreCompounds%, %repairDamage%, %swapDriver%)|false|false|5|Creates a plan for the next pitstop.
 cancel_pitstop=Assistant.Rule|Race Engineer.cancel_pitstop.rules|false|false|0|Clears the pitstop plan, if a pitstop is no longer needed.
 report_low_fuel=Assistant.Method|lowFuelWarning(%remainingFuel%, %remainingLaps%)|false|false|2|Reports that the car is running low on fuel.
 report_low_energy=Assistant.Method|lowEnergyWarning(%remainingEnergy%, %remainingLaps%)|false|false|2|Reports that the car is running low on virtual energy.
+report_low_grip=Assistant.Method|lowGripWarning()|false|false|0|Reports the grip is low and that it is time now for the planned tyre compound change.
 report_tyre_wear=Assistant.Method|tyreWearWarning(%tyre%, %wear%)|false|false|2|Reports a high tread wear on one of the tyres.
 report_brake_wear=Assistant.Method|brakeWearWarning(%wheel%, %wear%)|false|false|2|Reports a high wear on one of the brake pads.
 report_damage=Assistant.Method|damageWarning(%suspensionDamage%, %bodyworkDamage%, %engineDamage%)|false|false|3|Reports recent damage to the car to the driver.

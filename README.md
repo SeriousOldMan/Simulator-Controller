@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.6.5.0-release]() (Early build for 6.6.5. Changes: Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster, Changed Damp threshold for rF2 and LMU, Spotter intro now includes track grip, Fixed AC session end detection.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6650) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

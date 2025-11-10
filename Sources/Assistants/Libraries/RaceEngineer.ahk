@@ -63,6 +63,19 @@ class EnergyLowEvent extends EngineerEvent {
 	}
 }
 
+class GripLowEvent extends EngineerEvent {
+	createTrigger(event, phrase, arguments) {
+		return "The tyres are running out of grip. The planned tire change should now be carried out."
+	}
+
+	handleEvent(event, arguments*) {
+		if !super.handleEvent(event, arguments*)
+			this.Assistant.lowGripWarning(arguments)
+
+		return true
+	}
+}
+
 class TyreWearEvent extends EngineerEvent {
 	createTrigger(event, phrase, arguments) {
 		static wheels := false
@@ -1845,7 +1858,6 @@ class RaceEngineer extends RaceAssistant {
 
 				try {
 					speaker.speakPhrase("NotPossible")
-
 					speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 				}
 				finally {
@@ -5051,24 +5063,25 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if (!this.hasPlannedPitstop() && planPitstop) {
-							if this.confirmAction("Pitstop.Fuel") {
-								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						else if planPitstop
+							if !this.hasPlannedPitstop() {
+								if this.confirmAction("Pitstop.Fuel") {
+									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+								}
+								else
+									this.proposePitstop("Now")
 							}
-							else
-								this.proposePitstop("Now")
-						}
-						else if planPitstop {
-							if this.confirmAction("Pitstop.Fuel") {
-								speaker.speakPhrase("ConfirmPrepare", false, true)
+							else {
+								if this.confirmAction("Pitstop.Fuel") {
+									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+								}
+								else
+									this.preparePitstop()
 							}
-							else
-								this.preparePitstop()
-						}
 				}
 				finally {
 					speaker.endTalk()
@@ -5095,24 +5108,67 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if (!this.hasPlannedPitstop() && planPitstop) {
-							if this.confirmAction("Pitstop.Fuel") {
-								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						else if planPitstop
+							if !this.hasPlannedPitstop() {
+								if this.confirmAction("Pitstop.Fuel") {
+									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+								}
+								else
+									this.proposePitstop("Now")
 							}
-							else
-								this.proposePitstop("Now")
-						}
-						else if planPitstop {
-							if this.confirmAction("Pitstop.Fuel") {
-								speaker.speakPhrase("ConfirmPrepare", false, true)
+							else {
+								if this.confirmAction("Pitstop.Fuel") {
+									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+								}
+								else
+									this.preparePitstop()
 							}
-							else
-								this.preparePitstop()
-						}
+				}
+				finally {
+					speaker.endTalk()
+				}
+			}
+	}
+
+	lowGripWarning(tyreCompounds, planPitstop := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker
+
+		if (this.hasEnoughData(false) && this.Speaker[false])
+			if (!knowledgeBase.getValue("InPitLane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
+
+				speaker.beginTalk()
+
+				try {
+					this.getSpeaker().speakPhrase("LowGrip")
+
+					if this.supportsPitstop()
+						if this.hasPreparedPitstop()
+							speaker.speakPhrase("ComeIn")
+						else if planPitstop
+							if !this.hasPlannedPitstop() {
+								if this.confirmAction("Pitstop.Tyre") {
+									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+
+									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+								}
+								else
+									this.proposePitstop("Now")
+							}
+							else {
+								if this.confirmAction("Pitstop.Tyre") {
+									speaker.speakPhrase("ConfirmPrepare", false, true)
+
+									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+								}
+								else
+									this.preparePitstop()
+							}
 				}
 				finally {
 					speaker.endTalk()
@@ -5144,24 +5200,25 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase("ComeIn")
-						else if (!this.hasPlannedPitstop() && planPitstop) {
-							if this.confirmAction("Pitstop.Tyre") {
-								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						else if planPitstop
+							if !this.hasPlannedPitstop() {
+								if this.confirmAction("Pitstop.Tyre") {
+									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+								}
+								else
+									this.proposePitstop("Now")
 							}
-							else
-								this.proposePitstop("Now")
-						}
-						else if planPitstop {
-							if this.confirmAction("Pitstop.Tyre") {
-								speaker.speakPhrase("ConfirmPrepare", false, true)
+							else {
+								if this.confirmAction("Pitstop.Tyre") {
+									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+								}
+								else
+									this.preparePitstop()
 							}
-							else
-								this.preparePitstop()
-						}
 				}
 				finally {
 					speaker.endTalk()
@@ -5193,24 +5250,25 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop()
 						if this.hasPreparedPitstop()
 							speaker.speakPhrase("ComeIn")
-						else if (!this.hasPlannedPitstop() && planPitstop) {
-							if this.confirmAction("Pitstop.Brake") {
-								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						else if planPitstop
+							if !this.hasPlannedPitstop() {
+								if this.confirmAction("Pitstop.Brake") {
+									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-								this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+								}
+								else
+									this.proposePitstop("Now")
 							}
-							else
-								this.proposePitstop("Now")
-						}
-						else if planPitstop {
-							if this.confirmAction("Pitstop.Brake") {
-								speaker.speakPhrase("ConfirmPrepare", false, true)
+							else {
+								if this.confirmAction("Pitstop.Brake") {
+									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-								this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+								}
+								else
+									this.preparePitstop()
 							}
-							else
-								this.preparePitstop()
-						}
 				}
 				finally {
 					speaker.endTalk()
@@ -5340,8 +5398,8 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																											  : "WeatherDryChange"
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "TrackRainChange"
+																											  : "TrackDryChange"
 								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 				if (this.hasEnoughData(false) && this.supportsPitstop())
@@ -5440,6 +5498,12 @@ lowFuelWarning(context, remainingFuel, remainingLaps) {
 
 lowEnergyWarning(context, remainingEnergy, remainingLaps) {
 	context.KnowledgeBase.RaceAssistant.lowEnergyWarning(Round(remainingEnergy, 1), Floor(remainingLaps))
+
+	return true
+}
+
+lowGripWarning(context, tyreCompounds*) {
+	context.KnowledgeBase.RaceAssistant.lowGripWarning(tyreCompounds)
 
 	return true
 }

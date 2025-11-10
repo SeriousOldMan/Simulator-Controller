@@ -37,7 +37,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 6.6.5
 
-Everything handled automatically.
+New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "grip_low" event and the "report_low_grip" action, if necessary.
 
 ***
 

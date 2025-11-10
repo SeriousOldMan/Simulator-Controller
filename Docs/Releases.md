@@ -40,6 +40,8 @@
   - A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
   - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
+
 # Release history
 
 ## 6.6.3.0

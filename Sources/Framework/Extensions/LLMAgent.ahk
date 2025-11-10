@@ -144,6 +144,8 @@ class AgentBooster extends LLMBooster {
 			if isSet(language) {
 				if this.iInstructions.Has(language)
 					return this.iInstructions[language]
+				else if this.iInstructions.Has("en")
+					return this.iInstructions["en"]
 				else
 					return newMultiMap()
 			}

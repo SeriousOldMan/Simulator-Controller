@@ -519,9 +519,9 @@ The rule engine has some builtin predicates which can be used when formulating r
 
   - call
   
-	Syntax: call(function, arg1, ..., argN)
+	Syntax: call(function, arg1, ..., argN) or **:**function(arg1, ..., argN)
   
-    Using *call*, you can invoke functions in the global name space of the host programming language. Beside all arguments, an implicit first argument is passed to the function. This is an instance of the *ChoicePoint* class of the rule engine. This object also contains the following two properties to make is symetrical to the *Call* action in production rules:
+    Using *call* (or the shortcut syntax shown above), you can invoke functions in the global name space of the host programming language. Beside all arguments, an implicit first argument is passed to the function. This is an instance of the *ChoicePoint* class of the rule engine. This object also contains the following two properties to make is symetrical to the *Call* action in production rules:
 	
 	  1. Knowledgebase - an instance of class *Knowledgebase* in the host language.
 	  2. RuleEngine - an instance of class *RuleEngine* in the host language.

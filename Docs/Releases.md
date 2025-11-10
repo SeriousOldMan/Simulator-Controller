@@ -30,6 +30,7 @@
 
 #### Fixes
 
+  - Fixed a critical bug **not fixed** with the last release 6.6.4 (actually, fix code was removed accidently in the final merge process), which prevented the *Reasoning* booster to work in non-English settings.
   - Reduced probability of premature session end in timed races for *Assetto Corsa*.
 
 #### Changes
@@ -39,6 +40,7 @@
   - The Engineer now calls you to the pit after a pitstop has been planned for a tyre change to handle an upcoming weather change, and the grip has become too worse to continue the race on the current tyre compound.
   - A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
   - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
+  - [Developer] Foreign function calls in the rule engine can also be written like *:function(a1, a2, ...)* rather than *call(function, a1, a2, ...)*.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
 

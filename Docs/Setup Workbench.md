@@ -494,6 +494,8 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Brake.Duct.Front=advancedSetup.aeroBalance.brakeDuct[1]
 	Brake.Duct.Rear=advancedSetup.aeroBalance.brakeDuct[2]
 	...
+
+As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Workbench".
 	
 #### Assetto Corsa
 
@@ -522,8 +524,6 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Aero.Wing.Front=WING_1
 	Aero.Wing.Rear=WING_2
 	...
-
-As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Workbench".
 
 ## Notes
 

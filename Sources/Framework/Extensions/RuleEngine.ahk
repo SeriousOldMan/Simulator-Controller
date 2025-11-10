@@ -4746,7 +4746,16 @@ class ActionParser extends Parser {
 
 class StructParser extends Parser {
 	parse(terms) {
-		return Struct(terms[1], this.parseArguments(terms, 2))
+		local function
+
+		if (InStr(terms[1], ":") = 1) {
+			function := SubStr(terms[1], 2)
+
+			return Struct("call", concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
+											, this.parseArguments(terms, 2)))
+		}
+		else
+			return Struct(terms[1], this.parseArguments(terms, 2))
 	}
 
 	parseArguments(terms, start) {

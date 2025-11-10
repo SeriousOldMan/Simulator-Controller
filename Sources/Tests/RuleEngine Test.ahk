@@ -69,7 +69,7 @@ global kExecutionTestRules := "
 
 				construct(?A, ?B) <= Append(Foo., ?B, .Bar, ?A)
 
-				persist(?A, ?B) <= Call(showRelationship, ?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
+				persist(?A, ?B) <= :showRelationship(?A, ?B), !, Set(?B.grandchild, ?A), Set(?B.grandfather, true), Set(?A.grandchild, true), Produce()
 
 				father(Peter, Frank) <= Set(Peter.son, true), Produce()
 				father(Frank, Paul)
@@ -625,7 +625,7 @@ showRelationship(choicePoint, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
 	local knowledgeBase := choicePoint.ResultSet.KnowledgeBase
 
-	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
+	if true || (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, grandchild " is grandchild of " grandfather), SplashTextGui.Show("w200 h60")
 		Sleep(1000)
 		SplashTextGui.Destroy()

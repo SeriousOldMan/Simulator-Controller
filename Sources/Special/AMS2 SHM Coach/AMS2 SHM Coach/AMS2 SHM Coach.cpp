@@ -110,7 +110,8 @@ int main(int argc, char* argv[]) {
 				xCoordinates[numCoordinates] = (float)atof(argv[i]);
 				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
 
-				numCoordinates += 1;
+				if (++numCoordinates > 59)
+					break;
 			}
 		}
 	}

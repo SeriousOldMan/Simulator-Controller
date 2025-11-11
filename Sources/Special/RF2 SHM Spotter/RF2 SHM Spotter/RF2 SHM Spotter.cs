@@ -1846,8 +1846,9 @@ namespace RF2SHMSpotter {
 				xCoordinates[numCoordinates] = float.Parse(args[i]);
 				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-				numCoordinates += 1;
-			}
+                if (++numCoordinates > 59)
+                    break;
+            }
         }
         
 		string soundsDirectory = "";

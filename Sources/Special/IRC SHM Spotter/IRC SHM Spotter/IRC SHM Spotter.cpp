@@ -2166,7 +2166,8 @@ int main(int argc, char* argv[])
 
 				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
 	
-				numCoordinates += 1;
+				if (++numCoordinates > 59)
+					break;
 			}
 
 			if (numCoordinates == 0)

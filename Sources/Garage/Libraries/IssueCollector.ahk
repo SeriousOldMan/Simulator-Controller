@@ -39,6 +39,7 @@ class IssueCollector {
 	iTrackWidth := false
 
 	iAcousticFeedback := true
+	iSoundsDirectory := false
 
 	iDataFile := false
 	iCollectorPID := false
@@ -159,6 +160,19 @@ class IssueCollector {
 				this.iSampleFrequency := value
 			else
 				this.i%setting% := value
+
+		this.iSoundsDirectory := temporaryFileName("Sounds")
+
+		DirCreate(this.iSoundsDirectory)
+
+		FileCopy(kResourcesDirectory . "Sounds\*", this.iSoundsDirectory)
+		FileCopy(kUserHomeDirectory . "Sounds\*", this.iSoundsDirectory)
+
+		OnExit((*) => deleteDirectory(this.iSoundsDirectory))
+	}
+
+	__Delete() {
+		deleteDirectory(this.iSoundsDirectory)
 	}
 
 	loadFromSettings(settings := false, section := "Settigs") {
@@ -269,10 +283,10 @@ class IssueCollector {
 					options .= (A_Space . this.TrackWidth)
 
 				if this.AcousticFeedback {
-					options .= (A_Space . "`"" . kResourcesDirectory . "Sounds`"")
+					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
 
 					audioDevice := this.AudioSettings.AudioDevice
-					
+
 					if audioDevice
 						options .= (A_Space . "`"" . audioDevice . "`"")
 				}
@@ -348,9 +362,7 @@ class IssueCollector {
 	}
 
 	static acousticFeedback(soundFile) {
-		local audioSettings := IssueCollector.AudioSettings
-		
-		playSound("SWSoundPlayer.exe", soundFile, (audioSettings ? audioSettings : false), "echos 1 1 1 1")
+		playSound("SWSoundPlayer.exe", soundFile, IssueCollector.AudioSettings, "echos 1 1 1 1")
 	}
 
 	getHandling() {

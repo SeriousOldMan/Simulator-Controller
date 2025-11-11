@@ -198,6 +198,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	AudioSettings {
+		Get {
+			return return getAudioSettings("Coach")
+		}
+	}
+
 	Laps[lapNumber?] {
 		Get {
 			if isSet(lapNumber) {
@@ -1914,6 +1920,10 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startupTelemetryCoaching()
 
 		return result
+	}
+
+	acousticFeedback(soundFile) {
+		playSound("DCSoundPlayer.exe", soundFile, this.AudioSettings, "echos 1 1 1 1")
 	}
 
 	positionTrigger(sectionNr, positionX, positionY) {

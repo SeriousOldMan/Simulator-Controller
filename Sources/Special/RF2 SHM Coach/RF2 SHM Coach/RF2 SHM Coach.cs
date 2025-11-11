@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -145,14 +146,14 @@ namespace RF2SHMCoach {
         }
 
 		float[] xCoordinates = new float[60];
-		float[] yCoordinates = new float[60];
-		int numCoordinates = 0;
+        float[] yCoordinates = new float[60];
+        int numCoordinates = 0;
 		long lastUpdate = 0;
 		string triggerType = "Trigger";
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + (triggerType == "BrakeHints" ? 200 : 2000)))
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
@@ -185,6 +186,11 @@ namespace RF2SHMCoach {
 						{
 							if (triggerType == "Trigger")
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+							else if (triggerType == "BrakeHints")
+								if (audioDevice != "")
+									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+								else
+									new System.Media.SoundPlayer(hintSounds[i]).Play();
 
                             lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
@@ -195,6 +201,34 @@ namespace RF2SHMCoach {
 			}
         }
 
+        string[] hintSounds = new string[60];
+		DateTime lastHintsUpdate = DateTime.Now;
+
+		public void loadBrakeHints()
+		{
+			if ((hintFile != "") && System.IO.File.Exists(hintFile))
+			{
+				if (hintSounds.Length == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+				{
+                    var linesRead = System.IO.File.ReadLines(hintFile);
+
+                    numCoordinates = 0;
+
+                    foreach (var line in linesRead)
+                    {
+						var parts = line.Split(new char[] { ' ' }, 3);
+
+                        xCoordinates[numCoordinates] = float.Parse(parts[0]);
+                        yCoordinates[numCoordinates] = float.Parse(parts[1]);
+                        hintSounds[numCoordinates] = parts[2];
+
+                        if (++numCoordinates > 59)
+							break;
+                    }
+                }
+			} 
+		}
+
         public void initializeTrigger(string type, string[] args)
         {
 			triggerType = type;
@@ -204,11 +238,25 @@ namespace RF2SHMCoach {
 				xCoordinates[numCoordinates] = float.Parse(args[i]);
 				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-				numCoordinates += 1;
-			}
+                if (++numCoordinates > 59)
+                    break;
+            }
         }
 
-		public void Run(bool positionTrigger, bool brakeHints) {
+		string audioDevice = string.Empty;
+		string hintFile = string.Empty;
+
+        public void initializeBrakeHints(string type, string[] args)
+        {
+            triggerType = type;
+
+            hintFile = args[1];
+            
+			if (args.Length > 2)
+				audioDevice = args[2];
+        }
+
+        public void Run(bool positionTrigger, bool brakeHints) {
             while (true) {
 				if (!connected)
 					Connect();
@@ -235,6 +283,14 @@ namespace RF2SHMCoach {
 
 							Thread.Sleep(10);
 						}
+						else if (brakeHints)
+						{
+							loadBrakeHints();
+
+                            checkCoordinates(ref playerScoring);
+
+                            Thread.Sleep(10);
+                        }
 					}
 					else
 						Thread.Sleep(1000);

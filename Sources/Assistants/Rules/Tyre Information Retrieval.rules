@@ -55,3 +55,20 @@ setupTyrePressures(?compound, [?tyreType | ?tyreTypes], [?pressure | ?pressures]
 		setupTyrePressure(?compound, ?tyreType, ?pressure), setupTyrePressures(?compound, ?tyreTypes, ?pressures)
 
 tyrePressureTarget(?compound, ?tyreType, ?pressure) <= Get(Session.Settings.Tyre, ?compound, Pressure.Target, ?tyreType, ?pressure)
+
+gripIndex(?grip, ?index) <= index([Optimum, Fast, Green, Greasy, Damp, Wet, Flooded], ?grip, ?index)
+
+gripSymbol(?index, ?grip) <= gripIndex(?grip, ?index)
+
+optimalTyreCompound(?grip, Dry) <= availableTyreCompound(Intermediate, ?), !, any?(?grip, [Optimum, Fast, Green])
+optimalTyreCompound(?grip, Dry) <= availableTyreCompound(Wet, ?), !, any?(?grip, [Optimum, Fast, Green, Greasy])
+optimalTyreCompound(?, Dry)
+
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Dry, ?), availableTyreCompound(Wet, ?), !, any?(?grip, [Damp, Greasy])
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Dry, ?), !, any?(?grip, [Greasy, Damp, Wet, Flooded])
+optimalTyreCompound(?grip, Intermediate) <= availableTyreCompound(Wet, ?), !, any?(?grip, [Optimum, Fast, Green, Greasy, Damp, Greasy])
+optimalTyreCompound(?, Intermediate)
+
+optimalTyreCompound(?grip, Wet) <= availableTyreCompound(Intermediate, ?), !, any?(?grip, [Wet, Flooded])
+optimalTyreCompound(?grip, Wet) <= availableTyreCompound(Dry, ?), !, any?(?grip, [Damp, Wet, Flooded])
+optimalTyreCompound(?, Wet)

@@ -12,4 +12,4 @@ Technical notes:
 
 1. All parts of this documentation as well as the source code of Simulator Controller use a tab width of 4. The default tab width of GitHub is unfortunately 8 characters, so to get the best possible reading quality, take a second and set the tab width to 4 in your GitHub settings.
 
-2. When jumping to a link, it can happen, that you do not end up at the target location, especially when pictures are present in the documentation page above the part you are navigating to. Simply reloading the page will fix the issue.
+2. When jumping to a link, it can happen, that you do not end up at the target location, especially when pictures are present in the documentation page above the part you are navigating to. Simply reloading the page will fix this issue.

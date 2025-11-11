@@ -514,7 +514,7 @@ class DamageAnalysis extends Assert {
 					if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-					this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+					this.AssertEqual(5, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
 				}
@@ -669,7 +669,7 @@ class PitstopHandling extends Assert {
 		if vCompletedActions.Has("pitstopPlanned")
 			this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
-		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(3, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
 		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
@@ -719,7 +719,7 @@ class PitstopHandling extends Assert {
 		if vCompletedActions.Has("pitstopPlanned")
 			this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
-		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
 		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
@@ -772,7 +772,7 @@ class PitstopHandling extends Assert {
 		if vCompletedActions.Has("pitstopPlanned")
 			this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
-		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
+		this.AssertEqual(5, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
 		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
@@ -1159,7 +1159,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 21 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)
@@ -1534,7 +1534,7 @@ else {
 		}
 		until done
 	}
-	else if (raceNr = 21) {
+	else if ((raceNr = 21) || (raceNr = 24)) {
 		done := false
 
 		loop {
@@ -1552,6 +1552,9 @@ else {
 				else {
 					if (A_Index == 1) {
 						engineer.addLap(lap, &data)
+
+						if ((lap = 1) && (raceNr = 24))
+							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Compound.Change", "Weather")
 
 						if (lap = 3) {
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)

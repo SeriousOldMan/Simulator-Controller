@@ -17,6 +17,7 @@
 	  - [Windows](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-additional-voices)
 	  - [Azure](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#azure-cognitive-services)
 	  - [Google](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#google-speech-services)
+	  - [OpenAI API](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#openai-api)
 	  - [ElevenLabs](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#elevenlabs)
 	  - [Whisper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime)
 	  - [Boosting with a LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm)

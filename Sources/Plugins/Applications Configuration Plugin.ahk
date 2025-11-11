@@ -98,7 +98,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 		window.Add("Text", "x16 y407 w160 h23 Y:Move +0x200", translate("Window Title (optional)"))
 
-		window.Add("Text", "x24 y425 w155 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(Use AHK WinTitle Syntax)"))
+		window.Add("Text", "x24 y425 w155 h23 Y:Move c" . window.Theme.TextColor["Disabled"], translate("(use AHK WinTitle Syntax)"))
 
 		window.SetFont()
 

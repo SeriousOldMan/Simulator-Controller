@@ -101,9 +101,9 @@ class RecommendPitstopEvent extends StrategistEvent {
 		static instructions := false
 
 		if !instructions {
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+			instructions := readMultiMap(kResourcesDirectory . "Instructions\Race Strategist.instructions.en")
 
-			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Instructions\Race Strategist.instructions.en"))
 		}
 
 		if (targetLap = "Now")
@@ -150,9 +150,9 @@ class SimulateStrategyEvent extends StrategistEvent {
 		static instructions := false
 
 		if !instructions {
-			instructions := readMultiMap(kResourcesDirectory . "Translations\Race Strategist.instructions.en")
+			instructions := readMultiMap(kResourcesDirectory . "Instructions\Race Strategist.instructions.en")
 
-			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Translations\Race Strategist.instructions.en"))
+			addMultiMapValues(instructions, readMultiMap(kUserHomeDirectory . "Instructions\Race Strategist.instructions.en"))
 		}
 
 		if fullCourseYellow
@@ -2407,55 +2407,57 @@ class RaceStrategist extends GridRaceAssistant {
 		static lastStrategy := false
 		static lastPitstop := false
 
-		if (knowledgeBase && engineerPID) {
-			strategy := this.Strategy
+		if knowledgeBase {
+			if engineerPID {
+				strategy := this.Strategy
 
-			if strategy {
-				tyreSets := []
+				if strategy {
+					tyreSets := []
 
-				for ignore, descriptor in strategy.TyreSets
-					if descriptor
-						tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
+					for ignore, descriptor in strategy.TyreSets
+						if descriptor
+							tyreSets.Push(values2String("#", descriptor[1], descriptor[2], descriptor[3], descriptor[4]))
 
-				tyreSets := values2String("|", tyreSets*)
+					tyreSets := values2String("|", tyreSets*)
 
-				if (tyreSets != lastTyreSets) {
-					lastTyreSets := tyreSets
+					if (tyreSets != lastTyreSets) {
+						lastTyreSets := tyreSets
 
-					messageSend(kFileMessage, "Race Engineer", "updateTyreUsage:" . tyreSets, engineerPID)
-				}
-
-				if (strategy != lastStrategy) {
-					lastStrategy := strategy
-					fileName := temporaryFilename("Race Rules", "json")
-
-					rules := {RequiredPitstops: strategy.PitstopRule
-							, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
-							, MaxStintDuration: strategy.StintLength . " Minutes"}
-
-					if isObject(strategy.PitstopWindow) {
-						rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
-						rules.PitstopTo := (strategy.PitstopWindow[2] . " Minute")
+						messageSend(kFileMessage, "Race Engineer", "updateTyreUsage:" . tyreSets, engineerPID)
 					}
 
-					FileAppend(JSON.print(rules, isDebug() ? "  " : ""), fileName)
+					if (strategy != lastStrategy) {
+						lastStrategy := strategy
+						fileName := temporaryFilename("Race Rules", "json")
 
-					messageSend(kFileMessage, "Race Engineer", "updateRaceRules:" . fileName, engineerPID)
+						rules := {RequiredPitstops: strategy.PitstopRule
+								, Refuel: strategy.RefuelRule, TyreChange: strategy.TyreChangeRule
+								, MaxStintDuration: strategy.StintLength . " Minutes"}
+
+						if isObject(strategy.PitstopWindow) {
+							rules.PitstopFrom := (strategy.PitstopWindow[1] . " Minute")
+							rules.PitstopTo := (strategy.PitstopWindow[2] . " Minute")
+						}
+
+						FileAppend(JSON.print(rules, isDebug() ? "  " : ""), fileName)
+
+						messageSend(kFileMessage, "Race Engineer", "updateRaceRules:" . fileName, engineerPID)
+					}
+				}
+
+				if (this.TeamSession && (lastPitstop != knowledgeBase.getValue("Pitstop.Last", false))) {
+					lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
+					Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
+																 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
+																 , engineerPID)
+												   , 60000, kLowPriority)
 				}
 			}
 
-			if (this.TeamSession && (lastPitstop != knowledgeBase.getValue("Pitstop.Last", false))) {
-				lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
-
-				Task.startTask(() => messageSend(kFileMessage, "Race Engineer"
-															 , "requestPitstopHistory:Race Strategist;updatePitstopHistory;" . ProcessExist()
-															 , engineerPID)
-											   , 60000, kLowPriority)
-			}
+			this.saveSessionInfo(simulator, car, track, lapNumber
+							   , this.createSessionInfo(simulator, car, track, lapNumber, validLap, data))
 		}
-
-		this.saveSessionInfo(simulator, car, track, lapNumber
-						   , this.createSessionInfo(simulator, car, track, lapNumber, validLap, data))
 	}
 
 	addLap(lapNumber, &data) {
@@ -4561,18 +4563,20 @@ class RaceStrategist extends GridRaceAssistant {
 	updatePitstopHistory(pitstopHistory) {
 		local data, pitstops, usedTyreSets
 
-		if !isObject(pitstopHistory) {
-			data := readMultiMap(pitstopHistory)
+		if this.KnowledgeBase {
+			if !isObject(pitstopHistory) {
+				data := readMultiMap(pitstopHistory)
 
-			if !isDebug()
-				deleteFile(pitstopHistory)
+				if !isDebug()
+					deleteFile(pitstopHistory)
+			}
+			else
+				data := pitstopHistory
+
+			pitstops := this.createPitstopHistory(data, &usedTyreSets)
+
+			this.updateDynamicValues({PitstopHistory: pitstops, UsedTyreSets: usedTyreSets})
 		}
-		else
-			data := pitstopHistory
-
-		pitstops := this.createPitstopHistory(data, &usedTyreSets)
-
-		this.updateDynamicValues({PitstopHistory: pitstops, UsedTyreSets: usedTyreSets})
 	}
 
 	executePitstop(lapNumber) {
@@ -4689,8 +4693,8 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
-																											  : "WeatherDryChange"
+				speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "TrackRainChange"
+																											  : "TrackDryChange"
 								  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 				if this.hasEnoughData(false)

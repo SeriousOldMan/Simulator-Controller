@@ -73,6 +73,15 @@ class SpeechSynthesizer {
 	static sElevenLabsSampleFrequency := false
 	static sOpenAISampleFrequency := false
 
+	static sInitializePostProcessing := true
+
+	static sOverdriveGain := 20
+	static sOverdriveColor := 20
+	static sFilterHighpass := 800
+	static sFilterLowpass := 2200
+	static sNoiseVolume := Round(0.3 * 66 / 100, 2)
+	static sClickVolume := Round(0.6 * 80 / 100, 2)
+
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
@@ -447,6 +456,43 @@ class SpeechSynthesizer {
 		this.setPitch(0)
 	}
 
+	static initializePostProcessing(configuration := kSimulatorConfiguration) {
+		SpeechSynthesizer.sOverdriveGain := getMultiMapValue(configuration, "Voice Control", "Speaker.Overdrive", 20)
+		SpeechSynthesizer.sOverdriveColor := getMultiMapValue(configuration, "Voice Control", "Speaker.Color", 20)
+		SpeechSynthesizer.sFilterHighpass := getMultiMapValue(configuration, "Voice Control", "Speaker.HighPass", 800)
+		SpeechSynthesizer.sFilterLowpass := getMultiMapValue(configuration, "Voice Control", "Speaker.LowPass", 1800)
+
+		try {
+			SpeechSynthesizer.sNoiseVolume := Round(0.3 * getMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			SpeechSynthesizer.sNoiseVolume := Round(0.3 * 66 / 100, 2)
+		}
+
+		try {
+			SpeechSynthesizer.sClickVolume := Round(0.6 * getMultiMapValue(configuration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			SpeechSynthesizer.sClickVolume := Round(0.6 * 80 / 100, 2)
+		}
+
+		if !isInteger(SpeechSynthesizer.sOverDriveGain)
+			SpeechSynthesizer.sOverDriveGain := 20
+
+		if !isInteger(SpeechSynthesizer.sOverDriveColor)
+			SpeechSynthesizer.sOverDriveColor := 20
+
+		if !isInteger(SpeechSynthesizer.sFilterHighpass)
+			SpeechSynthesizer.sFilterHighpass := 800
+
+		if !isInteger(SpeechSynthesizer.sFilterLowpass)
+			SpeechSynthesizer.sFilterLowpass := 1800
+	}
+
 	getVoices() {
 		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
@@ -679,46 +725,14 @@ class SpeechSynthesizer {
 		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
-		static sOverdriveGain := kUndefined
-		static sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
+		static sOverdriveGain, sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
 
 		static counter := 1
 
-		if (sOverDriveGain = kUndefined) {
-			sOverdriveGain := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
-			sOverdriveColor := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
-			sFilterHighpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
-			sFilterLowpass := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+		if SpeechSynthesizer.sInitializePostProcessing {
+			SpeechSynthesizer.sInitializePostProcessing := false
 
-			try {
-				sNoiseVolume := Round(0.3 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				sNoiseVolume := Round(0.3 * 66 / 100, 2)
-			}
-
-			try {
-				sClickVolume := Round(0.6 * getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
-			}
-			catch Any as exception {
-				logError(exception, true)
-
-				sClickVolume := Round(0.6 * 80 / 100, 2)
-			}
-
-			if !isInteger(sOverDriveGain)
-				sOverDriveGain := 20
-
-			if !isInteger(sOverDriveColor)
-				sOverDriveColor := 20
-
-			if !isInteger(sFilterHighpass)
-				sFilterHighpass := 800
-
-			if !isInteger(sFilterLowpass)
-				sFilterLowpass := 1800
+			SpeechSynthesizer.initializePostProcessing()
 		}
 
 		if (options && !isInstance(options, Map))
@@ -780,10 +794,10 @@ class SpeechSynthesizer {
 			}
 
 			if (!options || !options.Has("Distort") || options["Distort"]) {
-				overdriveGain := sOverDriveGain
-				overdriveColor := sOverdriveColor
-				filterHighpass := sFilterHighpass
-				filterLowpass := sFilterLowpass
+				overdriveGain := SpeechSynthesizer.sOverDriveGain
+				overdriveColor := SpeechSynthesizer.sOverdriveColor
+				filterHighpass := SpeechSynthesizer.sFilterHighpass
+				filterLowpass := SpeechSynthesizer.sFilterLowpass
 			}
 			else {
 				overdriveGain := 0
@@ -793,12 +807,12 @@ class SpeechSynthesizer {
 			}
 
 			if (!options || !options.Has("Noise") || options["Noise"])
-				noiseVolume := sNoiseVolume
+				noiseVolume := SpeechSynthesizer.sNoiseVolume
 			else
 				noiseVolume := 0
 
 			if (!options || !options.Has("Click") || options["Click"])
-				clickVolume := sClickVolume
+				clickVolume := SpeechSynthesizer.sClickVolume
 			else
 				clickVolume := 0
 

@@ -374,7 +374,7 @@ You may have noticed, that the grammar files support a kind of include mechanism
 
 ### Instructions for the GPT-based Driving Coach
 
-The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Instructions* in the programm installation folder. They are named 
 
 	Driving Coach.instructions.LC
 
@@ -382,7 +382,7 @@ where *LC* stands for the language code.
 
 ### Instructions for the GPT-based Assistant Boosters
 
-Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Translations* in the programm installation folder. They are named 
+Very much like the Driving Coach, a GPT service can be used to extend the conversational and behavioral capabilities fo the *normal* Race Assistants. In those cases, instructions are also used to create a setting for the LLM to behave like an Engineer, for example, and also to provide additional data about the current session, the state of the car, and so on, to the LLM. All instructions are used as defaults in the configuration and can be altered by the user here as well. The language specific default instructions can be found in *Resources\Instructions* in the programm installation folder. They are named 
 
 	Conversation Booster.instructions.LC
 	

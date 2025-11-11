@@ -175,7 +175,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		editInstructions(type, title, *) {
-			if ((type = "Agent") && GetKeyState("Ctrl") && FileExist(kTranslationsDirectory . this.Assistant . ".instructions.en"))
+			if ((type = "Agent") && GetKeyState("Ctrl") && FileExist(kResourcesDirectory . "Instructions\" . this.Assistant . ".instructions.en"))
 				this.editInstructions(this.Assistant, title)
 			else
 				this.editInstructions(type, title)
@@ -898,10 +898,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				if FileExist(kTempDirectory . this.Assistant . ".instructions.en")
 					try {
 						if (FileRead(kTempDirectory . this.Assistant . ".instructions.en") = "Delete")
-							deleteFile(kUserTranslationsDirectory . this.Assistant . ".instructions.en")
+							deleteFile(kUserHomeDirectory . "Instructions\" . this.Assistant . ".instructions.en")
 						else
 							FileMove(kTempDirectory . this.Assistant . ".instructions.en"
-								   , kUserTranslationsDirectory . this.Assistant . ".instructions.en", 1)
+								   , kUserHomeDirectory . "Instructions\" . this.Assistant . ".instructions.en", 1)
 					}
 					catch Any as exception {
 						logError(exception, true)
@@ -1120,15 +1120,15 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		if (type = this.Assistant) {
 			if original
-				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTranslationsDirectory))
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kResourcesDirectory . "Instructions\"))
 			else
-				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserTranslationsDirectory, kTranslationsDirectory))
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserHomeDirectory . "Instructions\", kResourcesDirectory . "Instructions\"))
 		}
 		else {
 			instructions := newMultiMap()
 			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
 
-			for ignore, directory in [kTranslationsDirectory, kUserTranslationsDirectory]
+			for ignore, directory in [kResourcesDirectory . "Instructions\", kUserHomeDirectory . "Instructions\"]
 				loop Files (directory . reference . ".instructions.*") {
 					SplitPath A_LoopFilePath, , , &language
 

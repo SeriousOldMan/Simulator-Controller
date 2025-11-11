@@ -397,8 +397,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget4 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
 		widget4.LastValue := chosen
 		widget4.OnEvent("Change", chooseVoiceSynthesizer)
+		widget64 := window.Add("Text", "x" . (x1 + 163) . " yp w180 h23 +0x200 X:Move(0.3) Section Hidden", translate("(not for Assistants)"))
 
-		this.iTopWidgets := [[widget1, widget2], [widget3, widget4]]
+		this.iTopWidgets := [[widget1, widget2], [widget3, widget4, widget64]]
 
 		voices := [translate("Random"), translate("Deactivated")]
 
@@ -710,7 +711,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["soXPath"] := getMultiMapValue(configuration, "Voice Control", "SoX Path", "")
 
 			this.Value["listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", true)
-			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Listener.OpenAI", "")
 			this.Value["pushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 			this.Value["pushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 			this.Value["activationCommand"] := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
@@ -804,7 +804,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
 										  , "OpenAI|" . Trim(this.Control["openAISpeakerServerURLEdit"].Text) . "|"
 													  . Trim(this.Control["openAISpeakerAPIKeyEdit"].Text) . "|"
-													  . StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`"", "\n"))
+													  . StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
@@ -833,7 +833,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["openAISpeakerAPIKeyEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["openAISpeakerModelEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["openAISpeakerVoiceEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`n", "\n"))
+		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions"
+									  , StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
 
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", Trim(this.Control["openAIRecognizerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))
@@ -866,8 +867,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 													  . Trim(this.Control["openAIRecognizerAPIKeyEdit"].Text))
 
 			listener := Trim(this.Control["openAIListenerModelEdit"].Text)
-
-			setMultiMapValue(configuration, "Voice Control", "Listener.OpenAI", listener)
 		}
 		else if (this.Control["voiceRecognizerDropDown"].Value == 6)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
@@ -1151,7 +1150,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else
 			throw "Internal error detected in VoiceControlConfigurator.showWindowsSynthesizerEditor..."
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Windows"
 	}
@@ -1233,7 +1232,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Azure"
 	}
@@ -1350,7 +1349,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "Google"
 	}
@@ -1467,7 +1466,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "OpenAI"
 	}
@@ -1585,7 +1584,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
-		this.showControls(this.iOtherWidgets)
+		this.showOtherControls()
 
 		this.iSynthesizerMode := "ElevenLabs"
 	}
@@ -1853,7 +1852,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.transposeControls(this.iOpenAIRecognizerWidgets, (-24 * delta) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * (this.iOpenAIRecognizerWidgets.Length - 1), titleBarHeight)
 
-				this.Control["listenerLabel"].Visible := true, this.Control["listenerDropDown"].Visible := true
+				this.Control["listenerLabel"].Visible := true
+				this.Control["listenerDropDown"].Visible := true
 			}
 			else if (this.iRecognizerMode != "Init")
 				throw "Internal error detected in VoiceControlConfigurator.hideOpenAIRecognizerEditor..."
@@ -2202,13 +2202,19 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 	}
 
-	showControls(widgets) {
+	showOtherControls() {
+		this.showControls(this.iOtherWidgets
+						, (this.iRecognizerMode = "OpenAI") ? [this.Control["listenerLabel"], this.Control["listenerDropDown"]]
+															: [])
+	}
+
+	showControls(widgets, exclude := []) {
 		local ignore, widget, widgetPart
 
 		for ignore, widget in widgets
 			for ignore, widgetPart in widget {
 				widgetPart.Enabled := true
-				widgetPart.Visible := true
+				widgetPart.Visible := !inList(exclude, widgetPart)
 			}
 
 		if (this.Control["soXPathEdit"].Text = "")
@@ -2262,6 +2268,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		kSimulatorConfiguration := configuration
 
+		SpeechSynthesizer.initializePostProcessing()
+
 		try {
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 			language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
@@ -2277,6 +2285,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration
+
+			SpeechSynthesizer.initializePostProcessing()
 		}
 	}
 

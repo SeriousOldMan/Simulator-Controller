@@ -335,19 +335,19 @@ class LLMConnector {
 			if !tools
 				tools := this.GetTools()
 
-			if isDebug()
-				body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
-			else
-				body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
-
-			if isDebug() {
-				deleteFile(kTempDirectory . "LLM.request")
-
-				try
-					FileAppend(body, kTempDirectory . "LLM.request")
-			}
-
 			try {
+				if isDebug()
+					body := JSON.print(this.CreatePrompt(body, instructions, tools, question), "  ")
+				else
+					body := JSON.print(this.CreatePrompt(body, instructions, tools, question))
+
+				if isDebug() {
+					deleteFile(kTempDirectory . "LLM.request")
+
+					try
+						FileAppend(body, kTempDirectory . "LLM.request")
+				}
+
 				if this.Certificate {
 					try {
 						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]
@@ -460,6 +460,9 @@ class LLMConnector {
 		CreatePrompt(body, instructions, tools, question) {
 			local messages := []
 			local ignore, instruction, conversation
+
+			if (!question || (question == true) || (Trim(question) = ""))
+				throw Error("Invalid question detected in APIConnector.CreatePrompt...")
 
 			addInstruction(instruction) {
 				if (instruction && (Trim(instruction) != ""))
@@ -888,11 +891,8 @@ class LLMConnector {
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
-			local prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
-											, tools ? tools : this.GetTools()
-											, question)
 			local toolCall := false
-			local command, answer
+			local command, prompt, answer
 
 			if !this.Connect() {
 				this.Manager.connectorState("Error", "Connection")
@@ -900,14 +900,17 @@ class LLMConnector {
 				return false
 			}
 
-			if isDebug() {
-				deleteFile(kTempDirectory . "LLM.request")
-
-				try
-					FileAppend(prompt, kTempDirectory . "LLM.request")
-			}
-
 			try {
+				prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
+										  , tools ? tools : this.GetTools(), question)
+
+				if isDebug() {
+					deleteFile(kTempDirectory . "LLM.request")
+
+					try
+						FileAppend(prompt, kTempDirectory . "LLM.request")
+				}
+
 				; prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
 
 				while !deleteFile(kTempDirectory . "LLMRuntime.cmd")

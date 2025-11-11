@@ -1,16 +1,16 @@
 [Development]
-Version=6.6.4.0-dev
+Version=6.6.5.0-dev
 Target=6.6.4.0-release
-Date=10/31/2025
-Download=
-Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, OpenAI compatible speech synthesis, OpenAI compatible speech recognition
-Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
+Date=11/10/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yz-B3n9X/Releases/Simulator Controller 6.6.5.0-dev.zip
+Changes=Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster, Changed Damp threshold for rF2 and LMU, Spotter intro now includes track grip, Fixed AC session end detection, Shortcut syntax for foreign function calls, Fixed Reasoning booster instructions, Translation Fixes
+Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
-Version=6.6.3.0-release
-Date=10/31/2025
-Download=https://cutt.ly/kr74lcIg;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/oJ23uNtW/Releases/Simulator Controller 6.6.3.0-release.zip;https://www.dropbox.com/scl/fi/cuulhxwnc6isntmudnx17/Simulator-Controller-6.6.3.0-release.zip?rlkey=r3b5l1exlxlm0rg4mlgchjo84&st=633r151u&dl=1;http://%master%/Relases/Simulator Controller 6.6.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.3.0-release.zip
-Changes=Retry loop for speech recognizer initialization, Handle non-active cars in Spotter multiclass warnings, Fixed ACC UDP configuration (again), Fixed redraw of data tab in "Solo Center", Fixed premature end in team races in LMU, Added missing translations, Increased max memory limit to 2048 MB, Fixed corrupted driver IDs in session database, Added support for scrollable windows, Support zoom factor in track map in the Telemetry Viewer, Fly out window for track maps in "Session Database", Control zoom factor using mouse wheel, Moving track map by middle mouse button
-Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.4.1
+Version=6.6.4.0-release
+Date=11/07/2025
+Download=https://cutt.ly/5tqoDowS;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/6Zdl54mE/Releases/Simulator Controller 6.6.4.0-release.zip;https://www.dropbox.com/scl/fi/4f789b0r4tod6dmndvhuc/Simulator-Controller-6.6.4.0-release.zip?rlkey=hnlg6f7b19qk8rq8zy8szponw&st=6k0t6dla&dl=1;http://%master%/Release/Simulator Controller 6.6.4.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.4.0-release.zip
+Changes=Fixed header color for consistency report, Fixed export/import of sessions in "Session Database", Changed file format of database export, Changed file format of settings export, Fixed import of car/track specific settings in "Session Database", Reduced frequency of multiclass warnings, Resync button for zoomable track map, Fixed several bugs in speech system, OpenAI compatible speech synthesis, OpenAI compatible speech recognition, Fixed updated post processing when using Speaker test mode, Refactored instructions into separate folder
+Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
@@ -18,11 +18,11 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.5.5.Path=Resources
 Configuration.6.5.5.Content=Setup
 Configuration.6.5.5.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/7q55WHB0;https://www.dropbox.com/scl/fi/99gczarjkbbc716odq3g9/Configuration-6.5.5.zip?rlkey=h9paqd97fkge7i2ga3oc2ykfi&st=svk8rolq&dl=1;http://%master%/Components/Configuration 6.5.5.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.5.5.zip
-Utilities.6.4.1.Path=.
-Utilities.6.4.1.Content=Utilities
-Utilities.6.4.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zqlsImDT;https://www.dropbox.com/scl/fi/lvqsde4ebz89mpmtoj3jy/Utilities-6.4.1.zip?rlkey=u31vff33blrfxgsai9qabo3tx&st=jcnsa2m6&dl=1;http://%master%/Components/Utilities 6.4.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.4.1.zip
+Utilities.6.6.4.Path=.
+Utilities.6.6.4.Content=Utilities
+Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
 Type=Development
 [Version]
-Development=6.6.4.0-dev
-Release=6.6.3.0-release
+Development=6.6.5.0-dev
+Release=6.6.4.0-release

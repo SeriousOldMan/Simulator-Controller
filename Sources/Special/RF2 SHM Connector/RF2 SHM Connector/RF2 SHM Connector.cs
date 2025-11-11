@@ -462,12 +462,14 @@ namespace SHMConnector {
 
 				if (scoring.mScoringInfo.mAvgPathWetness >= 0.7)
 					grip = "Flooded";
-				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.2)
+				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.15)
 					grip = "Wet";
-				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.05)
+				else if (scoring.mScoringInfo.mAvgPathWetness >= 0.075)
 					grip = "Damp";
-				else if (scoring.mScoringInfo.mAvgPathWetness > 0.0)
+				else if (scoring.mScoringInfo.mAvgPathWetness > 0.02)
 					grip = "Greasy";
+				else if (scoring.mScoringInfo.mAvgPathWetness > 0.0)
+					grip = "Green";
 				else
 					grip = "Fast";
 
@@ -571,12 +573,10 @@ namespace SHMConnector {
 				return (cloudLevel < 0.5) ? "Drizzle" : "LightRain";
 			else if (rainLevel <= 0.3)
 				return (cloudLevel > 0.5) ? "MediumRain" : "LightRain";
-			else if (rainLevel <= 0.6)
-				return (cloudLevel > 0.5) ? "HeavyRain" : "MediumRain";
 			else if (rainLevel <= 0.8)
-				return (cloudLevel > 0.5) ? "ThunderStorm" : "HeavyRain";
+				return (cloudLevel > 0.8) ? "HeavyRain" : "MediumRain";
 			else
-				return "Thunderstorm";
+				return (cloudLevel > 0.8) ? "ThunderStorm" : "HeavyRain";
 		}
 
 		private static double GetCelcius(double kelvin) {

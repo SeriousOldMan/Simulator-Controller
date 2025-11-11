@@ -262,17 +262,6 @@ namespace ACSHMSpotter {
                 SendStringMessage(winHandle, 0, "Race Spotter:" + message);
         }
 
-        void SendTriggerMessage(string message)
-        {
-            int winHandle = FindWindowEx(0, 0, null, "Driving Coach.exe");
-
-            if (winHandle == 0)
-                winHandle = FindWindowEx(0, 0, null, "Driving Coach.ahk");
-
-            if (winHandle != 0)
-                SendStringMessage(winHandle, 0, "Driving Coach:" + message);
-        }
-
         void SendAnalyzerMessage(string message)
         {
             int winHandle = FindWindowEx(0, 0, null, "Setup Workbench.exe");
@@ -1638,9 +1627,6 @@ namespace ACSHMSpotter {
 							{
 								if (triggerType == "Automation")
 									SendAutomationMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-								else
-                                    SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-
 
                                 lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 

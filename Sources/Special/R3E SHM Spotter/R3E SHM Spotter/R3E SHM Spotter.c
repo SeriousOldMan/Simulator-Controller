@@ -126,22 +126,6 @@ void sendAutomationMessage(char* message) {
 	}
 }
 
-void sendTriggerMessage(char* message) {
-	HWND winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.exe");
-
-	if (winHandle == 0)
-		winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.ahk");
-
-	if (winHandle != 0) {
-		char buffer[128];
-
-		strcpy_s(buffer, 128, "Driving Coach:");
-		strcpy_s(buffer + strlen("Driving Coach:"), 128 - strlen("Driving Coach:"), message);
-
-		sendStringMessage(winHandle, 0, buffer);
-	}
-}
-
 void sendAnalyzerMessage(char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
 
@@ -1644,8 +1628,6 @@ void checkCoordinates(int playerID) {
 
 					if (strcmp(triggerType, "Automation") == 0)
 						sendAutomationMessage(buffer);
-					else
-						sendTriggerMessage(buffer);
 
 					lastUpdate = time(NULL);
 
@@ -1840,13 +1822,6 @@ int main(int argc, char* argv[])
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		positionTrigger = (strcmp(argv[1], "-Automation") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
-
-		if (!positionTrigger) {
-			positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
-
-			if (positionTrigger)
-				triggerType = "Trigger";
-		}
 
 		if (analyzeTelemetry) {
 			strcpy_s(dataFile, 512, argv[2]);

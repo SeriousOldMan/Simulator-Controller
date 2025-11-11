@@ -16,12 +16,6 @@ namespace ACSHMSpotter {
 
                 spotter.Run(false, true, false);
             }
-            else if (args.Length > 0 && args[0] == "-Trigger")
-            {
-                spotter.initializeTrigger("Trigger", args);
-
-                spotter.Run(false, true, false);
-            }
             else if (args.Length > 0 && args[0] == "-Calibrate")
             {
                 spotter.initializeAnalyzer(true, args);

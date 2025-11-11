@@ -247,22 +247,6 @@ void sendAutomationMessage(const char* message) {
 	}
 }
 
-void sendTriggerMessage(const char* message) {
-	HWND winHandle = FindWindowEx(0, 0, 0, "Driving Coach.exe");
-
-	if (winHandle == 0)
-		winHandle = FindWindowEx(0, 0, 0, "Driving Coach.ahk");
-
-	if (winHandle != 0) {
-		char buffer[128];
-
-		strcpy_s(buffer, 128, "Driving Coach:");
-		strcpy_s(buffer + strlen("Driving Coach:"), 128 - strlen("Driving Coach:"), message);
-
-		sendStringMessage(winHandle, 0, buffer);
-	}
-}
-
 void sendAnalyzerMessage(const char* message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, "Setup Workbench.exe");
 
@@ -1907,8 +1891,6 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 				if (strcmp(triggerType, "Automation") == 0)
 					sendAutomationMessage(buffer);
-				else
-					sendTriggerMessage(buffer);
 
 				lastUpdate = time(NULL);
 			}
@@ -2120,13 +2102,6 @@ int main(int argc, char* argv[])
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Automation") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
-
-		if (!positionTrigger) {
-			positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
-
-			if (positionTrigger)
-				triggerType = "Trigger";
-		}
 
 		if (mapTrack) {
 			if (argc > 2)

@@ -120,16 +120,6 @@ void sendAutomationMessage(string message) {
 		sendStringMessage(winHandle, 0, "Race Spotter:" + message);
 }
 
-void sendTriggerMessage(string message) {
-	HWND winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.exe");
-
-	if (winHandle == 0)
-		winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.ahk");
-
-	if (winHandle != 0)
-		sendStringMessage(winHandle, 0, "Driving Coach:" + message);
-}
-
 void sendAnalyzerMessage(string message) {
 	HWND winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.exe");
 
@@ -2068,8 +2058,6 @@ void checkCoordinates() {
 
 					if (strcmp(triggerType, "Automation") == 0)
 						sendAutomationMessage(buffer);
-					else
-						sendTriggerMessage(buffer);
 
 					lastUpdate = time(NULL);
 
@@ -2232,13 +2220,6 @@ int main(int argc, char* argv[])
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Automation") == 0);
 		carTelemetry = (strcmp(argv[1], "-Telemetry") == 0);
-
-		if (!positionTrigger) {
-			positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
-
-			if (positionTrigger)
-				triggerType = (char *)"Trigger";
-		}
 
 		if (mapTrack) {
 			if (argc > 2)

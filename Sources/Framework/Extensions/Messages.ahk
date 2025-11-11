@@ -561,7 +561,7 @@ receiveWindowMessage(wParam, lParam, *) {
     ;---------------------------------------------------------------------------
     request := decodeDWORD(dwData)					; 4-char decoded request
 
-	if ((request = "RS") || (request = "SD")) {
+	if ((request = "RS") || (request = "DC") || (request = "SD")) {
 		length  := (cbData - 1)						; length of DATA string (excl ZERO)
 		data    := StrGet(lpData, length, "")      	; DATA string from pointer
 	}
@@ -583,7 +583,7 @@ receiveWindowMessage(wParam, lParam, *) {
 	if isLogLevel(kLogInfo)
 		logMessage(kLogInfo, translate("Dispatching message `"") . request . "/" . category . (data ? translate("`": ") . data : translate("`"")))
 
-	if ((request = "RS") || (request = "INTR")) {
+	if ((request = "RS") || (request = "DC") || (request = "INTR")) {
 		try {
 			withProtection(ObjBindMethod(messageHandler, "call", category, data))
 		}

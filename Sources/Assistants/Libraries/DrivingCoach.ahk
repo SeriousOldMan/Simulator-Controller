@@ -1679,7 +1679,7 @@ class DrivingCoach extends GridRaceAssistant {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
 				pid := false
 
 				try {
@@ -1694,13 +1694,13 @@ class DrivingCoach extends GridRaceAssistant {
 				catch Any as exception {
 					logError(exception, true)
 
-					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
 															   , {simulator: code, protocol: "SHM"})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
-						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
 													  , {exePath: exePath, simulator: code, protocol: "SHM"})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}

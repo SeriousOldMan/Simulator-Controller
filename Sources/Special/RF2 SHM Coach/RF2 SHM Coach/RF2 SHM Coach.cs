@@ -153,7 +153,7 @@ namespace RF2SHMCoach {
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + (triggerType == "BrakeHints" ? 200 : 2000)))
+			if ((triggerType == "BrakeHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
@@ -208,13 +208,12 @@ namespace RF2SHMCoach {
 		{
 			if ((hintFile != "") && System.IO.File.Exists(hintFile))
 			{
-				if (hintSounds.Length == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
 				{
-                    var linesRead = System.IO.File.ReadLines(hintFile);
-
                     numCoordinates = 0;
+					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
 
-                    foreach (var line in linesRead)
+                    foreach (var line in System.IO.File.ReadLines(hintFile))
                     {
 						var parts = line.Split(new char[] { ' ' }, 3);
 

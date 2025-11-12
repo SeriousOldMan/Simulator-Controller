@@ -110,14 +110,56 @@ void sendTriggerMessage(char* message) {
 	}
 }
 
+BOOL fileExists(char* name) {
+	FILE* file;
+
+	if (!fopen_s(&file, name, "r")) {
+		fclose(file);
+
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+void splitString(const char* s, const char* delimiter, int count, char** parts) {
+	char* pos = strstr(s, delimiter);
+	int numParts = 0;
+
+	while (pos) {
+		if (count != 0 && numParts < (count - 1))
+			break;
+
+		int i = 0;
+
+		for (char* c = (char *)s; c < pos; c++)
+			parts[numParts][i++] = *c;
+
+		parts[numParts][i] = '\0';
+
+		s = (pos + 1);
+
+		numParts += 1;
+		pos = strstr(s, delimiter);
+	}
+
+	strcpy_s(parts[numParts], 256, s);
+}
+
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
 char* triggerType = "Trigger";
 
+char* audioDevice = "";
+char* hintFile = "";
+
+char* hintSounds[256][256];
+time_t lastHintsUpdate = 0;
+
 void checkCoordinates(int playerID) {
-	if (time(NULL) > (lastUpdate + 2)) {
+	if ((strcmp(triggerType, "BrakeHints") == 0) ? TRUE : time(NULL) > (lastUpdate + 2)) {
 		r3e_float64 velocityX = map_buffer->player.velocity.x;
 		r3e_float64 velocityY = map_buffer->player.velocity.z;
 		r3e_float64 velocityZ = map_buffer->player.velocity.y;
@@ -137,21 +179,29 @@ void checkCoordinates(int playerID) {
 
 			for (int i = 0; i < numCoordinates; i += 1) {
 				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
-					char buffer[60] = "";
-					char numBuffer[60];
+					char buffer[512] = "";
+					
+					if (strcmp(triggerType, "Trigger") == 0) {
+						char numBuffer[60];
 
-					strcat_s(buffer, 60, "positionTrigger:");
-					_itoa_s(i + 1, numBuffer, 60, 10);
-					strcat_s(buffer, 60, numBuffer);
-					strcat_s(buffer, 60, ";");
-					sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
-					strcat_s(buffer, 60, numBuffer);
-					strcat_s(buffer, 60, ";");
-					sprintf_s(numBuffer, 60, "%f", yCoordinates[i]);
-					strcat_s(buffer, 60, numBuffer);
+						strcat_s(buffer, 60, "positionTrigger:");
+						_itoa_s(i + 1, numBuffer, 60, 10);
+						strcat_s(buffer, 60, numBuffer);
+						strcat_s(buffer, 60, ";");
+						sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
+						strcat_s(buffer, 60, numBuffer);
+						strcat_s(buffer, 60, ";");
+						sprintf_s(numBuffer, 60, "%f", yCoordinates[i]);
+						strcat_s(buffer, 60, numBuffer);
 
-					if (strcmp(triggerType, "Trigger") == 0)
 						sendTriggerMessage(buffer);
+					}
+					else if (strcmp(triggerType, "BrakeHints") == 0) {
+						strcat_s(buffer, 512, "acousticFeedback:");
+						strcat_s(buffer, 512, (char *)hintSounds[i]);
+
+						sendTriggerMessage(buffer);
+					}
 
 					lastUpdate = time(NULL);
 
@@ -162,17 +212,67 @@ void checkCoordinates(int playerID) {
 	}
 }
 
+#ifdef WIN32
+#define stat _stat
+#endif
+
+void loadBrakeHints()
+{
+	if ((strcmp(hintFile, "") != 0) && fileExists(hintFile))
+	{
+		struct stat result;
+		time_t mod_time = 0;
+
+		if (stat(hintFile, &result) == 0)
+			mod_time = result.st_mtime;
+
+		if (numCoordinates == 0 || (mod_time > lastHintsUpdate))
+		{
+			numCoordinates = 0;
+			lastHintsUpdate = mod_time;
+
+			char xPart[255];
+			char yPart[255];
+			char hintPart[255];
+
+			char* parts[3] = { xPart, yPart, hintPart };
+
+			FILE* file = fopen(hintFile, "r");
+
+			char line[512];
+
+			if (file != NULL) {
+				while (fgets(line, sizeof(line), file)) {
+					splitString(line, " ", 3, parts);
+
+					xCoordinates[numCoordinates] = (float)atof(parts[0]);
+					yCoordinates[numCoordinates] = (float)atof(parts[1]);
+					
+					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[2]);
+
+					if (++numCoordinates > 255)
+						break;
+				}
+
+				fclose(file);
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
     BOOL mapped_r3e = FALSE;
 	int playerID = 0;
 	BOOL positionTrigger = FALSE;
-	// BOOL brakeHints = FALSE;
+	BOOL brakeHints = FALSE;
 
 	if (argc > 1) {
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 
 		if (positionTrigger) {
+			triggerType = "Trigger";
+
 			for (int i = 2; i < (argc - 1); i = i + 2) {
 				xCoordinates[numCoordinates] = (float)atof(argv[i]);
 				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
@@ -180,6 +280,17 @@ int main(int argc, char* argv[])
 				if (++numCoordinates > 255)
 					break;
 			}
+		}
+
+		brakeHints = (strcmp(argv[1], "-BrakeHints") == 0);
+
+		if (brakeHints) {
+			triggerType = "BrakeHints";
+
+			hintFile = argv[2];
+
+			if (argc > 3)
+				audioDevice = argv[3];
 		}
 	}
 
@@ -195,6 +306,13 @@ int main(int argc, char* argv[])
 				continue;
 
 			if (positionTrigger) {
+				checkCoordinates(playerID);
+
+				Sleep(10);
+			}
+			else if (positionTrigger) {
+				loadBrakeHints();
+
 				checkCoordinates(playerID);
 
 				Sleep(10);

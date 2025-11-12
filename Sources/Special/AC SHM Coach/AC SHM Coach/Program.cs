@@ -16,6 +16,12 @@ namespace ACSHMCoach {
 
                 coach.Run(true, false);
             }
+            else if (args.Length > 0 && args[0] == "-BrakeHints")
+            {
+                coach.initializeBrakeHints("BrakeHints", args);
+
+                coach.Run(false, true);
+            }
         }
     }
 }

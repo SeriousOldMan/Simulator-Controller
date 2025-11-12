@@ -110,8 +110,8 @@ void sendTriggerMessage(string message) {
 		sendStringMessage(winHandle, 0, "Driving Coach:" + message);
 }
 
-float xCoordinates[60];
-float yCoordinates[60];
+float xCoordinates[256];
+float yCoordinates[256];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
 char* triggerType = (char *)"Trigger";
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
 				xCoordinates[numCoordinates] = (float)atof(argv[i]);
 				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
 
-				if (++numCoordinates > 59)
+				if (++numCoordinates > 255)
 					break;
 			}
 		}

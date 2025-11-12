@@ -1599,8 +1599,8 @@ namespace ACSHMSpotter {
 			return true;
 		}
 
-		float[] xCoordinates = new float[60];
-		float[] yCoordinates = new float[60];
+		float[] xCoordinates = new float[256];
+		float[] yCoordinates = new float[256];
 		int numCoordinates = 0;
 		long lastUpdate = 0;
 		string triggerType = "Automation";
@@ -1772,7 +1772,7 @@ namespace ACSHMSpotter {
                 xCoordinates[numCoordinates] = float.Parse(args[i]);
                 yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-                if (++numCoordinates > 59)
+                if (++numCoordinates > 255)
                     break;
             }
         }

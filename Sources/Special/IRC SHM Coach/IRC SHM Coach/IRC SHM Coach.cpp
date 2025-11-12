@@ -240,8 +240,8 @@ void loadTrackCoordinates(char* fileName) {
 	hasTrackCoordinates = true;
 }
 
-float xCoordinates[60];
-float yCoordinates[60];
+float xCoordinates[256];
+float yCoordinates[256];
 float trackDistances[60];
 int numCoordinates = 0;
 time_t lastUpdate = 0;
@@ -347,7 +347,7 @@ int main(int argc, char* argv[])
 
 				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
 	
-				if (++numCoordinates > 59)
+				if (++numCoordinates > 255)
 					break;
 			}
 

@@ -46,6 +46,8 @@
   - [Developer] Foreign function calls in the rule engine can also be written like *:function(a1, a2, ...)* rather than *call(function, a1, a2, ...)*.
   - [Internal] Refactored the simulator provider processes for the Spotter and the Coach.
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
+
 # Release history
 
 ## 6.6.3.0

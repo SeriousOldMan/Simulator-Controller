@@ -200,7 +200,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	AudioSettings {
 		Get {
-			return return getAudioSettings("Coach")
+			return getAudioSettings("Coach")
 		}
 	}
 

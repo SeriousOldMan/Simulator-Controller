@@ -675,8 +675,8 @@ namespace RF2SHMCoach {
             }
         }
 
-        float[] xCoordinates = new float[60];
-        float[] yCoordinates = new float[60];
+		float[] xCoordinates = new float[256];
+        float[] yCoordinates = new float[256];
         int numCoordinates = 0;
 		long lastUpdate = 0;
 		string triggerType = "Trigger";
@@ -731,7 +731,7 @@ namespace RF2SHMCoach {
 			}
         }
 
-        string[] hintSounds = new string[60];
+        string[] hintSounds = new string[256];
 		DateTime lastHintsUpdate = DateTime.Now;
 
 		public void loadBrakeHints()
@@ -752,7 +752,7 @@ namespace RF2SHMCoach {
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintSounds[numCoordinates] = parts[2];
 
-                        if (++numCoordinates > 59)
+                        if (++numCoordinates > 255)
 							break;
                     }
                 }
@@ -768,7 +768,7 @@ namespace RF2SHMCoach {
 				xCoordinates[numCoordinates] = float.Parse(args[i]);
 				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-                if (++numCoordinates > 59)
+                if (++numCoordinates > 255)
                     break;
             }
         }

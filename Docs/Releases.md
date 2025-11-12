@@ -42,6 +42,7 @@
   - A [new event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
   - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
   - Sounds used by the acoustic feedback of the issue analyzer in the "Setup Workbench" can now be customized.
+  - Increased the number of corners, that the Coach can handle during on-track coaching from 30 to 128.
   - [Developer] Foreign function calls in the rule engine can also be written like *:function(a1, a2, ...)* rather than *call(function, a1, a2, ...)*.
   - [Internal] Refactored the simulator provider processes for the Spotter and the Coach.
 

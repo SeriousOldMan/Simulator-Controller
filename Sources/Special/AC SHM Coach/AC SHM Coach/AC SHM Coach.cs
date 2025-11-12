@@ -225,15 +225,15 @@ namespace ACSHMCoach {
                 SendStringMessage(winHandle, 0, "Driving Coach:" + message);
         }
 
-		float[] xCoordinates = new float[60];
-		float[] yCoordinates = new float[60];
+		float[] xCoordinates = new float[256];
+		float[] yCoordinates = new float[256];
 		int numCoordinates = 0;
 		long lastUpdate = 0;
 		string triggerType = "Trigger";
 
 		void checkCoordinates()
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if ((triggerType == "BrakeHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double velocityX = physics.LocalVelocity[0];
 				double velocityY = physics.LocalVelocity[2];
@@ -253,7 +253,11 @@ namespace ACSHMCoach {
 							{
 								if (triggerType == "Trigger")
 									SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-
+                                else if (triggerType == "BrakeHints")
+                                    if (audioDevice != "")
+                                        SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+                                    else
+                                        new System.Media.SoundPlayer(hintSounds[i]).Play();
 
                                 lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
@@ -273,9 +277,49 @@ namespace ACSHMCoach {
                 xCoordinates[numCoordinates] = float.Parse(args[i]);
                 yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-                if (++numCoordinates > 59)
+                if (++numCoordinates > 255)
                     break;
             }
+        }
+
+        string[] hintSounds = new string[256];
+        DateTime lastHintsUpdate = DateTime.Now;
+
+        public void loadBrakeHints()
+        {
+            if ((hintFile != "") && System.IO.File.Exists(hintFile))
+            {
+                if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+                {
+                    numCoordinates = 0;
+					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
+
+                    foreach (var line in System.IO.File.ReadLines(hintFile))
+                    {
+                        var parts = line.Split(new char[] { ' ' }, 3);
+
+                        xCoordinates[numCoordinates] = float.Parse(parts[0]);
+                        yCoordinates[numCoordinates] = float.Parse(parts[1]);
+                        hintSounds[numCoordinates] = parts[2];
+
+                        if (++numCoordinates > 255)
+                            break;
+                    }
+                }
+            }
+        }
+
+        string audioDevice = string.Empty;
+        string hintFile = string.Empty;
+
+        public void initializeBrakeHints(string type, string[] args)
+        {
+            triggerType = type;
+
+            hintFile = args[1];
+
+            if (args.Length > 2)
+                audioDevice = args[2];
         }
 
         public void Run(bool positionTrigger, bool brakeHints)
@@ -291,8 +335,16 @@ namespace ACSHMCoach {
 					checkCoordinates();
 
 					Thread.Sleep(10);
-				}
-			}
+                }
+                else if (brakeHints)
+                {
+                    loadBrakeHints();
+
+                    checkCoordinates();
+
+                    Thread.Sleep(10);
+                }
+            }
 
 			Close();
 		}

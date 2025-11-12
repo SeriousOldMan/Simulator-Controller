@@ -1075,7 +1075,13 @@ class DrivingCoach extends GridRaceAssistant {
 			setMultiMapValue(state, "Coaching", "Active", true)
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+			if isDebug()
+				logMessage(kLogDebug, "Telemetry collection started...")
 		}
+		else if !this.TelemetryCollector
+			if isDebug()
+				logMessage(kLogDebug, "Telemetry collection NOT started...")
 	}
 
 	shutdownTelemetryCoaching(deactivate := true) {
@@ -1085,6 +1091,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
+
+		if isDebug()
+			logMessage(kLogDebug, "Telemetry collection stopped...")
 
 		this.iAvailableTelemetry := CaseInsenseMap()
 
@@ -1111,11 +1120,20 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iTelemetryFuture := false
 
+		if isDebug()
+			if started
+				logMessage(kLogDebug, "Track coaching started...")
+			else
+				logMessage(kLogDebug, "Track coaching NOT started...")
+
 		return started
 	}
 
 	shutdownTrackCoaching() {
 		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		if isDebug()
+			logMessage(kLogDebug, "Track coaching stopped...")
 
 		this.shutdownTrackTrigger()
 
@@ -1139,6 +1157,9 @@ class DrivingCoach extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("CoachingReady", false, true)
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
+				if isDebug()
+					logMessage(kLogDebug, "No track sections available - using automatic approach...")
+
 				telemetry := this.TelemetryAnalyzer.createTelemetry(laps[1], kTempDirectory . "Driving Coach\Telemetry\Lap " . laps[1] . ".telemetry")
 
 				this.TelemetryAnalyzer.requireTrackSections(telemetry)
@@ -1216,6 +1237,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		for ignore, lap in laps
 			this.AvailableTelemetry[lap] := true
+
+		if isDebug()
+			logMessage(kLogDebug, this.AvailableTelemetry.Count . " lap telemetries available for coaching...")
 
 		if this.OnTrackCoaching
 			this.startupTrackCoaching()
@@ -1552,6 +1576,9 @@ class DrivingCoach extends GridRaceAssistant {
 					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
 					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.ForName")) {
+						if isDebug()
+							logMessage(kLogDebug, "Telemetry for lap " . lap . " available...")
+
 						car := knowledgeBase.getValue("Driver.Car", kUndefined)
 
 						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.ForName")
@@ -1590,6 +1617,9 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
+		if (isDebug() && !this.TelemetryCollector)
+			logMessage(kLogDebug, "Telemetry coaching: " . this.Simulator . " " . this.Track . " (" . this.TrackLength . ")")
+
 		if (!this.TelemetryCollector && this.Simulator && this.Track && ((this.TrackLength > 0) || isDebug())) {
 			DirCreate(kTempDirectory . "Driving Coach")
 			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
@@ -1607,6 +1637,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 			if (provider != "Internal")
 				provider .= ("|" . getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider.URL", ""))
+
+			if isDebug()
+				logMessage(kLogDebug, "Using telemetry provider " . provider . "...")
 
 			this.iTelemetryAnalyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 			this.iTelemetryCollector := TelemetryCollector(provider, kTempDirectory . "Driving Coach\Telemetry", this.Simulator, this.Track, this.TrackLength)

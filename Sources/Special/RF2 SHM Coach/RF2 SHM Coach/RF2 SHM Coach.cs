@@ -145,7 +145,537 @@ namespace RF2SHMCoach {
                 SendStringMessage(winHandle, 0, "Driving Coach:" + message);
         }
 
-		float[] xCoordinates = new float[60];
+        void SendAnalyzerMessage(string message)
+        {
+            int winHandle = FindWindowEx(0, 0, null, "Setup Workbench.exe");
+
+            if (winHandle == 0)
+                winHandle = FindWindowEx(0, 0, null, "Setup Workbench.ahk");
+
+            if (winHandle != 0)
+                SendStringMessage(winHandle, 0, "Analyzer:" + message);
+        }
+
+		class CornerDynamics
+        {
+            public double Speed;
+            public double Usos;
+            public int CompletedLaps;
+            public int Phase;
+
+            public CornerDynamics(double speed, double usos, int completedLaps, int phase)
+            {
+                Speed = speed;
+                Usos = usos;
+                CompletedLaps = completedLaps;
+                Phase = phase;
+            }
+        }
+
+        double vehicleSpeed(ref rF2VehicleScoring vehicle)
+        {
+            rF2Vec3 localVel = vehicle.mLocalVel;
+
+            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+        }
+
+        double vehicleSpeed(ref rF2VehicleTelemetry vehicle)
+        {
+            rF2Vec3 localVel = vehicle.mLocalVel;
+
+            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+        }
+
+        const int MAXVALUES = 6;
+		const double PI = 3.14159265;
+
+        List<float> recentSteerAngles = new List<float>();
+        List<float> recentGLongs = new List<float>();
+        List<float> recentIdealAngVels = new List<float>();
+        List<float> recentRealAngVels = new List<float>();
+
+        void pushValue(List<float> values, float value)
+        {
+            values.Add(value);
+
+            if ((int)values.Count > MAXVALUES)
+                values.RemoveAt(0);
+        }
+
+        float averageValue(List<float> values, ref int num)
+        {
+            float sum = 0.0f;
+
+            foreach (float value in values)
+                sum += value;
+
+            num = values.Count;
+
+            return (num > 0) ? sum / num : 0.0f;
+        }
+
+        float smoothValue(List<float> values, float value)
+        {
+            int ignore = 0;
+
+			if (false) {
+				pushValue(values, value);
+
+				return averageValue(values, ref ignore);
+			}
+			else
+				return value;
+        }
+
+        List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
+
+        string dataFile = "";
+        int understeerLightThreshold = 12;
+        int understeerMediumThreshold = 20;
+        int understeerHeavyThreshold = 35;
+        int oversteerLightThreshold = 2;
+        int oversteerMediumThreshold = -6;
+        int oversteerHeavyThreshold = -10;
+        int lowspeedThreshold = 100;
+        int steerLock = 900;
+        int steerRatio = 14;
+        int wheelbase = 270;
+        int trackWidth = 150;
+
+        int lastCompletedLaps = 0;
+        float lastSpeed = 0.0f;
+		
+		bool calibrate = false;
+        long lastSound = 0;
+
+		bool triggerUSOSBeep(string soundsDirectory, string audioDevice, double usos)
+		{
+			string wavFile;
+
+			if (usos < oversteerHeavyThreshold)
+				wavFile = soundsDirectory + "\\Oversteer Heavy.wav";
+			else if (usos < oversteerMediumThreshold)
+				wavFile = soundsDirectory + "\\Oversteer Medium.wav";
+			else if (usos < oversteerLightThreshold)
+				wavFile = soundsDirectory + "\\Oversteer Light.wav";
+			else if (usos > understeerHeavyThreshold)
+				wavFile = soundsDirectory + "\\Understeer Heavy.wav";
+			else if (usos > understeerMediumThreshold)
+				wavFile = soundsDirectory + "\\Understeer Medium.wav";
+			else if (usos > understeerLightThreshold)
+				wavFile = soundsDirectory + "\\Understeer Light.wav";
+			else
+				return false;
+
+			if (wavFile != "")
+				if (audioDevice != "")
+					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				else
+					new System.Media.SoundPlayer(wavFile).Play();
+			
+            return true;
+		}
+
+		bool collectTelemetry(string soundsDirectory, string audioDevice)
+		{
+            int carID = 0;
+
+            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                if (scoring.mVehicles[i].mIsPlayer != 0)
+                {
+                    carID = i;
+
+                    break;
+                }
+
+            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+
+            if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
+                return true;
+
+			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
+
+            float speed = (float)vehicleSpeed(ref telemetry.mVehicles[carID]);
+            float acceleration = (float)speed - lastSpeed;
+
+			lastSpeed = speed;
+
+            pushValue(recentGLongs, acceleration);
+
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+            double steerAngleRadians = -steeredAngleDegs / 57.2958;
+            double wheelBaseMeter = (float)wheelbase / 100;
+            double radius = wheelBaseMeter / steerAngleRadians;
+            double perimeter = radius * PI * 2;
+            double perimeterSpeed = lastSpeed / 3.6;
+            double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
+            
+			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+			{
+                // Get the average recent GLong
+                int numGLong = 0;
+                float glongAverage = averageValue(recentGLongs, ref numGLong);
+
+                int phase = 0;
+                if (numGLong > 0)
+                    if (glongAverage < -0.2)
+                    {
+                        // Braking
+                        phase = -1;
+                    }
+                    else if (glongAverage > 0.1)
+                    {
+                        // Accelerating
+                        phase = 1;
+                    }
+
+                CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
+
+				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
+				{
+					double slip = Math.Abs(idealAngularVelocity - angularVelocity);
+
+					if (steerAngle > 0) {
+						if (angularVelocity > 0)
+                        {
+							/*
+							if (calibrate)
+								slip *= -1;
+							else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							*/
+
+							slip *= -1;
+                        }
+                        else if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity < 0)
+                        {
+							/*
+							if (calibrate)
+								slip *= -1;
+                            else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
+							*/
+							
+							slip *= -1;
+                        }
+                        else if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
+
+					if (slip != 0)
+					{
+						cd.Usos = slip * 57.2989 * 1;
+
+						if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
+							if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
+								lastSound = Environment.TickCount;
+
+						if (false)
+						{
+							StreamWriter output = new StreamWriter(dataFile + ".trace", true);
+
+							output.Write(steerAngle + "  ");
+							output.Write(steeredAngleDegs + "  ");
+							output.Write(steerAngleRadians + "  ");
+							output.Write(lastSpeed + "  ");
+							output.Write(idealAngularVelocity + "  ");
+							output.Write(angularVelocity + "  ");
+							output.Write(slip + "  ");
+							output.WriteLine(cd.Usos);
+
+							output.Close();
+
+							Thread.Sleep(200);
+						}
+					}
+                    else
+						cd = null;
+                }
+
+				if (cd != null)
+					cornerDynamicsList.Add(cd);
+
+				int completedLaps = playerScoring.mTotalLaps;
+
+				if (lastCompletedLaps != completedLaps) {
+					lastCompletedLaps = completedLaps;
+					
+					while (true)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
+							cornerDynamicsList.RemoveAt(0);
+						else
+							break;
+				}
+			}
+
+            return true;
+        }
+
+        void writeTelemetry()
+        {
+            StreamWriter output = new StreamWriter(dataFile + ".tmp", false);
+
+            try
+            {
+                int[] slowLightUSNum = { 0, 0, 0 };
+                int[] slowMediumUSNum = { 0, 0, 0 };
+                int[] slowHeavyUSNum = { 0, 0, 0 };
+                int[] slowLightOSNum = { 0, 0, 0 };
+                int[] slowMediumOSNum = { 0, 0, 0 };
+                int[] slowHeavyOSNum = { 0, 0, 0 };
+                int slowTotalNum = 0;
+                int[] fastLightUSNum = { 0, 0, 0 };
+                int[] fastMediumUSNum = { 0, 0, 0 };
+                int[] fastHeavyUSNum = { 0, 0, 0 };
+                int[] fastLightOSNum = { 0, 0, 0 };
+                int[] fastMediumOSNum = { 0, 0, 0 };
+                int[] fastHeavyOSNum = { 0, 0, 0 };
+                int fastTotalNum = 0;
+		
+				int[] slowOSMin = { 0, 0, 0 };
+				int[] fastOSMin = { 0, 0, 0 };
+				int[] slowUSMax = { 0, 0, 0 };
+				int[] fastUSMax = { 0, 0, 0 };
+
+                foreach (CornerDynamics corner in cornerDynamicsList)
+                {
+                    int phase = corner.Phase + 1;
+
+                    if (calibrate) {
+						if (corner.Speed < lowspeedThreshold) {
+							slowOSMin[phase] = Math.Min(slowOSMin[phase], (int)corner.Usos);
+							slowUSMax[phase] = Math.Max(slowUSMax[phase], (int)corner.Usos);
+						}
+						else {
+							fastOSMin[phase] = Math.Min(fastOSMin[phase], (int)corner.Usos);
+							fastUSMax[phase] = Math.Max(fastUSMax[phase], (int)corner.Usos);
+						}
+					}
+					else {
+						if (corner.Speed < lowspeedThreshold)
+						{
+							slowTotalNum++;
+							if (corner.Usos < oversteerHeavyThreshold)
+							{
+								slowHeavyOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerMediumThreshold)
+							{
+								slowMediumOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerLightThreshold)
+							{
+								slowLightOSNum[phase]++;
+							}
+							else if (corner.Usos > understeerHeavyThreshold)
+							{
+								slowHeavyUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerMediumThreshold)
+							{
+								slowMediumUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerLightThreshold)
+							{
+								slowLightUSNum[phase]++;
+							}
+						}
+						else
+						{
+							fastTotalNum++;
+							if (corner.Usos < oversteerHeavyThreshold)
+							{
+								fastHeavyOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerMediumThreshold)
+							{
+								fastMediumOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerLightThreshold)
+							{
+								fastLightOSNum[phase]++;
+							}
+							else if (corner.Usos > understeerHeavyThreshold)
+							{
+								fastHeavyUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerMediumThreshold)
+							{
+								fastMediumUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerLightThreshold)
+							{
+								fastLightUSNum[phase]++;
+							}
+						}
+					}
+                }
+
+                if (calibrate) {
+					output.WriteLine("[Understeer.Slow]");
+
+					output.WriteLine("Entry=" + slowUSMax[0]);
+					output.WriteLine("Apex=" + slowUSMax[1]);
+					output.WriteLine("Exit=" + slowUSMax[2]);
+					
+					output.WriteLine("[Understeer.Fast]");
+
+					output.WriteLine("Entry=" + fastUSMax[0]);
+					output.WriteLine("Apex=" + fastUSMax[1]);
+					output.WriteLine("Exit=" + fastUSMax[2]);
+					
+					output.WriteLine("[Oversteer.Slow]");
+
+					output.WriteLine("Entry=" + slowOSMin[0]);
+					output.WriteLine("Apex=" + slowOSMin[1]);
+					output.WriteLine("Exit=" + slowOSMin[2]);
+					
+					output.WriteLine("[Oversteer.Fast]");
+
+					output.WriteLine("Entry=" + fastOSMin[0]);
+					output.WriteLine("Apex=" + fastOSMin[1]);
+					output.WriteLine("Exit=" + fastOSMin[2]);
+				}
+				else {
+					output.WriteLine("[Understeer.Slow.Light]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Understeer.Slow.Medium]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Understeer.Slow.Heavy]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Understeer.Fast.Light]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Understeer.Fast.Medium]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Understeer.Fast.Heavy]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Slow.Light]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Slow.Medium]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Slow.Heavy]");
+
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Fast.Light]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Fast.Medium]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Fast.Heavy]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
+					}
+				}
+
+                output.Close();
+
+                FileInfo info = new FileInfo(dataFile);
+
+                info.Delete();
+
+                info = new FileInfo(dataFile + ".tmp");
+
+                info.MoveTo(dataFile);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    output.Close();
+                }
+                catch (Exception)
+                {
+                }
+
+                // retry next round...
+            }
+        }
+
+        float[] xCoordinates = new float[60];
         float[] yCoordinates = new float[60];
         int numCoordinates = 0;
 		long lastUpdate = 0;
@@ -243,6 +773,7 @@ namespace RF2SHMCoach {
             }
         }
 
+		string soundsDirectory = "";
 		string audioDevice = string.Empty;
 		string hintFile = string.Empty;
 
@@ -255,9 +786,48 @@ namespace RF2SHMCoach {
 			if (args.Length > 2)
 				audioDevice = args[2];
         }
+        
+		public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
+        {
+            dataFile = args[1];
+			
+			calibrate = calibrateTelemetry;
+			
+			if (calibrate) {
+				lowspeedThreshold = int.Parse(args[2]);
+				steerLock = int.Parse(args[3]);
+				steerRatio = int.Parse(args[4]);
+				wheelbase = int.Parse(args[5]);
+				trackWidth = int.Parse(args[6]);
+			}
+			else {
+				understeerLightThreshold = int.Parse(args[2]);
+				understeerMediumThreshold = int.Parse(args[3]);
+				understeerHeavyThreshold = int.Parse(args[4]);
+				oversteerLightThreshold = int.Parse(args[5]);
+				oversteerMediumThreshold = int.Parse(args[6]);
+				oversteerHeavyThreshold = int.Parse(args[7]);
+				lowspeedThreshold = int.Parse(args[8]);
+				steerLock = int.Parse(args[9]);
+				steerRatio = int.Parse(args[10]);
+				wheelbase = int.Parse(args[11]);
+				trackWidth = int.Parse(args[12]);
 
-        public void Run(bool positionTrigger, bool brakeHints) {
-            while (true) {
+                if (args.Length > 13) {
+                    soundsDirectory = args[13];
+					
+					if (args.Length > 14)
+						audioDevice = args[14];
+				}
+            }
+        }
+
+        public void Run(bool positionTrigger, bool brakeHints, bool handlingAnalyzer) {
+            long counter = 0;
+			
+			while (true) {
+				counter += 1;
+				
 				if (!connected)
 					Connect();
 
@@ -283,7 +853,19 @@ namespace RF2SHMCoach {
 
 							Thread.Sleep(10);
 						}
-						else if (brakeHints)
+						else if (handlingAnalyzer)
+                        {
+                            if (collectTelemetry(soundsDirectory, audioDevice))
+							{
+                                if (counter % 20 == 0)
+                                    writeTelemetry();
+
+								Thread.Sleep(10);
+                            }
+                            else
+                                break;
+                        }
+                        else if (brakeHints)
 						{
 							loadBrakeHints();
 

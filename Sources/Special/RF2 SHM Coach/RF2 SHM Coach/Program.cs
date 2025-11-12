@@ -25,13 +25,25 @@ namespace RF2SHMCoach {
             {
                 coach.initializeTrigger("Trigger", args);
 
-                coach.Run(true, false);
+                coach.Run(true, false, false);
+            }
+            else if (args.Length > 0 && args[0] == "-Calibrate")
+            {
+                coach.initializeAnalyzer(true, args);
+
+                coach.Run(false, false, true);
+            }
+            else if (args.Length > 0 && args[0] == "-Analyze")
+            {
+                coach.initializeAnalyzer(false, args);
+
+                coach.Run(false, false, true);
             }
             else if (args.Length > 0 && args[0] == "-BrakeHints")
             {
                 coach.initializeBrakeHints("BrakeHints", args);
 
-                coach.Run(false, true);
+                coach.Run(false, true, false);
             }
         }
     }

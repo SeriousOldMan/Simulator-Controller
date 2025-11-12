@@ -293,7 +293,7 @@ class IssueCollector {
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				Run(kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
+				Run(kBinariesDirectory . "Providers\" . code . " SHM Coach.exe " . options, kBinariesDirectory, "Hide", &pid)
 
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
@@ -301,7 +301,7 @@ class IssueCollector {
 			catch Any as exception {
 				logError(exception, true)
 
-				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+				message := substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
 											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))

@@ -92,6 +92,7 @@ class VoiceManager extends ConfigurationItem {
 		iIsTalking := false
 		iText := ""
 		iFocus := false
+		iOptions := CaseInsenseMap()
 
 		VoiceManager {
 			Get {
@@ -154,12 +155,15 @@ class VoiceManager extends ConfigurationItem {
 				text := this.iText
 				focus := this.iFocus
 
+				options := (options ? combine(this.iOptions, options) : this.iOptions)
+
 				this.iText := ""
 				this.iFocus := false
 				this.iIsTalking := false
+				this.iOptions := CaseInsenseMap()
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus, false, options)
+					this.speak(text, focus, false, (options.Count > 0) ? options : false)
 			}
 		}
 
@@ -171,13 +175,16 @@ class VoiceManager extends ConfigurationItem {
 				this.iFocus := (this.iFocus || focus)
 
 				if options
-					throw "Options are not supported while talking..."
+					this.iOptions := combine(this.iOptions, options)
 			}
 			else {
 				if options
 					options.UseTalking := this.UseTalking
 				else
 					options := {UseTalking: this.UseTalking}
+
+				if focus
+					options.Important := true
 
 				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus, options ? map2String("|", "->", toMap(options)) : false)
 										, this.VoiceManager.VoiceServer)
@@ -235,6 +242,7 @@ class VoiceManager extends ConfigurationItem {
 		iIsTalking := false
 		iText := ""
 		iFocus := false
+		iOptions := CaseInsenseMap()
 
 		Routing {
 			Get {
@@ -316,12 +324,18 @@ class VoiceManager extends ConfigurationItem {
 				text := this.iText
 				focus := this.iFocus
 
+				if focus
+					this.iOptions["Important"] := true
+
+				options := (options ? combine(this.iOptions, options) : this.iOptions)
+
 				this.iText := ""
 				this.iFocus := false
 				this.iIsTalking := false
+				this.iOptions := CaseInsenseMap()
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus, false, options)
+					this.speak(text, focus, false, (options.Count > 0) ? options : false)
 			}
 		}
 
@@ -333,9 +347,15 @@ class VoiceManager extends ConfigurationItem {
 				this.iFocus := (this.iFocus || focus)
 
 				if options
-					throw "Options are not supported while talking..."
+					this.iOptions := combine(this.iOptions, options)
 			}
 			else {
+				if focus
+					if options
+						options.Important := true
+					else
+						options := {Important: true}
+
 				stopped := this.VoiceManager.stopListening()
 
 				try {

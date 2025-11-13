@@ -36,6 +36,7 @@
 
 #### Changes
 
+  - Very important messages by the Assistants will now be repeated until completed, when interrupted by urgent shout outs of the Spotter. For *normal* messages, this is only attempted five times.
   - The threshold between greasy and damp track conditions has been tweaked for *Le Mans Ultimate* and *rFactor 2*. This will result in more precise tyre change information (see next topic).
   - The tyre compound recommendation rule set based upon weather information has been extended by a component which takes the track grip into account. These rules are used by the Strategist and the Engineer, when preparing a pitstop and when to call you to the pit. All this results in almost perfect pitstop timing.
   - The Engineer now calls you to the pit after a pitstop has been planned for a tyre change to handle an upcoming weather change, and the grip has become too worse to continue the race on the current tyre compound.

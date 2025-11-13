@@ -1457,10 +1457,6 @@ class DrivingCoach extends GridRaceAssistant {
 		return theLap
 	}
 
-	getRunningTelemetry(corner?) {
-		return this.getTelemetry(&ignore := false, corner?)
-	}
-
 	addInstructionHint(instruction) {
 		this.iInstructionHints[instruction] := true
 	}

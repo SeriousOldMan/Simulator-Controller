@@ -720,7 +720,7 @@ namespace ACSHMCoach {
 
 		void checkCoordinates()
 		{
-			if ((triggerType == "BrakeHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if ((triggerType == "TrackHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double velocityX = physics.LocalVelocity[0];
 				double velocityY = physics.LocalVelocity[2];
@@ -740,7 +740,7 @@ namespace ACSHMCoach {
 							{
 								if (triggerType == "Trigger")
 									SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-                                else if (triggerType == "BrakeHints")
+                                else if (triggerType == "TrackHints")
                                     if (audioDevice != "")
                                         SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
                                     else
@@ -772,7 +772,7 @@ namespace ACSHMCoach {
         string[] hintSounds = new string[256];
         DateTime lastHintsUpdate = DateTime.Now;
 
-        public void loadBrakeHints()
+        public void loadTrackHints()
         {
             if ((hintFile != "") && System.IO.File.Exists(hintFile))
             {
@@ -800,7 +800,7 @@ namespace ACSHMCoach {
         string audioDevice = string.Empty;
         string hintFile = string.Empty;
 
-        public void initializeBrakeHints(string type, string[] args)
+        public void initializeTrackHints(string type, string[] args)
         {
             triggerType = type;
 
@@ -845,7 +845,7 @@ namespace ACSHMCoach {
             }
         }
 
-        public void Run(bool positionTrigger, bool brakeHints, bool handlingAnalyzer)
+        public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer)
 		{
 			long counter = 0;
 			
@@ -875,9 +875,9 @@ namespace ACSHMCoach {
 
 					Thread.Sleep(10);
                 }
-                else if (brakeHints)
+                else if (trackHints)
                 {
-                    loadBrakeHints();
+                    loadTrackHints();
 
                     checkCoordinates();
 

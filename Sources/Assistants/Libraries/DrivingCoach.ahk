@@ -73,6 +73,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTrackTriggerPID := false
 
+	iTrackHintsPID := false
+	iTrackHintsFile := false
+
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
@@ -328,6 +331,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.TelemetryCollector.shutdown()
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
+		OnExit(ObjBindMethod(this, "shutdownTrackHints", true))
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1094,6 +1098,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local state := newMultiMap()
 
 		this.shutdownTrackTrigger()
+		this.shutdownTrackHints()
 
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
@@ -1142,6 +1147,7 @@ class DrivingCoach extends GridRaceAssistant {
 			logMessage(kLogDebug, "Track coaching stopped...")
 
 		this.shutdownTrackTrigger()
+		this.shutdownTrackHints()
 
 		setMultiMapValue(state, "Coaching", "Track", false)
 
@@ -1156,7 +1162,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryAvailable(laps) {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
-		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry
+		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry, reference
 
 		if (this.AvailableTelemetry.Count = 0) {
 			if (this.Speaker[false] && !this.OnTrackCoaching)
@@ -1249,6 +1255,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.OnTrackCoaching
 			this.startupTrackCoaching()
+
+		if this.iTrackHintsPID {
+			this.getTelemetry(&reference := true)
+
+			if reference
+				this.updateTrackHints(reference)
+		}
 	}
 
 	reviewCornerPerformance(cornerNr, fileName) {
@@ -1781,6 +1794,128 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			this.iTrackTriggerPID := false
+		}
+
+		return false
+	}
+
+	startupTrackHints(telemetry) {
+		local simulator := this.Simulator
+		local analyzer := this.TelemetryAnalyzer
+		local code, data, audioDevice, options
+
+		if (!this.iTrackHintsPID && simulator && analyzer) {
+			this.iTrackHintsFile := temporaryFileName("Track", "hints")
+
+			sections := analyzer.TrackSections
+
+			if (analyzer.TrackSections.Length > 0) {
+				code := sessionDB.getSimulatorCode(simulator)
+				data := sessionDB.getTrackData(simulator, this.Track)
+
+				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
+				pid := false
+
+				try {
+					if !FileExist(exePath)
+						throw "File not found..."
+
+					audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
+					options := (audioDevice ? (" `"" . audioDevice . "`"") : "")
+
+					if data
+						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iTrackHintsFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" -TrackHints `"" . this.iTrackHintsFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
+															   , {simulator: code, protocol: "SHM"})
+										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+										   . kBinariesDirectory . translate(")"))
+
+					if !kSilentMode
+						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
+													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+
+				if pid
+					this.iTrackHintsPID := pid
+			}
+		}
+
+		return (this.iTrackHintsPID != false)
+	}
+
+	updateTrackHints(telemetry) {
+		local hintsFile := temporaryFileName("Track", "hints.tmp")
+		local brakeSound := getFileName("Brake.wav", kResourcesDirectory . "Sounds\", kUserHomeDirectory . "Sounds\")
+		local throttleSound := getFileName("Throttle.wav", kResourcesDirectory . "Sounds\", kUserHomeDirectory . "Sounds\")
+		local hints := ""
+		local tries := 3
+		local ignore, braking, accelerating
+
+		if this.iTrackHintsPID {
+			for ignore, braking in telemetry.Braking {
+				if (A_Index > 1)
+					hints .= "`n"
+
+				hints .= (braking.X . A_Space . braking.Y . A_Space . brakeSound)
+			}
+
+			for ignore, accelerating in telemetry.Accelerating {
+				if (A_Index > 1)
+					hints .= "`n"
+
+				hints .= (accelerating.X . A_Space . accelerating.Y . A_Space . throttleSound)
+			}
+
+			FileAppend(hints, hintsFile)
+
+			while (tries-- > 0)
+				try {
+					FileMove(hintsFile, this.iTrackHintsFile, 1)
+				}
+				catch Any {
+					Sleep(100)
+				}
+		}
+	}
+
+	shutdownTrackHints(force := false, arguments*) {
+		local pid := this.iTrackHintsPID
+		local tries
+
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+
+		if pid {
+			ProcessClose(pid)
+
+			if (force && ProcessExist(pid)) {
+				Sleep(500)
+
+				tries := 5
+
+				while (tries-- > 0) {
+					pid := ProcessExist(pid)
+
+					if pid {
+						ProcessClose(pid)
+
+						Sleep(500)
+					}
+					else
+						break
+				}
+			}
+
+			deleteFile(this.iTrackHintsFile)
+
+			this.iTrackHintsPID := false
 		}
 
 		return false

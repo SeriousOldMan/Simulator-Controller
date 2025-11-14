@@ -660,7 +660,7 @@ char* hintSounds[256][256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(int playerID) {
-	if ((strcmp(triggerType, "BrakeHints") == 0) ? TRUE : time(NULL) > (lastUpdate + 2)) {
+	if ((strcmp(triggerType, "TrackHints") == 0) ? TRUE : time(NULL) > (lastUpdate + 2)) {
 		r3e_float64 velocityX = map_buffer->player.velocity.x;
 		r3e_float64 velocityY = map_buffer->player.velocity.z;
 		r3e_float64 velocityZ = map_buffer->player.velocity.y;
@@ -697,7 +697,7 @@ void checkCoordinates(int playerID) {
 
 						sendTriggerMessage(buffer);
 					}
-					else if (strcmp(triggerType, "BrakeHints") == 0) {
+					else if (strcmp(triggerType, "TrackHints") == 0) {
 						strcat_s(buffer, 512, "acousticFeedback:");
 						strcat_s(buffer, 512, (char *)hintSounds[i]);
 
@@ -717,7 +717,7 @@ void checkCoordinates(int playerID) {
 #define stat _stat
 #endif
 
-void loadBrakeHints()
+void loadTrackHints()
 {
 	if ((strcmp(hintFile, "") != 0) && fileExists(hintFile))
 	{
@@ -768,7 +768,7 @@ int main(int argc, char* argv[])
 	BOOL handlingCalibrator = FALSE;
 	BOOL handlingAnalyzer = FALSE;
 	BOOL positionTrigger = FALSE;
-	BOOL brakeHints = FALSE;
+	BOOL trackHints = FALSE;
 	char* soundsDirectory = "";
 
 	if (argc > 1) {
@@ -786,10 +786,10 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		brakeHints = (strcmp(argv[1], "-BrakeHints") == 0);
+		trackHints = (strcmp(argv[1], "-TrackHints") == 0);
 
-		if (brakeHints) {
-			triggerType = "BrakeHints";
+		if (trackHints) {
+			triggerType = "TrackHints";
 
 			hintFile = argv[2];
 
@@ -860,7 +860,7 @@ int main(int argc, char* argv[])
 				Sleep(10);
 			}
 			else if (positionTrigger) {
-				loadBrakeHints();
+				loadTrackHints();
 
 				checkCoordinates(playerID);
 

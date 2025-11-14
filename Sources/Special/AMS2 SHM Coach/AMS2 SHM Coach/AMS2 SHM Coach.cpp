@@ -548,7 +548,7 @@ std::string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const SharedMemory* sharedData) {
-	if ((triggerType == "BrakeHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
 		float velocityX = sharedData->mWorldVelocity[VEC_X];
 		float velocityY = sharedData->mWorldVelocity[VEC_Z];
 		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
@@ -578,7 +578,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 
 						sendTriggerMessage(buffer);
 					}
-					else if (strcmp(triggerType, "BrakeHints") == 0) {
+					else if (strcmp(triggerType, "TrackHints") == 0) {
 						strcat_s(buffer, "acousticFeedback:");
 						strcat_s(buffer, hintSounds[i].c_str());
 
@@ -598,7 +598,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 #define stat _stat
 #endif
 
-void loadBrakeHints()
+void loadTrackHints()
 {
 	if ((hintFile != "") && fileExists(hintFile))
 	{
@@ -639,7 +639,7 @@ int main(int argc, char* argv[]) {
 	bool handlingCalibrator = false;
 	bool handlingAnalyzer = false;
 	bool positionTrigger = false;
-	bool brakeHints = false;
+	bool trackHints = false;
 	const char* soundsDirectory = "";
 
 	if (argc > 1) {
@@ -657,10 +657,10 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		brakeHints = (strcmp(argv[1], "-BrakeHints") == 0);
+		trackHints = (strcmp(argv[1], "-TrackHints") == 0);
 
-		if (brakeHints) {
-			triggerType = "BrakeHints";
+		if (trackHints) {
+			triggerType = "TrackHints";
 
 			hintFile = argv[2];
 
@@ -762,7 +762,7 @@ int main(int argc, char* argv[]) {
 				Sleep(10);
 			}
 			else if (positionTrigger) {
-				loadBrakeHints();
+				loadTrackHints();
 
 				checkCoordinates(sharedData);
 

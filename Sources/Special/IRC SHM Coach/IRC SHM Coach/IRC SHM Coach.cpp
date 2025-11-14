@@ -803,7 +803,7 @@ std::string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
-	if ((triggerType == "BrakeHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
 		char buffer[60];
 
 		const char* sessionInfo = irsdk_getSessionInfoStr();
@@ -856,7 +856,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 					sendTriggerMessage(buffer);
 				}
-				else if (strcmp(triggerType, "BrakeHints") == 0) {
+				else if (strcmp(triggerType, "TrackHints") == 0) {
 					strcat_s(buffer, "acousticFeedback:");
 					strcat_s(buffer, hintSounds[index].c_str());
 
@@ -873,7 +873,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 #define stat _stat
 #endif
 
-void loadBrakeHints()
+void loadTrackHints()
 {
 	if ((hintFile != "") && fileExists(hintFile))
 	{
@@ -916,7 +916,7 @@ int main(int argc, char* argv[])
 	bool handlingCalibrator = false;
 	bool handlingAnalyzer = false;
 	bool positionTrigger = false;
-	bool brakeHints = false;
+	bool trackHints = false;
 	const char* soundsDirectory = "";
 
 	if (argc > 1) {
@@ -956,15 +956,17 @@ int main(int argc, char* argv[])
 			if (numCoordinates == 0)
 				positionTrigger = false;
 
-			brakeHints = (strcmp(argv[1], "-BrakeHints") == 0);
+			trackHints = (strcmp(argv[1], "-TrackHints") == 0);
 
-			if (brakeHints) {
-				triggerType = "BrakeHints";
+			if (trackHints) {
+				triggerType = "TrackHints";
 
-				hintFile = argv[2];
+				loadTrackCoordinates(argv[2]);
 
-				if (argc > 3)
-					audioDevice = argv[3];
+				hintFile = argv[3];
+
+				if (argc > 4)
+					audioDevice = argv[4];
 			}
 
 			handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1060,7 +1062,7 @@ int main(int argc, char* argv[])
 						Sleep(10);
 					}
 					else if (positionTrigger) {
-						loadBrakeHints();
+						loadTrackHints();
 
 						checkCoordinates(pHeader, g_data, trackLength);
 

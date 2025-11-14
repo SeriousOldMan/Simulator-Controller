@@ -133,9 +133,12 @@ class Corner extends Section {
 	iRollingStart := 0					; Distance into the track, where accelerating starts
 	iAcceleratingStart := 0				; Distance into the track, where accelerating starts
 
-	iBrakingTime := 0					; Time of the braking phase in meters
-	iRollingTime := 0					; Time of the rolling phase in meters
-	iAcceleratingTime := 0				; Time of the acceleration phase in meters
+	iBrakeCurve := []
+	iThrottleCurve := []
+
+	iBrakingTime := 0					; Time of the braking phase in seconds
+	iRollingTime := 0					; Time of the rolling phase in seconds
+	iAcceleratingTime := 0				; Time of the acceleration phase in seconds
 
 	iBrakingLength := 0					; Length of the braking phase in meters
 	iRollingLength := 0					; Length of the rolling phase in meters
@@ -304,9 +307,45 @@ class Corner extends Section {
 		}
 	}
 
+	BrakingX {
+		Get {
+			return this.iBrakingX
+		}
+	}
+
+	BrakingY {
+		Get {
+			return this.iBrakingY
+		}
+	}
+
+	BrakeCurve {
+		Get {
+			return this.iBrakeCurve
+		}
+	}
+
 	AcceleratingStart {
 		Get {
 			return this.iAcceleratingStart
+		}
+	}
+
+	AcceleratingX {
+		Get {
+			return this.iAcceleratingX
+		}
+	}
+
+	AcceleratingY {
+		Get {
+			return this.iAcceleratingY
+		}
+	}
+
+	ThrottleCurve {
+		Get {
+			return this.iThrottleCurve
 		}
 	}
 
@@ -437,9 +476,9 @@ class Corner extends Section {
 	}
 
 	__New(trackSection, direction, curvature
-					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp
+					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp, brakeCurve
 					  , rollingStart, rollingTime, rollingLength
-					  , acceleratingStart, acceleratingTime, acceleratingLength
+					  , acceleratingStart, acceleratingTime, acceleratingLength, throttleCurve
 					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
@@ -496,6 +535,8 @@ class Corner extends Section {
 		local brakingLength := 0
 		local rollingLength := 0
 		local acceleratingLength := 0
+		local brakeCurve := []
+		local throttleCurve := []
 		local brakingTime := 0
 		local rollingTime := 0
 		local acceleratingTime := 0
@@ -669,6 +710,8 @@ class Corner extends Section {
 
 				brakeCount += 1
 
+				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY"), Brake: brake})
+
 				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
 					if ((brakeReference - brake) > 0.2)
 						brakeChanges += 1
@@ -715,6 +758,8 @@ class Corner extends Section {
 					tcActivations += 1
 
 				throttleCount += 1
+
+				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY"), Throttle: throttle})
 
 				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
 					if ((throttleReference - throttle) > 0.2)
@@ -764,9 +809,9 @@ class Corner extends Section {
 			acceleratingStart := kNull
 
 		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
-							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
+							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp, brakeCurve
 							 , rollingStart, rollingTime, rollingLength
-							 , acceleratingStart, acceleratingTime, acceleratingLength
+							 , acceleratingStart, acceleratingTime, acceleratingLength, throttleCurve
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
 							 , (throttleCount ? Round((tcActivations / throttleCount) * 100) : 100)
@@ -887,6 +932,8 @@ class Telemetry {
 	iSectorTimes := false
 
 	iSections := []
+	iBraking := false
+	iAccelerating := false
 
 	iMaxLateralGForce := 0
 	iMaxSpeed := 0
@@ -937,6 +984,24 @@ class Telemetry {
 
 		Set {
 			return (this.iSections := value)
+		}
+	}
+
+	Braking {
+		Get {
+			if !this.iBraking
+				this.iBraking := createBraking()
+
+			return this.iBraking
+		}
+	}
+
+	Accelerating {
+		Get {
+			if !this.iAccelerating
+				this.iAccelerating := createAccelerating()
+
+			return this.iAccelerating
 		}
 	}
 
@@ -1105,6 +1170,32 @@ class Telemetry {
 		return sections
 	}
 
+	createBraking() {
+		local braking := []
+		local ignore, section
+
+		for ignore, section in this.Sections
+			if isInstance(section, Corner)
+				braking.Push({Corner: section, StartX: section.BrakeCurve[1].X, Y: section.BrakeCurve[1].Y
+											 , Length: section.Length["Braking"], Time: section.Time["Braking"]
+											 , Curve: section.BrakeCurve})
+
+		return braking
+	}
+
+	createAccelerating() {
+		local accelerating := []
+		local ignore, section
+
+		for ignore, section in this.Sections
+			if isInstance(section, Corner)
+				accelerating.Push({Corner: section, StartX: section.ThrottleCurve[1].X, Y: section.ThrottleCurve[1].Y
+												  , Length: section.Length["Accelerating"], Time: Time["Accelerating"]
+												  , Curve: section.ThrottleCurve})
+
+		return accelerating
+	}
+
 	findSection(x, y, threshold := 10) {
 		local section := this.TelemetryAnalyzer.findSection(x, y, threshold)
 		local ignore, candidate
@@ -1112,6 +1203,45 @@ class Telemetry {
 		for ignore, candidate in this.Sections
 			if (candidate.TrackSection = section)
 				return candidate
+
+		return false
+	}
+
+	findCoordinates(distance, &x, &y) {
+		local candidate := false
+		local candidateDistance := 999999
+		local candidateX, candidateY, cDistance
+
+		loop this.Data.Length {
+			x := this.getValue(A_Index, "PosX")
+
+			if (x != kUndefined) {
+				y := this.getValue(A_Index, "PosX")
+
+				if candidate {
+					cDistance := Abs(this.getValue(A_Index, "Distance", kUndefined) - distance)
+
+					if (cDistance < candidateDistance) {
+						candidateDistance := cDistance
+						candidateX := x
+						candidateY := y
+
+						candidate := A_Index
+					}
+				}
+				else if this.getValue(A_Index, "Distance", kUndefined) {
+					candidateX := x
+					candidateY := y
+
+					candidate := A_Index
+				}
+			}
+		}
+
+		if candidate {
+			x := candidateX
+			y := candidateY
+		}
 
 		return false
 	}

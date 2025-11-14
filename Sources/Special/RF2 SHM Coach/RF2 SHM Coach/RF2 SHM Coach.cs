@@ -683,7 +683,7 @@ namespace RF2SHMCoach {
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if ((triggerType == "BrakeHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if ((triggerType == "TrackHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
@@ -716,7 +716,7 @@ namespace RF2SHMCoach {
 						{
 							if (triggerType == "Trigger")
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-							else if (triggerType == "BrakeHints")
+							else if (triggerType == "TrackHints")
 								if (audioDevice != "")
 									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 								else
@@ -734,7 +734,7 @@ namespace RF2SHMCoach {
         string[] hintSounds = new string[256];
 		DateTime lastHintsUpdate = DateTime.Now;
 
-		public void loadBrakeHints()
+		public void loadTrackHints()
 		{
 			if ((hintFile != "") && System.IO.File.Exists(hintFile))
 			{
@@ -776,7 +776,7 @@ namespace RF2SHMCoach {
 		string audioDevice = string.Empty;
 		string hintFile = string.Empty;
 
-        public void initializeBrakeHints(string type, string[] args)
+        public void initializeTrackHints(string type, string[] args)
         {
             triggerType = type;
 
@@ -821,7 +821,7 @@ namespace RF2SHMCoach {
             }
         }
 
-        public void Run(bool positionTrigger, bool brakeHints, bool handlingAnalyzer) {
+        public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer) {
             long counter = 0;
 			
 			while (true) {
@@ -864,9 +864,9 @@ namespace RF2SHMCoach {
                             else
                                 break;
                         }
-                        else if (brakeHints)
+                        else if (trackHints)
 						{
-							loadBrakeHints();
+							loadTrackHints();
 
                             checkCoordinates(ref playerScoring);
 

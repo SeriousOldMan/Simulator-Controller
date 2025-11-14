@@ -606,7 +606,7 @@ string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates() {
-	if ((triggerType == "BrakeHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -645,7 +645,7 @@ void checkCoordinates() {
 
 						sendTriggerMessage(buffer);
 					}
-					else if (strcmp(triggerType, "BrakeHints") == 0)
+					else if (strcmp(triggerType, "TrackHints") == 0)
 						sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
 					lastUpdate = time(NULL);
@@ -661,7 +661,7 @@ void checkCoordinates() {
 #define stat _stat
 #endif
 
-void loadBrakeHints()
+void loadTrackHints()
 {
 	if ((hintFile != "") && fileExists(hintFile))
 	{
@@ -700,7 +700,7 @@ int main(int argc, char* argv[])
 	initStatic();
 	
 	bool positionTrigger = false;
-	bool brakeHints = false;
+	bool trackHints = false;
 	bool handlingCalibrator = false;
 	bool handlingAnalyzer = false;
 	const char* soundsDirectory = "";
@@ -720,10 +720,10 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		brakeHints = (strcmp(argv[1], "-BrakeHints") == 0);
+		trackHints = (strcmp(argv[1], "-TrackHints") == 0);
 
-		if (brakeHints) {
-			triggerType = "BrakeHints";
+		if (trackHints) {
+			triggerType = "TrackHints";
 
 			hintFile = argv[2];
 
@@ -792,7 +792,7 @@ int main(int argc, char* argv[])
 			Sleep(10);
 		}
 		else if (positionTrigger) {
-			loadBrakeHints();
+			loadTrackHints();
 
 			checkCoordinates();
 

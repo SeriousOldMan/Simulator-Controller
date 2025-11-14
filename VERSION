@@ -1,9 +1,9 @@
 [Development]
-Version=6.6.5.0-release
-Target=6.6.5.0-release
+Version=6.6.6.0-dev
+Target=6.6.6.0-release
 Date=11/14/2025
-Download=https://cutt.ly/OtwH8rcd;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Qs7OL5BF/Releases/Simulator Controller 6.6.5.0-release.zip;https://www.dropbox.com/scl/fi/e897zpen7actzjdmk5p9l/Simulator-Controller-6.6.5.0-release.zip?rlkey=e3v573j7yoybot94aay3jvh92&st=n6zaq3wl&dl=1;http://%master%/Releases/Simulator Controller 6.6.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.5.0-release.zip
-Changes=Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster, Changed Damp threshold for rF2 and LMU, Spotter intro now includes track grip, Fixed AC session end detection, Shortcut syntax for foreign function calls, Fixed Reasoning booster instructions, Translation Fixes, Refactored Spotter/Coach provider, Optimized talking mode
+Download=
+Changes=Fixed acoustic feedback for handling issues
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.5.0-release
@@ -22,7 +22,7 @@ Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.6.5.0-release
+Development=6.6.6.0-dev
 Release=6.6.5.0-release

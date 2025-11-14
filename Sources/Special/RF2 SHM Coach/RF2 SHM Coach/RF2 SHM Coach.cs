@@ -683,7 +683,7 @@ namespace RF2SHMCoach {
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if ((triggerType == "TrackHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
@@ -709,10 +709,11 @@ namespace RF2SHMCoach {
 				{
 					double coordinateX = playerScoring.mPos.x;
 					double coordinateY = (- playerScoring.mPos.z);
+					int threshold = (triggerType == "Trigger") ? 20 : 5;
 
-					for (int i = 0; i < numCoordinates; i += 1)
+                    for (int i = 0; i < numCoordinates; i += 1)
 					{
-						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+						if (Math.Abs(xCoordinates[i] - coordinateX) < threshold && Math.Abs(yCoordinates[i] - coordinateY) < threshold)
 						{
 							if (triggerType == "Trigger")
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
@@ -722,8 +723,8 @@ namespace RF2SHMCoach {
 								else
 									new System.Media.SoundPlayer(hintSounds[i]).Play();
 
-                            lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
+							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+							
 							break;
 						}
 					}

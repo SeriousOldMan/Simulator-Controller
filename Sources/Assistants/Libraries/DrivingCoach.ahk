@@ -1125,6 +1125,8 @@ class DrivingCoach extends GridRaceAssistant {
 		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 		local started := this.startupTrackTrigger()
 
+		this.startupTrackHints()
+
 		setMultiMapValue(state, "Coaching", "Track", started)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1257,7 +1259,10 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startupTrackCoaching()
 
 		if this.iTrackHintsPID {
-			this.getTelemetry(&reference := true)
+			telemetry := this.getTelemetry(&reference := true)
+
+			if !reference
+				reference := telemetry
 
 			if reference
 				this.updateTrackHints(reference)
@@ -1799,17 +1804,17 @@ class DrivingCoach extends GridRaceAssistant {
 		return false
 	}
 
-	startupTrackHints(telemetry) {
+	startupTrackHints() {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local code, data, audioDevice, options
+		local sessionDB, code, data, audioDevice, options, telemetry, reference
 
 		if (!this.iTrackHintsPID && simulator && analyzer) {
 			this.iTrackHintsFile := temporaryFileName("Track", "hints")
 
-			sections := analyzer.TrackSections
-
 			if (analyzer.TrackSections.Length > 0) {
+				sessionDB := SessionDatabase()
+
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
@@ -1842,8 +1847,17 @@ class DrivingCoach extends GridRaceAssistant {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
-				if pid
+				if pid {
 					this.iTrackHintsPID := pid
+
+					telemetry := this.getTelemetry(&reference := true)
+
+					if !reference
+						reference := telemetry
+
+					if reference
+						this.updateTrackHints(reference)
+				}
 			}
 		}
 
@@ -1860,14 +1874,14 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.iTrackHintsPID {
 			for ignore, braking in telemetry.Braking {
-				if (A_Index > 1)
+				if (hints != "")
 					hints .= "`n"
 
 				hints .= (braking.X . A_Space . braking.Y . A_Space . brakeSound)
 			}
 
 			for ignore, accelerating in telemetry.Accelerating {
-				if (A_Index > 1)
+				if (hints != "")
 					hints .= "`n"
 
 				hints .= (accelerating.X . A_Space . accelerating.Y . A_Space . throttleSound)

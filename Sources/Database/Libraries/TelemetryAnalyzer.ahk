@@ -493,6 +493,9 @@ class Corner extends Section {
 		this.iRollingStart := rollingStart
 		this.iAcceleratingStart := acceleratingStart
 
+		this.iBrakeCurve := brakeCurve
+		this.iThrottleCurve := throttleCurve
+
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime
 		this.iAcceleratingTime := acceleratingTime
@@ -990,7 +993,7 @@ class Telemetry {
 	Braking {
 		Get {
 			if !this.iBraking
-				this.iBraking := createBraking()
+				this.iBraking := this.createBraking()
 
 			return this.iBraking
 		}
@@ -999,7 +1002,7 @@ class Telemetry {
 	Accelerating {
 		Get {
 			if !this.iAccelerating
-				this.iAccelerating := createAccelerating()
+				this.iAccelerating := this.createAccelerating()
 
 			return this.iAccelerating
 		}
@@ -1175,8 +1178,8 @@ class Telemetry {
 		local ignore, section
 
 		for ignore, section in this.Sections
-			if isInstance(section, Corner)
-				braking.Push({Corner: section, StartX: section.BrakeCurve[1].X, Y: section.BrakeCurve[1].Y
+			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0))
+				braking.Push({Corner: section, X: section.BrakeCurve[1].X, Y: section.BrakeCurve[1].Y
 											 , Length: section.Length["Braking"], Time: section.Time["Braking"]
 											 , Curve: section.BrakeCurve})
 
@@ -1188,9 +1191,9 @@ class Telemetry {
 		local ignore, section
 
 		for ignore, section in this.Sections
-			if isInstance(section, Corner)
-				accelerating.Push({Corner: section, StartX: section.ThrottleCurve[1].X, Y: section.ThrottleCurve[1].Y
-												  , Length: section.Length["Accelerating"], Time: Time["Accelerating"]
+			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0))
+				accelerating.Push({Corner: section, X: section.ThrottleCurve[1].X, Y: section.ThrottleCurve[1].Y
+												  , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
 												  , Curve: section.ThrottleCurve})
 
 		return accelerating

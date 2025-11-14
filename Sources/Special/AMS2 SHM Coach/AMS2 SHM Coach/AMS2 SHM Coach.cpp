@@ -548,7 +548,7 @@ std::string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const SharedMemory* sharedData) {
-	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > (lastUpdate + 2)) {
 		float velocityX = sharedData->mWorldVelocity[VEC_X];
 		float velocityY = sharedData->mWorldVelocity[VEC_Z];
 		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
@@ -558,9 +558,10 @@ void checkCoordinates(const SharedMemory* sharedData) {
 
 			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
+			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
 
 			for (int i = 0; i < numCoordinates; i += 1) {
-				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
+				if (fabs(xCoordinates[i] - coordinateX) < threshold && fabs(yCoordinates[i] - coordinateY) < threshold) {
 					char buffer[512] = "";
 					
 					if (strcmp(triggerType, "Trigger") == 0) {

@@ -606,7 +606,7 @@ string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates() {
-	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > (lastUpdate + 2)) {
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -626,9 +626,10 @@ void checkCoordinates() {
 
 			float coordinateX = gf->carCoordinates[carID][0];
 			float coordinateY = gf->carCoordinates[carID][2];
+			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
 
 			for (int i = 0; i < numCoordinates; i++) {
-				if (abs(xCoordinates[i] - coordinateX) < 20.0 && abs(yCoordinates[i] - coordinateY) < 20.0) {
+				if (abs(xCoordinates[i] - coordinateX) < threshold && abs(yCoordinates[i] - coordinateY) < threshold) {
 					if (strcmp(triggerType, "Trigger") == 0) {
 						char buffer[60] = "";
 						char numBuffer[60] = "";

@@ -395,6 +395,13 @@ Please note, that the range of supported pitstop services depends on the specifi
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
+#### Performing a pitstop
+
+Once a pitstop is prepared, you are free to enter the pit at any time. If the pitstop had been planned and prepared due to a request by the Strategist and you are running a race with an active stint timer, you should enter the pit immediately. In other cases, you are free to drive a few additional laps. Jona will call you actively to the pit, if:
+
+- When you are running low on fuel, and a pitstop has been prepared, Jona will call you to the pit in time.
+- When the pitstop has been planned and prepared due to an upcoming weather change, Jona will call you to the pit, when the grip level for the current tyre compounds is to bad to continue.
+
 Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and already prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode may be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
 
 | Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Brakes  | Repairs |

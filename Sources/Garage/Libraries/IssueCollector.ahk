@@ -285,7 +285,7 @@ class IssueCollector {
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
 
-					audioDevice := this.AudioSettings.AudioDevice
+					audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
 
 					if audioDevice
 						options .= (A_Space . "`"" . audioDevice . "`"")

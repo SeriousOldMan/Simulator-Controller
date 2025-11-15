@@ -803,7 +803,7 @@ std::string hintSounds[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
-	if ((triggerType == "TrackHints") ? true : time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > (lastUpdate + 2)) {
 		char buffer[60];
 
 		const char* sessionInfo = irsdk_getSessionInfoStr();
@@ -826,6 +826,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 		if (atof(buffer) > 0) {
 			float distance;
 			int index = 0;
+			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 30 : 10;
 
 			for (int i = 0; i < numCoordinates; i++) {
 				float cDistance = abs(trackDistances[i] - running);
@@ -838,7 +839,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 				}
 			}
 
-			if (distance < (30 / trackLength)) {
+			if (distance < (threshold / trackLength)) {
 				char buffer[512] = "";
 
 				if (strcmp(triggerType, "Trigger") == 0) {

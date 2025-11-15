@@ -720,7 +720,7 @@ namespace ACSHMCoach {
 
 		void checkCoordinates()
 		{
-			if ((triggerType == "TrackHints") ? true : DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
 				double velocityX = physics.LocalVelocity[0];
 				double velocityY = physics.LocalVelocity[2];
@@ -732,11 +732,12 @@ namespace ACSHMCoach {
 
 					float coordinateX = cars.cars[carID].worldPosition.x;
 					float coordinateY = cars.cars[carID].worldPosition.z;
+					int threshold = (triggerType == "Trigger") ? 20 : 5;
 
 					if ((coordinateX != 0) || (coordinateY != 0))
 						for (int i = 0; i < numCoordinates; i++)
 						{
-							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+							if (Math.Abs(xCoordinates[i] - coordinateX) < threshold && Math.Abs(yCoordinates[i] - coordinateY) < threshold)
 							{
 								if (triggerType == "Trigger")
 									SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);

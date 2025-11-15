@@ -660,7 +660,7 @@ char* hintSounds[256][256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(int playerID) {
-	if ((strcmp(triggerType, "TrackHints") == 0) ? TRUE : time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > (lastUpdate + 2)) {
 		r3e_float64 velocityX = map_buffer->player.velocity.x;
 		r3e_float64 velocityY = map_buffer->player.velocity.z;
 		r3e_float64 velocityZ = map_buffer->player.velocity.y;
@@ -677,9 +677,10 @@ void checkCoordinates(int playerID) {
 
 			r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
 			r3e_float32 coordinateY = - map_buffer->all_drivers_data_1[index].position.z;
+			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
 
 			for (int i = 0; i < numCoordinates; i += 1) {
-				if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
+				if (fabs(xCoordinates[i] - coordinateX) < threshold && fabs(yCoordinates[i] - coordinateY) < threshold) {
 					char buffer[512] = "";
 					
 					if (strcmp(triggerType, "Trigger") == 0) {

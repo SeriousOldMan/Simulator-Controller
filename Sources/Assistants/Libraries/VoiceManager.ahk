@@ -393,6 +393,9 @@ class VoiceManager extends ConfigurationItem {
 
 				index := Round(Random(0.55, phrases.Length + 0.45))
 
+				if (cache == true)
+					cache := phrase
+
 				if cache
 					cache .= ("." . index)
 
@@ -1084,51 +1087,54 @@ class VoiceManager extends ConfigurationItem {
 			return {Name: this.Name, User: this.User}
 	}
 
-	getSpeaker(fast := false) {
-		local pid, activationCommand, mode
-
+	getSpeaker() {
 		if (this.Speaker && !this.iSpeechSynthesizer) {
-			if (this.VoiceServer && !fast) {
-				pid := ProcessExist()
-
-				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
-				activationCommand := substituteVariables(activationCommand, {name: this.Name})
-
-				mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
-
-				if (mode = "Mixed")
-					mode := "Text"
-
-				messageSend(kFileMessage, "Voice"
-										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
-																					, StrReplace(activationCommand, ";", ",")
-																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
-																					, "remoteSpeakingStatusUpdate"
-																					, this.Language, this.Synthesizer, this.Speaker
-																					, this.Recognizer, this.Listener
-																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
-																					, this.SpeakerBooster, this.ListenerBooster
-																					, mode)
-										, this.VoiceServer)
-
-				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	, this.buildFragments(this.Language)
-																	, this.buildPhrases(this.Language))
-			}
-			else {
-				this.iSpeechSynthesizer := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																   , this.buildFragments(this.Language)
-																   , this.buildPhrases(this.Language))
-
-				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-				this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-			}
+			this.iSpeechSynthesizer := (this.VoiceServer ? this.getRemoteSpeaker() : this.getLocalSpeaker())
 
 			this.startListener()
 		}
 
 		return this.iSpeechSynthesizer
+	}
+
+	getRemoteSpeaker() {
+		local pid := ProcessExist()
+		local mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
+		local activationCommand := substituteVariables(getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+													 , {name: this.Name})
+
+		if (mode = "Mixed")
+			mode := "Text"
+
+		messageSend(kFileMessage, "Voice"
+								, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
+																			, StrReplace(activationCommand, ";", ",")
+																			, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																			, "remoteSpeakingStatusUpdate"
+																			, this.Language, this.Synthesizer, this.Speaker
+																			, this.Recognizer, this.Listener
+																			, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																			, this.SpeakerBooster, this.ListenerBooster
+																			, mode)
+								, this.VoiceServer)
+
+		return VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+											  , this.buildFragments(this.Language)
+											  , this.buildPhrases(this.Language))
+	}
+
+	getLocalSpeaker() {
+		local speaker
+
+		speaker := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+												 , this.buildFragments(this.Language)
+												 , this.buildPhrases(this.Language))
+
+		speaker.setVolume(this.SpeakerVolume)
+		speaker.setPitch(this.SpeakerPitch)
+		speaker.setRate(this.SpeakerSpeed)
+
+		return speaker
 	}
 
 	startListener() {

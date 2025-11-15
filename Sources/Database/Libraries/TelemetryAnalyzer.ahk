@@ -1180,6 +1180,7 @@ class Telemetry {
 		for ignore, section in this.Sections
 			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0))
 				braking.Push({Corner: section, X: section.BrakeCurve[1].X, Y: section.BrakeCurve[1].Y
+											 , Start: section.Start["Braking"]
 											 , Length: section.Length["Braking"], Time: section.Time["Braking"]
 											 , Curve: section.BrakeCurve})
 
@@ -1193,6 +1194,7 @@ class Telemetry {
 		for ignore, section in this.Sections
 			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0))
 				accelerating.Push({Corner: section, X: section.ThrottleCurve[1].X, Y: section.ThrottleCurve[1].Y
+												  , Start: section.Start["Accelerating"]
 												  , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
 												  , Curve: section.ThrottleCurve})
 
@@ -1210,7 +1212,7 @@ class Telemetry {
 		return false
 	}
 
-	findCoordinates(distance, &x, &y) {
+	findCoordinates(distance, &x, &y, threshold := 10) {
 		local candidate := false
 		local candidateDistance := 999999
 		local candidateX, candidateY, cDistance
@@ -1230,6 +1232,9 @@ class Telemetry {
 						candidateY := y
 
 						candidate := A_Index
+
+						if (candidateDistance < threshold)
+							break
 					}
 				}
 				else if this.getValue(A_Index, "Distance", kUndefined) {

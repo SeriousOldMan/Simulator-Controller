@@ -1212,7 +1212,7 @@ class Telemetry {
 		return false
 	}
 
-	findCoordinates(distance, &x, &y, threshold := 10) {
+	findCoordinates(distance, &x, &y) {
 		local candidate := false
 		local candidateDistance := 999999
 		local candidateX, candidateY, cDistance
@@ -1232,10 +1232,9 @@ class Telemetry {
 						candidateY := y
 
 						candidate := A_Index
-
-						if (candidateDistance < threshold)
-							break
 					}
+					else
+						break
 				}
 				else if this.getValue(A_Index, "Distance", kUndefined) {
 					candidateX := x

@@ -335,8 +335,9 @@ class DrivingCoach extends GridRaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
 		OnExit(ObjBindMethod(this, "shutdownBrakeTrigger", true))
 
-		try
-			this.iBrakeHint := this.getSpeaker(true).speakPhrase("Brake", false, false, "Brake", {File: true, Rephrase: false})
+		Task.startTask(() => this.iBrakeHint := this.VoiceManager.getLocalSpeaker().speakPhrase("Brake", false, false, true
+																									   , {File: true, Rephrase: false})
+					 , 10000, kLowPriority)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -717,6 +718,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if this.CoachingActive
 					this.trackCoachingStartRecognized(words)
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+			case "BrakeCoachingStart":
+				this.clearContinuation()
+
+				if this.CoachingActive
+					this.brakeCoachingStartRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "FinishCoaching":

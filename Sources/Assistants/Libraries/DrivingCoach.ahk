@@ -73,11 +73,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTrackTriggerPID := false
 
-	iTrackHintsPID := false
-	iTrackHintsFile := false
+	iBrakeTriggerPID := false
+	iBrakeTriggerFile := false
 
 	iBrakeHint := false
-	iThrottleHint := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -334,12 +333,10 @@ class DrivingCoach extends GridRaceAssistant {
 				this.TelemetryCollector.shutdown()
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
-		OnExit(ObjBindMethod(this, "shutdownTrackHints", true))
+		OnExit(ObjBindMethod(this, "shutdownBrakeTrigger", true))
 
-		try {
+		try
 			this.iBrakeHint := this.getSpeaker(true).speakPhrase("Brake", false, false, "Brake", {File: true, Rephrase: false})
-			this.iThrottleHint := this.getSpeaker(true).speakPhrase("Throttle", false, false, "Throttle", {File: true, Rephrase: false})
-		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -722,11 +719,11 @@ class DrivingCoach extends GridRaceAssistant {
 					this.trackCoachingStartRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
-			case "TrackCoachingFinish":
+			case "FinishCoaching":
 				this.clearContinuation()
 
 				if this.CoachingActive
-					this.trackCoachingFinishRecognized(words)
+					this.finishCoachingRecognized(words)
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 			case "ReferenceLap":
@@ -842,11 +839,21 @@ class DrivingCoach extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 	}
 
-	trackCoachingFinishRecognized(words, confirm := true) {
+	brakeCoachingStartRecognized(words, confirm := true) {
+		if this.startupBrakeCoaching() {
+			if (confirm && this.Speaker)
+				this.getSpeaker().speakPhrase("Roger")
+		}
+		else if (confirm && this.Speaker)
+			this.getSpeaker().speakPhrase("Later")
+	}
+
+	finishCoachingRecognized(words, confirm := true) {
 		if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase("Okay")
 
 		this.shutdownTrackCoaching()
+		this.shutdownBrakeCoaching()
 	}
 
 	referenceLapRecognized(words) {
@@ -1080,8 +1087,18 @@ class DrivingCoach extends GridRaceAssistant {
 			this.trackCoachingStartRecognized([], confirm)
 	}
 
-	finishTrackCoaching(confirm := true) {
-		this.trackCoachingFinishRecognized([], confirm)
+	startBrakeCoaching(confirm := true) {
+		if !this.CoachingActive {
+			this.telemetryCoachingStartRecognized([], confirm)
+
+			this.brakeCoachingStartRecognized([], false)
+		}
+		else
+			this.brakeCoachingStartRecognized([], confirm)
+	}
+
+	finishCoaching(confirm := true) {
+		this.finishCoachingRecognized([], confirm)
 	}
 
 	startupTelemetryCoaching() {
@@ -1106,7 +1123,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local state := newMultiMap()
 
 		this.shutdownTrackTrigger()
-		this.shutdownTrackHints()
+		this.shutdownBrakeTrigger()
 
 		if this.TelemetryCollector
 			this.shutdownTelemetryCollector()
@@ -1130,8 +1147,12 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTrackCoaching() {
-		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-		local started := this.startupTrackTrigger()
+		local state, started
+
+		this.shutdownBrakeTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		started := this.startupTrackTrigger()
 
 		setMultiMapValue(state, "Coaching", "Track", started)
 
@@ -1148,23 +1169,40 @@ class DrivingCoach extends GridRaceAssistant {
 		return started
 	}
 
-	shutdownTrackCoaching() {
-		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-
-		if isDebug()
-			logMessage(kLogDebug, "Track coaching stopped...")
+	startupBrakeCoaching() {
+		local state, started
 
 		this.shutdownTrackTrigger()
 
-		setMultiMapValue(state, "Coaching", "Track", false)
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		started := this.startupBrakeTrigger()
+
+		setMultiMapValue(state, "Coaching", "Brake", started)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		if isDebug()
+			if started
+				logMessage(kLogDebug, "Brake coaching started...")
+			else
+				logMessage(kLogDebug, "Brake coaching NOT started...")
+
+		return started
+	}
+
+	shutdownBrakeCoaching() {
+		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		if isDebug()
+			logMessage(kLogDebug, "Brake coaching stopped...")
+
+		this.shutdownBrakeTrigger()
+
+		setMultiMapValue(state, "Coaching", "Brake", false)
 
 		removeMultiMapValues(state, "Instructions")
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
-
-		this.iOnTrackCoaching := false
-		this.iFocusedCorners := []
-		this.iTelemetryFuture := false
 	}
 
 	telemetryAvailable(laps) {
@@ -1263,14 +1301,14 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.OnTrackCoaching
 			this.startupTrackCoaching()
 
-		if this.iTrackHintsPID {
+		if this.iBrakeTriggerPID {
 			telemetry := this.getTelemetry(&reference := true)
 
 			if !reference
 				reference := telemetry
 
 			if reference
-				this.updateTrackHints(reference)
+				this.updateBrakeTrigger(reference)
 		}
 	}
 
@@ -1809,13 +1847,13 @@ class DrivingCoach extends GridRaceAssistant {
 		return false
 	}
 
-	startupTrackHints() {
+	startupBrakeTrigger() {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local sessionDB, code, data, audioDevice, options, telemetry, reference
 
-		if (!this.iTrackHintsPID && simulator && analyzer) {
-			this.iTrackHintsFile := temporaryFileName("Track", "hints")
+		if (!this.iBrakeTriggerPID && simulator && analyzer) {
+			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
 
 			if (analyzer.TrackSections.Length > 0) {
 				sessionDB := SessionDatabase()
@@ -1830,13 +1868,17 @@ class DrivingCoach extends GridRaceAssistant {
 					if !FileExist(exePath)
 						throw "File not found..."
 
-					audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
-					options := (audioDevice ? (" `"" . audioDevice . "`"") : "")
+					if false {
+						audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
+						options := (audioDevice ? (" `"" . audioDevice . "`"") : "")
+					}
+					else
+						options := ""
 
 					if data
-						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iTrackHintsFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 					else
-						Run("`"" . exePath . "`" -TrackHints `"" . this.iTrackHintsFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1853,7 +1895,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if pid {
-					this.iTrackHintsPID := pid
+					this.iBrakeTriggerPID := pid
 
 					telemetry := this.getTelemetry(&reference := true)
 
@@ -1861,42 +1903,34 @@ class DrivingCoach extends GridRaceAssistant {
 						reference := telemetry
 
 					if reference
-						this.updateTrackHints(reference)
+						this.updateBrakeTrigger(reference)
 				}
 			}
 		}
 
-		return (this.iTrackHintsPID != false)
+		return (this.iBrakeTriggerPID != false)
 	}
 
-	updateTrackHints(telemetry) {
-		local hintsFile := temporaryFileName("Track", "hints.tmp")
+	updateBrakeTrigger(telemetry) {
+		local triggerFile := temporaryFileName("Brake", "trigger.tmp")
 		local brakeSound := this.iBrakeHint
-		local throttleSound := this.iThrottleHint
-		local hints := ""
+		local triggers := ""
 		local tries := 3
 		local ignore, braking, accelerating
 
-		if this.iTrackHintsPID {
+		if this.iBrakeTriggerPID {
 			for ignore, braking in telemetry.Braking {
-				if (hints != "")
-					hints .= "`n"
+				if (triggers != "")
+					triggers .= "`n"
 
-				hints .= (braking.X . A_Space . braking.Y . A_Space . brakeSound)
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . brakeSound)
 			}
 
-			for ignore, accelerating in telemetry.Accelerating {
-				if (hints != "")
-					hints .= "`n"
-
-				hints .= (accelerating.X . A_Space . accelerating.Y . A_Space . throttleSound)
-			}
-
-			FileAppend(hints, hintsFile)
+			FileAppend(triggers, triggerFile)
 
 			while (tries-- > 0)
 				try {
-					FileMove(hintsFile, this.iTrackHintsFile, 1)
+					FileMove(triggerFile, this.iBrakeTriggerFile, 1)
 				}
 				catch Any {
 					Sleep(100)
@@ -1904,8 +1938,8 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	shutdownTrackHints(force := false, arguments*) {
-		local pid := this.iTrackHintsPID
+	shutdownBrakeTrigger(force := false, arguments*) {
+		local pid := this.iBrakeTriggerPID
 		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
@@ -1932,9 +1966,9 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			}
 
-			deleteFile(this.iTrackHintsFile)
+			deleteFile(this.iBrakeTriggerFile)
 
-			this.iTrackHintsPID := false
+			this.iBrakeTriggerPID := false
 		}
 
 		return false

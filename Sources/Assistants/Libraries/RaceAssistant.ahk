@@ -2253,8 +2253,8 @@ class RaceAssistant extends ConfigurationItem {
 		this.setDebug(option, !this.Debug[option])
 	}
 
-	getSpeaker() {
-		return this.VoiceManager.getSpeaker()
+	getSpeaker(fast := false) {
+		return this.VoiceManager.getSpeaker(fast)
 	}
 
 	hasEnoughData(inform := true) {

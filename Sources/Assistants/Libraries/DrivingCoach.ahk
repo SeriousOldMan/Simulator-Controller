@@ -76,6 +76,9 @@ class DrivingCoach extends GridRaceAssistant {
 	iTrackHintsPID := false
 	iTrackHintsFile := false
 
+	iBrakeHint := false
+	iThrottleHint := false
+
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
 
@@ -332,6 +335,11 @@ class DrivingCoach extends GridRaceAssistant {
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
 		OnExit(ObjBindMethod(this, "shutdownTrackHints", true))
+
+		try {
+			this.iBrakeHint := this.getSpeaker(true).speakPhrase("Brake", false, false, "Brake", {File: true, Rephrase: false})
+			this.iThrottleHint := this.getSpeaker(true).speakPhrase("Throttle", false, false, "Throttle", {File: true, Rephrase: false})
+		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1125,8 +1133,6 @@ class DrivingCoach extends GridRaceAssistant {
 		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 		local started := this.startupTrackTrigger()
 
-		this.startupTrackHints()
-
 		setMultiMapValue(state, "Coaching", "Track", started)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1149,7 +1155,6 @@ class DrivingCoach extends GridRaceAssistant {
 			logMessage(kLogDebug, "Track coaching stopped...")
 
 		this.shutdownTrackTrigger()
-		this.shutdownTrackHints()
 
 		setMultiMapValue(state, "Coaching", "Track", false)
 
@@ -1866,8 +1871,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateTrackHints(telemetry) {
 		local hintsFile := temporaryFileName("Track", "hints.tmp")
-		local brakeSound := getFileName("Brake.wav", kResourcesDirectory . "Sounds\", kUserHomeDirectory . "Sounds\")
-		local throttleSound := getFileName("Throttle.wav", kResourcesDirectory . "Sounds\", kUserHomeDirectory . "Sounds\")
+		local brakeSound := this.iBrakeHint
+		local throttleSound := this.iThrottleHint
 		local hints := ""
 		local tries := 3
 		local ignore, braking, accelerating

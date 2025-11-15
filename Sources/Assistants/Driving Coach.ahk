@@ -87,9 +87,9 @@ startupDrivingCoach() {
 	local remotePID := false
 	local coachName := "Aiden"
 	local coachLogo := false
-	local coachLanguage := false
+	local coachLanguage := "EN"
 	local coachSynthesizer := true
-	local coachSpeaker := false
+	local coachSpeaker := true
 	local coachSpeakerVocalics := false
 	local coachSpeakerBooster := false
 	local coachRecognizer := true

@@ -751,6 +751,9 @@ class SpeechSynthesizer {
 				cacheFileName := this.cacheFileName(cache)
 
 			if FileExist(cacheFileName) {
+				if (options && options.Has("File") && options["File"])
+					return cacheFileName
+
 				this.wait()
 
 				if (wait || !this.Awaitable)
@@ -849,6 +852,9 @@ class SpeechSynthesizer {
 					if (this.Synthesizer = "Windows")
 						this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 				}
+
+				if (cache && options && options.Has("File") && options["File"])
+					return temp2Name
 
 				this.wait()
 

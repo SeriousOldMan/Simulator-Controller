@@ -321,7 +321,7 @@ class VoiceManager extends ConfigurationItem {
 				this.iIsTalking := false
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus, false, options)
+					return this.speak(text, focus, false, options)
 			}
 		}
 
@@ -357,7 +357,7 @@ class VoiceManager extends ConfigurationItem {
 
 					try {
 						if this.UseTalking
-							super.speak(text, !this.Awaitable, cache, options)
+							return super.speak(text, !this.Awaitable, cache, options)
 						else if InStr(text, "。") {
 							for ignore, part in string2Values("。", text)
 								if (Trim(part) != "")
@@ -369,7 +369,7 @@ class VoiceManager extends ConfigurationItem {
 									super.speak(part . translate("."), !this.Awaitable, cache, options)
 						}
 						else
-							super.speak(text, !this.Awaitable, cache, options)
+							return super.speak(text, !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -380,6 +380,8 @@ class VoiceManager extends ConfigurationItem {
 						this.VoiceManager.startListening()
 				}
 			}
+
+			return false
 		}
 
 		getPhrase(phrase, variables := false, &cache := false) {
@@ -404,7 +406,7 @@ class VoiceManager extends ConfigurationItem {
 			phrase := this.getPhrase(phrase, variables, &cache)
 
 			if phrase
-				this.speak(phrase, focus, cache, options)
+				return this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {
@@ -1082,11 +1084,11 @@ class VoiceManager extends ConfigurationItem {
 			return {Name: this.Name, User: this.User}
 	}
 
-	getSpeaker() {
+	getSpeaker(fast := false) {
 		local pid, activationCommand, mode
 
 		if (this.Speaker && !this.iSpeechSynthesizer) {
-			if this.VoiceServer {
+			if (this.VoiceServer && !fast) {
 				pid := ProcessExist()
 
 				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)

@@ -261,11 +261,11 @@ removeDuplicates(list) {
 	return result
 }
 
-combine(initialMap, collections*) {
+combine(initialMap, maps*) {
 	local result := initialMap.Clone()
 	local ignore, collection, key, value
 
-	for ignore, collection in collections
+	for ignore, collection in maps
 		if isInstance(collection, Map) {
 			for key, value in collection
 				result[key] := value

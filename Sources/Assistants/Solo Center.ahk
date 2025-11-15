@@ -3101,7 +3101,7 @@ class SoloCenter extends ConfigurationItem {
 					if (exist(lap.Compounds, (c) => (c && (c != "-"))) && !isNull(run.TyreSet)) {
 						found := false
 
-						if (A_Index > 1) {
+						if (tyreSets.Length > 0) {
 							lastTyreSet := tyreSets[tyreSets.Length]
 
 							if isDebug()
@@ -3127,7 +3127,6 @@ class SoloCenter extends ConfigurationItem {
 						}
 						else if isDebug()
 							logMessage(kLogDebug, "updateUsedTyreSets - Run: " . run.Nr . "; TyreSet: " . run.TyreSet . "; TyreLaps: " . this.getTyreLaps(run))
-
 
 						if !found
 							tyreSets.Push({Nr: run.TyreSet, Compounds: run.Compounds, Laps: this.getTyreLaps(run)})

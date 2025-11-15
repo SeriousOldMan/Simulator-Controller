@@ -760,7 +760,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startConversation()
 
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching")
+			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching", false, false, false, {Noise: false})
 
 		this.iCoachingActive := true
 
@@ -769,7 +769,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	telemetryCoachingFinishRecognized(words, confirm := true) {
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("Roger")
+			this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
 
 		this.shutdownTelemetryCoaching()
 	}
@@ -784,7 +784,7 @@ class DrivingCoach extends GridRaceAssistant {
 		try {
 			if ((cornerNr = kUndefined) || !isNumber(cornerNr)) {
 				if this.Speaker
-					this.getSpeaker().speakPhrase("Repeat")
+					this.getSpeaker().speakPhrase("Repeat", false, false, false, {Noise: false})
 			}
 			else {
 				telemetry := this.getTelemetry(&reference := true, cornerNr)
@@ -801,10 +801,10 @@ class DrivingCoach extends GridRaceAssistant {
 						this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 					}
 					else if this.Speaker
-						this.getSpeaker().speakPhrase("Repeat")
+						this.getSpeaker().speakPhrase("Repeat", false, false, false, {Noise: false})
 				}
 				else if this.Speaker
-					this.getSpeaker().speakPhrase("Later")
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 			}
 		}
 		finally {
@@ -831,7 +831,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.handleVoiceText("TEXT", command, true, values2String(A_Space, words*))
 			}
 			else if this.Speaker
-				this.getSpeaker().speakPhrase("Later")
+				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 		}
 		finally {
 			this.Mode := oldMode
@@ -841,10 +841,10 @@ class DrivingCoach extends GridRaceAssistant {
 	trackCoachingStartRecognized(words, confirm := true) {
 		if this.startupTrackCoaching() {
 			if (confirm && this.Speaker)
-				this.getSpeaker().speakPhrase("Roger")
+				this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
 		}
 		else if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("Later")
+			this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 	}
 
 	brakeCoachingStartRecognized(words, confirm := true) {
@@ -858,7 +858,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	finishCoachingRecognized(words, confirm := true) {
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("Okay")
+			this.getSpeaker().speakPhrase("Okay", false, false, false, {Noise: false})
 
 		this.shutdownTrackCoaching()
 		this.shutdownBrakeCoaching()
@@ -875,20 +875,20 @@ class DrivingCoach extends GridRaceAssistant {
 			else if inList(words, speaker.Fragments["Last"])
 				this.iReferenceMode := "Last"
 			else {
-				speaker.speakPhrase("Repeat")
+				speaker.speakPhrase("Repeat", false, false, false, {Noise: false})
 
 				return
 			}
 
 			this.iReferenceModeAuto := false
 
-			speaker.speakPhrase("Roger")
+			speaker.speakPhrase("Roger", false, false, false, {Noise: false})
 		}
 	}
 
 	noReferenceLapRecognized(words) {
 		if this.Speaker
-			this.getSpeaker().speakPhrase("Roger")
+			this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
 
 		this.iReferenceMode := "None"
 		this.iReferenceModeAuto := false
@@ -900,7 +900,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (corner != kUndefined) {
 			if this.startupTrackCoaching() {
 				if (confirm && this.Speaker)
-					this.getSpeaker().speakPhrase("Roger")
+					this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
 
 				corner := String(corner)
 
@@ -908,15 +908,15 @@ class DrivingCoach extends GridRaceAssistant {
 					this.FocusedCorners.Push(corner)
 			}
 			else if (confirm && this.Speaker)
-				this.getSpeaker().speakPhrase("Later")
+				this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 		}
 		else
-			this.getSpeaker().speakPhrase("Repeat")
+			this.getSpeaker().speakPhrase("Repeat", false, false, false, {Noise: false})
 	}
 
 	noFocusCornerRecognized(words, confirm := true) {
 		if (confirm && this.Speaker)
-			this.getSpeaker().speakPhrase("Roger")
+			this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
 
 		this.iFocusedCorners := []
 		this.iTelemetryFuture := false
@@ -1219,7 +1219,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (this.AvailableTelemetry.Count = 0) {
 			if (this.Speaker[false] && !this.OnTrackCoaching)
-				this.getSpeaker().speakPhrase("CoachingReady", false, true)
+				this.getSpeaker().speakPhrase("CoachingReady", false, true, false, {Noise: false, Important: true})
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
 				if isDebug()
@@ -1356,7 +1356,7 @@ class DrivingCoach extends GridRaceAssistant {
 					this.handleVoiceText("TEXT", command, false)
 				}
 				else if this.Speaker
-					this.getSpeaker().speakPhrase("Later")
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 			}
 			finally {
 				this.Mode := oldMode
@@ -1524,10 +1524,6 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		return theLap
-	}
-
-	getRunningTelemetry(corner?) {
-		return this.getTelemetry(&ignore := false, corner?)
 	}
 
 	addInstructionHint(instruction) {
@@ -2362,7 +2358,7 @@ class DrivingCoach extends GridRaceAssistant {
 									}
 								}
 								finally {
-									speaker.endTalk({Rephrase: false})
+									speaker.endTalk({Rephrase: false, Noise: false})
 								}
 							}
 						}

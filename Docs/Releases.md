@@ -1,5 +1,36 @@
 # Latest stable release
 
+## 6.6.5.0
+
+#### Date: 11/14/25 (planned)
+
+#### Fixes
+
+  - Fixed a critical bug **not fixed** with the last release 6.6.4 (actually, fix code was removed accidently in the final merge process), which prevented the *Reasoning* booster to work in non-English configurations.
+  - Reduced probability of premature session end in timed races for *Assetto Corsa*.
+  - Fixed a couple translations in the "Setup Workbench".
+
+#### Changes
+
+  - Very important messages by the Assistants will now be repeated until completed, when interrupted by urgent shout outs of the Spotter. For *normal* messages, this is only attempted five times.
+  - The threshold between greasy and damp track conditions has been tweaked for *Le Mans Ultimate* and *rFactor 2*. This will result in more precise tyre change information (see next topic).
+  - The tyre compound recommendation rule set based upon weather information has been extended by a component which takes the track grip into account. These rules are used by the Strategist and the Engineer, when preparing a pitstop and when to call you to the pit. All this results in almost perfect pitstop timing.
+  - The Engineer now calls you to the pit after a pitstop has been planned for a tyre change to handle an upcoming weather change, and the grip has become too worse to continue the race on the current tyre compound. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#performing-a-pitstop) for more information.
+  - A [new event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
+  - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
+  - Sounds used by the acoustic feedback of the issue analyzer in the "Setup Workbench" can now be customized.
+  - Increased the number of corners, that the Coach can handle during on-track coaching from 30 to 128.
+  - [Developer] Foreign function calls in the rule engine can also be written like *:function(a1, a2, ...)* rather than *call(function, a1, a2, ...)*.
+  - [Internal] Refactored the simulator provider processes for the Spotter and the Coach.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.6.4.0
 
 #### Date: 11/07/25
@@ -21,35 +52,7 @@
   - Changes to the audio post processing settings will be reflected live, when using the speech output test mode.
   - A new speech synthesizer as well as a new voice recognition engine has been added, which can work with all OpenAI compatible speech APIs. This allows also for local neural network based speech generation and recognition, when using [Speaches.ai](https://speaches.ai), for example. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#openai-api) for more information.
   - [Internal] Refactored all LLM instructions into a separate *Instructions* folder.
-
-# Upcoming release
-
-## 6.6.5.0
-
-#### Date: 11/14/25 (planned)
-
-#### Fixes
-
-  - Fixed a critical bug **not fixed** with the last release 6.6.4 (actually, fix code was removed accidently in the final merge process), which prevented the *Reasoning* booster to work in non-English configurations.
-  - Reduced probability of premature session end in timed races for *Assetto Corsa*.
-  - Fixed a couple translations in the "Setup Workbench".
-
-#### Changes
-
-  - The threshold between greasy and damp track conditions has been tweaked for *Le Mans Ultimate* and *rFactor 2*. This will result in more precise tyre change information (see next topic).
-  - The tyre compound recommendation rule set based upon weather information has been extended by a component which takes the track grip into account. These rules are used by the Strategist and the Engineer, when preparing a pitstop and when to call you to the pit. All this results in almost perfect pitstop timing.
-  - The Engineer now calls you to the pit after a pitstop has been planned for a tyre change to handle an upcoming weather change, and the grip has become too worse to continue the race on the current tyre compound.
-  - A [new event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer. The event "Grip Low" is triggered, when a pitstop has been planned for tyre compound change and it is now time to carry out the tyre change. The corresponding action "Low Grip Reporting" will inform the driver that it is time to change the tyres and will tell the pit crew to prepare the pitstop.
-  - The Spotter now informs about the current track grip additionally to the current and upcoming weather at the start of a session.
-  - Sounds used by the acoustic feedback of the issue analyzer in the "Setup Workbench" can now be customized.
-  - Increased the number of corners, that the Coach can handle during on-track coaching from 30 to 128.
-  - [Developer] Foreign function calls in the rule engine can also be written like *:function(a1, a2, ...)* rather than *call(function, a1, a2, ...)*.
-  - [Internal] Refactored the simulator provider processes for the Spotter and the Coach.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
-
-# Release history
-
+  
 ## 6.6.3.0
 
 #### Date: 10/31/25

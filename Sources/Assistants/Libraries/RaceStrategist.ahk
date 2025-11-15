@@ -4294,7 +4294,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if fixed {
 			if isInteger(plannedLap) {
 				if plannedLap {
-					speaker.speakPhrase("PitstopLap", {lap: Max(lap, lastLap + 1)})
+					speaker.speakPhrase("PitstopLap", {lap: Max(lap, lastLap + 1)}, false, false, {Important: true})
 
 					if hasEngineer {
 						speaker.speakPhrase("ConfirmInformEngineer", false, true)
@@ -4310,7 +4310,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 		else if (plannedLap == kUndefined) {
 			if strategyLap {
-				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)})
+				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)}, false, false, {Important: true})
 
 				if hasEngineer {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
@@ -4329,7 +4329,7 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				pitstopOptions := []
 
-			speaker.speakPhrase("PitstopLap", {lap: plannedLap})
+			speaker.speakPhrase("PitstopLap", {lap: plannedLap}, false, false, {Important: true})
 
 			if this.confirmAction("Strategy.Explain") {
 				speaker.speakPhrase("Explain", false, true)
@@ -4600,7 +4600,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 					if this.Speaker[false]
-						this.getSpeaker().speakPhrase("StintMap", {map: map})
+						this.getSpeaker().speakPhrase("StintMap", {map: map}, false, false, {Important: true})
 			}
 			else if getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", false)
 				knowledgeBase.setFact("Strategy.Recalculate", "Pitstop")
@@ -4717,7 +4717,7 @@ class RaceStrategist extends GridRaceAssistant {
 							this.planPitstop()
 			}
 			finally {
-				speaker.endTalk()
+				speaker.endTalk({Important: true})
 			}
 		}
 	}
@@ -4801,7 +4801,7 @@ class RaceStrategist extends GridRaceAssistant {
 						this.confirmNextPitstop(plannedPitstopLap)
 			}
 			finally {
-				speaker.endTalk()
+				speaker.endTalk({Important: true})
 
 				if fullCourseYellow
 					this.Strategy.FullCourseYellow := false

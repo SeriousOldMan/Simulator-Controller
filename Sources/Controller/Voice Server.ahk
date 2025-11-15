@@ -536,7 +536,10 @@ class VoiceServer extends ConfigurationItem {
 
 				try {
 					for ignore, part in parts {
-						tries := 5
+						if (options && (options.HasProp("Important") && options.Important))
+							tries := 999
+						else
+							tries := 5
 
 						while (tries-- > 0) {
 							if (tries == 0)

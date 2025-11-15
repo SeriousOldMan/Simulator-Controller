@@ -4261,7 +4261,7 @@ class RaceEngineer extends RaceAssistant {
 						this.preparePitstop()
 			}
 			finally {
-				speaker.endTalk()
+				speaker.endTalk({Important: true})
 			}
 		}
 
@@ -4405,9 +4405,9 @@ class RaceEngineer extends RaceAssistant {
 				speaker := this.getSpeaker()
 
 				if lap
-					speaker.speakPhrase("PrepareLap", {lap: lap})
+					speaker.speakPhrase("PrepareLap", {lap: lap}, false, false, {Important: true})
 				else
-					speaker.speakPhrase("PrepareNow")
+					speaker.speakPhrase("PrepareNow", false, false, false, {Important: true})
 			}
 
 			if !lap
@@ -4739,7 +4739,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
 			if this.Listener {
-				this.getSpeaker().speakPhrase("ConfirmRePlan")
+				this.getSpeaker().speakPhrase("ConfirmRePlan", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "invokePlanPitstop", false, lap, arguments*))
 			}
@@ -4791,7 +4791,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
 			if this.Listener {
-				speaker.speakPhrase("ConfirmRePlan")
+				speaker.speakPhrase("ConfirmRePlan", false, true)
 
 				this.setContinuation(ObjBindMethod(this, "invokePlanDriverSwap", false, lap, arguments*))
 			}
@@ -5084,7 +5084,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 				}
 				finally {
-					speaker.endTalk()
+					speaker.endTalk({Important: true})
 				}
 			}
 	}
@@ -5129,7 +5129,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 				}
 				finally {
-					speaker.endTalk()
+					speaker.endTalk({Important: true})
 				}
 			}
 	}
@@ -5171,7 +5171,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 				}
 				finally {
-					speaker.endTalk()
+					speaker.endTalk({Important: true})
 				}
 			}
 	}
@@ -5221,7 +5221,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 				}
 				finally {
-					speaker.endTalk()
+					speaker.endTalk({Important: true})
 				}
 			}
 	}
@@ -5271,7 +5271,7 @@ class RaceEngineer extends RaceAssistant {
 							}
 				}
 				finally {
-					speaker.endTalk()
+					speaker.endTalk({Important: true})
 				}
 			}
 	}
@@ -5412,7 +5412,7 @@ class RaceEngineer extends RaceAssistant {
 						this.proposePitstop("Now", kUndefined, true)
 			}
 			finally {
-				speaker.endTalk()
+				speaker.endTalk({Important: true})
 			}
 		}
 	}
@@ -5429,7 +5429,7 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.pitstopPrepared(pitstopNumber)
 
 			if this.Speaker
-				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit"), 10000)
+				Task.startTask(() => this.getSpeaker().speakPhrase("CallToPit", false, false, false, {Important: true}), 10000)
 		}
 	}
 

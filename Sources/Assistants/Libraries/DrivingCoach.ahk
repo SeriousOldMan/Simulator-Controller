@@ -1937,7 +1937,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (start < 0)
 					start := (trackLength - start)
 
-				if telemetry.findCoordinates(distance, &x, &y) {
+				if telemetry.findCoordinates(start, &x, &y) {
 					if (triggers != "")
 						triggers .= "`n"
 

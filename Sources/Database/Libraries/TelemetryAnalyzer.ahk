@@ -243,7 +243,7 @@ class Corner extends Section {
 
 	RollingRPM {
 		Get {
-			return this.iRollingRPM
+			return Round(this.iRollingRPM)
 		}
 	}
 
@@ -255,7 +255,7 @@ class Corner extends Section {
 
 	AcceleratingRPM {
 		Get {
-			return this.iAcceleratingRPM
+			return Round(this.iAcceleratingRPM)
 		}
 	}
 
@@ -505,9 +505,9 @@ class Corner extends Section {
 		this.iAcceleratingLength := acceleratingLength
 
 		this.iRollingGear := rollingGear
-		this.iRollingRPM := rollingRPM
+		this.iRollingRPM := Round(rollingRPM)
 		this.iAcceleratingGear := acceleratingGear
-		this.iAcceleratingRPM := acceleratingRPM
+		this.iAcceleratingRPM := Round(acceleratingRPM)
 		this.iAcceleratingSpeed := acceleratingSpeed
 
 		this.iMinLateralGForce := minG
@@ -1028,7 +1028,7 @@ class Telemetry {
 
 	MaxRPM {
 		Get {
-			return this.iMaxRPM
+			return Round(this.iMaxRPM)
 		}
 	}
 
@@ -1218,39 +1218,38 @@ class Telemetry {
 		local candidateX, candidateY, cDistance
 
 		loop this.Data.Length {
-			x := this.getValue(A_Index, "PosX")
+			cDistance := this.getValue(A_Index, "Distance", kUndefined)
 
-			if (x != kUndefined) {
-				y := this.getValue(A_Index, "PosX")
-
+			if (cDistance != kUndefined)
 				if candidate {
-					cDistance := Abs(this.getValue(A_Index, "Distance", kUndefined) - distance)
+					cDistance := Abs(cDistance - distance)
 
 					if (cDistance < candidateDistance) {
 						candidateDistance := cDistance
-						candidateX := x
-						candidateY := y
+						candidateX := this.getValue(A_Index, "PosX")
+						candidateY := this.getValue(A_Index, "PosY")
 
 						candidate := A_Index
 					}
 					else
 						break
 				}
-				else if this.getValue(A_Index, "Distance", kUndefined) {
-					candidateX := x
-					candidateY := y
+				else {
+					candidateX := this.getValue(A_Index, "PosX")
+					candidateY := this.getValue(A_Index, "PosY")
 
 					candidate := A_Index
 				}
-			}
 		}
 
 		if candidate {
 			x := candidateX
 			y := candidateY
-		}
 
-		return false
+			return true
+		}
+		else
+			return false
 	}
 
 	getValue(index, name, default := kUndefined) {

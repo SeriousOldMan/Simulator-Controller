@@ -829,9 +829,9 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 		getDataValue(buffer, header, data, "Speed");
 
 		if (atof(buffer) > 0) {
-			float distance;
+			float distance = 99999;
 			int index = 0;
-			
+
 			for (int i = 0; i < numCoordinates; i++) {
 				float cDistance = abs(trackDistances[i] - running);
 
@@ -863,8 +863,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					nextUpdate = time(NULL) + 2;
 				}
 			}
-			else {
-				if distance
+			if (distance < (hintDistances[index] / trackLength)) {
 				char buffer[512] = "";
 
 				strcat_s(buffer, "acousticFeedback:");

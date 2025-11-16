@@ -1990,7 +1990,12 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			}
 
-			deleteFile(this.iBrakeTriggerFile)
+			loop 5 {
+				if deleteFile(this.iBrakeTriggerFile)
+					break
+
+				Sleep(100)
+			}
 
 			this.iBrakeTriggerPID := false
 		}

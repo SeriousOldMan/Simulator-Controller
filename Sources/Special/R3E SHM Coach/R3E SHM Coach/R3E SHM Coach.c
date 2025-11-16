@@ -162,6 +162,10 @@ void splitString(const char* s, const char* delimiter, int count, char** parts) 
 	strcpy_s(parts[numParts], 256, s);
 }
 
+inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
+	return sqrt((x * x) + (y * y));
+}
+
 #define MAXVALUES 6
 #define PI 3.14159265
 
@@ -650,17 +654,18 @@ void writeTelemetry(BOOL calibrate) {
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
-time_t lastUpdate = 0;
+time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
 char* audioDevice = "";
 char* hintFile = "";
 
 char* hintSounds[256][256];
+float hintDistances[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(int playerID) {
-	if (time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > nextUpdate) {
 		r3e_float64 velocityX = map_buffer->player.velocity.x;
 		r3e_float64 velocityY = map_buffer->player.velocity.z;
 		r3e_float64 velocityZ = map_buffer->player.velocity.y;
@@ -677,13 +682,11 @@ void checkCoordinates(int playerID) {
 
 			r3e_float32 coordinateX = map_buffer->all_drivers_data_1[index].position.x;
 			r3e_float32 coordinateY = - map_buffer->all_drivers_data_1[index].position.z;
-			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
-
-			for (int i = 0; i < numCoordinates; i += 1) {
-				if (fabs(xCoordinates[i] - coordinateX) < threshold && fabs(yCoordinates[i] - coordinateY) < threshold) {
-					char buffer[512] = "";
-					
-					if (strcmp(triggerType, "Trigger") == 0) {
+			
+			if (strcmp(triggerType, "Trigger") == 0) {
+				for (int i = 0; i < numCoordinates; i += 1) {
+					if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
+						char buffer[512] = "";
 						char numBuffer[60];
 
 						strcat_s(buffer, 60, "positionTrigger:");
@@ -697,17 +700,27 @@ void checkCoordinates(int playerID) {
 						strcat_s(buffer, 60, numBuffer);
 
 						sendTriggerMessage(buffer);
+
+						nextUpdate = time(NULL) + 2;
+
+						break;
 					}
-					else if (strcmp(triggerType, "TrackHints") == 0) {
+				}
+			}
+			else {
+				for (int i = 0; i < numCoordinates; i += 1) {
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
+						char buffer[512] = "";
+
 						strcat_s(buffer, 512, "acousticFeedback:");
-						strcat_s(buffer, 512, (char *)hintSounds[i]);
+						strcat_s(buffer, 512, (char*)hintSounds[i]);
 
 						sendTriggerMessage(buffer);
+						
+						nextUpdate = time(NULL) + 2;
+
+						break;
 					}
-
-					lastUpdate = time(NULL);
-
-					break;
 				}
 			}
 		}
@@ -735,9 +748,10 @@ void loadTrackHints()
 
 			char xPart[255];
 			char yPart[255];
+			char distancePart[255];
 			char hintPart[255];
 
-			char* parts[3] = { xPart, yPart, hintPart };
+			char* parts[4] = { xPart, yPart, distancePart, hintPart };
 
 			FILE* file = fopen(hintFile, "r");
 
@@ -745,12 +759,13 @@ void loadTrackHints()
 
 			if (file != NULL) {
 				while (fgets(line, sizeof(line), file)) {
-					splitString(line, " ", 3, parts);
+					splitString(line, " ", 4, parts);
 
 					xCoordinates[numCoordinates] = (float)atof(parts[0]);
 					yCoordinates[numCoordinates] = (float)atof(parts[1]);
+					hintDistances[numCoordinates] = (float)atof(parts[2]);
 					
-					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[2]);
+					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[3]);
 
 					if (++numCoordinates > 255)
 						break;

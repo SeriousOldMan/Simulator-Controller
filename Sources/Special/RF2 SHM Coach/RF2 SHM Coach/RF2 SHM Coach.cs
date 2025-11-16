@@ -741,7 +741,7 @@ namespace RF2SHMCoach {
 								else {
 									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
 
-									lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 								}
 								
 								break;

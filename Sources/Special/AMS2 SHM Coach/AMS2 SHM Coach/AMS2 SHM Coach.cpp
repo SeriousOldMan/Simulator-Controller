@@ -549,7 +549,7 @@ std::string audioDevice = "";
 std::string hintFile = "";
 
 std::string hintSounds[256];
-float hintCoordinates[256]
+float hintDistances[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const SharedMemory* sharedData) {
@@ -564,7 +564,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 			
-			if (strcmp(triggerType, "Trigger") {
+			if (strcmp(triggerType, "Trigger") == 0) {
 				for (int i = 0; i < numCoordinates; i += 1) {
 					if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
 						char buffer[512] = "";						
@@ -635,7 +635,7 @@ void loadTrackHints()
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
-				hintCoordinates[numCoordinates] = (float)atof(parts[2].c_str());
+				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
 				hintSounds[numCoordinates] = parts[3];
 
 				if (++numCoordinates > 255)

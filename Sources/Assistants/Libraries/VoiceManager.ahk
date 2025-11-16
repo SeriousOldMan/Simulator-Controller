@@ -157,6 +157,9 @@ class VoiceManager extends ConfigurationItem {
 
 				options := (options ? combine(this.iOptions, options) : this.iOptions)
 
+				if focus
+					options.Important := true
+
 				this.iText := ""
 				this.iFocus := false
 				this.iIsTalking := false

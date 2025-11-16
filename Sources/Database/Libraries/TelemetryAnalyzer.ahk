@@ -129,9 +129,9 @@ class Corner extends Section {
 	iDirection := "Left"				; OneOf("Left", "Right")
 	iCurvature := 0.0					; Higher values -> sharper corner
 
-	iBrakingStart := 0					; Distance into the track, where braking starts
-	iRollingStart := 0					; Distance into the track, where accelerating starts
-	iAcceleratingStart := 0				; Distance into the track, where accelerating starts
+	iBrakingStart := 0					; Distance from the apex, where braking starts
+	iRollingStart := 0					; Distance from the apex, where accelerating starts
+	iAcceleratingStart := 0				; Distance from the apex, where accelerating starts
 
 	iBrakeCurve := []
 	iThrottleCurve := []
@@ -682,7 +682,7 @@ class Corner extends Section {
 			lastSteeringDelta := (steering - lastSteering)
 			lastSteering := steering
 
-			if (brake > 0.2)
+			if (brake > 0.1)
 				phase := "Braking"
 			else if (throttle <= 0.2)
 				phase := "Rolling"
@@ -713,7 +713,8 @@ class Corner extends Section {
 
 				brakeCount += 1
 
-				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY"), Brake: brake})
+				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
+							   , Distance: telemetry.getValue(index, "Distance"), Brake: brake})
 
 				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
 					if ((brakeReference - brake) > 0.2)
@@ -762,7 +763,8 @@ class Corner extends Section {
 
 				throttleCount += 1
 
-				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY"), Throttle: throttle})
+				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
+								  , Distance: telemetry.getValue(index, "Distance"), Throttle: throttle})
 
 				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
 					if ((throttleReference - throttle) > 0.2)
@@ -1175,28 +1177,32 @@ class Telemetry {
 
 	createBraking() {
 		local braking := []
-		local ignore, section
+		local ignore, section, brake
 
 		for ignore, section in this.Sections
-			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0))
-				braking.Push({Corner: section, X: section.BrakeCurve[1].X, Y: section.BrakeCurve[1].Y
-											 , Start: section.Start["Braking"]
-											 , Length: section.Length["Braking"], Time: section.Time["Braking"]
-											 , Curve: section.BrakeCurve})
+			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0)) {
+				brake := section.BrakeCurve[1]
+
+				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance
+							, Length: section.Length["Braking"], Time: section.Time["Braking"]
+							, Curve: section.BrakeCurve})
+			}
 
 		return braking
 	}
 
 	createAccelerating() {
 		local accelerating := []
-		local ignore, section
+		local ignore, section, throttle
 
 		for ignore, section in this.Sections
-			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0))
-				accelerating.Push({Corner: section, X: section.ThrottleCurve[1].X, Y: section.ThrottleCurve[1].Y
-												  , Start: section.Start["Accelerating"]
-												  , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
-												  , Curve: section.ThrottleCurve})
+			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0)) {
+				throttle := section.ThrottleCurve[1]
+
+				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance
+								 , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
+								 , Curve: section.ThrottleCurve})
+			}
 
 		return accelerating
 	}
@@ -1231,8 +1237,6 @@ class Telemetry {
 
 						candidate := A_Index
 					}
-					else
-						break
 				}
 				else {
 					candidateX := this.getValue(A_Index, "PosX")

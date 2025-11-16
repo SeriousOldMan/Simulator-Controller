@@ -1927,12 +1927,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (this.iBrakeTriggerPID && collector) {
 			if !distance
-				distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 20))
+				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 50))
 
 			trackLength := collector.TrackLength
 
 			for ignore, braking in telemetry.Braking {
-				start := (braking.Start + distance)
+				start := (braking.Start - distance)
 
 				if (start < 0)
 					start := (trackLength - start)

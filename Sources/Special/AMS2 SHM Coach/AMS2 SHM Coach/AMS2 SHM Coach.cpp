@@ -96,6 +96,10 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	return parts;
 }
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -538,17 +542,18 @@ void writeTelemetry(const SharedMemory* sharedData, bool calibrate) {
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
-time_t lastUpdate = 0;
+time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
 std::string audioDevice = "";
 std::string hintFile = "";
 
 std::string hintSounds[256];
+float hintCoordinates[256]
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const SharedMemory* sharedData) {
-	if (time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > nextUpdate) {
 		float velocityX = sharedData->mWorldVelocity[VEC_X];
 		float velocityY = sharedData->mWorldVelocity[VEC_Z];
 		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
@@ -558,13 +563,11 @@ void checkCoordinates(const SharedMemory* sharedData) {
 
 			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
-			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
-
-			for (int i = 0; i < numCoordinates; i += 1) {
-				if (fabs(xCoordinates[i] - coordinateX) < threshold && fabs(yCoordinates[i] - coordinateY) < threshold) {
-					char buffer[512] = "";
-					
-					if (strcmp(triggerType, "Trigger") == 0) {
+			
+			if (strcmp(triggerType, "Trigger") {
+				for (int i = 0; i < numCoordinates; i += 1) {
+					if (fabs(xCoordinates[i] - coordinateX) < 20 && fabs(yCoordinates[i] - coordinateY) < 20) {
+						char buffer[512] = "";						
 						char numBuffer[60] = "";
 
 						strcat_s(buffer, "positionTrigger:");
@@ -578,17 +581,27 @@ void checkCoordinates(const SharedMemory* sharedData) {
 						strcat_s(buffer, numBuffer);
 
 						sendTriggerMessage(buffer);
+
+						nextUpdate = time(NULL) + 2;
+
+						break;
 					}
-					else if (strcmp(triggerType, "TrackHints") == 0) {
+				}
+			}
+			else {
+				for (int i = 0; i < numCoordinates; i += 1) {
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
+						char buffer[512] = "";
+						
 						strcat_s(buffer, "acousticFeedback:");
 						strcat_s(buffer, hintSounds[i].c_str());
 
 						sendTriggerMessage(buffer);
+
+						nextUpdate = time(NULL) + 2;
+
+						break;
 					}
-
-					lastUpdate = time(NULL);
-
-					break;
 				}
 			}
 		}
@@ -618,10 +631,11 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 3);
+				auto parts = splitString(line, " ", 4);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
+				hintCoordinates[numCoordinates] = (float)atof(parts[2].c_str());
 				hintSounds[numCoordinates] = parts[3];
 
 				if (++numCoordinates > 255)

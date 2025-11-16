@@ -1921,28 +1921,33 @@ class DrivingCoach extends GridRaceAssistant {
 		local brakeSound := this.iBrakeHint
 		local triggers := ""
 		local tries := 3
-		local ignore, braking, accelerating, trackLength, x, y
+		local ignore, braking, accelerating, x, y
 
 		static distance := false
 
 		if (this.iBrakeTriggerPID && collector) {
 			if !distance
-				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 50))
-
-			trackLength := collector.TrackLength
+				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 20))
 
 			for ignore, braking in telemetry.Braking {
+				/*
 				start := (braking.Start - distance)
 
 				if (start < 0)
-					start := (trackLength - start)
+					start := (collector.TrackLength - start)
 
 				if telemetry.findCoordinates(start, &x, &y) {
 					if (triggers != "")
 						triggers .= "`n"
 
-					triggers .= (x . A_Space . y . A_Space . brakeSound)
+					triggers .= (x . A_Space . y . A_Space . distance . A_Space . brakeSound)
 				}
+				*/
+
+				if (triggers != "")
+					triggers .= "`n"
+
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeSound)
 			}
 
 			FileAppend(triggers, triggerFile)

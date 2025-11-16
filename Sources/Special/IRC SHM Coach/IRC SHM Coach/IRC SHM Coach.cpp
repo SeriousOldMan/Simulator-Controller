@@ -268,6 +268,10 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	return parts;
 }
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -793,17 +797,18 @@ float xCoordinates[256];
 float yCoordinates[256];
 float trackDistances[60];
 int numCoordinates = 0;
-time_t lastUpdate = 0;
+time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
 std::string audioDevice = "";
 std::string hintFile = "";
 
 std::string hintSounds[256];
+float hintDistances[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
-	if (time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > nextUpdate) {
 		char buffer[60];
 
 		const char* sessionInfo = irsdk_getSessionInfoStr();
@@ -826,8 +831,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 		if (atof(buffer) > 0) {
 			float distance;
 			int index = 0;
-			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 30 : 10;
-
+			
 			for (int i = 0; i < numCoordinates; i++) {
 				float cDistance = abs(trackDistances[i] - running);
 
@@ -839,10 +843,9 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 				}
 			}
 
-			if (distance < (threshold / trackLength)) {
-				char buffer[512] = "";
-
-				if (strcmp(triggerType, "Trigger") == 0) {
+			if (strcmp(triggerType, "Trigger") == 0) {
+				if (distance < (30 / trackLength)) {
+					char buffer[512] = "";
 					char numBuffer[60] = "";
 
 					strcat_s(buffer, "positionTrigger:");
@@ -856,15 +859,20 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					strcat_s(buffer, numBuffer);
 
 					sendTriggerMessage(buffer);
-				}
-				else if (strcmp(triggerType, "TrackHints") == 0) {
-					strcat_s(buffer, "acousticFeedback:");
-					strcat_s(buffer, hintSounds[index].c_str());
 
-					sendTriggerMessage(buffer);
+					nextUpdate = time(NULL) + 2;
 				}
+			}
+			else {
+				if distance
+				char buffer[512] = "";
 
-				lastUpdate = time(NULL);
+				strcat_s(buffer, "acousticFeedback:");
+				strcat_s(buffer, hintSounds[index].c_str());
+
+				sendTriggerMessage(buffer);
+
+				nextUpdate = time(NULL) + 2;
 			}
 		}
 	}
@@ -893,10 +901,11 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 3);
+				auto parts = splitString(line, " ", 4);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
+				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
 				hintSounds[numCoordinates] = parts[3];
 
 				if (++numCoordinates > 255)

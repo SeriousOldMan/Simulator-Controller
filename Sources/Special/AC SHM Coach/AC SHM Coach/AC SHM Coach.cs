@@ -236,6 +236,11 @@ namespace ACSHMCoach {
                 SendStringMessage(winHandle, 0, "Analyzer:" + message);
         }
 
+		double vectorLength(double x, double y)
+		{
+			return Math.Sqrt((x * x) + (y * y));
+		}
+
         class CornerDynamics
 		{
 			public double Speed;
@@ -715,12 +720,12 @@ namespace ACSHMCoach {
         float[] xCoordinates = new float[256];
 		float[] yCoordinates = new float[256];
 		int numCoordinates = 0;
-		long lastUpdate = 0;
+		long nextUpdate = 0;
 		string triggerType = "Trigger";
 
 		void checkCoordinates()
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double velocityX = physics.LocalVelocity[0];
 				double velocityY = physics.LocalVelocity[2];
@@ -732,24 +737,39 @@ namespace ACSHMCoach {
 
 					float coordinateX = cars.cars[carID].worldPosition.x;
 					float coordinateY = cars.cars[carID].worldPosition.z;
-					int threshold = (triggerType == "Trigger") ? 20 : 5;
-
+					
 					if ((coordinateX != 0) || (coordinateY != 0))
-						for (int i = 0; i < numCoordinates; i++)
-						{
-							if (Math.Abs(xCoordinates[i] - coordinateX) < threshold && Math.Abs(yCoordinates[i] - coordinateY) < threshold)
+						if (triggerType == "Trigger") {
+							for (int i = 0; i < numCoordinates; i++)
 							{
-								if (triggerType == "Trigger")
+								if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+								{
 									SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-                                else if (triggerType == "TrackHints")
-                                    if (audioDevice != "")
-                                        SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-                                    else
-                                        new System.Media.SoundPlayer(hintSounds[i]).Play();
+									
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
 
-                                lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+									break;
+								}
+							}
+						}
+						else {
+							for (int i = 0; i < numCoordinates; i++)
+							{
+								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+								{
+									if (audioDevice != "") {
+										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-								break;
+										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+									}
+									else {
+										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
+
+										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+									}
+
+									break;
+								}
 							}
 						}
 				}
@@ -771,6 +791,7 @@ namespace ACSHMCoach {
         }
 
         string[] hintSounds = new string[256];
+		float[] hintDistances = new float[256];
         DateTime lastHintsUpdate = DateTime.Now;
 
         public void loadTrackHints()
@@ -784,11 +805,12 @@ namespace ACSHMCoach {
 
                     foreach (var line in System.IO.File.ReadLines(hintFile))
                     {
-                        var parts = line.Split(new char[] { ' ' }, 3);
+                        var parts = line.Split(new char[] { ' ' }, 4);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
-                        hintSounds[numCoordinates] = parts[2];
+                        hintDistances[numCoordinates] = float.Parse(parts[2]);
+                        hintSounds[numCoordinates] = parts[3];
 
                         if (++numCoordinates > 255)
                             break;

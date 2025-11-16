@@ -152,6 +152,10 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	return parts;
 }
 
+inline float vectorLength(float x, float y) {
+	return sqrt((x * x) + (y * y));
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -596,17 +600,18 @@ void writeTelemetry(bool calibrate) {
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
-time_t lastUpdate = 0;
+time_t nextUpdate = 0;
 const char* triggerType = "Trigger";
 
 string audioDevice = "";
 string hintFile = "";
 
 string hintSounds[256];
+float hintDistances[256];
 time_t lastHintsUpdate = 0;
 
 void checkCoordinates() {
-	if (time(NULL) > (lastUpdate + 2)) {
+	if (time(NULL) > nextUpdate) {
 		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -626,11 +631,10 @@ void checkCoordinates() {
 
 			float coordinateX = gf->carCoordinates[carID][0];
 			float coordinateY = gf->carCoordinates[carID][2];
-			int threshold = (strcmp(triggerType, "Trigger") == 0) ? 20 : 5;
-
-			for (int i = 0; i < numCoordinates; i++) {
-				if (abs(xCoordinates[i] - coordinateX) < threshold && abs(yCoordinates[i] - coordinateY) < threshold) {
-					if (strcmp(triggerType, "Trigger") == 0) {
+			
+			if (strcmp(triggerType, "Trigger") == 0) {
+				for (int i = 0; i < numCoordinates; i++) {
+					if (abs(xCoordinates[i] - coordinateX) < 20 && abs(yCoordinates[i] - coordinateY) < 20) {
 						char buffer[60] = "";
 						char numBuffer[60] = "";
 
@@ -645,13 +649,22 @@ void checkCoordinates() {
 						strcat_s(buffer, numBuffer);
 
 						sendTriggerMessage(buffer);
+
+						nextUpdate = time(NULL) + 2;
+
+						break;
 					}
-					else if (strcmp(triggerType, "TrackHints") == 0)
+				}
+			}
+			else {
+				for (int i = 0; i < numCoordinates; i++) {
+					if (vectorLength(xCoordinates[i] - coordinateX, abs(yCoordinates[i] - coordinateY)) < hintDistances[i]) {
 						sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-					lastUpdate = time(NULL);
+						nextUpdate = time(NULL) + 2;
 
-					break;
+						break;
+					}
 				}
 			}
 		}
@@ -681,10 +694,11 @@ void loadTrackHints()
 			string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 3);
+				auto parts = splitString(line, " ", 4);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
+				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
 				hintSounds[numCoordinates] = parts[3];
 
 				if (++numCoordinates > 255)

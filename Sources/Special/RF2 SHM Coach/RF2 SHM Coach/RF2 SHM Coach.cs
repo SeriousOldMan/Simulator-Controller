@@ -156,6 +156,11 @@ namespace RF2SHMCoach {
                 SendStringMessage(winHandle, 0, "Analyzer:" + message);
         }
 
+		double vectorLength(double x, double y)
+		{
+			return Math.Sqrt((x * x) + (y * y));
+		}
+
 		class CornerDynamics
         {
             public double Speed;
@@ -678,12 +683,12 @@ namespace RF2SHMCoach {
 		float[] xCoordinates = new float[256];
         float[] yCoordinates = new float[256];
         int numCoordinates = 0;
-		long lastUpdate = 0;
+		long nextUpdate = 0;
 		string triggerType = "Trigger";
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
+			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
@@ -709,23 +714,38 @@ namespace RF2SHMCoach {
 				{
 					double coordinateX = playerScoring.mPos.x;
 					double coordinateY = (- playerScoring.mPos.z);
-					int threshold = (triggerType == "Trigger") ? 20 : 5;
 
-                    for (int i = 0; i < numCoordinates; i += 1)
-					{
-						if (Math.Abs(xCoordinates[i] - coordinateX) < threshold && Math.Abs(yCoordinates[i] - coordinateY) < threshold)
+					if (triggerType == "Trigger") {
+						for (int i = 0; i < numCoordinates; i += 1)
 						{
-							if (triggerType == "Trigger")
+							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
+							{
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-							else if (triggerType == "TrackHints")
-								if (audioDevice != "")
+								
+								nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+								
+								break;
+							}
+						}
+					}
+					else {
+						for (int i = 0; i < numCoordinates; i += 1)
+						{
+							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+							{
+								if (audioDevice != "") {
 									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-								else
-									new System.Media.SoundPlayer(hintSounds[i]).Play();
+								
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+								}
+								else {
+									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
 
-							lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-							
-							break;
+									lastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+								}
+								
+								break;
+							}
 						}
 					}
 				}
@@ -733,6 +753,7 @@ namespace RF2SHMCoach {
         }
 
         string[] hintSounds = new string[256];
+        float[] hintDistances = new float[256];
 		DateTime lastHintsUpdate = DateTime.Now;
 
 		public void loadTrackHints()
@@ -746,11 +767,12 @@ namespace RF2SHMCoach {
 
                     foreach (var line in System.IO.File.ReadLines(hintFile))
                     {
-						var parts = line.Split(new char[] { ' ' }, 3);
+						var parts = line.Split(new char[] { ' ' }, 4);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
-                        hintSounds[numCoordinates] = parts[2];
+                        hintDistances[numCoordinates] = float.Parse(parts[2]);
+                        hintSounds[numCoordinates] = parts[3];
 
                         if (++numCoordinates > 255)
 							break;

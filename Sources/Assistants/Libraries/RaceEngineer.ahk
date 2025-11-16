@@ -2271,7 +2271,7 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "FuelAmount", kUndefined)
 
 			if ((value != kUndefined) && (Abs(Floor(knowledgeBase.getValue("Pitstop.Planned.Fuel")) - Floor(value)) > 2)) {
-				this.pitstopOptionChanged("Refuel", verbose, Round(value, 1))
+				this.pitstopOptionChanged("Refuel", verbose && !getMultiMapValue(data, "FuelAmount.Silent", false), Round(value, 1))
 
 				result := true
 			}
@@ -2297,7 +2297,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if changed {
-					this.pitstopOptionChanged("Tyre Compound Axle", verbose, tyreCompounds, tyreCompoundColors)
+					this.pitstopOptionChanged("Tyre Compound Axle", verbose && !getMultiMapValue(data, "TyreCompound.Silent", false)
+																  , tyreCompounds, tyreCompoundColors)
 
 					result := true
 				}
@@ -2320,7 +2321,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if changed {
-					this.pitstopOptionChanged("Tyre Compound Wheel", verbose, tyreCompounds, tyreCompoundColors)
+					this.pitstopOptionChanged("Tyre Compound Wheel", verbose && !getMultiMapValue(data, "TyreCompound.Silent", false)
+																   , tyreCompounds, tyreCompoundColors)
 
 					result := true
 				}
@@ -2328,7 +2330,7 @@ class RaceEngineer extends RaceAssistant {
 			else {
 				if ((tc != kUndefined) && ((knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound") != tc)
 										|| (knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color") != tcc))) {
-					this.pitstopOptionChanged("Tyre Compound", verbose, tc, tcc)
+					this.pitstopOptionChanged("Tyre Compound", verbose && !getMultiMapValue(data, "TyreCompound.Silent", false), tc, tcc)
 
 					result := true
 				}
@@ -2338,7 +2340,8 @@ class RaceEngineer extends RaceAssistant {
 				value := getMultiMapValue(data, "Setup Data", "TyreSet", kUndefined)
 
 				if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Tyre.Set") != value)) {
-					this.pitstopOptionChanged("Tyre Set", verbose, value)
+					this.pitstopOptionChanged("Tyre Set", verbose && !getMultiMapValue(data, "Tyre Set.Silent", false)
+														, value)
 
 					result := true
 				}
@@ -2361,7 +2364,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 
 				if changed {
-					this.pitstopOptionChanged("Tyre Pressures", verbose, values*)
+					this.pitstopOptionChanged("Tyre Pressures", verbose && !getMultiMapValue(data, "Tyre Pressures.Silent", false)
+															  , values*)
 
 					result := true
 				}
@@ -2380,7 +2384,8 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairSuspension", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension") != value)) {
-				this.pitstopOptionChanged("Repair Suspension", verbose, value)
+				this.pitstopOptionChanged("Repair Suspension", verbose && !getMultiMapValue(data, "Repair Suspension.Silent", false)
+															 , value)
 
 				result := true
 			}
@@ -2388,7 +2393,8 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairBodywork", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork") != value)) {
-				this.pitstopOptionChanged("Repair Bodywork", verbose, value)
+				this.pitstopOptionChanged("Repair Bodywork", verbose && !getMultiMapValue(data, "Repair Bodywork.Silent", false)
+														   , value)
 
 				result := true
 			}
@@ -2396,7 +2402,8 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "RepairEngine", kUndefined)
 
 			if ((value != kUndefined) && (knowledgeBase.getValue("Pitstop.Planned.Repair.Engine") != value)) {
-				this.pitstopOptionChanged("Repair Engine", verbose, value)
+				this.pitstopOptionChanged("Repair Engine", verbose && !getMultiMapValue(data, "Repair Engine.Silent", false)
+														 , value)
 
 				result := true
 			}
@@ -2404,7 +2411,7 @@ class RaceEngineer extends RaceAssistant {
 			value := getMultiMapValue(data, "Setup Data", "Driver", kUndefined)
 
 			if (value != kUndefined)
-				if this.updateDriver(value, verbose)
+				if this.updateDriver(value, verbose && !getMultiMapValue(data, "Driver.Silent", false))
 					result := true
 
 			if result

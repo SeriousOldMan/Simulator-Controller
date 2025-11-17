@@ -3,7 +3,7 @@ Version=6.6.6.0-dev
 Target=6.6.6.0-release
 Date=11/17/2025
 Download=
-Changes=Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration
+Changes=Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.5.0-release

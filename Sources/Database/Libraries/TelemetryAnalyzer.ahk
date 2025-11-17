@@ -1221,8 +1221,11 @@ class Telemetry {
 	findCoordinates(distance, &x, &y) {
 		local candidate := false
 		local candidateDistance := 999999
-		local candidateX, candidateY, cDistance
+		local lowIndex := 1
+		local highIndex := this.Data.Length
+		local candidateX, candidateY, cDistance, cIndex
 
+		/*
 		loop this.Data.Length {
 			cDistance := this.getValue(A_Index, "Distance", kUndefined)
 
@@ -1245,15 +1248,29 @@ class Telemetry {
 					candidate := A_Index
 				}
 		}
+		*/
 
-		if candidate {
-			x := candidateX
-			y := candidateY
+		while (lowIndex <= highIndex) {
+			cIndex := (lowIndex + Round((highIndex - lowIndex) / 2))
 
-			return true
+			cDistance := this.getValue(cIndex, "Distance", kUndefined)
+
+			if (cDistance = kUndefined)
+				break
+			else if distance < cDistance
+				highIndex := cIndex - 1
+			else
+				lowIndex := cIndex + 1
+
+			if (lowIndex > highIndex) {
+				x := this.getValue(cIndex, "PosX")
+				y := this.getValue(cIndex, "PosY")
+
+				return true
+			}
 		}
-		else
-			return false
+
+		return false
 	}
 
 	getValue(index, name, default := kUndefined) {

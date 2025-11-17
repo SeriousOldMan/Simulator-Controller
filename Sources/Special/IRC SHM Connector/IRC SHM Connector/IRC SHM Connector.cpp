@@ -739,7 +739,10 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 				printLine(output, "Car." + std::string(carIdx1) + ".Incidents=" + std::string(result));
 
 				if (trackPositions)
-					printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=" + std::to_string(((float*)trackPositions)[carIndex]));
+					if (((float*)trackPositions)[carIndex] >= 0)
+						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=" + std::to_string(((float*)trackPositions)[carIndex]));
+					else
+						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=^0");
 
 				if (trackLocations) {
 					irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[carIndex];

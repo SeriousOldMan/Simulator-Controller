@@ -392,7 +392,7 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, lapTime in filteredLapTimes
-					if (lapTime < (avg + (avg - min)))
+					if (lapTime <= (avg + (avg - min)))
 						lapTimes.Push(lapTime)
 
 				min := Round(minimum(lapTimes) / 1000, 1)

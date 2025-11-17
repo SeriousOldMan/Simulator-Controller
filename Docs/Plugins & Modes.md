@@ -222,6 +222,10 @@ Note: To change the labels, that are displayed for all these effects and trigger
 
 Last but not least, the connection between the "Motion Feedback" plugin and *SimFeedback* still has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." button in the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
 
+### Known issues
+
+Connection between the "Motion Feedback" plugin and *SimFeedback* has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." on the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
+
 ## Plugin *Pedal Calibration*
 
 This plugin allows you to choose between different calibration curves for your high end pedals directly from the Button Box. The current implementation supports the Heusinkveld pedal family, but the vendor specific part of the plugin is quite small. Therefore is an adoption to a different pedal product possible without much effort. The "Pedal Calibration" plugin It uses [SmartControl](https://heusinkveld.com/download-smartcontrol-configuration-tool/?q=%2Fdownload-smartcontrol-configuration-tool%2F&v=3a52f3c22ed6) to control the pedal calibration.

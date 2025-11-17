@@ -735,7 +735,10 @@ void writePositions(const irsdk_header *header, const char* data)
 				printf("Car.%s.Incidents=%s\n", carIdx1, result);
 
 				if (trackPositions)
-					printf("Car.%s.Lap.Running=%f\n", carIdx1, ((float*)trackPositions)[carIndex]);
+					if (((float*)trackPositions)[carIndex] >= 0)
+						printf("Car.%s.Lap.Running=%f\n", carIdx1, ((float*)trackPositions)[carIndex]);
+					else
+						printf("Car.%s.Lap.Running=0\n");
 
 				if (trackLocations) {
 					irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[carIndex];

@@ -44,10 +44,6 @@ emptyTempDirectory(*) {
 	deleteDirectory(kTempDirectory, false)
 }
 
-exitApplication(*) {
-	ExitApp(0)
-}
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;

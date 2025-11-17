@@ -224,7 +224,8 @@ class SpeechRecognizer {
 
 		__New() {
 			OnExit((*) {
-				this.StopRecognizer()
+				try
+					this.StopRecognizer()
 
 				return false
 			})

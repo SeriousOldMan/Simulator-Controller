@@ -384,6 +384,8 @@ class SetupWorkbench extends ConfigurationItem {
 		OnExit((*) {
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
+				
+			return false
 		})
 	}
 

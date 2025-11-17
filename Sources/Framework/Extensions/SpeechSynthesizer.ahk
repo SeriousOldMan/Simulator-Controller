@@ -496,85 +496,92 @@ class SpeechSynthesizer {
 	getVoices() {
 		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
-		if (this.Synthesizer = "Windows") {
-			result := []
+		try {
+			if (this.Synthesizer = "Windows") {
+				result := []
 
-			loop this.iSpeechSynthesizer.GetVoices.Count
-				result.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
+				loop this.iSpeechSynthesizer.GetVoices.Count
+					result.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
 
-			return result
-		}
-		else if (this.Synthesizer = "dotNET")
-			return string2Values("|", this.iSpeechSynthesizer.GetVoices())
-		else if (this.Synthesizer = "Azure") {
-			if (Trim(this.iAPIKey) != "") {
-				voices := this.iSpeechSynthesizer.GetVoices()
+				return result
+			}
+			else if (this.Synthesizer = "dotNET")
+				return string2Values("|", this.iSpeechSynthesizer.GetVoices())
+			else if (this.Synthesizer = "Azure") {
+				if (Trim(this.iAPIKey) != "") {
+					voices := this.iSpeechSynthesizer.GetVoices()
 
-				if (voices = "") {
-					result := []
+					if (voices = "") {
+						result := []
 
-					for languageCode, voiceInfos in kAzureVoices
-						for ignore, voiceInfo in voiceInfos
-							result.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
+						for languageCode, voiceInfos in kAzureVoices
+							for ignore, voiceInfo in voiceInfos
+								result.Push(voiceInfo[2] . " (" . voiceInfo[1] . ")")
 
-					return result
+						return result
+					}
+					else
+						return string2Values("|", voices)
 				}
 				else
-					return string2Values("|", voices)
+					return []
 			}
-			else
+			else if (this.Synthesizer = "OpenAI")
 				return []
-		}
-		else if (this.Synthesizer = "OpenAI")
-			return []
-		else if (this.Synthesizer = "ElevenLabs") {
-			voices := []
+			else if (this.Synthesizer = "ElevenLabs") {
+				voices := []
 
-			if (Trim(this.iAPIKey) != "") {
-				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=default", ""
-											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+				if (Trim(this.iAPIKey) != "") {
+					result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=default", ""
+												 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-				if ((result.Status >= 200) && (result.Status < 300))
-					for ignore, voiceInfo in result.JSON["voices"]
-						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+					if ((result.Status >= 200) && (result.Status < 300))
+						for ignore, voiceInfo in result.JSON["voices"]
+							voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
-				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=personal", ""
-											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+					result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=personal", ""
+												 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-				if ((result.Status >= 200) && (result.Status < 300))
-					for ignore, voiceInfo in result.JSON["voices"]
-						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+					if ((result.Status >= 200) && (result.Status < 300))
+						for ignore, voiceInfo in result.JSON["voices"]
+							voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
 
-				result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=workspace", ""
-											 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
+					result := WinHttpRequest().GET("https://api.elevenlabs.io/v2/voices?voice_type=workspace", ""
+												 , Map("xi-api-key", this.iAPIKey), {Encoding: "UTF-8"})
 
-				if ((result.Status >= 200) && (result.Status < 300))
-					for ignore, voiceInfo in result.JSON["voices"]
-						voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+					if ((result.Status >= 200) && (result.Status < 300))
+						for ignore, voiceInfo in result.JSON["voices"]
+							voices.Push(voiceInfo["name"] . " (" . voiceInfo["voice_id"] . ")")
+				}
+
+				return voices
 			}
+			else if (this.iGoogleMode = "HTTP") {
+				if (Trim(this.iAPIKey) != "") {
+					result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iAPIKey, "", Map(), {Encoding: "UTF-8"})
 
-			return voices
-		}
-		else if (this.iGoogleMode = "HTTP") {
-			if (Trim(this.iAPIKey) != "") {
-				result := WinHttpRequest().GET("https://texttospeech.googleapis.com/v1/voices?key=" . this.iAPIKey, "", Map(), {Encoding: "UTF-8"})
+					if ((result.Status >= 200) && (result.Status < 300)) {
+						voices := []
 
-				if ((result.Status >= 200) && (result.Status < 300)) {
-					voices := []
+						for ignore, voiceInfo in result.JSON["voices"]
+							voices.Push(voiceInfo["name"] . " - " . voiceInfo["ssmlGender"] . " (" . voiceInfo["languageCodes"][1] . ")")
 
-					for ignore, voiceInfo in result.JSON["voices"]
-						voices.Push(voiceInfo["name"] . " - " . voiceInfo["ssmlGender"] . " (" . voiceInfo["languageCodes"][1] . ")")
-
-					return voices
+						return voices
+					}
+					else
+						return []
 				}
 				else
 					return []
 			}
 			else
-				return []
+				return string2Values("|", this.iSpeechSynthesizer.GetVoices())
 		}
-		else
-			return string2Values("|", this.iSpeechSynthesizer.GetVoices())
+		catch Any as exception {
+			logError(exception)
+
+			return []
+		}
 	}
 
 	setPlayerLevel(level) {

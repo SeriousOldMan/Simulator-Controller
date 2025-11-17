@@ -666,6 +666,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 
 		this.iIssueCollector := false
+		
+		return false
 	}
 
 	computeTemperatures(samples) {

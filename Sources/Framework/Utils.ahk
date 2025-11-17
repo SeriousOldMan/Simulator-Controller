@@ -437,7 +437,12 @@ exitProcess(urgent := false) {
 	if urgent
 		kGuardExit := false
 
-	ExitApp(0)
+	try {
+		ExitApp(0)
+	}
+	finally {
+		ProcessClose(ProcessExist())
+	}
 }
 
 exitProcesses(title, message, silent := false, force := false, excludes := [], urgent := false) {

@@ -326,6 +326,8 @@ class DrivingCoach extends GridRaceAssistant {
 		OnExit((*) {
 			if this.TelemetryCollector
 				this.TelemetryCollector.shutdown()
+			
+			return false
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
 	}

@@ -245,7 +245,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, paused, fuelAmound
+		local sessionData, paused
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -271,12 +271,10 @@ class LMUProvider extends Sector397Provider {
 			track := this.Track
 
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
-			data := newMultiMap()
+			data := super.readSessionData(options, protocol?)
 
-			fuelAmount := this.getRefuelAmount(setupData)
-
-			setMultiMapValue(data, "Setup Data", "FuelAmount", fuelAmount)
-			setMultiMapValue(data, "Setup Data", "RefuelAmount", fuelAmount - getMultiMapValue(data, "Setup Data", "FuelRemaining", 0))
+			setMultiMapValue(data, "Setup Data", "FuelAmount", this.getRefuelAmount(setupData))
+			setMultiMapValue(data, "Setup Data", "RefuelAmount", setupData.getRefuelLevel() - getMultiMapValue(data, "Setup Data", "FuelRemaining", 0))
 
 			for key, postFix in keys {
 				tyreCompound := setupData.TyreCompound[key]

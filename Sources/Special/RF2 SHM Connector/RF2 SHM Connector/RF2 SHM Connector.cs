@@ -1113,6 +1113,9 @@ namespace SHMConnector {
 		public string ReadSetup() {
             StringWriter strWriter = new StringWriter();
 
+            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+            ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+
             strWriter.WriteLine("[Setup Data]");
 
 			if (connected)
@@ -1123,7 +1126,9 @@ namespace SHMConnector {
 					strWriter.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
 				}
 
-				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
+                strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
+
+                if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 

@@ -2275,6 +2275,15 @@ class RaceEngineer extends RaceAssistant {
 
 				result := true
 			}
+			else {
+				value := getMultiMapValue(data, "Setup Data", "RefuelAmount", kUndefined)
+
+				if ((value != kUndefined) && (Abs(Floor(knowledgeBase.getValue("Pitstop.Planned.Fuel")) - Floor(value)) > 2)) {
+					this.pitstopOptionChanged("Refuel", false, Round(value, 1))
+
+					result := true
+				}
+			}
 
 			tc := getMultiMapValue(data, "Setup Data", "TyreCompound", kUndefined)
 			tcc := getMultiMapValue(data, "Setup Data", "TyreCompoundColor")

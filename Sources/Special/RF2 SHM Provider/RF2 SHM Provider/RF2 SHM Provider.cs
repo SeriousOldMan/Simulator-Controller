@@ -227,7 +227,7 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".TyreCompoundRawRear="); Console.WriteLine(compound);
 			}
 		}		
-	public void ReadData() {
+		public void ReadData() {
 			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
@@ -1071,6 +1071,9 @@ namespace RF2SHMProvider {
 		}
 
 		public void ReadSetup() {
+			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+
 			Console.WriteLine("[Setup Data]");
 
 			if (connected) {
@@ -1078,9 +1081,11 @@ namespace RF2SHMProvider {
 				{
 					Console.Write("FuelAmount=");
 					Console.WriteLine(GetFuel(GetStringFromBytes(pitInfo.mPitMenu.mChoiceString)));
-				}
 
-				if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
+				}
+                Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
+
+                if (SelectPitstopCategory("F TIRES:") || SelectPitstopCategory("FL TIRE:"))
 				{
 					string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 

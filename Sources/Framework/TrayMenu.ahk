@@ -45,7 +45,12 @@ emptyTempDirectory(*) {
 }
 
 exitApplication(*) {
-	ExitApp(0)
+	try {
+		ExitApp(0)
+	}
+	finally {
+		ProcessClose(ProcessExist())
+	}
 }
 
 

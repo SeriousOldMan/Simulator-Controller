@@ -685,9 +685,18 @@ namespace RF2SHMCoach {
         int numCoordinates = 0;
 		long nextUpdate = 0;
 		string triggerType = "Trigger";
+		int lastLap = 0;
+		int lastHint = -1;
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
+			if (lastLap != playerScoring.mTotalLaps)
+			{
+				lastLap = playerScoring.mTotalLaps;
+				lastHint = -1;
+
+			}
+
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
@@ -733,17 +742,23 @@ namespace RF2SHMCoach {
 						{
 							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 							{
-								if (audioDevice != "") {
-									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-								
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
-								}
-								else {
-									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
+								if (i > lastHint) {
+									lastHint = i;
 
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+									if (audioDevice != "")
+									{
+										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+
+										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+									}
+									else
+									{
+										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
+
+										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+									}
 								}
-								
+
 								break;
 							}
 						}

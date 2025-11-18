@@ -1218,7 +1218,7 @@ class Telemetry {
 			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0)) {
 				brake := section.BrakeCurve[1]
 
-				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: brake.Speed["Braking"]
+				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: section.Speed["Braking"]
 							, Length: section.Length["Braking"], Time: section.Time["Braking"]
 							, Curve: section.BrakeCurve})
 			}
@@ -1234,7 +1234,7 @@ class Telemetry {
 			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0)) {
 				throttle := section.ThrottleCurve[1]
 
-				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: throttle.Speed["Accelerating"]
+				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: section.Speed["Accelerating"]
 								 , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
 								 , Curve: section.ThrottleCurve})
 			}

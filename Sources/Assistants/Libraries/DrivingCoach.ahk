@@ -342,7 +342,7 @@ class DrivingCoach extends GridRaceAssistant {
 		OnExit((*) {
 			if this.TelemetryCollector
 				this.TelemetryCollector.shutdown()
-			
+
 			return false
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
@@ -1966,8 +1966,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 				delta := (braking.Speed * 1000 / 3600)
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownOne . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + delta) . A_Space . countdownTwo . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . countdownOne . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownTwo . "`n")
 				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
 			}
 

@@ -748,14 +748,10 @@ namespace RF2SHMCoach {
 								{
 									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
 								}
 								else
-								{
 									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-								}
 								
 								break;
 							}

@@ -806,8 +806,22 @@ std::string hintFile = "";
 std::string hintSounds[256];
 float hintDistances[256];
 time_t lastHintsUpdate = 0;
+int lastLap = 0;
+int lastHint = -1;
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
+	char* rawValue;
+
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int carLaps = *((int*)rawValue);
+
+	if (lastLap != carLaps) {
+		lastLap = carLaps;
+
+		lastHint = -1;
+	}
+
 	if (time(NULL) > nextUpdate) {
 		char buffer[60];
 
@@ -863,7 +877,9 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					nextUpdate = time(NULL) + 2;
 				}
 			}
-			if (distance < (hintDistances[index] / trackLength)) {
+			else if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
+				lastHint = index;
+
 				char buffer[512] = "";
 
 				strcat_s(buffer, "acousticFeedback:");

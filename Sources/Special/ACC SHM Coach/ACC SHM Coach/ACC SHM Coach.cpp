@@ -609,12 +609,20 @@ string hintFile = "";
 string hintSounds[256];
 float hintDistances[256];
 time_t lastHintsUpdate = 0;
+int lastLap = 0;
+int lastHint = -1;
 
 void checkCoordinates() {
-	if (time(NULL) > nextUpdate) {
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
+	if (lastLap != gf->completedLaps) {
+		lastLap = gf->completedLaps;
+
+		lastHint = -1;
+	}
+
+	if (time(NULL) > nextUpdate) {
 		float velocityX = pf->velocity[0];
 		float velocityY = pf->velocity[2];
 		float velocityZ = pf->velocity[1];
@@ -657,8 +665,10 @@ void checkCoordinates() {
 				}
 			}
 			else {
-				for (int i = 0; i < numCoordinates; i++) {
+				for (int i = lastHint + 1; i < numCoordinates; i++) {
 					if (vectorLength(xCoordinates[i] - coordinateX, abs(yCoordinates[i] - coordinateY)) < hintDistances[i]) {
+						lastHint = i;
+
 						sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
 						nextUpdate = time(NULL) + 2;

@@ -693,8 +693,8 @@ namespace RF2SHMCoach {
 			if (lastLap != playerScoring.mTotalLaps)
 			{
 				lastLap = playerScoring.mTotalLaps;
-				lastHint = -1;
 
+				lastHint = -1;
 			}
 
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
@@ -738,27 +738,25 @@ namespace RF2SHMCoach {
 						}
 					}
 					else {
-						for (int i = 0; i < numCoordinates; i += 1)
+						for (int i = lastHint + 1; i < numCoordinates; i += 1)
 						{
 							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 							{
-								if (i > lastHint) {
-									lastHint = i;
+								lastHint = i;
 
-									if (audioDevice != "")
-									{
-										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+								if (audioDevice != "")
+								{
+									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
-									}
-									else
-									{
-										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-									}
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
 								}
+								else
+								{
+									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
 
+									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+								}
+								
 								break;
 							}
 						}

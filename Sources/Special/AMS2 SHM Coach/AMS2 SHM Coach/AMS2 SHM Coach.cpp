@@ -551,16 +551,24 @@ std::string hintFile = "";
 std::string hintSounds[256];
 float hintDistances[256];
 time_t lastHintsUpdate = 0;
+int lastLap = 0;
+int lastHint = -1;
 
 void checkCoordinates(const SharedMemory* sharedData) {
+	int carID = sharedData->mViewedParticipantIndex;
+
+	if (lastLap != sharedData->mParticipantInfo[carID].mLapsCompleted) {
+		lastLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
+
+		lastHint = -1;
+	}
+
 	if (time(NULL) > nextUpdate) {
 		float velocityX = sharedData->mWorldVelocity[VEC_X];
 		float velocityY = sharedData->mWorldVelocity[VEC_Z];
 		float velocityZ = sharedData->mWorldVelocity[VEC_Y];
 
 		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-			int carID = sharedData->mViewedParticipantIndex;
-
 			float coordinateX = sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X];
 			float coordinateY = - sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z];
 			
@@ -589,8 +597,10 @@ void checkCoordinates(const SharedMemory* sharedData) {
 				}
 			}
 			else {
-				for (int i = 0; i < numCoordinates; i += 1) {
+				for (int i = lastHint + 1; i < numCoordinates; i += 1) {
 					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
+						lastHint = i;
+
 						char buffer[512] = "";
 						
 						strcat_s(buffer, "acousticFeedback:");

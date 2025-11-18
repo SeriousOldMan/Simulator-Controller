@@ -663,8 +663,16 @@ char* hintFile = "";
 char* hintSounds[256][256];
 float hintDistances[256];
 time_t lastHintsUpdate = 0;
+int lastLap = 0;
+int lastHint = -1;
 
 void checkCoordinates(int playerID) {
+	if (lastLap != map_buffer->completed_laps) {
+		lastLap = map_buffer->completed_laps;
+
+		lastHint = -1;
+	}
+
 	if (time(NULL) > nextUpdate) {
 		r3e_float64 velocityX = map_buffer->player.velocity.x;
 		r3e_float64 velocityY = map_buffer->player.velocity.z;
@@ -708,8 +716,10 @@ void checkCoordinates(int playerID) {
 				}
 			}
 			else {
-				for (int i = 0; i < numCoordinates; i += 1) {
+				for (int i = lastHint +1; i < numCoordinates; i += 1) {
 					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
+						lastHint = i;
+						
 						char buffer[512] = "";
 
 						strcat_s(buffer, 512, "acousticFeedback:");

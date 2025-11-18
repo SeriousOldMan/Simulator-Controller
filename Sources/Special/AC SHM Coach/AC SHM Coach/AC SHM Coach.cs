@@ -722,9 +722,18 @@ namespace ACSHMCoach {
 		int numCoordinates = 0;
 		long nextUpdate = 0;
 		string triggerType = "Trigger";
+		int lastLap = 0;
+		int lastHint = -1;
 
 		void checkCoordinates()
 		{
+			if (lastLap != graphics.CompletedLaps)
+			{
+				lastLap = graphics.CompletedLaps;
+
+				lastHint = -1;
+			}
+
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double velocityX = physics.LocalVelocity[0];
@@ -753,10 +762,12 @@ namespace ACSHMCoach {
 							}
 						}
 						else {
-							for (int i = 0; i < numCoordinates; i++)
+							for (int i = lastHint + 1; i < numCoordinates; i++)
 							{
 								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 								{
+									lastHint = i;
+
 									if (audioDevice != "") {
 										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 

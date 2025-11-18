@@ -414,6 +414,8 @@ systemMonitor(command := false, arguments*) {
 	static sessionInfoSize := 11
 	static nextSessionUpdate := A_TickCount
 
+	static raceAssistants := false
+
 	nonZero(value) {
 		return ((value != 0) && (value != "-"))
 	}
@@ -2147,7 +2149,7 @@ systemMonitor(command := false, arguments*) {
 			sessionInfo := newMultiMap()
 			states := []
 
-			for ignore, assistant in kRaceAssistants
+			for ignore, assistant in raceAssistants
 				states.Push(readMultiMap(kTempDirectory . assistant . " Session.state"))
 
 			maxLap := 0
@@ -2220,6 +2222,15 @@ systemMonitor(command := false, arguments*) {
 	}
 	else {
 		result := false
+
+		if !raceAssistants {
+			raceAssistants := ["Driving Coach", "Race Spotter", "Race Strategist", "Race Engineer"]
+
+			do(kRaceAssistants, (a) {
+				if !inList(raceAssisants, a)
+					raceAssistants.InsertAt(1, a)
+			})
+		}
 
 		systemMonitorGui := Window({Descriptor: "System Monitor", Resizeable: true, Closeable: true, Options: "+SysMenu +Caption"})
 

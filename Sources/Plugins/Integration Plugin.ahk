@@ -855,7 +855,18 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		static lastUpdate := A_Now
 
-		for ignore, assistant in kRaceAssistants {
+		static raceAssistants := false
+
+		if !raceAssistants {
+			raceAssistants := ["Driving Coach", "Race Spotter", "Race Strategist", "Race Engineer"]
+
+			do(kRaceAssistants, (a) {
+				if !inList(raceAssisants, a)
+					raceAssistants.InsertAt(1, a)
+			})
+		}
+
+		for ignore, assistant in raceAssistants {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
 			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
@@ -874,7 +885,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			lastUpdate := A_Now
 			sessionInfo := newMultiMap()
 
-			for ignore, assistant in kRaceAssistants
+			for ignore, assistant in raceAssistants
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
 			try {

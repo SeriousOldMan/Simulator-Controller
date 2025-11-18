@@ -19,4 +19,4 @@
 										[Aero.Height.Front.Left, Aero.Height.Front.Right, 
 										 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
 										 Differential.Power, Differential.Coast,
-										 Electronics.TC, Electronics.ABS, Electronics.Engine.Limiter]))
+										 Electronics.Engine.Limiter]))

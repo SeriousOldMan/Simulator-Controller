@@ -927,6 +927,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["azureSubscriptionKeyEdit"].Text := this.Value["azureSubscriptionKey"]
 		this.Control["azureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
 
+		this.Control["googleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
+
 		this.Control["elevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
 
 		this.Control["openAISpeakerServerURLEdit"].Text := this.Value["openAISpeakerServerURL"]

@@ -1229,6 +1229,8 @@ class SoloCenter extends ConfigurationItem {
 
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
+				
+			return false
 		})
 	}
 

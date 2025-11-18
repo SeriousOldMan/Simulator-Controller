@@ -2227,7 +2227,7 @@ systemMonitor(command := false, arguments*) {
 			raceAssistants := ["Driving Coach", "Race Spotter", "Race Strategist", "Race Engineer"]
 
 			do(kRaceAssistants, (a) {
-				if !inList(raceAssisants, a)
+				if !inList(raceAssistants, a)
 					raceAssistants.InsertAt(1, a)
 			})
 		}

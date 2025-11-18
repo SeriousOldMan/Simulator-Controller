@@ -76,7 +76,10 @@ class DrivingCoach extends GridRaceAssistant {
 	iBrakeTriggerPID := false
 	iBrakeTriggerFile := false
 
-	iBrakeHint := false
+	iBrakeCommand := false
+	iReleaseCommand := false
+	iCountdownOne := false
+	iCountdownTwo := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -335,9 +338,16 @@ class DrivingCoach extends GridRaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
 		OnExit(ObjBindMethod(this, "shutdownBrakeTrigger", true))
 
-		Task.startTask(() => this.iBrakeHint := this.VoiceManager.getLocalSpeaker().speakPhrase("Brake", false, false, true
-																									   , {File: true, Rephrase: false})
-					 , 10000, kLowPriority)
+		Task.startTask(() {
+			local speaker := this.VoiceManager.getLocalSpeaker()
+
+			if speaker {
+				this.iBrakeCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Brake", false, false, true, {File: true, Rephrase: false})
+				this.iReleaseCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Release", false, false, true, {File: true, Rephrase: false})
+				this.iCountdownOne := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownOne", false, false, true, {File: true, Rephrase: false})
+				this.iCountdownTwo := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownTwo", false, false, true, {File: true, Rephrase: false})
+			}
+		}, 10000, kLowPriority)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1918,36 +1928,28 @@ class DrivingCoach extends GridRaceAssistant {
 	updateBrakeTrigger(telemetry) {
 		local collector := this.TelemetryCollector
 		local triggerFile := temporaryFileName("Brake", "trigger.tmp")
-		local brakeSound := this.iBrakeHint
+		local countdownOne := this.iCountdownOne
+		local countdownTwo := this.iCountdownTwo
+		local brakeCommand := this.iBrakeCommand
 		local triggers := ""
 		local tries := 3
-		local ignore, braking, accelerating, x, y
+		local ignore, braking, delta
 
 		static distance := false
 
-		if (this.iBrakeTriggerPID && collector) {
+		if (this.iBrakeTriggerPID && collector && brakeCommand) {
 			if !distance
-				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 20))
+				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 30))
 
 			for ignore, braking in telemetry.Braking {
-				/*
-				start := (braking.Start - distance)
-
-				if (start < 0)
-					start := (collector.TrackLength - start)
-
-				if telemetry.findCoordinates(start, &x, &y) {
-					if (triggers != "")
-						triggers .= "`n"
-
-					triggers .= (x . A_Space . y . A_Space . distance . A_Space . brakeSound)
-				}
-				*/
-
 				if (triggers != "")
 					triggers .= "`n"
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeSound)
+				delta := (braking.Speed * 1000 / 3600)
+
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownOne . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + delta) . A_Space . countdownTwo . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
 			}
 
 			FileAppend(triggers, triggerFile)

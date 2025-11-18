@@ -181,6 +181,13 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				this.createRaceAssistantAction(controller, "TrackCoaching", coaching)
 		}
 
+		if (this.Active || (isDebug() && isDevelopment())) {
+			coaching := this.getArgumentValue("brakeCoaching", false)
+
+			if coaching
+				this.createRaceAssistantAction(controller, "BrakeCoaching", coaching)
+		}
+
 		DirCreate(kTempDirectory . "Driving Coach")
 
 		deleteFile(kTempDirectory . "Driving Coach\Coaching.state")
@@ -237,6 +244,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, controller.findFunction(actionFunction)
 																		   , this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
+		else if (action = "BrakeCoaching") {
+			descriptor := ConfigurationItem.descriptor(action, "Toggle")
+
+			this.registerAction(DrivingCoachPlugin.BrakeCoachingToggleAction(this, controller.findFunction(actionFunction)
+																		   , this.getLabel(descriptor, action), this.getIcon(descriptor)))
+		}
 		else
 			logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
@@ -270,6 +283,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if (telemetryCoaching != kUndefined)
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Coach", session . ".OnTrackCoaching", telemetryCoaching)
+
+			telemetryCoaching := getMultiMapValue(this.StartupSettings, "Functions", "Brake Coaching", kUndefined)
+
+			if (telemetryCoaching != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Coach", session . ".BrakeCoaching", telemetryCoaching)
 
 			privateSession := getMultiMapValue(this.StartupSettings, "Functions", "Private Practice", kUndefined)
 
@@ -458,7 +477,7 @@ startTelemetryCoaching(confirm := true, auto := false) {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.startTelemetryCoaching(auto, confirm)
+			plugin.startTelemetryCoaching(confirm, auto)
 	}
 	finally {
 		protectionOff()

@@ -816,12 +816,6 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 	int carLaps = *((int*)rawValue);
 
-	if (lastLap != carLaps) {
-		lastLap = carLaps;
-
-		lastHint = -1;
-	}
-
 	if (time(NULL) > nextUpdate) {
 		char buffer[60];
 
@@ -877,17 +871,30 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					nextUpdate = time(NULL) + 2;
 				}
 			}
-			else if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
-				lastHint = index;
+			else {
+				if (lastLap != carLaps) {
+					lastLap = carLaps;
 
-				char buffer[512] = "";
+					lastHint = -1;
+				}
 
-				strcat_s(buffer, "acousticFeedback:");
-				strcat_s(buffer, hintSounds[index].c_str());
+				if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
+					lastHint = index;
 
-				sendTriggerMessage(buffer);
+					if (audioDevice != "")
+					{
+						char buffer[512] = "";
 
-				nextUpdate = time(NULL) + 2;
+						strcat_s(buffer, "acousticFeedback:");
+						strcat_s(buffer, hintSounds[index].c_str());
+
+						sendTriggerMessage(buffer);
+
+						nextUpdate = time(NULL) + 1;
+					}
+					else
+						PlaySoundA(hintSounds[index].c_str(), NULL, SND_SYNC);
+				}
 			}
 		}
 	}

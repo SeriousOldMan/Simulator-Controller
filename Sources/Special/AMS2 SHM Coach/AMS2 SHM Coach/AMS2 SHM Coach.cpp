@@ -557,12 +557,6 @@ int lastHint = -1;
 void checkCoordinates(const SharedMemory* sharedData) {
 	int carID = sharedData->mViewedParticipantIndex;
 
-	if (lastLap != sharedData->mParticipantInfo[carID].mLapsCompleted) {
-		lastLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
-
-		lastHint = -1;
-	}
-
 	if (time(NULL) > nextUpdate) {
 		float velocityX = sharedData->mWorldVelocity[VEC_X];
 		float velocityY = sharedData->mWorldVelocity[VEC_Z];
@@ -597,18 +591,29 @@ void checkCoordinates(const SharedMemory* sharedData) {
 				}
 			}
 			else {
+				if (lastLap != sharedData->mParticipantInfo[carID].mLapsCompleted) {
+					lastLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
+
+					lastHint = -1;
+				}
+
 				for (int i = lastHint + 1; i < numCoordinates; i += 1) {
 					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
 						lastHint = i;
 
-						char buffer[512] = "";
-						
-						strcat_s(buffer, "acousticFeedback:");
-						strcat_s(buffer, hintSounds[i].c_str());
+						if (audioDevice != "")
+						{
+							char buffer[512] = "";
 
-						sendTriggerMessage(buffer);
+							strcat_s(buffer, "acousticFeedback:");
+							strcat_s(buffer, hintSounds[i].c_str());
 
-						nextUpdate = time(NULL) + 2;
+							sendTriggerMessage(buffer);
+
+							nextUpdate = time(NULL) + 1;
+						}
+						else
+							PlaySoundA(hintSounds[i].c_str(), NULL, SND_SYNC);
 
 						break;
 					}

@@ -727,13 +727,6 @@ namespace ACSHMCoach {
 
 		void checkCoordinates()
 		{
-			if (lastLap != graphics.CompletedLaps)
-			{
-				lastLap = graphics.CompletedLaps;
-
-				lastHint = -1;
-			}
-
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double velocityX = physics.LocalVelocity[0];
@@ -762,7 +755,14 @@ namespace ACSHMCoach {
 							}
 						}
 						else {
-							for (int i = lastHint + 1; i < numCoordinates; i++)
+                            if (lastLap != graphics.CompletedLaps)
+                            {
+                                lastLap = graphics.CompletedLaps;
+
+                                lastHint = -1;
+                            }
+
+                            for (int i = lastHint + 1; i < numCoordinates; i++)
 							{
 								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 								{
@@ -771,13 +771,10 @@ namespace ACSHMCoach {
 									if (audioDevice != "") {
 										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
+										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
 									}
-									else {
+									else
 										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-									}
 
 									break;
 								}

@@ -690,13 +690,6 @@ namespace RF2SHMCoach {
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (lastLap != playerScoring.mTotalLaps)
-			{
-				lastLap = playerScoring.mTotalLaps;
-
-				lastHint = -1;
-			}
-
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
 				double lVelocityX = playerScoring.mLocalVel.x;
@@ -738,7 +731,14 @@ namespace RF2SHMCoach {
 						}
 					}
 					else {
-						for (int i = lastHint + 1; i < numCoordinates; i += 1)
+                        if (lastLap != playerScoring.mTotalLaps)
+                        {
+                            lastLap = playerScoring.mTotalLaps;
+
+                            lastHint = -1;
+                        }
+
+                        for (int i = lastHint + 1; i < numCoordinates; i += 1)
 						{
 							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 							{

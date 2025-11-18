@@ -616,12 +616,6 @@ void checkCoordinates() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if (lastLap != gf->completedLaps) {
-		lastLap = gf->completedLaps;
-
-		lastHint = -1;
-	}
-
 	if (time(NULL) > nextUpdate) {
 		float velocityX = pf->velocity[0];
 		float velocityY = pf->velocity[2];
@@ -665,13 +659,24 @@ void checkCoordinates() {
 				}
 			}
 			else {
+				if (lastLap != gf->completedLaps) {
+					lastLap = gf->completedLaps;
+
+					lastHint = -1;
+				}
+
 				for (int i = lastHint + 1; i < numCoordinates; i++) {
 					if (vectorLength(xCoordinates[i] - coordinateX, abs(yCoordinates[i] - coordinateY)) < hintDistances[i]) {
 						lastHint = i;
 
-						sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+						if (audioDevice != "")
+						{
+							sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
-						nextUpdate = time(NULL) + 2;
+							nextUpdate = time(NULL) + 1;
+						}
+						else
+							PlaySoundA(hintSounds[i].c_str(), NULL, SND_SYNC);
 
 						break;
 					}

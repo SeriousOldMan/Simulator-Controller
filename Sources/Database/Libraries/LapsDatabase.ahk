@@ -653,10 +653,15 @@ computeFilterValues(rows, &lapTimeAverage, &lapTimeStdDev, &consumptionAverage, 
 }
 
 validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
-	if ((row["Lap.Time"] > 0) && (row["Fuel.Consumption"] > 0))
-		return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
-	else
+	try {
+		if ((row["Lap.Time"] > 0) && (row["Fuel.Consumption"] > 0))
+			return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+		else
+			return false
+	}
+	catch Any {
 		return false
+	}
 }
 
 invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, drivers, row) {

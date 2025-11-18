@@ -168,7 +168,11 @@ class IssueCollector {
 		FileCopy(kResourcesDirectory . "Sounds\*", this.iSoundsDirectory)
 		FileCopy(kUserHomeDirectory . "Sounds\*", this.iSoundsDirectory)
 
-		OnExit((*) => deleteDirectory(this.iSoundsDirectory))
+		OnExit((*) {
+			deleteDirectory(this.iSoundsDirectory)
+			
+			return false
+		})
 	}
 
 	__Delete() {

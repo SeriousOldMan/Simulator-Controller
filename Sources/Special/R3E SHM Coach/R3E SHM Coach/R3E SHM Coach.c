@@ -831,6 +831,8 @@ void loadTrackHints()
 						break;
 				}
 
+				lastHint = numCoordinates;
+
 				fclose(file);
 			}
 		}

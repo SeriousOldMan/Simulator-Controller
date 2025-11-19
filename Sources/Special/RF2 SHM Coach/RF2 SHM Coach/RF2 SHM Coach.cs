@@ -773,9 +773,13 @@ namespace RF2SHMCoach {
                             lastHint = -1;
                         }
 
+						int bestHint = -1;
+
                         for (int i = lastHint + 1; i < numCoordinates; i += 1)
 						{
 							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+								bestHint = i;
+							else if (bestHint > -1)
 							{
 								lastHint = i;
 
@@ -790,10 +794,10 @@ namespace RF2SHMCoach {
 								}
 								else
 									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-								
+
 								break;
 							}
-						}
+                        }
 					}
 				}
 			}
@@ -824,6 +828,8 @@ namespace RF2SHMCoach {
                         if (++numCoordinates > 255)
 							break;
                     }
+
+					lastHint = -1;
                 }
 			} 
 		}

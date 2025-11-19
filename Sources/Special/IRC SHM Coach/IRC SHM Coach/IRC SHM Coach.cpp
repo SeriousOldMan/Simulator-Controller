@@ -972,6 +972,8 @@ void loadTrackHints()
 				if (++numCoordinates > 255)
 					break;
 			}
+
+			lastHint = numCoordinates;
 		}
 	}
 }

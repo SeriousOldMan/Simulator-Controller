@@ -781,19 +781,19 @@ namespace RF2SHMCoach {
 								bestHint = i;
 							else if (bestHint > -1)
 							{
-								lastHint = i;
+								lastHint = bestHint;
 
 								if (audioDevice != "")
 								{
 									if (player != "")
-										playSound(hintSounds[i]);
+										playSound(hintSounds[bestHint]);
 									else
-										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+										SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 
 									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
 								}
 								else
-									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
+									new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
 
 								break;
 							}

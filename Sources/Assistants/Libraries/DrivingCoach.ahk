@@ -1884,6 +1884,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local player := requireSoundPlayer("DCTriggerPlayer")
+		local options := ""
 		local sessionDB, code, data, options, telemetry, reference
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
@@ -1947,6 +1948,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local countdownOne := this.iCountdownOne
 		local countdownTwo := this.iCountdownTwo
 		local brakeCommand := this.iBrakeCommand
+		local releaseCommand := this.iReleaseCommand
 		local triggers := ""
 		local tries := 3
 		local ignore, braking, brake, maxBrake, delta
@@ -1963,15 +1965,15 @@ class DrivingCoach extends GridRaceAssistant {
 
 				delta := (braking.Speed * 1000 / 3600)
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownOne . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (1 * delta)) . A_Space . countdownTwo . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . countdownOne . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownTwo . "`n")
 				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
 
 				maxBrake := 0
 
 				for ignore, brake in braking.Curve
 					if (brake.Brake < (maxBrake * 0.9)) {
-						triggers .= ("`n" . brake.X . A_Space . braeke.Y . A_Space . distance . A_Space . releaseCommand)
+						triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . distance . A_Space . releaseCommand)
 
 						break
 					}

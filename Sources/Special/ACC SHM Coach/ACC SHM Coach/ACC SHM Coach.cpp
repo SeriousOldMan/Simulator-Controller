@@ -156,6 +156,32 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+void playSound(string wavFile) {
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcessA(
+		NULL,               // Application name
+		(char*)wavFile.c_str(),         // Command line
+		NULL,               // Process handle not inheritable
+		NULL,               // Thread handle not inheritable
+		FALSE,              // Set handle inheritance to FALSE
+		0,                  // No creation flags
+		NULL,               // Use parent's environment block
+		NULL,               // Use parent's starting directory 
+		&si,                // Pointer to STARTUPINFO structure
+		&pi)                // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		// Wait until process exits
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -235,6 +261,8 @@ int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 long lastSound = 0;
 
+string player = "";
+
 bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
 	string wavFile = "";
 
@@ -252,8 +280,12 @@ bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
 	if (wavFile != "") {
-		if (audioDevice != "")
-			sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		if (audioDevice != "") {
+			if (player != "")
+				playSound(wavFile);
+			else
+				sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		}
 		else
 			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
@@ -604,6 +636,7 @@ time_t nextUpdate = 0;
 const char* triggerType = "Trigger";
 
 string audioDevice = "";
+float volume = 0;
 string hintFile = "";
 
 string hintSounds[256];
@@ -671,7 +704,10 @@ void checkCoordinates() {
 
 						if (audioDevice != "")
 						{
-							sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+							if (player != "")
+								playSound(hintSounds[i]);
+							else
+								sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
 							nextUpdate = time(NULL) + 1;
 						}
@@ -759,6 +795,12 @@ int main(int argc, char* argv[])
 
 			if (argc > 3)
 				audioDevice = argv[3];
+
+			if (argc > 4)
+				audioDevice = atof(argv[4]);
+
+			if (argc > 5)
+				player = argv[5];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

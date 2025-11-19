@@ -1883,7 +1883,8 @@ class DrivingCoach extends GridRaceAssistant {
 	startupBrakeTrigger() {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sessionDB, code, data, audioDevice, options, telemetry, reference
+		local player := requireSoundPlayer("DCTriggerPlayer")
+		local sessionDB, code, data, options, telemetry, reference
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -1901,12 +1902,8 @@ class DrivingCoach extends GridRaceAssistant {
 					if !FileExist(exePath)
 						throw "File not found..."
 
-					if false {
-						audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
-						options := (audioDevice ? (" `"" . audioDevice . "`"") : "")
-					}
-					else
-						options := ""
+					if this.AudioSettings
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`"") : ""))
 
 					if data
 						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)

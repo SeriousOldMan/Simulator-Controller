@@ -239,7 +239,37 @@ namespace ACSHMCoach {
 		double vectorLength(double x, double y)
 		{
 			return Math.Sqrt((x * x) + (y * y));
-		}
+        }
+
+        void playSound(string wavFile, bool synch = true)
+        {
+            try
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = player,
+                    Arguments = $"\"{wavFile}\" -T waveaudio \"{audioDevice}\" vol {volume}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+
+                    process.Start();
+
+                    if (synch)
+                        process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
 
         class CornerDynamics
 		{
@@ -340,7 +370,12 @@ namespace ACSHMCoach {
 
 			if (wavFile != "")
 				if (audioDevice != "")
-					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				{
+					if (player != "")
+						playSound(wavFile, false);
+					else
+						SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				}
 				else
 					new System.Media.SoundPlayer(wavFile).Play();
 
@@ -769,7 +804,10 @@ namespace ACSHMCoach {
 									lastHint = i;
 
 									if (audioDevice != "") {
-										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+										if (player != "")
+											playSound(hintSounds[i]);
+										else
+											SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
 
 										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
 									}
@@ -829,6 +867,8 @@ namespace ACSHMCoach {
 
         string soundsDirectory = "";
         string audioDevice = string.Empty;
+		string player = string.Empty;
+		float volume = 0;
         string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
@@ -839,6 +879,12 @@ namespace ACSHMCoach {
 
             if (args.Length > 2)
                 audioDevice = args[2];
+
+            if (args.Length > 3)
+                volume = float.Parse(args[3]);
+
+            if (args.Length > 4)
+                player = args[4];
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)

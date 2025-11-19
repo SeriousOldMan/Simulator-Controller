@@ -166,6 +166,34 @@ inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
 	return sqrt((x * x) + (y * y));
 }
 
+
+
+void playSound(char* wavFile) {
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcessA(
+		NULL,               // Application name
+		wavFile,			// Command line
+		NULL,               // Process handle not inheritable
+		NULL,               // Thread handle not inheritable
+		FALSE,              // Set handle inheritance to FALSE
+		0,                  // No creation flags
+		NULL,               // Use parent's environment block
+		NULL,               // Use parent's starting directory 
+		&si,                // Pointer to STARTUPINFO structure
+		&pi)                // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		// Wait until process exits
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+}
+
 #define MAXVALUES 6
 #define PI 3.14159265
 
@@ -286,6 +314,8 @@ int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
 long lastSound = 0;
 
+char* player = "";
+
 BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
 	BOOL sound = TRUE;
 	char wavFile[255];
@@ -310,12 +340,16 @@ BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
 
 	if (sound) {
 		if (audioDevice) {
-			char buffer[512];
+			if (strcmp(player, "") == 0) {
+				char buffer[512];
 
-			strcpy_s(buffer, 512, "acousticFeedback:");
-			strcpy_s(buffer + strlen("acousticFeedback:"), 512 - strlen("acousticFeedback:"), wavFile);
+				strcpy_s(buffer, 512, "acousticFeedback:");
+				strcpy_s(buffer + strlen("acousticFeedback:"), 512 - strlen("acousticFeedback:"), wavFile);
 
-			sendAnalyzerMessage(buffer);
+				sendAnalyzerMessage(buffer);
+			}
+			else
+				playSound(wavFile);
 		}
 		else
 			PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
@@ -343,7 +377,7 @@ BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) 
 	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
 	r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
-		(float)map_buffer->player.local_angular_velocity.y);
+											  (float)map_buffer->player.local_angular_velocity.y);
 	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
 	r3e_float64 wheelBaseMeter = (float)wheelbase / 100;
@@ -351,7 +385,7 @@ BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) 
 	r3e_float64 perimeter = radius * PI * 2;
 	r3e_float64 perimeterSpeed = lastSpeed / 3.6;
 	r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
-		(float)(perimeterSpeed / perimeter * 2 * PI));
+												   (float)(perimeterSpeed / perimeter * 2 * PI));
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		// Get the average recent GLong
@@ -658,6 +692,7 @@ time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
 char* audioDevice = "";
+float volume = 0;
 char* hintFile = "";
 
 char* hintSounds[256][256];
@@ -722,12 +757,16 @@ void checkCoordinates(int playerID) {
 
 						if (strcmp(audioDevice, "") == 0)
 						{
-							char buffer[512] = "";
+							if (strcmp(player, "") == 0) {
+								char buffer[512] = "";
 
-							strcat_s(buffer, 512, "acousticFeedback:");
-							strcat_s(buffer, 512, (char *)hintSounds[index]);
+								strcat_s(buffer, 512, "acousticFeedback:");
+								strcat_s(buffer, 512, (char*)hintSounds[index]);
 
-							sendTriggerMessage(buffer);
+								sendTriggerMessage(buffer);
+							}
+							else
+								playSound(hintSounds[index]);
 
 							nextUpdate = time(NULL) + 1;
 						}
@@ -826,6 +865,12 @@ int main(int argc, char* argv[])
 
 			if (argc > 3)
 				audioDevice = argv[3];
+
+			if (argc > 4)
+				volume = (float)atof(argv[4]);
+
+			if (argc > 5)
+				player = argv[5];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

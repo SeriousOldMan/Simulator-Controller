@@ -1883,7 +1883,8 @@ class DrivingCoach extends GridRaceAssistant {
 	startupBrakeTrigger() {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sessionDB, code, data, audioDevice, options, telemetry, reference
+		local player := requireSoundPlayer("DCTriggerPlayer")
+		local sessionDB, code, data, options, telemetry, reference
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -1901,12 +1902,8 @@ class DrivingCoach extends GridRaceAssistant {
 					if !FileExist(exePath)
 						throw "File not found..."
 
-					if false {
-						audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
-						options := (audioDevice ? (" `"" . audioDevice . "`"") : "")
-					}
-					else
-						options := ""
+					if this.AudioSettings
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`"") : ""))
 
 					if data
 						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
@@ -1952,7 +1949,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local brakeCommand := this.iBrakeCommand
 		local triggers := ""
 		local tries := 3
-		local ignore, braking, delta
+		local ignore, braking, brake, maxBrake, delta
 
 		static distance := false
 
@@ -1966,9 +1963,20 @@ class DrivingCoach extends GridRaceAssistant {
 
 				delta := (braking.Speed * 1000 / 3600)
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . countdownOne . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownTwo . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownOne . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (1 * delta)) . A_Space . countdownTwo . "`n")
 				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
+
+				maxBrake := 0
+
+				for ignore, brake in braking.Curve
+					if (brake.Brake < (maxBrake * 0.9)) {
+						triggers .= ("`n" . brake.X . A_Space . braeke.Y . A_Space . distance . A_Space . releaseCommand)
+
+						break
+					}
+					else
+						maxBrake := Max(maxBrake, brake.Brake)
 			}
 
 			FileAppend(triggers, triggerFile)

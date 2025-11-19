@@ -201,7 +201,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if (active != this.TelemetryCoachingActive) {
 				this.iTelemetryCoachingActive := active
 
-				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), active)
+				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), active)
+				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), active)
 
 				this.updateActions(kSessionUnknown)
 			}
@@ -220,8 +221,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}, 5000, kLowPriority).start()
 
 		Task.startTask(() {
-			if this.Controller.Started
-				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), false)
+			if this.Controller.Started {
+				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), false)
+				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), false)
+			}
 			else
 				return Task.CurrentTask
 		}, 500, kHighPriority)
@@ -413,14 +416,38 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		this.startSession(settings, data)
 	}
 
-	updateTelemetryCoachingTrayLabel(label, enabled) {
+	updateTrackCoachingTrayLabel(label, enabled) {
 		static hasTrayMenu := false
 
 		toggleTelemetryCoaching(*) {
 			if this.TelemetryCoachingActive
 				this.finishTelemetryCoaching()
 			else
-				this.startTelemetryCoaching(true, true)
+				this.startTelemetryCoaching(true, "Track")
+		}
+
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
+
+		if !hasTrayMenu {
+			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			A_TrayMenu.Check(label)
+		else
+			A_TrayMenu.Uncheck(label)
+	}
+
+	updateBrakeCoachingTrayLabel(label, enabled) {
+		static hasTrayMenu := false
+
+		toggleTelemetryCoaching(*) {
+			if this.BrakeCoachingActive
+				this.finishTelemetryCoaching()
+			else
+				this.startTelemetryCoaching(true, "Brake")
 		}
 
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")

@@ -272,6 +272,38 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+std::string player = "";
+std::string audioDevice = "";
+float volume = 0;
+STARTUPINFOA si = { sizeof(si) };
+
+void playSound(std::string wavFile) {
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcessA(
+		NULL,               // Application name
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+								((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
+								"vol " + std::to_string(volume)).c_str(),         // Command line
+		NULL,               // Process handle not inheritable
+		NULL,               // Thread handle not inheritable
+		FALSE,              // Set handle inheritance to FALSE
+		0,                  // No creation flags
+		NULL,               // Use parent's environment block
+		NULL,               // Use parent's starting directory 
+		&si,                // Pointer to STARTUPINFO structure
+		&pi)                // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		// Wait until process exits
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -366,8 +398,12 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
 	if (wavFile != "") {
-		if (audioDevice != "")
-			sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		if (audioDevice != "") {
+			if (player != "")
+				playSound(wavFile);
+			else
+				sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		}
 		else
 			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
@@ -800,7 +836,6 @@ int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
-std::string audioDevice = "";
 std::string hintFile = "";
 
 std::string hintSounds[256];
@@ -883,12 +918,16 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 					if (audioDevice != "")
 					{
-						char buffer[512] = "";
+						if (player != "")
+							playSound(hintSounds[index]);
+						else {
+							char buffer[512] = "";
 
-						strcat_s(buffer, "acousticFeedback:");
-						strcat_s(buffer, hintSounds[index].c_str());
+							strcat_s(buffer, "acousticFeedback:");
+							strcat_s(buffer, hintSounds[index].c_str());
 
-						sendTriggerMessage(buffer);
+							sendTriggerMessage(buffer);
+						}
 
 						nextUpdate = time(NULL) + 1;
 					}
@@ -999,6 +1038,12 @@ int main(int argc, char* argv[])
 
 				if (argc > 4)
 					audioDevice = argv[4];
+
+				if (argc > 5)
+					audioDevice = atof(argv[5]);
+
+				if (argc > 6)
+					audioDevice = argv[6];
 			}
 
 			handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

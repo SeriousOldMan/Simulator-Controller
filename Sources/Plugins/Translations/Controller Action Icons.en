@@ -658,6 +658,7 @@ PitstopPrepare.Activate=
 RaceAssistant.Toggle=
 TelemetryCoaching.Toggle=
 TrackCoaching.Toggle=
+BrakeCoaching.Toggle=
 Call.Activate=
 Interrupt.Activate=
 SetupWorkbenchOpen.Activate=

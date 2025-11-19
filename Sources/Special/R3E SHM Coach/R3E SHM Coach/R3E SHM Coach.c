@@ -167,14 +167,24 @@ inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
 }
 
 
+char* player = "";
+char* audioDevice = "";
+float volume = 0;
+STARTUPINFOA si = { sizeof(si) };
 
 void playSound(char* wavFile) {
-	STARTUPINFOA si;
 	PROCESS_INFORMATION pi;
+
+	char buffer[512];
+	
+	if (strcmp(audioDevice, "") == 0)
+		sprintf_s(buffer, 256, "\"%s\" \"%s\" -T waveaudio vol %f", player, wavFile, volume);
+	else
+		sprintf_s(buffer, 256, "\"%s\" \"%s\" -T waveaudio \"%s\" vol %f", player, wavFile, audioDevice, volume);
 
 	if (CreateProcessA(
 		NULL,               // Application name
-		wavFile,			// Command line
+		buffer,				// Command line
 		NULL,               // Process handle not inheritable
 		NULL,               // Thread handle not inheritable
 		FALSE,              // Set handle inheritance to FALSE
@@ -314,9 +324,7 @@ int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
 long lastSound = 0;
 
-char* player = "";
-
-BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
+BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 	BOOL sound = TRUE;
 	char wavFile[255];
 
@@ -339,7 +347,7 @@ BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
 		sound = FALSE;
 
 	if (sound) {
-		if (audioDevice) {
+		if (strcmp(audioDevice, "") != 0) {
 			if (strcmp(player, "") == 0) {
 				char buffer[512];
 
@@ -360,7 +368,7 @@ BOOL triggerUSOSBeep(char* soundsDirectory, char* audioDevice, double usos) {
 		return FALSE;
 }
 
-BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) {
+BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
 	int playerIdx = getPlayerIndex();
 
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
@@ -433,7 +441,7 @@ BOOL collectTelemetry(char* soundsDirectory, char* audioDevice, BOOL calibrate) 
 			cd.usos = slip * 57.2989 * 1;
 
 			if ((strlen(soundsDirectory) > 0) && (long)GetTickCount() > (lastSound + 300))
-				if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.usos))
+				if (triggerUSOSBeep(soundsDirectory, cd.usos))
 					lastSound = GetTickCount();
 
 			if (FALSE) {
@@ -691,11 +699,9 @@ int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
-char* audioDevice = "";
-float volume = 0;
 char* hintFile = "";
 
-char* hintSounds[256][256];
+char hintSounds[256][256];
 float hintDistances[256];
 time_t lastHintsUpdate = 0;
 int lastLap = 0;
@@ -759,9 +765,9 @@ void checkCoordinates(int playerID) {
 						{
 							if (strcmp(player, "") == 0) {
 								char buffer[512] = "";
-
+								
 								strcat_s(buffer, 512, "acousticFeedback:");
-								strcat_s(buffer, 512, (char*)hintSounds[index]);
+								strcat_s(buffer, 512, hintSounds[index]);
 
 								sendTriggerMessage(buffer);
 							}
@@ -771,7 +777,7 @@ void checkCoordinates(int playerID) {
 							nextUpdate = time(NULL) + 1;
 						}
 						else
-							PlaySoundA((char *)hintSounds[index], NULL, SND_SYNC);
+							PlaySoundA(hintSounds[index], NULL, SND_SYNC);
 
 						break;
 					}
@@ -921,7 +927,7 @@ int main(int argc, char* argv[])
 				continue;
 
 			if (handlingAnalyzer) {
-				if (collectTelemetry(soundsDirectory, audioDevice, handlingCalibrator)) {
+				if (collectTelemetry(soundsDirectory, handlingCalibrator)) {
 					if (remainder(counter, 20) == 0)
 						writeTelemetry(handlingCalibrator);
 

@@ -272,13 +272,19 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+std::string player = "";
+std::string audioDevice = "";
+float volume = 0;
+STARTUPINFOA si = { sizeof(si) };
+
 void playSound(std::string wavFile) {
-	STARTUPINFOA si;
 	PROCESS_INFORMATION pi;
 
 	if (CreateProcessA(
 		NULL,               // Application name
-		(char*)wavFile.c_str(),         // Command line
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+								((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
+								"vol " + std::to_string(volume)).c_str(),         // Command line
 		NULL,               // Process handle not inheritable
 		NULL,               // Thread handle not inheritable
 		FALSE,              // Set handle inheritance to FALSE
@@ -374,8 +380,6 @@ int trackWidth = 150;
 int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 long lastSound = 0;
-
-std::string player = "";
 
 bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float usos) {
 	std::string wavFile = "";
@@ -832,8 +836,6 @@ int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
-std::string audioDevice = "";
-float volume = 0;
 std::string hintFile = "";
 
 std::string hintSounds[256];

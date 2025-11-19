@@ -162,7 +162,7 @@ namespace RF2SHMCoach {
 			return Math.Sqrt((x * x) + (y * y));
 		}
 
-		void playSound(string wavFile, bool synch = true) {
+		void playSound(string wavFile, bool wait = true) {
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -181,7 +181,7 @@ namespace RF2SHMCoach {
 
                     process.Start();
 
-					if (synch)
+					if (wait)
 						process.WaitForExit();
                 }
             }
@@ -725,9 +725,9 @@ namespace RF2SHMCoach {
 
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
-			{
-				double lVelocityX = playerScoring.mLocalVel.x;
+            if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
+            {
+                double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
 				double lVelocityZ = playerScoring.mLocalVel.z;
 
@@ -786,11 +786,9 @@ namespace RF2SHMCoach {
 								if (audioDevice != "")
 								{
 									if (player != "")
-										playSound(hintSounds[bestHint]);
+										playSound(hintSounds[bestHint], false);
 									else
 										SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
-
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
 								}
 								else
 									new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
@@ -818,12 +816,12 @@ namespace RF2SHMCoach {
 
                     foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-						var parts = line.Split(new char[] { ' ' }, 4);
+						var parts = line.Split(new char[] { ' ' }, 5);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintSounds[numCoordinates] = parts[3];
+                        hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
 							break;

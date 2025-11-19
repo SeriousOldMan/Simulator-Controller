@@ -241,7 +241,7 @@ namespace ACSHMCoach {
 			return Math.Sqrt((x * x) + (y * y));
         }
 
-        void playSound(string wavFile, bool synch = true)
+        void playSound(string wavFile, bool wait = true)
         {
             try
             {
@@ -261,7 +261,7 @@ namespace ACSHMCoach {
 
                     process.Start();
 
-                    if (synch)
+                    if (wait)
                         process.WaitForExit();
                 }
             }
@@ -797,23 +797,26 @@ namespace ACSHMCoach {
                                 lastHint = -1;
                             }
 
+							int bestHint = -1;
+
                             for (int i = lastHint + 1; i < numCoordinates; i++)
 							{
 								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+									bestHint = i;
+								else if (bestHint > -1)
 								{
-									lastHint = i;
+									lastHint = bestHint;
 
-									if (audioDevice != "") {
+									if (audioDevice != "")
+									{
 										if (player != "")
-											playSound(hintSounds[i]);
+											playSound(hintSounds[bestHint], false);
 										else
-											SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
+											SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 									}
 									else
-										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-
+										new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
+										
 									break;
 								}
 							}
@@ -851,18 +854,18 @@ namespace ACSHMCoach {
 
                     foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-                        var parts = line.Split(new char[] { ' ' }, 4);
+                        var parts = line.Split(new char[] { ' ' }, 5);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintSounds[numCoordinates] = parts[3];
+                        hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
                             break;
                     }
 
-					lastHint = numCoordinates;
+					lastHint = -1;
                 }
             }
         }

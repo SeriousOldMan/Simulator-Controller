@@ -105,7 +105,7 @@ std::string audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
 
-void playSound(std::string wavFile) {
+void playSound(std::string wavFile, bool wait = true) {
 	PROCESS_INFORMATION pi;
 
 	if (CreateProcessA(
@@ -123,8 +123,9 @@ void playSound(std::string wavFile) {
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		// Wait until process exits
-		WaitForSingleObject(pi.hProcess, INFINITE);
+		if (wait)
+			// Wait until process exits
+			WaitForSingleObject(pi.hProcess, INFINITE);
 
 		// Close process and thread handles
 		CloseHandle(pi.hProcess);
@@ -226,7 +227,7 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 	if (wavFile != "") {
 		if (audioDevice != "") {
 			if (player != "")
-				playSound(wavFile);
+				playSound(wavFile, false);
 			else
 				sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
 		}
@@ -632,27 +633,31 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					lastHint = -1;
 				}
 
+				int bestHint = -1;
+
 				for (int i = lastHint + 1; i < numCoordinates; i += 1) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
-						lastHint = i;
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+						bestHint = i;
+					else if (bestHint > -1) {
+						lastHint = bestHint;
 
 						if (audioDevice != "")
 						{
 							if (player != "")
-								playSound(hintSounds[i]);
+								playSound(hintSounds[bestHint], false);
 							else {
 								char buffer[512] = "";
 
 								strcat_s(buffer, "acousticFeedback:");
-								strcat_s(buffer, hintSounds[i].c_str());
+								strcat_s(buffer, hintSounds[bestHint].c_str());
 
 								sendTriggerMessage(buffer);
 							}
-
-							nextUpdate = time(NULL) + 1;
 						}
-						else
-							PlaySoundA(hintSounds[i].c_str(), NULL, SND_SYNC);
+						else {
+							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+						}
 
 						break;
 					}
@@ -685,18 +690,18 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 4);
+				auto parts = splitString(line, " ", 5);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
 				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[3];
+				hintSounds[numCoordinates] = parts[4];
 
 				if (++numCoordinates > 255)
 					break;
 			}
 
-			lastHint = numCoordinates;
+			lastHint = -1;
 		}
 	}
 }

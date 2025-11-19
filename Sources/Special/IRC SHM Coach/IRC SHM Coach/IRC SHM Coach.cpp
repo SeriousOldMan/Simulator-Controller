@@ -277,7 +277,7 @@ std::string audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
 
-void playSound(std::string wavFile) {
+void playSound(std::string wavFile, bool wait = true) {
 	PROCESS_INFORMATION pi;
 
 	if (CreateProcessA(
@@ -295,8 +295,9 @@ void playSound(std::string wavFile) {
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		// Wait until process exits
-		WaitForSingleObject(pi.hProcess, INFINITE);
+		if (wait)
+			// Wait until process exits
+			WaitForSingleObject(pi.hProcess, INFINITE);
 
 		// Close process and thread handles
 		CloseHandle(pi.hProcess);
@@ -400,7 +401,7 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 	if (wavFile != "") {
 		if (audioDevice != "") {
 			if (player != "")
-				playSound(wavFile);
+				playSound(wavFile, false);
 			else
 				sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
 		}
@@ -919,7 +920,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					if (audioDevice != "")
 					{
 						if (player != "")
-							playSound(hintSounds[index]);
+							playSound(hintSounds[index], false);
 						else {
 							char buffer[512] = "";
 
@@ -928,11 +929,11 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 							sendTriggerMessage(buffer);
 						}
-
-						nextUpdate = time(NULL) + 1;
 					}
-					else
-						PlaySoundA(hintSounds[index].c_str(), NULL, SND_SYNC);
+					else {
+						PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+						PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+					}
 				}
 			}
 		}
@@ -962,18 +963,18 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 4);
+				auto parts = splitString(line, " ", 5);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
 				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[3];
+				hintSounds[numCoordinates] = parts[4];
 
 				if (++numCoordinates > 255)
 					break;
 			}
 
-			lastHint = numCoordinates;
+			lastHint = -1;
 		}
 	}
 }

@@ -172,7 +172,7 @@ char* audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
 
-void playSound(char* wavFile) {
+void playSound(char* wavFile, BOOL wait) {
 	PROCESS_INFORMATION pi;
 
 	char buffer[512];
@@ -195,8 +195,9 @@ void playSound(char* wavFile) {
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		// Wait until process exits
-		WaitForSingleObject(pi.hProcess, INFINITE);
+		if (wait)
+			// Wait until process exits
+			WaitForSingleObject(pi.hProcess, INFINITE);
 
 		// Close process and thread handles
 		CloseHandle(pi.hProcess);
@@ -357,7 +358,7 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 				sendAnalyzerMessage(buffer);
 			}
 			else
-				playSound(wavFile);
+				playSound(wavFile, FALSE);
 		}
 		else
 			PlaySoundA(wavFile, NULL, SND_FILENAME | SND_ASYNC);
@@ -757,9 +758,13 @@ void checkCoordinates(int playerID) {
 					lastHint = -1;
 				}
 
+				int bestHint = -1;
+
 				for (int i = lastHint +1; i < numCoordinates; i += 1) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
-						lastHint = i;
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+						bestHint = i;
+					else if (bestHint > -1) {
+						lastHint = bestHint;
 
 						if (strcmp(audioDevice, "") == 0)
 						{
@@ -767,17 +772,19 @@ void checkCoordinates(int playerID) {
 								char buffer[512] = "";
 								
 								strcat_s(buffer, 512, "acousticFeedback:");
-								strcat_s(buffer, 512, hintSounds[index]);
+								strcat_s(buffer, 512, hintSounds[bestHint]);
 
 								sendTriggerMessage(buffer);
 							}
 							else
-								playSound(hintSounds[index]);
+								playSound(hintSounds[bestHint], FALSE);
 
 							nextUpdate = time(NULL) + 1;
 						}
-						else
-							PlaySoundA(hintSounds[index], NULL, SND_SYNC);
+						else {
+							PlaySoundA(NULL, NULL, SND_ASYNC);
+							PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
+						}
 
 						break;
 					}
@@ -811,7 +818,7 @@ void loadTrackHints()
 			char distancePart[255];
 			char hintPart[255];
 
-			char* parts[4] = { xPart, yPart, distancePart, hintPart };
+			char* parts[5] = { xPart, yPart, distancePart, hintPart };
 
 			FILE* file = fopen(hintFile, "r");
 
@@ -819,19 +826,19 @@ void loadTrackHints()
 
 			if (file != NULL) {
 				while (fgets(line, sizeof(line), file)) {
-					splitString(line, " ", 4, parts);
+					splitString(line, " ", 5, parts);
 
 					xCoordinates[numCoordinates] = (float)atof(parts[0]);
 					yCoordinates[numCoordinates] = (float)atof(parts[1]);
 					hintDistances[numCoordinates] = (float)atof(parts[2]);
 					
-					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[3]);
+					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[4]);
 
 					if (++numCoordinates > 255)
 						break;
 				}
 
-				lastHint = numCoordinates;
+				lastHint = -1;
 
 				fclose(file);
 			}

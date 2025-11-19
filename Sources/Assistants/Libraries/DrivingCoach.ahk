@@ -1965,16 +1965,16 @@ class DrivingCoach extends GridRaceAssistant {
 
 				delta := (braking.Speed * 1000 / 3600)
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . countdownOne . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . countdownTwo . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . 1 . A_Space . countdownOne . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . 2 . A_Space . countdownTwo . "`n")
+				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . 3 . A_Space . brakeCommand)
 
 				maxBrake := 0
 
 				for ignore, brake in braking.Curve
 					if (brake.Brake < (maxBrake * 0.9)) {
 						if ((brake.Distance - braking.Start) > distance)
-							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . distance . A_Space . releaseCommand)
+							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . distance . A_Space . 4 . A_Space . releaseCommand)
 
 						break
 					}

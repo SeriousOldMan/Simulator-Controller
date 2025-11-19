@@ -3238,7 +3238,7 @@ class RaceAssistant extends ConfigurationItem {
 			if startTime {
 				laps := this.KnowledgeBase.getValue("Lap", 0)
 
-				if (laps >= 20) {
+				if (laps >= 10) {
 					info := {Simulator: SessionDatabase.getSimulatorName(simulator)
 						   , Car: SessionDatabase.getCarName(simulator, car)
 						   , Track: SessionDatabase.getTrackName(simulator, track)

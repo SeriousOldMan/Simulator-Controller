@@ -849,7 +849,7 @@ namespace ACSHMCoach {
                     numCoordinates = 0;
 					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
 
-                    foreach (var line in System.IO.File.ReadLines(hintFile))
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
                         var parts = line.Split(new char[] { ' ' }, 4);
 

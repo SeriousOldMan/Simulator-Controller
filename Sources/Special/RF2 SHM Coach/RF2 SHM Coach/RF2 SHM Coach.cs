@@ -812,6 +812,9 @@ namespace RF2SHMCoach {
 							}
 							else
 								new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
+
+							if (lastPhase >= Brake)
+								lastPhase = Start;
 						}
 					}
 				}

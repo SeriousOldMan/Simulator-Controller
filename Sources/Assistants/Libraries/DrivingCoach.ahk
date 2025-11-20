@@ -2012,7 +2012,7 @@ class DrivingCoach extends GridRaceAssistant {
 				metersPerSec := (braking.Speed * 1000 / 3600)
 				startDistance := (braking.Start - (6 * metersPerSec))
 
-				if ((startDistance > endDistance) && (Random(1, 10) <= 8)){
+				if (Random(1, 10) <= 8) {
 					if (triggers != "")
 						triggers .= "`n"
 

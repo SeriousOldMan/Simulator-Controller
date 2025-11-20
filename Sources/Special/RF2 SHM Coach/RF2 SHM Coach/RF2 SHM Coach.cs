@@ -868,10 +868,8 @@ namespace RF2SHMCoach {
 							break;
                     }
 
-					/*
 					lastHint = -1;
-					lastPhase = "Release";
-					*/
+					lastPhase = Start;
                 }
 			} 
 		}

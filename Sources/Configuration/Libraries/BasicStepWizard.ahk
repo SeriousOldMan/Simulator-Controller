@@ -1495,7 +1495,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 			switch synthesizer, false {
 				case "Azure":
-					this.Value["azureSubscriptionKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+					this.Value["azureSubscriptionKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
 					this.Value["azureAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
 				case "Google":
 					this.Value["googleAPIKeyFile"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]

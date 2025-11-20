@@ -1202,6 +1202,9 @@ int main(int argc, char* argv[]) {
 				// More writes had happened during the read. Should be rare, but can happen.
 				continue;
 			}
+
+			if (telemetryLap == -1)
+				telemetryLap = (localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted + 1);
 			
 			if (mapTrack) {
 				if (!writeCoordinates(sharedData))

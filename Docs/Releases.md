@@ -6,6 +6,7 @@
 
 #### Fixes
 
+  - Fixed a critical bug introduced with the last release, which prevented proper configuration of Azure speech synthesis.
   - Fixed a critical bug **not fixed** with the last release 6.6.4 (actually, fix code was removed accidently in the final merge process), which prevented the *Reasoning* booster to work in non-English configurations.
   - Reduced probability of premature session end in timed races for *Assetto Corsa*.
   - Fixed a couple translations in the "Setup Workbench".
@@ -38,11 +39,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug, that caused the Google API for voice configuration to be lost when a configuration created by "Simulator Setup" or "Simulator Configuration" was opened next time.
   - *iRacing* now reports the distance into the track as **-1** for cars, that are standing at the pit or have left the session. This caused some miscalculations, that have been fixed.
   - Fixed the display of lap times in race reports for sessions with just one lap. A rare case, of course, but can happen in hill climbs or Rallye stages, for example.
+  - Fixed a bug that caused incomplete telemetry data when Simulator Controller was started while the session was already ongoing.
 
 #### Changes
 
   - Rearranged the order of data acquisition from the different Race Assistants for display in "System Monitor" and/or the Integration plugin. This will result in more accuracy in those cases, when one Assistant, for example the Engineer, has more detailed knowledge about a given topic than the other Assistants.
-  - [Internal] More restructering of the Driving Coach internals for the upcoming anniversary release.
+  - [Internal] More restructuring of the Driving Coach internals for the upcoming anniversary release.
   - New car models for "Setup Workbench" (by @neophyte):
     - Assetto Corsa
 	  - Porsche 911 GT3 Cup 2017

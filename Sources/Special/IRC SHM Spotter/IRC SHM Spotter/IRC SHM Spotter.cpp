@@ -1714,6 +1714,14 @@ int main(int argc, char* argv[])
 						playerCarIndex = atoi(playerCarIdx);
 					}
 
+					if (telemetryLap == -1) {
+						char* rawValue;
+
+						getRawDataValue(rawValue, pHeader, g_data, "Lap");
+
+						telemetryLap = (*((int*)rawValue) + 1);
+					}
+
 					if (mapTrack) {
 						if (!writeCoordinates(pHeader, g_data, playerCarIndex)) {
 							done = true;

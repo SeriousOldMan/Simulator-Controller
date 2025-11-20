@@ -729,6 +729,7 @@ namespace RF2SHMCoach {
 		string triggerType = "Trigger";
 		int lastLap = 0;
 		int lastHint = -1;
+		int lastGroup = 0;
 		int lastPhase = Start;
 		
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
@@ -779,6 +780,7 @@ namespace RF2SHMCoach {
 							lastLap = playerScoring.mTotalLaps;
 
 							lastHint = -1;
+							lastGroup = 0;
 							lastPhase = Start;
 						}
 
@@ -797,10 +799,13 @@ namespace RF2SHMCoach {
 						}
 
 						if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro))) {
-							if (hintPhases[bestHint] <= lastPhase)
+							if ((lastGroup != hintGroups[bestHint]) && (hintPhases[bestHint] != Intro))
+								return;
+							else if ((hintPhases[bestHint] <= lastPhase) && (hintPhases[bestHint] != Intro))
 								return;
 
 							lastHint = bestHint;
+							lastGroup = hintGroups[bestHint];
 							lastPhase = hintPhases[bestHint];
 
 							if (audioDevice != "")
@@ -821,9 +826,10 @@ namespace RF2SHMCoach {
 			}
         }
 
+        int[] hintGroups = new int[256];
         int[] hintPhases = new int[256];
-        string[] hintSounds = new string[256];
         float[] hintDistances = new float[256];
+        string[] hintSounds = new string[256];
         DateTime lastHintsUpdate = DateTime.Now;
 
         public void loadTrackHints()
@@ -837,12 +843,10 @@ namespace RF2SHMCoach {
 
                     foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-						var parts = line.Split(new char[] { ' ' }, 5);
+						var parts = line.Split(new char[] { ' ' }, 6);
 
-                        xCoordinates[numCoordinates] = float.Parse(parts[0]);
-                        yCoordinates[numCoordinates] = float.Parse(parts[1]);
-                        hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        switch (parts[3].ToLower())
+                        hintGroups[numCoordinates] = float.Parse(parts[0]);
+                        switch (parts[1].ToLower())
                         {
                             case "intro":
                                 hintPhases[numCoordinates] = Intro;
@@ -865,13 +869,17 @@ namespace RF2SHMCoach {
 
                                 break;
                         }
-                        hintSounds[numCoordinates] = parts[4];
+                        xCoordinates[numCoordinates] = float.Parse(parts[2]);
+                        yCoordinates[numCoordinates] = float.Parse(parts[3]);
+                        hintDistances[numCoordinates] = float.Parse(parts[4]);
+                        hintSounds[numCoordinates] = parts[5];
 
                         if (++numCoordinates > 255)
 							break;
                     }
 
 					lastHint = -1;
+					lastGroup = 0;
 					lastPhase = Start;
                 }
 			} 

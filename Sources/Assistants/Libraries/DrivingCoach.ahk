@@ -1955,7 +1955,9 @@ class DrivingCoach extends GridRaceAssistant {
 		local triggers := ""
 		local endDistance := -99999
 		local tries := 3
-		local ignore, braking, brake, maxBrake, metersPerSec, trackLength, startDistance
+		local group, hints, ignore, braking, brake, maxBrake, metersPerSec, trackLength, startDistance, x, y
+
+		static lastTelemetry := false
 
 		static distance := false
 		static hardBraking := false
@@ -1999,6 +2001,11 @@ class DrivingCoach extends GridRaceAssistant {
 			return this.iBrakeHints[key]
 		}
 
+		if (telemetry == lastTelemetry)
+			return
+		else
+			lastTelemetry := telemetry
+
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand) {
 			if !distance {
 				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 30))
@@ -2012,14 +2019,19 @@ class DrivingCoach extends GridRaceAssistant {
 				metersPerSec := (braking.Speed * 1000 / 3600)
 				startDistance := (braking.Start - (6 * metersPerSec))
 
-				if (Random(1, 10) <= 8) {
-					if (triggers != "")
-						triggers .= "`n"
+				if ((startDistance >= 0) && (Random(1, 10) <= 8)) {
+					group := A_Index
 
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (6 * metersPerSec)) . A_Space . "Intro" . A_Space . getIntro(braking.Curve) . "`n")
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (3 * metersPerSec)) . A_Space . "Ready" . A_Space . countdownOne . "`n")
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (1.5 * metersPerSec)) . A_Space . "Set" . A_Space . countdownTwo . "`n")
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . "Brake" . A_Space . brakeCommand)
+					if telemetry.findCoordinates(startDistance, &x, &y)
+						hints := (group . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
+
+					if telemetry.findCoordinates(braking.Start - (3 * metersPerSec), &x, &y)
+						hints .= (group . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")
+
+					if telemetry.findCoordinates(braking.Start - (1.5 * metersPerSec), &x, &y)
+						hints .= (group . A_Space . "Set" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownTwo . "`n")
+
+					hints .= (group . A_Space . "Brake" . A_Space . braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
 
 					endDistance := (braking.Start + metersPerSec)
 
@@ -2029,14 +2041,23 @@ class DrivingCoach extends GridRaceAssistant {
 						if ((brake.Brake < (maxBrake * 0.7)) && ((brake.Distance - braking.Start) > distance)) {
 							endDistance := brake.Distance
 
-							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . "Release" . A_Space . releaseCommand)
+							triggers .= ("`n" . group . A_Space . "Release" . A_Space . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . releaseCommand)
 
 							break
 						}
 						else
 							maxBrake := Max(maxBrake, brake.Brake)
 
-					logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; End: " . endDistance . "; mps: " . metersPerSec)
+					if (endDistance < trackLength) {
+						if (triggers != "")
+							triggers .= ("`n" . hints)
+						else
+							triggers := hints
+
+						logMessage(kLogCritical, "Corner: " . group . "; Start: " . startDistance . "; End: " . endDistance . "; mps: " . metersPerSec)
+					}
+					else
+						logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
 				}
 				else
 					logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)

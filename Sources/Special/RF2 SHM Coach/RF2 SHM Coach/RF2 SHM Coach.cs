@@ -845,7 +845,7 @@ namespace RF2SHMCoach {
                     {
 						var parts = line.Split(new char[] { ' ' }, 6);
 
-                        hintGroups[numCoordinates] = float.Parse(parts[0]);
+                        hintGroups[numCoordinates] = int.Parse(parts[0]);
                         switch (parts[1].ToLower())
                         {
                             case "intro":

@@ -2017,9 +2017,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 			for ignore, braking in telemetry.Braking {
 				metersPerSec := (braking.Speed * 1000 / 3600)
-				startDistance := (braking.Start - (6 * metersPerSec))
+				startDistance := (braking.Start - (8 * metersPerSec))
 
-				if ((startDistance >= 0) && (Random(1, 10) <= 8)) {
+				if ((startDistance >= 0) && ((startDistance - metersPerSec) > endDistance) && (Random(1, 10) <= 8)) {
 					group := A_Index
 
 					if telemetry.findCoordinates(startDistance, &x, &y)
@@ -2039,9 +2039,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 					for ignore, brake in braking.Curve
 						if ((brake.Brake < (maxBrake * 0.7)) && ((brake.Distance - braking.Start) > distance)) {
-							endDistance := brake.Distance
+							endDistance := (brake.Distance + (metersPerSec / 2))
 
-							triggers .= ("`n" . group . A_Space . "Release" . A_Space . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . releaseCommand)
+							hints .= ("`n" . group . A_Space . "Release" . A_Space . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . releaseCommand)
 
 							break
 						}
@@ -2054,13 +2054,14 @@ class DrivingCoach extends GridRaceAssistant {
 						else
 							triggers := hints
 
-						logMessage(kLogCritical, "Corner: " . group . "; Start: " . startDistance . "; End: " . endDistance . "; mps: " . metersPerSec)
+						if isDebug()
+							logMessage(kLogDebug, "Corner: " . group . "; Start: " . startDistance . "; End: " . endDistance . "; mps: " . metersPerSec)
 					}
-					else
-						logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
+					else if isDebug()
+						logMessage(kLogDebug, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
 				}
-				else
-					logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
+				else if isDebug()
+					logMessage(kLogDebug, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
 			}
 
 			FileAppend(triggers, triggerFile)

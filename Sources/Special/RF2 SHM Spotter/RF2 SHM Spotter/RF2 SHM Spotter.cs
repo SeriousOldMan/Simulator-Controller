@@ -1405,9 +1405,6 @@ namespace RF2SHMSpotter {
 
 						ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 
-						if (telemetryLap == -1)
-							telemetryLap = playerScoring.mTotalLaps + 1;
-
                         if (mapTrack)
 						{
 							if (!writeCoordinates(ref playerScoring))

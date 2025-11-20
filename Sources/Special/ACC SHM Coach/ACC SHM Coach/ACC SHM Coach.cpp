@@ -704,7 +704,7 @@ void checkCoordinates() {
 				int bestHint = -1;
 
 				for (int i = lastHint + 1; i < numCoordinates; i++) {
-					if (vectorLength(xCoordinates[i] - coordinateX, abs(yCoordinates[i] - coordinateY)) < hintDistances[i])
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
 						bestHint = i;
 					else if (bestHint > -1) {
 						lastHint = bestHint;

@@ -1258,35 +1258,6 @@ class Telemetry {
 		local highIndex := this.Data.Length
 		local cIndex, cDistance
 
-		/*
-		local candidate := false
-		local candidateDistance := 999999
-		local candidateX, candidateY, cDistance, cIndex
-
-		loop this.Data.Length {
-			cDistance := this.getValue(A_Index, "Distance", kUndefined)
-
-			if (cDistance != kUndefined)
-				if candidate {
-					cDistance := Abs(cDistance - distance)
-
-					if (cDistance < candidateDistance) {
-						candidateDistance := cDistance
-						candidateX := this.getValue(A_Index, "PosX")
-						candidateY := this.getValue(A_Index, "PosY")
-
-						candidate := A_Index
-					}
-				}
-				else {
-					candidateX := this.getValue(A_Index, "PosX")
-					candidateY := this.getValue(A_Index, "PosY")
-
-					candidate := A_Index
-				}
-		}
-		*/
-
 		while (lowIndex <= highIndex) {
 			cIndex := (lowIndex + Round((highIndex - lowIndex) / 2))
 			cDistance := this.getValue(cIndex, "Distance", kUndefined)

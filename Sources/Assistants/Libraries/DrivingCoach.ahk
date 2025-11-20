@@ -82,6 +82,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iReleaseCommand := false
 	iCountdownOne := false
 	iCountdownTwo := false
+	iBrakeHints := CaseInseneMap()
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -350,6 +351,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		Task.startTask(() {
 			local speaker := this.VoiceManager.getLocalSpeaker()
+			local ignore, phrase, count
 
 			if speaker {
 				this.iBrakeCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Brake", false, false, true, {File: true, Rephrase: false})
@@ -1949,37 +1951,92 @@ class DrivingCoach extends GridRaceAssistant {
 		local countdownTwo := this.iCountdownTwo
 		local brakeCommand := this.iBrakeCommand
 		local releaseCommand := this.iReleaseCommand
+		local speaker := this.VoiceManager.getLocalSpeaker()
 		local triggers := ""
+		local endDistance := -99999
 		local tries := 3
-		local ignore, braking, brake, maxBrake, delta
+		local ignore, braking, brake, maxBrake, delta, trackLength, startDistance
 
 		static distance := false
+		static hardBraking := false
+		static trailBraking := false
 
-		if (this.iBrakeTriggerPID && collector && brakeCommand && !FileExist(this.iBrakeTriggerFile . ".update")) {
-			if !distance
+		getIntro(brakeCurve) {
+			local maxBrake := 0
+			local releaseStart := false
+			local introNr, brakeNr, releaseNr
+			local introPhrase, brakePhrase, releasePhrase
+			local ignore, key, hardBrake, trailBrake
+
+			for index, brake in brakeCurve {
+				maxBrake := Max(brake.Brake, maxBrake)
+
+				if (!releaseStart && (brake.Brake < (maxBrake * 0.5)))
+					releaseStart := index
+			}
+
+			hardBrake := (maxBrake > hardBraking)
+			trailBrake := (index < (brakeCurve.Length * trailBraking))
+
+			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
+
+			if hardBrake
+				brakePhrase := speaker.getPhrase("BrakeHard", false, &ignore := false, &brakeNr)
+			else
+				brakePhrase := speaker.getPhrase("BrakeSoft", false, &ignore := false, &brakeNr)
+
+			if trailBrake
+				releasePhrase := speaker.getPhrase("TrailBrake", false, &ignore := false, &brakeNr)
+			else
+				releasePhrase := speaker.getPhrase("NoTrailBrake", false, &ignore := false, &brakeNr)
+
+			key := (introNr . (hardBrake ? "H" : "S") . brakeNr . (trailBrake ? "T" : "N") . releaseNr)
+
+			if !this.iBrakeHints.Has(key)
+				this.iBrakeHints[key] := speaker.speak(introPhrase . A_Space . brakePhrase . A_Space . releasePhrase
+													 , false, key, {File: true, Rephrase: false})
+
+			return this.iBrakeHints[key]
+		}
+
+		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand) {
+			if !distance {
 				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 30))
+				hardBraking := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Threshold", 70) / 100)
+				trailBraking := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Release", 30)) / 100)
+			}
+
+			trackLength := collector.TrackLength
 
 			for ignore, braking in telemetry.Braking {
-				if (triggers != "")
-					triggers .= "`n"
-
 				delta := (braking.Speed * 1000 / 3600)
+				startDistance := (braking.Start - (10 * delta))
 
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . 1 . A_Space . countdownOne . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . 2 . A_Space . countdownTwo . "`n")
-				triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . 3 . A_Space . brakeCommand)
+				if ((startDistance > lastDistance) && (Random(1, 10) <= 7)) {
+					if (triggers != "")
+						triggers .= "`n"
 
-				maxBrake := 0
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (10 * delta)) . A_Space . "Intro" . A_Space . getIntro(braking.Curve) . "`n")
 
-				for ignore, brake in braking.Curve
-					if (brake.Brake < (maxBrake * 0.8)) {
-						if ((brake.Distance - braking.Start) > distance)
-							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . 4 . A_Space . releaseCommand)
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . "Ready" . A_Space . countdownOne . "`n")
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . "Set" . A_Space . countdownTwo . "`n")
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . "Brake" . A_Space . brakeCommand)
 
-						break
-					}
-					else
-						maxBrake := Max(maxBrake, brake.Brake)
+					lastDistance := (braking.Start + delta)
+
+					maxBrake := 0
+
+					for ignore, brake in braking.Curve
+						if ((brake.Brake < (maxBrake * 0.5)) && ((brake.Distance - braking.Start) > distance)) {
+							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . "Release" . A_Space . releaseCommand)
+
+							lastDistance := (brake.Distance + delta)
+
+							break
+						}
+						else
+							maxBrake := Max(maxBrake, brake.Brake)
+				}
 			}
 
 			FileAppend(triggers, triggerFile)
@@ -1988,7 +2045,7 @@ class DrivingCoach extends GridRaceAssistant {
 				try {
 					FileMove(triggerFile, this.iBrakeTriggerFile, 1)
 
-					FileAppend("TRUE", this.iBrakeTriggerFile . ".update")
+					break
 				}
 				catch Any {
 					Sleep(100)
@@ -2025,8 +2082,6 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			loop 5 {
-				deleteFile(this.iBrakeTriggerFile . ".update")
-
 				if deleteFile(this.iBrakeTriggerFile)
 					break
 

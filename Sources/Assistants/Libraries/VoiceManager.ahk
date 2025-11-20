@@ -194,9 +194,14 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		getPhrase(phrase, variables := false, &cache := false) {
+		getAllPhrases(phrase) {
 			local phrases := this.Phrases
-			local index
+
+			return (phrases.Has(phrase) ? phrases[phrase] : [])
+		}
+
+		getPhrase(phrase, variables := false, &cache := false, &index?) {
+			local phrases := this.Phrases
 
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
@@ -407,9 +412,14 @@ class VoiceManager extends ConfigurationItem {
 			return false
 		}
 
-		getPhrase(phrase, variables := false, &cache := false) {
+		getAllPhrases(phrase) {
 			local phrases := this.Phrases
-			local index
+
+			return (phrases.Has(phrase) ? phrases[phrase] : [])
+		}
+
+		getPhrase(phrase, variables := false, &cache := false, &index?) {
+			local phrases := this.Phrases
 
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
@@ -424,6 +434,8 @@ class VoiceManager extends ConfigurationItem {
 
 				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
+			else
+				index := false
 
 			return phrase
 		}

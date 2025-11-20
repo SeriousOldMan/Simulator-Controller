@@ -722,7 +722,7 @@ namespace RF2SHMCoach {
 		string triggerType = "Trigger";
 		int lastLap = 0;
 		int lastHint = -1;
-
+		
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
             if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
@@ -781,6 +781,9 @@ namespace RF2SHMCoach {
 								bestHint = i;
 							else if (bestHint > -1)
 							{
+								if ((lastHint == -1) && (hintPhases[bestHint] != "Intro"))
+									return;
+
 								lastHint = bestHint;
 
 								if (audioDevice != "")
@@ -801,24 +804,28 @@ namespace RF2SHMCoach {
 			}
         }
 
+        string[] hintPhases = new string[256];
         string[] hintSounds = new string[256];
         float[] hintDistances = new float[256];
+        DateTime lastHintsUpdate = DateTime.Now;
 
-		public void loadTrackHints()
+        public void loadTrackHints()
 		{
 			if ((hintFile != "") && System.IO.File.Exists(hintFile))
 			{
-				if (numCoordinates == 0 || System.IO.File.Exists(hintFile + ".update"))
+				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
 				{
                     numCoordinates = 0;
-					
-					foreach (var line in System.IO.File.ReadAllLines(hintFile))
+                    lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
+
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
 						var parts = line.Split(new char[] { ' ' }, 5);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
+                        hintPhases[numCoordinates] = parts[3];
                         hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
@@ -826,12 +833,6 @@ namespace RF2SHMCoach {
                     }
 
 					lastHint = -1;
-
-					try
-					{
-						System.IO.File.Delete(hintFile + ".update");
-					}
-					catch { }
                 }
 			} 
 		}

@@ -2272,7 +2272,9 @@ class RaceEngineer extends RaceAssistant {
 
 			if (value != kUndefined) {
 				if (Abs(Floor(knowledgeBase.getValue("Pitstop.Planned.Fuel")) - Floor(value)) > 2) {
-					this.pitstopOptionChanged("Refuel", verbose && !getMultiMapValue(data, "Setup Data", "FuelAmount.Silent", false), Round(value, 1))
+					this.pitstopOptionChanged("Refuel", verbose && !this.iPitstopFillUp
+																&& !getMultiMapValue(data, "Setup Data", "FuelAmount.Silent", false)
+													  , Round(value, 1))
 
 					result := true
 				}

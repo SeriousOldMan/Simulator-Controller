@@ -6,6 +6,7 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 using RF2SHMCoach.rFactor2Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -161,6 +162,35 @@ namespace RF2SHMCoach {
 			return Math.Sqrt((x * x) + (y * y));
 		}
 
+		void playSound(string wavFile, bool wait = true) {
+            try
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = player,
+                    Arguments = $"\"{wavFile}\" -T waveaudio \"{audioDevice}\" vol {volume}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+
+                    process.Start();
+
+					if (wait)
+						process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+				return;
+            }
+        }
+
 		class CornerDynamics
         {
             public double Speed;
@@ -274,7 +304,12 @@ namespace RF2SHMCoach {
 
 			if (wavFile != "")
 				if (audioDevice != "")
-					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				{
+					if (player != "")
+						playSound(wavFile, false);
+					else
+						SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				}
 				else
 					new System.Media.SoundPlayer(wavFile).Play();
 			
@@ -680,19 +715,27 @@ namespace RF2SHMCoach {
             }
         }
 
-		float[] xCoordinates = new float[256];
+        const int Start = 0;
+        const int Intro = 1;
+        const int Ready = 2;
+        const int Set = 3;
+        const int Brake = 4;
+        const int Release = 5;
+
+        float[] xCoordinates = new float[256];
         float[] yCoordinates = new float[256];
         int numCoordinates = 0;
 		long nextUpdate = 0;
 		string triggerType = "Trigger";
 		int lastLap = 0;
 		int lastHint = -1;
-
+		int lastPhase = Start;
+		
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
-			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
-			{
-				double lVelocityX = playerScoring.mLocalVel.x;
+            if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
+            {
+                double lVelocityX = playerScoring.mLocalVel.x;
 				double lVelocityY = playerScoring.mLocalVel.y;
 				double lVelocityZ = playerScoring.mLocalVel.z;
 
@@ -723,69 +766,113 @@ namespace RF2SHMCoach {
 							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 							{
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-								
+
 								nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
-								
+
 								break;
 							}
 						}
 					}
 					else {
-                        if (lastLap != playerScoring.mTotalLaps)
-                        {
-                            lastLap = playerScoring.mTotalLaps;
-
-                            lastHint = -1;
-                        }
-
-                        for (int i = lastHint + 1; i < numCoordinates; i += 1)
+						if (lastLap != playerScoring.mTotalLaps)
 						{
-							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+							lastLap = playerScoring.mTotalLaps;
+
+							lastHint = -1;
+							lastPhase = Start;
+						}
+
+						int bestHint = -1;
+						float bestDistance = 99999;
+
+						for (int i = lastHint + 1; i < numCoordinates; i += 1)
+						{
+							float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
+
+							if ((curDistance < hintDistances[i]) && (curDistance < bestDistance))
 							{
-								lastHint = i;
-
-								if (audioDevice != "")
-								{
-									SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-
-									nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
-								}
-								else
-									new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-								
-								break;
+								bestHint = i;
+								bestDistance = curDistance;
 							}
+						}
+
+						if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro))) {
+							if (hintPhases[bestHint] <= lastPhase)
+								return;
+
+							lastHint = bestHint;
+							lastPhase = hintPhases[bestHint];
+
+							if (audioDevice != "")
+							{
+								if (player != "")
+									playSound(hintSounds[bestHint], false);
+								else
+									SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
+							}
+							else
+								new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
+
+							if (lastPhase >= Brake)
+								lastPhase = Start;
 						}
 					}
 				}
 			}
         }
 
+        int[] hintPhases = new int[256];
         string[] hintSounds = new string[256];
         float[] hintDistances = new float[256];
-		DateTime lastHintsUpdate = DateTime.Now;
+        DateTime lastHintsUpdate = DateTime.Now;
 
-		public void loadTrackHints()
+        public void loadTrackHints()
 		{
 			if ((hintFile != "") && System.IO.File.Exists(hintFile))
 			{
 				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
 				{
                     numCoordinates = 0;
-					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
+                    lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
 
-                    foreach (var line in System.IO.File.ReadLines(hintFile))
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-						var parts = line.Split(new char[] { ' ' }, 4);
+						var parts = line.Split(new char[] { ' ' }, 5);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintSounds[numCoordinates] = parts[3];
+                        switch (parts[3].ToLower())
+                        {
+                            case "intro":
+                                hintPhases[numCoordinates] = Intro;
+
+								break;
+                            case "ready":
+                                hintPhases[numCoordinates] = Ready;
+
+								break;
+                            case "set":
+                                hintPhases[numCoordinates] = Set;
+
+								break;
+                            case "brake":
+                                hintPhases[numCoordinates] = Brake;
+
+                                break;
+                            case "release":
+                                hintPhases[numCoordinates] = Release;
+
+                                break;
+                        }
+                        hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
 							break;
                     }
+
+					lastHint = -1;
+					lastPhase = Start;
                 }
 			} 
 		}
@@ -802,10 +889,14 @@ namespace RF2SHMCoach {
                 if (++numCoordinates > 255)
                     break;
             }
+
+            Thread.Sleep(10000);
         }
 
 		string soundsDirectory = "";
 		string audioDevice = string.Empty;
+		string player = string.Empty;
+		float volume = 0;
 		string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
@@ -813,12 +904,20 @@ namespace RF2SHMCoach {
             triggerType = type;
 
             hintFile = args[1];
-            
-			if (args.Length > 2)
-				audioDevice = args[2];
+
+            if (args.Length > 2)
+                audioDevice = args[2];
+
+            if (args.Length > 3)
+                volume = float.Parse(args[3]);
+
+            if (args.Length > 4)
+                player = args[4];
+
+			Thread.Sleep(10000);
         }
-        
-		public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
+
+        public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
         {
             dataFile = args[1];
 			

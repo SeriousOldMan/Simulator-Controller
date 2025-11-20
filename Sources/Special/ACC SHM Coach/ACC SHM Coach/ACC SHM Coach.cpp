@@ -156,6 +156,39 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+string player = "";
+string audioDevice = "";
+float volume = 1;
+STARTUPINFOA si = { sizeof(si) };
+
+void playSound(string wavFile, bool wait = true) {
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcessA(
+		NULL,               // Application name
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+								          ((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
+								          "vol " + std::to_string(volume)).c_str(),         // Command line
+		NULL,               // Process handle not inheritable
+		NULL,               // Thread handle not inheritable
+		FALSE,              // Set handle inheritance to FALSE
+		0,                  // No creation flags
+		NULL,               // Use parent's environment block
+		NULL,               // Use parent's starting directory 
+		&si,                // Pointer to STARTUPINFO structure
+		&pi)                // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		if (wait)
+			// Wait until process exits
+			WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -252,8 +285,12 @@ bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
 	if (wavFile != "") {
-		if (audioDevice != "")
-			sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		if (audioDevice != "") {
+			if (player != "")
+				playSound(wavFile, false);
+			else
+				sendAnalyzerMessage("acousticFeedback:" + wavFile);
+		}
 		else
 			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
@@ -603,7 +640,6 @@ int numCoordinates = 0;
 time_t nextUpdate = 0;
 const char* triggerType = "Trigger";
 
-string audioDevice = "";
 string hintFile = "";
 
 string hintSounds[256];
@@ -665,18 +701,27 @@ void checkCoordinates() {
 					lastHint = -1;
 				}
 
+				int bestHint = -1;
+
 				for (int i = lastHint + 1; i < numCoordinates; i++) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
-						lastHint = i;
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+						bestHint = i;
+					else if (bestHint > -1) {
+						lastHint = bestHint;
 
 						if (audioDevice != "")
 						{
-							sendTriggerMessage("acousticFeedback:" + hintSounds[i]);
+							if (player != "")
+								playSound(hintSounds[bestHint], false);
+							else
+								sendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 
 							nextUpdate = time(NULL) + 1;
 						}
-						else
-							PlaySoundA(hintSounds[i].c_str(), NULL, SND_SYNC);
+						else {
+							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+						}
 
 						break;
 					}
@@ -709,16 +754,18 @@ void loadTrackHints()
 			string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 4);
+				auto parts = splitString(line, " ", 5);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
 				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[3];
+				hintSounds[numCoordinates] = parts[4];
 
 				if (++numCoordinates > 255)
 					break;
 			}
+
+			lastHint = -1;
 		}
 	}
 }
@@ -759,6 +806,12 @@ int main(int argc, char* argv[])
 
 			if (argc > 3)
 				audioDevice = argv[3];
+
+			if (argc > 4)
+				audioDevice = atof(argv[4]);
+
+			if (argc > 5)
+				player = argv[5];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

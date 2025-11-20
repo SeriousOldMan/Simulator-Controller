@@ -248,6 +248,7 @@ class IssueCollector {
 
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
+		local player := requireSoundPlayer("DCAnalyzerPlayer")
 		local pid, options, code, message, audioDevice
 
 		collectSamples() {
@@ -288,11 +289,9 @@ class IssueCollector {
 
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
-
-					audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
-
-					if audioDevice
-						options .= (A_Space . "`"" . audioDevice . "`"")
+					
+					if this.AudioSettings
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`"") : ""))
 				}
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)

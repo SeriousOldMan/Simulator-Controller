@@ -239,7 +239,37 @@ namespace ACSHMCoach {
 		double vectorLength(double x, double y)
 		{
 			return Math.Sqrt((x * x) + (y * y));
-		}
+        }
+
+        void playSound(string wavFile, bool wait = true)
+        {
+            try
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = player,
+                    Arguments = $"\"{wavFile}\" -T waveaudio \"{audioDevice}\" vol {volume}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+
+                    process.Start();
+
+                    if (wait)
+                        process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
 
         class CornerDynamics
 		{
@@ -340,7 +370,12 @@ namespace ACSHMCoach {
 
 			if (wavFile != "")
 				if (audioDevice != "")
-					SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				{
+					if (player != "")
+						playSound(wavFile, false);
+					else
+						SendAnalyzerMessage("acousticFeedback:" + wavFile);
+				}
 				else
 					new System.Media.SoundPlayer(wavFile).Play();
 
@@ -762,20 +797,26 @@ namespace ACSHMCoach {
                                 lastHint = -1;
                             }
 
+							int bestHint = -1;
+
                             for (int i = lastHint + 1; i < numCoordinates; i++)
 							{
 								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+									bestHint = i;
+								else if (bestHint > -1)
 								{
-									lastHint = i;
+									lastHint = bestHint;
 
-									if (audioDevice != "") {
-										SendTriggerMessage("acousticFeedback:" + hintSounds[i]);
-
-										nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 1000;
+									if (audioDevice != "")
+									{
+										if (player != "")
+											playSound(hintSounds[bestHint], false);
+										else
+											SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 									}
 									else
-										new System.Media.SoundPlayer(hintSounds[i]).PlaySync();
-
+										new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
+										
 									break;
 								}
 							}
@@ -811,24 +852,28 @@ namespace ACSHMCoach {
                     numCoordinates = 0;
 					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
 
-                    foreach (var line in System.IO.File.ReadLines(hintFile))
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-                        var parts = line.Split(new char[] { ' ' }, 4);
+                        var parts = line.Split(new char[] { ' ' }, 5);
 
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintSounds[numCoordinates] = parts[3];
+                        hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
                             break;
                     }
+
+					lastHint = -1;
                 }
             }
         }
 
         string soundsDirectory = "";
         string audioDevice = string.Empty;
+		string player = string.Empty;
+		float volume = 0;
         string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
@@ -839,6 +884,12 @@ namespace ACSHMCoach {
 
             if (args.Length > 2)
                 audioDevice = args[2];
+
+            if (args.Length > 3)
+                volume = float.Parse(args[3]);
+
+            if (args.Length > 4)
+                player = args[4];
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)

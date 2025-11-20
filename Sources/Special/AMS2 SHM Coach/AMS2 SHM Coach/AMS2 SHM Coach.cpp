@@ -100,6 +100,39 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+std::string player = "";
+std::string audioDevice = "";
+float volume = 0;
+STARTUPINFOA si = { sizeof(si) };
+
+void playSound(std::string wavFile, bool wait = true) {
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcessA(
+		NULL,               // Application name
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+								((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
+								"vol " + std::to_string(volume)).c_str(),         // Command line
+		NULL,               // Process handle not inheritable
+		NULL,               // Thread handle not inheritable
+		FALSE,              // Set handle inheritance to FALSE
+		0,                  // No creation flags
+		NULL,               // Use parent's environment block
+		NULL,               // Use parent's starting directory 
+		&si,                // Pointer to STARTUPINFO structure
+		&pi)                // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		if (wait)
+			// Wait until process exits
+			WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+}
+
 class CornerDynamics {
 public:
 	float speed;
@@ -192,8 +225,12 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
 	if (wavFile != "") {
-		if (audioDevice != "")
-			sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		if (audioDevice != "") {
+			if (player != "")
+				playSound(wavFile, false);
+			else
+				sendAnalyzerMessage(("acousticFeedback:" + wavFile).c_str());
+		}
 		else
 			PlaySoundA(wavFile.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 
@@ -545,7 +582,6 @@ int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
-std::string audioDevice = "";
 std::string hintFile = "";
 
 std::string hintSounds[256];
@@ -597,23 +633,31 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					lastHint = -1;
 				}
 
+				int bestHint = -1;
+
 				for (int i = lastHint + 1; i < numCoordinates; i += 1) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i]) {
-						lastHint = i;
+					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+						bestHint = i;
+					else if (bestHint > -1) {
+						lastHint = bestHint;
 
 						if (audioDevice != "")
 						{
-							char buffer[512] = "";
+							if (player != "")
+								playSound(hintSounds[bestHint], false);
+							else {
+								char buffer[512] = "";
 
-							strcat_s(buffer, "acousticFeedback:");
-							strcat_s(buffer, hintSounds[i].c_str());
+								strcat_s(buffer, "acousticFeedback:");
+								strcat_s(buffer, hintSounds[bestHint].c_str());
 
-							sendTriggerMessage(buffer);
-
-							nextUpdate = time(NULL) + 1;
+								sendTriggerMessage(buffer);
+							}
 						}
-						else
-							PlaySoundA(hintSounds[i].c_str(), NULL, SND_SYNC);
+						else {
+							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+						}
 
 						break;
 					}
@@ -646,16 +690,18 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 4);
+				auto parts = splitString(line, " ", 5);
 
 				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
 				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
 				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[3];
+				hintSounds[numCoordinates] = parts[4];
 
 				if (++numCoordinates > 255)
 					break;
 			}
+
+			lastHint = -1;
 		}
 	}
 }
@@ -696,6 +742,12 @@ int main(int argc, char* argv[]) {
 
 			if (argc > 3)
 				audioDevice = argv[3];
+
+			if (argc > 4)
+				volume = atof(argv[4]);
+
+			if (argc > 5)
+				player = argv[5];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

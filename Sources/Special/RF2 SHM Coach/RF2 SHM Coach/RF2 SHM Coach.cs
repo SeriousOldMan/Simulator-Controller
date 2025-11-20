@@ -803,18 +803,16 @@ namespace RF2SHMCoach {
 
         string[] hintSounds = new string[256];
         float[] hintDistances = new float[256];
-		DateTime lastHintsUpdate = DateTime.Now;
 
 		public void loadTrackHints()
 		{
 			if ((hintFile != "") && System.IO.File.Exists(hintFile))
 			{
-				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+				if (numCoordinates == 0 || System.IO.File.Exists(hintFile + ".update"))
 				{
                     numCoordinates = 0;
-					lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
-
-                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
+					
+					foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
 						var parts = line.Split(new char[] { ' ' }, 5);
 
@@ -828,6 +826,12 @@ namespace RF2SHMCoach {
                     }
 
 					lastHint = -1;
+
+					try
+					{
+						System.IO.File.Delete(hintFile + ".update");
+					}
+					catch { }
                 }
 			} 
 		}

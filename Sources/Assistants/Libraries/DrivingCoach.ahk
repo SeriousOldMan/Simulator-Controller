@@ -1955,7 +1955,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		static distance := false
 
-		if (this.iBrakeTriggerPID && collector && brakeCommand) {
+		if (this.iBrakeTriggerPID && collector && brakeCommand && !FileExist(this.iBrakeTriggerFile . ".update")) {
 			if !distance
 				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Brakepoint.Distance", 30))
 
@@ -1972,9 +1972,9 @@ class DrivingCoach extends GridRaceAssistant {
 				maxBrake := 0
 
 				for ignore, brake in braking.Curve
-					if (brake.Brake < (maxBrake * 0.9)) {
+					if (brake.Brake < (maxBrake * 0.8)) {
 						if ((brake.Distance - braking.Start) > distance)
-							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . distance . A_Space . 4 . A_Space . releaseCommand)
+							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . 4 . A_Space . releaseCommand)
 
 						break
 					}
@@ -1987,6 +1987,8 @@ class DrivingCoach extends GridRaceAssistant {
 			while (tries-- > 0)
 				try {
 					FileMove(triggerFile, this.iBrakeTriggerFile, 1)
+
+					FileAppend("TRUE", this.iBrakeTriggerFile . ".update")
 				}
 				catch Any {
 					Sleep(100)
@@ -2023,6 +2025,8 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			loop 5 {
+				deleteFile(this.iBrakeTriggerFile . ".update")
+
 				if deleteFile(this.iBrakeTriggerFile)
 					break
 

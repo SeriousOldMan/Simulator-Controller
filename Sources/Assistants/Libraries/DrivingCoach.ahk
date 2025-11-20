@@ -2027,7 +2027,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					for ignore, brake in braking.Curve
 						if ((brake.Brake < (maxBrake * 0.7)) && ((brake.Distance - braking.Start) > distance)) {
-							endDistance := (brake.Distance + metersPerSec)
+							endDistance := brake.Distance
 
 							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . "Release" . A_Space . releaseCommand)
 

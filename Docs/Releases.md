@@ -39,6 +39,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug, that caused the Google API for voice configuration to be lost when a configuration created by "Simulator Setup" or "Simulator Configuration" was opened next time.
   - *iRacing* now reports the distance into the track as **-1** for cars, that are standing at the pit or have left the session. This caused some miscalculations, that have been fixed.
   - Fixed the display of lap times in race reports for sessions with just one lap. A rare case, of course, but can happen in hill climbs or Rallye stages, for example.
+  - Fixed a bug that caused incomplete telemetry data when Simulator Controller was started while the session was already ongoing.
 
 #### Changes
 

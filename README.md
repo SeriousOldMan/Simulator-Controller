@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.6.6.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/FbO-_Xyh/Releases/Simulator%20Controller%206.6.6.0-beta.zip) (Test build for 6.6.6. Changes: Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition.)
+[6.6.6.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/FbO-_Xyh/Releases/Simulator%20Controller%206.6.6.0-beta.zip) (Test build for 6.6.6. Changes: Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition, Fixed incomplete lap telemetries.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6660) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-666) of this version and all the versions you might have skipped, before installing and using this version.
 

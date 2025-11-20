@@ -715,13 +715,21 @@ namespace RF2SHMCoach {
             }
         }
 
-		float[] xCoordinates = new float[256];
+        const int Start = 0;
+        const int Intro = 1;
+        const int Ready = 2;
+        const int Set = 3;
+        const int Brake = 4;
+        const int Release = 5;
+
+        float[] xCoordinates = new float[256];
         float[] yCoordinates = new float[256];
         int numCoordinates = 0;
 		long nextUpdate = 0;
 		string triggerType = "Trigger";
 		int lastLap = 0;
 		int lastHint = -1;
+		int lastPhase = Start;
 		
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
@@ -758,53 +766,59 @@ namespace RF2SHMCoach {
 							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 							{
 								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
-								
+
 								nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
-								
+
 								break;
 							}
 						}
 					}
 					else {
-                        if (lastLap != playerScoring.mTotalLaps)
-                        {
-                            lastLap = playerScoring.mTotalLaps;
+						if (lastLap != playerScoring.mTotalLaps)
+						{
+							lastLap = playerScoring.mTotalLaps;
 
-                            lastHint = -1;
-                        }
+							lastHint = -1;
+							lastPhase = Start;
+						}
 
 						int bestHint = -1;
+						float bestDistance = 99999;
 
-                        for (int i = lastHint + 1; i < numCoordinates; i += 1)
+						for (int i = lastHint + 1; i < numCoordinates; i += 1)
 						{
-							if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
-								bestHint = i;
-							else if (bestHint > -1)
+							float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
+
+							if ((curDistance < hintDistances[i]) && (curDistance < bestDistance))
 							{
-								if ((lastHint == -1) && (hintPhases[bestHint] != "Intro"))
-									return;
-
-								lastHint = bestHint;
-
-								if (audioDevice != "")
-								{
-									if (player != "")
-										playSound(hintSounds[bestHint], false);
-									else
-										SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
-								}
-								else
-									new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
-
-								break;
+								bestHint = i;
+								bestDistance = curDistance;
 							}
-                        }
+						}
+
+						if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro))) {
+							if (hintPhases[bestHint] <= lastPhase)
+								return;
+
+							lastHint = bestHint;
+							lastPhase = hintPhases[bestHint];
+
+							if (audioDevice != "")
+							{
+								if (player != "")
+									playSound(hintSounds[bestHint], false);
+								else
+									SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
+							}
+							else
+								new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
+						}
 					}
 				}
 			}
         }
 
-        string[] hintPhases = new string[256];
+        int[] hintPhases = new int[256];
         string[] hintSounds = new string[256];
         float[] hintDistances = new float[256];
         DateTime lastHintsUpdate = DateTime.Now;
@@ -825,14 +839,39 @@ namespace RF2SHMCoach {
                         xCoordinates[numCoordinates] = float.Parse(parts[0]);
                         yCoordinates[numCoordinates] = float.Parse(parts[1]);
                         hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintPhases[numCoordinates] = parts[3];
+                        switch (parts[3].ToLower())
+                        {
+                            case "intro":
+                                hintPhases[numCoordinates] = Intro;
+
+								break;
+                            case "ready":
+                                hintPhases[numCoordinates] = Ready;
+
+								break;
+                            case "set":
+                                hintPhases[numCoordinates] = Set;
+
+								break;
+                            case "brake":
+                                hintPhases[numCoordinates] = Brake;
+
+                                break;
+                            case "release":
+                                hintPhases[numCoordinates] = Release;
+
+                                break;
+                        }
                         hintSounds[numCoordinates] = parts[4];
 
                         if (++numCoordinates > 255)
 							break;
                     }
 
+					/*
 					lastHint = -1;
+					lastPhase = "Release";
+					*/
                 }
 			} 
 		}

@@ -849,6 +849,8 @@ namespace RF2SHMCoach {
                 if (++numCoordinates > 255)
                     break;
             }
+
+            Thread.Sleep(10000);
         }
 
 		string soundsDirectory = "";
@@ -871,6 +873,8 @@ namespace RF2SHMCoach {
 
             if (args.Length > 4)
                 player = args[4];
+
+			Thread.Sleep(10000);
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)

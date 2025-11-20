@@ -82,7 +82,7 @@ class DrivingCoach extends GridRaceAssistant {
 	iReleaseCommand := false
 	iCountdownOne := false
 	iCountdownTwo := false
-	iBrakeHints := CaseInseneMap()
+	iBrakeHints := CaseInsenseMap()
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -1955,7 +1955,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local triggers := ""
 		local endDistance := -99999
 		local tries := 3
-		local ignore, braking, brake, maxBrake, delta, trackLength, startDistance
+		local ignore, braking, brake, maxBrake, metersPerSec, trackLength, startDistance
 
 		static distance := false
 		static hardBraking := false
@@ -1976,7 +1976,7 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			hardBrake := (maxBrake > hardBraking)
-			trailBrake := (index < (brakeCurve.Length * trailBraking))
+			trailBrake := (releaseStart ? (releaseStart < (brakeCurve.Length * trailBraking)) : false)
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
 
@@ -1986,9 +1986,9 @@ class DrivingCoach extends GridRaceAssistant {
 				brakePhrase := speaker.getPhrase("BrakeSoft", false, &ignore := false, &brakeNr)
 
 			if trailBrake
-				releasePhrase := speaker.getPhrase("TrailBrake", false, &ignore := false, &brakeNr)
+				releasePhrase := speaker.getPhrase("TrailBrake", false, &ignore := false, &releaseNr)
 			else
-				releasePhrase := speaker.getPhrase("NoTrailBrake", false, &ignore := false, &brakeNr)
+				releasePhrase := speaker.getPhrase("NoTrailBrake", false, &ignore := false, &releaseNr)
 
 			key := (introNr . (hardBrake ? "H" : "S") . brakeNr . (trailBrake ? "T" : "N") . releaseNr)
 
@@ -2009,34 +2009,37 @@ class DrivingCoach extends GridRaceAssistant {
 			trackLength := collector.TrackLength
 
 			for ignore, braking in telemetry.Braking {
-				delta := (braking.Speed * 1000 / 3600)
-				startDistance := (braking.Start - (10 * delta))
+				metersPerSec := (braking.Speed * 1000 / 3600)
+				startDistance := (braking.Start - (6 * metersPerSec))
 
-				if ((startDistance > lastDistance) && (Random(1, 10) <= 7)) {
+				if ((startDistance > endDistance) && (Random(1, 10) <= 8)){
 					if (triggers != "")
 						triggers .= "`n"
 
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (10 * delta)) . A_Space . "Intro" . A_Space . getIntro(braking.Curve) . "`n")
-
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (4 * delta)) . A_Space . "Ready" . A_Space . countdownOne . "`n")
-					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (2 * delta)) . A_Space . "Set" . A_Space . countdownTwo . "`n")
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (6 * metersPerSec)) . A_Space . "Intro" . A_Space . getIntro(braking.Curve) . "`n")
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (3 * metersPerSec)) . A_Space . "Ready" . A_Space . countdownOne . "`n")
+					triggers .= (braking.X . A_Space . braking.Y . A_Space . (distance + (1.5 * metersPerSec)) . A_Space . "Set" . A_Space . countdownTwo . "`n")
 					triggers .= (braking.X . A_Space . braking.Y . A_Space . distance . A_Space . "Brake" . A_Space . brakeCommand)
 
-					lastDistance := (braking.Start + delta)
+					endDistance := (braking.Start + metersPerSec)
 
 					maxBrake := 0
 
 					for ignore, brake in braking.Curve
 						if ((brake.Brake < (maxBrake * 0.5)) && ((brake.Distance - braking.Start) > distance)) {
-							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . "Release" . A_Space . releaseCommand)
+							endDistance := (brake.Distance + metersPerSec)
 
-							lastDistance := (brake.Distance + delta)
+							triggers .= ("`n" . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . "Release" . A_Space . releaseCommand)
 
 							break
 						}
 						else
 							maxBrake := Max(maxBrake, brake.Brake)
+
+					logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; End: " . endDistance . "; mps: " . metersPerSec)
 				}
+				else
+					logMessage(kLogCritical, "Corner: " . A_Index . "; Start: " . startDistance . "; mps: " . metersPerSec)
 			}
 
 			FileAppend(triggers, triggerFile)

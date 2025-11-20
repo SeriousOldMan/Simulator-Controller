@@ -1435,9 +1435,6 @@ namespace RF2SHMSpotter {
 
                             if (running)
 							{
-								if (telemetryLap == -1)
-                                    telemetryLap = (playerScoring.mTotalLaps + 1);
-
                                 if (carTelemetry)
                                     collectCarTelemetry(ref playerScoring);
                                 else

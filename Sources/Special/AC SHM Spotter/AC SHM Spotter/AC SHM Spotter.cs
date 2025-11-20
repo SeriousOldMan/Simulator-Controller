@@ -1388,10 +1388,7 @@ namespace ACSHMSpotter {
 
                     if (running)
 					{
-						if (telemetryLap == -1)
-							telemetryLap = (graphics.CompletedLaps + 1);
-
-                        if (carTelemetry)
+						if (carTelemetry)
 							collectCarTelemetry();
 						else
 						{

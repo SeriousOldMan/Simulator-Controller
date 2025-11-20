@@ -1823,9 +1823,6 @@ int main(int argc, char* argv[])
 	while (++counter) {
 		bool wait = true;
 
-		if (telemetryLap == -1)
-			telemetryLap = (gf->completedLaps + 1);
-
 		if (mapTrack) {
 			if (!writeCoordinates())
 				break;

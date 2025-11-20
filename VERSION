@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.6.0-beta
 Target=6.6.6.0-release
-Date=11/20/2025
+Date=11/19/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/FbO-_Xyh/Releases/Simulator%20Controller%206.6.6.0-beta.zip
-Changes=Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition, Fixed incomplete lap telemetries
+Changes=Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.5.0-release

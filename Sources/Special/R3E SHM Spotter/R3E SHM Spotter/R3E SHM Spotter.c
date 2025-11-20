@@ -1930,9 +1930,6 @@ int main(int argc, char* argv[])
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-						if (telemetryLap == -1)
-							telemetryLap = (map_buffer->completed_laps + 1);
-
 						if (carTelemetry)
 							collectCarTelemetry(playerID);
 						else {

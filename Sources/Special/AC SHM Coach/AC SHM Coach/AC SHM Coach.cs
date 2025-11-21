@@ -381,10 +381,12 @@ namespace ACSHMCoach {
 				}
                 else
                 {
-                    if (lastPlayer != null)
-                        lastPlayer.Stop();
+					if (lastPlayer != null)
+					{
+						lastPlayer.Stop();
 
-                    lastPlayer.Dispose();
+						lastPlayer.Dispose();
+					}
 
                     lastPlayer = new System.Media.SoundPlayer(wavFile);
 
@@ -852,10 +854,12 @@ namespace ACSHMCoach {
                                 }
                                 else
                                 {
-                                    if (lastPlayer != null)
-                                        lastPlayer.Stop();
+									if (lastPlayer != null)
+									{
+										lastPlayer.Stop();
 
-                                    lastPlayer.Dispose();
+										lastPlayer.Dispose();
+									}
 
                                     lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
 

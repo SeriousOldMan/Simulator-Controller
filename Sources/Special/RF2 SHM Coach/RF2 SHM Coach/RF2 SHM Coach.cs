@@ -310,12 +310,13 @@ namespace RF2SHMCoach {
 					else
 						SendAnalyzerMessage("acousticFeedback:" + wavFile);
 				}
-                else
-                {
-                    if (lastPlayer != null)
-                        lastPlayer.Stop();
+				else
+				{
+					if (lastPlayer != null) {
+						lastPlayer.Stop();
 
-                    lastPlayer.Dispose();
+						lastPlayer.Dispose();
+					}
 
                     lastPlayer = new System.Media.SoundPlayer(wavFile);
 
@@ -827,9 +828,11 @@ namespace RF2SHMCoach {
 							else
 							{
 								if (lastPlayer != null)
+								{
 									lastPlayer.Stop();
 
-								lastPlayer.Dispose();
+									lastPlayer.Dispose();
+								}
 
 								lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
 

@@ -1975,12 +1975,12 @@ class DrivingCoach extends GridRaceAssistant {
 			for index, brake in brakeCurve {
 				maxBrake := Max(brake.Brake, maxBrake)
 
-				if (!releaseStart && (brake.Brake <= (maxBrake * trailBrakingThreshold)))
+				if (!releaseStart && (brake.Brake <= (maxBrake * releaseThreshold)))
 					releaseStart := index
 			}
 
 			hardBrake := (maxBrake >= brakeThreshold)
-			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBraking)) : false)
+			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false)
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
 

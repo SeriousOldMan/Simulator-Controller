@@ -830,6 +830,13 @@ void loadTrackCoordinates(char* fileName) {
 	hasTrackCoordinates = true;
 }
 
+const int Start = 0;
+const int Intro = 1;
+const int Ready = 2;
+const int Set = 3;
+const int Brake = 4;
+const int Release = 5;
+
 float xCoordinates[256];
 float yCoordinates[256];
 float trackDistances[60];
@@ -839,11 +846,15 @@ char* triggerType = "Trigger";
 
 std::string hintFile = "";
 
-std::string hintSounds[256];
+int hintGroups[256];
+int hintPhases[256];
 float hintDistances[256];
+std::string hintSounds[256];
 time_t lastHintsUpdate = 0;
 int lastLap = 0;
 int lastHint = -1;
+int lastGroup = 0;
+int lastPhase = Start;
 
 void checkCoordinates(const irsdk_header* header, const char* data, float trackLength) {
 	char* rawValue;
@@ -912,27 +923,44 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					lastLap = carLaps;
 
 					lastHint = -1;
+					lastGroup = 0;
+					lastPhase = Start;
 				}
 
 				if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
-					lastHint = index;
+					int phase = hintPhases[index];
+					int group = hintGroups[index];
 
-					if (audioDevice != "")
-					{
-						if (player != "")
-							playSound(hintSounds[index], false);
-						else {
-							char buffer[512] = "";
+					if ((lastHint > -1) || (phase == Intro)) {
+						if ((lastGroup != group) && (phase != Intro))
+							return;
+						else if ((phase <= lastPhase) && (phase != Intro))
+							return;
 
-							strcat_s(buffer, "acousticFeedback:");
-							strcat_s(buffer, hintSounds[index].c_str());
+						lastHint = index;
+						lastGroup = group;
+						lastPhase = phase;
 
-							sendTriggerMessage(buffer);
+						if (audioDevice != "")
+						{
+							if (player != "")
+								playSound(hintSounds[index], false);
+							else {
+								char buffer[512] = "";
+
+								strcat_s(buffer, "acousticFeedback:");
+								strcat_s(buffer, hintSounds[index].c_str());
+
+								sendTriggerMessage(buffer);
+							}
 						}
-					}
-					else {
-						PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-						PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+						else {
+							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+							PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+						}
+
+						if (lastPhase >= Brake)
+							lastPhase = Start;
 					}
 				}
 			}
@@ -963,18 +991,31 @@ void loadTrackHints()
 			std::string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 5);
+				auto parts = splitString(line, " ", 6);
 
-				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
-				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
-				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[4];
+				hintGroups[numCoordinates] = atoi(parts[0].c_str());
+				if (parts[1] == "Intro" || parts[1] == "intro")
+					hintPhases[numCoordinates] = Intro;
+				else if (parts[1] == "Ready" || parts[1] == "ready")
+					hintPhases[numCoordinates] = Ready;
+				else if (parts[1] == "Set" || parts[1] == "set")
+					hintPhases[numCoordinates] = Set;
+				else if (parts[1] == "Brake" || parts[1] == "brake")
+					hintPhases[numCoordinates] = Brake;
+				else if (parts[1] == "Release" || parts[1] == "release")
+					hintPhases[numCoordinates] = Release;
+				xCoordinates[numCoordinates] = (float)atof(parts[2].c_str());
+				yCoordinates[numCoordinates] = (float)atof(parts[3].c_str());
+				hintDistances[numCoordinates] = (float)atof(parts[4].c_str());
+				hintSounds[numCoordinates] = parts[5];
 
 				if (++numCoordinates > 255)
 					break;
 			}
 
 			lastHint = -1;
+			lastGroup = 0;
+			lastPhase = Start;
 		}
 	}
 }

@@ -634,6 +634,13 @@ void writeTelemetry(bool calibrate) {
 	}
 }
 
+const int Start = 0;
+const int Intro = 1;
+const int Ready = 2;
+const int Set = 3;
+const int Brake = 4;
+const int Release = 5;
+
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
@@ -642,11 +649,15 @@ const char* triggerType = "Trigger";
 
 string hintFile = "";
 
-string hintSounds[256];
+int hintGroups[256];
+int hintPhases[256];
 float hintDistances[256];
+string hintSounds[256];
 time_t lastHintsUpdate = 0;
 int lastLap = 0;
 int lastHint = -1;
+int lastGroup = 0;
+int lastPhase = Start;
 
 void checkCoordinates() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
@@ -699,15 +710,37 @@ void checkCoordinates() {
 					lastLap = gf->completedLaps;
 
 					lastHint = -1;
+					lastGroup = 0;
+					lastPhase = Start;
 				}
 
 				int bestHint = -1;
+				float bestDistance = 99999;
 
-				for (int i = lastHint + 1; i < numCoordinates; i++) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+				for (int i = lastHint + 1; i < numCoordinates; i += 1)
+				{
+					float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
+
+					if ((curDistance < hintDistances[i]) && (curDistance < bestDistance))
+					{
 						bestHint = i;
-					else if (bestHint > -1) {
+						bestDistance = curDistance;
+					}
+				}
+
+				if (bestHint > lastHint) {
+					int phase = hintPhases[bestHint];
+					int group = hintGroups[bestHint];
+
+					if ((lastHint > -1) || (phase == Intro)) {
+						if ((lastGroup != group) && (phase != Intro))
+							return;
+						else if ((phase <= lastPhase) && (phase != Intro))
+							return;
+
 						lastHint = bestHint;
+						lastGroup = group;
+						lastPhase = phase;
 
 						if (audioDevice != "")
 						{
@@ -719,11 +752,14 @@ void checkCoordinates() {
 							nextUpdate = time(NULL) + 1;
 						}
 						else {
+							char* sound = (char*)hintSounds[bestHint].c_str();
+
 							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+							PlaySoundA(sound, NULL, SND_FILENAME | SND_ASYNC);
 						}
 
-						break;
+						if (lastPhase >= Brake)
+							lastPhase = Start;
 					}
 				}
 			}
@@ -754,18 +790,31 @@ void loadTrackHints()
 			string line;
 
 			while (std::getline(infile, line)) {
-				auto parts = splitString(line, " ", 5);
+				auto parts = splitString(line, " ", 6);
 
-				xCoordinates[numCoordinates] = (float)atof(parts[0].c_str());
-				yCoordinates[numCoordinates] = (float)atof(parts[1].c_str());
-				hintDistances[numCoordinates] = (float)atof(parts[2].c_str());
-				hintSounds[numCoordinates] = parts[4];
+				hintGroups[numCoordinates] = atoi(parts[0].c_str());
+				if (parts[1] == "Intro" || parts[1] == "intro")
+					hintPhases[numCoordinates] = Intro;
+				else if (parts[1] == "Ready" || parts[1] == "ready")
+					hintPhases[numCoordinates] = Ready;
+				else if (parts[1] == "Set" || parts[1] == "set")
+					hintPhases[numCoordinates] = Set;
+				else if (parts[1] == "Brake" || parts[1] == "brake")
+					hintPhases[numCoordinates] = Brake;
+				else if (parts[1] == "Release" || parts[1] == "release")
+					hintPhases[numCoordinates] = Release;
+				xCoordinates[numCoordinates] = (float)atof(parts[2].c_str());
+				yCoordinates[numCoordinates] = (float)atof(parts[3].c_str());
+				hintDistances[numCoordinates] = (float)atof(parts[4].c_str());
+				hintSounds[numCoordinates] = parts[5];
 
 				if (++numCoordinates > 255)
 					break;
 			}
 
 			lastHint = -1;
+			lastGroup = 0;
+			lastPhase = Start;
 		}
 	}
 }

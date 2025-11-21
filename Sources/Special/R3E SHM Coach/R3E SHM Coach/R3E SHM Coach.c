@@ -694,6 +694,13 @@ void writeTelemetry(BOOL calibrate) {
 	}
 }
 
+#define Start 0
+#define Intro 1
+#define Ready 2
+#define Set 3
+#define Brake 4
+#define Release 5
+
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
@@ -702,11 +709,15 @@ char* triggerType = "Trigger";
 
 char* hintFile = "";
 
-char hintSounds[256][256];
+int hintGroups[256];
+int hintPhases[256];
 float hintDistances[256];
+char hintSounds[256][256];
 time_t lastHintsUpdate = 0;
 int lastLap = 0;
 int lastHint = -1;
+int lastGroup = 0;
+int lastPhase = Start;
 
 void checkCoordinates(int playerID) {
 	if (time(NULL) > nextUpdate) {
@@ -756,15 +767,37 @@ void checkCoordinates(int playerID) {
 					lastLap = map_buffer->completed_laps;
 
 					lastHint = -1;
+					lastGroup = 0;
+					lastPhase = Start;
 				}
 
 				int bestHint = -1;
+				float bestDistance = 99999;
 
-				for (int i = lastHint +1; i < numCoordinates; i += 1) {
-					if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
+				for (int i = lastHint + 1; i < numCoordinates; i += 1)
+				{
+					float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
+
+					if ((curDistance < hintDistances[i]) && (curDistance < bestDistance))
+					{
 						bestHint = i;
-					else if (bestHint > -1) {
+						bestDistance = curDistance;
+					}
+				}
+
+				if (bestHint > lastHint) {
+					int phase = hintPhases[bestHint];
+					int group = hintGroups[bestHint];
+
+					if ((lastHint > -1) || (phase == Intro)) {
+						if ((lastGroup != group) && (phase != Intro))
+							return;
+						else if ((phase <= lastPhase) && (phase != Intro))
+							return;
+
 						lastHint = bestHint;
+						lastGroup = group;
+						lastPhase = phase;
 
 						if (strcmp(audioDevice, "") == 0)
 						{
@@ -786,7 +819,8 @@ void checkCoordinates(int playerID) {
 							PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
 						}
 
-						break;
+						if (lastPhase >= Brake)
+							lastPhase = Start;
 					}
 				}
 			}
@@ -813,12 +847,14 @@ void loadTrackHints()
 			numCoordinates = 0;
 			lastHintsUpdate = mod_time;
 
-			char xPart[255];
-			char yPart[255];
-			char distancePart[255];
-			char hintPart[255];
+			char groupPart[256];
+			char phasePart[256];
+			char xPart[256];
+			char yPart[256];
+			char distancePart[256];
+			char hintPart[256];
 
-			char* parts[5] = { xPart, yPart, distancePart, hintPart };
+			char* parts[6] = { groupPart, phasePart, xPart, yPart, distancePart, hintPart };
 
 			FILE* file = fopen(hintFile, "r");
 
@@ -826,19 +862,32 @@ void loadTrackHints()
 
 			if (file != NULL) {
 				while (fgets(line, sizeof(line), file)) {
-					splitString(line, " ", 5, parts);
+					splitString(line, " ", 6, parts);
 
-					xCoordinates[numCoordinates] = (float)atof(parts[0]);
-					yCoordinates[numCoordinates] = (float)atof(parts[1]);
-					hintDistances[numCoordinates] = (float)atof(parts[2]);
+					hintGroups[numCoordinates] = atoi(parts[0]);
+					if (strcmp(parts[1], "Intro") == 0 || strcmp(parts[1], "intro") == 0)
+						hintPhases[numCoordinates] = Intro;
+					else if (strcmp(parts[1], "Ready") == 0 || strcmp(parts[1], "ready") == 0)
+						hintPhases[numCoordinates] = Ready;
+					else if (strcmp(parts[1], "Set") == 0 || strcmp(parts[1], "set") == 0)
+						hintPhases[numCoordinates] = Set;
+					else if (strcmp(parts[1], "Brake") == 0 || strcmp(parts[1], "brake") == 0)
+						hintPhases[numCoordinates] = Brake;
+					else if (strcmp(parts[1], "Release") == 0 || strcmp(parts[1], "release") == 0)
+						hintPhases[numCoordinates] = Release;
+					xCoordinates[numCoordinates] = (float)atof(parts[2]);
+					yCoordinates[numCoordinates] = (float)atof(parts[3]);
+					hintDistances[numCoordinates] = (float)atof(parts[4]);
 					
-					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[4]);
+					strcpy_s((char *)hintSounds[numCoordinates], 256, parts[5]);
 
 					if (++numCoordinates > 255)
 						break;
 				}
 
 				lastHint = -1;
+				lastGroup = 0;
+				lastPhase = Start;
 
 				fclose(file);
 			}

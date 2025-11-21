@@ -7,6 +7,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Lifetime;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -349,6 +350,8 @@ namespace ACSHMCoach {
 		bool calibrate = false;
         long lastSound = 0;
 
+        System.Media.SoundPlayer lastPlayer = null;
+
         bool triggerUSOSBeep(string soundsDirectory, string audioDevice, double usos)
         {
             string wavFile;
@@ -376,8 +379,17 @@ namespace ACSHMCoach {
 					else
 						SendAnalyzerMessage("acousticFeedback:" + wavFile);
 				}
-				else
-					new System.Media.SoundPlayer(wavFile).Play();
+                else
+                {
+                    if (lastPlayer != null)
+                        lastPlayer.Stop();
+
+                    lastPlayer.Dispose();
+
+                    lastPlayer = new System.Media.SoundPlayer(wavFile);
+
+                    lastPlayer.Play();
+                }
 
             return true;
         }
@@ -752,6 +764,13 @@ namespace ACSHMCoach {
 			}
 		}
 
+        const int Start = 0;
+        const int Intro = 1;
+        const int Ready = 2;
+        const int Set = 3;
+        const int Brake = 4;
+        const int Release = 5;
+
         float[] xCoordinates = new float[256];
 		float[] yCoordinates = new float[256];
 		int numCoordinates = 0;
@@ -759,8 +778,10 @@ namespace ACSHMCoach {
 		string triggerType = "Trigger";
 		int lastLap = 0;
 		int lastHint = -1;
+        int lastGroup = 0;
+        int lastPhase = Start;
 
-		void checkCoordinates()
+        void checkCoordinates()
 		{
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
 			{
@@ -795,32 +816,58 @@ namespace ACSHMCoach {
                                 lastLap = graphics.CompletedLaps;
 
                                 lastHint = -1;
+                                lastGroup = 0;
+                                lastPhase = Start;
                             }
 
 							int bestHint = -1;
+                            float bestDistance = 99999;
 
-                            for (int i = lastHint + 1; i < numCoordinates; i++)
-							{
-								if (vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY) < hintDistances[i])
-									bestHint = i;
-								else if (bestHint > -1)
-								{
-									lastHint = bestHint;
+                            for (int i = lastHint + 1; i < numCoordinates; i += 1)
+                            {
+                                float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
 
-									if (audioDevice != "")
-									{
-										if (player != "")
-											playSound(hintSounds[bestHint], false);
-										else
-											SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
-									}
-									else
-										new System.Media.SoundPlayer(hintSounds[bestHint]).Play();
-										
-									break;
-								}
-							}
-						}
+                                if ((curDistance < hintDistances[i]) && (curDistance < bestDistance))
+                                {
+                                    bestHint = i;
+                                    bestDistance = curDistance;
+                                }
+                            }
+
+                            if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro)))
+                            {
+                                if ((lastGroup != hintGroups[bestHint]) && (hintPhases[bestHint] != Intro))
+                                    return;
+                                else if ((hintPhases[bestHint] <= lastPhase) && (hintPhases[bestHint] != Intro))
+                                    return;
+
+                                lastHint = bestHint;
+                                lastGroup = hintGroups[bestHint];
+                                lastPhase = hintPhases[bestHint];
+
+                                if (audioDevice != "")
+                                {
+                                    if (player != "")
+                                        playSound(hintSounds[bestHint], false);
+                                    else
+                                        SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
+                                }
+                                else
+                                {
+                                    if (lastPlayer != null)
+                                        lastPlayer.Stop();
+
+                                    lastPlayer.Dispose();
+
+                                    lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
+
+                                    lastPlayer.Play();
+                                }
+
+                                if (lastPhase >= Brake)
+                                    lastPhase = Start;
+                            }
+                        }
 				}
 			}
         }
@@ -839,8 +886,10 @@ namespace ACSHMCoach {
             }
         }
 
+        int[] hintGroups = new int[256];
+        int[] hintPhases = new int[256];
+        float[] hintDistances = new float[256];
         string[] hintSounds = new string[256];
-		float[] hintDistances = new float[256];
         DateTime lastHintsUpdate = DateTime.Now;
 
         public void loadTrackHints()
@@ -854,18 +903,44 @@ namespace ACSHMCoach {
 
                     foreach (var line in System.IO.File.ReadAllLines(hintFile))
                     {
-                        var parts = line.Split(new char[] { ' ' }, 5);
+                        var parts = line.Split(new char[] { ' ' }, 6);
 
-                        xCoordinates[numCoordinates] = float.Parse(parts[0]);
-                        yCoordinates[numCoordinates] = float.Parse(parts[1]);
-                        hintDistances[numCoordinates] = float.Parse(parts[2]);
-                        hintSounds[numCoordinates] = parts[4];
+                        hintGroups[numCoordinates] = int.Parse(parts[0]);
+                        switch (parts[1].ToLower())
+                        {
+                            case "intro":
+                                hintPhases[numCoordinates] = Intro;
+
+                                break;
+                            case "ready":
+                                hintPhases[numCoordinates] = Ready;
+
+                                break;
+                            case "set":
+                                hintPhases[numCoordinates] = Set;
+
+                                break;
+                            case "brake":
+                                hintPhases[numCoordinates] = Brake;
+
+                                break;
+                            case "release":
+                                hintPhases[numCoordinates] = Release;
+
+                                break;
+                        }
+                        xCoordinates[numCoordinates] = float.Parse(parts[2]);
+                        yCoordinates[numCoordinates] = float.Parse(parts[3]);
+                        hintDistances[numCoordinates] = float.Parse(parts[4]);
+                        hintSounds[numCoordinates] = parts[5];
 
                         if (++numCoordinates > 255)
                             break;
                     }
 
-					lastHint = -1;
+                    lastHint = -1;
+                    lastGroup = 0;
+                    lastPhase = Start;
                 }
             }
         }

@@ -816,8 +816,6 @@ namespace ACSHMCoach {
                                 lastLap = graphics.CompletedLaps;
 
                                 lastHint = -1;
-                                lastGroup = 0;
-                                lastPhase = Start;
                             }
 
 							int bestHint = -1;
@@ -834,7 +832,7 @@ namespace ACSHMCoach {
                                 }
                             }
 
-                            if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro)))
+                            if ((bestHint > lastHint) && ((lastPhase != Start) || (hintPhases[bestHint] == Intro)))
                             {
                                 if ((lastGroup != hintGroups[bestHint]) && (hintPhases[bestHint] != Intro))
                                     return;

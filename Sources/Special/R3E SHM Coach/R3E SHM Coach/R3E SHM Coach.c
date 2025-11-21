@@ -767,8 +767,6 @@ void checkCoordinates(int playerID) {
 					lastLap = map_buffer->completed_laps;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				int bestHint = -1;
@@ -789,7 +787,7 @@ void checkCoordinates(int playerID) {
 					int phase = hintPhases[bestHint];
 					int group = hintGroups[bestHint];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))

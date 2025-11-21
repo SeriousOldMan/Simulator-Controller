@@ -791,8 +791,6 @@ namespace RF2SHMCoach {
 							lastLap = playerScoring.mTotalLaps;
 
 							lastHint = -1;
-							lastGroup = 0;
-							lastPhase = Start;
 						}
 
 						int bestHint = -1;
@@ -809,7 +807,7 @@ namespace RF2SHMCoach {
 							}
 						}
 
-						if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro))) {
+						if ((bestHint > lastHint) && ((lastPhase != Start) || (hintPhases[bestHint] == Intro))) {
 							if ((lastGroup != hintGroups[bestHint]) && (hintPhases[bestHint] != Intro))
 								return;
 							else if ((hintPhases[bestHint] <= lastPhase) && (hintPhases[bestHint] != Intro))
@@ -837,9 +835,6 @@ namespace RF2SHMCoach {
 
 								lastPlayer.Play();
 							}
-
-							if (lastPhase >= Brake)
-								lastPhase = Start;
 						}
 					}
 				}

@@ -923,15 +923,13 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					lastLap = carLaps;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
 					int phase = hintPhases[index];
 					int group = hintGroups[index];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))

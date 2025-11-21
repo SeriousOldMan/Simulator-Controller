@@ -642,8 +642,6 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					lastLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				int bestHint = -1;
@@ -664,7 +662,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					int phase = hintPhases[bestHint];
 					int group = hintGroups[bestHint];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))

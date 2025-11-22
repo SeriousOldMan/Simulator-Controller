@@ -142,9 +142,9 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 		if (count != 0 && ++numParts >= count)
 			break;
 
-		parts.push_back(s.substr(offset, pos));
+		parts.push_back(s.substr(offset, pos - offset));
 
-		offset += pos + delimiter.length();
+		offset += pos - offset + delimiter.length();
 	}
 
 	parts.push_back(s.substr(offset));
@@ -921,7 +921,7 @@ int main(int argc, char* argv[])
 
 			Sleep(10);
 		}
-		else if (positionTrigger) {
+		else if (trackHints) {
 			loadTrackHints();
 
 			checkCoordinates();

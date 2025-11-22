@@ -85,10 +85,12 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	while ((pos = s.find(delimiter, offset)) != std::string::npos) {
 		if (count != 0 && ++numParts >= count)
 			break;
+		
+		int length = pos - offset;
 
-		parts.push_back(s.substr(offset, pos));
+		parts.push_back(s.substr(offset, length));
 
-		offset += pos + delimiter.length();
+		offset += length + delimiter.length();
 	}
 
 	parts.push_back(s.substr(offset));
@@ -888,7 +890,7 @@ int main(int argc, char* argv[]) {
 
 				Sleep(10);
 			}
-			else if (positionTrigger) {
+			else if (trackHints) {
 				loadTrackHints();
 
 				checkCoordinates(sharedData);

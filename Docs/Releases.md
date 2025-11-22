@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 6.6.6.0
+
+#### Date: 11/21/25
+
+#### Fixes
+
+  - Fixed a bug in the Handling Analyzer of the "Setup WOrkbench", that prevented issues to be collected if the acoustic feedback for over-/understeer was enabled at the same time.
+  - Fixed the continuous update of the refuel amount for a planned pitstop in all apps for *Le Mans Ultimate*.
+  - Fixed a bug, that caused the Google API for voice configuration to be lost when a configuration created by "Simulator Setup" or "Simulator Configuration" was opened next time.
+  - *iRacing* now reports the distance into the track as **-1** for cars, that are standing at the pit or have left the session. This caused some miscalculations, that have been fixed.
+  - Fixed the display of lap times in race reports for sessions with just one lap. A rare case, of course, but can happen in hill climbs or Rallye stages, for example.
+
+#### Changes
+
+  - Rearranged the order of data acquisition from the different Race Assistants for display in "System Monitor" and/or the Integration plugin. This will result in more accuracy in those cases, when one Assistant, for example the Engineer, has more detailed knowledge about a given topic than the other Assistants.
+  - [Internal] More restructuring of the Driving Coach internals for the upcoming anniversary release.
+  - New car models for "Setup Workbench" (by @neophyte):
+    - Assetto Corsa
+	  - Porsche 911 GT3 Cup 2017
+      - ACF GT3 - BMW M4 GT3 2021 (as part of the DLC for modded cars)
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.6.5.0
 
 #### Date: 11/14/25 (planned)
@@ -25,31 +52,6 @@
   - [Internal] Refactored the simulator provider processes for the Spotter and the Coach.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-665), if you have configured a *Reasoning* booster for the Race Engineer.
-
-# Upcoming release
-
-## 6.6.6.0
-
-#### Date: 11/21/25 (planned)
-
-#### Fixes
-
-  - Fixed a bug in the Handling Analyzer of the "Setup WOrkbench", that prevented issues to be collected if the acoustic feedback for over-/understeer was enabled at the same time.
-  - Fixed the continuous update of the refuel amount for a planned pitstop in all apps for *Le Mans Ultimate*.
-  - Fixed a bug, that caused the Google API for voice configuration to be lost when a configuration created by "Simulator Setup" or "Simulator Configuration" was opened next time.
-  - *iRacing* now reports the distance into the track as **-1** for cars, that are standing at the pit or have left the session. This caused some miscalculations, that have been fixed.
-  - Fixed the display of lap times in race reports for sessions with just one lap. A rare case, of course, but can happen in hill climbs or Rallye stages, for example.
-
-#### Changes
-
-  - Rearranged the order of data acquisition from the different Race Assistants for display in "System Monitor" and/or the Integration plugin. This will result in more accuracy in those cases, when one Assistant, for example the Engineer, has more detailed knowledge about a given topic than the other Assistants.
-  - [Internal] More restructuring of the Driving Coach internals for the upcoming anniversary release.
-  - New car models for "Setup Workbench" (by @neophyte):
-    - Assetto Corsa
-	  - Porsche 911 GT3 Cup 2017
-      - ACF GT3 - BMW M4 GT3 2021 (as part of the DLC for modded cars)
-
-# Release history
 
 ## 6.6.4.0
 

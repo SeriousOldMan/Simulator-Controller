@@ -153,7 +153,7 @@ void splitString(const char* s, const char* delimiter, int count, char** parts) 
 
 		parts[numParts][i] = '\0';
 
-		s = (pos + 1);
+		s = (pos + strlen(delimiter));
 
 		numParts += 1;
 		pos = strstr(s, delimiter);
@@ -997,7 +997,7 @@ int main(int argc, char* argv[])
 
 				Sleep(10);
 			}
-			else if (positionTrigger) {
+			else if (trackHints) {
 				loadTrackHints();
 
 				checkCoordinates(playerID);

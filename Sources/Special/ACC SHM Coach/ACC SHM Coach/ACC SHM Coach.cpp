@@ -141,10 +141,12 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	while ((pos = s.find(delimiter, offset)) != std::string::npos) {
 		if (count != 0 && ++numParts >= count)
 			break;
+		
+		int length = pos - offset;
 
-		parts.push_back(s.substr(offset, pos - offset));
+		parts.push_back(s.substr(offset, length));
 
-		offset += pos - offset + delimiter.length();
+		offset += length + delimiter.length();
 	}
 
 	parts.push_back(s.substr(offset));

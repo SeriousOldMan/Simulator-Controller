@@ -741,7 +741,8 @@ class Corner extends Section {
 					brakingSpeed := speed
 
 				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
-							   , Distance: telemetry.getValue(index, "Distance"), Brake: brake})
+							   , Distance: telemetry.getValue(index, "Distance")
+							   , Time: telemetry.getValue(index, "Time"), Brake: brake})
 
 				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
 					if ((brakeReference - brake) > 0.2)
@@ -799,7 +800,8 @@ class Corner extends Section {
 					acceleratingInitialSpeed := speed
 
 				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
-								  , Distance: telemetry.getValue(index, "Distance"), Throttle: throttle})
+								  , Distance: telemetry.getValue(index, "Distance")
+								  , Time: telemetry.getValue(index, "Time"), Throttle: throttle})
 
 				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
 					if ((throttleReference - throttle) > 0.2)
@@ -1219,8 +1221,7 @@ class Telemetry {
 				brake := section.BrakeCurve[1]
 
 				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: section.Speed["Braking"]
-							, Length: section.Length["Braking"], Time: section.Time["Braking"]
-							, Curve: section.BrakeCurve})
+							, Length: section.Length["Braking"], Time: brake.Time, Curve: section.BrakeCurve})
 			}
 
 		return braking
@@ -1235,8 +1236,7 @@ class Telemetry {
 				throttle := section.ThrottleCurve[1]
 
 				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: section.Speed["Accelerating"]
-								 , Length: section.Length["Accelerating"], Time: section.Time["Accelerating"]
-								 , Curve: section.ThrottleCurve})
+								 , Length: section.Length["Accelerating"], Time: throttle.Time, Curve: section.ThrottleCurve})
 			}
 
 		return accelerating
@@ -1253,18 +1253,18 @@ class Telemetry {
 		return false
 	}
 
-	findCoordinates(distance, &x, &y) {
+	findCoordinates(channel, value, &x, &y, channels*) {
 		local lowIndex := 1
 		local highIndex := this.Data.Length
-		local cIndex, cDistance
+		local cIndex, cValue
 
 		while (lowIndex <= highIndex) {
 			cIndex := (lowIndex + Round((highIndex - lowIndex) / 2))
-			cDistance := this.getValue(cIndex, "Distance", kUndefined)
+			cValue := this.getValue(cIndex, channel, kUndefined)
 
-			if (cDistance = kUndefined)
+			if (cValue = kUndefined)
 				break
-			else if distance < cDistance
+			else if distance < cValue
 				highIndex := cIndex - 1
 			else
 				lowIndex := cIndex + 1
@@ -1272,6 +1272,9 @@ class Telemetry {
 			if (lowIndex > highIndex) {
 				x := this.getValue(cIndex, "PosX")
 				y := this.getValue(cIndex, "PosY")
+
+				for ignore, channel in channels
+					%channel% := this.getValue(cIndex, %channel%)
 
 				return true
 			}

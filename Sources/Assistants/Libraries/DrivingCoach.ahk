@@ -1945,6 +1945,8 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	updateBrakeTrigger(telemetry) {
+		local knowledgeBase := this.KnowledgeBase
+		local lap := knowledgeBase.getValue("Lap")
 		local collector := this.TelemetryCollector
 		local triggerFile := temporaryFileName("Brake", "trigger.tmp")
 		local countdownOne := this.iCountdownOne
@@ -1957,9 +1959,10 @@ class DrivingCoach extends GridRaceAssistant {
 		local tries := 3
 		local brakeSections := []
 		local ignore, index, braking, brake, maxBrake, metersPerSec, trackLength, startDistance, x, y
-		local section, numSections, instructions
+		local section, numSections, instructions, clean
 
 		static lastTelemetry := false
+		static nextLap := 0
 
 		static distance := false
 		static brakeThreshold := false
@@ -2012,10 +2015,12 @@ class DrivingCoach extends GridRaceAssistant {
 					 || ((section2.End >= section1.Start) || (section2.End <= section1.End)))
 		}
 
-		if (telemetry == lastTelemetry)
+		if ((telemetry == lastTelemetry) && (lap < nextLap))
 			return
-		else
+		else {
 			lastTelemetry := telemetry
+			nextLap := (lap + 3)
+		}
 
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand) {
 			if !distance {
@@ -2067,30 +2072,51 @@ class DrivingCoach extends GridRaceAssistant {
 				brakeSections.Push({Corner: index, Start: startDistance, End: endDistance, Instructions: instructions})
 			}
 
-			brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 8))
-			numSections := brakeSections.Length
+			brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 7))
 
-			for index, section in brakeSections {
-				if (numSections > 1)
-					if (index = 1) {
-						if (overlap(section, brakeSections[2]) || overlap(brakeSections[numSections], section))
-							continue
-					}
-					else if (index = numSections) {
-						if (overlap(section, brakeSections[1]) || overlap(brakeSections[numSections - 1], section))
-							continue
-					}
-					else if (overlap(brakeSections[Max(1, index - 1)], section) || overlap(section, brakeSections[Min(numSections, index + 1)]))
-						continue
+			loop {
+				numSections := brakeSections.Length
+				clean := true
+				triggers := ""
 
-				if (triggers != "")
-					triggers .= ("`n" . section.Instructions)
-				else
-					triggers := section.Instructions
+				for index, section in brakeSections {
+					if (numSections > 1)
+						if (index = 1) {
+							if (overlap(section, brakeSections[2]) || overlap(brakeSections[numSections], section)) {
+								brakeSections.RemoveAt(index)
 
-				if isDebug()
-					logMessage(kLogDebug, "Corner: " . section.Corner . "; Start: " . section.Start . "; End: " . section.End)
+								clean := false
+
+								break
+							}
+						}
+						else if (index = numSections) {
+							if (overlap(section, brakeSections[1]) || overlap(brakeSections[numSections - 1], section)) {
+								brakeSections.RemoveAt(index)
+
+								clean := false
+
+								break
+							}
+						}
+						else if (overlap(brakeSections[Max(1, index - 1)], section) || overlap(section, brakeSections[Min(numSections, index + 1)])) {
+							brakeSections.RemoveAt(index)
+
+							clean := false
+
+							break
+						}
+
+					if (triggers != "")
+						triggers .= ("`n" . section.Instructions)
+					else
+						triggers := section.Instructions
+
+					if isDebug()
+						logMessage(kLogDebug, "Corner: " . section.Corner . "; Start: " . section.Start . "; End: " . section.End)
+				}
 			}
+			until clean
 
 			FileAppend(triggers, triggerFile)
 

@@ -4773,10 +4773,10 @@ class GridRaceAssistant extends RaceAssistant {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		if isDebug()
-			logMessage(kLogDebug, "Grid Position: " . this.getPosition(driver, "Overall", data) . ", " . this.getPosition(driver, "Class", data) . "; Force: " . (force ? kTrue : kFalse) . "; Position: " . this.GridPosition)
-
 		if ((force || !this.GridPosition) && count && driver) {
+			if isDebug()
+				logMessage(kLogDebug, "Grid Position: " . this.getPosition(driver, "Overall", data) . ", " . this.getPosition(driver, "Class", data) . "; Force: " . (force ? kTrue : kFalse) . "; Position: " . this.GridPosition)
+
 			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
 			this.iClassGridPosition := this.getPosition(driver, "Class", data)
 		}

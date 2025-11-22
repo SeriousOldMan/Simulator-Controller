@@ -201,8 +201,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			if (active != this.TelemetryCoachingActive) {
 				this.iTelemetryCoachingActive := active
 
-				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), active)
-				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), active)
+				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
+				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
 
 				this.updateActions(kSessionUnknown)
 			}
@@ -214,7 +214,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			}
 
 			if (brake != this.BrakeCoachingActive) {
-				this.iBrakeCoachingActive := track
+				this.iBrakeCoachingActive := brake
 
 				this.updateActions(kSessionUnknown)
 			}

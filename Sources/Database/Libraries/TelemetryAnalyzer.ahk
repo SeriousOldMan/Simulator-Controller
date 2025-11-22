@@ -1264,7 +1264,7 @@ class Telemetry {
 
 			if (cValue = kUndefined)
 				break
-			else if distance < cValue
+			else if value < cValue
 				highIndex := cIndex - 1
 			else
 				lowIndex := cIndex + 1

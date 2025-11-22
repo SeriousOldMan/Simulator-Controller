@@ -1116,7 +1116,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm)
 
-			this.trackCoachingStartRecognized([], false)
+			this.updateConfigurationValues({OnTrackCoaching: true})
 		}
 		else
 			this.trackCoachingStartRecognized([], confirm)
@@ -1126,7 +1126,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm)
 
-			this.brakeCoachingStartRecognized([], false)
+			this.updateConfigurationValues({BrakeCoaching: true})
 		}
 		else
 			this.brakeCoachingStartRecognized([], confirm)
@@ -2050,7 +2050,7 @@ class DrivingCoach extends GridRaceAssistant {
 			return
 		else {
 			lastTelemetry := telemetry
-			nextLap := (lap + 3)
+			nextLap := (lap + 2)
 		}
 
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
@@ -2069,13 +2069,13 @@ class DrivingCoach extends GridRaceAssistant {
 					brakeTime := braking.Time
 					section := A_Index
 
-					if telemetry.findCoordinates("Time", normmalizeTime(brakeTime - 8), &x, &y, &startDistance := "Distance")
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 8000), &x, &y, &startDistance := "Distance")
 						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
 
-					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 3), &x, &y)
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 3000), &x, &y)
 						instructions .= (section . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")
 
-					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 1.5), &x, &y)
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 1500), &x, &y)
 						instructions .= (section . A_Space . "Set" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownTwo . "`n")
 
 					instructions .= (section . A_Space . "Brake" . A_Space . braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)

@@ -446,8 +446,12 @@ class DrivingCoach extends GridRaceAssistant {
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
 		}
 
-		if values.HasProp("OnTrackCoaching")
+		if values.HasProp("OnTrackCoaching") {
 			this.iOnTrackCoaching := values.OnTrackCoaching
+
+			this.iFocusedCorners := []
+			this.iTelemetryFuture := false
+		}
 
 		if values.HasProp("BrakeCoaching")
 			this.iBrakeCoaching := values.BrakeCoaching
@@ -1116,6 +1120,8 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm)
 
+			this.trackCoachingStartRecognized([], false)
+
 			this.updateConfigurationValues({OnTrackCoaching: true})
 		}
 		else
@@ -1125,6 +1131,8 @@ class DrivingCoach extends GridRaceAssistant {
 	startBrakeCoaching(confirm := true) {
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm)
+
+			this.brakeCoachingStartRecognized([], false)
 
 			this.updateConfigurationValues({BrakeCoaching: true})
 		}
@@ -1175,11 +1183,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if deactivate {
 			this.iCoachingActive := false
 
-			this.iOnTrackCoaching := false
-			this.iFocusedCorners := []
-			this.iTelemetryFuture := false
-
-			this.iBrakeCoaching := false
+			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false})
 		}
 	}
 
@@ -1220,9 +1224,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		this.iOnTrackCoaching := false
-		this.iFocusedCorners := []
-		this.iTelemetryFuture := false
+		this.updateConfigurationValues({OnTrackCoaching: false})
 	}
 
 	startupBrakeCoaching() {
@@ -1260,7 +1262,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		this.iBrakeCoaching := false
+		this.updateConfigurationValues({BrakeCoaching: false})
 	}
 
 	telemetryAvailable(laps) {

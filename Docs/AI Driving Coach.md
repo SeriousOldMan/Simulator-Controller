@@ -441,6 +441,14 @@ Another and possibly easier way to automatically start telemetry-based coaching 
 
 As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm), the Driving Coach can also be used without a LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
 
+### Special notes for *Assetto Corsa Competizione*
+
+A special learning method is used for *Assetto Corsa Competizione*, because this simulator lack some important data in the API about track position. Therefore it can take up to 4 laps, before data is coming in.
+
+### Special notes for *RaceRoom Racing Experience*
+
+COmplete telemetry data is only provided for valid laps. Make sure to stay within track limits before the Coach has acquire the first set of telemetry data.
+
 ## How it works
 
 Beside using a LLM to interact with the driver, the Driving Coach uses the same rule-based AI engine as the other Assistants. Therefore, the Driving Coach has the same understanding of the current race situation as the other Assistants. As you already might have guessed, this knowledge is used to supply the data to the LLM using the [Instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#instructions) described above.

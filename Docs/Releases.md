@@ -23,7 +23,18 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.6.7.0
+
+#### Date: 11/28/25 (planned)
+
+#### Fixes
+
+  - None this time.
+
+#### Changes
+
+  - Using Hello is now supported in Assistant activation phrases in English.
+  - Using Hallo is now supported in Assistant activation phrases in German.
 
 # Release history
 

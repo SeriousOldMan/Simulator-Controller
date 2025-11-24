@@ -49,7 +49,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.6.7.0-dev]() (Early build for 6.6.7. Changes: Support for Hello/Hallo in activation phrase.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6670) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-667) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

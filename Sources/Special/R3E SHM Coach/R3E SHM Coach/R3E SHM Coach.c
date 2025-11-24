@@ -101,10 +101,10 @@ void sendTriggerMessage(char* message) {
 		winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.ahk");
 
 	if (winHandle != 0) {
-		char buffer[128];
+		char buffer[512];
 
-		strcpy_s(buffer, 128, "Driving Coach:");
-		strcpy_s(buffer + strlen("Driving Coach:"), 128 - strlen("Driving Coach:"), message);
+		strcpy_s(buffer, 512, "Driving Coach:");
+		strcpy_s(buffer + strlen("Driving Coach:"), 512 - strlen("Driving Coach:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -117,10 +117,10 @@ void sendAnalyzerMessage(char* message) {
 		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
 
 	if (winHandle != 0) {
-		char buffer[128];
+		char buffer[512];
 
-		strcpy_s(buffer, 128, "Analyzer:");
-		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
+		strcpy_s(buffer, 512, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 512 - strlen("Analyzer:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -143,23 +143,28 @@ void splitString(const char* s, const char* delimiter, int count, char** parts) 
 	int numParts = 0;
 
 	while (pos) {
-		if (count != 0 && numParts < (count - 1))
+		if (count != 0 && numParts >= (count - 1))
 			break;
 
 		int i = 0;
 
-		for (char* c = (char *)s; c < pos; c++)
+		for (char* c = (char *)s; i < 255 && c < pos; c++)
 			parts[numParts][i++] = *c;
 
 		parts[numParts][i] = '\0';
 
-		s = (pos + 1);
+		s = (pos + strlen(delimiter));
 
 		numParts += 1;
 		pos = strstr(s, delimiter);
 	}
 
-	strcpy_s(parts[numParts], 256, s);
+	int i = 0;
+
+	for (char* c = (char*)s; i < 255 && *c != '\0' && *c != '\n'; c++)
+		parts[numParts][i++] = *c;
+
+	parts[numParts][i] = '\0';
 }
 
 inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
@@ -767,8 +772,6 @@ void checkCoordinates(int playerID) {
 					lastLap = map_buffer->completed_laps;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				int bestHint = -1;
@@ -789,7 +792,7 @@ void checkCoordinates(int playerID) {
 					int phase = hintPhases[bestHint];
 					int group = hintGroups[bestHint];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))
@@ -999,7 +1002,7 @@ int main(int argc, char* argv[])
 
 				Sleep(10);
 			}
-			else if (positionTrigger) {
+			else if (trackHints) {
 				loadTrackHints();
 
 				checkCoordinates(playerID);

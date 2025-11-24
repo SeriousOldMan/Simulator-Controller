@@ -78,7 +78,7 @@ Ultimately, the decision between an early or late pit stop should be based on ca
 
 **Driver:** Can you shorten this answer?
 
-**Aiden**: Certainly! Here's a shorter version:
+**Aiden:** Certainly! Here's a shorter version:
 
 The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behavior. 
 
@@ -375,6 +375,47 @@ It is possible to work with the Driving Coach on specific corners. To start this
 with *X* the number of the corner you want to practice. This command can be issued multiple times and the Driving Coach will remember the different corners you want to practice.
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
+
+#### Practicing brakings points
+
+Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:
+
+**Aiden:** For the next corner, brake as hard as you can and then gradually release the brake while turning in.
+
+**Aiden:** Ready
+
+**Aiden:** Set
+
+**Aiden:** Brake
+
+**Aiden:** Release
+
+The following video gives you a good demonstration of this:
+
+[![](https://img.youtube.com/vi/itT8sCm_51c/0.jpg)](https://youtu.be/itT8sCm_51c)
+
+##### Notes
+
+1. This works also in restricted mode, i.e. without a GPT connection (see below).
+2. You can either use corner by corner coaching as described above or brake point coaching.
+3. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
+
+   - *Coach: Distance before Braking Point*
+     
+	 This setting defines how many meters before the actual braking point the Coach will yell out "Brake". Default is 30 meters.
+   - *Coach: Threshold for hard brake pressure*
+   
+     Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
+   - *Coach: Threshold for release pressure*
+   
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent.
+   - *Coach: Threshold for trail braking*
+   
+     When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.
+	 
+   Please note, that all these settings can be defined per car and even per track.
+5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
 
 ### Automatic activation of coaching mode
 

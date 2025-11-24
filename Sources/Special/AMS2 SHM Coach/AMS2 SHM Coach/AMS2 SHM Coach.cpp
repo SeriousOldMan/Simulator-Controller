@@ -39,10 +39,10 @@ void sendTriggerMessage(const char* message) {
 		winHandle = FindWindowEx(0, 0, 0, L"Driving Coach.ahk");
 
 	if (winHandle != 0) {
-		char buffer[128];
+		char buffer[512];
 
-		strcpy_s(buffer, 128, "Driving Coach:");
-		strcpy_s(buffer + strlen("Driving Coach:"), 128 - strlen("Driving Coach:"), message);
+		strcpy_s(buffer, 512, "Driving Coach:");
+		strcpy_s(buffer + strlen("Driving Coach:"), 512 - strlen("Driving Coach:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -55,10 +55,10 @@ void sendAnalyzerMessage(const char* message) {
 		winHandle = FindWindowEx(0, 0, 0, L"Setup Workbench.ahk");
 
 	if (winHandle != 0) {
-		char buffer[128];
+		char buffer[512];
 
-		strcpy_s(buffer, 128, "Analyzer:");
-		strcpy_s(buffer + strlen("Analyzer:"), 128 - strlen("Analyzer:"), message);
+		strcpy_s(buffer, 512, "Analyzer:");
+		strcpy_s(buffer + strlen("Analyzer:"), 512 - strlen("Analyzer:"), message);
 
 		sendStringMessage(winHandle, 0, buffer);
 	}
@@ -85,10 +85,12 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	while ((pos = s.find(delimiter, offset)) != std::string::npos) {
 		if (count != 0 && ++numParts >= count)
 			break;
+		
+		int length = pos - offset;
 
-		parts.push_back(s.substr(offset, pos));
+		parts.push_back(s.substr(offset, length));
 
-		offset += pos + delimiter.length();
+		offset += length + delimiter.length();
 	}
 
 	parts.push_back(s.substr(offset));
@@ -642,8 +644,6 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					lastLap = sharedData->mParticipantInfo[carID].mLapsCompleted;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				int bestHint = -1;
@@ -664,7 +664,7 @@ void checkCoordinates(const SharedMemory* sharedData) {
 					int phase = hintPhases[bestHint];
 					int group = hintGroups[bestHint];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))
@@ -890,7 +890,7 @@ int main(int argc, char* argv[]) {
 
 				Sleep(10);
 			}
-			else if (positionTrigger) {
+			else if (trackHints) {
 				loadTrackHints();
 
 				checkCoordinates(sharedData);

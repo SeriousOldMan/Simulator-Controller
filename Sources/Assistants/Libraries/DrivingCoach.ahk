@@ -446,8 +446,12 @@ class DrivingCoach extends GridRaceAssistant {
 				:= getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeSmoothnessThreshold", 90)
 		}
 
-		if values.HasProp("OnTrackCoaching")
+		if values.HasProp("OnTrackCoaching") {
 			this.iOnTrackCoaching := values.OnTrackCoaching
+
+			this.iFocusedCorners := []
+			this.iTelemetryFuture := false
+		}
 
 		if values.HasProp("BrakeCoaching")
 			this.iBrakeCoaching := values.BrakeCoaching
@@ -1117,6 +1121,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.telemetryCoachingStartRecognized([], confirm)
 
 			this.trackCoachingStartRecognized([], false)
+
+			this.updateConfigurationValues({OnTrackCoaching: true})
 		}
 		else
 			this.trackCoachingStartRecognized([], confirm)
@@ -1127,6 +1133,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.telemetryCoachingStartRecognized([], confirm)
 
 			this.brakeCoachingStartRecognized([], false)
+
+			this.updateConfigurationValues({BrakeCoaching: true})
 		}
 		else
 			this.brakeCoachingStartRecognized([], confirm)
@@ -1175,11 +1183,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if deactivate {
 			this.iCoachingActive := false
 
-			this.iOnTrackCoaching := false
-			this.iFocusedCorners := []
-			this.iTelemetryFuture := false
-
-			this.iBrakeCoaching := false
+			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false})
 		}
 	}
 
@@ -1204,6 +1208,23 @@ class DrivingCoach extends GridRaceAssistant {
 				logMessage(kLogDebug, "Track coaching NOT started...")
 
 		return started
+	}
+
+	shutdownTrackCoaching() {
+		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		if isDebug()
+			logMessage(kLogDebug, "Track coaching stopped...")
+
+		this.shutdownTrackTrigger()
+
+		setMultiMapValue(state, "Coaching", "Track", false)
+
+		removeMultiMapValues(state, "Instructions")
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.updateConfigurationValues({OnTrackCoaching: false})
 	}
 
 	startupBrakeCoaching() {
@@ -1240,6 +1261,8 @@ class DrivingCoach extends GridRaceAssistant {
 		removeMultiMapValues(state, "Instructions")
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.updateConfigurationValues({BrakeCoaching: false})
 	}
 
 	telemetryAvailable(laps) {
@@ -1945,6 +1968,9 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	updateBrakeTrigger(telemetry) {
+		local knowledgeBase := this.KnowledgeBase
+		local lap := knowledgeBase.getValue("Lap")
+		local lapTime := telemetry.getValue(telemetry.Data.Length, "Time", 0)
 		local collector := this.TelemetryCollector
 		local triggerFile := temporaryFileName("Brake", "trigger.tmp")
 		local countdownOne := this.iCountdownOne
@@ -1953,18 +1979,28 @@ class DrivingCoach extends GridRaceAssistant {
 		local releaseCommand := this.iReleaseCommand
 		local speaker := this.VoiceManager.getLocalSpeaker()
 		local triggers := ""
-		local endDistance := -99999
 		local tries := 3
 		local brakeSections := []
-		local ignore, index, braking, brake, maxBrake, metersPerSec, trackLength, startDistance, x, y
-		local section, numSections, instructions
+		local ignore, index, braking, brake, maxBrake, metersPerSec, trackLength
+		local brakeTime, startDistance, endDistance, x, y
+		local section, numSections, instructions, clean
 
 		static lastTelemetry := false
+		static nextLap := 0
 
 		static distance := false
 		static brakeThreshold := false
 		static releaseThreshold := false
 		static trailBrakingThreshold := false
+
+		normalizeTime(time) {
+			if (time < 0)
+				return (lapTime + time)
+			else if (time > lapTime)
+				return (time - lapTime)
+			else
+				return time
+		}
 
 		getIntro(brakeCurve) {
 			local maxBrake := 0
@@ -1975,12 +2011,12 @@ class DrivingCoach extends GridRaceAssistant {
 			for index, brake in brakeCurve {
 				maxBrake := Max(brake.Brake, maxBrake)
 
-				if (!releaseStart && (brake.Brake <= (maxBrake * trailBrakingThreshold)))
+				if (!releaseStart && (brake.Brake <= (maxBrake * releaseThreshold)))
 					releaseStart := index
 			}
 
 			hardBrake := (maxBrake >= brakeThreshold)
-			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBraking)) : false)
+			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false)
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
 
@@ -2012,98 +2048,133 @@ class DrivingCoach extends GridRaceAssistant {
 					 || ((section2.End >= section1.Start) || (section2.End <= section1.End)))
 		}
 
-		if (telemetry == lastTelemetry)
+		if ((telemetry == lastTelemetry) && (lap < nextLap))
 			return
-		else
+		else {
 			lastTelemetry := telemetry
+			nextLap := (lap + 2)
+		}
 
-		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand) {
-			if !distance {
-				distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Distance", 30))
-				brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 70) / 100)
-				releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 70) / 100)
-				trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
-			}
+		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
+			try {
+				if !distance {
+					distance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Distance", 30))
+					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
+					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
+					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
+				}
 
-			trackLength := collector.TrackLength
+				trackLength := collector.TrackLength
 
-			for index, braking in telemetry.Braking {
-				metersPerSec := (braking.Speed * 1000 / 3600)
-				startDistance := (braking.Start - (8 * metersPerSec))
-				section := A_Index
+				for index, braking in telemetry.Braking {
+					metersPerSec := (braking.Speed * 1000 / 3600)
+					brakeTime := braking.Time
+					section := A_Index
 
-				if (startDistance < 0)
-					startDistance := (trackLength - startDistance)
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 8000), &x, &y, &startDistance := "Distance")
+						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
 
-				if telemetry.findCoordinates(startDistance, &x, &y)
-					instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 3000), &x, &y)
+						instructions .= (section . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")
 
-				if telemetry.findCoordinates(braking.Start - (3 * metersPerSec), &x, &y)
-					instructions .= (section . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")
+					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 1500), &x, &y)
+						instructions .= (section . A_Space . "Set" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownTwo . "`n")
 
-				if telemetry.findCoordinates(braking.Start - (1.5 * metersPerSec), &x, &y)
-					instructions .= (section . A_Space . "Set" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownTwo . "`n")
+					instructions .= (section . A_Space . "Brake" . A_Space . braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
 
-				instructions .= (section . A_Space . "Brake" . A_Space . braking.X . A_Space . braking.Y . A_Space . distance . A_Space . brakeCommand)
+					endDistance := (braking.Start + metersPerSec)
 
-				endDistance := (braking.Start + metersPerSec)
+					maxBrake := 0
 
-				maxBrake := 0
+					for ignore, brake in braking.Curve
+						if ((brake.Brake < (maxBrake * releaseThreshold)) && ((brake.Distance - braking.Start) > distance)) {
+							endDistance := (brake.Distance + (metersPerSec / 2))
 
-				for ignore, brake in braking.Curve
-					if ((brake.Brake < (maxBrake * releaseThreshold)) && ((brake.Distance - braking.Start) > distance)) {
-						endDistance := (brake.Distance + (metersPerSec / 2))
+							instructions .= ("`n" . section . A_Space . "Release" . A_Space . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . releaseCommand)
 
-						instructions .= ("`n" . section . A_Space . "Release" . A_Space . brake.X . A_Space . brake.Y . A_Space . Round(distance / 2) . A_Space . releaseCommand)
+							break
+						}
+						else
+							maxBrake := Max(maxBrake, brake.Brake)
+
+					if (endDistance > trackLength)
+						endDistance := (startDistance - trackLength)
+
+					brakeSections.Push({Corner: section, Speed: metersPerSec
+									  , Start: startDistance, End: endDistance, Instructions: instructions})
+				}
+
+				if isDebug()
+					logMessage(kLogDebug, "All brake sections: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+
+				brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 7))
+
+				if isDebug()
+					logMessage(kLogDebug, "Brake section candidates: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+
+				loop {
+					numSections := brakeSections.Length
+					clean := true
+					triggers := ""
+
+					for index, section in brakeSections {
+						if (numSections > 1)
+							if (index = 1) {
+								if (overlap(section, brakeSections[2]) || overlap(brakeSections[numSections], section)) {
+									brakeSections.RemoveAt(index)
+
+									clean := false
+
+									break
+								}
+							}
+							else if (index = numSections) {
+								if (overlap(section, brakeSections[1]) || overlap(brakeSections[numSections - 1], section)) {
+									brakeSections.RemoveAt(index)
+
+									clean := false
+
+									break
+								}
+							}
+							else if (overlap(brakeSections[Max(1, index - 1)], section)
+								  || overlap(section, brakeSections[Min(numSections, index + 1)])) {
+								brakeSections.RemoveAt(index)
+
+								clean := false
+
+								break
+							}
+
+						if (triggers != "")
+							triggers .= ("`n" . section.Instructions)
+						else
+							triggers := section.Instructions
+					}
+				}
+				until clean
+
+				if isDebug()
+					do(brakeSections, (section) {
+						logMessage(kLogDebug, "Corner: " . section.Corner . "; Start: " . section.Start
+																		  . "; End: " . section.End . "; Speed (m/s): " . section.Speed)
+					})
+
+				FileAppend(triggers, triggerFile)
+
+				while (tries-- > 0)
+					try {
+						FileMove(triggerFile, this.iBrakeTriggerFile, 1)
 
 						break
 					}
-					else
-						maxBrake := Max(maxBrake, brake.Brake)
-
-				if (endDistance > trackLength)
-					endDistance := (startDistance - trackLength)
-
-				brakeSections.Push({Corner: index, Start: startDistance, End: endDistance, Instructions: instructions})
-			}
-
-			brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 8))
-			numSections := brakeSections.Length
-
-			for index, section in brakeSections {
-				if (numSections > 1)
-					if (index = 1) {
-						if (overlap(section, brakeSections[2]) || overlap(brakeSections[numSections], section))
-							continue
+					catch Any {
+						Sleep(100)
 					}
-					else if (index = numSections) {
-						if (overlap(section, brakeSections[1]) || overlap(brakeSections[numSections - 1], section))
-							continue
-					}
-					else if (overlap(brakeSections[Max(1, index - 1)], section) || overlap(section, brakeSections[Min(numSections, index + 1)]))
-						continue
-
-				if (triggers != "")
-					triggers .= ("`n" . section.Instructions)
-				else
-					triggers := section.Instructions
-
-				if isDebug()
-					logMessage(kLogDebug, "Corner: " . section.Corner . "; Start: " . section.Start . "; End: " . section.End)
 			}
-
-			FileAppend(triggers, triggerFile)
-
-			while (tries-- > 0)
-				try {
-					FileMove(triggerFile, this.iBrakeTriggerFile, 1)
-
-					break
-				}
-				catch Any {
-					Sleep(100)
-				}
-		}
+			catch Any as exception {
+				logError(exception, true)
+			}
 	}
 
 	shutdownBrakeTrigger(force := false, arguments*) {

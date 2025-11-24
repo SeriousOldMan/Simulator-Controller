@@ -141,10 +141,12 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 	while ((pos = s.find(delimiter, offset)) != std::string::npos) {
 		if (count != 0 && ++numParts >= count)
 			break;
+		
+		int length = pos - offset;
 
-		parts.push_back(s.substr(offset, pos));
+		parts.push_back(s.substr(offset, length));
 
-		offset += pos + delimiter.length();
+		offset += length + delimiter.length();
 	}
 
 	parts.push_back(s.substr(offset));
@@ -710,8 +712,6 @@ void checkCoordinates() {
 					lastLap = gf->completedLaps;
 
 					lastHint = -1;
-					lastGroup = 0;
-					lastPhase = Start;
 				}
 
 				int bestHint = -1;
@@ -732,7 +732,7 @@ void checkCoordinates() {
 					int phase = hintPhases[bestHint];
 					int group = hintGroups[bestHint];
 
-					if ((lastHint > -1) || (phase == Intro)) {
+					if ((lastPhase != Start) || (phase == Intro)) {
 						if ((lastGroup != group) && (phase != Intro))
 							return;
 						else if ((phase <= lastPhase) && (phase != Intro))
@@ -923,7 +923,7 @@ int main(int argc, char* argv[])
 
 			Sleep(10);
 		}
-		else if (positionTrigger) {
+		else if (trackHints) {
 			loadTrackHints();
 
 			checkCoordinates();

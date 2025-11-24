@@ -310,12 +310,13 @@ namespace RF2SHMCoach {
 					else
 						SendAnalyzerMessage("acousticFeedback:" + wavFile);
 				}
-                else
-                {
-                    if (lastPlayer != null)
-                        lastPlayer.Stop();
+				else
+				{
+					if (lastPlayer != null) {
+						lastPlayer.Stop();
 
-                    lastPlayer.Dispose();
+						lastPlayer.Dispose();
+					}
 
                     lastPlayer = new System.Media.SoundPlayer(wavFile);
 
@@ -791,8 +792,6 @@ namespace RF2SHMCoach {
 							lastLap = playerScoring.mTotalLaps;
 
 							lastHint = -1;
-							lastGroup = 0;
-							lastPhase = Start;
 						}
 
 						int bestHint = -1;
@@ -809,7 +808,7 @@ namespace RF2SHMCoach {
 							}
 						}
 
-						if ((bestHint > lastHint) && ((lastHint > -1) || (hintPhases[bestHint] == Intro))) {
+						if ((bestHint > lastHint) && ((lastPhase != Start) || (hintPhases[bestHint] == Intro))) {
 							if ((lastGroup != hintGroups[bestHint]) && (hintPhases[bestHint] != Intro))
 								return;
 							else if ((hintPhases[bestHint] <= lastPhase) && (hintPhases[bestHint] != Intro))
@@ -829,17 +828,16 @@ namespace RF2SHMCoach {
 							else
 							{
 								if (lastPlayer != null)
+								{
 									lastPlayer.Stop();
 
-								lastPlayer.Dispose();
+									lastPlayer.Dispose();
+								}
 
 								lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
 
 								lastPlayer.Play();
 							}
-
-							if (lastPhase >= Brake)
-								lastPhase = Start;
 						}
 					}
 				}

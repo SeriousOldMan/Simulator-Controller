@@ -441,7 +441,8 @@ exitProcess(urgent := false) {
 		ExitApp(0)
 	}
 	finally {
-		ProcessClose(ProcessExist())
+		if urgent
+			ProcessClose(ProcessExist())
 	}
 }
 

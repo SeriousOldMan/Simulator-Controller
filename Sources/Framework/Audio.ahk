@@ -128,6 +128,9 @@ requireSoundPlayer(player) {
 
 	if (kSox && FileExist(kSox)) {
 		path := (kProgramsDirectory . player)
+		
+		if !InStr(player, ".exe")
+			player .= ".exe"
 
 		if FileExist(path)
 			return path

@@ -173,6 +173,7 @@ inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
 
 
 char* player = "";
+char* workingDirectory = "";
 char* audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
@@ -183,9 +184,9 @@ void playSound(char* wavFile, BOOL wait) {
 	char buffer[512];
 	
 	if (strcmp(audioDevice, "") == 0)
-		sprintf_s(buffer, 256, "\"%s\" \"%s\" -T waveaudio vol %f", player, wavFile, volume);
+		sprintf_s(buffer, 256, "\"%s\" \"%s\" -t waveaudio vol %f", player, wavFile, volume);
 	else
-		sprintf_s(buffer, 256, "\"%s\" \"%s\" -T waveaudio \"%s\" vol %f", player, wavFile, audioDevice, volume);
+		sprintf_s(buffer, 256, "\"%s\" \"%s\" -t waveaudio \"%s\" vol %f", player, wavFile, audioDevice, volume);
 
 	if (CreateProcessA(
 		NULL,               // Application name
@@ -195,7 +196,7 @@ void playSound(char* wavFile, BOOL wait) {
 		FALSE,              // Set handle inheritance to FALSE
 		0,                  // No creation flags
 		NULL,               // Use parent's environment block
-		NULL,               // Use parent's starting directory 
+		workingDirectory,
 		&si,                // Pointer to STARTUPINFO structure
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
@@ -938,6 +939,9 @@ int main(int argc, char* argv[])
 
 			if (argc > 5)
 				player = argv[5];
+
+			if (argc > 6)
+				workingDirectory = argv[6];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -967,6 +971,15 @@ int main(int argc, char* argv[])
 
 					if (argc > 13)
 						audioDevice = argv[13];
+
+					if (argc > 14)
+						volume = (float)atof(argv[14]);
+
+					if (argc > 15)
+						player = argv[15];
+
+					if (argc > 16)
+						workingDirectory = argv[16];
 				}
 			}
 		}

@@ -275,6 +275,7 @@ inline float vectorLength(float x, float y) {
 }
 
 std::string player = "";
+std::string workingDirectory = "";
 std::string audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
@@ -284,7 +285,7 @@ void playSound(std::string wavFile, bool wait = true) {
 
 	if (CreateProcessA(
 		NULL,               // Application name
-		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -t waveaudio " +
 								((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
 								"vol " + std::to_string(volume)).c_str(),         // Command line
 		NULL,               // Process handle not inheritable
@@ -292,7 +293,7 @@ void playSound(std::string wavFile, bool wait = true) {
 		FALSE,              // Set handle inheritance to FALSE
 		0,                  // No creation flags
 		NULL,               // Use parent's environment block
-		NULL,               // Use parent's starting directory 
+		workingDirectory.c_str(),
 		&si,                // Pointer to STARTUPINFO structure
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
@@ -1084,10 +1085,13 @@ int main(int argc, char* argv[])
 					audioDevice = argv[4];
 
 				if (argc > 5)
-					audioDevice = atof(argv[5]);
+					volume = atof(argv[5]);
 
 				if (argc > 6)
-					audioDevice = argv[6];
+					player = argv[6];
+
+				if (argc > 7)
+					workingDirectory = argv[7];
 			}
 
 			handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1113,12 +1117,21 @@ int main(int argc, char* argv[])
 					steerRatio = atoi(argv[10]);
 					wheelbase = atoi(argv[11]);
 					trackWidth = atoi(argv[12]);
+					
+					if (argc > 13) {
+						soundsDirectory = argv[13];
 
-					if (argc > 14) {
-						soundsDirectory = argv[14];
+						if (argc > 14)
+							audioDevice = argv[14];
 
 						if (argc > 15)
-							soundsDirectory = argv[15];
+							volume = atof(argv[15]);
+
+						if (argc > 16)
+							player = argv[16];
+
+						if (argc > 17)
+							workingDirectory = argv[17];
 					}
 				}
 			}

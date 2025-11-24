@@ -249,7 +249,7 @@ namespace ACSHMCoach {
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = player,
-                    Arguments = $"\"{wavFile}\" -T waveaudio \"{audioDevice}\" vol {volume}",
+                    Arguments = $"\"{wavFile}\" -t waveaudio \"{audioDevice}\" vol {volume}",
                     UseShellExecute = false,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
@@ -949,8 +949,9 @@ namespace ACSHMCoach {
 
         string soundsDirectory = "";
         string audioDevice = string.Empty;
-		string player = string.Empty;
-		float volume = 0;
+        string player = string.Empty;
+        string workingDirectory = string.Empty;
+        float volume = 0;
         string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
@@ -967,6 +968,9 @@ namespace ACSHMCoach {
 
             if (args.Length > 4)
                 player = args[4];
+
+            if (args.Length > 5)
+                workingDirectory = args[5];
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
@@ -1000,7 +1004,16 @@ namespace ACSHMCoach {
 
 					if (args.Length > 14)
 						audioDevice = args[14];
-				}
+
+                    if (args.Length > 15)
+                        volume = float.Parse(args[15]);
+
+                    if (args.Length > 16)
+                        player = args[16];
+
+                    if (args.Length > 17)
+                        workingDirectory = args[17];
+                }
             }
         }
 

@@ -170,7 +170,7 @@ class IssueCollector {
 
 		OnExit((*) {
 			deleteDirectory(this.iSoundsDirectory)
-			
+
 			return false
 		})
 	}
@@ -248,8 +248,8 @@ class IssueCollector {
 
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
-		local player := requireSoundPlayer("DCAnalyzerPlayer")
-		local pid, options, code, message, audioDevice
+		local player := requireSoundPlayer("DCAnalyzerPlayer.exe")
+		local pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
 			this.updateSamples()
@@ -289,9 +289,15 @@ class IssueCollector {
 
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
-					
-					if this.AudioSettings
-						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`"") : ""))
+
+					if this.AudioSettings {
+						if kSox
+							SplitPath(kSox, , &workingDirectory)
+						else
+							workingDirectory := A_WorkingDir
+
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+					}
 				}
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)

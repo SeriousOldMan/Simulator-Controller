@@ -168,7 +168,8 @@ namespace RF2SHMCoach {
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = player,
-                    Arguments = $"\"{wavFile}\" -T waveaudio \"{audioDevice}\" vol {volume}",
+					WorkingDirectory = workingDirectory,
+                    Arguments = $"\"{wavFile}\" -t waveaudio \"{audioDevice}\" vol {volume}",
                     UseShellExecute = false,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
@@ -919,10 +920,11 @@ namespace RF2SHMCoach {
             Thread.Sleep(10000);
         }
 
-		string soundsDirectory = "";
+		string soundsDirectory = string.Empty;
 		string audioDevice = string.Empty;
-		string player = string.Empty;
-		float volume = 0;
+        string player = string.Empty;
+        string workingDirectory = string.Empty;
+        float volume = 0;
 		string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
@@ -940,7 +942,10 @@ namespace RF2SHMCoach {
             if (args.Length > 4)
                 player = args[4];
 
-			Thread.Sleep(10000);
+            if (args.Length > 5)
+                workingDirectory = args[5];
+
+            Thread.Sleep(10000);
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
@@ -971,10 +976,19 @@ namespace RF2SHMCoach {
 
                 if (args.Length > 13) {
                     soundsDirectory = args[13];
-					
-					if (args.Length > 14)
-						audioDevice = args[14];
-				}
+
+                    if (args.Length > 14)
+                        audioDevice = args[14];
+
+                    if (args.Length > 15)
+                        volume = float.Parse(args[15]);
+
+                    if (args.Length > 16)
+                        player = args[16];
+
+                    if (args.Length > 17)
+                        workingDirectory = args[17];
+                }
             }
         }
 

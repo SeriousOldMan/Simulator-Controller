@@ -103,6 +103,7 @@ inline float vectorLength(float x, float y) {
 }
 
 std::string player = "";
+std::string workingDirectory = "";
 std::string audioDevice = "";
 float volume = 0;
 STARTUPINFOA si = { sizeof(si) };
@@ -112,7 +113,7 @@ void playSound(std::string wavFile, bool wait = true) {
 
 	if (CreateProcessA(
 		NULL,               // Application name
-		(char*)("\"" + player + "\" \"" + wavFile + "\" -T waveaudio " +
+		(char*)("\"" + player + "\" \"" + wavFile + "\" -t waveaudio " +
 								((audioDevice != "") ? ("\"" + audioDevice + "\" ") : "") +
 								"vol " + std::to_string(volume)).c_str(),         // Command line
 		NULL,               // Process handle not inheritable
@@ -120,7 +121,7 @@ void playSound(std::string wavFile, bool wait = true) {
 		FALSE,              // Set handle inheritance to FALSE
 		0,                  // No creation flags
 		NULL,               // Use parent's environment block
-		NULL,               // Use parent's starting directory 
+		workingDirectory.c_str(),
 		&si,                // Pointer to STARTUPINFO structure
 		&pi)                // Pointer to PROCESS_INFORMATION structure
 		)
@@ -795,6 +796,9 @@ int main(int argc, char* argv[]) {
 
 			if (argc > 5)
 				player = argv[5];
+
+			if (argc > 6)
+				workingDirectory = argv[6];
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -828,6 +832,15 @@ int main(int argc, char* argv[]) {
 
 					if (argc > 15)
 						audioDevice = argv[15];
+
+					if (argc > 16)
+						volume = atof(argv[16]);
+
+					if (argc > 17)
+						player = argv[17];
+
+					if (argc > 18)
+						workingDirectory = argv[18];
 				}
 			}
 		}

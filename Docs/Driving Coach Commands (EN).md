@@ -60,7 +60,7 @@ Information=session information, stint information, handling information
 
 1.  Conversation
 
-	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+	[{Hi, Hey, Hello} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
 	
 	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
 	
@@ -91,14 +91,16 @@ Information=session information, stint information, handling information
 	[(CanWe) {focus on, talk about} {corner number, corner} (Number), {Please take, Take} a {closer look, look} at {corner number, corner} (Number), Where can I improve in {corner number, corner} (Number), What should I consider {for, in} {corner number, corner} (Number)]
 
 	[(CanYou) give me {recommendations, tips, a guide, instructions} {while I am driving, while driving, for each corner}, {Please tell, Tell} me {ahead of, for} each corner what I {can, should} change, (CanYou) coach me {on the track, while I am driving, while driving}]
+	
+	[(CanWe) {focus on, practice, practise} {corner, corner number} (Number), Let us {focus on, practice, practise} {corner, corner number} (Number), (CanYou) give me {recommendations, tips, a guide, instructions} for {corner, corner number} (Number)]
+	
+	[(CanYou) tell me where the braking points are, {Please tell, Tell} me where to brake, (CanWe) practise {braking, brake points}]
 
 	[{Thank you now, Now} I want to focus, {Okay let, Let} me {apply, try} {your recommendations, your instructions, that} now, {Please stop, Stop} giving me {recommendations, tips, instructions, recommendations for each corner, tips for each corner, instructions for each corner}, {Please no, No} more {instructions, instructions please}]
 
 	[(CanWe) use the {fastest, last} lap as {reference, reference lap}, {Please use, Use} the {fastest, last} lap as {reference, reference lap}]
 
 	[{Please do, Do} not use a reference {lap, lap please}]
-	
-	[(CanWe) {focus on, practice, practise} {corner, corner number} (Number), Let us {focus on, practice, practise} {corner, corner number} (Number), (CanYou) give me {recommendations, tips, a guide, instructions} for {corner, corner number} (Number)]
 	
 	[(CanWe) {focus, focus again} on the whole track, Let us {focus, focus again} on the whole track]
 

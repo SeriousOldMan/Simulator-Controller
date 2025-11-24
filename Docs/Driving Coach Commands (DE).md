@@ -50,7 +50,7 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 
 1.  Konversation
 
-	[{Hi, Hey} %name%, %name% hörst du mich, %name% ich brauche Dich, Hey %name% wo bist Du]
+	[{Hi, Hey, Hallo} %name%, %name% hörst du mich, %name% ich brauche Dich, {Hi, Hey, Hallo} %name% wo bist Du]
 	
 	[Einverstanden, Ja bitte, Ja mach weiter, Perfekt mach weiter, Mach weiter bitte, Okay weitermachen, Okay machen wir weiter, Richtig]
 	
@@ -81,14 +81,16 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 	[(KannstDu) (Mir) eine Einschätzung von Kurve (Number) geben, {Kannst Du Dir mal, Schau Dir mal, Kannst Du Dir bitte mal, Bitte schau Dir mal} Kurve (Number) {anschauen, anschauen bitte}, Wie kann ich mich in Kurve (Number) verbessern, Worauf soll ich in Kurve (Number) achten]
 
 	[(KannstDu) (Mir) {Anweisungen, Anweisungen für jede Kurve} {geben, geben während ich fahre}, (GibMir) {Anweisungen, Anweisungen für jede Kurve}, {Bitte sag, Sag} (Mir) {vor jeder Kurve, für jede Kurve} {wie ich mich verbessern kann, was ich ändern muss}]
+	
+	[(KoennenWir) {uns, Dich} auf {Kurve, Kurve Nummer} (Number) konzentrieren, Lass uns auf {Kurve, Kurve Nummer} (Number) konzentrieren, (KannstDu) (Mir) Anweisungen für {Kurve, Kurve Nummer} (Number) geben]
+	
+	[(KannstDu) (Mir) sagen wo die Bremspunkte sind, (GibMir) Anweisungen für die Bremspunkte, (KoennenWir) die Bremspunkte trainieren]
 
 	[{Danke jetzt, Jetzt} muss ich mich {konzentrieren, konzentrieren danke}, {Okay jetzt, Jetzt} werde {ich das, ich Deine Anweisungen, ich Deine Hinweise} erst {mal, einmal} anwenden, {Danke jetzt, Jetzt} komme ich erstmal alleine klar, {Bitte keine, Keine} Hinweise mehr]
 
 	[(KoennenWir) die {schnellste, letzte} Runde als {Referenz, Referenzrunde} verwenden, {Bitte verwende, Verwende} die {schnellste, letzte} Runde als {Referenz, Referenzrunde}, {Bitte als, Als} {Referenz, Referenzrunde} die {schnellste, letzte} Runde {verwenden, verwenden bitte}]
 
 	[{Bitte keine, Keine} {Referenzrunde mehr, Referenzrunde} {verwenden, verwenden bitte}]
-	
-	[(KoennenWir) {uns, Dich} auf {Kurve, Kurve Nummer} (Number) konzentrieren, Lass uns auf {Kurve, Kurve Nummer} (Number) konzentrieren, (KannstDu) (Mir) Anweisungen für {Kurve, Kurve Nummer} (Number) geben]
 	
 	[(KoennenWir) {uns, Dich} {wieder auf, auf} {die ganze, die} Strecke konzentrieren, Lass uns {wieder auf, auf} {die ganze, die} Strecke konzentrieren]
 

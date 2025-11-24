@@ -87,18 +87,20 @@ Information=informações da sessão, informações do stint, informações de m
    [Obrigado {pela sua ajuda, eu aprendi muito, isso foi ótimo}, Isso foi ótimo, obrigado. Ok, já chega por hoje]
 
    [(CanYou) me dê {uma visão geral, uma visão geral curva por curva, uma visão geral volta por volta, uma visão geral da volta inteira, uma visão completa, uma visão completa curva por curva}, {Por favor, dê, Dê} uma olhada na pista completa, Onde posso melhorar na pista]
-
-   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor dê} uma {olhada mais de perto, olhada} na {curva, curva número, volta, volta número} (Number), Onde posso melhorar na {curva, curva número, volta, volta número} (Number), O que devo considerar {na} {curva, curva número, volta, volta número} (Number), O que devo procurar na {curva, curva número, volta, volta número} (Number)]
+   
+   [{Obrigado agora, Agora} quero me concentrar, {Ok, deixe} eu {aplicar, tentar} {suas recomendações, suas instruções, isso} agora, {Por favor, pare} de me dar {recomendações, dicas, instruções, recomendações para cada curva, recomendações para cada volta, dicas para cada curva, dicas para cada volta, instruções para cada curva, instruções para cada volta}, {Por favor, não} de mais {instruções, instruções por favor}]
 
    [(CanYou) me dê {recomendações, dicas, instruções} {enquanto eu estiver dirigindo, para cada curva, para cada volta}, {Diga por favor} {antes de, para} cada {curva, volta} o que eu {posso, devo} mudar, (CanYou) treinar-me {na pista, enquanto eu estiver dirigindo, enquanto estiver dirigindo}]
 
-   [{Obrigado agora, Agora} quero me concentrar, {Ok, deixe} eu {aplicar, tentar} {suas recomendações, suas instruções, isso} agora, {Por favor, pare} de me dar {recomendações, dicas, instruções, recomendações para cada curva, recomendações para cada volta, dicas para cada curva, dicas para cada volta, instruções para cada curva, instruções para cada volta}, {Por favor, não} de mais {instruções, instruções por favor}]
+   [(CanWe) {focar em, praticar} {curva, curva número} (Número), Vamos {focar em, praticar} {curva, curva número} (Número), (CanYou) me dê {recomendações, dicas, um guia, instruções} para {curva, curva número} (Número)]
+   
+   [(CanYou) me dizer onde estão os pontos de frenagem, {Por favor, me diga, Diga} onde frear, (CanWe) praticar {frenagem, pontos de frenagem}]
+
+   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor dê} uma {olhada mais de perto, olhada} na {curva, curva número, volta, volta número} (Number), Onde posso melhorar na {curva, curva número, volta, volta número} (Number), O que devo considerar {na} {curva, curva número, volta, volta número} (Number), O que devo procurar na {curva, curva número, volta, volta número} (Number)]
 
    [(CanWe) utilizar a {volta mais rápida, última volta} como {referência, volta de referência}, {Please use, Use} a {volta mais rápida, última volta} como {referência, volta de referência}]
 
    [{Por favor} não utilizar uma referência da {volta}]
-
-   [(CanWe) {focar em, praticar} {curva, curva número} (Número), Vamos {focar em, praticar} {curva, curva número} (Número), (CanYou) me dê {recomendações, dicas, um guia, instruções} para {curva, curva número} (Número)]
 
    [(CanWe) {focar, focar novamente} em todo o percurso, Vamos {focar, focar novamente} em toda a faixa]
 

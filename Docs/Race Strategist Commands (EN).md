@@ -59,7 +59,7 @@ Announcements=weather warnings
 
 1.  Conversation
 
-	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
+	[{Hi, Hey, Hello} %name%, %name% do you hear me, %name% I need you, %name% where are you, %name% come in please]
 
 	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]]
 

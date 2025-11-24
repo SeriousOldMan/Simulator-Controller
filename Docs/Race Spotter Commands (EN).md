@@ -59,7 +59,7 @@ Announcements=delta information, tactical advice, side alerts, rear alerts, blue
 
 1.  Conversation
 
-	[{Hi, Hey} %name%, %name% do you hear me, %name% I need you, %name% where are you]
+	[{Hi, Hey, Hello} %name%, %name% do you hear me, %name% I need you, %name% where are you]
 
 	[Yes {please, of course}, {Yes, Perfect} go on, {Go, Okay go} {on, on please, ahead, ahead please}, I agree, Right, Correct, Confirmed, I confirm, Affirmative]
 

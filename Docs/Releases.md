@@ -29,7 +29,7 @@
 
 #### Fixes
 
-  - None this time.
+  - Fixed the voice command reference sheet for Japanese.
 
 #### Changes
 
@@ -43,6 +43,7 @@
 	- A new controller action function ["startBrakeCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) lets you start brake coaching from scripts, rules or any other programmatic source.
 	- An optional *confirm* parameter has been added to the controller action functions "startTrackCoaching" and "startBrakeCoaching".
 	- The existing controller action function ["startTelemetryCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been extended to additionally support immediate start of the brake coaching mode.
+	- All command reference sheets have been updated.
 
 # Release history
 

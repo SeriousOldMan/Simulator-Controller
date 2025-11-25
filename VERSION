@@ -1,9 +1,9 @@
 [Development]
 Version=6.6.7.0-dev
 Target=6.6.7.0-release
-Date=11/24/2025
+Date=11/25/2025
 Download=
-Changes=Support for Hello/Hallo in activation phrase
+Changes=Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.6.0-release

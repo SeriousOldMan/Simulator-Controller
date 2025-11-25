@@ -29,12 +29,13 @@
 
 #### Fixes
 
-  - None this time.
+  - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
 
 #### Changes
 
-  - Using Hello is now supported in Assistant activation phrases in English.
-  - Using Hallo is now supported in Assistant activation phrases in German.
+  - Using "Hello instead of "Hey" is now supported in Assistant activation phrases in English.
+  - Using "Hallo" instead of "Hi" is now supported in Assistant activation phrases in German.
+  - A generic CSV importer has been added to the "Session Database". It allow you to import telemetry data from any location. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) from more information.
 
 # Release history
 

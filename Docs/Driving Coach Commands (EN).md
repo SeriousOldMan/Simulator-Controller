@@ -94,7 +94,7 @@ Information=session information, stint information, handling information
 	
 	[(CanWe) {focus on, practice, practise} {corner, corner number} (Number), Let us {focus on, practice, practise} {corner, corner number} (Number), (CanYou) give me {recommendations, tips, a guide, instructions} for {corner, corner number} (Number)]
 	
-	[(CanYou) tell me where the braking points are, {Please tell, Tell} me where to brake, (CanWe) practise {braking, brake points}]
+	[(CanYou) tell me where the braking points are, {Please tell, Tell} me where to brake, (CanWe) practise {braking, braking points}]
 
 	[{Thank you now, Now} I want to focus, {Okay let, Let} me {apply, try} {your recommendations, your instructions, that} now, {Please stop, Stop} giving me {recommendations, tips, instructions, recommendations for each corner, tips for each corner, instructions for each corner}, {Please no, No} more {instructions, instructions please}]
 

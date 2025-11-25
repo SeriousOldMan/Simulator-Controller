@@ -1572,7 +1572,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
 		local running := 0
-		local name, infoFileName
+		local name, infoFileName, motecFile
 
 		importFromSecondMonitor(&info) {
 			local pid, count, importFileName
@@ -1710,14 +1710,19 @@ class SessionDatabase extends ConfigurationItem {
 												line.Push(kNull)
 										}
 										else if !firstPass
-											if (channel[1] = "UNKNOWN (PosX)")
-												line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][1])
-											else if (channel[1] = "UNKNOWN (PosY)")
-												line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][2])
-											else
+											try {
+												if (channel[1] = "UNKNOWN (PosX)")
+													line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][1])
+												else if (channel[1] = "UNKNOWN (PosY)")
+													line.Push(points[Max(1, Min(points.Length, (line[1] / trackLength) * points.Length))][2])
+												else
+													line.Push("n/a")
+											}
+											catch Any {
 												line.Push("n/a")
+											}
 
-										if firstPass
+										if (firstPass && (line.Length > 1) && isNumber(line[1]))
 											trackLength := Max(trackLength, line[1])
 									}
 
@@ -1746,6 +1751,94 @@ class SessionDatabase extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 				}
+			}
+
+			return false
+		}
+
+		importFromCSV(&info) {
+			local steerLock := this.getCarSteerLock(simulator, car, track)
+			local channels := CaseInsenseMap()
+			local time := 0
+			local index, column, entry, line
+
+			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
+								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
+								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME"]
+
+			try {
+				importFileName := temporaryFileName("Import", "telemetry")
+
+				deleteFile(importFileName)
+
+				info := newMultiMap()
+
+				loop Read, fileName {
+					if (A_Index = 1) {
+						for index, column in string2Values(",", A_LoopReadLine)
+							if inList(csvChannels, column)
+								channels[column] := index
+					}
+					else {
+						entry := collect(string2Values(",", A_LoopReadLine), (f) => StrReplace(f, "`"", ""))
+						line := []
+
+						for ignore, channel in csvChannels {
+							if channels.Has(channel) {
+								value := entry[channels[channel]]
+
+								if isNumber(value) {
+									switch channel, false {
+										case "DISTANCE":
+											running += 0.0001
+
+											if (running > 1)
+												running := 0
+										case "STEERANGLE":
+											value *= 57.296
+
+											if steerLock
+												value := (- value / steerLock)
+											else
+												value := (- value)
+										case "TIME":
+											time := Max(time, value)
+
+											value *= 1000
+									}
+
+									line.Push(value)
+								}
+								else
+									line.Push(kNull)
+							}
+							else
+								line.Push(kNull)
+						}
+
+						FileAppend(values2String(";", line*) . "`n", importFileName)
+					}
+				}
+
+				setMultiMapValue(info, "Info", "Track", track)
+
+				if (time > 0)
+					setMultiMapValue(info, "Info", "LapTime", Round(time, 2))
+
+				setMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+
+				if FileExist(importFileName) {
+					infoFileName := temporaryFileName("Import", "info")
+
+					writeMultiMap(infoFileName, info)
+
+					info := infoFileName
+
+					return importFileName
+				}
+			}
+			catch Any as exception {
+				logError(exception)
 			}
 
 			return false
@@ -1814,12 +1907,21 @@ class SessionDatabase extends ConfigurationItem {
 			return fileName
 		}
 		else if InStr(fileName, ".CSV") {
+			motecFile := false
+
+			loop Read, fileName {
+				if InStr(A_LoopReadLine, "MoTeC CSV File")
+					motecFile := true
+
+				break
+			}
+
 			if verbose
 				withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
-					fileName := importFromMoTec(&info)
+					fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
 				})
 			else
-				fileName := importFromMoTec(&info)
+				fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
 
 			return fileName
 		}

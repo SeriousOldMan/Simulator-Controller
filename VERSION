@@ -3,7 +3,7 @@ Version=6.7.0.0-dev
 Target=6.7.0.0-release
 Date=11/24/2025
 Download=
-Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching"
+Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.6.0-release

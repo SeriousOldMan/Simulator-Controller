@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.0.0-dev]() (Early build for 6.7.0. Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching".)
+[6.7.0.0-dev]() (Early build for 6.7.0. Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6700) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-670) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1,5 +1,6 @@
 #### General
   1. Support for unit conversions per simulator
+  2. Make the location of the local data folder configurable during installation process
 
 #### Voice System
   1. Integration of local TTS engines for voice generation

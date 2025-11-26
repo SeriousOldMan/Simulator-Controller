@@ -1757,10 +1757,11 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		importFromCSV(&info) {
+			local iRacing := (SessionDatabase.getSimulatorName(simulator) = "iRacing")
 			local steerLock := this.getCarSteerLock(simulator, car, track)
 			local channels := CaseInsenseMap()
 			local time := 0
-			local index, column, entry, line
+			local trackFile, trackData, index, column, entry, line
 
 			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
 								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
@@ -1770,6 +1771,18 @@ class SessionDatabase extends ConfigurationItem {
 				importFileName := temporaryFileName("Import", "telemetry")
 
 				deleteFile(importFileName)
+
+				if iRacing {
+					trackFile := this.getTrackData(simulator, track)
+					trackData := []
+
+					if trackFile {
+						loop Read, trackFile
+							trackData.Push(string2Values(A_Space, A_LoopReadLine))
+					}
+					else
+						return false
+				}
 
 				info := newMultiMap()
 
@@ -1790,10 +1803,12 @@ class SessionDatabase extends ConfigurationItem {
 								if isNumber(value) {
 									switch channel, false {
 										case "DISTANCE":
-											running += 0.0001
+											if !iRacing {
+												running += 0.0001
 
-											if (running > 1)
-												running := 0
+												if (running > 1)
+													running := 0
+											}
 										case "STEERANGLE":
 											value *= 57.296
 
@@ -1814,6 +1829,13 @@ class SessionDatabase extends ConfigurationItem {
 							}
 							else
 								line.Push(kNull)
+						}
+
+						if (iRacing && isNumber(line[1])) {
+							running := (Max(1, Min(1000, Round(line[1] * 1000))) / 1000)
+
+							line[12] := trackData[running][1]
+							line[13] := trackData[running][2]
 						}
 
 						FileAppend(values2String(";", line*) . "`n", importFileName)

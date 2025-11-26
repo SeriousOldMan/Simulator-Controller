@@ -185,27 +185,28 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
 - And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 - Finally, telemetry data can be imported from any tool, as long as an export in generic CSV format is supported. The following columns are supported:
 
-  | Column         | Required   | Value      |
-  |----------------|------------|------------|
-  | DISTANCE       | Yes        | The relative distance into the track as a value between 0 and 1. |
-  | TIME           | Yes        | The time passed since start/finish line (DISTANCE = 0) in seconds. |
-  | THROTTLE       | No         | The amount of throttle application as a value between 0 and 1.   |
-  | BRAKE          | No         | The amount of throttle application as a value between 0 and 1.   |
-  | STEERANGLE     | Yes        | The current angle of the steering wheel in radians.              |
-  | GEAR           | No         | The currently selected gear of the transmission.                 |
-  | SPEED          | Yes        | The speed of the car in km/h. Other units can also be imported, but will be misinterpreted when comparing telemetry data. |
-  | TC             | No         | 0 = no TC activation, 1 = TC is active.                          |
-  | ABS            | No         | 0 = no ABS activation, 1 = ABS is active.                        |
-  | ABS            | No         | 0 = no ABS activation, 1 = ABS is active.                        |
-  | G_LAT          | No         | The lateral accelaration in multiples of G (9.81 m/s*2). For example, a typical accelearation of a GT3 car while cornering is 2 G. |
-  | G_LON          | No         | The longitudinal accelaration in multiples of G (9.81 m/s*2).    |
-  | POS_X          | Yes        | The horizontal position of the car on the track map in internal coordinates of the current simulator. |
-  | POS_Y          | Yes        | The vertical position of the car on the track map in internal coordinates of the current simulator. |
+  | Column (1)     | Required (2)  | Value      |
+  |----------------|---------------|------------|
+  | DISTANCE       | Yes           | The relative distance into the track as a value between 0 and 1. |
+  | TIME           | Yes           | The time passed since start/finish line (DISTANCE = 0) in seconds. |
+  | THROTTLE       | No            | The amount of throttle application as a value between 0 and 1.   |
+  | BRAKE          | No            | The amount of throttle application as a value between 0 and 1.   |
+  | STEERANGLE     | Yes           | The current angle of the steering wheel in radians.              |
+  | GEAR           | No            | The currently selected gear of the transmission.                 |
+  | SPEED          | Yes           | The speed of the car in km/h. Other units can also be imported, but will be misinterpreted when comparing telemetry data. |
+  | TC             | No            | 0 = no TC activation, 1 = TC is active.                          |
+  | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
+  | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
+  | G_LAT          | No            | The lateral accelaration in multiples of G (9.81 m/s*2). For example, a typical accelearation of a GT3 car while cornering is 2 G. |
+  | G_LON          | No            | The longitudinal accelaration in multiples of G (9.81 m/s*2).    |
+  | POS_X (3)      | Yes           | The horizontal location of the car on the track map in internal coordinates of the current simulator. |
+  | POS_Y (3)      | Yes           | The vertical location of the car on the track map in internal coordinates of the current simulator. |
   
   Notes:
   
-  - The order of the columns is not important.
-  - CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.
+  (1) The sequence of the columns in the CSV file is not important.
+  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.
+  (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
 
 Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.
 

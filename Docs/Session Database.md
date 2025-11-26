@@ -208,7 +208,10 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
 
-Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.
+Good to know:
+
+1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
+2. When importing lap telemetry data directly in the "Laps" tab of "Session Database", everything said above applies as well.
 
 ###### Special notes for *Assetto Corsa Competizione*
 

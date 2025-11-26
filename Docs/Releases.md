@@ -35,6 +35,7 @@
 #### Changes
 
   - Updated many voice commands for the Driving Coach in Japanese.
+  - The Driving Coach now more precisely inform about the start of the coaching.
   - The Driving Coach provides a new coaching mode that helps you to learn braking points and effective braking techniques. When this coaching mode is active, the Coach will tell you how to brake and also will tell you exactly where to brake and where to release the brake again. This coaching mode is based on telemetry data, therefore using a reference lap from a fast and experienced driver is the key for success.
     - See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#Practicing-braking-points) for more information about this new coching mode.
     - A [new voice command for the Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) lets you activate brake coaching.

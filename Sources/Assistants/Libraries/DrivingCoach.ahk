@@ -1118,7 +1118,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	startTrackCoaching(confirm := true) {
 		if !this.CoachingActive {
-			this.telemetryCoachingStartRecognized([], confirm)
+			this.telemetryCoachingStartRecognized([], confirm, "Track")
 
 			this.trackCoachingStartRecognized([], false)
 
@@ -1130,7 +1130,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	startBrakeCoaching(confirm := true) {
 		if !this.CoachingActive {
-			this.telemetryCoachingStartRecognized([], confirm)
+			this.telemetryCoachingStartRecognized([], confirm, "Brake")
 
 			this.brakeCoachingStartRecognized([], false)
 

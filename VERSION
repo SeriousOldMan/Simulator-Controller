@@ -1,8 +1,8 @@
 [Development]
 Version=6.6.7.0-dev
 Target=6.6.7.0-release
-Date=11/25/2025
-Download=
+Date=11/26/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QTXOzBy5/Releases/Simulator%20Controller%206.6.7.0-dev.zip
 Changes=Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]

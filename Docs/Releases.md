@@ -30,6 +30,7 @@
 #### Fixes
 
   - Fixed the voice command reference sheet for Japanese.
+  - Added some missing translations.
 
 #### Changes
 

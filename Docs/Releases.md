@@ -7,6 +7,7 @@
 #### Fixes
 
   - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
+  - Fixed a bug for *Assetto Corsa*, which caused the Spotter to give information about disconnected cars.
 
 #### Changes
 

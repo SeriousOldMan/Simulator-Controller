@@ -37,7 +37,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing.)
+[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6670) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-667) of this version and all the versions you might have skipped, before installing and using this version.
 

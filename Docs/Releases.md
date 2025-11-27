@@ -1,5 +1,26 @@
 # Latest stable release
 
+## 6.6.7.0
+
+#### Date: 11/28/25
+
+#### Fixes
+
+  - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
+
+#### Changes
+
+  - Using "Hello instead of "Hey" is now supported in Assistant activation phrases in English.
+  - Using "Hallo" instead of "Hi" is now supported in Assistant activation phrases in German.
+  - It is now possible to define global default choices for community sharing in the settings of the "Session Database" for the different object types. This value is used whenever a new object (a strategy, for example) is created in the session database. If this default is not set, the corresponding choice from the consent will be used as default sharing setting.
+  - A generic CSV importer has been added to the "Session Database". It allow you to import telemetry data from any location. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) from more information.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.6.6.0
 
 #### Date: 11/21/25
@@ -20,25 +41,6 @@
     - Assetto Corsa
 	  - Porsche 911 GT3 Cup 2017
       - ACF GT3 - BMW M4 GT3 2021 (as part of the DLC for modded cars)
-
-# Upcoming release
-
-## 6.6.7.0
-
-#### Date: 11/28/25 (planned)
-
-#### Fixes
-
-  - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
-
-#### Changes
-
-  - Using "Hello instead of "Hey" is now supported in Assistant activation phrases in English.
-  - Using "Hallo" instead of "Hi" is now supported in Assistant activation phrases in German.
-  - It is now possible to define global default choices for community sharing in the settings of the "Session Database" for the different object types. This value is used whenever a new object (a strategy, for example) is created in the session database. If this default is not set, the corresponding choice from the consent will be used as default sharing setting.
-  - A generic CSV importer has been added to the "Session Database". It allow you to import telemetry data from any location. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) from more information.
-
-# Release history
 
 ## 6.6.5.0
 

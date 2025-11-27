@@ -826,7 +826,7 @@ namespace ACSHMSpotter {
 					{
 						ref AcCarInfo car = ref cars.cars[i];
                         
-						if (car.isCarInPitline + car.isCarInPit > 0)
+						if ((car.isCarInPitline + car.isCarInPit > 0) || (car.isConnected == 0))
                             continue;
 
                         double speed = car.speedMS * 3.6;

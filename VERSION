@@ -6,7 +6,7 @@ Download=https://cutt.ly/Ytt6M71H;https://fileshare.impresion3d.pro/filebrowser/
 Changes=Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
-Version=6.6.6.0-release
+Version=6.6.7.0-release
 Date=11/28/2025
 Download=https://cutt.ly/Ytt6M71H;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vjtD8zlM/Releases/Simulator Controller 6.6.7.0-release.zip;https://www.dropbox.com/scl/fi/7fzvazet12knsvc1kos2t/Simulator-Controller-6.6.7.0-release.zip?rlkey=0phz9bkybe7yqkcp9njuhh7dl&st=2bbh027o&dl=1;http://%master%/Releases/Simulator Controller 6.6.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.7.0-release.zip
 Changes=Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing

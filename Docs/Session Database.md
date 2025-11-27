@@ -180,8 +180,8 @@ The Telemetry Viewer is available in the following applications to collect lap t
 If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can load telemetry data that has not been stored in the session database.
 
 - You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
-- You can import telemetery data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
-- Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track is already available. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
+- You can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+- Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track has already been created. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
 - And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 - Finally, telemetry data can be imported from any tool, as long as an export in generic CSV format is supported. The following columns are supported:
 
@@ -191,11 +191,10 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | TIME           | Yes           | The time passed since start/finish line (DISTANCE = 0) in seconds. |
   | THROTTLE       | No            | The amount of throttle application as a value between 0 and 1.   |
   | BRAKE          | No            | The amount of throttle application as a value between 0 and 1.   |
-  | STEERANGLE     | Yes           | The current angle of the steering wheel in radians.              |
+  | STEERANGLE     | Yes           | The current angle of the steering wheel in radians. This value will also be divided by the steer lock (if available) as decribed above for the MoTeC importer. |
   | GEAR           | No            | The currently selected gear of the transmission.                 |
   | SPEED          | Yes           | The speed of the car in km/h. Other units can also be imported, but will be misinterpreted when comparing telemetry data. |
   | TC             | No            | 0 = no TC activation, 1 = TC is active.                          |
-  | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
   | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
   | G_LAT          | No            | The lateral accelaration in multiples of G (9.81 m/s*2). For example, a typical accelearation of a GT3 car while cornering is 2 G. |
   | G_LON          | No            | The longitudinal accelaration in multiples of G (9.81 m/s*2).    |
@@ -204,8 +203,8 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   
   Notes:
   
-  (1) The sequence of the columns in the CSV file is not important.
-  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.
+  (1) The sequence of the columns in the CSV file is not important.<br>
+  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.<br>
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
 
 Good to know:

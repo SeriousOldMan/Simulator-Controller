@@ -1545,6 +1545,10 @@ class SessionDatabase extends ConfigurationItem {
 		return false
 	}
 
+	getSynchronizeDefault(type) {
+		return true
+	}
+
 	getTelemetryDirectory(simulator, car, track, origin) {
 		return (kDatabaseDirectory . StrTitle(origin) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
 								   . "\" . this.getTrackCode(simulator, track) . "\Lap Telemetries\")
@@ -2063,7 +2067,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Telemetry", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Lap Telemetries"))
-				setMultiMapValue(info, "Access", "Synchronize", true)
+				setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Lap Telemetries"))
 
 				writeMultiMap(fileName . ".info", info)
 
@@ -2287,7 +2291,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Sessions"))
-				setMultiMapValue(info, "Access", "Synchronize", true)
+				setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Sessions"))
 
 				writeMultiMap(fileName, info)
 
@@ -2536,7 +2540,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Setup", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Car Setups"))
-				setMultiMapValue(info, "Access", "Synchronize", true)
+				setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Car Setups"))
 
 				writeMultiMap(fileName . ".info", info)
 
@@ -2742,7 +2746,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Strategy", "Synchronized", false)
 
 				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Race Strategies"))
-				setMultiMapValue(info, "Access", "Synchronize", true)
+				setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Race Strategies"))
 
 				writeMultiMap(fileName . ".info", info)
 

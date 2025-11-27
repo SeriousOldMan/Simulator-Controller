@@ -1526,7 +1526,7 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
-	static getShareDefault(type) {
+	getShareDefault(type) {
 		local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 		local consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
@@ -1543,10 +1543,6 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		return false
-	}
-
-	getShareDefault(type) {
-		return SessionDatabase.getShareDefault(type)
 	}
 
 	getTelemetryDirectory(simulator, car, track, origin) {

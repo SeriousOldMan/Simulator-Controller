@@ -403,15 +403,15 @@ The following video gives you a good demonstration of this:
 3. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
 4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
 
-   - *Coach: Distance before Braking Point*
+   - *Coach: Time before Braking Point*
      
-	 This setting defines how many meters before the actual braking point the Coach will yell out "Brake". Default is 30 meters.
+	 This setting defines how many milliseconds before the actual braking point the Coach will yell out "Brake". Default is 200 milliseconds. The exact value depends on your PC setup, since sound processing will take some time, and also on your reaction time. The default value of 200 ms is a good compromise to start with.
    - *Coach: Threshold for hard brake pressure*
    
      Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
    - *Coach: Threshold for release pressure*
    
-     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent.
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 4).
    - *Coach: Threshold for trail braking*
    
      When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.

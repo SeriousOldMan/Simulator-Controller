@@ -180,8 +180,8 @@ The Telemetry Viewer is available in the following applications to collect lap t
 If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can load telemetry data that has not been stored in the session database.
 
 - You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
-- You can import telemetery data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
-- Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track is already available. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
+- You can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+- Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track has already been created. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
 - And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" field must be included. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 - Finally, telemetry data can be imported from any tool, as long as an export in generic CSV format is supported. The following columns are supported:
 
@@ -191,11 +191,10 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | TIME           | Yes           | The time passed since start/finish line (DISTANCE = 0) in seconds. |
   | THROTTLE       | No            | The amount of throttle application as a value between 0 and 1.   |
   | BRAKE          | No            | The amount of throttle application as a value between 0 and 1.   |
-  | STEERANGLE     | Yes           | The current angle of the steering wheel in radians.              |
+  | STEERANGLE     | Yes           | The current angle of the steering wheel in radians. This value will also be divided by the steer lock (if available) as decribed above for the MoTeC importer. |
   | GEAR           | No            | The currently selected gear of the transmission.                 |
   | SPEED          | Yes           | The speed of the car in km/h. Other units can also be imported, but will be misinterpreted when comparing telemetry data. |
   | TC             | No            | 0 = no TC activation, 1 = TC is active.                          |
-  | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
   | ABS            | No            | 0 = no ABS activation, 1 = ABS is active.                        |
   | G_LAT          | No            | The lateral accelaration in multiples of G (9.81 m/s*2). For example, a typical accelearation of a GT3 car while cornering is 2 G. |
   | G_LON          | No            | The longitudinal accelaration in multiples of G (9.81 m/s*2).    |
@@ -204,11 +203,14 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   
   Notes:
   
-  (1) The sequence of the columns in the CSV file is not important.
-  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.
+  (1) The sequence of the columns in the CSV file is not important.<br>
+  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.<br>
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
 
-Good to know: When importing lap telemetry data directly in the "Laps" tab of "Session Database", the same applies.
+Good to know:
+
+1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
+2. When importing lap telemetry data directly in the "Laps" tab of "Session Database", everything said above applies as well.
 
 ###### Special notes for *Assetto Corsa Competizione*
 
@@ -355,6 +357,8 @@ If you want to rebuild your local database, for example, after losing all your d
 Please note, that the initial synchronization might take quite a while (up to a couple of hours), depending on the amount of data in your local database, but also depending on the amount of data available by your team mates. The synchronization will run in the background without any further user interaction. The background process is automatically started by "Simulator Startup". Once, the initial synchronization is finished, the incremental update of your database will take only a few seconds and happens in the interval mentioned above.
 
 Final note: Once you have changed the database location or the synchronization settings, you will be prompted to restart all applications of Simulator Controller.
+
+In the second group, you can define the default choice for community sharing for the different objects in the session database. This default values is used, whenever a new object (a strategy, for example) is created. Whether the object will be really shared in the end, also depends on your consent (see below).
 
 With the "Consent..." button in the lower left corner of the dialog, you can open the [consent dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community), if you want to review and possibly change your community settings.
 

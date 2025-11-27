@@ -6284,7 +6284,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						else
 							driver := this.SessionDatabase.ID
 
-						this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, telemetry, size, false, true, driver)
+						this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, telemetry, size
+														  , this.SessionDatabase.getShareDefault("Lap Telemetries"), true, driver)
 
 						if info {
 							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName())
@@ -7678,7 +7679,7 @@ editSettings(editorOrCommand, arguments*) {
 	local directory, empty, original, changed, restart, groups, replication
 	local oldConnections, ignore, group, enabled, values
 	local identifier, serverURL, serverToken, serverURLs, serverTokens
-	local availableServerURLs, settings, chosen, translator, msgResult
+	local availableServerURLs, settings, chosen, translator, msgResult, consent
 
 	static result := false
 	static sessionDB := false
@@ -7700,6 +7701,9 @@ editSettings(editorOrCommand, arguments*) {
 	static synchSetupsCheck
 	static synchStrategiesCheck
 	static synchTelemetriesCheck
+	static shareSetupsCheck
+	static shareStrategiesCheck
+	static shareTelemetriesCheck
 	static serverIdentifierEdit := ""
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
@@ -8158,7 +8162,32 @@ editSettings(editorOrCommand, arguments*) {
 		rebuildButton := settingsEditorGui.Add("Button", "x296 yp w96", translate("Rebuild..."))
 		rebuildButton.OnEvent("Click", rebuildDatabase)
 
-		settingsEditorGui.Add("Button", "x16 ys+248 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
+		settingsEditorGui.SetFont("Italic", "Arial")
+
+		settingsEditorGui.Add("GroupBox", "x16 yp+40 w388 h70 Section", translate("Share with Community"))
+
+		settingsEditorGui.SetFont("Norm", "Arial")
+
+		consent := readMultiMap(kUserConfigDirectory . "CONSENT")
+
+		shareStrategiesCheck := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+		shareStrategiesCheck := getMultiMapValue(configuration, "Share", "Race Strategies", shareStrategiesCheck)
+
+		shareSetupsCheck := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+		shareSetupsCheck := getMultiMapValue(configuration, "Share", "Car Setups", shareSetupsCheck)
+
+		shareTelemetriesCheck := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
+		shareTelemetriesCheck := getMultiMapValue(configuration, "Share", "Lap Telemetries", shareTelemetriesCheck)
+
+		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Default"))
+		shareStrategiesCheck := settingsEditorGui.Add("CheckBox", "x146 yp w120 h21 Checked" . shareStrategiesCheck, translate("Strategies"))
+		shareStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		shareSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21 Checked" . shareSetupsCheck, translate("Setups"))
+		shareSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		shareTelemetriesCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21 Checked" . shareTelemetriesCheck, translate("Telemetries"))
+		shareTelemetriesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+
+		settingsEditorGui.Add("Button", "x16 ys+78 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
 			settingsEditorGui.Block()
 
 			try {
@@ -8294,6 +8323,10 @@ editSettings(editorOrCommand, arguments*) {
 				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
 				setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit.Text)
+
+				setMultiMapValue(configuration, "Share", "Race Strategies", shareStrategiesCheck.Value)
+				setMultiMapValue(configuration, "Share", "Car Setups", shareSetupsCheck.Value)
+				setMultiMapValue(configuration, "Share", "Lap Telemetries", shareTelemetriesCheck.Value)
 
 				if changed {
 					setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", CaseInsenseMap()))

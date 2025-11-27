@@ -1591,7 +1591,7 @@ class TelemetryViewer {
 							}
 
 							sessionDB.writeTelemetry(simulator, car, track, fileName, telemetry, size
-												   , false, true, driver)
+												   , sessionDB.getShareDefault("Lap Telemetries"), true, driver)
 
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 

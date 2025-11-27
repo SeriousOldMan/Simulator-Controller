@@ -1989,7 +1989,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local triggers := ""
 		local tries := 3
 		local brakeSections := []
-		local ignore, index, braking, brake, maxBrake, maxBrakeIndex, threshold, metersPerSec, trackLength
+		local ignore, index, braking, brake, maxBrake, metersPerSec, trackLength
 		local brakeTime, startDistance, endDistance, x, y
 		local section, numSections, instructions, clean
 
@@ -2067,7 +2067,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
 			try {
 				if !delta {
-					delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 200))
+					delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
 					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
 					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
 					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
@@ -2094,33 +2094,18 @@ class DrivingCoach extends GridRaceAssistant {
 					endDistance := (braking.Start + metersPerSec)
 
 					maxBrake := 0
-					maxBrakeIndex := 1
 
 					for index, brake in braking.Curve
-						if (brake.Brake < (maxBrake * releaseThreshold)) {
+						if ((brake.Brake < (maxBrake * releaseThreshold)) && ((brake.Distance - braking.Start) > distance)) {
 							endDistance := (brake.Distance + (metersPerSec / 2))
 
-							threshold := (maxBrake - ((maxBrake - (maxBrake * releaseThreshold)) / 4))
-
-							while (--index > maxBrakeIndex) {
-								brake := braking.Curve[index]
-
-								if (brake.Brake > threshold) {
-									if (((brake.Distance - braking.Start) > distance)
-									 && telemetry.findCoordinates("Time", normalizeTime(brake.Time - delta), &x, &y))
-										instructions .= ("`n" . section . A_Space . "Release" . A_Space . x . A_Space . y . A_Space . distance . A_Space . releaseCommand)
-
-									break
-								}
-							}
+							if telemetry.findCoordinates("Time", normalizeTime(brake.Time - delta), &x, &y)
+								instructions .= ("`n" . section . A_Space . "Release" . A_Space . x . A_Space . y . A_Space . distance . A_Space . releaseCommand)
 
 							break
 						}
-						else if (brake.Brake > maxBrake) {
-							maxBrakeIndex := index
-
-							maxBrake := brake.Brake
-						}
+						else
+							maxBrake := Max(brake.Brake, maxBrake)
 
 					if (endDistance > trackLength)
 						endDistance := (startDistance - trackLength)

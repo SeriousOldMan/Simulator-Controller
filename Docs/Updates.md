@@ -41,6 +41,12 @@ Everything handled automatically, but you may want to include the "BrakeCoaching
 
 ***
 
+## Release 6.6.7
+
+Nothing to do.
+
+***
+
 ## Release 6.6.6
 
 Nothing to do.

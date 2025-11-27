@@ -358,6 +358,8 @@ Please note, that the initial synchronization might take quite a while (up to a 
 
 Final note: Once you have changed the database location or the synchronization settings, you will be prompted to restart all applications of Simulator Controller.
 
+In the second group, you can define the default choice for community sharing for the different objects in the session database. This default values is used, whenever a new object (a strategy, for example) is created. Whether the object will be really shared in the end, also depends on your consent (see below).
+
 With the "Consent..." button in the lower left corner of the dialog, you can open the [consent dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community), if you want to review and possibly change your community settings.
 
 ##### Data privacy

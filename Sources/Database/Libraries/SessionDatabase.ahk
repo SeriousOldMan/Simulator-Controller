@@ -1526,6 +1526,29 @@ class SessionDatabase extends ConfigurationItem {
 		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
+	static getShareDefault(type) {
+		local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+		local consent := readMultiMap(kUserConfigDirectory . "CONSENT")
+
+		switch type, false {
+			case "Race Strategies":
+				return getMultiMapValue(configuration, "Share", "Race Strategies"
+													 , (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes"))
+			case "Car Setups":
+				return getMultiMapValue(configuration, "Share", "Car Setups"
+													 , (getMultiMapValue(consent, "Consent", "Car Setups", "No") = "Yes"))
+			case "Lap Telemetries":
+				return getMultiMapValue(configuration, "Share", "Lap Telemetries"
+													 , (getMultiMapValue(consent, "Consent", "Lap Telemetries", "No") = "Yes"))
+		}
+
+		return false
+	}
+
+	getShareDefault(type) {
+		return SessionDatabase.getShareDefault(type)
+	}
+
 	getTelemetryDirectory(simulator, car, track, origin) {
 		return (kDatabaseDirectory . StrTitle(origin) . "\" . this.getSimulatorCode(simulator) . "\" . this.getCarCode(simulator, car)
 								   . "\" . this.getTrackCode(simulator, track) . "\Lap Telemetries\")
@@ -2043,7 +2066,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
 				setMultiMapValue(info, "Telemetry", "Synchronized", false)
 
-				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Lap Telemetries"))
 				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName . ".info", info)
@@ -2267,7 +2290,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Session", "Identifier", createGuid())
 				setMultiMapValue(info, "Session", "Synchronized", false)
 
-				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Sessions"))
 				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName, info)
@@ -2516,7 +2539,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Setup", "Identifier", createGuid())
 				setMultiMapValue(info, "Setup", "Synchronized", false)
 
-				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Car Setups"))
 				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName . ".info", info)
@@ -2722,7 +2745,7 @@ class SessionDatabase extends ConfigurationItem {
 				setMultiMapValue(info, "Strategy", "Identifier", createGuid())
 				setMultiMapValue(info, "Strategy", "Synchronized", false)
 
-				setMultiMapValue(info, "Access", "Share", true)
+				setMultiMapValue(info, "Access", "Share", this.getShareDefault("Race Strategies"))
 				setMultiMapValue(info, "Access", "Synchronize", true)
 
 				writeMultiMap(fileName . ".info", info)

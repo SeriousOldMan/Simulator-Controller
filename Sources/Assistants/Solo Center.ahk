@@ -4938,7 +4938,8 @@ class SoloCenter extends ConfigurationItem {
 								file.Close()
 
 								sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size
-													 , false, !FileExist(directory . "Telemetry\*.telemetry")
+													 , !FileExist(directory . "Telemetry\*.telemetry") && sessionDB.getShareDefault("Sessions")
+													 , !FileExist(directory . "Telemetry\*.telemetry")
 													 , SessionDatabase.ID)
 
 								return

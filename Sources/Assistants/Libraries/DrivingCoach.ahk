@@ -1359,7 +1359,8 @@ class DrivingCoach extends GridRaceAssistant {
 					file.Close()
 
 					sessionDB.writeTelemetry(this.Simulator, this.Car, this.Track, fileName, telemetry, size
-										   , (scope = "Community"), true, SessionDatabase.ID)
+										   , (scope = "Community") || sessionDB.getShareDefault("Lap Telemetries")
+										   , true, SessionDatabase.ID)
 
 					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, fileName)
 

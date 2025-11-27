@@ -10079,7 +10079,8 @@ class TeamCenter extends ConfigurationItem {
 										file.Close()
 
 										sessionDB.writeSession(simulator, car, track, "Team", fileName, info, session, size
-															 , false, !this.HasTelemetry, SessionDatabase.ID)
+															 , !this.HasTelemetry && sessionDB.getShareDefault("Sessions")
+															 , !this.HasTelemetry, SessionDatabase.ID)
 
 										return
 									}

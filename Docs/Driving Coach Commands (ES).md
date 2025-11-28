@@ -91,14 +91,16 @@ Information=Información de la sesión, Información de la Stint, Información d
 	[(CanWe) {centrarnos, hablar sobre} {número de curva, curva} (Number), {Por favor toma, Toma} {mira más de cerca, mira} a {número de curva, curva} (Number), ¿Dónde puedo mejorar? {número de curva, curva} (Number),  ( 3) ¿Qué debo considerar {para, en} {número de curva, curva} (Number), Qué debo tener en cuenta en la curva (Number)]
 
 	[(CanYou) darme {recomendaciones, consejos, una guía, instrucciones} {mientras conduzco, para cada curva}, {Por favor dime, Dime} {antes de, para} cada curva lo que {puedo, debería} cambiar, (CanYou) entrenarme {en la pista, mientras conduzco}]
+	
+	[(CanWe) centrarnos en la {número de curva, curva} (Number), {Practiquemos, Centrémonos} la {número de curva, curva} (Number), (CanYou) darme {recomendaciones, consejos, una guía, instrucciones} para la {número de curva, curva} (Number)]
+	
+	[(CanYou) decirme dónde están los puntos de frenado, {Por favor dime, Dime} dónde frenar, (CanWe) practicar {frenado, puntos de frenado}]
 
 	[{Gracias ahora, Ahora} quiero concentrarme, {Está bien déjame, Déjame} {aplicar, probar} {tus recomendaciones, tus instrucciones, eso} ahora, {Por favor deja, Deja} dándome {recomendaciones, consejos, instrucciones, recomendaciones para cada curva, tips para cada curva, instrucciones para cada curva}, {Por favor no, No} más {instrucciones, instrucciones por favor}]
 
 	[(CanWe) usar la vuelta {más rápida, última} como {referencia, vuelta de referencia}, {Por favor use, Use} la vuelta {más rápida, última} como {referencia, vuelta de referencia}]
 
 	[{Por favor haz, Haz} no utilices una referencia {vuelta, vuelta por favor}]
-	
-	[(CanWe) centrarnos en la {número de curva, curva} (Number), {Practiquemos, Centrémonos} la {número de curva, curva} (Number), (CanYou) darme {recomendaciones, consejos, una guía, instrucciones} para la {número de curva, curva} (Number)]
 	
 	[(CanWe) {centrarnos, centrarnos de nuevo} en toda la pista, {Centrémonos nuevamente, Centrémonos} en toda la pista]
 

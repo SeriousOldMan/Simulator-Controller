@@ -29,6 +29,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 	iTelemetryCoachingActive := false
 	iTrackCoachingActive := false
+	iBrakeCoachingActive := false
 
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -47,8 +48,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			this.callRemote("startTrackCoaching", arguments*)
 		}
 
-		finishTrackCoaching(arguments*) {
-			this.callRemote("finishTrackCoaching", arguments*)
+		startBrakeCoaching(arguments*) {
+			this.callRemote("startBrakeCoaching", arguments*)
+		}
+
+		finishCoaching(arguments*) {
+			this.callRemote("finishCoaching", arguments*)
 		}
 	}
 
@@ -96,9 +101,34 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			local plugin := this.Plugin
 
 			if (plugin.TrackCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
-				plugin.finishTrackCoaching()
+				plugin.finishCoaching()
 			else if (!plugin.TrackCoachingActive && ((trigger = "On") || (trigger == "Push")))
 				plugin.startTrackCoaching()
+		}
+	}
+
+	class BrakeCoachingToggleAction extends ControllerAction {
+		iPlugin := false
+
+		Plugin {
+			Get {
+				return this.iPlugin
+			}
+		}
+
+		__New(plugin, function, label, icon) {
+			this.iPlugin := plugin
+
+			super.__New(function, label, icon)
+		}
+
+		fireAction(function, trigger) {
+			local plugin := this.Plugin
+
+			if (plugin.BrakeCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
+				plugin.finishCoaching()
+			else if (!plugin.BrakeCoachingActive && ((trigger = "On") || (trigger == "Push")))
+				plugin.startBrakeCoaching()
 		}
 	}
 
@@ -126,6 +156,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 	}
 
+	BrakeCoachingActive {
+		Get {
+			return this.iBrakeCoachingActive
+		}
+	}
+
 	__New(controller, name, configuration := false, register := true) {
 		local coaching
 
@@ -145,6 +181,13 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				this.createRaceAssistantAction(controller, "TrackCoaching", coaching)
 		}
 
+		if (this.Active || (isDebug() && isDevelopment())) {
+			coaching := this.getArgumentValue("brakeCoaching", false)
+
+			if coaching
+				this.createRaceAssistantAction(controller, "BrakeCoaching", coaching)
+		}
+
 		DirCreate(kTempDirectory . "Driving Coach")
 
 		deleteFile(kTempDirectory . "Driving Coach\Coaching.state")
@@ -153,11 +196,13 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 			local active := getMultiMapValue(state, "Coaching", "Active", false)
 			local track := (active && getMultiMapValue(state, "Coaching", "Track", false))
+			local brake := (active && getMultiMapValue(state, "Coaching", "Brake", false))
 
 			if (active != this.TelemetryCoachingActive) {
 				this.iTelemetryCoachingActive := active
 
-				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), active)
+				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
+				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
 
 				this.updateActions(kSessionUnknown)
 			}
@@ -167,11 +212,19 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 				this.updateActions(kSessionUnknown)
 			}
+
+			if (brake != this.BrakeCoachingActive) {
+				this.iBrakeCoachingActive := brake
+
+				this.updateActions(kSessionUnknown)
+			}
 		}, 5000, kLowPriority).start()
 
 		Task.startTask(() {
-			if this.Controller.Started
-				this.updateTelemetryCoachingTrayLabel(translate("On-track Coaching"), false)
+			if this.Controller.Started {
+				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), false)
+				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), false)
+			}
 			else
 				return Task.CurrentTask
 		}, 500, kHighPriority)
@@ -192,6 +245,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
 			this.registerAction(DrivingCoachPlugin.TrackCoachingToggleAction(this, controller.findFunction(actionFunction)
+																		   , this.getLabel(descriptor, action), this.getIcon(descriptor)))
+		}
+		else if (action = "BrakeCoaching") {
+			descriptor := ConfigurationItem.descriptor(action, "Toggle")
+
+			this.registerAction(DrivingCoachPlugin.BrakeCoachingToggleAction(this, controller.findFunction(actionFunction)
 																		   , this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
@@ -228,6 +287,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				for ignore, session in ["Practice", "Qualification", "Race"]
 					setMultiMapValue(settings, "Assistant.Coach", session . ".OnTrackCoaching", telemetryCoaching)
 
+			telemetryCoaching := getMultiMapValue(this.StartupSettings, "Functions", "Brake Coaching", kUndefined)
+
+			if (telemetryCoaching != kUndefined)
+				for ignore, session in ["Practice", "Qualification", "Race"]
+					setMultiMapValue(settings, "Assistant.Coach", session . ".BrakeCoaching", telemetryCoaching)
+
 			privateSession := getMultiMapValue(this.StartupSettings, "Functions", "Private Practice", kUndefined)
 
 			if (privateSession != kUndefined)
@@ -257,6 +322,12 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			else if isInstance(theAction, DrivingCoachPlugin.TrackCoachingToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackCoachingActive ? "Green" : "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackCoachingActive ? "Activated" : "Deactivated")
+
+				theAction.Function.enable(kAllTrigger, theAction)
+			}
+			else if isInstance(theAction, DrivingCoachPlugin.BrakeCoachingToggleAction) {
+				theAction.Function.setLabel(this.actionLabel(theAction), this.BrakeCoachingActive ? "Green" : "Black")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.BrakeCoachingActive ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
 			}
@@ -345,14 +416,38 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		this.startSession(settings, data)
 	}
 
-	updateTelemetryCoachingTrayLabel(label, enabled) {
+	updateTrackCoachingTrayLabel(label, enabled) {
 		static hasTrayMenu := false
 
 		toggleTelemetryCoaching(*) {
 			if this.TelemetryCoachingActive
 				this.finishTelemetryCoaching()
 			else
-				this.startTelemetryCoaching(true, true)
+				this.startTelemetryCoaching(true, "Track")
+		}
+
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
+
+		if !hasTrayMenu {
+			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
+
+			hasTrayMenu := true
+		}
+
+		if enabled
+			A_TrayMenu.Check(label)
+		else
+			A_TrayMenu.Uncheck(label)
+	}
+
+	updateBrakeCoachingTrayLabel(label, enabled) {
+		static hasTrayMenu := false
+
+		toggleTelemetryCoaching(*) {
+			if this.BrakeCoachingActive
+				this.finishTelemetryCoaching()
+			else
+				this.startTelemetryCoaching(true, "Brake")
 		}
 
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
@@ -385,9 +480,14 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			this.DrivingCoach.startTrackCoaching(confirm)
 	}
 
-	finishTrackCoaching() {
+	startBrakeCoaching(confirm := true) {
 		if this.DrivingCoach
-			this.DrivingCoach.finishTrackCoaching()
+			this.DrivingCoach.startBrakeCoaching(confirm)
+	}
+
+	finishCoaching() {
+		if this.DrivingCoach
+			this.DrivingCoach.finishCoaching()
 	}
 }
 
@@ -404,7 +504,7 @@ startTelemetryCoaching(confirm := true, auto := false) {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.startTelemetryCoaching(auto, confirm)
+			plugin.startTelemetryCoaching(confirm, auto)
 	}
 	finally {
 		protectionOff()
@@ -441,7 +541,7 @@ startTrackCoaching(confirm := true) {
 	}
 }
 
-finishTrackCoaching() {
+startBrakeCoaching(confirm := true) {
 	local controller := SimulatorController.Instance
 	local plugin := controller.findPlugin(kDrivingCoachPlugin)
 
@@ -449,7 +549,22 @@ finishTrackCoaching() {
 
 	try {
 		if (plugin && controller.isActive(plugin))
-			plugin.finishTrackCoaching()
+			plugin.startBrakeCoaching(confirm)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+finishCoaching() {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kDrivingCoachPlugin)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.finishCoaching()
 	}
 	finally {
 		protectionOff()

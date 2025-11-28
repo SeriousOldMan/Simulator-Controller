@@ -185,7 +185,7 @@ requestShareSessionDatabaseConsent() {
 
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID
-	local shareTyrePressures, shareCarSetups, shareRaceStrategies, shareLapTelemetries, options, consent
+	local options, consent
 
 	if (!ProcessExist("Database Synchronizer.exe") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) && isProperInstallation()) {
 		idFileName := kUserConfigDirectory . "ID"
@@ -207,23 +207,18 @@ startDatabaseSynchronizer() {
 			if (ID = dbID) {
 				consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
-				shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-				shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
-				shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
-				shareLapTelemetries := (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
-
 				options := ("-ID `"" . ID . "`" -Synchronize " . true)
 
-				if shareTyrePressures
+				if (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 					options .= " -Pressures"
 
-				if shareCarSetups
+				if (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 					options .= " -Setups"
 
-				if shareRaceStrategies
+				if (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
 					options .= " -Strategies"
 
-				if shareLapTelemetries
+				if (getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "No") = "Yes")
 					options .= " -Telemetries"
 
 				try {
@@ -429,7 +424,7 @@ startupApplication() {
 
 MessageManager.pause()
 
-if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
+if (!isDetachedInstallation() && !Development() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 	if kLogStartup
 		logMessage(kLogOff, "Checking for updates...")
 

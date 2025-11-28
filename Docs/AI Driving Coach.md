@@ -78,7 +78,7 @@ Ultimately, the decision between an early or late pit stop should be based on ca
 
 **Driver:** Can you shorten this answer?
 
-**Aiden**: Certainly! Here's a shorter version:
+**Aiden:** Certainly! Here's a shorter version:
 
 The decision between an early or late pit stop depends on factors like track conditions, tire degradation, and competitor behavior. 
 
@@ -171,7 +171,7 @@ A very important aspect in the configuration of the Driving Coach are the so cal
 
 Simulator Controller provide default instructions for all supported languages and instruction categories, but you are free to create your own instructions. Please note, that the default instructions are optimized for OpenAI language models. If you are using LLMs provided by GPT4All, you may have to adopt or totally rewrite the default instructions to work with the chosen model.
 
-Instructions support embedded variables. These variables are automatically replaced with information about the currently running simulation, your progress in the current race, or handling issues, and so on. Whether or not the Driving Coach will understand and use this information will heavily depend on the model and the current context of your discussion with the coach. But you may be successful in most cases by explicitly asking the Driving Coach to take a look at the supplied data.
+Instructions support embedded variables. These variables are automatically replaced with information about the currently running simulation, your progress in the current race, or handling issues, and so on. Whether or not the Driving Coach will understand and use this information will heavily depend on the model and the current context of your discussion with the Coach. But you may be successful in most cases by explicitly asking the Driving Coach to take a look at the supplied data.
 
 Below you find all instruction categories and the supported variables:
 
@@ -224,13 +224,13 @@ IMPORTANT: Depending on the configuration, especially the chosen model and also 
 
 ## Interacting with Aiden
 
-Since an interaction with Aiden always is kind of a free dialog, the only way to interact with Aiden is through voice. Simply call your coach, for example with "Hey Aiden", and then formulate your first question. And here the fun begins. Interacting with a LLM feels like a natural human-2-human interaction, but you need to follow some rules to get the information you want:
+Since an interaction with Aiden always is kind of a free dialog, the only way to interact with Aiden is through voice. Simply call your Coach, for example with "Hey Aiden", and then formulate your first question. And here the fun begins. Interacting with a LLM feels like a natural human-2-human interaction, but you need to follow some rules to get the information you want:
 
 1. Be as specific as possible
    Asking "What can you tell me about trailbraking" will at best give you a long essay about this topic. A better question will be "I have problems with trailbraking. How can I improve it?"
 
 2. Give as much context as you have
-   It is important that your coach knows as much about the background of your current situation and the purpose of your question as possible. Give this information as early as possible.
+   It is important that your Coach knows as much about the background of your current situation and the purpose of your question as possible. Give this information as early as possible.
    
    Most of the context information is provided in the initial default instructions (see the [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) for more information how to provide these instructions). But you may have individual context information, which you can provide **before** your question. Example: "I am driving a Mercedes AMG GT3, which has a front motor. I have severe problems with understeering. How should I adopt my drving technique? And how can I setup the car to counteract this?"
 
@@ -376,29 +376,83 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
+#### Practicing braking points
+
+Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:
+
+**Aiden:** For the next corner, brake as hard as you can and then gradually release the brake while turning in.
+
+**Aiden:** Ready
+
+**Aiden:** Set
+
+**Aiden:** Brake
+
+**Aiden:** Release
+
+Important: The command "Release" does not mean that you should completely release the brake at this point, but that you should begin releasing the brakes according to the braking technique mentioned in the first call.
+
+The following video gives you a good demonstration of this:
+
+[![](https://img.youtube.com/vi/itT8sCm_51c/0.jpg)](https://youtu.be/itT8sCm_51c)
+
+##### Notes
+
+1. This works also in restricted mode, i.e. without a GPT connection (see below).
+2. You can either use corner by corner coaching as described above or brake point coaching.
+3. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
+
+   - *Coach: Time before Braking Point*
+     
+	 This setting defines how many milliseconds before the actual braking point the Coach will yell out "Brake". Default is 300 milliseconds. The exact value depends on your PC setup, since sound processing will take some time, and also on your reaction time. The default value of 300 ms is a good compromise to start with.
+   - *Coach: Threshold for hard brake pressure*
+   
+     Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
+   - *Coach: Threshold for release pressure*
+   
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 4).
+   - *Coach: Threshold for trail braking*
+   
+     When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.
+	 
+   Please note, that all these settings can be defined per car and even per track.
+5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
+
 ### Automatic activation of coaching mode
 
-Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the coach on your side in each practice session. Always having to ask the coach to come along can become boring with time. But it is easy to automate that using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
+Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the Coach on your side in each practice session. Always having to ask the Coach to come along can become boring with time. As always with Simulator Controller, there are several methods to do this:
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG)
+1. Actions (e.g. "TrackCoaching", "BrakeCoaching", etc.) can be bound to buttons on your steering wheel or Button Box.
+2. Also, corresponding functions are available for "On-track Coaching" and "Brake Coaching" in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start the coaching mode, once telemetry data is available.
+3. Or you use the tray menu of the "Simulator Controller" process to activate a coaching mode.
+4. Lastly, and more as an expert example, it is possible to automate almost anything by using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 
-If you want to use this for your own setup, here is the rule text, so you can copy it:
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Driving%20Coach%20Startup.JPG)
 
-	{All: [?Session.Type = 2], {None: [?Coaching.Started]}} =>
-			(Call: Assistant.Call(startTelemetryCoaching, false)), (Set: Coaching.Started),
-			(Call: Assistant.Speak("Kim here. I'll start my computer. Run some warmup laps and then we will have a look at the telemetry."))
+   If you want to use this for your own setup, here is the rule text, so you can copy it:
 
-	[?Session.Type > 2] => (Call: Assistant.Call(finishTelemetryCoaching, false)), (Clear: Coaching.Started)
+		{All: [?Session.Type = 2], {None: [?Coaching.Started]}} =>
+				(Call: Assistant.Call(startTelemetryCoaching, false)), (Set: Coaching.Started),
+				(Call: Assistant.Speak("Kim here. I'll start my computer. Run some warmup laps and then we will have a look at the telemetry."))
 
-Replace "Kim" with the name of your Driving Coach.
+		[?Session.Type > 2] => (Call: Assistant.Call(finishTelemetryCoaching, false)), (Clear: Coaching.Started)
 
-Expert Notes: *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session, all values below **2** are for internal purposes.
+   Replace "Kim" with the name of your Driving Coach.
 
-Another and possibly easier way to automatically start telemetry-based coaching is by using the "On-track Coaching" function in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start on-track coaching, once telemetry data is available.
+   *startTelemetryCoaching* and *finishTelemetryCoaching* are methods of the *DrivingCoach* class, the session type **2** represents *practice*, **3** stands for *qualifying* and **4** for a *race* session, all values below **2** are for internal purposes.
 
 ### Restricted mode without a LLM
 
-As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm), the Driving Coach can also be used without a LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
+As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm), the Driving Coach can also be used without a LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the Coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
+
+### Special notes for *Assetto Corsa Competizione*
+
+A special learning method is used for *Assetto Corsa Competizione*, because this simulator lack some important data in the API about track position. Therefore it can take up to 4 laps, before data is coming in.
+
+### Special notes for *RaceRoom Racing Experience*
+
+COmplete telemetry data is only provided for valid laps. Make sure to stay within track limits before the Coach has acquire the first set of telemetry data.
 
 ## How it works
 

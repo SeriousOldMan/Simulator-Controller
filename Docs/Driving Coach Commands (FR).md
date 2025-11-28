@@ -92,13 +92,15 @@ Information=informations sur la session, informations sur le relais, information
 
 	[(CanYou) me donner {des recommandations, des conseils, un guide, des instructions} {pendant que je conduis, en conduisant, à chaque virage}, {S'il vous plaît dites-moi, Dites-moi} {avant, pour} chaque coin ce que je {peut, devrais} changer, (CanYou) {m'entraîner sur la piste, me coacher pendant que je conduis, me coacher en conduisant}]
 	
+	[(CanWe) {concentrer sur, pratiquer} le {coin numéro, coin} (Number), {Pratiquons, Concentrons-nous sur} le {coin numéro, coin} (Number), (CanYou) me donner {des recommandations, des conseils, un guide, des instructions} pour le {coin numéro, coin} (Number)]
+	
+	[(CanYou) me dire où se trouvent les points de freinage, {Veuillez me dire, Dites-moi} où freiner, (CanWe) pratiquer {le freinage, les points de freinage}]
+	
 	[{Merci maintenant, Maintenant} je veux me concentrer, Ok, laisse-moi {appliquer, essayer} {tes instructions, vos recommandations, ça} maintenant, {S'il vous plaît arrêtez, Arrêtez} de me donner des {instructions, recommandations, instructions pour chaque coin, recommandations pour chaque coin}, {S'il vous plaît plus, Plus} {d'instructions, d'instructions s'il vous plaît}]
 
 	[(CanWe) utiliser le tour le plus rapide comme {référence, tour de référence}, {Veuillez utiliser, Utiliser} le tour le plus rapide comme {référence, tour de référence}]
 
 	[{S'il vous plaît n'utilisez, N'utilisez} pas de référence {tour, tour s'il vous plaît}]
-	
-	[(CanWe) {concentrer sur, pratiquer} le {coin numéro, coin} (Number), {Pratiquons, Concentrons-nous sur} le {coin numéro, coin} (Number), (CanYou) me donner {des recommandations, des conseils, un guide, des instructions} pour le {coin numéro, coin} (Number)]
 	
 	[(CanWe) {concentrer, concentrer à nouveau} sur toute la piste, {Concentrons-nous, Concentrons-nous à nouveau} sur toute la piste]
 

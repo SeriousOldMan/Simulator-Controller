@@ -6285,7 +6285,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							driver := this.SessionDatabase.ID
 
 						this.SessionDatabase.writeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, telemetry, size
-														  , this.SessionDatabase.getShareDefault("Lap Telemetries"), true, driver)
+														  , this.SessionDatabase.getShareDefault("Lap Telemetries")
+														  , this.SessionDatabase.getSynchronizeDefault("Lap Telemetries")
+														  , driver)
 
 						if info {
 							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName())

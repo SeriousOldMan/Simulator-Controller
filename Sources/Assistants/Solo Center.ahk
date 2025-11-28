@@ -4939,7 +4939,7 @@ class SoloCenter extends ConfigurationItem {
 
 								sessionDB.writeSession(simulator, car, track, "Solo", fileName, info, session, size
 													 , !FileExist(directory . "Telemetry\*.telemetry") && sessionDB.getShareDefault("Sessions")
-													 , !FileExist(directory . "Telemetry\*.telemetry")
+													 , !FileExist(directory . "Telemetry\*.telemetry") && sessionDB.getSynchronizeDefault("Sessions")
 													 , SessionDatabase.ID)
 
 								return

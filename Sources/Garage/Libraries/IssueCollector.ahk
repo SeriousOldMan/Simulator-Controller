@@ -170,7 +170,7 @@ class IssueCollector {
 
 		OnExit((*) {
 			deleteDirectory(this.iSoundsDirectory)
-			
+
 			return false
 		})
 	}
@@ -248,7 +248,8 @@ class IssueCollector {
 
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
-		local pid, options, code, message, audioDevice
+		local player := requireSoundPlayer("DCAnalyzerPlayer.exe")
+		local pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
 			this.updateSamples()
@@ -289,15 +290,19 @@ class IssueCollector {
 				if this.AcousticFeedback {
 					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
 
-					audioDevice := (this.AudioSettings ? this.AudioSettings.AudioDevice : false)
+					if this.AudioSettings {
+						if kSox
+							SplitPath(kSox, , &workingDirectory)
+						else
+							workingDirectory := A_WorkingDir
 
-					if audioDevice
-						options .= (A_Space . "`"" . audioDevice . "`"")
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+					}
 				}
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				Run(kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
+				Run(kBinariesDirectory . "Providers\" . code . " SHM Coach.exe " . options, kBinariesDirectory, "Hide", &pid)
 
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
@@ -305,7 +310,7 @@ class IssueCollector {
 			catch Any as exception {
 				logError(exception, true)
 
-				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+				message := substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
 											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))

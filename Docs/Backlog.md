@@ -20,9 +20,8 @@
 
 #### Assistants
   1. Better answers by the Strategist, when a pitstop cannot be recommended
-  2. Approaching corner braking point countdown by the Coach
-  3. Shift beeps by the Coach
-  4. Configurable priority for voice output between Spotter and other Assistants
+  2. Shift beeps by the Coach
+  3. Configurable priority for voice output between Spotter and other Assistants
   
 #### Session Database
   1. Active validation of value ranges in settings definitions

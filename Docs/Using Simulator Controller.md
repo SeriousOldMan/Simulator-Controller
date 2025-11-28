@@ -249,7 +249,7 @@ Before version 5.5.8 of Simulator Controller, it was necessary to press the *Pus
 
 You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button to activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" method as described below.
 
-Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Configuration).
+Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings).
 
 As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, for example, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent.
 

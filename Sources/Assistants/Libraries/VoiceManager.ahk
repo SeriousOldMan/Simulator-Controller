@@ -194,9 +194,14 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		getPhrase(phrase, variables := false, &cache := false) {
+		getAllPhrases(phrase) {
 			local phrases := this.Phrases
-			local index
+
+			return (phrases.Has(phrase) ? phrases[phrase] : [])
+		}
+
+		getPhrase(phrase, variables := false, &cache := false, &index?) {
+			local phrases := this.Phrases
 
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
@@ -338,7 +343,7 @@ class VoiceManager extends ConfigurationItem {
 				this.iOptions := CaseInsenseMap()
 
 				if (StrLen(Trim(text)) > 0)
-					this.speak(text, focus, false, (options.Count > 0) ? options : false)
+					return this.speak(text, focus, false, (options.Count > 0) ? options : false)
 			}
 		}
 
@@ -380,7 +385,7 @@ class VoiceManager extends ConfigurationItem {
 
 					try {
 						if this.UseTalking
-							super.speak(text, !this.Awaitable, cache, options)
+							return super.speak(text, !this.Awaitable, cache, options)
 						else if InStr(text, "。") {
 							for ignore, part in string2Values("。", text)
 								if (Trim(part) != "")
@@ -392,7 +397,7 @@ class VoiceManager extends ConfigurationItem {
 									super.speak(part . translate("."), !this.Awaitable, cache, options)
 						}
 						else
-							super.speak(text, !this.Awaitable, cache, options)
+							return super.speak(text, !this.Awaitable, cache, options)
 					}
 					finally {
 						this.Speaking := false
@@ -403,22 +408,34 @@ class VoiceManager extends ConfigurationItem {
 						this.VoiceManager.startListening()
 				}
 			}
+
+			return false
 		}
 
-		getPhrase(phrase, variables := false, &cache := false) {
+		getAllPhrases(phrase) {
 			local phrases := this.Phrases
-			local index
+
+			return (phrases.Has(phrase) ? phrases[phrase] : [])
+		}
+
+		getPhrase(phrase, variables := false, &cache := false, &index?) {
+			local phrases := this.Phrases
 
 			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
 				index := Round(Random(0.55, phrases.Length + 0.45))
 
+				if (cache == true)
+					cache := phrase
+
 				if cache
 					cache .= ("." . index)
 
 				phrase := substituteVariables(phrases[index], this.VoiceManager.getPhraseVariables(variables))
 			}
+			else
+				index := false
 
 			return phrase
 		}
@@ -427,7 +444,7 @@ class VoiceManager extends ConfigurationItem {
 			phrase := this.getPhrase(phrase, variables, &cache)
 
 			if phrase
-				this.speak(phrase, focus, cache, options)
+				return this.speak(phrase, focus, cache, options)
 		}
 
 		number2Speech(number, precision := kUndefined) {
@@ -1106,50 +1123,53 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	getSpeaker() {
-		local pid, activationCommand, mode
-
 		if (this.Speaker && !this.iSpeechSynthesizer) {
-			if this.VoiceServer {
-				pid := ProcessExist()
-
-				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
-				activationCommand := substituteVariables(activationCommand, {name: this.Name})
-
-				mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
-
-				if (mode = "Mixed")
-					mode := "Text"
-
-				messageSend(kFileMessage, "Voice"
-										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
-																					, StrReplace(activationCommand, ";", ",")
-																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
-																					, "remoteSpeakingStatusUpdate"
-																					, this.Language, this.Synthesizer, this.Speaker
-																					, this.Recognizer, this.Listener
-																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
-																					, this.SpeakerBooster, this.ListenerBooster
-																					, mode)
-										, this.VoiceServer)
-
-				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																	, this.buildFragments(this.Language)
-																	, this.buildPhrases(this.Language))
-			}
-			else {
-				this.iSpeechSynthesizer := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																   , this.buildFragments(this.Language)
-																   , this.buildPhrases(this.Language))
-
-				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-				this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-			}
+			this.iSpeechSynthesizer := (this.VoiceServer ? this.getRemoteSpeaker() : this.getLocalSpeaker())
 
 			this.startListener()
 		}
 
 		return this.iSpeechSynthesizer
+	}
+
+	getRemoteSpeaker() {
+		local pid := ProcessExist()
+		local mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
+		local activationCommand := substituteVariables(getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+													 , {name: this.Name})
+
+		if (mode = "Mixed")
+			mode := "Text"
+
+		messageSend(kFileMessage, "Voice"
+								, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
+																			, StrReplace(activationCommand, ";", ",")
+																			, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																			, "remoteSpeakingStatusUpdate"
+																			, this.Language, this.Synthesizer, this.Speaker
+																			, this.Recognizer, this.Listener
+																			, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
+																			, this.SpeakerBooster, this.ListenerBooster
+																			, mode)
+								, this.VoiceServer)
+
+		return VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+											  , this.buildFragments(this.Language)
+											  , this.buildPhrases(this.Language))
+	}
+
+	getLocalSpeaker() {
+		local speaker
+
+		speaker := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+												 , this.buildFragments(this.Language)
+												 , this.buildPhrases(this.Language))
+
+		speaker.setVolume(this.SpeakerVolume)
+		speaker.setPitch(this.SpeakerPitch)
+		speaker.setRate(this.SpeakerSpeed)
+
+		return speaker
 	}
 
 	startListener() {

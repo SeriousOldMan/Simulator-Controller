@@ -129,13 +129,20 @@ class Corner extends Section {
 	iDirection := "Left"				; OneOf("Left", "Right")
 	iCurvature := 0.0					; Higher values -> sharper corner
 
-	iBrakingStart := 0					; Distance into the track, where braking starts
-	iRollingStart := 0					; Distance into the track, where accelerating starts
-	iAcceleratingStart := 0				; Distance into the track, where accelerating starts
+	iBrakingStart := 0					; Distance from the apex, where braking starts
+	iRollingStart := 0					; Distance from the apex, where accelerating starts
+	iAcceleratingStart := 0				; Distance from the apex, where accelerating starts
 
-	iBrakingTime := 0					; Time of the braking phase in meters
-	iRollingTime := 0					; Time of the rolling phase in meters
-	iAcceleratingTime := 0				; Time of the acceleration phase in meters
+	iBrakeCurve := []
+	iThrottleCurve := []
+
+	iBrakingTime := 0					; Time of the braking phase in seconds
+	iRollingTime := 0					; Time of the rolling phase in seconds
+	iAcceleratingTime := 0				; Time of the acceleration phase in seconds
+
+	iBrakingSpeed := 0					; Speed at the braking point in km/h
+	iRollingSpeed := 0					; Speed at the apex in km/h
+	iAcceleratingInitialSpeed := 0		; Spped at the start of acceleration in km/h
 
 	iBrakingLength := 0					; Length of the braking phase in meters
 	iRollingLength := 0					; Length of the rolling phase in meters
@@ -146,7 +153,7 @@ class Corner extends Section {
 
 	iAcceleratingGear := 0				; Gear at start of the accelerating phase
 	iAcceleratingRPM := 0				; RPM at start of the accelarating phase
-	iAcceleratingSpeed := 0				; Speed at the end of the accelerating phase
+	iAcceleratingFinalSpeed := 0		; Speed at the end of the accelerating phase
 
 	iMinLateralGForce := 0				; Min G Force around apex (rolling phase)
 	iMaxLateralGForce := 0				; Max G Force around apex (rolling phase)
@@ -217,6 +224,19 @@ class Corner extends Section {
 		}
 	}
 
+	Speed[part := "Rolling"] {
+		Get {
+			if ((part = "Entry") || (part = "Braking"))
+				return this.iBrakingSpeed
+			else if ((part = "Apex") || (part = "Rolling"))
+				return this.iRollingSpeed
+			else if ((part = "Exit") || (part = "Accelerating"))
+				return this.iAcceleratingInitialSpeed
+			else
+				return 0
+		}
+	}
+
 	Length[part := "Overall"] {
 		Get {
 			if (part = "Overall")
@@ -240,7 +260,7 @@ class Corner extends Section {
 
 	RollingRPM {
 		Get {
-			return this.iRollingRPM
+			return Round(this.iRollingRPM)
 		}
 	}
 
@@ -252,13 +272,13 @@ class Corner extends Section {
 
 	AcceleratingRPM {
 		Get {
-			return this.iAcceleratingRPM
+			return Round(this.iAcceleratingRPM)
 		}
 	}
 
 	AcceleratingSpeed {
 		Get {
-			return this.iAcceleratingSpeed
+			return this.iAcceleratingFinalSpeed
 		}
 	}
 
@@ -304,9 +324,45 @@ class Corner extends Section {
 		}
 	}
 
+	BrakingX {
+		Get {
+			return this.iBrakingX
+		}
+	}
+
+	BrakingY {
+		Get {
+			return this.iBrakingY
+		}
+	}
+
+	BrakeCurve {
+		Get {
+			return this.iBrakeCurve
+		}
+	}
+
 	AcceleratingStart {
 		Get {
 			return this.iAcceleratingStart
+		}
+	}
+
+	AcceleratingX {
+		Get {
+			return this.iAcceleratingX
+		}
+	}
+
+	AcceleratingY {
+		Get {
+			return this.iAcceleratingY
+		}
+	}
+
+	ThrottleCurve {
+		Get {
+			return this.iThrottleCurve
 		}
 	}
 
@@ -437,10 +493,10 @@ class Corner extends Section {
 	}
 
 	__New(trackSection, direction, curvature
-					  , brakingStart, brakingTime, brakingLength, maxBrakePressure, brakePressureRampUp
-					  , rollingStart, rollingTime, rollingLength
-					  , acceleratingStart, acceleratingTime, acceleratingLength
-					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
+					  , brakingStart, brakingTime, brakingSpeed, brakingLength, maxBrakePressure, brakePressureRampUp, brakeCurve
+					  , rollingStart, rollingTime, rollingSpeed, rollingLength
+					  , acceleratingStart, acceleratingTime, acceleratingInitialSpeed, acceleratingLength, throttleCurve
+					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingFinalSpeed
 					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
 					  , throttleCorrections, throttleSmoothness
@@ -454,19 +510,26 @@ class Corner extends Section {
 		this.iRollingStart := rollingStart
 		this.iAcceleratingStart := acceleratingStart
 
+		this.iBrakeCurve := brakeCurve
+		this.iThrottleCurve := throttleCurve
+
 		this.iBrakingTime := brakingTime
 		this.iRollingTime := rollingTime
 		this.iAcceleratingTime := acceleratingTime
+
+		this.iBrakingSpeed := brakingSpeed
+		this.iRollingSpeed := rollingSpeed
+		this.iAcceleratingInitialSpeed := acceleratingInitialSpeed
 
 		this.iBrakingLength := brakingLength
 		this.iRollingLength := rollingLength
 		this.iAcceleratingLength := acceleratingLength
 
 		this.iRollingGear := rollingGear
-		this.iRollingRPM := rollingRPM
+		this.iRollingRPM := Round(rollingRPM)
 		this.iAcceleratingGear := acceleratingGear
-		this.iAcceleratingRPM := acceleratingRPM
-		this.iAcceleratingSpeed := acceleratingSpeed
+		this.iAcceleratingRPM := Round(acceleratingRPM)
+		this.iAcceleratingFinalSpeed := acceleratingFinalSpeed
 
 		this.iMinLateralGForce := minG
 		this.iMaxLateralGForce := maxG
@@ -493,9 +556,14 @@ class Corner extends Section {
 		local index := startIndex
 		local phase := "Approaching"
 		local lastPhase := phase
+		local brakingSpeed := 0
+		local rollingSpeed := 0
+		local acceleratingInitialSpeed := 0
 		local brakingLength := 0
 		local rollingLength := 0
 		local acceleratingLength := 0
+		local brakeCurve := []
+		local throttleCurve := []
 		local brakingTime := 0
 		local rollingTime := 0
 		local acceleratingTime := 0
@@ -503,7 +571,7 @@ class Corner extends Section {
 		local rollingRPM := 0
 		local acceleratingGear := 0
 		local acceleratingRPM := 0
-		local acceleratingSpeed := 0
+		local acceleratingFinalSpeed := 0
 		local curvature := telemetry.getValue(index, "Curvature", kNull)
 		local speed := kUndefined
 		local latG := kUndefined
@@ -582,7 +650,7 @@ class Corner extends Section {
 			else if (phase = "Accelerating") {
 				acceleratingLength += distance(startIdx, index)
 				acceleratingTime += (telemetry.getValue(index, "Time", 0) - startTime)
-				acceleratingSpeed := Max(speed, acceleratingSpeed)
+				acceleratingFinalSpeed := Max(speed, acceleratingFinalSpeed)
 			}
 		}
 
@@ -638,7 +706,7 @@ class Corner extends Section {
 			lastSteeringDelta := (steering - lastSteering)
 			lastSteering := steering
 
-			if (brake > 0.2)
+			if (brake > 0.1)
 				phase := "Braking"
 			else if (throttle <= 0.2)
 				phase := "Rolling"
@@ -669,6 +737,13 @@ class Corner extends Section {
 
 				brakeCount += 1
 
+				if (brakeCount == 1)
+					brakingSpeed := speed
+
+				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
+							   , Distance: telemetry.getValue(index, "Distance")
+							   , Time: telemetry.getValue(index, "Time"), Brake: brake})
+
 				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
 					if ((brakeReference - brake) > 0.2)
 						brakeChanges += 1
@@ -686,6 +761,11 @@ class Corner extends Section {
 			else if (phase = "Rolling") {
 				if (rollingStart == kNull)
 					rollingStart := startIdx
+
+				if (rollingSpeed == 0)
+					rollingSpeed := speed
+				else
+					rollingSpeed := Min(rollingSpeed, speed)
 
 				if (rollingGear == kNull) {
 					rollingGear := telemetry.getValue(index, "Gear")
@@ -715,6 +795,13 @@ class Corner extends Section {
 					tcActivations += 1
 
 				throttleCount += 1
+
+				if (throttleCount == 1)
+					acceleratingInitialSpeed := speed
+
+				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
+								  , Distance: telemetry.getValue(index, "Distance")
+								  , Time: telemetry.getValue(index, "Time"), Throttle: throttle})
 
 				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
 					if ((throttleReference - throttle) > 0.2)
@@ -764,10 +851,10 @@ class Corner extends Section {
 			acceleratingStart := kNull
 
 		return Corner(section, (sumSteering > 0) ? "Right" : "Left", (curvature != kNull) ? curvature : 0
-							 , brakingStart, brakingTime, brakingLength, Round(maxBrake * 100), brakeRampUp
-							 , rollingStart, rollingTime, rollingLength
-							 , acceleratingStart, acceleratingTime, acceleratingLength
-							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingSpeed
+							 , brakingStart, brakingTime, brakingSpeed, brakingLength, Round(maxBrake * 100), brakeRampUp, brakeCurve
+							 , rollingStart, rollingTime, rollingSpeed, rollingLength
+							 , acceleratingStart, acceleratingTime, acceleratingInitialSpeed, acceleratingLength, throttleCurve
+							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingFinalSpeed
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
 							 , (throttleCount ? Round((tcActivations / throttleCount) * 100) : 100)
 							 , (brakeCount ? Round((absActivations / brakeCount) * 100) : 100)
@@ -887,6 +974,8 @@ class Telemetry {
 	iSectorTimes := false
 
 	iSections := []
+	iBraking := false
+	iAccelerating := false
 
 	iMaxLateralGForce := 0
 	iMaxSpeed := 0
@@ -940,6 +1029,24 @@ class Telemetry {
 		}
 	}
 
+	Braking {
+		Get {
+			if !this.iBraking
+				this.iBraking := this.createBraking()
+
+			return this.iBraking
+		}
+	}
+
+	Accelerating {
+		Get {
+			if !this.iAccelerating
+				this.iAccelerating := this.createAccelerating()
+
+			return this.iAccelerating
+		}
+	}
+
 	MaxLateralGForce {
 		Get {
 			return this.iMaxLateralGForce
@@ -960,7 +1067,7 @@ class Telemetry {
 
 	MaxRPM {
 		Get {
-			return this.iMaxRPM
+			return Round(this.iMaxRPM)
 		}
 	}
 
@@ -1105,6 +1212,36 @@ class Telemetry {
 		return sections
 	}
 
+	createBraking() {
+		local braking := []
+		local ignore, section, brake
+
+		for ignore, section in this.Sections
+			if (isInstance(section, Corner) && (section.BrakeCurve.Length > 0)) {
+				brake := section.BrakeCurve[1]
+
+				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: section.Speed["Braking"]
+							, Length: section.Length["Braking"], Time: brake.Time, Curve: section.BrakeCurve})
+			}
+
+		return braking
+	}
+
+	createAccelerating() {
+		local accelerating := []
+		local ignore, section, throttle
+
+		for ignore, section in this.Sections
+			if (isInstance(section, Corner) && (section.ThrottleCurve.Length > 0)) {
+				throttle := section.ThrottleCurve[1]
+
+				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: section.Speed["Accelerating"]
+								 , Length: section.Length["Accelerating"], Time: throttle.Time, Curve: section.ThrottleCurve})
+			}
+
+		return accelerating
+	}
+
 	findSection(x, y, threshold := 10) {
 		local section := this.TelemetryAnalyzer.findSection(x, y, threshold)
 		local ignore, candidate
@@ -1112,6 +1249,36 @@ class Telemetry {
 		for ignore, candidate in this.Sections
 			if (candidate.TrackSection = section)
 				return candidate
+
+		return false
+	}
+
+	findCoordinates(channel, value, &x, &y, channels*) {
+		local lowIndex := 1
+		local highIndex := this.Data.Length
+		local cIndex, cValue
+
+		while (lowIndex <= highIndex) {
+			cIndex := (lowIndex + Round((highIndex - lowIndex) / 2))
+			cValue := this.getValue(cIndex, channel, kUndefined)
+
+			if (cValue = kUndefined)
+				break
+			else if value < cValue
+				highIndex := cIndex - 1
+			else
+				lowIndex := cIndex + 1
+
+			if (lowIndex > highIndex) {
+				x := this.getValue(cIndex, "PosX")
+				y := this.getValue(cIndex, "PosY")
+
+				for ignore, channel in channels
+					%channel% := this.getValue(cIndex, %channel%)
+
+				return true
+			}
+		}
 
 		return false
 	}

@@ -14,34 +14,22 @@ namespace ACSHMSpotter {
             {
                 spotter.initializeTrigger("Automation", args);
 
-                spotter.Run(false, true, false);
-            }
-            else if (args.Length > 0 && args[0] == "-Calibrate")
-            {
-                spotter.initializeAnalyzer(true, args);
-
-                spotter.Run(false, false, true);
-            }
-            else if (args.Length > 0 && args[0] == "-Analyze")
-            {
-                spotter.initializeAnalyzer(false, args);
-
-                spotter.Run(false, false, true);
+                spotter.Run(false, true);
             }
             else if (args.Length > 0 && args[0] == "-Map")
             {
                 if (args.Length > 1)
                     spotter.initializeMapper(args[1]);
 
-                spotter.Run(true, false, false);
+                spotter.Run(true, false);
             }
             else if (args.Length > 0 && args[0] == "-Telemetry")
-                spotter.Run(false, false, false, args[2]);
+                spotter.Run(false, false, args[2]);
             else
             {
                 spotter.initializeSpotter(args);
 
-                spotter.Run(false, false, false);
+                spotter.Run(false, false);
             }
         }
     }

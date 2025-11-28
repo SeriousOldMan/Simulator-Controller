@@ -850,7 +850,9 @@ class DarkTheme extends Theme {
 			}
 		}
 
-		return withTask(RecolorizerTask(), modifiedImage.Bind(fileName, "Invrt", whiteIcon))
+		return withBlockedWindows(() {
+			return withTask(RecolorizerTask(), modifiedImage.Bind(fileName, "Invrt", whiteIcon))
+		})
 	}
 
 	ComputeControlOptions(window, type, options) {

@@ -47,6 +47,12 @@ Nothing to do.
 
 ***
 
+## Release 6.6.7
+
+Everything handled automatically.
+
+***
+
 ## Release 6.6.6
 
 Nothing to do.

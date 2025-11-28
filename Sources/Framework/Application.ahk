@@ -429,7 +429,7 @@ startupApplication() {
 
 MessageManager.pause()
 
-if (!isDetachedInstallation() && !isDebug() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
+if (!isDetachedInstallation() && !Development() && !inList(kBackgroundApps, StrSplit(A_ScriptName, ".")[1])) {
 	if kLogStartup
 		logMessage(kLogOff, "Checking for updates...")
 

@@ -64,4 +64,4 @@ copy "Race Strategist Commands (JA).md" ..\..\Controller.Wiki\Race-Strategist-Co
 copy "Race Spotter Commands (JA).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(JA).md
 copy "Session Settings.md" ..\..\Controller.Wiki\Session-Settings.md
 copy "Keyboard Modifiers.md" ..\..\Controller.Wiki\Keyboard-Modifiers.md
-copy "Core Configuration.md" ..\..\Controller.Wiki\Core-Configuration.md
+copy "Core Settings.md" ..\..\Controller.Wiki\Core-Settings.md

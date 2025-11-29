@@ -492,7 +492,8 @@ class TelemetryChart {
 		local row := false
 		local coordX, coordY, dx, dy, deltaX, deltaY, row
 
-		threshold /= (this.Window["zoomEdit"].Value / 100)
+		if this.TelemetryViewer.TrackMap
+			threshold /= (this.TelemetryViewer.TrackMap.Window["zoomEdit"].Value / 100)
 
 		if ((data.Length > 0) && data[1].Length > 11) {
 			loop data.Length {

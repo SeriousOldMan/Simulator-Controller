@@ -18,7 +18,30 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.7.0.0
+
+#### Date: 12/05/25 (planned)
+
+#### Fixes
+
+  - Fixed the voice command reference sheet for Japanese.
+  - Added some missing translations.
+
+#### Changes
+
+  - Updated many voice commands for the Driving Coach in Japanese.
+  - The Driving Coach now more precisely inform about the start of the coaching.
+  - The Driving Coach provides a new coaching mode that helps you to learn braking points and effective braking techniques. When this coaching mode is active, the Coach will tell you how to brake and also will tell you exactly where to brake and where to release the brake again. This coaching mode is based on telemetry data, therefore using a reference lap from a fast and experienced driver is the key for success.
+    - See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#Practicing-braking-points) for more information about this new coching mode.
+    - A [new voice command for the Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) lets you activate brake coaching.
+	- New "Brake Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and brake coaching by the Driving Coach when this startup profile is active.
+	- Brake coaching can also be started by choosing the corresponding item in the tray menu of the Simulator Controller process.
+	- A new action "BrakeCoaching" has been defined for the Driving Coach plugin, which let you activate brake coaching using a button on your wheel, your Button Box or your Stream Deck.
+	- A new icon in the Stream Deck icon set is provided for the new "BrakeCoaching" action.
+	- A new controller action function ["startBrakeCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) lets you start brake coaching from scripts, rules or any other programmatic source.
+	- An optional *confirm* parameter has been added to the controller action functions "startTrackCoaching" and "startBrakeCoaching".
+	- The existing controller action function ["startTelemetryCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been extended to additionally support immediate start of the brake coaching mode.
+	- All command reference sheets have been updated.
 
 # Release history
 

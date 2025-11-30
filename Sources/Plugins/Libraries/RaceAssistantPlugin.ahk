@@ -1592,10 +1592,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		else
 			session := kSessionFinished
 
-		if (session == kSesssionPaused)
-			RaceAssistantPlugin.pauseSession()
+		if (session == kSessionPaused)
+			RaceAssistantPlugin.pauseAssistantsSession()
 		else
-			RaceAssistantPlugin.resumeSession()
+			RaceAssistantPlugin.resumeAssistantsSession()
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Active

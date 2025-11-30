@@ -29,6 +29,8 @@
 
 #### Changes
 
+  - The starting fuel capacity for the strategy simulation in "Setup Workbench" is now limited to teh fuel capacity of the car.
+  - A very special tweak for *Le Mans Ultimate*: If you are running a team race with Simulator Controller in Solo mode, the Assistants will no longer inform about cars around and other stuff, if you are not driving.
   - Updated many voice commands for the Driving Coach in Japanese.
   - The Driving Coach now more precisely inform about the start of the coaching.
   - The Driving Coach provides a new coaching mode that helps you to learn braking points and effective braking techniques. When this coaching mode is active, the Coach will tell you how to brake and also will tell you exactly where to brake and where to release the brake again. This coaching mode is based on telemetry data, therefore using a reference lap from a fast and experienced driver is the key for success.

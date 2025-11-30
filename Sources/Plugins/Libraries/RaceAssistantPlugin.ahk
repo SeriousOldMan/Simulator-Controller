@@ -69,6 +69,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	iRaceAssistantActive := false
 	iRaceAssistantPrepared := false
+	iRaceAssistantPaused := false
 
 	iNextSessionUpdate := false
 
@@ -126,6 +127,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		finishSession(arguments*) {
 			this.callRemote("finishSession", arguments*)
+		}
+
+		pauseSession(arguments*) {
+			this.callRemote("pauseSession", arguments*)
+		}
+
+		resumeSession(arguments*) {
+			this.callRemote("resumeSession", arguments*)
 		}
 
 		addLap(arguments*) {
@@ -1465,6 +1474,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	static pauseAssistantsSession() {
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if (assistant.Enabled && assistant.RaceAssistant)
+				assistant.pauseSession()
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.pauseSession()
+	}
+
+	static resumeAssistantsSession() {
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if (assistant.Enabled && assistant.RaceAssistant)
+				assistant.resumeSession()
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.resumeSession()
+	}
+
 	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
@@ -1564,6 +1591,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 		else
 			session := kSessionFinished
+
+		if (session == kSesssionPaused)
+			RaceAssistantPlugin.pauseSession()
+		else
+			RaceAssistantPlugin.resumeSession()
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Active
@@ -2148,6 +2180,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			if shutdown
 				this.shutdownRaceAssistant()
+		}
+	}
+
+	pauseSession() {
+		if !this.iRaceAssistantPaused {
+			this.iRaceAssistantPaused := true
+
+			if this.RaceAssistant
+				this.RaceAssistant.pauseSession()
+		}
+	}
+
+	resumeSession() {
+		if this.iRaceAssistantPaused {
+			this.iRaceAssistantPaused := false
+
+			if this.RaceAssistant
+				this.RaceAssistant.resumeSession()
 		}
 	}
 

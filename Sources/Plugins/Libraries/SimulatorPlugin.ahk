@@ -1,4 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Simulator Plugin                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -1196,6 +1197,12 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		this.Car := false
 		this.Track := false
+	}
+
+	pauseSession() {
+	}
+
+	resumeSession() {
 	}
 
 	addLap(lap, data) {

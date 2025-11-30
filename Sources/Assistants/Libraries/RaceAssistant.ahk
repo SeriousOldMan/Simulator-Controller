@@ -2479,6 +2479,12 @@ class RaceAssistant extends ConfigurationItem {
 		throw "Virtual method RaceAssistant.finishSession must be implemented in a subclass..."
 	}
 
+	pauseSession() {
+	}
+
+	resumeSession() {
+	}
+
 	restoreSessionState(settingsFile, stateFile) {
 		local tries := 10
 		local sessionState, sessionSettings

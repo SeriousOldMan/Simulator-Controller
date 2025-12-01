@@ -745,17 +745,27 @@ class DrivingCoach extends GridRaceAssistant {
 			case "TrackCoachingStart":
 				this.clearContinuation()
 
-				if this.CoachingActive
+				if !this.CoachingActive
+					this.telemetryCoachingStartRecognized(words, true, "Track")
+				else
 					this.trackCoachingStartRecognized(words)
+
+				/*
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+				*/
 			case "BrakeCoachingStart":
 				this.clearContinuation()
 
-				if this.CoachingActive
+				if !this.CoachingActive
+					this.telemetryCoachingStartRecognized(words, true, "Brake")
+				else
 					this.brakeCoachingStartRecognized(words)
+
+				/*
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+				*/
 			case "FinishCoaching":
 				this.clearContinuation()
 
@@ -794,6 +804,11 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iCoachingActive := true
 
 		this.startupTelemetryCoaching()
+
+		if (auto = "Brake")
+			this.updateConfigurationValues({BrakeCoaching: true})
+		else if auto
+			this.updateConfigurationValues({OnTrackCoaching: true})
 	}
 
 	telemetryCoachingFinishRecognized(words, confirm := true) {
@@ -1270,8 +1285,9 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry, reference
 
 		if (this.AvailableTelemetry.Count = 0) {
-			if (this.Speaker[false] && !this.OnTrackCoaching && !this.BrakeCoaching)
-				this.getSpeaker().speakPhrase("CoachingReady", false, true, false, {Noise: false, Important: true})
+			if this.Speaker[false]
+				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching) ? "CoachingStart" : "CoachingReady"
+											, false, true, false, {Noise: false, Important: true})
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
 				if isDebug()

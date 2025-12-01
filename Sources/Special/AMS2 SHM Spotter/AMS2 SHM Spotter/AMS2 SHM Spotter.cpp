@@ -1010,11 +1010,15 @@ void checkCoordinates(const SharedMemory* sharedData) {
 
 std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
+int startTelemetryLap = -1;
 int telemetryLap = -1;
 double lastRunning = -1;
 
 void collectCarTelemetry(const SharedMemory* sharedData) {
 	ParticipantInfo vehicle = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
+	
+	if (vehicle.mLapsCompleted < startTelemetryLap)
+		return;
 	
 	try {
 		if ((vehicle.mLapsCompleted + 1) != telemetryLap) {
@@ -1202,6 +1206,9 @@ int main(int argc, char* argv[]) {
 				// More writes had happened during the read. Should be rare, but can happen.
 				continue;
 			}
+			
+			if (startTelemetryLap == -1)
+				startTelemetryLap = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted + 1;
 			
 			if (mapTrack) {
 				if (!writeCoordinates(sharedData))

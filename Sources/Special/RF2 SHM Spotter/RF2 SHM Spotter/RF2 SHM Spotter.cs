@@ -1217,12 +1217,16 @@ namespace RF2SHMSpotter {
 
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
+		int startTelemetryLap = -1;
         int telemetryLap = -1;
 		double lastRunning = -1;
 
         void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
         {
             int playerID = playerScoring.mID;
+			
+			if (playerScoring.mTotalLaps < startTelemetryLap)
+				return;
 
             try
             {
@@ -1405,6 +1409,9 @@ namespace RF2SHMSpotter {
 
 						ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 
+						if (startTelemetryLap == -1)
+							startTelemetryLap = playerScoring.mTotalLaps + 1;
+						
                         if (mapTrack)
 						{
 							if (!writeCoordinates(ref playerScoring))

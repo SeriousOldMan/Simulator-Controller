@@ -1621,6 +1621,7 @@ void checkCoordinates() {
 
 string telemetryDirectory = "";
 ofstream telemetryFile;
+int startTelemetryLap = -1;
 int telemetryLap = -1;
 float lastRunning = -1;
 
@@ -1628,6 +1629,9 @@ void collectCarTelemetry() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	int carID = gf->playerCarID;
 
+	if (gf->completedLaps < startTelemetryLap)
+		return;
+	
 	for (int i = 0; i < gf->activeCars; i++)
 		if (gf->carID[i] == carID) {
 			carID = i;
@@ -1819,6 +1823,9 @@ int main(int argc, char* argv[])
 	int countdown = 4000;
 	int safety = 200;
 	long counter = 0;
+	
+	if (startTelemetryLap == -1)
+		startTelemetryLap = gf->completedLaps + 1;
 
 	while (++counter) {
 		bool wait = true;

@@ -26,6 +26,7 @@
 
   - Fixed the voice command reference sheet for Japanese.
   - Added some missing translations.
+  - Fixed a condition that caused the telemetry data for the first lap to be incomplete, if the collection is started mid-lap.
 
 #### Changes
 

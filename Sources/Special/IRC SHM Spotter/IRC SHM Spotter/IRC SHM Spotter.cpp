@@ -1386,6 +1386,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
+int startTelemetryLap = -1;
 int telemetryLap = -1;
 double lastTelemetryRunning = -1;
 
@@ -1396,6 +1397,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 	getRawDataValue(rawValue, header, data, "Lap");
 
 	int carLaps = *((int*)rawValue);
+	
+	if (carLaps < startTelemetryLap)
+		return;
 
 	try {
 		if ((carLaps + 1) != telemetryLap) {
@@ -1712,6 +1716,14 @@ int main(int argc, char* argv[])
 						getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
 
 						playerCarIndex = atoi(playerCarIdx);
+					}
+					
+					if (startTelemetryLap == -1) {
+						char* rawValue;
+
+						getRawDataValue(rawValue, pHeader, g_data, "Lap");
+
+						startTelemetryLap = *((int*)rawValue) + 1;
 					}
 
 					if (mapTrack) {

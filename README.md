@@ -49,7 +49,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.0.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KjjbWG2H/Releases/Simulator%20Controller%206.7.0.0-alpha.zip) (Test build for 6.7.0. Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode.)
+[6.7.0.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KjjbWG2H/Releases/Simulator%20Controller%206.7.0.0-alpha.zip) (Test build for 6.7.0. Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6700) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-670) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -132,6 +132,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
 35. [Scripting Assistant behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+
+36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
 
 This list will be extended from time to time to cover new functionalities.
 

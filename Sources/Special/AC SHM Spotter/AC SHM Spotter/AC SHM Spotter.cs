@@ -1164,12 +1164,16 @@ namespace ACSHMSpotter {
 
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
-        int telemetryLap = -1;
+        int startTelemetryLap = -1;
+		int telemetryLap = -1;
 		float lastRunning = -1;
 
         void collectCarTelemetry()
         {
             ref AcCarInfo driver = ref cars.cars[0];
+			
+			if (graphics.CompletedLaps < startTelemetryLap)
+				return;
             
             try
             {
@@ -1356,6 +1360,9 @@ namespace ACSHMSpotter {
 				cars = ReadCars();
 
 				bool wait = true;
+				
+				if (startTelemetryLap == -1)
+					startTelemetryLap = graphics.CompletedLaps + 1;
 
                 if (mapTrack)
 				{

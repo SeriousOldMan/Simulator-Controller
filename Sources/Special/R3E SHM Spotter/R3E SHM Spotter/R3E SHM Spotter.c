@@ -1140,6 +1140,7 @@ void checkCoordinates(int playerID) {
 
 char* telemetryDirectory = "";
 FILE* telemetryFile = 0;
+int startTelemetryLap = -1;
 int telemetryLap = -1;
 double lastRunning = -1;
 
@@ -1156,6 +1157,11 @@ void collectCarTelemetry(int playerID) {
 	char buffer[60] = "";
 	int index = -1;
 
+	int carLaps = map_buffer->completed_laps;
+	
+	if (carLaps < startTelemetryLap)
+		return;
+
 	for (int id = 0; id < map_buffer->num_cars; id++)
 		if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
 			index = id;
@@ -1164,8 +1170,6 @@ void collectCarTelemetry(int playerID) {
 
 	if (index == -1)
 		return;
-
-	int carLaps = map_buffer->completed_laps;
 
 	if ((carLaps + 1) != telemetryLap) {
 		if (telemetryFile) {
@@ -1360,6 +1364,9 @@ int main(int argc, char* argv[])
 				mapped_r3e = TRUE;
 
 		if (mapped_r3e) {
+			if (startTelemetryLap == -1)
+				startTelemetryLap = map_buffer->completed_laps + 1;
+			
 			playerID = getPlayerID();
 
 			if (playerID == -1)

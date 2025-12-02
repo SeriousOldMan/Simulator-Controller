@@ -27,10 +27,12 @@
   - Fixed the voice command reference sheet for Japanese.
   - Added some missing translations.
   - Fixed a condition that caused the telemetry data for the first lap to be incomplete, if the collection is started mid-lap.
+  - Fixed a bug for *iRacing* which caused the last trigger of track automations to be ignored.
 
 #### Changes
 
   - The starting fuel capacity for the strategy simulation in "Setup Workbench" is now limited to teh fuel capacity of the car.
+  - The label in a Button Box visual representation now shows starting coaching modes of the Driving Coach in light gray color.
   - A very special tweak for *Le Mans Ultimate*: If you are running a team race with Simulator Controller in Solo mode, the Assistants will no longer inform about cars around and other stuff, if you are not driving.
   - The "Time" channel is now supported in *iRacing* telemetry collection.
   - Updated many voice commands for the Driving Coach in Japanese.

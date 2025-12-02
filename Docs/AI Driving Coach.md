@@ -415,6 +415,9 @@ The following video gives you a good demonstration of this:
    - *Coach: Threshold for trail braking*
    
      When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.
+   - *Coach: Threshold for trail steering*
+   
+     A braking phase is also considered to be proper trail braking, if the brake is still applied if the steering wheel is already turned in by this amount of the maximum steering angle, while the brake is still applied. Default is 70 percent.
 	 
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.

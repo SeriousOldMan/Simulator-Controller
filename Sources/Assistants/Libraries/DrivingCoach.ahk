@@ -1760,13 +1760,6 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
-
-
-		if (this.TelemetryCollector && ((this.TelemetryCollector.Simulator != this.Simulator)
-									 || (this.TelemetryCollector.Track != this.Track)
-									 || (this.iTelemetryCollector.TrackLength != this.TrackLength)))
-			this.shutdownTelemetryCollector()
-
 		if (isDebug() && !this.TelemetryCollector)
 			logMessage(kLogDebug, "Telemetry coaching: " . this.Simulator . " " . this.Track . " (" . this.TrackLength . ")")
 

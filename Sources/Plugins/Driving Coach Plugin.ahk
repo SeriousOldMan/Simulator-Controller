@@ -320,13 +320,15 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				theAction.Function.enable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, DrivingCoachPlugin.TrackCoachingToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackCoachingActive ? "Green" : "Black")
+				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackCoachingActive ? ((this.TrackCoachingActive = "Starting") ? "Gray" : "Green")
+																								  : "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackCoachingActive ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)
 			}
 			else if isInstance(theAction, DrivingCoachPlugin.BrakeCoachingToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.BrakeCoachingActive ? "Green" : "Black")
+				theAction.Function.setLabel(this.actionLabel(theAction), this.BrakeCoachingActive ? ((this.BrakeCoachingActive = "Starting") ? "Gray" : "Green")
+																								  : "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.BrakeCoachingActive ? "Activated" : "Deactivated")
 
 				theAction.Function.enable(kAllTrigger, theAction)

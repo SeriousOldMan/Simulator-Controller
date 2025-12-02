@@ -1235,7 +1235,8 @@ class Telemetry {
 				brake := section.BrakeCurve[1]
 
 				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: section.Speed["Braking"]
-							, Length: section.Length["Braking"], Time: brake.Time, Curve: section.BrakeCurve})
+							, Length: section.Length["Braking"], Time: brake.Time
+							, MaxSteering: section.MaxSteering, Curve: section.BrakeCurve})
 			}
 
 		return braking
@@ -1250,7 +1251,8 @@ class Telemetry {
 				throttle := section.ThrottleCurve[1]
 
 				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: section.Speed["Accelerating"]
-								 , Length: section.Length["Accelerating"], Time: throttle.Time, Curve: section.ThrottleCurve})
+								 , Length: section.Length["Accelerating"], Time: throttle.Time
+								 , MaxSteering: section.MaxSteering, Curve: section.ThrottleCurve})
 			}
 
 		return accelerating

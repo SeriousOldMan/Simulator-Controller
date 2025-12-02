@@ -247,6 +247,23 @@ void sendAutomationMessage(const char* message) {
 	}
 }
 
+int getCompletedLaps() {
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char playerCarIdx[10] = "";
+	char sessionID[10] = "";
+
+	getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	char result[100];
+
+	if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+		return atoi(result);
+	else
+		return 0;
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -1395,10 +1412,8 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 	char buffer[60] = "";
 	char* rawValue;
 
-	getRawDataValue(rawValue, header, data, "Lap");
+	int carLaps = getCompletedLaps();
 
-	int carLaps = *((int*)rawValue);
-	
 	if (carLaps < startTelemetryLap)
 		return;
 
@@ -1729,13 +1744,8 @@ int main(int argc, char* argv[])
 						playerCarIndex = atoi(playerCarIdx);
 					}
 					
-					if (startTelemetryLap == -1) {
-						char* rawValue;
-
-						getRawDataValue(rawValue, pHeader, g_data, "Lap");
-
-						startTelemetryLap = *((int*)rawValue) + 1;
-					}
+					if (startTelemetryLap == -1)
+						startTelemetryLap = getCompletedLaps() + 1;
 
 					if (mapTrack) {
 						if (!writeCoordinates(pHeader, g_data, playerCarIndex)) {

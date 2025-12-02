@@ -2092,8 +2092,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 		getIntro(braking) {
 			local brakeCurve := braking.Curve
-			local maxBrake := 0
 			local maxSteering := Abs(braking.MaxSteering)
+			local maxBrake := 0
 			local releaseStart := false
 			local trailBrake := false
 			local introPhrase, brakePhrase, releasePhrase, introNr, brakeNr, releaseNr
@@ -2106,18 +2106,18 @@ class DrivingCoach extends GridRaceAssistant {
 					releaseStart := index
 			}
 
-			for index, brake in brakeCurve {
-				steering := (Abs(brake.Steering) / maxSteering)
+			hardBrake := (maxBrake >= brakeThreshold)
 
-				if (((steering / maxSteering) > trailSteeringThreshold)
-				 && ((brake.Brake / maxBrake) > (steering * steering))) {
+			maxSteering *= trailSteeringThreshold)
+			maxBrake *= (1 - trailSteeringThreshold)
+
+			for index, brake in brakeCurve
+				if ((Abs(brake.Steering) > maxSteering) && (brake.Brake > maxBrake)) {
 					trailBrake := true
 
 					break
 				}
-			}
 
-			hardBrake := (maxBrake >= brakeThreshold)
 			trailBrake := (trailBrake || (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false))
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)

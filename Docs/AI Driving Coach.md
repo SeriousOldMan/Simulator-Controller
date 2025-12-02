@@ -411,7 +411,7 @@ The following video gives you a good demonstration of this:
      Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
    - *Coach: Threshold for release pressure*
    
-     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 4).
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 2).
    - *Coach: Threshold for trail braking*
    
      When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.

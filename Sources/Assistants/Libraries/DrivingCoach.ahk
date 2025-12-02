@@ -2022,6 +2022,7 @@ class DrivingCoach extends GridRaceAssistant {
 		static brakeThreshold := false
 		static releaseThreshold := false
 		static trailBrakingThreshold := false
+		static trailSteeringThreshold := false
 
 		normalizeTime(time) {
 			if (time < 0)
@@ -2032,21 +2033,36 @@ class DrivingCoach extends GridRaceAssistant {
 				return time
 		}
 
-		getIntro(brakeCurve) {
+		getIntro(corner) {
+			local brakeCurve := corner.Braking
 			local maxBrake := 0
+			local apexSteering := Abs(corner.MaxSteering)
+			local maxSteering := 0
 			local releaseStart := false
+			local trailBrake := false
 			local introPhrase, brakePhrase, releasePhrase, introNr, brakeNr, releaseNr
-			local ignore, key, hardBrake, trailBrake, index, brake
+			local ignore, key, hardBrake, index, brake, steering
 
 			for index, brake in brakeCurve {
 				maxBrake := Max(brake.Brake, maxBrake)
+				maxSteering := Max(Abs(brake.Steering), maxSteering)
 
 				if (!releaseStart && (brake.Brake <= (maxBrake * releaseThreshold)))
 					releaseStart := index
 			}
 
+			for index, brake in brakeCurve {
+				steering := (steering / maxSteering)
+
+				if (((steering / maxSteering) > trailSteeringThreshold)
+				 && ((brake.Brake / maxBrake) > (steering * steering))) {
+					trailBrake := true
+
+					break
+				}
+
 			hardBrake := (maxBrake >= brakeThreshold)
-			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false)
+			trailBrake := (trailBrake || (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false))
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
 
@@ -2092,6 +2108,7 @@ class DrivingCoach extends GridRaceAssistant {
 					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
 					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
 					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
+					trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailSteering", 50) / 100)
 				}
 
 				trackLength := collector.TrackLength
@@ -2102,7 +2119,7 @@ class DrivingCoach extends GridRaceAssistant {
 					section := A_Index
 
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 8000), &x, &y, &startDistance := "Distance")
-						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
+						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking) . "`n")
 
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 3000), &x, &y)
 						instructions .= (section . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")

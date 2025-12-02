@@ -1456,6 +1456,8 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		float longG = 0.0;
 		float latG = 0.0;
 		double time = 0.0;
+		float coordinateX;
+		float coordinateY;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
@@ -1493,26 +1495,20 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				time = ((*(double*)rawValue) - startTime) * 1000;
 			
 			telemetryFile << (playerRunning * trackLength) << ";"
-						  << throttle << ";"
-						  << brake << ";"
-						  << steerAngle << ";"
-						  << gear << ";"
-						  << rpms << ";"
-						  << speed << ";"
-						  << "n/a" << ";"
-						  << "n/a" << ";"
-						  << longG << ";" << - latG << ";"
-						  << "n/a" ";"
-						  << "n/a" ";"
-						  << time;
-
-			float coordinateX;
-			float coordinateY;
+				<< throttle << ";"
+				<< brake << ";"
+				<< steerAngle << ";"
+				<< gear << ";"
+				<< rpms << ";"
+				<< speed << ";"
+				<< "n/a" << ";"
+				<< "n/a" << ";"
+				<< longG << ";" << -latG;
 
 			if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-				telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
+				telemetryFile << ";" << coordinateX << ";" << coordinateY <<  ";" << time << std::endl;
 			else
-				telemetryFile << std::endl;
+				telemetryFile << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1532,9 +1528,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 						 << longG << ";" << -latG;
 
 					if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-						file << ";" << coordinateX << ";" << coordinateY << std::endl;
+						file << ";" << coordinateX << ";" << coordinateY << ";" << time << std::endl;
 					else
-						file << std::endl;
+						file << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
 
 					file.close();
 				}
@@ -1622,7 +1618,7 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);
 
-			for (int i = 3; i < (argc - 2); i = i + 2) {
+			for (int i = 3; i <= (argc - 2); i = i + 2) {
 				float x = (float)atof(argv[i]);
 				float y = (float)atof(argv[i + 1]);
 

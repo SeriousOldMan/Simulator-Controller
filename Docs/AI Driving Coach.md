@@ -394,7 +394,7 @@ Important: The command "Release" does not mean that you should completely releas
 
 The following video gives you a good demonstration of this:
 
-[![](https://img.youtube.com/vi/itT8sCm_51c/0.jpg)](https://youtu.be/itT8sCm_51c)
+[![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
 ##### Notes
 

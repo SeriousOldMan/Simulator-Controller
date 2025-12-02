@@ -1,9 +1,9 @@
 [Development]
 Version=6.7.0.0-alpha
 Target=6.7.0.0-release
-Date=12/01/2025
+Date=12/02/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KjjbWG2H/Releases/Simulator Controller 6.7.0.0-alpha.zip
-Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps
+Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.6.7.0-release

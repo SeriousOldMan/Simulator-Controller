@@ -1388,6 +1388,7 @@ std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
 int startTelemetryLap = -1;
 int telemetryLap = -1;
+double startTime = 0;
 double lastTelemetryRunning = -1;
 
 void collectCarTelemetry(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
@@ -1417,6 +1418,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			}
 
 			telemetryLap = (carLaps + 1);
+			
+			if (getRawDataValue(rawValue, header, data, "SessionTime"))
+				startTime = *((double*)rawValue);
 
 			sprintf_s(buffer, "%d", telemetryLap);
 
@@ -1436,6 +1440,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		int rpms = 0;
 		float longG = 0.0;
 		float latG = 0.0;
+		double time = 0.0;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
@@ -1469,6 +1474,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			if (getRawDataValue(rawValue, header, data, "LatAccel"))
 				latG = (*(float*)rawValue) / 9.807;
 			
+			if (getRawDataValue(rawValue, header, data, "SessionTime"))
+				time = ((*(double*)rawValue) - startTime) * 1000;
+			
 			telemetryFile << (playerRunning * trackLength) << ";"
 						  << throttle << ";"
 						  << brake << ";"
@@ -1478,7 +1486,10 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 						  << speed << ";"
 						  << "n/a" << ";"
 						  << "n/a" << ";"
-						  << longG << ";" << - latG;
+						  << longG << ";" << - latG << ";"
+						  << "n/a" ";"
+						  << "n/a" ";"
+						  << time;
 
 			float coordinateX;
 			float coordinateY;

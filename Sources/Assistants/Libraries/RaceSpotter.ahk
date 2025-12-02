@@ -4293,7 +4293,12 @@ class RaceSpotter extends GridRaceAssistant {
 			logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
 
 		if (lapNumber = this.LastLap) {
-			this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+			try {
+				this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 			if this.DriverUpdateTime {
 				if (A_TickCount >= this.iNextDriverUpdate) {

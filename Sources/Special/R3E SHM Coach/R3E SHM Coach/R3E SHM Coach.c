@@ -803,7 +803,7 @@ void checkCoordinates(int playerID) {
 						lastGroup = group;
 						lastPhase = phase;
 
-						if (strcmp(audioDevice, "") == 0)
+						if (strcmp(audioDevice, "") != 0)
 						{
 							if (strcmp(player, "") == 0) {
 								char buffer[512] = "";

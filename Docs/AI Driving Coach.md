@@ -376,7 +376,7 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
-#### Practicing braking points
+### Practicing braking points
 
 Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:
 

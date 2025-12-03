@@ -1145,7 +1145,7 @@ r3e_float64 startTime = 0.0;
 int telemetryLap = -1;
 double lastRunning = -1;
 
-inline void printNAValue(FILE* file, float value) {
+inline void printNAValue(FILE* file, double value) {
 	if (value == -1)
 		fprintf(file, "n/a;");
 	else
@@ -1226,9 +1226,8 @@ void collectCarTelemetry(int playerID) {
 		lastRunning = -1;
 	}
 
-	double carDistance = map_buffer->all_drivers_data_1[index].lap_distance;
-	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
-
+	double running = map_buffer->all_drivers_data_1[index].lap_distance;
+	
 	if (running > lastRunning) {
 		/*
 		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",

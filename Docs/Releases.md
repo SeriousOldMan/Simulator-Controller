@@ -29,6 +29,7 @@
   - Fixed a condition that caused the telemetry data for the first lap to be incomplete, if the collection is started mid-lap.
   - Fixed a bug for *iRacing* which caused the last trigger of track automations to be ignored.
   - Fixed the "Time" channel in telemetry for invalid laps collected in *RaceRoom Racing Experience*.
+  - Fixed "Distance" channel in telemetry for *RaceRoom Racing Experience*, which was a value between 0 and 1, but must be multiplied by track length.
 
 #### Changes
 

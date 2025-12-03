@@ -407,7 +407,7 @@ The following video gives you a good demonstration of this:
      
 	 This setting defines how many milliseconds before the actual braking point the Coach will yell out "Brake". Default is 300 milliseconds. The exact value depends on your PC setup, since sound processing will take some time, and also on your reaction time. The default value of 300 ms is a good compromise to start with.
    
-   - *Coach: Threshold for hard brake pressure*
+   - *Threshold for hard brake pressure*
    
      Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
    

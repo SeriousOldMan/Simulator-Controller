@@ -2074,12 +2074,13 @@ class DrivingCoach extends GridRaceAssistant {
 		static lastTelemetry := false
 		static nextLap := 0
 
-		static delta := false
+		static delta := kUndefined
 		static distance := 25
-		static brakeThreshold := false
-		static releaseThreshold := false
-		static trailBrakingThreshold := false
-		static trailSteeringThreshold := false
+		static brakeThreshold
+		static releaseThreshold
+		static trailBrakingThreshold
+		static trailSteeringThreshold
+		static trailBrakeSteeringRatio
 
 		normalizeTime(time) {
 			if (time < 0)
@@ -2108,8 +2109,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 			hardBrake := (maxBrake >= brakeThreshold)
 
-			maxSteering *= trailSteeringThreshold)
-			maxBrake *= (1 - trailSteeringThreshold)
+			maxSteering *= trailSteeringThreshold
+			maxBrake *= ((1 - trailSteeringThreshold) * trailBrakeSteeringRatio)
 
 			for index, brake in brakeCurve
 				if ((Abs(brake.Steering) > maxSteering) && (brake.Brake > maxBrake)) {
@@ -2159,12 +2160,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
 			try {
-				if !delta {
+				if (delta == kUndefined) {
 					delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
 					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
 					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
-					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
-					trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailSteering", 70) / 100)
+					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailBraking", 50)) / 100)
+					trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailSteering", 70) / 100)
+					trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 0.8)
 				}
 
 				trackLength := collector.TrackLength

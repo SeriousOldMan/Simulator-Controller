@@ -463,7 +463,7 @@ A special learning method is used for *Assetto Corsa Competizione*, because this
 
 ### Special notes for *RaceRoom Racing Experience*
 
-COmplete telemetry data is only provided for valid laps. Make sure to stay within track limits before the Coach has acquire the first set of telemetry data.
+Complete telemetry data is only provided for valid laps. Make sure to stay within track limits before the Coach has acquired the first set of telemetry data.
 
 ## How it works
 

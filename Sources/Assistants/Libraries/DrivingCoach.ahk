@@ -2137,7 +2137,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			if !this.iBrakeHints.Has(key)
 				this.iBrakeHints[key] := speaker.speak(introPhrase . A_Space . brakePhrase . A_Space . releasePhrase
-													 , false, key, {File: true, Rephrase: false})
+													 , false, key, {File: true})
 
 			return this.iBrakeHints[key]
 		}

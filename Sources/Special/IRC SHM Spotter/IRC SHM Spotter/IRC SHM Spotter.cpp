@@ -1455,7 +1455,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		int rpms = 0;
 		float longG = 0.0;
 		float latG = 0.0;
-		double time = 0.0;
+		long time = 0;
 		float coordinateX;
 		float coordinateY;
 
@@ -1492,7 +1492,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				latG = (*(float*)rawValue) / 9.807;
 			
 			if (getRawDataValue(rawValue, header, data, "SessionTime"))
-				time = ((*(double*)rawValue) - startTime) * 1000;
+				time = (long)round(((*(double*)rawValue) - startTime) * 1000);
 			
 			telemetryFile << (playerRunning * trackLength) << ";"
 				<< throttle << ";"

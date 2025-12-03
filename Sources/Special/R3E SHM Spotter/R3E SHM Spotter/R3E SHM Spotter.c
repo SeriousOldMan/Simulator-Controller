@@ -1141,6 +1141,7 @@ void checkCoordinates(int playerID) {
 char* telemetryDirectory = "";
 FILE* telemetryFile = 0;
 int startTelemetryLap = -1;
+r3e_float64 startTime = 0.0;
 int telemetryLap = -1;
 double lastRunning = -1;
 
@@ -1202,6 +1203,8 @@ void collectCarTelemetry(int playerID) {
 		}
 			
 		telemetryLap = (carLaps + 1);
+		
+		startTime = map_buffer->player.game_simulation_time;
 
 		int offset = strlen(telemetryDirectory);
 
@@ -1250,11 +1253,8 @@ void collectCarTelemetry(int playerID) {
 																 map_buffer->all_drivers_data_1[index].position.x,
 																 -map_buffer->all_drivers_data_1[index].position.z);
 
-		if (map_buffer->lap_time_current_self != -1)
-			fprintf(telemetryFile, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
-		else
-			fprintf(telemetryFile, "n/a\n");
-
+		fprintf(telemetryFile, "%d\n", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000));
+		
 		int offset = strlen(telemetryDirectory);
 
 		strcpy_s(tmpFileName, 512, telemetryDirectory);

@@ -425,7 +425,7 @@ The following video gives you a good demonstration of this:
 
    - *Ratio brake pressure to steer angle for trail braking*
    
-     Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 0.8.
+     Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 1.0 (which is the ideal value).
 	 
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.

@@ -2166,7 +2166,7 @@ class DrivingCoach extends GridRaceAssistant {
 					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
 					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailBraking", 50)) / 100)
 					trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailSteering", 70) / 100)
-					trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 0.8)
+					trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 1.0)
 				}
 
 				trackLength := collector.TrackLength

@@ -413,7 +413,7 @@ The following video gives you a good demonstration of this:
    
    - *Threshold for release pressure*
    
-     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 2).
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 2). Adjust this value for vehicles without ABS where the brake pressure needs to be reduced when braking, but this should not be considered releasing the brake.
    
    - *Threshold for trail braking length*
    
@@ -425,7 +425,7 @@ The following video gives you a good demonstration of this:
 
    - *Ratio brake pressure to steer angle for trail braking*
    
-     Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 0.8.
+     Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 1.0, which is the ideal value. Values below 1.0 allow for less braking than ideal, but even values above 1.0 are possible when you want to push very hard on the brakes and know how to handles an instable car on turning in.
 	 
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.

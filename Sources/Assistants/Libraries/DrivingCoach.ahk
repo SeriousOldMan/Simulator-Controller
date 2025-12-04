@@ -1174,16 +1174,16 @@ class DrivingCoach extends GridRaceAssistant {
 			this.telemetryCoachingStartRecognized([], confirm, "Track")
 
 			this.trackCoachingStartRecognized([], false)
-
-			this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
-
-			setMultiMapValue(state, "Coaching", "Track", "Starting")
-			setMultiMapValue(state, "Coaching", "Brake", false)
-
-			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 		else
 			this.trackCoachingStartRecognized([], confirm)
+
+		this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
+
+		setMultiMapValue(state, "Coaching", "Track", "Starting")
+		setMultiMapValue(state, "Coaching", "Brake", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
 	startBrakeCoaching(confirm := true) {
@@ -1193,18 +1193,18 @@ class DrivingCoach extends GridRaceAssistant {
 			this.telemetryCoachingStartRecognized([], confirm, "Brake")
 
 			this.brakeCoachingStartRecognized([], false)
-
-			this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false})
-
-			state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-
-			setMultiMapValue(state, "Coaching", "Brake", "Starting")
-			setMultiMapValue(state, "Coaching", "Track", false)
-
-			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 		else
 			this.brakeCoachingStartRecognized([], confirm)
+
+		this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false})
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		setMultiMapValue(state, "Coaching", "Brake", "Starting")
+		setMultiMapValue(state, "Coaching", "Track", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
 	finishCoaching(confirm := true) {

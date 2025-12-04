@@ -813,14 +813,16 @@ class DrivingCoach extends GridRaceAssistant {
 			setMultiMapValue(state, "Coaching", "Active", true)
 
 			if (auto = "Brake") {
-				this.updateConfigurationValues({BrakeCoaching: true})
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Brake", "Starting")
+				setMultiMapValue(state, "Coaching", "Track", false)
 			}
 			else {
-				this.updateConfigurationValues({OnTrackCoaching: true})
+				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Track", "Starting")
+				setMultiMapValue(state, "Coaching", "Brake", false)
 			}
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1143,14 +1145,16 @@ class DrivingCoach extends GridRaceAssistant {
 			setMultiMapValue(state, "Coaching", "Active", true)
 
 			if (auto = "Brake") {
-				this.updateConfigurationValues({BrakeCoaching: true})
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Brake", "Starting")
+				setMultiMapValue(state, "Coaching", "Track", false)
 			}
 			else {
-				this.updateConfigurationValues({OnTrackCoaching: true})
+				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Track", "Starting")
+				setMultiMapValue(state, "Coaching", "Brake", false)
 			}
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1171,9 +1175,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.trackCoachingStartRecognized([], false)
 
-			this.updateConfigurationValues({OnTrackCoaching: true})
+			this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
 
 			setMultiMapValue(state, "Coaching", "Track", "Starting")
+			setMultiMapValue(state, "Coaching", "Brake", false)
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
@@ -1189,11 +1194,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.brakeCoachingStartRecognized([], false)
 
-			this.updateConfigurationValues({BrakeCoaching: true})
+			this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false})
 
 			state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 			setMultiMapValue(state, "Coaching", "Brake", "Starting")
+			setMultiMapValue(state, "Coaching", "Track", false)
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
@@ -2245,12 +2251,12 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if isDebug()
-					logMessage(kLogDebug, "All brake sections: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+					logMessage(kLogDebug, "All brake sections: " . values2String(", ", collect(brakeSections, (b) => b.Corner . ": [" . b.Start . ", " . b.End . "]")*))
 
 				brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 7))
 
 				if isDebug()
-					logMessage(kLogDebug, "Brake section candidates: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+					logMessage(kLogDebug, "Brake section candidates: " . values2String(", ", collect(brakeSections, (b) => b.Corner . ": [" . b.Start . ", " . b.End . "]")*))
 
 				loop {
 					numSections := brakeSections.Length

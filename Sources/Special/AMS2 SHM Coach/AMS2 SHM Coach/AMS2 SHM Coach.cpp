@@ -692,9 +692,6 @@ void checkCoordinates(const SharedMemory* sharedData) {
 							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
 							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
 						}
-
-						if (lastPhase >= Brake)
-							lastPhase = Start;
 					}
 				}
 			}

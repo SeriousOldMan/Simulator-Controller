@@ -991,9 +991,6 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 								PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
 								PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
 							}
-
-							if (lastPhase >= Brake)
-								lastPhase = Start;
 						}
 					}
 				}

@@ -822,9 +822,6 @@ void checkCoordinates(int playerID) {
 							PlaySoundA(NULL, NULL, SND_ASYNC);
 							PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
 						}
-
-						if (lastPhase >= Brake)
-							lastPhase = Start;
 					}
 				}
 			}

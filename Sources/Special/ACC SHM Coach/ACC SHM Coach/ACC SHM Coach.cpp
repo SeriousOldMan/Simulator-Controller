@@ -758,9 +758,6 @@ void checkCoordinates() {
 							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
 							PlaySoundA(sound, NULL, SND_FILENAME | SND_ASYNC);
 						}
-
-						if (lastPhase >= Brake)
-							lastPhase = Start;
 					}
 				}
 			}

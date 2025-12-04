@@ -1,23 +1,5 @@
 # Latest stable release
 
-## 6.6.7.0
-
-#### Date: 11/28/25
-
-#### Fixes
-
-  - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
-  - Fixed a bug for *Assetto Corsa*, which caused the Spotter to give information about disconnected cars.
-
-#### Changes
-
-  - Using "Hello instead of "Hey" is now supported in Assistant activation phrases in English.
-  - Using "Hallo" instead of "Hi" is now supported in Assistant activation phrases in German.
-  - It is now possible to define global default choices for community sharing in the settings of the "Session Database" for the different object types. This value is used whenever a new object (a strategy, for example) is created in the session database. If this default is not set, the corresponding choice from the consent will be used as default sharing setting.
-  - A generic CSV importer has been added to the "Session Database". It allow you to import telemetry data from any location. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) from more information.
-
-# Upcoming release
-
 ## 6.7.0.0
 
 #### Date: 12/05/25 (planned)
@@ -29,6 +11,7 @@
   - Fixed a condition that caused the telemetry data for the first lap to be incomplete, if the collection is started mid-lap.
   - Fixed a bug for *iRacing* which caused the last trigger of track automations to be ignored.
   - Fixed the "Time" channel in telemetry for invalid laps collected in *RaceRoom Racing Experience*.
+  - Fixed "Distance" channel in telemetry for *RaceRoom Racing Experience*, which was a value between 0 and 1, but must be multiplied by track length.
 
 #### Changes
 
@@ -51,7 +34,27 @@
 	- Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" gives you fine-grained control over the interpretation of braking zones by the Driving Coach.
 	- All command reference sheets have been updated.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 6.6.7.0
+
+#### Date: 11/28/25
+
+#### Fixes
+
+  - Fixed a crash in the MoTec telemetry importer, if the "Distance" field is *not* included.
+  - Fixed a bug for *Assetto Corsa*, which caused the Spotter to give information about disconnected cars.
+
+#### Changes
+
+  - Using "Hello instead of "Hey" is now supported in Assistant activation phrases in English.
+  - Using "Hallo" instead of "Hi" is now supported in Assistant activation phrases in German.
+  - It is now possible to define global default choices for community sharing in the settings of the "Session Database" for the different object types. This value is used whenever a new object (a strategy, for example) is created in the session database. If this default is not set, the corresponding choice from the consent will be used as default sharing setting.
+  - A generic CSV importer has been added to the "Session Database". It allow you to import telemetry data from any location. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) from more information.
 
 ## 6.6.6.0
 

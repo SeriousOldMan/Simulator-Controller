@@ -1,15 +1,15 @@
 [Development]
-Version=6.7.0.0-beta
+Version=6.7.0.0-release
 Target=6.7.0.0-release
-Date=12/03/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/uBzb83ia/Releases/Simulator%20Controller%206.7.0.0-beta.zip
+Date=12/05/2025
+Download=https://cutt.ly/1tuF4i7o;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/v2q_Vtvv/Releases/Simulator Controller 6.7.0.0-release.zip;https://www.dropbox.com/scl/fi/mh98nu7pqhwx4u4r0527p/Simulator-Controller-6.7.0.0-release.zip?rlkey=ieaw3u694v1ji73ll4k4kcnx6&st=junamydt&dl=1;http://%master%/Releases/Simulator Controller 6.7.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.0.0-release.zip
 Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
-Version=6.6.7.0-release
-Date=11/28/2025
-Download=https://cutt.ly/Ytt6M71H;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vjtD8zlM/Releases/Simulator Controller 6.6.7.0-release.zip;https://www.dropbox.com/scl/fi/7fzvazet12knsvc1kos2t/Simulator-Controller-6.6.7.0-release.zip?rlkey=0phz9bkybe7yqkcp9njuhh7dl&st=2bbh027o&dl=1;http://%master%/Releases/Simulator Controller 6.6.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.6.7.0-release.zip
-Changes=Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing
+Version=6.7.0.0-release
+Date=12/05/2025
+Download=https://cutt.ly/1tuF4i7o;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/v2q_Vtvv/Releases/Simulator Controller 6.7.0.0-release.zip;https://www.dropbox.com/scl/fi/mh98nu7pqhwx4u4r0527p/Simulator-Controller-6.7.0.0-release.zip?rlkey=ieaw3u694v1ji73ll4k4kcnx6&st=junamydt&dl=1;http://%master%/Releases/Simulator Controller 6.7.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.0.0-release.zip
+Changes=New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.7.0.0-beta
-Release=6.6.7.0-release
+Development=6.7.0.0-release
+Release=6.7.0.0-release

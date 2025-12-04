@@ -865,9 +865,6 @@ namespace ACSHMCoach {
 
                                     lastPlayer.Play();
                                 }
-
-                                if (lastPhase >= Brake)
-                                    lastPhase = Start;
                             }
                         }
 				}

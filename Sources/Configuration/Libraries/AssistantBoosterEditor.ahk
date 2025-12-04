@@ -445,7 +445,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			if (provider = this.iCurrentConversationProvider) {
 				providerConfiguration["Model"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Model", defaults["Model"])
-				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".MaxTokens", defaults["MaxTokens"])
+				providerConfiguration["MaxTokens"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".MaxTokens", defaults["ConversationMaxTokens"])
+
+				if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+					providerConfiguration["MaxTokens"] := 2048
 
 				providerConfiguration["Speaker"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".Speaker", defaults["Speaker"])
 				providerConfiguration["SpeakerProbability"] := getMultiMapValue(configuration, "Conversation Booster", this.Assistant . ".SpeakerProbability", defaults["SpeakerProbability"])
@@ -474,6 +477,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			else {
 				for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 					providerConfiguration[setting] := getMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, defaults[setting])
+
+				if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+					providerConfiguration["MaxTokens"] := 2048
 
 				if (provider = "LLM Runtime")
 					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Conversation Booster", provider . ".GPULayers", defaults["ConversationGPULayers"])
@@ -569,6 +575,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations["Conversation." . provider]
+
+			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+				providerConfiguration["MaxTokens"] := 2048
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Conversation Booster", provider . "." . setting, providerConfiguration[setting])

@@ -12,6 +12,7 @@
   - Fixed a bug for *iRacing* which caused the last trigger of track automations to be ignored.
   - Fixed the "Time" channel in telemetry for invalid laps collected in *RaceRoom Racing Experience*.
   - Fixed "Distance" channel in telemetry for *RaceRoom Racing Experience*, which was a value between 0 and 1, but must be multiplied by track length.
+  - Fixed invalid *MaxTokens* value in Drving Coach and Assistant Booster configurations.
 
 #### Changes
 

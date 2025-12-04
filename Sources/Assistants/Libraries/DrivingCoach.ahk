@@ -1886,21 +1886,18 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTrackTrigger() {
+		local distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, sessionDB, code, data, exePath, pid
 		local ignore, section, x, y
 
-		static distance := false
 
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
 
 			if (sections && (sections.Length > 0)) {
 				positions := ""
-
-				if !distance
-					distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 
 				for ignore, section in sections
 					if (section.Type = "Corner") {
@@ -2073,20 +2070,19 @@ class DrivingCoach extends GridRaceAssistant {
 		local triggers := ""
 		local tries := 3
 		local brakeSections := []
+		local delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
+		local brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
+		local releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
+		local trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailBraking", 50)) / 100)
+		local trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailSteering", 70) / 100)
+		local trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 1.0)
 		local ignore, index, braking, brake, maxBrake, maxBrakeIndex, metersPerSec, trackLength, hasRelease
 		local brakeTime, startDistance, endDistance, x, y
 		local section, numSections, instructions, clean
 
 		static lastTelemetry := false
 		static nextLap := 0
-
-		static delta := kUndefined
 		static distance := 25
-		static brakeThreshold
-		static releaseThreshold
-		static trailBrakingThreshold
-		static trailSteeringThreshold
-		static trailBrakeSteeringRatio
 
 		normalizeTime(time) {
 			if (time < 0)
@@ -2166,15 +2162,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
 			try {
-				if (delta == kUndefined) {
-					delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
-					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
-					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
-					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailBraking", 50)) / 100)
-					trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailSteering", 70) / 100)
-					trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 1.0)
-				}
-
 				trackLength := collector.TrackLength
 
 				for index, braking in telemetry.Braking {
@@ -2546,11 +2533,11 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
+		local wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 		local cornerNr, instruct, telemetry, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
-		static wait := false
 		static hintProblems := false
 		static hints := false
 		static instructionCount := 0
@@ -2647,9 +2634,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
-		if !wait {
-			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
-
+		if !hints {
 			hints := ["BrakeEarlier", "BrakeLater", "BrakeHarder", "BrakeSofter"
 					, "BrakeFaster", "BrakeSlower", "AccelerateEarlier", "AccelerateLater"
 					, "AccelerateHarder", "AccelerateSofter", "PushLess", "PushMore"]

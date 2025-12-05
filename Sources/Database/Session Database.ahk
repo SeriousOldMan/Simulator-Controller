@@ -3852,46 +3852,53 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		sections := this.TrackSections
 
-		this.TrackSectionsListView.Delete()
+		this.TrackSectionsListView.Opt("-Redraw")
 
-		loop this.TrackSectionsListView.GetCount("Col")
-			this.TrackSectionsListView.DeleteCol(1)
+		try {
+			this.TrackSectionsListView.Delete()
 
-		for index, section in sections {
-			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
+			loop this.TrackSectionsListView.GetCount("Col")
+				this.TrackSectionsListView.DeleteCol(1)
 
-			if (section.HasProp("Name") && (Trim(section.Name) != ""))
-				hasNames := true
-		}
+			for index, section in sections {
+				section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
 
-		if hasNames {
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
-				this.TrackSectionsListView.InsertCol(A_Index, "", column)
-		}
-		else
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
-				this.TrackSectionsListView.InsertCol(A_Index, "", column)
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					hasNames := true
+			}
 
-		bubbleSort(&sections, (a, b) => (a.Index > b.Index))
-
-		for index, section in sections {
-			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
-
-			if hasNames
-				this.TrackSectionsListView.Add(section.Active ? "Check" : ""
-											 , section.Nr, translate(section.Type), (section.HasProp("Name") ? section.Name : "")
-											 , computeLength(index), Round(section.X), Round(section.Y))
+			if hasNames {
+				for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
+					this.TrackSectionsListView.InsertCol(A_Index, "", column)
+			}
 			else
-				this.TrackSectionsListView.Add(section.Active ? "Check" : ""
-											 , section.Nr, translate(section.Type)
-											 , computeLength(index), Round(section.X), Round(section.Y))
+				for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
+					this.TrackSectionsListView.InsertCol(A_Index, "", column)
+
+			bubbleSort(&sections, (a, b) => (a.Index > b.Index))
+
+			for index, section in sections {
+				section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
+
+				if hasNames
+					this.TrackSectionsListView.Add(section.Active ? "Check" : ""
+												 , section.Nr, translate(section.Type), (section.HasProp("Name") ? section.Name : "")
+												 , computeLength(index), Round(section.X), Round(section.Y))
+				else
+					this.TrackSectionsListView.Add(section.Active ? "Check" : ""
+												 , section.Nr, translate(section.Type)
+												 , computeLength(index), Round(section.X), Round(section.Y))
+			}
+
+			this.TrackSectionsListView.ModifyCol()
+			loop 4
+				this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
 		}
+		finally {
+			this.TrackSectionsListView.Opt("+Redraw")
 
-		this.TrackSectionsListView.ModifyCol()
-		loop 4
-			this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
-
-		this.TrackSectionsListView.Redraw()
+			this.TrackSectionsListView.Redraw()
+		}
 
 		if (save && this.TrackMap) {
 			sections := this.TrackSections.Clone()

@@ -328,7 +328,7 @@ Before you can use the telemetry-based coaching, you must have recorded a [track
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/raw/main/Docs/Images/Session%20Database%2020.jpg)
 
-Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking is necessary, since you will not get any valuable insights for those corners from Aiden.
+Please note, that you do not have to set sections for each corner, only for those where you are interested in. On the other hand, if you want the corner numbers te resemble the official numbering, define sections for each corner and disable those sections, you are not interested in, for example high speed turns, where no braking is necessary, since you will not get any valuable insights for those corners from Aiden. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#editing-track-sections) for more information.
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 

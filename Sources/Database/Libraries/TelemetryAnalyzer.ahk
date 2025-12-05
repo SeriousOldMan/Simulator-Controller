@@ -1622,6 +1622,7 @@ class TelemetryAnalyzer {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
 
@@ -1655,7 +1656,7 @@ class TelemetryAnalyzer {
 				if ((phase = "Find") || (phase = "Straight")) {
 					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0) > 0) {
 						if (phase = "Straight")
-							sections.Push({Type: "Straight", Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
+							sections.Push({Type: "Straight", Active: true, Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Entry"
 						index := Max(1, startIndex + 5, index - 10)
@@ -1671,7 +1672,7 @@ class TelemetryAnalyzer {
 				}
 				else if (phase = "Exit") {
 					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Throttle", 0) = 1.0) {
-						sections.Push({Type: "Corner", Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
+						sections.Push({Type: "Corner", Active: true, Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Straight"
 
@@ -1702,6 +1703,7 @@ class TelemetryAnalyzer {
 		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
 						 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})

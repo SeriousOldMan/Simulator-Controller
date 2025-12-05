@@ -644,6 +644,7 @@ const int Set = 3;
 const int Brake = 4;
 const int Release = 5;
 
+int tIndices[256];
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
@@ -691,7 +692,7 @@ void checkCoordinates() {
 						char numBuffer[60] = "";
 
 						strcat_s(buffer, "positionTrigger:");
-						_itoa_s(i + 1, numBuffer, 10);
+						_itoa_s(tIndices[i], numBuffer, 10);
 						strcat_s(buffer, numBuffer);
 						strcat_s(buffer, ";");
 						sprintf_s(numBuffer, "%f", xCoordinates[i]);
@@ -835,9 +836,10 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			triggerType = "Trigger";
 
-			for (int i = 2; i < (argc - 1); i = i + 2) {
-				xCoordinates[numCoordinates] = (float)atof(argv[i]);
-				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+			for (int i = 2; i < (argc - 1); i = i + 3) {
+				tIndices[numCoordinates] = atoi(argv[i]);
+				xCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+				yCoordinates[numCoordinates] = (float)atof(argv[i + 2]);
 
 				if (++numCoordinates > 255)
 					break;

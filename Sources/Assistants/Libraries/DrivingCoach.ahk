@@ -1903,20 +1903,22 @@ class DrivingCoach extends GridRaceAssistant {
 					distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 
 				for ignore, section in sections
-					if (section.Type = "Corner") {
-						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
-							positions .= (A_Space . x . A_Space . y)
+					if section.Active
+						if (section.Type = "Corner") {
+							if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
+								positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							else
+								positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+						}
 						else
-							positions .= (A_Space . -32767 . A_Space . -32767)
-					}
-					else
-						positions .= (A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
 
 				for ignore, section in sections
-					if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
-						positions .= (A_Space . x . A_Space . y)
-					else
-						positions .= (A_Space . -32767 . A_Space . -32767)
+					if section.Active
+						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
+							positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+						else
+							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
 
 				sessionDB := SessionDatabase()
 

@@ -857,6 +857,7 @@ const int Set = 3;
 const int Brake = 4;
 const int Release = 5;
 
+int tIndices[256];
 float xCoordinates[256];
 float yCoordinates[256];
 float trackDistances[60];
@@ -924,7 +925,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					char numBuffer[60] = "";
 
 					strcat_s(buffer, "positionTrigger:");
-					_itoa_s(index + 1, numBuffer, 10);
+					_itoa_s(tIndices[index], numBuffer, 10);
 					strcat_s(buffer, numBuffer);
 					strcat_s(buffer, ";");
 					sprintf_s(numBuffer, "%f", xCoordinates[index]);
@@ -1071,10 +1072,11 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);
 
-			for (int i = 3; i < (argc - 2); i = i + 2) {
-				float x = (float)atof(argv[i]);
-				float y = (float)atof(argv[i + 1]);
+			for (int i = 3; i < (argc - 3); i = i + 3) {
+				float x = (float)atof(argv[i + 1]);
+				float y = (float)atof(argv[i + 2]);
 
+				tIndices[numCoordinates] = atoi(argv[i]);
 				xCoordinates[numCoordinates] = x;
 				yCoordinates[numCoordinates] = y;
 

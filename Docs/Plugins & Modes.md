@@ -59,7 +59,7 @@ The parameter *launchApplications* allows you to specify a list of applications 
 
 #### Configuration of custom modes
 
-Beside using all the predefined modes of the various plugins, you can define your own modes using custom functions. First you have to define your own functions using the builtin [controller action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). You do this by creating a custom function like this:
+Beside using all the predefined modes of the various plugins, you can define your own modes using custom functions. First you have to define your own functions using the builtin [controller action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions). You do this by creating a custom function like this:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
 
@@ -615,7 +615,7 @@ See the following table for the supported settings:
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa Competizione* simulation.
 
@@ -738,7 +738,7 @@ See the following table for the supported settings:
 | BodyworkRepair | Toggles the repair of all the bodywork. |
 | EngineRepair | Toggles the repair of the engine. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa* simulation.
 
@@ -854,7 +854,7 @@ See the following table for the supported settings:
 | TyreRearRight | Change the pressure for the rear right tyre. Supports the additional increments argument. |
 | RepairRequest | Toggles, whether repairs will be carried out during the next pitstop.  |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
@@ -964,7 +964,7 @@ See the following table for the supported settings:
 | RepairRequest | Cycles through the available repair options. |
 | PitstopRequest | Requests or unrequests a pitstop. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *rFactor 2* simulation.
 
@@ -1068,7 +1068,7 @@ See the following table for the supported settings:
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
@@ -1183,7 +1183,7 @@ See the following table for the supported settings:
 | DriverSwap | Enables or disables driver swap for the upcoming pitstop. |
 | PitstopRequest | Requests or unrequests a pitstop. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
@@ -1285,7 +1285,7 @@ See the following table for the supported settings:
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
@@ -1401,7 +1401,7 @@ See the following table for the supported settings:
 | BrakeChange | Toggles the replacement of the brake pads. |
 | PitstopRequest | Requests or unrequests a pitstop. |
 
-Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) for more information.
+Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
 Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Le Mans Ultimate* simulation.
 

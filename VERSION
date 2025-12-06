@@ -1,9 +1,9 @@
 [Development]
 Version=6.7.1.0-dev
 Target=6.7.1.0-release
-Date=12/05/2025
+Date=12/06/2025
 Download=
-Changes=Support for enabling/disabling of track sections
+Changes=Support for enabling/disabling of track sections, Refactoring of action function documentation
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.7.0.0-release

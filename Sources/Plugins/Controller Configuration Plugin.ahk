@@ -303,7 +303,7 @@ class FunctionsList extends ConfigurationItemList {
 		}
 
 		openActionsDocumentation(*) {
-			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions")
+			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions")
 		}
 
 		window.Add("ListView", "x16 y200 w457 h186 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))

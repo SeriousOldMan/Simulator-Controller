@@ -29,9 +29,9 @@
 	- Brake coaching can also be started by choosing the corresponding item in the tray menu of the Simulator Controller process.
 	- A new action "BrakeCoaching" has been defined for the Driving Coach plugin, which let you activate brake coaching using a button on your wheel, your Button Box or your Stream Deck.
 	- A new icon in the Stream Deck icon set is provided for the new "BrakeCoaching" action.
-	- A new controller action function ["startBrakeCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) lets you start brake coaching from scripts, rules or any other programmatic source.
+	- A new controller action function ["startBrakeCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) lets you start brake coaching from scripts, rules or any other programmatic source.
 	- An optional *confirm* parameter has been added to the controller action functions "startTrackCoaching" and "startBrakeCoaching".
-	- The existing controller action function ["startTelemetryCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been extended to additionally support immediate start of the brake coaching mode.
+	- The existing controller action function ["startTelemetryCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) has been extended to additionally support immediate start of the brake coaching mode.
 	- Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" gives you fine-grained control over the interpretation of braking zones by the Driving Coach.
 	- All command reference sheets have been updated.
 
@@ -195,8 +195,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Race rules are now included in the LLM knowledge of the Race Engineer and the Race Strategist, when running a session under strategy control.
   - Using audio routing it is now possible to control the sound volume of all audio ouput depending on the different audio configurations. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
   - [Important] Removed all automatic update procedures before version 6.0. Updates from versions older than this are not supported anymore.
-  - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
-  - [Expert] A new action type "Action" is supplid in the track automation. This allows you to trigger any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) depending on the current position on the track. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for more information.
+  - [Expert] The new controller action functions [*raiseEvent* and *triggerAction*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) let you raise events and trigger actions in the *Reasoning* booster of any Assistant using your Stream Deck, Button Box or any other hardware controller.
+  - [Expert] A new action type "Action" is supplid in the track automation. This allows you to trigger any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) depending on the current position on the track. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation) for more information.
   - [Expert] A new *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants) let you raise events or trigger actions in the *Reasoning* booster of an Assistant from scripts which are *executed* from a controller action function or have been triggered by an active track automation.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-661), if you are using the DLC for modded cars in *Assetto Corsa*.
@@ -569,7 +569,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Information about the available virtual energy and also energy consumption is displayed in the "Fuel" widget in the "System Monitor".
 	- [Developer] The same information is also available in the ["Session State.json"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) file.
 	- A new [event and a new action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-engineer) have been defined for the *Reasoning* booster of the Race Engineer, which allows a connected LLM to handle low energy conditions. Revisit your event and action configuration, if you have configured a *Reasoning* booster and include the new event and the new action, if necessary.
-  - [Expert] The controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can now handle arguments which are then passed to the external application or script.
+  - [Expert] The controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) can now handle arguments which are then passed to the external application or script.
   - [Developer] All fuel releated fields in the "Session State.json" file have changed their name to be aligned with the new energy related fields. The old fields are still available for compatibility reasons.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-638), especially if you have configured a *Reasoning* booster for the Race Engineer.
@@ -684,7 +684,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [Important] The handling of the pitstop settings has changed for *rFactor 2*. It is now required to have the hotkeys for opening and closing the Pitstop MFD to be defined. This is necessary, because settings are not changed correctly, if the Pitstop MFD is not open while the change happens.
   - A [new setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" lets you define the minimum speed for the Race Spotter to be active. This useful, for example, to let the Spotter shut up during FCY phases. Default for "Spotter: Activation Speed" is 60 km/h.
   - Information about the current tyre wear is now supported for *Le Mans Ultimate*.
-  - Support for executing *Lua* scripts has been added to the ["execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) controller action function. The scripts are executed in the "Simulator Controller" process and have access to the simulator and session state.
+  - Support for executing *Lua* scripts has been added to the ["execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) controller action function. The scripts are executed in the "Simulator Controller" process and have access to the simulator and session state.
   - Multiple tyre compounds will be shown in the "Race Reports", if they have been used on the car.
   - "Race Settings" now support multiple tyre compounds for the initial car setup, if supported by the current simulator. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for additional remarks.
   - The detection of the currently active simulator has been improved for "Race Settings".
@@ -779,8 +779,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - The Engineer now better informs about auto adjustments to the refuel amount after a pitstop has been planned and prepared in LMU races.
-  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
-  - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
+  - Two new controller action functions [*enableListening* and *disableListening*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allow you to fully mute and unmute voice recognition by a button, for example. This can help, if you are using the same *Push-To-Talk* button with Simulator Controller and Discord or TeamSpeak.
+  - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
   - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
   - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
   - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
@@ -1235,7 +1235,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - The Driving Coach will also use automatically generated track sections if none are yet configured for the given track. Same remarks apply here.
   8. New "On-track Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and on-track coaching by the Driving Coach when this startup profile is active.
   9. On-track coaching can now also enabled from the tray menu of the "Simulator Controller" process.
-  10. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), that let you control whether the Driving Coach will confirm the command.
+  10. Additional arguments for the controller action functions [*startTelemetryCoaching* and *startTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions), that let you control whether the Driving Coach will confirm the command.
   11. Support for an additional session type named "Time Trial" has been added to all applications.
       - Hotlap and time trial modes of the different simulators are mapped to this single session type.
 	  - General support by all Assistants is comparable to "Qualification".
@@ -1265,7 +1265,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - A controller action "TrackCoaching" has been defined for the [Driving Coach plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-driving-coach) to request active coaching while driving from your Button Box or Stream Deck.
 	 - New icons for the "TelemetryCoaching" and "TrackCoaching" actions has been added to the Stream Deck icon set.
 	 - Several new settings in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) to fine-tune the corner by corner coaching of the Driving Coach.
-     - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allow you to control the telemetry-based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
+     - New controller action functions [*startTelemetryCoaching*, *finishTelemetryCoaching*, *startTrackCoaching* and *finishTrackCoaching*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allow you to control the telemetry-based coaching mode from custom functions and scripts. Even use them in LLM actions in the *Reasoning* booster.
      - Many new [system level instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#instructions) for the Driving Coach, which guide the LLM through the complex resoning process.
 	 - Telemetry data for reference laps can be stored weather specific in the "Session Database".
 	 - Several other changes and additions in the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach), which will make worth to re-read the chapter.
@@ -1498,7 +1498,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. Automatic track mapping can now be enabled or disabled in various ways, whichever suits your working style best. Default is "On" as before, but this is helpful, if the starting procedure of a non-circuit track requires to roll forward into the starting box.
      - The Tray menu of the "Simulator Controller" background process now contains an item for *Track Mapping*.
      - New controller action ["TrackMapping"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) for the Race Spotter plugin, which toggles the track mapping on / off.
-	 - New [controller action functions *enableTrackMapping* and *disableTrackMapping*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which can be used to automate the track mapping.
+	 - New [controller action functions *enableTrackMapping* and *disableTrackMapping*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions), which can be used to automate the track mapping.
 	 - The *Conversation* booster for the Race Spotter supports starting and stopping the track mapper by voice command (see below).
 	 - Track mapping can also be enabled ot disabled in the Startup Profiles.
 	 - New icon in the Stream Deck icon set for the "TrackMapping" action.
@@ -1586,7 +1586,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Added available tyre compounds to the knowledge passed to the LLM in several Assistant Boosters.
   4. The [LLM action plan_pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#actions) now accept a tyre compound argument.
   5. Optimized pressure loss reporting by the Race Engineer.
-  6. Allow both a predefined action for a controller function together with bound actions from plugins. Using this you can, for example, play a short sound for each button press as a kind of acknowledgement. Use the "play" [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to do this.
+  6. Allow both a predefined action for a controller function together with bound actions from plugins. Using this you can, for example, play a short sound for each button press as a kind of acknowledgement. Use the "play" [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) to do this.
   7. Many clarifications in the documentations for ["Customize Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) and for the ["Rule Engine"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
   8. The code editor for LLM events and actions now allows scrolling and copying even if the displayed rule text is read-only.
   9. The fields for unchangeable builtin events and actions are now shown as read-only and no longer as disabled.
@@ -1623,8 +1623,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - Dark (new, uses the dark theme colors of Windows 10 / 11)
 	  
 	  See the updated [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#color-schemes) for some examples.
-  11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to output spoken messages from your controller scripts.
-  12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to play sound files from your controller scripts.
+  11. A new [controller action functions "speak"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allows you to output spoken messages from your controller scripts.
+  12. A new [controller action functions "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allows you to play sound files from your controller scripts.
   13. "speak" and "play" has been added to the [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track-&-automation) in Track Automation, which let's you put out a spoken message or play a sound file at a given track location. Rally support is coming...
   14. The automated update procedure now asks before a non-release version is installed.
   15. [Internal] Implemented a postprocessor for the compiler which compresses the binary files. The applications are much smaller now.
@@ -2512,8 +2512,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   21. Automatic updates for versions prior to 4.0.0 are no longer possible.
   22. Migrated the sources to AHK 2.08.
   23. [Experts Only] The grammar files has been split up and modularized.
-  24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
-  25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) directly. This opens endless possibilities for controller hardware configuration.
+  24. [Experts Only] New [controller action functions "targetListener", "startActivation", "startListen" and "stopListen"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions), which let you control the listen mode of voice control from your custom scripts. There are also three new icons in the Stream Deck icon set, which can represent these custom actions.
+  25. [Experts Only] *Normal* controller functions (for example "Button", "Dial", etc.) can now also call a [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) directly. This opens endless possibilities for controller hardware configuration.
   26. [Developers Only] MultiMap files can now "#Include" other MultiMap files.
   27. New car models for "Setup Workbench":
       - Assetto Corsa
@@ -2531,7 +2531,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. The recommended cold tyre pressures will be displayed in the "Tyres" session info widget in the "System Monitor".
   7. The "Practice Center" now warns you, if you try to switch the simulator, car or track, while still having unsaved data in an active session.
   8. The audio routing capabilities have been extended. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for more information.
-  9. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
+  9. [Experts Only] A new [controller action function "callCustom"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) has been addded, which allow you to activate custom controller functions from external scripts, for example.
   10. [Developer Only] Additional information has been added to the ["Session State.json" file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) for tyre pressures. The property "Pressures" was renamed to "HotPressures" and a new property "ColdPressures" is available now.
   11. New and updated car models for "Setup Workbench":
       - Assetto Corsa
@@ -2632,7 +2632,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   9. Apps launched from "Simulator Startup" will select the current simulator, car and track a simulation is currently running.
   10. "Race Reports" will now try to open the recently selected simulator, car and track, if no simulation is currently running.
   11. New plugin parameter "openRaceReports" for the ["Race Strategist"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist), which let you start the race reports browser from your controller hardware.
-  12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) which you can use in your custom controller actions.
+  12. New controller action function ["openRaceReports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) which you can use in your custom controller actions.
   13. Fixed "Use initial pressures" for initialization of sessions with a very long formation lap.
   14. Migrated the sources to AHK 2.04.
   15. New car models for "Setup Workbench":
@@ -2925,7 +2925,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Better session end detection for practice sessions when you has been standing in the pitlane for a long time.
   4. General better last lap and session end detection for *Assetto Corsa Competizione*.
   5. "Race Center" now provides detailed information about the pitstops of all cars. This information is available in the details report for each lap.
-  6. New [*hotkey* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) allows you to program special keyboard sequences which then can be triggered by a push of a button or by issuing a voice command.
+  6. New [*hotkey* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allows you to program special keyboard sequences which then can be triggered by a push of a button or by issuing a voice command.
   7. A new "Copy" button in "Race Center" lets you select one of the predefined tyre pressure setups or one of the past pitstops settings which will then be used to [initialize the fields](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#planning-a-pitstop) in the "Pitstop" tab.
   8. "Race Center" can now display the actual settings in the Pitstop MFD for those simulators, which support reading this data. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#initiating-a-pitstop-for-the-current-driver) for more information.
   9. Fixed several tyre compound meta data after the recent *rFactor 2* update.
@@ -3386,7 +3386,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. The quality of race reports has been improved for *rFactor 2*.
   4. Some tweaks in the delta calculation of the Spotter.
   5. Many of the important settings like Team Server On/Off, Track Automation On/Off, and so on, are now available in the tray menu of "Simulator Controller". See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#enabling-and-disabling-features) for more information.
-  6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) let you control the availability of the Race Assistants with an external event source.
+  6. The new controller action functions ["enableRaceAssistant" and "disableRaceAssistant"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) let you control the availability of the Race Assistants with an external event source.
   7. The controller action function "changePitstopBrakeType" has been renamed to "changePitstopBrakePadType".
   8. A new new preset in "Simulator Setup" let you mute the Spotter in case, you want to use a different tool for this purpose, but still want to use the track mapping and automation feature that are handled by the Spotter as well.
   9. The connection to the Team Server is now deferred in "Simulator Configuration" until you enter the "Team" tab. The tool therefore starts much faster now.
@@ -3844,7 +3844,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New tool ["Setup Advisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor), which generates recommendations for changing the setup options of a car based on problem descriptions provided by the driver.
   4. New [plugin parameter "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for "Race Engineer" plugin.
-  5. New [action function "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions).
+  5. New [action function "openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions).
   6. Frequency of blue flag warnings has been drastically reduced.
   7. Fixed sporadic cacophony of Race Assistants voice output.
   8. Support for tyre compound color variation in Strategy simulations. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation) for more information.
@@ -3949,7 +3949,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Almost fully implemented "Race Center" (formerly "Team Dashboard") for multiplayer endurance races and professional stint races with engineer support by a team mate. See the complete new and extensive [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) for more information.
   4. New [plugin parameter "openTeamCenter"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "RaceEngineer" and "Race Strategist" plugins.
-  5. New ["openTeamCenter" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Race Center" from external event sources.
+  5. New ["openTeamCenter" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) to trigger opening the "Race Center" from external event sources.
   6. Fixed several critical bugs in "Server Administration".
   7. Added the new BMW M4 GT3 to the list of known ACC cars.
 
@@ -4060,7 +4060,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. New "Strategy Workbench" tool. Currently undocumented and not much more than an Alpha release.
   5. "Race Strategist" can now save race statistics for later use in the "Strategy Workbench". See the [revised configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the "Race Strategist" plugin for more information.
   6. New [plugin parameter "openStrategyWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for "Race Strategist" plugin.
-  7. New ["openStrategyWorkbench" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) to trigger opening the "Strategy Workbench" from external event sources.
+  7. New ["openStrategyWorkbench" action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) to trigger opening the "Strategy Workbench" from external event sources.
   8. Fixed "Setup Wizard" to correctly generate the "Pedal Calibration" configuration.
   9. [Developer] New lightweight Database library to handle simple in-memory or persistent data sets.
 
@@ -4141,7 +4141,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. New fully integrated telemetry provider for *Automobilista 2* (see [AMS2 SHM Reader](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Sources/Foreign/AMS2%20SHM%20Reader)).
   4. Full support for Jona and Cato incl. automated pitstop handling for *Automobilista 2*.
   5. [New "Pitstop" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-5) for the "AMS2" plugin to control the pitstop settings from your hardware controller.
-  6. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) can integrate and control each Windows application from your hardware controller.
+  6. New [controller action "execute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) can integrate and control each Windows application from your hardware controller.
 
 ## 3.1.6-release 07/02/21
 

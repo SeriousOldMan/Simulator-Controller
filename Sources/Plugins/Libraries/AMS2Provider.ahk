@@ -17,10 +17,20 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class AMS2Provider extends SimulatorProvider {
-	Simulator {
+	static Simulator {
 		Get {
 			return "Automobilista 2"
 		}
+	}
+
+	Simulator {
+		Get {
+			return AMS2Provider.Simulator
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("AMS2", AMS2Provider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

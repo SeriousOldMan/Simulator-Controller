@@ -29,9 +29,15 @@ class LMUProvider extends Sector397Provider {
 
 	iFuelRatio := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "Le Mans Ultimate"
+		}
+	}
+
+	Simulator {
+		Get {
+			return LMUProvider.Simulator
 		}
 	}
 
@@ -75,6 +81,10 @@ class LMUProvider extends Sector397Provider {
 		Get {
 			return this.iStandingsData
 		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("LMU", LMUProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

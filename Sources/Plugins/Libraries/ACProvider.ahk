@@ -21,10 +21,26 @@ class ACProvider extends SimulatorProvider {
 
 	static sCarData := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "Assetto Corsa"
 		}
+	}
+
+	Simulator {
+		Get {
+			return ACProvider.Simulator
+		}
+	}
+
+	static Protocol {
+		Get {
+			return "CLR"
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("AC", ACProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

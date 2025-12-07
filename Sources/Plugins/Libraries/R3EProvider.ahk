@@ -22,10 +22,20 @@ class R3EProvider extends SimulatorProvider {
 	static sCarDB := false
 	static sClassDB := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "RaceRoom Racing Experience"
 		}
+	}
+
+	Simulator {
+		Get {
+			return R3EProvider.Simulator
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("R3E", R3EProvider)
 	}
 
 	__New(arguments*) {

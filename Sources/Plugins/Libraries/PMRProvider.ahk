@@ -17,10 +17,26 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class PMRProvider extends SimulatorProvider {
-	Simulator {
+	static Simulator {
 		Get {
 			return "Project Motor Racing"
 		}
+	}
+
+	Simulator {
+		Get {
+			return PMRProvider.Simulator
+		}
+	}
+
+	static Protocol {
+		Get {
+			return "CLR"
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("PMR", PMRProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

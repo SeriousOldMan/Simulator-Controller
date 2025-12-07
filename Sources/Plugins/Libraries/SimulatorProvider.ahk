@@ -11,6 +11,7 @@
 
 #Include "..\..\Framework\Extensions\CLR.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -35,6 +36,8 @@ global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Tri
 ;;;-------------------------------------------------------------------------;;;
 
 class SimulatorProvider {
+	static sSimulatorProviders := Map()
+
 	iCar := false
 	iTrack := false
 
@@ -51,6 +54,13 @@ class SimulatorProvider {
 			this.iSimulator := SessionDatabase.getSimulatorName(simulator)
 
 			super.__New(car, track)
+		}
+	}
+
+	static SimulatorProviders[code?] {
+		Get {
+			return (isSet(code) ? SimulatorProvider.sSimulatorProviders[code]
+								: SimulatorProvider.sSimulatorProviders)
 		}
 	}
 
@@ -78,6 +88,12 @@ class SimulatorProvider {
 		}
 	}
 
+	static Protocol {
+		Get {
+			return "DLL"
+		}
+	}
+
 	__New(car, track) {
 		this.iCar := SessionDatabase.getCarCode(this.Simulator, car)
 		this.iTrack := SessionDatabase.getTrackCode(this.Simulator, track)
@@ -90,6 +106,10 @@ class SimulatorProvider {
 		catch Any {
 			return SimulatorProvider.GenericSimulatorProvider(SessionDatabase.getSimulatorName(simulator), car, track)
 		}
+	}
+
+	static registerSimulatorProvider(code, class) {
+		SimulatorProvider.sSimulatorProviders[code] := class
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
@@ -278,11 +298,14 @@ callSimulator(simulator, options := "", protocol?) {
 	local dllName, dllFile
 
 	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
-	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
-									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR", "LMU", "CLR", "PMR", "CLR")
+	static protocols := CaseInsenseMap()
 	static connectors := CaseInsenseMap()
 
 	simulator := SessionDatabase.getSimulatorCode(simulator)
+
+	if !protocols.Has(simulator)
+		try
+			protocols[simulator] := %simulator . "Provider"%.Protocol
 
 	if (defaultProtocol = "EXE")
 		protocol := "EXE"

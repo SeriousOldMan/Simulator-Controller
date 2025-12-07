@@ -53,7 +53,7 @@ global kSessionSchemas := CaseInsenseMap("Drivers", ["ID", "Forname", "Surname",
 global kSimulatorCodes := Map("Assetto Corsa", "AC", "Assetto Corsa EVO", "ACE", "Assetto Corsa Competizione", "ACC"
 							, "Automobilista 2", "AMS2"
 							, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
-							, "Rennsport", "RSP", "Le Mans Ultimate", "LMU")
+							, "Rennsport", "RSP", "Le Mans Ultimate", "LMU", "Project Motor Racing", "PMR")
 
 
 ;;;-------------------------------------------------------------------------;;;

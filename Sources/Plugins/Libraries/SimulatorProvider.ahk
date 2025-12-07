@@ -279,7 +279,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 	static defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "Simulator", "Data Provider", "DLL")
 	static protocols := CaseInsenseMap("AC", "CLR", "ACC", "DLL", "R3E", "DLL", "IRC", "DLL"
-									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR", "LMU", "CLR")
+									 , "AMS2", "DLL", "PCARS2", "DLL", "RF2", "CLR", "LMU", "CLR", "PMR", "CLR")
 	static connectors := CaseInsenseMap()
 
 	simulator := SessionDatabase.getSimulatorCode(simulator)

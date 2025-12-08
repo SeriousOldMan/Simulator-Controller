@@ -150,7 +150,7 @@ These functions are not meant to be used by the general user.
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
 | setDebug | debug | Builtin | Enables or disables debugging. *debug* must be either *true* or *false*. |
-| setLogLevel | logLevel | Builtin | Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. |
+| setLogLevel | logLevel | Builtin | Sets the log level. *logLevel* must be one of "Debug", "Info", "Warn", "Critical" or "Off", where "Debug" is the most verbose one. |
 | increaseLogLevel | - | Builtin | Increases the log level, i.e. makes the log information more verbose. |
 | decreaseLogLevel | - | Builtin | Decreases the log level, i.e. makes the log information less verbose. |
 | invoke | target, method, [Optional] argument, ... | System | Invokes an internal method. *target* may be either "Controller" (or "Simulator Controller") for a method of the single controller instance itself or the name of a registered plugin or a name of a mode in the format *plugin*.*mode* and *method* is the name of the method to invoke for this target. You can supply any number of arguments to the invocation call. |

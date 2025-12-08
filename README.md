@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.7.1.0-dev]() (Early build for 6.7.0. Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6710) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-671) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

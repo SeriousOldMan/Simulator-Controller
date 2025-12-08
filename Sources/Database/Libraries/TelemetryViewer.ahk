@@ -3297,9 +3297,9 @@ class TrackMap {
 
 			sectionsMenu.Add(translate("Active"), (*) {
 				if section.Active
-					return "Deactivate"
+					result := "Deactivate"
 				else
-					return "Activate"
+					result := "Activate"
 			})
 			sectionsMenu.Check(translate("Active"))
 

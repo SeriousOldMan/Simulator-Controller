@@ -1140,10 +1140,12 @@ void checkCoordinates(int playerID) {
 
 char* telemetryDirectory = "";
 FILE* telemetryFile = 0;
+int startTelemetryLap = -1;
+r3e_float64 startTime = 0.0;
 int telemetryLap = -1;
 double lastRunning = -1;
 
-inline void printNAValue(FILE* file, float value) {
+inline void printNAValue(FILE* file, double value) {
 	if (value == -1)
 		fprintf(file, "n/a;");
 	else
@@ -1156,6 +1158,11 @@ void collectCarTelemetry(int playerID) {
 	char buffer[60] = "";
 	int index = -1;
 
+	int carLaps = map_buffer->completed_laps;
+	
+	if (carLaps < startTelemetryLap)
+		return;
+
 	for (int id = 0; id < map_buffer->num_cars; id++)
 		if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
 			index = id;
@@ -1164,8 +1171,6 @@ void collectCarTelemetry(int playerID) {
 
 	if (index == -1)
 		return;
-
-	int carLaps = map_buffer->completed_laps;
 
 	if ((carLaps + 1) != telemetryLap) {
 		if (telemetryFile) {
@@ -1198,6 +1203,8 @@ void collectCarTelemetry(int playerID) {
 		}
 			
 		telemetryLap = (carLaps + 1);
+		
+		startTime = map_buffer->player.game_simulation_time;
 
 		int offset = strlen(telemetryDirectory);
 
@@ -1219,9 +1226,8 @@ void collectCarTelemetry(int playerID) {
 		lastRunning = -1;
 	}
 
-	double carDistance = map_buffer->all_drivers_data_1[index].lap_distance;
-	float running = (float)max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
-
+	double running = map_buffer->all_drivers_data_1[index].lap_distance;
+	
 	if (running > lastRunning) {
 		/*
 		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",
@@ -1246,11 +1252,8 @@ void collectCarTelemetry(int playerID) {
 																 map_buffer->all_drivers_data_1[index].position.x,
 																 -map_buffer->all_drivers_data_1[index].position.z);
 
-		if (map_buffer->lap_time_current_self != -1)
-			fprintf(telemetryFile, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
-		else
-			fprintf(telemetryFile, "n/a\n");
-
+		fprintf(telemetryFile, "%d\n", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000));
+		
 		int offset = strlen(telemetryDirectory);
 
 		strcpy_s(tmpFileName, 512, telemetryDirectory);
@@ -1360,6 +1363,9 @@ int main(int argc, char* argv[])
 				mapped_r3e = TRUE;
 
 		if (mapped_r3e) {
+			if (startTelemetryLap == -1)
+				startTelemetryLap = map_buffer->completed_laps + 1;
+			
 			playerID = getPlayerID();
 
 			if (playerID == -1)

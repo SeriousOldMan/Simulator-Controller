@@ -457,6 +457,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				providerConfiguration[setting] := getMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, defaults[setting])
 
+			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+				providerConfiguration["MaxTokens"] := 2048
+
 			if (provider = "LLM Runtime")
 				providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", provider . ".GPULayers", defaults["GPULayers"])
 
@@ -504,6 +507,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations[provider]
+
+			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+				providerConfiguration["MaxTokens"] := 2048
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Driving Coach Service", provider . "." . setting, providerConfiguration[setting])

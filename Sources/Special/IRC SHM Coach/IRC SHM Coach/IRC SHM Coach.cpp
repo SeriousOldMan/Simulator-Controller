@@ -816,6 +816,23 @@ float rXCoordinates[1000];
 float rYCoordinates[1000];
 bool hasTrackCoordinates = false;
 
+bool getCarCoordinates(const irsdk_header* header, const char* data, const int carIdx, float& coordinateX, float& coordinateY) {
+	char* trackPositions;
+
+	if (hasTrackCoordinates) {
+		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) {
+			int index = max(0, min((int)round(((float*)trackPositions)[carIdx] * 999), 999));
+
+			coordinateX = rXCoordinates[index];
+			coordinateY = rYCoordinates[index];
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void loadTrackCoordinates(char* fileName) {
 	std::ifstream infile(fileName);
 	int index = 0;
@@ -840,6 +857,7 @@ const int Set = 3;
 const int Brake = 4;
 const int Release = 5;
 
+int tIndices[256];
 float xCoordinates[256];
 float yCoordinates[256];
 float trackDistances[60];
@@ -890,24 +908,24 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 			float distance = 99999;
 			int index = 0;
 
-			for (int i = 0; i < numCoordinates; i++) {
-				float cDistance = abs(trackDistances[i] - running);
-
-				if (i == 0)
-					distance = cDistance;
-				else if (cDistance < distance) {
-					distance = cDistance;
-					index = i;
-				}
-			}
-
 			if (strcmp(triggerType, "Trigger") == 0) {
+				for (int i = 0; i < numCoordinates; i++) {
+					float cDistance = abs(trackDistances[i] - running);
+
+					if (i == 0)
+						distance = cDistance;
+					else if (cDistance < distance) {
+						distance = cDistance;
+						index = i;
+					}
+				}
+
 				if (distance < (30 / trackLength)) {
 					char buffer[512] = "";
 					char numBuffer[60] = "";
 
 					strcat_s(buffer, "positionTrigger:");
-					_itoa_s(index + 1, numBuffer, 10);
+					_itoa_s(tIndices[index], numBuffer, 10);
 					strcat_s(buffer, numBuffer);
 					strcat_s(buffer, ";");
 					sprintf_s(numBuffer, "%f", xCoordinates[index]);
@@ -928,40 +946,53 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 					lastHint = -1;
 				}
 
-				if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
-					int phase = hintPhases[index];
-					int group = hintGroups[index];
+				float coordinateX;
+				float coordinateY;
 
-					if ((lastPhase != Start) || (phase == Intro)) {
-						if ((lastGroup != group) && (phase != Intro))
-							return;
-						else if ((phase <= lastPhase) && (phase != Intro))
-							return;
+				if (getCarCoordinates(header, data, carIdx, coordinateX, coordinateY)) {
+					for (int i = lastHint + 1; i < numCoordinates; i += 1)
+					{
+						float curDistance = (float)vectorLength(xCoordinates[i] - coordinateX, yCoordinates[i] - coordinateY);
 
-						lastHint = index;
-						lastGroup = group;
-						lastPhase = phase;
-
-						if (audioDevice != "")
+						if ((curDistance < hintDistances[i]) && (curDistance < distance))
 						{
-							if (player != "")
-								playSound(hintSounds[index], false);
+							index = i;
+							distance = curDistance;
+						}
+					}
+
+					if (index > lastHint && distance < (hintDistances[index] / trackLength)) {
+						int phase = hintPhases[index];
+						int group = hintGroups[index];
+
+						if ((lastPhase != Start) || (phase == Intro)) {
+							if ((lastGroup != group) && (phase != Intro))
+								return;
+							else if ((phase <= lastPhase) && (phase != Intro))
+								return;
+
+							lastHint = index;
+							lastGroup = group;
+							lastPhase = phase;
+
+							if (audioDevice != "")
+							{
+								if (player != "")
+									playSound(hintSounds[index], false);
+								else {
+									char buffer[512] = "";
+
+									strcat_s(buffer, "acousticFeedback:");
+									strcat_s(buffer, hintSounds[index].c_str());
+
+									sendTriggerMessage(buffer);
+								}
+							}
 							else {
-								char buffer[512] = "";
-
-								strcat_s(buffer, "acousticFeedback:");
-								strcat_s(buffer, hintSounds[index].c_str());
-
-								sendTriggerMessage(buffer);
+								PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+								PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
 							}
 						}
-						else {
-							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-							PlaySoundA(hintSounds[index].c_str(), NULL, SND_FILENAME | SND_ASYNC);
-						}
-
-						if (lastPhase >= Brake)
-							lastPhase = Start;
 					}
 				}
 			}
@@ -1041,10 +1072,11 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);
 
-			for (int i = 3; i < (argc - 2); i = i + 2) {
-				float x = (float)atof(argv[i]);
-				float y = (float)atof(argv[i + 1]);
+			for (int i = 3; i < (argc - 3); i = i + 3) {
+				float x = (float)atof(argv[i + 1]);
+				float y = (float)atof(argv[i + 2]);
 
+				tIndices[numCoordinates] = atoi(argv[i]);
 				xCoordinates[numCoordinates] = x;
 				yCoordinates[numCoordinates] = y;
 
@@ -1064,79 +1096,78 @@ int main(int argc, char* argv[])
 				}
 
 				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
-	
+
 				if (++numCoordinates > 255)
 					break;
 			}
 
 			if (numCoordinates == 0)
 				positionTrigger = false;
+		}
 
-			trackHints = (strcmp(argv[1], "-TrackHints") == 0);
+		trackHints = (strcmp(argv[1], "-TrackHints") == 0);
 
-			if (trackHints) {
-				triggerType = "TrackHints";
+		if (trackHints) {
+			triggerType = "TrackHints";
 
-				loadTrackCoordinates(argv[2]);
+			loadTrackCoordinates(argv[2]);
 
-				hintFile = argv[3];
+			hintFile = argv[3];
 
-				if (argc > 4)
-					audioDevice = argv[4];
+			if (argc > 4)
+				audioDevice = argv[4];
 
-				if (argc > 5)
-					volume = atof(argv[5]);
+			if (argc > 5)
+				volume = atof(argv[5]);
 
-				if (argc > 6)
-					player = argv[6];
+			if (argc > 6)
+				player = argv[6];
 
-				if (argc > 7)
-					workingDirectory = argv[7];
+			if (argc > 7)
+				workingDirectory = argv[7];
+		}
+
+		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
+		handlingAnalyzer = handlingCalibrator || (strcmp(argv[1], "-Analyze") == 0);
+
+		if (handlingAnalyzer) {
+			dataFile = argv[2];
+
+			if (handlingCalibrator) {
+				lowspeedThreshold = atoi(argv[3]);
+				steerRatio = atoi(argv[4]);
+				wheelbase = atoi(argv[5]);
+				trackWidth = atoi(argv[6]);
 			}
-
-			handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
-			handlingAnalyzer = handlingCalibrator || (strcmp(argv[1], "-Analyze") == 0);
-
-			if (handlingAnalyzer) {
-				dataFile = argv[2];
-
-				if (handlingCalibrator) {
-					lowspeedThreshold = atoi(argv[3]);
-					steerRatio = atoi(argv[4]);
-					wheelbase = atoi(argv[5]);
-					trackWidth = atoi(argv[6]);
-				}
-				else {
-					understeerLightThreshold = atoi(argv[3]);
-					understeerMediumThreshold = atoi(argv[4]);
-					understeerHeavyThreshold = atoi(argv[5]);
-					oversteerLightThreshold = atoi(argv[6]);
-					oversteerMediumThreshold = atoi(argv[7]);
-					oversteerHeavyThreshold = atoi(argv[8]);
-					lowspeedThreshold = atoi(argv[9]);
-					steerRatio = atoi(argv[10]);
-					wheelbase = atoi(argv[11]);
-					trackWidth = atoi(argv[12]);
+			else {
+				understeerLightThreshold = atoi(argv[3]);
+				understeerMediumThreshold = atoi(argv[4]);
+				understeerHeavyThreshold = atoi(argv[5]);
+				oversteerLightThreshold = atoi(argv[6]);
+				oversteerMediumThreshold = atoi(argv[7]);
+				oversteerHeavyThreshold = atoi(argv[8]);
+				lowspeedThreshold = atoi(argv[9]);
+				steerRatio = atoi(argv[10]);
+				wheelbase = atoi(argv[11]);
+				trackWidth = atoi(argv[12]);
 					
-					if (argc > 13) {
-						soundsDirectory = argv[13];
+				if (argc > 13) {
+					soundsDirectory = argv[13];
 
-						if (argc > 14)
-							audioDevice = argv[14];
+					if (argc > 14)
+						audioDevice = argv[14];
 
-						if (argc > 15)
-							volume = atof(argv[15]);
+					if (argc > 15)
+						volume = atof(argv[15]);
 
-						if (argc > 16)
-							player = argv[16];
+					if (argc > 16)
+						player = argv[16];
 
-						if (argc > 17)
-							workingDirectory = argv[17];
-					}
+					if (argc > 17)
+						workingDirectory = argv[17];
 				}
 			}
 		}
-		
 	}
 
 	float trackLength = 0.0;

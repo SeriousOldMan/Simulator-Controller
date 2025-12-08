@@ -707,6 +707,7 @@ void writeTelemetry(BOOL calibrate) {
 #define Brake 4
 #define Release 5
 
+int tIndices[256];
 float xCoordinates[256];
 float yCoordinates[256];
 int numCoordinates = 0;
@@ -751,7 +752,7 @@ void checkCoordinates(int playerID) {
 						char numBuffer[60];
 
 						strcat_s(buffer, 60, "positionTrigger:");
-						_itoa_s(i + 1, numBuffer, 60, 10);
+						_itoa_s(tIndices[i], numBuffer, 60, 10);
 						strcat_s(buffer, 60, numBuffer);
 						strcat_s(buffer, 60, ";");
 						sprintf_s(numBuffer, 60, "%f", xCoordinates[i]);
@@ -803,7 +804,7 @@ void checkCoordinates(int playerID) {
 						lastGroup = group;
 						lastPhase = phase;
 
-						if (strcmp(audioDevice, "") == 0)
+						if (strcmp(audioDevice, "") != 0)
 						{
 							if (strcmp(player, "") == 0) {
 								char buffer[512] = "";
@@ -822,9 +823,6 @@ void checkCoordinates(int playerID) {
 							PlaySoundA(NULL, NULL, SND_ASYNC);
 							PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
 						}
-
-						if (lastPhase >= Brake)
-							lastPhase = Start;
 					}
 				}
 			}
@@ -915,9 +913,10 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			triggerType = "Trigger";
 
-			for (int i = 2; i < (argc - 1); i = i + 2) {
-				xCoordinates[numCoordinates] = (float)atof(argv[i]);
-				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+			for (int i = 2; i < (argc - 1); i = i + 3) {
+				tIndices[numCoordinates] = atoi(argv[i]);
+				xCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
+				yCoordinates[numCoordinates] = (float)atof(argv[i + 2]);
 
 				if (++numCoordinates > 255)
 					break;

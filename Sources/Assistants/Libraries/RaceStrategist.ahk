@@ -2113,6 +2113,21 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local lastLap, asked
 
+		forceFinishSession() {
+			if !this.SessionDataActive {
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+
+				this.finishSession()
+
+				return false
+			}
+			else {
+				Task.CurrentTask.Sleep := 5000
+
+				return Task.CurrentTask
+			}
+		}
+
 		if knowledgeBase {
 			lastLap := knowledgeBase.getValue("Lap", 0)
 
@@ -2166,7 +2181,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
-					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+					Task.startTask(forceFinishSession, 120000, kLowPriority)
 
 					return
 				}
@@ -2184,21 +2199,6 @@ class RaceStrategist extends GridRaceAssistant {
 								, HasLapsData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished
 								, OriginalStrategy: false, Strategy: false, SessionTime: false})
-	}
-
-	forceFinishSession() {
-		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
-
-			this.finishSession()
-
-			return false
-		}
-		else {
-			Task.CurrentTask.Sleep := 5000
-
-			return Task.CurrentTask
-		}
 	}
 
 	finishSessionWithReview(shutdown) {

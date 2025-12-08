@@ -247,6 +247,23 @@ void sendAutomationMessage(const char* message) {
 	}
 }
 
+int getCompletedLaps() {
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char playerCarIdx[10] = "";
+	char sessionID[10] = "";
+
+	getYamlValue(playerCarIdx, sessionInfo, "DriverInfo:DriverCarIdx:");
+
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	char result[100];
+
+	if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:CarIdx:{%s}LapsComplete:", sessionID, playerCarIdx))
+		return atoi(result);
+	else
+		return 0;
+}
+
 #define PI 3.14159265
 
 long cycle = 0;
@@ -1386,16 +1403,19 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 std::string telemetryDirectory = "";
 std::ofstream telemetryFile;
+int startTelemetryLap = -1;
 int telemetryLap = -1;
+double startTime = 0;
 double lastTelemetryRunning = -1;
 
 void collectCarTelemetry(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
 	char buffer[60] = "";
 	char* rawValue;
 
-	getRawDataValue(rawValue, header, data, "Lap");
+	int carLaps = getCompletedLaps();
 
-	int carLaps = *((int*)rawValue);
+	if (carLaps < startTelemetryLap)
+		return;
 
 	try {
 		if ((carLaps + 1) != telemetryLap) {
@@ -1413,6 +1433,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			}
 
 			telemetryLap = (carLaps + 1);
+			
+			if (getRawDataValue(rawValue, header, data, "SessionTime"))
+				startTime = *((double*)rawValue);
 
 			sprintf_s(buffer, "%d", telemetryLap);
 
@@ -1432,6 +1455,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		int rpms = 0;
 		float longG = 0.0;
 		float latG = 0.0;
+		long time = 0;
+		float coordinateX;
+		float coordinateY;
 
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
@@ -1465,24 +1491,24 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			if (getRawDataValue(rawValue, header, data, "LatAccel"))
 				latG = (*(float*)rawValue) / 9.807;
 			
+			if (getRawDataValue(rawValue, header, data, "SessionTime"))
+				time = (long)round(((*(double*)rawValue) - startTime) * 1000);
+			
 			telemetryFile << (playerRunning * trackLength) << ";"
-						  << throttle << ";"
-						  << brake << ";"
-						  << steerAngle << ";"
-						  << gear << ";"
-						  << rpms << ";"
-						  << speed << ";"
-						  << "n/a" << ";"
-						  << "n/a" << ";"
-						  << longG << ";" << - latG;
-
-			float coordinateX;
-			float coordinateY;
+				<< throttle << ";"
+				<< brake << ";"
+				<< steerAngle << ";"
+				<< gear << ";"
+				<< rpms << ";"
+				<< speed << ";"
+				<< "n/a" << ";"
+				<< "n/a" << ";"
+				<< longG << ";" << -latG;
 
 			if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-				telemetryFile << ";" << coordinateX << ";" << coordinateY << std::endl;
+				telemetryFile << ";" << coordinateX << ";" << coordinateY <<  ";" << time << std::endl;
 			else
-				telemetryFile << std::endl;
+				telemetryFile << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1502,9 +1528,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 						 << longG << ";" << -latG;
 
 					if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-						file << ";" << coordinateX << ";" << coordinateY << std::endl;
+						file << ";" << coordinateX << ";" << coordinateY << ";" << time << std::endl;
 					else
-						file << std::endl;
+						file << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
 
 					file.close();
 				}
@@ -1592,7 +1618,7 @@ int main(int argc, char* argv[])
 		if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);
 
-			for (int i = 3; i < (argc - 2); i = i + 2) {
+			for (int i = 3; i <= (argc - 2); i = i + 2) {
 				float x = (float)atof(argv[i]);
 				float y = (float)atof(argv[i + 1]);
 
@@ -1713,6 +1739,9 @@ int main(int argc, char* argv[])
 
 						playerCarIndex = atoi(playerCarIdx);
 					}
+					
+					if (startTelemetryLap == -1)
+						startTelemetryLap = getCompletedLaps() + 1;
 
 					if (mapTrack) {
 						if (!writeCoordinates(pHeader, g_data, playerCarIndex)) {

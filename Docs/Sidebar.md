@@ -193,6 +193,7 @@
     - [Managing instructions and information processing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#enabling-and-disabling-specific-instructions-and-information-processing)
   - [Driver coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data)
 	- [On-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-on-the-track)
+	- [Brake coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-braking-points)
 	- [Automatic coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#troubleshooting)

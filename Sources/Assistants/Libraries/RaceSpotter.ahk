@@ -865,6 +865,7 @@ class PositionInfo {
 class RaceSpotter extends GridRaceAssistant {
 	iSpotterPID := false
 	iRunning := false
+	iPaused := false
 	iEnabled := true
 
 	iSessionDataActive := false
@@ -1073,7 +1074,13 @@ class RaceSpotter extends GridRaceAssistant {
 
 	Running {
 		Get {
-			return this.iRunning
+			return (this.iRunning && !this.Paused)
+		}
+	}
+
+	Paused {
+		Get {
+			return this.iPaused
 		}
 	}
 
@@ -3326,7 +3333,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.iAllCars := false
 		}
 
-		if (!this.VoiceManager.Speaking[true] && this.DriverCar && !this.DriverCar.InPit && this.Enabled) {
+		if (!this.VoiceManager.Speaking[true] && this.DriverCar && !this.DriverCar.InPit && this.Enabled && this.Running) {
 			if isDebug()
 				logMessage(kLogDebug, "UpdateDriver: " . lastLap . ", " . sector . " Driver: " . (this.DriverCar != false) . ", " . (this.DriverCar && this.DriverCar.InPit) . " Race: " . isRace)
 
@@ -4051,6 +4058,21 @@ class RaceSpotter extends GridRaceAssistant {
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
 
+		forceFinishSession() {
+			if !this.SessionDataActive {
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+
+				this.finishSession()
+
+				return false
+			}
+			else {
+				Task.CurrentTask.Sleep := 5000
+
+				return Task.CurrentTask
+			}
+		}
+
 		if knowledgeBase {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
@@ -4061,7 +4083,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
-						Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+						Task.startTask(forceFinishSession, 120000, kLowPriority)
 
 						return
 					}
@@ -4081,19 +4103,12 @@ class RaceSpotter extends GridRaceAssistant {
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
 	}
 
-	forceFinishSession() {
-		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+	pauseSession() {
+		this.iPaused := true
+	}
 
-			this.finishSession()
-
-			return false
-		}
-		else {
-			Task.CurrentTask.Sleep := 5000
-
-			return Task.CurrentTask
-		}
+	resumeSession() {
+		this.iPaused := false
 	}
 
 	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
@@ -4278,7 +4293,12 @@ class RaceSpotter extends GridRaceAssistant {
 			logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
 
 		if (lapNumber = this.LastLap) {
-			this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+			try {
+				this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 
 			if this.DriverUpdateTime {
 				if (A_TickCount >= this.iNextDriverUpdate) {

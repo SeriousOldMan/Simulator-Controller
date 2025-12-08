@@ -1662,7 +1662,6 @@ loadStartupProfiles(target, fileName := false) {
 		for ignore, function in functions
 			if selected.Has("Function." . function[2])
 				setMultiMapValue(settings, "Functions", function[2], selected["Function." . function[2]])
-
 	}
 
 	return settings
@@ -2245,8 +2244,14 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			if profile.Has("Function." . function) {
 				if profile["Function." . function]
 					profile.Delete("Function." . function)
-				else
+				else {
 					profile["Function." . function] := true
+
+					if ((function = "Brake Coaching") && profile.Has("Function.On-Track Coaching"))
+						profile["Function.On-Track Coaching"] := false
+					else if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
+						profile["Function.Brake Coaching"] := false
+				}
 			}
 			else
 				profile["Function." . function] := false

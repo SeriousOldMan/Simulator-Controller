@@ -1,3 +1,4 @@
+copy "Action Functions.md" ..\..\Controller.Wiki\Action-Functions.md
 copy "Backlog.md" ..\..\Controller.Wiki\Backlog.md
 copy "Classes Reference.md" ..\..\Controller.Wiki\Classes-Reference.md
 copy "Constants Reference.md" ..\..\Controller.Wiki\Constants-Reference.md

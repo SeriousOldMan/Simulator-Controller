@@ -2989,6 +2989,21 @@ class RaceEngineer extends RaceAssistant {
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
 
+		forceFinishSession() {
+			if !this.SessionDataActive {
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+
+				this.finishSession()
+
+				return false
+			}
+			else {
+				Task.CurrentTask.Sleep := 5000
+
+				return Task.CurrentTask
+			}
+		}
+
 		if knowledgeBase {
 			logMessage(kLogDebug, "Finish: Speaker is " . this.Speaker)
 			logMessage(kLogDebug, "Finish: Listener is " . this.Listener)
@@ -3013,7 +3028,7 @@ class RaceEngineer extends RaceAssistant {
 
 							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
-							Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+							Task.startTask(forceFinishSession, 120000, kLowPriority)
 
 							return
 						}
@@ -3026,7 +3041,7 @@ class RaceEngineer extends RaceAssistant {
 
 							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
 
-							Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)
+							Task.startTask(forceFinishSession, 120000, kLowPriority)
 
 							return
 						}
@@ -3043,21 +3058,6 @@ class RaceEngineer extends RaceAssistant {
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false, HasPressureData: false})
 		this.updateSessionValues({Simulator: "", Car: "", Track: "", Session: kSessionFinished, SessionTime: false})
-	}
-
-	forceFinishSession() {
-		if !this.SessionDataActive {
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
-
-			this.finishSession()
-
-			return false
-		}
-		else {
-			Task.CurrentTask.Sleep := 5000
-
-			return Task.CurrentTask
-		}
 	}
 
 	shutdownSession(phase, confirmed := false) {

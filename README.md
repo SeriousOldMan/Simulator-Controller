@@ -34,24 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
-An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
+[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
 
-[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6670) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-667) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6700) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-670) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.6.6.0-release](https://cutt.ly/0trWWfWa) (Changes: Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition.)
+[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter.)
 
-[6.6.5.0-release](https://cutt.ly/OtwH8rcd) (Changes: Full rework of weather related tyre change handing, New event "GripLow" for *Reasoning* booster, New action "report_low_grip" for *Reasoning* booster, Changed Damp threshold for rF2 and LMU, Spotter intro now includes track grip, Fixed AC session end detection, Shortcut syntax for foreign function calls, Fixed Reasoning booster instructions, Translation Fixes, Refactored Spotter/Coach provider, Optimized talking mode.)
+[6.6.6.0-release](https://cutt.ly/0trWWfWa) (Changes: Fixed acoustic feedback for handling issues, Fixed continuous update of refuel amount for LMU, Fixed storing of Google API key in the configuration, Fixed negative track runnings in IRC, Fixed race reports for sessions with just one lap, New car models for Setup Workbench, Rearranged session state data acquisition.)
 
 #### Latest development build
 
-[6.7.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KjjbWG2H/Releases/Simulator%20Controller%206.7.0.0-alpha.zip) (Early build for 6.7.0. Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6700) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-670) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 
@@ -133,6 +128,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 35. [Scripting Assistant behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
+36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
@@ -166,6 +163,8 @@ Click on the picture to hear an actual conversation with the Driving Coach:
 The Driving Coach can even use telemetry data to give you instructions how to improve your cornering performance while you are driving on the track.
 
 [![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
+
+[![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
 The AI Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, using a local runtime, which comes with Simulator Controller or using tools like Ollama or GPT4All.
 

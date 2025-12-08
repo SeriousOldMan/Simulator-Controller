@@ -328,7 +328,7 @@ Before you can use the telemetry-based coaching, you must have recorded a [track
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/raw/main/Docs/Images/Session%20Database%2020.jpg)
 
-Please note, that you do not have to set sections for each corner, only for those where you are interested in. You also should not define corners where no braking is necessary, since you will not get any valuable insights for those corners from Aiden.
+Please note, that you do not have to set sections for each corner, only for those where you are interested in. On the other hand, if you want the corner numbers te resemble the official numbering, define sections for each corner and disable those sections, you are not interested in, for example high speed turns, where no braking is necessary, since you will not get any valuable insights for those corners from Aiden. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#editing-track-sections) for more information.
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
@@ -376,7 +376,7 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
-#### Practicing braking points
+### Practicing braking points
 
 Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:
 
@@ -394,7 +394,7 @@ Important: The command "Release" does not mean that you should completely releas
 
 The following video gives you a good demonstration of this:
 
-[![](https://img.youtube.com/vi/itT8sCm_51c/0.jpg)](https://youtu.be/itT8sCm_51c)
+[![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
 ##### Notes
 
@@ -403,18 +403,29 @@ The following video gives you a good demonstration of this:
 3. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
 4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
 
-   - *Coach: Time before Braking Point*
+   - *Time before Braking Point*
      
 	 This setting defines how many milliseconds before the actual braking point the Coach will yell out "Brake". Default is 300 milliseconds. The exact value depends on your PC setup, since sound processing will take some time, and also on your reaction time. The default value of 300 ms is a good compromise to start with.
-   - *Coach: Threshold for hard brake pressure*
+   
+   - *Threshold for hard brake pressure*
    
      Specifies the percentage of the possible brake pressure above which braking is considered to be hard. Default is 90 percent.
-   - *Coach: Threshold for release pressure*
    
-     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 4).
-   - *Coach: Threshold for trail braking*
+   - *Threshold for release pressure*
+   
+     When the brake pressures falls below this percentage of the maximum braking pressure in that braking zone, the Coach inteprets this as releasing the brake. Default is 80 percent. The point, where the Coach tells you to release the brakes is actually a bit earlier, where the brake pressure falls below P(max) - ((P(max) - P(threshold)) / 2). Adjust this value for vehicles without ABS where the brake pressure needs to be reduced when braking, but this should not be considered releasing the brake.
+   
+   - *Threshold for trail braking length*
    
      When the release phase is at least this percentage long of the the overall length of the braking phase, the Coach interprets this as trail braking. Default is 50 percent.
+   
+   - *Threshold for trail braking steer angle*
+   
+     A braking phase is also considered to be proper trail braking, if the brake is still applied if the steering wheel is already turned in by this amount of the maximum steering angle, while the brake is still applied. Default is 70 percent.
+
+   - *Ratio brake pressure to steer angle for trail braking*
+   
+     Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 1.0, which is the ideal value. Values below 1.0 allow for less braking than ideal, but even values above 1.0 are possible when you want to push very hard on the brakes and know how to handles an instable car on turning in.
 	 
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
@@ -449,10 +460,6 @@ As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/
 ### Special notes for *Assetto Corsa Competizione*
 
 A special learning method is used for *Assetto Corsa Competizione*, because this simulator lack some important data in the API about track position. Therefore it can take up to 4 laps, before data is coming in.
-
-### Special notes for *RaceRoom Racing Experience*
-
-COmplete telemetry data is only provided for valid laps. Make sure to stay within track limits before the Coach has acquire the first set of telemetry data.
 
 ## How it works
 

@@ -1290,6 +1290,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editor.saveTrackAutomation()
 		}
 
+		activateTrackSection(listView, line, checked, *) {
+			if line {
+				this.TrackSections[line].Active := checked
+
+				this.updateTrackSections()
+				this.updateTrackMap()
+			}
+		}
+
 		selectData(*) {
 			editor.updateState()
 		}
@@ -2070,7 +2079,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackAutomationsListView.OnEvent("DoubleClick", selectTrackAutomation)
 		this.iTrackAutomationsListView.OnEvent("ItemSelect", navTrackAutomation)
 
-		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")])
+		this.iTrackSectionsListView := editorGui.Add("ListView", "xp yp w360 h142 Y:Move(0.9) X:Move(0.2) W:Grow(0.8) H:Grow(0.1) Hidden -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", [translate("Nr."), translate("Section"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")])
+		this.iTrackSectionsListView.OnEvent("Click", noSelect)
+		this.iTrackSectionsListView.OnEvent("DoubleClick", noSelect)
+		this.iTrackSectionsListView.OnEvent("ItemSelect", noSelect)
+		this.iTrackSectionsListView.OnEvent("ItemCheck", activateTrackSection)
 
 		widget1 := editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Name"))
 		widget2 := editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
@@ -3684,6 +3697,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			sectionsMenu.Add()
 
+			sectionsMenu.Add(translate("Active"), (*) {
+				if section.Active
+					result := "Deactivate"
+				else
+					result := "Activate"
+			})
+
+			if section.Active
+				sectionsMenu.Check(translate("Active"))
+
 			sectionsMenu.Add(translate("Delete"), (*) => (result := "Delete"))
 		}
 
@@ -3721,9 +3744,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						result := "Straight"
 					}
+					else if (result = "Corner")
+						section.Type := "Corner"
+					else if (result = "Straight")
+						section.Type := "Straight"
+					else if (result = "Activate")
+						section.Active := true
+					else if (result = "Deactivate")
+						section.Active := false
+
+					result := section.Type
 				}
-				else
+				else {
 					section := Object()
+
+					section.Active := true
+				}
 
 				section.Type := result
 
@@ -3816,43 +3852,53 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		sections := this.TrackSections
 
-		this.TrackSectionsListView.Delete()
+		this.TrackSectionsListView.Opt("-Redraw")
 
-		loop this.TrackSectionsListView.GetCount("Col")
-			this.TrackSectionsListView.DeleteCol(1)
+		try {
+			this.TrackSectionsListView.Delete()
 
-		for index, section in sections {
-			section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
+			loop this.TrackSectionsListView.GetCount("Col")
+				this.TrackSectionsListView.DeleteCol(1)
 
-			if (section.HasProp("Name") && (Trim(section.Name) != ""))
-				hasNames := true
-		}
+			for index, section in sections {
+				section.Index := this.getTrackCoordinateIndex(section.X, section.Y)
 
-		if hasNames {
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
-				this.TrackSectionsListView.InsertCol(A_Index, "", column)
-		}
-		else
-			for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
-				this.TrackSectionsListView.InsertCol(A_Index, "", column)
+				if (section.HasProp("Name") && (Trim(section.Name) != ""))
+					hasNames := true
+			}
 
-		bubbleSort(&sections, (a, b) => (a.Index > b.Index))
-
-		for index, section in sections {
-			section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
-
-			if hasNames
-				this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), (section.HasProp("Name") ? section.Name : "")
-												 , computeLength(index), Round(section.X), Round(section.Y))
+			if hasNames {
+				for ignore, column in [translate("Nr."), translate("Type"), translate("Name"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
+					this.TrackSectionsListView.InsertCol(A_Index, "", column)
+			}
 			else
-				this.TrackSectionsListView.Add("", section.Nr, translate(section.Type), computeLength(index), Round(section.X), Round(section.Y))
+				for ignore, column in [translate("Nr."), translate("Type"), translate("Length") . translate(" (") . getUnit("Length", true) . translate(")"), translate("X"), translate("Y")]
+					this.TrackSectionsListView.InsertCol(A_Index, "", column)
+
+			bubbleSort(&sections, (a, b) => (a.Index > b.Index))
+
+			for index, section in sections {
+				section.Nr := ((section.Type = "Corner") ? ++corners : ++straights)
+
+				if hasNames
+					this.TrackSectionsListView.Add(section.Active ? "Check" : ""
+												 , section.Nr, translate(section.Type), (section.HasProp("Name") ? section.Name : "")
+												 , computeLength(index), Round(section.X), Round(section.Y))
+				else
+					this.TrackSectionsListView.Add(section.Active ? "Check" : ""
+												 , section.Nr, translate(section.Type)
+												 , computeLength(index), Round(section.X), Round(section.Y))
+			}
+
+			this.TrackSectionsListView.ModifyCol()
+			loop 4
+				this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
 		}
+		finally {
+			this.TrackSectionsListView.Opt("+Redraw")
 
-		this.TrackSectionsListView.ModifyCol()
-		loop 4
-			this.TrackSectionsListView.ModifyCol(A_Index, "AutoHdr")
-
-		this.TrackSectionsListView.Redraw()
+			this.TrackSectionsListView.Redraw()
+		}
 
 		if (save && this.TrackMap) {
 			sections := this.TrackSections.Clone()
@@ -3867,6 +3913,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				for index, section in sections {
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+					setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 					setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
@@ -4049,7 +4096,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local x, y, w, h, imgScale, deltaX, deltaY
 		local token, bitmap, graphics, brushHotkey, brushCommand, brishStart, brushCorner, brushStraight, r
-		local ignore, action, section, imgX, imgY, trackImage
+		local ignore, action, section, imgX, imgY, trackImage, brushCornerDeactivated, brushStraightDeactivated
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
 
@@ -4110,6 +4157,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			brushStart := Gdip_BrushCreateSolid(0xff808080)
 			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
 			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
+			brushCornerDeactivated := Gdip_BrushCreateSolid(0xffAA5050)
+			brushStraightDeactivated := Gdip_BrushCreateSolid(0xff50AA50)
 
 			imgX := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", "1.X")) * scale)
 			imgY := Round((marginX + offsetY + getMultiMapValue(trackMap, "Points", "1.Y")) * scale)
@@ -4120,7 +4169,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				imgX := Round((marginX + offsetX + section.X) * scale)
 				imgY := Round((marginX + offsetY + section.Y) * scale)
 
-				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
+				if section.Active
+					Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight
+											 , imgX - r, imgY - r, r * 2, r * 2)
+				else
+					Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCornerDeactivated
+																		 : brushStraightDeactivated
+											 , imgX - r, imgY - r, r * 2, r * 2)
 			}
 
 			Gdip_DeleteBrush(brushStart)
@@ -4207,6 +4262,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active", true)
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 

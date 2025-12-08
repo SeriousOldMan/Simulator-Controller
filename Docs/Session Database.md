@@ -101,6 +101,8 @@ To start a new section, simply click on a position on the track and choose wheth
 
 When defining sections and you want to work with telemetry data or use the on-track coaching of the Driving Coach, it is important to set the section starting point before any section specific driver inputs take place. For example, a corner section should include the complete braking phase and also the initial part of the acceleration phase until the car has settled.
 
+Sections can be disabled by either the section menu or by deselecting the section in the section list. This will make this section *invisible* to the Driving Coach, for example, but the sequence of corners and straights will be preserved, thereby keeping the corner numbers stable. Please make sure, that you always disable a corner and the following section, otherwise you will get unpredictable results.
+
 It is possible to open the track map in an external, zoomable window, which makes editing sections of very long tracks like the Nordschleife much more easy. To open this window click on the small button to the right of the "Edit" drop down menu. Beside using the control in the upper left corner of the window to control the zoom factor, you can use the mouse wheel to zoom and out. Furthermore, the track map can be moved with the mouse by holding down the middle mouse button.
 
 Good to know: Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.

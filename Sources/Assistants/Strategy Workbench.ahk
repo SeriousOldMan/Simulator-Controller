@@ -684,6 +684,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		validateSimInitialFuelAmount(*) {
 			validateInteger("simInitialFuelAmountEdit", 0)
+
+			workbench.updateState()
 		}
 
 		validateSimAvgLapTime(*) {
@@ -1885,6 +1887,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["tyreChangeRequirementsDropDown"].Choose(oldTChoice ? oldTChoice : 1)
 		this.Control["refuelRequirementsDropDown"].Choose(oldFChoice ? oldFChoice : 1)
 
+		try
+			this.Control["simInitialFuelAmountEdit"].Text := Round(Min(this.Control["simInitialFuelAmountEdit"].Text
+																	 , this.Control["fuelCapacityEdit"].Text))
+
 		this.Control["addFixedPitstopButton"].Enabled := this.FixedPitstops
 
 		if (this.FixedPitstops && this.FixedPitstopsListView.GetNext(0)) {
@@ -3036,8 +3042,10 @@ class StrategyWorkbench extends ConfigurationItem {
 						if (getMultiMapValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
 							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
 
-						if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
+						if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined) {
 							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount")))
+							this.Control["simInitialFuelAmountEdit"].Text := this.Control["fuelCapacityEdit"].Text
+						}
 
 						if ((getMultiMapValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
 						 && (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {

@@ -69,8 +69,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	iRaceAssistantActive := false
 	iRaceAssistantPrepared := false
+	iRaceAssistantPaused := false
 
 	iNextSessionUpdate := false
+
+	iLaps := 0
 
 	class RemoteRaceAssistant {
 		iPlugin := false
@@ -126,6 +129,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		finishSession(arguments*) {
 			this.callRemote("finishSession", arguments*)
+		}
+
+		pauseSession(arguments*) {
+			this.callRemote("pauseSession", arguments*)
+		}
+
+		resumeSession(arguments*) {
+			this.callRemote("resumeSession", arguments*)
 		}
 
 		addLap(arguments*) {
@@ -1465,6 +1476,24 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	static pauseAssistantsSession() {
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if (assistant.Enabled && assistant.RaceAssistant)
+				assistant.pauseSession()
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.pauseSession()
+	}
+
+	static resumeAssistantsSession() {
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if (assistant.Enabled && assistant.RaceAssistant)
+				assistant.resumeSession()
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.resumeSession()
+	}
+
 	static addAssistantsLap(data, telemetryData, standingsData) {
 		local ignore, assistant
 
@@ -1564,6 +1593,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 		else
 			session := kSessionFinished
+
+		if (session == kSessionPaused)
+			RaceAssistantPlugin.pauseAssistantsSession()
+		else
+			RaceAssistantPlugin.resumeAssistantsSession()
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Active
@@ -2110,8 +2144,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			loop Files, kTempDirectory . code . " Data\" . assistant . "*.*"
 				deleteFile(A_LoopFilePath)
 
-			if this.RaceAssistant
-				this.finishSession(false, false)
+			if this.RaceAssistant {
+				if (this.iLaps > 0)
+					this.finishSession(false, false)
+			}
 			else
 				this.requireRaceAssistant()
 
@@ -2140,6 +2176,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (teamServer && teamServer.SessionActive && this.TeamSessionActive)
 			teamServer.setSessionValue(this.Plugin . " Session Info", "")
 
+		this.iLaps := 0
+
 		if this.RaceAssistant {
 			this.RaceAssistant.finishSession(finalize)
 
@@ -2151,8 +2189,28 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	pauseSession() {
+		if !this.iRaceAssistantPaused {
+			this.iRaceAssistantPaused := true
+
+			if this.RaceAssistant
+				this.RaceAssistant.pauseSession()
+		}
+	}
+
+	resumeSession() {
+		if this.iRaceAssistantPaused {
+			this.iRaceAssistantPaused := false
+
+			if this.RaceAssistant
+				this.RaceAssistant.resumeSession()
+		}
+	}
+
 	addLap(lap, update, data) {
 		local dataFile
+
+		this.iLaps := lap
 
 		if this.RaceAssistant {
 			dataFile := (kTempDirectory . this.Simulator.Code . " Data\" . this.Plugin . " Lap " . lap . "." . update . ".data")

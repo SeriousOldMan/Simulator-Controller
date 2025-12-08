@@ -492,7 +492,8 @@ class TelemetryChart {
 		local row := false
 		local coordX, coordY, dx, dy, deltaX, deltaY, row
 
-		threshold /= (this.Window["zoomEdit"].Value / 100)
+		if this.TelemetryViewer.TrackMap
+			threshold /= (this.TelemetryViewer.TrackMap.Window["zoomEdit"].Value / 100)
 
 		if ((data.Length > 0) && data[1].Length > 11) {
 			loop data.Length {
@@ -2604,6 +2605,7 @@ class TrackMap {
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+							setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 							setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
 
@@ -2957,6 +2959,7 @@ class TrackMap {
 
 		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active", true)
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
@@ -3076,6 +3079,7 @@ class TrackMap {
 			for index, section in sections {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
@@ -3291,6 +3295,14 @@ class TrackMap {
 
 			sectionsMenu.Add()
 
+			sectionsMenu.Add(translate("Active"), (*) {
+				if section.Active
+					return "Deactivate"
+				else
+					return "Activate"
+			})
+			sectionsMenu.Check(translate("Active"))
+
 			sectionsMenu.Add(translate("Delete"), (*) => (result := "Delete"))
 		}
 
@@ -3328,9 +3340,22 @@ class TrackMap {
 
 						result := "Straight"
 					}
+					else if (result = "Corner")
+						section.Type := "Corner"
+					else if (result = "Straight")
+						section.Type := "Straight"
+					else if (result = "Activate")
+						section.Active := true
+					else if (result = "Deactivate")
+						section.Active := false
+
+					result := section.Type
 				}
-				else
+				else {
 					section := Object()
+
+					section.Active := true
+				}
 
 				section.Type := result
 
@@ -3360,6 +3385,7 @@ class TrackMap {
 		local scrollY := scrollbar.GetScrollInfo(scrollbar.SB_VERT).Pos
 		local x, y, w, h, imgScale, deltaX, deltaY
 		local token, bitmap, graphics, brush, r, imgX, imgY, trackImage
+		local brushCorner, brushStraight, brushCornerDeactivated, brushStraightDeactivated
 
 		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
 
@@ -3429,6 +3455,8 @@ class TrackMap {
 			brushStart := Gdip_BrushCreateSolid(0xff808080)
 			brushCorner := Gdip_BrushCreateSolid(0xffFF0000)
 			brushStraight := Gdip_BrushCreateSolid(0xff00FF00)
+			brushCornerDeactivated := Gdip_BrushCreateSolid(0xffAA5050)
+			brushStraightDeactivated := Gdip_BrushCreateSolid(0xff50AA50)
 
 			imgX := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", "1.X")) * scale)
 			imgY := Round((marginX + offsetY + getMultiMapValue(trackMap, "Points", "1.Y")) * scale)
@@ -3439,7 +3467,13 @@ class TrackMap {
 				imgX := Round((marginX + offsetX + section.X) * scale)
 				imgY := Round((marginX + offsetY + section.Y) * scale)
 
-				Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight, imgX - r, imgY - r, r * 2, r * 2)
+				if section.Active
+					Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCorner : brushStraight
+											 , imgX - r, imgY - r, r * 2, r * 2)
+				else
+					Gdip_FillEllipse(graphics, (section.Type = "Corner") ? brushCornerDeactivated
+																		 : brushStraightDeactivated
+											 , imgX - r, imgY - r, r * 2, r * 2)
 			}
 
 			Gdip_DeleteBrush(brushStart)

@@ -309,7 +309,7 @@ Here you define, what should happen, when you arrive at this specific location o
 
 3. Action(s)
 
-   You can call any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) here. Multiple action calls can be given, separated by "|" or by ";". Example:
+   You can call any [controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) here. Multiple action calls can be given, separated by "|" or by ";". Example:
    
        raiseEvent("Race Strategist", "UndercutSimulation")
 	   
@@ -337,11 +337,11 @@ And a final warning: This kind of automation might be considered illegal accordi
 
 ### Enabling and disabling Track Automations
 
-For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) available.
+For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) available.
 
 ### Choosing between different Track Automations
 
-As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions) action function. To use this, you must create an entry in your configuration like:
+As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) action function. To use this, you must create an entry in your configuration like:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%201.JPG)
 

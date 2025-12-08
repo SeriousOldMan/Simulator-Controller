@@ -155,6 +155,8 @@ class Corner extends Section {
 	iAcceleratingRPM := 0				; RPM at start of the accelarating phase
 	iAcceleratingFinalSpeed := 0		; Speed at the end of the accelerating phase
 
+	iMaxSteering := 0					; -1 -> 1
+
 	iMinLateralGForce := 0				; Min G Force around apex (rolling phase)
 	iMaxLateralGForce := 0				; Max G Force around apex (rolling phase)
 	iAvgLateralGForce := 0				; Avg G Force around apex (rolling phase)
@@ -279,6 +281,12 @@ class Corner extends Section {
 	AcceleratingSpeed {
 		Get {
 			return this.iAcceleratingFinalSpeed
+		}
+	}
+
+	MaxSteering {
+		Get {
+			return this.iMaxSteering
 		}
 	}
 
@@ -497,7 +505,7 @@ class Corner extends Section {
 					  , rollingStart, rollingTime, rollingSpeed, rollingLength
 					  , acceleratingStart, acceleratingTime, acceleratingInitialSpeed, acceleratingLength, throttleCurve
 					  , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingFinalSpeed
-					  , minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
+					  , maxSteering, minG, maxG, avgG, minSpeed, maxSpeed, avgSpeed, tcActivations, absActivations
 					  , steeringCorrections, steeringSmoothness
 					  , throttleCorrections, throttleSmoothness
 					  , brakeCorrections, brakeSmoothness) {
@@ -530,6 +538,8 @@ class Corner extends Section {
 		this.iAcceleratingGear := acceleratingGear
 		this.iAcceleratingRPM := Round(acceleratingRPM)
 		this.iAcceleratingFinalSpeed := acceleratingFinalSpeed
+
+		this.iMaxSteering := maxSteering
 
 		this.iMinLateralGForce := minG
 		this.iMaxLateralGForce := maxG
@@ -598,6 +608,7 @@ class Corner extends Section {
 		local maxSpeed := speed
 		local speeds := []
 		local latG := Abs(telemetry.getValue(index, "Lat G"))
+		local maxSteering := 0
 		local minLatG := latG
 		local maxLatG := latG
 		local latGs := []
@@ -689,6 +700,8 @@ class Corner extends Section {
 
 			steeringCount += 1
 
+			maxSteering := Max(steering, Abs(steering))
+
 			if ((lastSteeringDelta > 0) && (steering < lastSteering)) {
 				if ((steeringReference - steering) > 0.05)
 					steeringChanges += 1
@@ -742,7 +755,7 @@ class Corner extends Section {
 
 				brakeCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
 							   , Distance: telemetry.getValue(index, "Distance")
-							   , Time: telemetry.getValue(index, "Time"), Brake: brake})
+							   , Time: telemetry.getValue(index, "Time"), Brake: brake, Steering: steering})
 
 				if ((lastBrakeDelta > 0) && (brake < lastBrake)) {
 					if ((brakeReference - brake) > 0.2)
@@ -801,7 +814,7 @@ class Corner extends Section {
 
 				throttleCurve.Push({X: telemetry.getValue(index, "PosX"), Y: telemetry.getValue(index, "PosY")
 								  , Distance: telemetry.getValue(index, "Distance")
-								  , Time: telemetry.getValue(index, "Time"), Throttle: throttle})
+								  , Time: telemetry.getValue(index, "Time"), Throttle: throttle, Steering: steering})
 
 				if ((lastThrottleDelta > 0) && (throttle < lastThrottle)) {
 					if ((throttleReference - throttle) > 0.2)
@@ -855,6 +868,7 @@ class Corner extends Section {
 							 , rollingStart, rollingTime, rollingSpeed, rollingLength
 							 , acceleratingStart, acceleratingTime, acceleratingInitialSpeed, acceleratingLength, throttleCurve
 							 , rollingGear, rollingRPM, acceleratingGear, acceleratingRPM, acceleratingFinalSpeed
+							 , (sumSteering > 0) ? maxSteering : (maxSteering * -1)
 							 , minLatG, maxLatG, average(latGs), minSpeed, maxSpeed, average(speeds)
 							 , (throttleCount ? Round((tcActivations / throttleCount) * 100) : 100)
 							 , (brakeCount ? Round((absActivations / brakeCount) * 100) : 100)
@@ -1221,7 +1235,8 @@ class Telemetry {
 				brake := section.BrakeCurve[1]
 
 				braking.Push({X: brake.X, Y: brake.Y, Start: brake.Distance, Speed: section.Speed["Braking"]
-							, Length: section.Length["Braking"], Time: brake.Time, Curve: section.BrakeCurve})
+							, Length: section.Length["Braking"], Time: brake.Time
+							, MaxSteering: section.MaxSteering, Curve: section.BrakeCurve})
 			}
 
 		return braking
@@ -1236,7 +1251,8 @@ class Telemetry {
 				throttle := section.ThrottleCurve[1]
 
 				accelerating.Push({X: throttle.X, Y: throttle.Y, Start: throttle.Distance, Speed: section.Speed["Accelerating"]
-								 , Length: section.Length["Accelerating"], Time: throttle.Time, Curve: section.ThrottleCurve})
+								 , Length: section.Length["Accelerating"], Time: throttle.Time
+								 , MaxSteering: section.MaxSteering, Curve: section.ThrottleCurve})
 			}
 
 		return accelerating
@@ -1606,6 +1622,7 @@ class TelemetryAnalyzer {
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
 				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
 
@@ -1639,7 +1656,7 @@ class TelemetryAnalyzer {
 				if ((phase = "Find") || (phase = "Straight")) {
 					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Brake", 0) > 0) {
 						if (phase = "Straight")
-							sections.Push({Type: "Straight", Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
+							sections.Push({Type: "Straight", Active: true, Nr: straightNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Entry"
 						index := Max(1, startIndex + 5, index - 10)
@@ -1655,7 +1672,7 @@ class TelemetryAnalyzer {
 				}
 				else if (phase = "Exit") {
 					if (TelemetryAnalyzer.getValue(telemetry.Data[telemetryIndex], "Throttle", 0) = 1.0) {
-						sections.Push({Type: "Corner", Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
+						sections.Push({Type: "Corner", Active: true, Nr: cornerNr++, Index: startIndex, X: startX, Y: startY})
 
 						phase := "Straight"
 
@@ -1686,6 +1703,7 @@ class TelemetryAnalyzer {
 		loop getMultiMapValue(trackMap, "Sections", "Count") {
 			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+						 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
 						 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})

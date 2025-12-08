@@ -745,17 +745,27 @@ class DrivingCoach extends GridRaceAssistant {
 			case "TrackCoachingStart":
 				this.clearContinuation()
 
-				if this.CoachingActive
+				if !this.CoachingActive
+					this.telemetryCoachingStartRecognized(words, true, "Track")
+				else
 					this.trackCoachingStartRecognized(words)
+
+				/*
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+				*/
 			case "BrakeCoachingStart":
 				this.clearContinuation()
 
-				if this.CoachingActive
+				if !this.CoachingActive
+					this.telemetryCoachingStartRecognized(words, true, "Brake")
+				else
 					this.brakeCoachingStartRecognized(words)
+
+				/*
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+				*/
 			case "FinishCoaching":
 				this.clearContinuation()
 
@@ -785,6 +795,8 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	telemetryCoachingStartRecognized(words, confirm := true, auto := false) {
+		local state
+
 		if !this.Connector
 			this.startConversation()
 
@@ -794,6 +806,27 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iCoachingActive := true
 
 		this.startupTelemetryCoaching()
+
+		if auto {
+			state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+			setMultiMapValue(state, "Coaching", "Active", true)
+
+			if (auto = "Brake") {
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false})
+
+				setMultiMapValue(state, "Coaching", "Brake", "Starting")
+				setMultiMapValue(state, "Coaching", "Track", false)
+			}
+			else {
+				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
+
+				setMultiMapValue(state, "Coaching", "Track", "Starting")
+				setMultiMapValue(state, "Coaching", "Brake", false)
+			}
+
+			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+		}
 	}
 
 	telemetryCoachingFinishRecognized(words, confirm := true) {
@@ -1104,10 +1137,28 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startTelemetryCoaching(confirm := true, auto := false) {
-		if (auto = "Brake")
-			this.updateConfigurationValues({BrakeCoaching: true})
-		else if auto
-			this.updateConfigurationValues({OnTrackCoaching: true})
+		local state
+
+		if auto {
+			state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+			setMultiMapValue(state, "Coaching", "Active", true)
+
+			if (auto = "Brake") {
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false})
+
+				setMultiMapValue(state, "Coaching", "Brake", "Starting")
+				setMultiMapValue(state, "Coaching", "Track", false)
+			}
+			else {
+				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
+
+				setMultiMapValue(state, "Coaching", "Track", "Starting")
+				setMultiMapValue(state, "Coaching", "Brake", false)
+			}
+
+			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+		}
 
 		this.telemetryCoachingStartRecognized([], confirm, auto)
 	}
@@ -1117,27 +1168,43 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startTrackCoaching(confirm := true) {
+		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm, "Track")
 
 			this.trackCoachingStartRecognized([], false)
-
-			this.updateConfigurationValues({OnTrackCoaching: true})
 		}
 		else
 			this.trackCoachingStartRecognized([], confirm)
+
+		this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false})
+
+		setMultiMapValue(state, "Coaching", "Track", "Starting")
+		setMultiMapValue(state, "Coaching", "Brake", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
 	startBrakeCoaching(confirm := true) {
+		local state
+
 		if !this.CoachingActive {
 			this.telemetryCoachingStartRecognized([], confirm, "Brake")
 
 			this.brakeCoachingStartRecognized([], false)
-
-			this.updateConfigurationValues({BrakeCoaching: true})
 		}
 		else
 			this.brakeCoachingStartRecognized([], confirm)
+
+		this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false})
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		setMultiMapValue(state, "Coaching", "Brake", "Starting")
+		setMultiMapValue(state, "Coaching", "Track", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 	}
 
 	finishCoaching(confirm := true) {
@@ -1151,6 +1218,11 @@ class DrivingCoach extends GridRaceAssistant {
 			state := newMultiMap()
 
 			setMultiMapValue(state, "Coaching", "Active", true)
+
+			if this.OnTrackCoaching
+				setMultiMapValue(state, "Coaching", "Track", "Starting")
+			else if this.BrakeCoaching
+				setMultiMapValue(state, "Coaching", "Brake", "Starting")
 
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
@@ -1192,8 +1264,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.shutdownBrakeTrigger()
 
-		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 		started := this.startupTrackTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", started)
 
@@ -1211,12 +1284,14 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	shutdownTrackCoaching() {
-		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		local state
 
 		if isDebug()
 			logMessage(kLogDebug, "Track coaching stopped...")
 
 		this.shutdownTrackTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", false)
 
@@ -1232,8 +1307,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.shutdownTrackTrigger()
 
-		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 		started := this.startupBrakeTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Brake", started)
 
@@ -1249,12 +1325,14 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	shutdownBrakeCoaching() {
-		local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+		local state
 
 		if isDebug()
 			logMessage(kLogDebug, "Brake coaching stopped...")
 
 		this.shutdownBrakeTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Brake", false)
 
@@ -1270,8 +1348,9 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry, reference
 
 		if (this.AvailableTelemetry.Count = 0) {
-			if (this.Speaker[false] && !this.OnTrackCoaching && !this.BrakeCoaching)
-				this.getSpeaker().speakPhrase("CoachingReady", false, true, false, {Noise: false, Important: true})
+			if this.Speaker[false]
+				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching) ? "CoachingStart" : "CoachingReady"
+											, false, true, false, {Noise: false, Important: true})
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
 				if isDebug()
@@ -1744,6 +1823,11 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 		}
 
+		if (this.TelemetryCollector && ((this.TelemetryCollector.Simulator != this.Simulator)
+									 || (this.TelemetryCollector.Track != this.Track)
+									 || (this.iTelemetryCollector.TrackLength != this.TrackLength)))
+			this.shutdownTelemetryCollector()
+
 		if (isDebug() && !this.TelemetryCollector)
 			logMessage(kLogDebug, "Telemetry coaching: " . this.Simulator . " " . this.Track . " (" . this.TrackLength . ")")
 
@@ -1802,12 +1886,12 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupTrackTrigger() {
+		local distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, sessionDB, code, data, exePath, pid
 		local ignore, section, x, y
 
-		static distance := false
 
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
@@ -1815,24 +1899,23 @@ class DrivingCoach extends GridRaceAssistant {
 			if (sections && (sections.Length > 0)) {
 				positions := ""
 
-				if !distance
-					distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
-
 				for ignore, section in sections
-					if (section.Type = "Corner") {
-						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
-							positions .= (A_Space . x . A_Space . y)
+					if section.Active
+						if (section.Type = "Corner") {
+							if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
+								positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							else
+								positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+						}
 						else
-							positions .= (A_Space . -32767 . A_Space . -32767)
-					}
-					else
-						positions .= (A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
 
 				for ignore, section in sections
-					if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
-						positions .= (A_Space . x . A_Space . y)
-					else
-						positions .= (A_Space . -32767 . A_Space . -32767)
+					if section.Active
+						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
+							positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+						else
+							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
 
 				sessionDB := SessionDatabase()
 
@@ -1989,18 +2072,19 @@ class DrivingCoach extends GridRaceAssistant {
 		local triggers := ""
 		local tries := 3
 		local brakeSections := []
-		local ignore, index, braking, brake, maxBrake, metersPerSec, trackLength
+		local delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
+		local brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
+		local releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
+		local trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailBraking", 50)) / 100)
+		local trailSteeringThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.TrailSteering", 70) / 100)
+		local trailBrakeSteeringRatio := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Ratio.TrailBrakeSteering", 1.0)
+		local ignore, index, braking, brake, maxBrake, maxBrakeIndex, metersPerSec, trackLength, hasRelease
 		local brakeTime, startDistance, endDistance, x, y
 		local section, numSections, instructions, clean
 
 		static lastTelemetry := false
 		static nextLap := 0
-
-		static delta := false
 		static distance := 25
-		static brakeThreshold := false
-		static releaseThreshold := false
-		static trailBrakingThreshold := false
 
 		normalizeTime(time) {
 			if (time < 0)
@@ -2011,11 +2095,14 @@ class DrivingCoach extends GridRaceAssistant {
 				return time
 		}
 
-		getIntro(brakeCurve) {
+		getIntro(braking) {
+			local brakeCurve := braking.Curve
+			local maxSteering := Abs(braking.MaxSteering)
 			local maxBrake := 0
 			local releaseStart := false
+			local trailBrake := false
 			local introPhrase, brakePhrase, releasePhrase, introNr, brakeNr, releaseNr
-			local ignore, key, hardBrake, trailBrake, index, brake
+			local ignore, key, hardBrake, index, brake, steering
 
 			for index, brake in brakeCurve {
 				maxBrake := Max(brake.Brake, maxBrake)
@@ -2025,7 +2112,18 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			hardBrake := (maxBrake >= brakeThreshold)
-			trailBrake := (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false)
+
+			maxSteering *= trailSteeringThreshold
+			maxBrake *= ((1 - trailSteeringThreshold) * trailBrakeSteeringRatio)
+
+			for index, brake in brakeCurve
+				if ((Abs(brake.Steering) > maxSteering) && (brake.Brake > maxBrake)) {
+					trailBrake := true
+
+					break
+				}
+
+			trailBrake := (trailBrake || (releaseStart ? (releaseStart <= (brakeCurve.Length * trailBrakingThreshold)) : false))
 
 			introPhrase := speaker.getPhrase("BrakeIntro", false, &ignore := false, &introNr)
 
@@ -2066,13 +2164,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
 			try {
-				if !delta {
-					delta := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Braking.Time", 300))
-					brakeThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.HardBraking", 90) / 100)
-					releaseThreshold := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.BrakeRelease", 80) / 100)
-					trailBrakingThreshold := ((100 - getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Threshold.Braking.TrailBraking", 50)) / 100)
-				}
-
 				trackLength := collector.TrackLength
 
 				for index, braking in telemetry.Braking {
@@ -2081,7 +2172,7 @@ class DrivingCoach extends GridRaceAssistant {
 					section := A_Index
 
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 8000), &x, &y, &startDistance := "Distance")
-						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking.Curve) . "`n")
+						instructions := (section . A_Space . "Intro" . A_Space . x . A_Space . y . A_Space . distance . A_Space . getIntro(braking) . "`n")
 
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 3000), &x, &y)
 						instructions .= (section . A_Space . "Ready" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownOne . "`n")
@@ -2094,18 +2185,52 @@ class DrivingCoach extends GridRaceAssistant {
 					endDistance := (braking.Start + metersPerSec)
 
 					maxBrake := 0
+					maxBrakeIndex := 1
+					hasRelease := false
 
 					for index, brake in braking.Curve
-						if ((brake.Brake < (maxBrake * releaseThreshold)) && ((brake.Distance - braking.Start) > distance)) {
+						if (brake.Brake < (maxBrake * releaseThreshold)) {
 							endDistance := (brake.Distance + (metersPerSec / 2))
 
-							if telemetry.findCoordinates("Time", normalizeTime(brake.Time - delta), &x, &y)
-								instructions .= ("`n" . section . A_Space . "Release" . A_Space . x . A_Space . y . A_Space . distance . A_Space . releaseCommand)
+							threshold := (maxBrake - ((maxBrake - (maxBrake * releaseThreshold)) / 2))
+
+							while (--index > maxBrakeIndex) {
+								brake := braking.Curve[index]
+
+								if (brake.Brake > threshold) {
+									brake := braking.Curve[index + 1]
+
+									if (((brake.Distance - braking.Start) > distance)
+									 && telemetry.findCoordinates("Time", normalizeTime(brake.Time - delta), &x, &y)) {
+										instructions .= ("`n" . section . A_Space . "Release" . A_Space . x . A_Space . y . A_Space . distance . A_Space . releaseCommand)
+
+										hasRelease := true
+									}
+
+									break
+								}
+							}
 
 							break
 						}
-						else
-							maxBrake := Max(brake.Brake, maxBrake)
+						else if (brake.Brake > maxBrake) {
+							maxBrakeIndex := index
+
+							maxBrake := brake.Brake
+						}
+
+					if !hasRelease
+						for index, brake in braking.Curve
+							if ((brake.Brake < (maxBrake * releaseThreshold)) && ((brake.Distance - braking.Start) > distance)) {
+								endDistance := (brake.Distance + (metersPerSec / 2))
+
+								if telemetry.findCoordinates("Time", normalizeTime(brake.Time - delta), &x, &y)
+									instructions .= ("`n" . section . A_Space . "Release" . A_Space . x . A_Space . y . A_Space . distance . A_Space . releaseCommand)
+
+								break
+							}
+							else
+								maxBrake := Max(brake.Brake, maxBrake)
 
 					if (endDistance > trackLength)
 						endDistance := (startDistance - trackLength)
@@ -2115,12 +2240,12 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 
 				if isDebug()
-					logMessage(kLogDebug, "All brake sections: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+					logMessage(kLogDebug, "All brake sections: " . values2String(", ", collect(brakeSections, (b) => b.Corner . ": [" . b.Start . ", " . b.End . "]")*))
 
 				brakeSections := choose(brakeSections, (*) => (Random(1.0, 10.0) <= 7))
 
 				if isDebug()
-					logMessage(kLogDebug, "Brake section candidates: " . values2String(", ", collect(brakeSections, (b) => b.Corner)*))
+					logMessage(kLogDebug, "Brake section candidates: " . values2String(", ", collect(brakeSections, (b) => b.Corner . ": [" . b.Start . ", " . b.End . "]")*))
 
 				loop {
 					numSections := brakeSections.Length
@@ -2410,11 +2535,11 @@ class DrivingCoach extends GridRaceAssistant {
 	positionTrigger(sectionNr, positionX, positionY) {
 		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
+		local wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
 		local cornerNr, instruct, telemetry, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
-		static wait := false
 		static hintProblems := false
 		static hints := false
 		static instructionCount := 0
@@ -2511,9 +2636,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if ((Round(positionX) = -32767) && (Round(positionY) = -32767))
 			return
 
-		if !wait {
-			wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
-
+		if !hints {
 			hints := ["BrakeEarlier", "BrakeLater", "BrakeHarder", "BrakeSofter"
 					, "BrakeFaster", "BrakeSlower", "AccelerateEarlier", "AccelerateLater"
 					, "AccelerateHarder", "AccelerateSofter", "PushLess", "PushMore"]

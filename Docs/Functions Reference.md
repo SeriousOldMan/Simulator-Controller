@@ -388,7 +388,7 @@ Diasables all tray messages from now on. Every following call to *trayMessage* w
 ***
 
 ## Controller Actions
-The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). Therefore, they will be configured for controller functions using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions). Therefore, they will be configured for controller functions using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *setDebug(debug :: Boolean)*
 Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.

@@ -1229,7 +1229,7 @@ class SoloCenter extends ConfigurationItem {
 
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
-				
+
 			return false
 		})
 	}
@@ -8013,10 +8013,50 @@ class SoloCenter extends ConfigurationItem {
 		this.pushTask(showLapDetailsAsync.Bind(lap))
 	}
 
+	startupTelemetrySystem(track, trackLength) {
+		local provider
+
+		if this.TelemetryCollector
+			if ((track != "Unknown") && (trackLength > 0)) {
+				if (this.TelemetryCollector == true) {
+					provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+															, "Telemetry Viewer", "Provider", "Internal")
+
+					this.iTelemetryCollector := TelemetryCollector(provider, this.SessionDirectory . "Telemetry"
+																 , this.Simulator, track, trackLength)
+				}
+
+				if ((this.TelemetryCollector.Simulator != this.Simulator)
+				 || (this.TelemetryCollector.Track != track)
+				 || (this.iTelemetryCollector.TrackLength != trackLength)) {
+					this.TelemetryCollector.initialize(this.Simulator, track, trackLength)
+
+					this.TelemetryCollector.startup(true)
+				}
+				else
+					this.TelemetryCollector.startup()
+			}
+			else if isInstance(this.TelemetryCollector, TelemetryCollector)
+				this.TelemetryCollector.shutdown()
+
+		if this.TelemetryViewer
+			if ((track != "Unknown") && (trackLength > 0)) {
+				if this.TelemetryCollector
+					this.TelemetryViewer.startupCollector(this.TelemetryCollector)
+				else {
+					this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
+
+					this.iTelemetryCollector := this.TelemetryViewer.TelemetryCollector[true]
+				}
+			}
+			else
+				this.TelemetryViewer.shutdownCollector()
+	}
+
 	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local save, translator, msgResult
+			local save, translator, msgResult, track, trackLength
 
 			if fileName
 				data := readMultiMap(fileName)
@@ -8062,11 +8102,13 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				}
 
+				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
+				trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
+
 				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"), false)
 
 				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
-									   , getMultiMapValue(data, "Session Data", "Car")
-									   , getMultiMapValue(data, "Session Data", "Track"))
+									   , getMultiMapValue(data, "Session Data", "Car"), track)
 
 				this.analyzeTelemetry()
 
@@ -8081,6 +8123,8 @@ class SoloCenter extends ConfigurationItem {
 
 				if this.AutoTelemetry
 					this.iTelemetryCollector := true
+
+				this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 			}
@@ -8101,47 +8145,12 @@ class SoloCenter extends ConfigurationItem {
 			local data := readMultiMap(fileName)
 			local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 			local trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
-			local provider
 
 			try {
 				if (!this.LastLap && !update)
 					this.startSession(data, true)
 
-				if this.TelemetryCollector
-					if ((track != "Unknown") && (trackLength > 0)) {
-						if (this.TelemetryCollector == true) {
-							provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-																	, "Telemetry Viewer", "Provider", "Internal")
-
-							this.iTelemetryCollector := TelemetryCollector(provider, this.SessionDirectory . "Telemetry"
-																		 , this.Simulator, track, trackLength)
-						}
-
-						if ((this.TelemetryCollector.Simulator != this.Simulator)
-						 || (this.TelemetryCollector.Track != track)
-						 || (this.iTelemetryCollector.TrackLength != trackLength)) {
-							this.TelemetryCollector.initialize(this.Simulator, track, trackLength)
-
-							this.TelemetryCollector.startup(true)
-						}
-						else
-							this.TelemetryCollector.startup()
-					}
-					else if isInstance(this.TelemetryCollector, TelemetryCollector)
-						this.TelemetryCollector.shutdown()
-
-				if this.TelemetryViewer
-					if ((track != "Unknown") && (trackLength > 0)) {
-						if this.TelemetryCollector
-							this.TelemetryViewer.startupCollector(this.TelemetryCollector)
-						else {
-							this.TelemetryViewer.startupCollector(this.Simulator, track, trackLength)
-
-							this.iTelemetryCollector := this.TelemetryViewer.TelemetryCollector[true]
-						}
-					}
-					else
-						this.TelemetryViewer.shutdownCollector()
+				this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 

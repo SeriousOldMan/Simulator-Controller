@@ -733,6 +733,7 @@ namespace RF2SHMCoach {
         const int Brake = 4;
         const int Release = 5;
 
+        int[] tIndices = new int[256];
         float[] xCoordinates = new float[256];
         float[] yCoordinates = new float[256];
         int numCoordinates = 0;
@@ -779,7 +780,7 @@ namespace RF2SHMCoach {
 						{
 							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 							{
-								SendTriggerMessage("positionTrigger:" + (i + 1) + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+								SendTriggerMessage("positionTrigger:" + tIndices[i] + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
 
 								nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
 
@@ -908,10 +909,11 @@ namespace RF2SHMCoach {
         {
 			triggerType = type;
 
-			for (int i = 1; i < (args.Length - 1); i += 2)
+			for (int i = 1; i < (args.Length - 1); i += 3)
 			{
-				xCoordinates[numCoordinates] = float.Parse(args[i]);
-				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+				tIndices[numCoordinates] = int.Parse(args[i]);
+				xCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+				yCoordinates[numCoordinates] = float.Parse(args[i + 2]);
 
                 if (++numCoordinates > 255)
                     break;

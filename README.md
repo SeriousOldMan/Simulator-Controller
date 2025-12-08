@@ -130,6 +130,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
 
+37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

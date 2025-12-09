@@ -49,9 +49,7 @@ namespace SHMConnector
             {
                 if (receiver == null)
                 {
-                    if (Open())
-                        Thread.Sleep(1000);
-                    else
+                    if (!Open())
                         return "[Session Data]\nActive=false\n";
                 }
 
@@ -73,11 +71,14 @@ namespace SHMConnector
 
             sb.Append("[Session Data]\n");
 
-            if (raceInfo == null || playerState == null)
+            if (raceInfo == null)
             {
                 sb.Append("Active=false\n");
                 return sb.ToString();
             }
+
+            // Active means game is running and sending data
+            // Paused indicates actual session state
 
             sb.Append("Active=true\n");
             sb.AppendFormat("Paused={0}\n", raceInfo.State == UDPRaceSessionState.Active ? "false" : "true");
@@ -92,7 +93,11 @@ namespace SHMConnector
             else
                 sb.Append("Session=Other\n");
 
-            sb.AppendFormat("Car={0}\n", NormalizeName(playerState.VehicleName));
+            if (playerState != null)
+                sb.AppendFormat("Car={0}\n", NormalizeName(playerState.VehicleName));
+            else
+                sb.Append("Car=Unknown\n");
+            
             sb.AppendFormat("Track={0}-{1}\n", NormalizeName(raceInfo.Track), NormalizeName(raceInfo.Layout));
 
             if (playerTelem != null)
@@ -148,20 +153,40 @@ namespace SHMConnector
             }
 
             sb.Append("[Stint Data]\n");
-            ParseDriverName(playerState.DriverName, out string forename, out string surname, out string nickname);
-            sb.AppendFormat("DriverForname={0}\n", forename);
-            sb.AppendFormat("DriverSurname={0}\n", surname);
-            sb.AppendFormat("DriverNickname={0}\n", nickname);
-            sb.AppendFormat("Position={0}\n", playerState.RacePos);
-            sb.Append("LapValid=true\n");
-            sb.AppendFormat("LapLastTime={0}\n", I(playerState.BestLapTime * 1000));
-            sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
-            sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
-            sb.AppendFormat("Laps={0}\n", playerState.CurrentLap);
-            sb.AppendFormat("StintTimeRemaining={0}\n", I(raceInfo.Duration * 60));
-            sb.AppendFormat("DriverTimeRemaining={0}\n", I(raceInfo.Duration * 60));
-            sb.AppendFormat("InPit={0}\n", playerState.InPits ? "true" : "false");
-            sb.AppendFormat("InPitLane={0}\n", playerState.InPits ? "true" : "false");
+            
+            if (playerState != null)
+            {
+                ParseDriverName(playerState.DriverName, out string forename, out string surname, out string nickname);
+                sb.AppendFormat("DriverForname={0}\n", forename);
+                sb.AppendFormat("DriverSurname={0}\n", surname);
+                sb.AppendFormat("DriverNickname={0}\n", nickname);
+                sb.AppendFormat("Position={0}\n", playerState.RacePos);
+                sb.Append("LapValid=true\n");
+                sb.AppendFormat("LapLastTime={0}\n", I(playerState.BestLapTime * 1000));
+                sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
+                sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
+                sb.AppendFormat("Laps={0}\n", playerState.CurrentLap);
+                sb.AppendFormat("StintTimeRemaining={0}\n", I(raceInfo.Duration * 60));
+                sb.AppendFormat("DriverTimeRemaining={0}\n", I(raceInfo.Duration * 60));
+                sb.AppendFormat("InPit={0}\n", playerState.InPits ? "true" : "false");
+                sb.AppendFormat("InPitLane={0}\n", playerState.InPits ? "true" : "false");
+            }
+            else
+            {
+                sb.Append("DriverForname=\n");
+                sb.Append("DriverSurname=\n");
+                sb.Append("DriverNickname=\n");
+                sb.Append("Position=0\n");
+                sb.Append("LapValid=true\n");
+                sb.Append("LapLastTime=0\n");
+                sb.Append("LapBestTime=0\n");
+                sb.Append("Sector=0\n");
+                sb.Append("Laps=0\n");
+                sb.AppendFormat("StintTimeRemaining={0}\n", I(raceInfo.Duration * 60));
+                sb.AppendFormat("DriverTimeRemaining={0}\n", I(raceInfo.Duration * 60));
+                sb.Append("InPit=false\n");
+                sb.Append("InPitLane=false\n");
+            }
 
             sb.Append("[Track Data]\n");
             sb.AppendFormat("Length={0}\n", F(raceInfo.LayoutLength));
@@ -194,6 +219,8 @@ namespace SHMConnector
             }
 
             participants.Sort((a, b) => a.RacePos.CompareTo(b.RacePos));
+
+            sb.Append("Active=true\n");
 
             int playerCar = 0;
             for (int i = 0; i < participants.Count; i++)

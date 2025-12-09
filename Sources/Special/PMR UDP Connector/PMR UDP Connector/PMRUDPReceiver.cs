@@ -168,5 +168,13 @@ namespace SHMConnector
                 return raceInfo != null && raceInfo.State == UDPRaceSessionState.Active;
             }
         }
+
+        public bool HasReceivedData()
+        {
+            lock (dataLock)
+            {
+                return raceInfo != null;
+            }
+        }
     }
 }

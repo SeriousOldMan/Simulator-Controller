@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMR UDP Connector", "PMR UDP Connector\PMR UDP Connector.csproj", "{B8F2A9D3-7E4C-4D1B-9A2F-8C5D6E7F8A9B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8F2A9D3-7E4C-4D1B-9A2F-8C5D6E7F8A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8F2A9D3-7E4C-4D1B-9A2F-8C5D6E7F8A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8F2A9D3-7E4C-4D1B-9A2F-8C5D6E7F8A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8F2A9D3-7E4C-4D1B-9A2F-8C5D6E7F8A9B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {662127E4-F120-4782-8831-D5A3295255B1}
+	EndGlobalSection
+EndGlobal

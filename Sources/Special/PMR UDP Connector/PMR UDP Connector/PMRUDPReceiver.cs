@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace PMR_UDP_Connector
+namespace SHMConnector
 {
     public class PMRUDPReceiver
     {

@@ -4,14 +4,14 @@ using System.Globalization;
 using System.Text;
 using System.Threading;
 
-namespace PMR_UDP_Connector
+namespace SHMConnector
 {
-    public class PMRUDPConnector
+    public class SHMConnector
     {
         private PMRUDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
-        public PMRUDPConnector()
+        public SHMConnector()
         {
         }
 

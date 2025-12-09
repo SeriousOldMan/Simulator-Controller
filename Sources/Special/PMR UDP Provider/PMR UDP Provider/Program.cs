@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Threading;
-using PMR_UDP_Connector;
 
 namespace PMR_UDP_Provider
 {
@@ -13,7 +12,7 @@ namespace PMR_UDP_Provider
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
             
             string request = args.Length > 0 ? args[0] : "";
-            PMRUDPConnector connector = new PMRUDPConnector();
+            SHMConnector.SHMConnector connector = new SHMConnector.SHMConnector();
             
             if (!connector.Open())
             {

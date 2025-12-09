@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Threading;
 
 namespace PMR_UDP_Connector
 {
@@ -48,7 +49,9 @@ namespace PMR_UDP_Connector
             {
                 if (receiver == null)
                 {
-                    if (!Open())
+                    if (Open())
+                        Thread.Sleep(1000);
+                    else
                         return "[Session Data]\nActive=false\n";
                 }
 

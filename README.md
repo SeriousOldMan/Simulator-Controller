@@ -229,7 +229,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
     - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins are supplied out of the box:
-    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow, when they become available
+    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project Motor Racing*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow, when they become available
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
 	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
@@ -279,7 +279,8 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist, with Aiden, the AI Driving Coach and also with Elisa, the AI Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist, with Aiden, the AI Driving Coach and also Elisa, the AI Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
-| [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. pitstop automation and integration of the Race Assistants. Functionality is identical to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
+| [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. pitstop automation and integration of the Race Assistants. Functionality is comparable to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
+| [PMR](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pmr) | Full support for *Project Motor Racing* incl. integration of the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 ### Third party applications

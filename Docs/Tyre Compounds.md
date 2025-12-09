@@ -52,7 +52,7 @@ When creating the tyre compound rule as in the examples above, it is **important
 
 A very special case is *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
 
-The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compoung must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
+The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compound must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
 
 ### *Tyre Data* files
 

@@ -48,7 +48,7 @@ Each Race Assistant is running an internal rule engine. These functions can be u
 
 ### Custom *Push-to-Talk* implementation
 
-These functions can be used to implement custome *Push-to-Talk* behavior or work around a problem, when steering wheel buttons are not recognized properly. Use them as functions for controller actions.
+These functions can be used to implement custom *Push-to-Talk* behavior or work around a problem, when steering wheel buttons are not recognized properly. Use them as functions for controller actions. It is important, that the *Push-to-Talk* method is set to "Custom", otherwise calls to these functions will be ignored.
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
@@ -56,8 +56,6 @@ These functions can be used to implement custome *Push-to-Talk* behavior or work
 | startActivation | - | Voice Control | Activates the activation listen mode. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button to prepare for issuing an activation command. Only usable, if you have chosen the *Push-To-Talk* mode "Custom" in the configuration. |
 | startListen | - | Voice Control | Activates the listen mode of the currently targeted dialog partner. Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button. Only usable, if you have chosen the *Push-To-Talk* mode "Custom" in the configuration. |
 | stopListen | - | Voice Control | Stops the listen mode and tries to understand the spoken command (both activation and normal). Simuilar to using the [Push-To-Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) button. Only usable, if you have chosen the *Push-To-Talk* mode "Custom" in the configuration. |
-| enableListening | - | Voice Control | Fully enables voice recognition again after it has been disabled using *disableListening*. |
-| disableListening | - | Voice Control | Fully disables voice recognition for all currently active conversation partners. Listening will also be disabled for all conversation partners, which are started afterwards. No microphone input will be processed until the listening is enabled again using *enableListening*. |
 
 ### Custom hardware controller actions
 
@@ -109,6 +107,8 @@ These functions let you start and top coaching by the Driving Coach and let you 
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
+| enableListening | - | Voice Control | Fully enables voice recognition again after it has been disabled using *disableListening*. |
+| disableListening | - | Voice Control | Fully disables voice recognition for all currently active conversation partners. Listening will also be disabled for all conversation partners, which are started afterwards. No microphone input will be processed until the listening is enabled again using *enableListening*. |
 | enableDataCollection | type | Race Engineer, Race Strategist | This enables the transfer of data of the given *type* to the session database again, after it had been disabled previously by calling *disableDataCollection*. *type* must be one of "Pressures" for cold pressures information collected by the Race Engineer or "Laps" for strategy-related data collected by the Race Strategist.<br><br>Good to know: The data is still being collected and used for any purpose during the session, but will not be stored in the database at the end of the session. |
 | disableDataCollection | type | Race Engineer, Race Strategist | This disables the transfer of data of the given *type* to the session database at the end of the session. *type* must be one of "Pressures" for cold pressures information collected by the Race Engineer or "Laps" for strategy-related data collected by the Race Strategist. Use this in sessions, if you don't want the data to be permanently stored, because you are in a race with 2x fuel consumption for example. Please note, that calling *disableDataCollection* only affects the Race Assistants directly. Any data collected in the "Solo Center" for example can still be transfered to the session database manually.<br><br>Good to know: The data is still being collected and used for any purpose during the session, but will not be stored in the database at the end of the session. |
 | enableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Enables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |

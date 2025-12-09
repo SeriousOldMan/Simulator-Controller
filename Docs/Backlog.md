@@ -21,6 +21,7 @@
   1. Better answers by the Strategist, when a pitstop cannot be recommended
   2. Shift beeps by the Coach
   3. Configurable priority for voice output between Spotter and other Assistants
+  4. Include lap time meadian value in the lap time information given by the Strategist and others
   
 #### Session Database
   1. Active validation of value ranges in settings definitions

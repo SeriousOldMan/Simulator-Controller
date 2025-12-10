@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace SHMConnector
+namespace PMRUDPConnector
 {
     public class PMRUDPReceiver
     {
@@ -21,7 +21,7 @@ namespace SHMConnector
         private int playerVehicleId = -1;
         private readonly object dataLock = new object();
 
-        public PMRUDPReceiver(int port = 7576, string multicastGroup = "224.0.0.150", bool useMulticast = true)
+        public PMRUDPReceiver(int port = 7576, string multicastGroup = "127.0.0.1", bool useMulticast = true)
         {
             this.port = port;
             this.multicastGroup = multicastGroup;
@@ -166,6 +166,13 @@ namespace SHMConnector
             lock (dataLock)
             {
                 return raceInfo != null && raceInfo.State == UDPRaceSessionState.Active;
+            }
+        }
+        public bool HasReceivedData()
+        {
+            lock (dataLock)
+            {
+                return raceInfo != null;
             }
         }
     }

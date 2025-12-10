@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SHMConnector
+namespace PMRUDPConnector
 {
     public enum UDPPacketType : byte
     {

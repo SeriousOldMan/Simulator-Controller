@@ -33,7 +33,7 @@ class PMRProvider extends SimulatorProvider {
 		Get {
 			return {Connector: {Type: "CLR", Protocol: "UDP"
 							  , File: kBinariesDirectory . "Connectors\PMR UDP Connector.dll"
-							  , Instance: "UDPConnector.UDPConnector"}
+							  , Instance: "PMRUDPConnector.PMRUDPConnector"}
 				  , Provider: {Type: "EXE", Protocol: "UDP"
 							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe"}}
 		}

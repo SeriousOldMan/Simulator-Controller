@@ -12,7 +12,7 @@ namespace PMR_UDP_Provider
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
             
             string request = args.Length > 0 ? args[0] : "";
-            SHMConnector.SHMConnector connector = new SHMConnector.SHMConnector();
+            PMRUDPConnector.PMRUDPConnector connector = new PMRUDPConnector.PMRUDPConnector();
             
             if (!connector.Open())
             {

@@ -34,7 +34,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SHMConnector.cs" />
+    <Compile Include="PMRUDPConnector.cs" />
     <Compile Include="PMRUDPProtocol.cs" />
     <Compile Include="PMRUDPReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

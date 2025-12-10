@@ -4,14 +4,14 @@ using System.Globalization;
 using System.Text;
 using System.Threading;
 
-namespace SHMConnector
+namespace PMRUDPConnector
 {
-    public class SHMConnector
+    public class PMRUDPConnector
     {
         private PMRUDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
-        public SHMConnector()
+        public PMRUDPConnector()
         {
         }
 
@@ -49,9 +49,7 @@ namespace SHMConnector
             {
                 if (receiver == null)
                 {
-                    if (Open())
-                        Thread.Sleep(1000);
-                    else
+                    if (!Open())
                         return "[Session Data]\nActive=false\n";
                 }
 

@@ -373,10 +373,20 @@ callSimulator(simulator, options := "", protocol?) {
 
 	try {
 		if (options = "Close") {
-			if ((protocol.Type = "DLL") && connectors.Has(simulator . ".DLL"))
-				DLLCall(protocol.Library . "\close")
-			else if ((protocol.Type = "CLR") && connectors.Has(simulator . ".CLR"))
-				connectors[simulator . ".CLR"].Close()
+			if ((protocol.Type = "DLL") && connectors.Has(simulator . ".DLL")) {
+				try {
+					DLLCall(protocol.Library . "\close")
+
+					connectors.Delete(simulator . ".DLL")
+				}
+			}
+			else if ((protocol.Type = "CLR") && connectors.Has(simulator . ".CLR")) {
+				try {
+					connectors[simulator . ".CLR"].Close()
+
+					connectors.Delete(simulator . ".DLL")
+				}
+			}
 		}
 		else {
 			if (protocol.Type = "DLL") {

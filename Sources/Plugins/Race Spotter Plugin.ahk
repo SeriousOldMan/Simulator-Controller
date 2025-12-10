@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "Libraries\SimulatorProvider.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
@@ -518,7 +519,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	startupTrackAutomation() {
-		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath, pid
+		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath, protocol, pid
 
 		if (!this.iAutomationPID && this.Simulator) {
 			trackAutomation := this.Simulator.TrackAutomation
@@ -537,10 +538,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
+					protocol := SimulatorProvider.getProtocol(code, "Spotter")
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
 					if !FileExist(exePath)
 						throw "File not found..."
 
@@ -553,13 +560,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
@@ -604,7 +611,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	startupTrackMapper(trackType, trackLength := 0) {
-		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, pid, dataFile, mapperState
+		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, protocol, pid, dataFile, mapperState
 
 		static sessionDB := false
 
@@ -682,9 +689,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				simulatorCode := sessionDB.getSimulatorCode(simulator)
 				track := this.Simulator.Track
 				dataFile := temporaryFileName(simulatorCode . " Track Mapper", "data")
-				exePath := (kBinariesDirectory . "Providers\" . simulatorCode . " SHM Spotter.exe")
+
+				protocol := "SHM"
+				exePath := "..."
 
 				try {
+					protocol := SimulatorProvider.getProtocol(simulatorCode, "Spotter")
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
 					if !FileExist(exePath)
 						throw "File not found..."
 
@@ -698,13 +712,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-															   , {simulator: simulatorCode, protocol: "SHM"})
+															   , {simulator: simulatorCode, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: simulatorCode, protocol: "SHM"})
+													  , {exePath: exePath, simulator: simulatorCode, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 

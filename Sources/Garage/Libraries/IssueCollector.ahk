@@ -249,7 +249,7 @@ class IssueCollector {
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local player := requireSoundPlayer("DCAnalyzerPlayer.exe")
-		local pid, options, code, message, audioDevice, workingDirectory
+		local exePath, protocol, pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
 			this.updateSamples()
@@ -302,7 +302,18 @@ class IssueCollector {
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				Run(kBinariesDirectory . "Providers\" . code . " SHM Coach.exe " . options, kBinariesDirectory, "Hide", &pid)
+				protocol := "SHM"
+				exePath := "..."
+
+				protocol := SimulatorProvider.getProtocol(code, "Coach")
+
+				exePath := protocol.File
+				protocol := protocol.Protocol
+
+				if !FileExist(exePath)
+					throw "File not found..."
+
+				Run("`"" . exePath . "`"" . A_Space . options, kBinariesDirectory, "Hide", &pid)
 
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile
@@ -311,7 +322,7 @@ class IssueCollector {
 				logError(exception, true)
 
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
+											 , {simulator: code, protocol: protocol, exePath: exePath})
 
 				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))
 

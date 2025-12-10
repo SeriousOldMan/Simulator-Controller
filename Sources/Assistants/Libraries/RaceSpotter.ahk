@@ -20,6 +20,7 @@
 #Include "..\..\Framework\Extensions\Math.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "RaceAssistant.ahk"
 
 
@@ -3715,14 +3716,23 @@ class RaceSpotter extends GridRaceAssistant {
 
 	startupSpotter(forceShutdown := false) {
 		local pid := false
-		local code, exePath, trackData, traceFile
+		local code, exePath, protocol, trackData, traceFile
 
 		if !this.iSpotterPID {
 			code := this.SettingsDatabase.getSimulatorCode(this.Simulator)
 
-			exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+			protocol := "SHM"
+			exePath := "..."
 
-			if FileExist(exePath) {
+			try {
+				protocol := SimulatorProvider.getProtocol(code, "Spotter")
+
+				exePath := protocol.File
+				protocol := protocol.Protocol
+
+				if !FileExist(exePath)
+					throw "File not found..."
+
 				this.shutdownSpotter(forceShutdown)
 
 				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.Track)
@@ -3732,33 +3742,31 @@ class RaceSpotter extends GridRaceAssistant {
 
 				deleteFile(kTempDirectory . "Race Spotter.semaphore")
 
-				try {
-					Run("`"" . exePath . "`" " . this.TrackLength . A_Space
-											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
-											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
-											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
-											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
-											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
-											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
-											   . (trackData ? (" `"" . trackData . "`"") : "")
-					  , kBinariesDirectory, "Hide", &pid)
-				}
-				catch Any as exception {
-					logError(exception, true)
-
-					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-															   , {simulator: code, protocol: "SHM"})
-										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-										   . kBinariesDirectory . translate(")"))
-
-					if !kSilentMode
-						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
+				Run("`"" . exePath . "`" " . this.TrackLength . A_Space
+										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
+										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
+										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
+										   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
+										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
+										   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
+										   . (trackData ? (" `"" . trackData . "`"") : "")
+				  , kBinariesDirectory, "Hide", &pid)
 
 				if pid
 					this.iSpotterPID := pid
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
+														   , {simulator: code, protocol: protocol})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
+
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: protocol})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 

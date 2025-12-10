@@ -26,6 +26,7 @@
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "RaceAssistant.ahk"
 
 
@@ -1889,7 +1890,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sections, positions, sessionDB, code, data, exePath, pid
+		local sections, positions, sessionDB, code, data, exePath, protocol, pid
 		local ignore, section, x, y
 
 
@@ -1922,11 +1923,17 @@ class DrivingCoach extends GridRaceAssistant {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
-					if !FileExist(exePath)
+					protocol := SimulatorProvider.getProtocol(code, "Coach")
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
+					if !FileExist(protocol.File)
 						throw "File not found..."
 
 					if data
@@ -1938,13 +1945,13 @@ class DrivingCoach extends GridRaceAssistant {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
@@ -1996,6 +2003,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local player := requireSoundPlayer("DCTriggerPlayer.exe")
 		local options := ""
 		local sessionDB, code, data, options, telemetry, reference, workingDirectory
+		local exePath, protocol, pid
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -2006,10 +2014,16 @@ class DrivingCoach extends GridRaceAssistant {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
+					protocol := SimulatorProvider.getProtocol(code, "Coach")
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
 					if !FileExist(exePath)
 						throw "File not found..."
 
@@ -2031,13 +2045,13 @@ class DrivingCoach extends GridRaceAssistant {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 

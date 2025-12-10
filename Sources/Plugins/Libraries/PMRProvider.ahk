@@ -35,7 +35,11 @@ class PMRProvider extends SimulatorProvider {
 							  , File: kBinariesDirectory . "Connectors\PMR UDP Connector.dll"
 							  , Instance: "PMRUDPConnector.PMRUDPConnector"}
 				  , Provider: {Type: "EXE", Protocol: "UDP"
-							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe"}}
+							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe"}
+				  , Spotter: {Type: "EXE", Protocol: "UDP"
+							 , File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe"}
+				  , Coach: {Type: "EXE", Protocol: "UDP"
+						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}}
 		}
 	}
 

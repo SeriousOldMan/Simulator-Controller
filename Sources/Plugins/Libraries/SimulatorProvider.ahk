@@ -94,13 +94,52 @@ class SimulatorProvider {
 							  , File: kBinariesDirectory . "Connectors\%simulator% SHM Connector.dll"
 							  , Library: "%simulator% SHM Connector"}
 				  , Provider: {Type: "EXE", Protocol: "SHM"
-							 , File: kBinariesDirectory . "Providers\%simulator% SHM Provider.exe"}}
+							 , File: kBinariesDirectory . "Providers\%simulator% SHM Provider.exe"}
+				  , Spotter: {Type: "EXE", Protocol: "SHM"
+							 , File: kBinariesDirectory . "Providers\%simulator% SHM Spotter.exe"}
+				  , Coach: {Type: "EXE", Protocol: "SHM"
+						  , File: kBinariesDirectory . "Providers\%simulator% SHM Coach.exe"}}
 		}
 	}
 
 	__New(car, track) {
 		this.iCar := SessionDatabase.getCarCode(this.Simulator, car)
 		this.iTrack := SessionDatabase.getTrackCode(this.Simulator, track)
+	}
+
+	static getProtocols(simulator) {
+		local protocols
+
+		updateSimulator(object) {
+			local property, value
+
+			for property, value in object.OwnProps()
+				if isObject(value)
+					updateSimulator(value)
+				else if isInstance(value, String)
+					object.%property% := substituteVariables(value, {simulator: simulator})
+		}
+
+		simulator := SessionDatabase.getSimulatorCode(simulator)
+
+		try {
+			protocols := %simulator . "Provider"%.Protocols
+
+			updateSimulator(protocols)
+
+			return protocols
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			throw "Unsupported simulator detected in SimulatorProvider.getProtocols..."
+		}
+	}
+
+	static getProtocol(simulator, protocol) {
+		local protocols := this.getProtocols(simulator)
+
+		return (protocols.HasProp(protocol) ? protocols.%protocol% : false)
 	}
 
 	static createSimulatorProvider(simulator, car, track) {
@@ -299,7 +338,6 @@ class SimulatorProvider {
 callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
 	local connector, curWorkingDir, buf
-	local dllName, dllFile, library
 
 	static defaultProtocol := ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																		, kUserConfigDirectory, kConfigDirectory))
@@ -312,7 +350,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 	if !protocols.Has(simulator)
 		try {
-			protocols[simulator] := %simulator . "Provider"%.Protocols
+			protocols[simulator] := SimulatorProvider.getProtocols(simulator)
 		}
 		catch Any {
 			throw "Unsupported simulator detected in callSimulator..."
@@ -336,23 +374,21 @@ callSimulator(simulator, options := "", protocol?) {
 	try {
 		if (options = "Close") {
 			if ((protocol.Type = "DLL") && connectors.Has(simulator . ".DLL"))
-				DLLCall(substituteVariables(protocol.Library, {simulator: simulator}) . "\close")
+				DLLCall(protocol.Library . "\close")
 			else if ((protocol.Type = "CLR") && connectors.Has(simulator . ".CLR"))
 				connectors[simulator . ".CLR"].Close()
 		}
 		else {
 			if (protocol.Type = "DLL") {
 				if !connectors.Has(simulator . ".DLL") {
-					library := substituteVariables(protocol.Library, {simulator: simulator})
 					curWorkingDir := A_WorkingDir
 
 					SetWorkingDir(kBinariesDirectory . "Connectors\")
 
 					try {
-						connector := DllCall("LoadLibrary", "Str", substituteVariables(protocol.File, {simulator: simulator})
-														  , "Ptr")
+						connector := DllCall("LoadLibrary", "Str", protocol.File, "Ptr")
 
-						DLLCall(library . "\open")
+						DLLCall(protocol.Library . "\open")
 
 						connectors[simulator . ".DLL"] := connector
 					}
@@ -363,7 +399,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 				buf := Buffer(1024 * 1024)
 
-				DllCall(library . "\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
+				DllCall(protocol.Library . "\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
 
 				data := parseMultiMap(StrGet(buf, "UTF-8"))
 
@@ -374,15 +410,13 @@ callSimulator(simulator, options := "", protocol?) {
 				if connectors.Has(simulator . ".CLR")
 					connector := connectors[simulator . ".CLR"]
 				else {
-					dllFile := substituteVariables(protocol.File, {simulator: simulator})
+					if !FileExist(protocol.File)
+						throw "Unable to find `"" . protocol.File . "`" in callSimulator..."
 
-					if !FileExist(dllFile)
-						throw "Unable to find `"" . dllFile . "`" in callSimulator..."
-
-					connector := CLR_LoadLibrary(dllFile).CreateInstance(substituteVariables(protocol.Instance, {simulator: simulator}))
+					connector := CLR_LoadLibrary(protocol.File).CreateInstance(protocol.Instance)
 
 					if (!connector.Open() && !isDebug())
-						throw "Cannot startup `"" . dllFile . "`" in callSimulator..."
+						throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
 
 					connectors[simulator . ".CLR"] := connector
 				}
@@ -393,16 +427,14 @@ callSimulator(simulator, options := "", protocol?) {
 					throw ("DLL returned empty data for " . simulator . " in callSimulator...")
 			}
 			else if (protocol.Type = "EXE") {
-				exePath := substituteVariables(protocol.File, {simulator: simulator})
-
-				if !FileExist(exePath)
-					throw "File `"" . exePath . "`" not found in callSimulator..."
+				if !FileExist(protocol.File)
+					throw "File `"" . protocol.File . "`" not found in callSimulator..."
 
 				DirCreate(kTempDirectory . simulator . " Data")
 
 				dataFile := temporaryFileName(simulator . " Data\SHM", "data")
 
-				RunWait(A_ComSpec . " /c `"`"" . exePath . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
+				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 				data := readMultiMap(dataFile)
 
@@ -418,14 +450,17 @@ callSimulator(simulator, options := "", protocol?) {
 		if ((protocol = kUndefined) || (protocol.Type = "EXE")) {
 			logError(exception, true)
 
-			if (protocol = kUndefined)
+			if (protocol = kUndefined) {
 				protocol := "SHM"
-			else
+				exePath := "..."
+			}
+			else {
+				exePath := protocol.File
 				protocol := protocol.Protocol
+			}
 
 			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
-													   , {simulator: simulator
-														, protocol: protocol})
+													   , {simulator: simulator, protocol: protocol})
 								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 								   . kBinariesDirectory . translate(")"))
 

@@ -1325,10 +1325,6 @@ This plugin handles the *Le Mans Ultimate* simulation game. An application with 
 
 Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
-### Disclaimer
-
-The *Le Mans Ultimate* game is under heavy development by the studio at the time of this writing. It is marketed as early access and many things are still not working. This also affects the data API and the integration with Simulator Controller. For example, pitstop settings handling is not supported yet and there are problems with driver names and car model names. I will continiously improve on that as far as there are improvements on the side of the *Le Mans Ultimate* data API.
-
 ### Mode *Chat*
 
 The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Le Mans Ultimate" activates the chat system only there.

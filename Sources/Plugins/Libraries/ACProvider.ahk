@@ -33,9 +33,13 @@ class ACProvider extends SimulatorProvider {
 		}
 	}
 
-	static Protocol {
+	static Protocols {
 		Get {
-			return "CLR"
+			return {Connector: {Type: "CLR", Protocol: "SHM"
+							  , File: kBinariesDirectory . "Connectors\AC SHM Connector.dll"
+							  , Instance: "SHMConnector.SHMConnector"}
+				  , Provider: {Type: "EXE", Protocol: "SHM"
+							 , File: kBinariesDirectory . "Providers\AC SHM Provider.exe"}}
 		}
 	}
 

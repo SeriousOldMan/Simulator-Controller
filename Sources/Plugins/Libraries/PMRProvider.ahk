@@ -29,9 +29,13 @@ class PMRProvider extends SimulatorProvider {
 		}
 	}
 
-	static Protocol {
+	static Protocols {
 		Get {
-			return "CLR"
+			return {Connector: {Type: "CLR", Protocol: "UDP"
+							  , File: kBinariesDirectory . "Connectors\PMR UDP Connector.dll"
+							  , Instance: "UDPConnector.UDPConnector"}
+				  , Provider: {Type: "EXE", Protocol: "UDP"
+							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe"}}
 		}
 	}
 

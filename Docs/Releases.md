@@ -48,6 +48,7 @@
 #### Changes
 
   - It is now possible to specifically activate/deactivate sections on the track map, that are used by the Driving Coach for the coaching sessions. This allows you to define sections for each corner, thereby having the correct corner numbers all the time, but only have those section active, for which you want to get instructions. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  - Many additions to the tyre compound meta data for *Automobilista 2* by @inthebagbud UK.
   - [Expert] The documentation for all internal controller action functions, which can be used for scripting, defining your own voice commands, etc. have been rearranged for more clarity. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) the new documentation for all these functions.
 
 # Release history

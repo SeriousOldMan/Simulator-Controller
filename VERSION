@@ -1,9 +1,9 @@
 [Development]
-Version=6.7.1.0-dev
+Version=6.7.1.0-beta
 Target=6.7.1.0-release
-Date=12/08/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ABG9HSaF/Releases/Simulator Controller 6.7.1.0-dev.zip
-Changes=Support for enabling/disabling of track sections, Refactoring of action function documentation
+Date=12/10/2025
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/NPD8RmV_/Releases/Simulator Controller 6.7.1.0-beta.zip
+Changes=Support for enabling/disabling of track sections, Refactoring of action function documentation, Update of AMS2 tyre data
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.7.0.0-release
@@ -24,5 +24,5 @@ Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.7.1.0-dev
+Development=6.7.1.0-beta
 Release=6.7.0.0-release

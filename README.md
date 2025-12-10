@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.7.1.0-dev]() (Early build for 6.7.0. Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6710) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-671) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -129,6 +131,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 35. [Scripting Assistant behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
+
+37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
 
 This list will be extended from time to time to cover new functionalities.
 

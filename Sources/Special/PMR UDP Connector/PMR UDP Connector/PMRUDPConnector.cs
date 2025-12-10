@@ -23,7 +23,13 @@ namespace PMRUDPConnector
                     receiver.Stop();
 
                 receiver = new PMRUDPReceiver();
-                return receiver.Start();
+                
+                bool started = receiver.Start();
+
+                if (!started)
+                    receiver = null;
+
+                return started;
             }
             catch
             {

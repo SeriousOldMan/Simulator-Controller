@@ -391,6 +391,10 @@ callSimulator(simulator, options := "", protocol?) {
 						DLLCall(protocol.Library . "\open")
 
 						connectors[simulator . ".DLL"] := connector
+
+						OnExit((*) {
+							callSimulator(simulator, "Close", "Connector")
+						})
 					}
 					finally {
 						SetWorkingDir(curWorkingDir)
@@ -419,6 +423,10 @@ callSimulator(simulator, options := "", protocol?) {
 						throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
 
 					connectors[simulator . ".CLR"] := connector
+
+					OnExit((*) {
+						callSimulator(simulator, "Close", "Connector")
+					})
 				}
 
 				data := parseMultiMap(connector.Call(options))

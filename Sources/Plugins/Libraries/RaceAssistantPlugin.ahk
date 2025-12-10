@@ -1720,7 +1720,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 		else if (driver && ((driver == true) || (driver.Finish <= getMultiMapValue(data, "Position Data", "Car." . driver.Car . ".Laps")))) {
 			if isDebug()
-				logMessage(kLogDebug, "Driver finished: " . driver.Finish . "; " . getMultiMapValue(data, "Position Data", "Car." . driver.Car . ".Laps"))
+				logMessage(kLogDebug, "Driver finished: " . ((driver == true) ? true : driver.Finish) . "; "
+														  . getMultiMapValue(data, "Position Data", "Car." . driver.Car . ".Laps"))
 
 			return true
 		}

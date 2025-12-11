@@ -30,7 +30,7 @@ namespace PMRUDPConnector
 					started = false;
 					
 					for (int i = 0; i <= 3 && !started; i++)
-						if (receiver,HasReceivedData())
+						if (receiver.HasReceivedData())
 							started = true;
 						else
 							Thread.Sleep(100);

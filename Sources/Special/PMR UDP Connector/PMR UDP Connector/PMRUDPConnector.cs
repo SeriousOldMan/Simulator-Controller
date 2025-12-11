@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -30,7 +31,7 @@ namespace PMRUDPConnector
 					started = false;
 					
 					for (int i = 0; i <= 3 && !started; i++)
-						if (receiver,HasReceivedData())
+						if (receiver.HasReceivedData())
 							started = true;
 						else
 							Thread.Sleep(100);
@@ -84,10 +85,13 @@ namespace PMRUDPConnector
             var raceInfo = receiver.GetRaceInfo();
             var playerState = receiver.GetPlayerState();
             var playerTelem = receiver.GetPlayerTelemetry();
+            var participants = receiver.GetAllParticipantStates();
+
+            participants.Sort((a, b) => a.VehicleId.CompareTo(b.VehicleId));
 
             sb.Append("[Session Data]\n");
 
-            if (raceInfo == null || playerState == null)
+            if (raceInfo == null || playerState == null || playerTelem == null || participants == null)
             {
                 sb.Append("Active=false\n");
                 return sb.ToString();
@@ -95,6 +99,7 @@ namespace PMRUDPConnector
 
             sb.Append("Active=true\n");
             sb.AppendFormat("Paused={0}\n", raceInfo.State == UDPRaceSessionState.Active ? "false" : "true");
+            // GameMode ???
             
             string sessionType = raceInfo.Session.ToLower();
             if (sessionType.Contains("race"))
@@ -109,12 +114,11 @@ namespace PMRUDPConnector
             sb.AppendFormat("Car={0}\n", NormalizeName(playerState.VehicleName));
             sb.AppendFormat("Track={0}-{1}\n", NormalizeName(raceInfo.Track), NormalizeName(raceInfo.Layout));
 
-            if (playerTelem != null)
-                sb.AppendFormat("FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
+            sb.AppendFormat("FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
 
             sb.AppendFormat("SessionFormat={0}\n", raceInfo.IsLaps ? "Laps" : "Time");
-            sb.AppendFormat("SessionTimeRemaining={0}\n", I(raceInfo.Duration * 60));
-            sb.AppendFormat("SessionLapsRemaining={0}\n", 0);
+            sb.AppendFormat("SessionTimeRemaining={0}\n", I(raceInfo.Duration * 1000)); // session time abziehen
+            sb.AppendFormat("SessionLapsRemaining={0}\n", 0); // Berechnung ????
 
             sb.Append("[Car Data]\n");
             sb.Append("MAP=n/a\n");
@@ -168,12 +172,12 @@ namespace PMRUDPConnector
             sb.AppendFormat("DriverNickname={0}\n", nickname);
             sb.AppendFormat("Position={0}\n", playerState.RacePos);
             sb.Append("LapValid=true\n");
-            sb.AppendFormat("LapLastTime={0}\n", I(playerState.BestLapTime * 1000));
+            sb.AppendFormat("LapLastTime={0}\n", I(playerState.CurrentLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
             sb.AppendFormat("Laps={0}\n", playerState.CurrentLap);
-            sb.AppendFormat("StintTimeRemaining={0}\n", I(raceInfo.Duration * 60));
-            sb.AppendFormat("DriverTimeRemaining={0}\n", I(raceInfo.Duration * 60));
+            sb.AppendFormat("StintTimeRemaining={0}\n", I(raceInfo.Duration * 1000));
+            sb.AppendFormat("DriverTimeRemaining={0}\n", I(raceInfo.Duration * 1000));
             sb.AppendFormat("InPit={0}\n", playerState.InPits ? "true" : "false");
             sb.AppendFormat("InPitLane={0}\n", playerState.InPits ? "true" : "false");
 
@@ -182,11 +186,22 @@ namespace PMRUDPConnector
             sb.AppendFormat("Temperature={0}\n", F(raceInfo.TrackTemperature));
             sb.Append("Grip=Optimum\n");
 
+            for (int i = 0; i < participants.Count; i++)
+            {
+                var t = receiver.GetParticpantTelemetry(participants[i].VehicleId);
+                int carNum = i + 1;
+
+                if (t != null)
+                    sb.AppendFormat("Car.{0}.Position={1},{2}\n", carNum, t.Chassis.PosWS[0], t.Chassis.PosWS[1]); // Testen*
+                else
+                    sb.AppendFormat("Car.{0}.Position=false\n", carNum);
+            }
+
             sb.Append("[Weather Data]\n");
             sb.AppendFormat("Temperature={0}\n", F(raceInfo.AmbientTemperature));
-            sb.AppendFormat("Weather={0}\n", raceInfo.Weather);
-            sb.AppendFormat("Weather10Min={0}\n", raceInfo.Weather);
-            sb.AppendFormat("Weather30Min={0}\n", raceInfo.Weather);
+            sb.AppendFormat("Weather={0}\n", "Dry"); // raceInfo.Weather);
+            sb.AppendFormat("Weather10Min={0}\n", "Dry"); // raceInfo.Weather);
+            sb.AppendFormat("Weather30Min={0}\n", "Dry"); // raceInfo.Weather);
 
             return sb.ToString();
         }
@@ -207,9 +222,9 @@ namespace PMRUDPConnector
                 return sb.ToString();
             }
 
-            participants.Sort((a, b) => a.RacePos.CompareTo(b.RacePos));
-			
-			sb.Append("Active=true\n");
+            participants.Sort((a, b) => a.VehicleId.CompareTo(b.VehicleId));
+
+            sb.Append("Active=true\n");
 
             int playerCar = 0;
             for (int i = 0; i < participants.Count; i++)
@@ -228,21 +243,21 @@ namespace PMRUDPConnector
                 var p = participants[i];
                 int carNum = i + 1;
 
-                sb.AppendFormat("Car.{0}.Nr={1}\n", carNum, carNum);
-                sb.AppendFormat("Car.{0}.ID={1}\n", carNum, carNum);
+                sb.AppendFormat("Car.{0}.Nr={1}\n", carNum, p.VehicleId);
+                sb.AppendFormat("Car.{0}.ID={1}\n", carNum, p.VehicleId + 1);
                 sb.AppendFormat("Car.{0}.Class={1}\n", carNum, p.VehicleClass);
                 sb.AppendFormat("Car.{0}.Position={1}\n", carNum, p.RacePos);
                 sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, p.CurrentLap);
-                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));
+                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(- p.LapProgress));// Testen
                 sb.AppendFormat("Car.{0}.Lap.Running.Valid=true\n", carNum);
-                sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));
+                sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.CurrentLapTime * 1000));
 
-                if (p.BestSectorTimes.Count >= 3)
+                if (p.CurrentSectorTimes.Count >= 3) // Testen
                 {
                     sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
-                        I(p.BestSectorTimes[0] * 1000),
-                        I(p.BestSectorTimes[1] * 1000),
-                        I(p.BestSectorTimes[2] * 1000));
+                        I(p.CurrentSectorTimes[0] * 1000),
+                        I(p.CurrentSectorTimes[1] * 1000),
+                        I(p.CurrentSectorTimes[2] * 1000));
                 }
 
                 sb.AppendFormat("Car.{0}.Car={1}\n", carNum, NormalizeName(p.VehicleName));
@@ -262,9 +277,9 @@ namespace PMRUDPConnector
 
         private string NormalizeName(string name)
         {
-            return name.Replace("/", "").Replace(":", "").Replace("*", "")
-                       .Replace("?", "").Replace("<", "").Replace(">", "")
-                       .Replace("|", "");
+            return name.Replace("/", " ").Replace(":", " ").Replace("*", " ")
+                       .Replace("?", " ").Replace("<", " ").Replace(">", " ")
+                       .Replace("|", " ");
         }
 
         private void ParseDriverName(string fullName, out string forename, out string surname, out string nickname)

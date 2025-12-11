@@ -135,20 +135,30 @@ namespace PMRUDPConnector
 
         public UDPParticipantRaceState GetPlayerState()
         {
-            lock (dataLock)
-            {
-                if (playerVehicleId >= 0 && participantStates.ContainsKey(playerVehicleId))
-                    return participantStates[playerVehicleId];
-                return null;
-            }
+            return GetParticipantState(playerVehicleId);
         }
 
         public UDPVehicleTelemetry GetPlayerTelemetry()
         {
+            return GetParticpantTelemetry(playerVehicleId);
+        }
+
+        public UDPParticipantRaceState GetParticipantState(int vehicleID)
+        {
             lock (dataLock)
             {
-                if (playerVehicleId >= 0 && participantTelemetry.ContainsKey(playerVehicleId))
-                    return participantTelemetry[playerVehicleId];
+                if (vehicleID >= 0 && participantStates.ContainsKey(vehicleID))
+                    return participantStates[vehicleID];
+                return null;
+            }
+        }
+
+        public UDPVehicleTelemetry GetParticpantTelemetry(int vehicleID)
+        {
+            lock (dataLock)
+            {
+                if (vehicleID >= 0 && participantTelemetry.ContainsKey(vehicleID))
+                    return participantTelemetry[vehicleID];
                 return null;
             }
         }
@@ -158,6 +168,14 @@ namespace PMRUDPConnector
             lock (dataLock)
             {
                 return new List<UDPParticipantRaceState>(participantStates.Values);
+            }
+        }
+
+        public List<UDPVehicleTelemetry> GetAllParticipantTelemetries()
+        {
+            lock (dataLock)
+            {
+                return new List<UDPVehicleTelemetry>(participantTelemetry.Values);
             }
         }
 

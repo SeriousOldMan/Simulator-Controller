@@ -122,8 +122,8 @@ namespace PMRUDPConnector
 
             sb.Append("[Car Data]\n");
             sb.Append("MAP=n/a\n");
-            sb.Append("TC=n/a\n");
-            sb.Append("ABS=n/a\n");
+            sb.AppendFormat("TC={0}\n", (playerTelem.Setup.TCSLevel >= 0) ? I(playerTelem.Setup.TCSLevel) : "n/a");
+            sb.AppendFormat("ABS={0}\n", (playerTelem.Setup.ABSLevel >= 0) ? I(playerTelem.Setup.ABSLevel) : "n/a");
             sb.Append("BodyworkDamage=0,0,0,0,0\n");
             sb.Append("SuspensionDamage=0,0,0,0\n");
             sb.Append("EngineDamage=0\n");
@@ -202,6 +202,9 @@ namespace PMRUDPConnector
             sb.AppendFormat("Weather={0}\n", "Dry"); // raceInfo.Weather);
             sb.AppendFormat("Weather10Min={0}\n", "Dry"); // raceInfo.Weather);
             sb.AppendFormat("Weather30Min={0}\n", "Dry"); // raceInfo.Weather);
+
+            sb.Append("[Debug Data]\n");
+            sb.AppendFormat("Mode={0}\n", raceInfo.GameMode);
 
             return sb.ToString();
         }

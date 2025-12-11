@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -14,6 +15,41 @@ namespace PMRUDPConnector
 
         public PMRUDPConnector()
         {
+        }
+
+        public int GetTimeIntoSession()
+        {
+            return 0; // Actually wrong, but not available...
+        }
+
+        public int GetRemainingLaps()
+        {
+            var raceInfo = receiver.GetRaceInfo();
+
+            if (raceInfo.IsLaps)
+                return (int)(raceInfo.Duration - receiver.GetPlayerState().CurrentLap);
+            else
+                try {
+                    return (int)(GetRemainingTime() / (receiver.GetPlayerState().CurrentLapTime * 1000));
+                }
+                catch {
+                    return 1;
+                }
+        }
+
+        public long GetRemainingTime()
+        {
+            var raceInfo = receiver.GetRaceInfo();
+
+            if (raceInfo.IsLaps)
+                try {
+                    return (long)(GetRemainingLaps() * receiver.GetPlayerState().CurrentLapTime * 1000);
+                }
+                catch {
+                    return 60000;
+                }
+            else
+                return (long)(raceInfo.Duration * 1000 - GetTimeIntoSession());
         }
 
         public bool Open()
@@ -34,7 +70,7 @@ namespace PMRUDPConnector
 						if (receiver.HasReceivedData())
 							started = true;
 						else
-							Thread.Sleep(100);
+							Thread.Sleep(200);
 				}
 
                 if (!started)
@@ -117,8 +153,8 @@ namespace PMRUDPConnector
             sb.AppendFormat("FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
 
             sb.AppendFormat("SessionFormat={0}\n", raceInfo.IsLaps ? "Laps" : "Time");
-            sb.AppendFormat("SessionTimeRemaining={0}\n", I(raceInfo.Duration * 1000)); // session time abziehen
-            sb.AppendFormat("SessionLapsRemaining={0}\n", 0); // Berechnung ????
+            sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));
+            sb.AppendFormat("SessionLapsRemaining={0}\n", I(GetRemainingLaps()));
 
             sb.Append("[Car Data]\n");
             sb.Append("MAP=n/a\n");
@@ -324,6 +360,11 @@ namespace PMRUDPConnector
         private string I(float value)
         {
             return ((int)value).ToString(enUS);
+        }
+
+        private string L(float value)
+        {
+            return ((long)value).ToString(enUS);
         }
 
         private string I(int value)

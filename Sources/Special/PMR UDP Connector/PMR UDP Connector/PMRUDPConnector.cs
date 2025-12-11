@@ -106,12 +106,16 @@ namespace PMRUDPConnector
                         return "[Session Data]\nActive=false\n";
                 }
 
-                bool writeStandings = request != null && request.Contains("Standings");
+                bool writeStandings = request != null && request.ToLower().Contains("standings");
                 return writeStandings ? GenerateStandings() : GenerateTelemetry();
             }
             catch
             {
                 return "[Session Data]\nActive=false\n";
+            }
+            finally
+            {
+                Close(); // Not really good for performance, but otherwise errors on Open...
             }
         }
 
@@ -135,7 +139,6 @@ namespace PMRUDPConnector
 
             sb.Append("Active=true\n");
             sb.AppendFormat("Paused={0}\n", raceInfo.State == UDPRaceSessionState.Active ? "false" : "true");
-            // GameMode ???
             
             string sessionType = raceInfo.Session.ToLower();
             if (sessionType.Contains("race"))
@@ -228,7 +231,7 @@ namespace PMRUDPConnector
                 int carNum = i + 1;
 
                 if (t != null)
-                    sb.AppendFormat("Car.{0}.Position={1},{2}\n", carNum, t.Chassis.PosWS[0], t.Chassis.PosWS[1]); // Testen*
+                    sb.AppendFormat("Car.{0}.Position={1},{2}\n", carNum, t.Chassis.PosWS[0], t.Chassis.PosWS[2]);
                 else
                     sb.AppendFormat("Car.{0}.Position=false\n", carNum);
             }
@@ -287,11 +290,11 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.Class={1}\n", carNum, p.VehicleClass);
                 sb.AppendFormat("Car.{0}.Position={1}\n", carNum, p.RacePos);
                 sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, p.CurrentLap);
-                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(- p.LapProgress));// Testen
+                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));// Need to be tested...
                 sb.AppendFormat("Car.{0}.Lap.Running.Valid=true\n", carNum);
                 sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.CurrentLapTime * 1000));
 
-                if (p.CurrentSectorTimes.Count >= 3) // Testen
+                if (p.CurrentSectorTimes.Count >= 3) // Need to be tested...
                 {
                     sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
                         I(p.CurrentSectorTimes[0] * 1000),

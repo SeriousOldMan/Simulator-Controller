@@ -168,11 +168,12 @@ namespace PMRUDPConnector
                 return raceInfo != null && raceInfo.State == UDPRaceSessionState.Active;
             }
         }
+		
         public bool HasReceivedData()
         {
             lock (dataLock)
             {
-                return raceInfo != null;
+                return raceInfo != null && participantStates.Count > 0 && participantTelemetry.Count > 0;
             }
         }
     }

@@ -25,6 +25,16 @@ namespace PMRUDPConnector
                 receiver = new PMRUDPReceiver();
                 
                 bool started = receiver.Start();
+				
+				if (started) {
+					started = false;
+					
+					for (int i = 0; i <= 3 && !started; i++)
+						if (receiver,HasReceivedData())
+							started = true;
+						else
+							Thread.Sleep(100);
+				}
 
                 if (!started)
                     receiver = null;
@@ -198,6 +208,8 @@ namespace PMRUDPConnector
             }
 
             participants.Sort((a, b) => a.RacePos.CompareTo(b.RacePos));
+			
+			sb.Append("Active=true\n");
 
             int playerCar = 0;
             for (int i = 0; i < participants.Count; i++)

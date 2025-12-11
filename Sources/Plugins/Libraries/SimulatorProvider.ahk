@@ -339,12 +339,20 @@ callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
 	local connector, curWorkingDir, buf
 
-	static defaultProtocol := ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
-																		, kUserConfigDirectory, kConfigDirectory))
-											   , "Simulator", "Data Provider", "DLL") = "DLL") ? "Connector"
-																							   : "Provider")
+	static defaultProtocol := false
 	static protocols := CaseInsenseMap()
 	static connectors := CaseInsenseMap()
+
+	if !defaultProtocol {
+		defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																   , kUserConfigDirectory, kConfigDirectory))
+										  , "Simulator", "Data Provider", "Connector")
+
+		if ((defaultProtocol = "Connector") || (defaultProtocol = "DLL"))
+			defaultProtocol := "Connector"
+		else
+			defaultProtocol := "Provider"
+	}
 
 	simulator := SessionDatabase.getSimulatorCode(simulator)
 

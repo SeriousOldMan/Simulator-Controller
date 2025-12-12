@@ -117,7 +117,7 @@ class SimulatorProvider {
 				if isObject(value)
 					updateSimulator(value)
 				else if isInstance(value, String)
-					object.%property% := substituteVariables(value, {simulator: simulator})
+					object.%property% := substituteVariables(value, {simulator: simulator}, false)
 		}
 
 		simulator := SessionDatabase.getSimulatorCode(simulator)

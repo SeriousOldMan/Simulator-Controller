@@ -96,7 +96,7 @@ class SimulatorProvider {
 				  , Provider: {Type: "EXE", Protocol: "SHM"
 							 , File: kBinariesDirectory . "Providers\%simulator% SHM Provider.exe"}
 				  , Spotter: {Type: "EXE", Protocol: "SHM"
-							 , File: kBinariesDirectory . "Providers\%simulator% SHM Spotter.exe"}
+							, File: kBinariesDirectory . "Providers\%simulator% SHM Spotter.exe"}
 				  , Coach: {Type: "EXE", Protocol: "SHM"
 						  , File: kBinariesDirectory . "Providers\%simulator% SHM Coach.exe"}}
 		}

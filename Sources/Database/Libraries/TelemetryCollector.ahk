@@ -442,7 +442,7 @@ class TelemetryCollector {
 					else
 						arguments := ""
 					
-					Run("`"" . exePath . "` " . arguments . " -Telemetry " . this.iTrackLength
+					Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
 					  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
 				}

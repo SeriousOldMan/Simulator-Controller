@@ -19,11 +19,11 @@
 class Sector397Provider extends SimulatorProvider {
 	static Protocols {
 		Get {
-			return {Connector: {Type: "CLR", Protocol: "SHM"
-							  , File: kBinariesDirectory . "Connectors\%simulator% SHM Connector.dll"
-							  , Instance: "SHMConnector.SHMConnector"}
-				  , Provider: {Type: "EXE", Protocol: "SHM"
-							 , File: kBinariesDirectory . "Providers\%simulator% SHM Provider.exe"}}
+			local protocols := super.Protocols
+			
+			protocols.Connector.Type := "CLR"
+			
+			return protocols
 		}
 	}
 

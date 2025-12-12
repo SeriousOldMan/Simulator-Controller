@@ -1,5 +1,24 @@
 # Latest stable release
 
+## 6.7.1.0
+
+#### Date: 12/12/25
+
+#### Fixes
+
+  - None this time...
+
+#### Changes
+
+  - It is now possible to specifically activate/deactivate sections on the track map, that are used by the Driving Coach for the coaching sessions. This allows you to define sections for each corner, thereby having the correct corner numbers all the time, but only have those section active, for which you want to get instructions. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  - [Expert] The documentation for all internal controller action functions, which can be used for scripting, defining your own voice commands, etc. have been rearranged for more clarity. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) the new documentation for all these functions.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.7.0.0
 
 #### Date: 12/05/25
@@ -34,23 +53,6 @@
 	- The existing controller action function ["startTelemetryCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) has been extended to additionally support immediate start of the brake coaching mode.
 	- Many new [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" gives you fine-grained control over the interpretation of braking zones by the Driving Coach.
 	- All command reference sheets have been updated.
-
-# Upcoming release
-
-## 6.7.1.0
-
-#### Date: 12/12/25 (planned)
-
-#### Fixes
-
-  - None this time...
-
-#### Changes
-
-  - It is now possible to specifically activate/deactivate sections on the track map, that are used by the Driving Coach for the coaching sessions. This allows you to define sections for each corner, thereby having the correct corner numbers all the time, but only have those section active, for which you want to get instructions. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
-  - [Expert] The documentation for all internal controller action functions, which can be used for scripting, defining your own voice commands, etc. have been rearranged for more clarity. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) the new documentation for all these functions.
-
-# Release history
 
 ## 6.6.7.0
 

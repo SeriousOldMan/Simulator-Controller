@@ -91,14 +91,14 @@ class SimulatorProvider {
 	static Protocols {
 		Get {
 			return {Connector: {Type: "DLL", Protocol: "SHM"
-							  , File: kBinariesDirectory . "Connectors\%simulator% SHM Connector.dll"
+							  , File: kBinariesDirectory . "Connectors\%simulator% %protocol% Connector.dll"
 							  , Library: "%simulator% SHM Connector"}
 				  , Provider: {Type: "EXE", Protocol: "SHM"
-							 , File: kBinariesDirectory . "Providers\%simulator% SHM Provider.exe"}
+							 , File: kBinariesDirectory . "Providers\%simulator% %protocol% Provider.exe"}
 				  , Spotter: {Type: "EXE", Protocol: "SHM"
-							, File: kBinariesDirectory . "Providers\%simulator% SHM Spotter.exe"}
+							, File: kBinariesDirectory . "Providers\%simulator% %protocol% Spotter.exe"}
 				  , Coach: {Type: "EXE", Protocol: "SHM"
-						  , File: kBinariesDirectory . "Providers\%simulator% SHM Coach.exe"}}
+						  , File: kBinariesDirectory . "Providers\%simulator% %protocol% Coach.exe"}}
 		}
 	}
 
@@ -111,13 +111,21 @@ class SimulatorProvider {
 		local protocols
 
 		updateSimulator(object) {
-			local property, value
+			local property, value, protocol
+
+			if object.HasProp("Protocol")
+				protocol := object.Protocol
 
 			for property, value in object.OwnProps()
 				if isObject(value)
 					updateSimulator(value)
 				else if isInstance(value, String)
-					object.%property% := substituteVariables(value, {simulator: simulator}, false)
+					try
+						if isSet(protocol)
+							object.%property% := substituteVariables(value, {simulator: simulator
+																		   , protocol: protocol}, false)
+						else
+							object.%property% := substituteVariables(value, {simulator: simulator}, false)
 		}
 
 		simulator := SessionDatabase.getSimulatorCode(simulator)

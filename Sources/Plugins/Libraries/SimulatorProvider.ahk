@@ -92,7 +92,7 @@ class SimulatorProvider {
 		Get {
 			return {Connector: {Type: "DLL", Protocol: "SHM"
 							  , File: kBinariesDirectory . "Connectors\%simulator% %protocol% Connector.dll"
-							  , Library: "%simulator% SHM Connector"}
+							  , Library: "%simulator% %protocol% Connector"}
 				  , Provider: {Type: "EXE", Protocol: "SHM"
 							 , File: kBinariesDirectory . "Providers\%simulator% %protocol% Provider.exe"}
 				  , Spotter: {Type: "EXE", Protocol: "SHM"

@@ -1890,7 +1890,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sections, positions, sessionDB, code, data, exePath, protocol, pid
+		local sections, positions, sessionDB, code, data, exePath, protocol, pid, arguments
 		local ignore, section, x, y
 
 
@@ -1936,10 +1936,15 @@ class DrivingCoach extends GridRaceAssistant {
 					if !FileExist(protocol.File)
 						throw "File not found..."
 
-					if data
-						Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 					else
-						Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+						arguments := ""
+
+					if data
+						Run("`"" . exePath . "`" " . arguments . " -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" " . arguments . " -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -2003,7 +2008,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local player := requireSoundPlayer("DCTriggerPlayer.exe")
 		local options := ""
 		local sessionDB, code, data, options, telemetry, reference, workingDirectory
-		local exePath, protocol, pid
+		local exePath, protocol, pid, arguments
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -2036,10 +2041,15 @@ class DrivingCoach extends GridRaceAssistant {
 						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
 					}
 
-					if data
-						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 					else
-						Run("`"" . exePath . "`" -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						arguments := ""
+
+					if data
+						Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)

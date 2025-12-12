@@ -52,14 +52,14 @@ namespace PMRUDPConnector
                 return (long)(raceInfo.Duration * 1000 - GetTimeIntoSession());
         }
 
-        public bool Open()
+        public bool Open(string multiCastGroup = "224.0.0.150", int multiCastPort = 7576, bool useMultiCast = true)
         {
             try
             {
                 if (receiver != null)
                     receiver.Stop();
 
-                receiver = new PMRUDPReceiver();
+                receiver = new PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
                 
                 bool started = receiver.Start();
 				

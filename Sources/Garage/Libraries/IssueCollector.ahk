@@ -249,7 +249,7 @@ class IssueCollector {
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local player := requireSoundPlayer("DCAnalyzerPlayer.exe")
-		local exePath, protocol, pid, options, code, message, audioDevice, workingDirectory
+		local exePath, protocol, arguments, pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
 			this.updateSamples()
@@ -313,7 +313,12 @@ class IssueCollector {
 				if !FileExist(exePath)
 					throw "File not found..."
 
-				Run("`"" . exePath . "`"" . A_Space . options, kBinariesDirectory, "Hide", &pid)
+				if protocol.HasProp("Arguments")
+					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+				else
+					arguments := ""
+
+				Run("`"" . exePath . "`" " . arguments . A_Space . options, kBinariesDirectory, "Hide", &pid)
 
 				this.iCalibrate := calibrate
 				this.iDataFile := dataFile

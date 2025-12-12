@@ -1496,6 +1496,10 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
+*Project Motor Racing* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 224.0.0.150,7576,true (where the last argument, *multiCast*, specifies whether *MultiCast* mode is used). If you have changed the connection information in the PMR configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
+
+	udpConnection: *ip*, *port*, *multiCast*
+
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
 	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,

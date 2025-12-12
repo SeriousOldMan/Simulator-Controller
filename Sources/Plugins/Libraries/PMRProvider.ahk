@@ -17,6 +17,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class PMRProvider extends SimulatorProvider {
+	static sMultiCastGroup := false
+	static sMultiCastPort := false
+	static sMultiCast := true
+
 	static Simulator {
 		Get {
 			return "Project Motor Racing"
@@ -31,20 +35,36 @@ class PMRProvider extends SimulatorProvider {
 
 	static Protocols {
 		Get {
+			local arguments := [PMRProvider.sMultiCastGroup, PMRProvider.sMultiCastPort, PMRProvider.sMultiCast]
+
 			return {Connector: {Type: "CLR", Protocol: "UDP"
 							  , File: kBinariesDirectory . "Connectors\PMR UDP Connector.dll"
-							  , Instance: "PMRUDPConnector.PMRUDPConnector"}
+							  , Instance: "PMRUDPConnector.PMRUDPConnector", Arguments: arguments}
 				  , Provider: {Type: "EXE", Protocol: "UDP"
-							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe"}
+							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe", Arguments: arguments}
 				  , Spotter: {Type: "EXE", Protocol: "UDP"
-							 , File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe"}
+							, File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe", Arguments: arguments}
 				  , Coach: {Type: "EXE", Protocol: "UDP"
-						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}}
+						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}, Arguments: arguments}
 		}
 	}
 
 	static __New(arguments*) {
 		SimulatorProvider.registerSimulatorProvider("PMR", PMRProvider)
+	}
+
+	__New(arguments*) {
+		local configuration
+
+		if !PMRProvider.sMultiCastGroup {
+			configuration := readMultiMap(kUserConfigDirectory . "PMR Configuration.ini")
+
+			PMRProvider.sMultiCastGroup := getMultiMapValue(configuration, "UDP", "MultiCastGroup", "224.0.0.150")
+			PMRProvider.sMultiCastPort := getMultiMapValue(configuration, "UDP", "Port", 7576)
+			PMRProvider.sMultiCast := getMultiMapValue(configuration, "UDP", "MultiCast", true)
+		}
+
+		super.__New(arguments*)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

@@ -519,7 +519,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	startupTrackAutomation() {
-		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath, protocol, pid
+		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data
+		local exePath, protocol, arguments, pid
 
 		if (!this.iAutomationPID && this.Simulator) {
 			trackAutomation := this.Simulator.TrackAutomation
@@ -551,10 +552,15 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					if !FileExist(exePath)
 						throw "File not found..."
 
-					if data
-						Run("`"" . exePath . "`" -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 					else
-						Run("`"" . exePath . "`" -Automation " . positions, kBinariesDirectory, "Hide", &pid)
+						arguments := ""
+						
+					if data
+						Run("`"" . exePath . "`" " . arguments . " -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" " . arguments . " -Automation " . positions, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -611,7 +617,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 	}
 
 	startupTrackMapper(trackType, trackLength := 0) {
-		local simulator, simulatorName, simulatorCode, hasTrackMap, track, exePath, protocol, pid, dataFile, mapperState
+		local simulator, simulatorName, simulatorCode, hasTrackMap, track
+		local exePath, protocol, arguments, pid, dataFile, mapperState
 
 		static sessionDB := false
 
@@ -703,8 +710,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 						throw "File not found..."
 
 					this.iMapperPhase := "Collect"
+					
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
 
-					Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
+					Run(A_ComSpec . " /c `"`"" . exePath . "`" " . arguments . " -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
 					this.iMapperPID := pid
 				}

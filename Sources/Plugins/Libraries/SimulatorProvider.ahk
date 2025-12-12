@@ -337,7 +337,7 @@ class SimulatorProvider {
 
 callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
-	local connector, curWorkingDir, buf
+	local connector, curWorkingDir, buf, arguments
 
 	static defaultProtocol := false
 	static protocols := CaseInsenseMap()
@@ -406,7 +406,10 @@ callSimulator(simulator, options := "", protocol?) {
 					try {
 						connector := DllCall("LoadLibrary", "Str", protocol.File, "Ptr")
 
-						DLLCall(protocol.Library . "\open")
+						if protocol.HasProp("Arguments")
+							DLLCall(protocol.Library . "\open", "Str", values2String(",", protocol.Arguments*))
+						else
+							DLLCall(protocol.Library . "\open")
 
 						connectors[simulator . ".DLL"] := connector
 
@@ -437,8 +440,14 @@ callSimulator(simulator, options := "", protocol?) {
 
 					connector := CLR_LoadLibrary(protocol.File).CreateInstance(protocol.Instance)
 
-					if (!connector.Open() && !isDebug())
-						throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
+					if protocol.HasProp("Arguments") {
+						if (!connector.Open(protocol.Arguments*) && !isDebug())
+							throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
+					}
+					else {
+						if (!connector.Open() && !isDebug())
+							throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
+					}
 
 					connectors[simulator . ".CLR"] := connector
 
@@ -460,7 +469,12 @@ callSimulator(simulator, options := "", protocol?) {
 
 				dataFile := temporaryFileName(simulator . " Data\SHM", "data")
 
-				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
+				if protocol.HasProp("Arguments")
+					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+				else
+					arguments := ""
+
+				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" " . arguments . " `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 				data := readMultiMap(dataFile)
 

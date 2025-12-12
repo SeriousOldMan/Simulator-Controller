@@ -408,7 +408,7 @@ class TelemetryCollector {
 
 	startup(restart := false) {
 		local sessionDB := SessionDatabase()
-		local code, exePath, protocol, pid, trackData
+		local code, exePath, protocol, arguments, pid, trackData
 
 		if (this.Provider = "Internal") {
 			if (this.iTelemetryCollectorPID && restart)
@@ -437,7 +437,12 @@ class TelemetryCollector {
 
 					trackData := sessionDB.getTrackData(code, this.Track)
 
-					Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+					
+					Run("`"" . exePath . "` " . arguments . " -Telemetry " . this.iTrackLength
 					  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
 					  , kBinariesDirectory, "Hide", &pid)
 				}

@@ -29,7 +29,7 @@ namespace PMRUDPConnector
             var playerState = receiver.GetPlayerState();
 
             if (raceInfo.SessionIsLaps)
-                return (int)(raceInfo.Duration - (playerState.CurrentLap - 1));
+                return (int)(raceInfo.Duration - Math.Max(0, playerState.CurrentLap - 1));
             else
                 try {
                     return (int)(GetRemainingTime() / (playerState.BestLapTime * 1000));
@@ -220,7 +220,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("LapLastTime={0}\n", I(playerState.LastLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
-            sb.AppendFormat("Laps={0}\n", playerState.CurrentLap - 1);
+            sb.AppendFormat("Laps={0}\n", Math.Max(0, playerState.CurrentLap - 1));
             sb.AppendFormat("StintTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("DriverTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("InPit={0}\n", playerState.InPits ? "true" : "false");
@@ -250,7 +250,8 @@ namespace PMRUDPConnector
 
             sb.Append("[Debug Data]\n");
             sb.AppendFormat("GameMode={0}\n", raceInfo.GameMode);
-            sb.AppendFormat("Weathher={0}\n", raceInfo.Weather);
+            sb.AppendFormat("Weather={0}\n", raceInfo.Weather);
+            sb.AppendFormat("WeatherID={0}\n", raceInfo.WeatherId);
             sb.AppendFormat("AeroDamage={0}\n", playerState.AeroDamage);
 
             return sb.ToString();
@@ -297,7 +298,7 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.ID={1}\n", carNum, p.VehicleId + 1);
                 sb.AppendFormat("Car.{0}.Class={1}\n", carNum, p.VehicleClass);
                 sb.AppendFormat("Car.{0}.Position={1}\n", carNum, p.RacePos);
-                sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, p.CurrentLap - 1);
+                sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, Math.Max(0, p.CurrentLap - 1));
                 sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));
                 sb.AppendFormat("Car.{0}.Lap.Running.Valid={1}\n", carNum, p.LapValid ? "true" : "false");
                 sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));

@@ -156,7 +156,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("Car={0}\n", NormalizeName(playerState.VehicleName));
             sb.AppendFormat("Track={0}-{1}\n", NormalizeName(raceInfo.Track), NormalizeName(raceInfo.Layout));
 
-            sb.AppendFormat("	FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
+            sb.AppendFormat("FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
 
             sb.AppendFormat("SessionFormat={0}\n", raceInfo.SessionIsLaps ? "Laps" : "Time");
             sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));

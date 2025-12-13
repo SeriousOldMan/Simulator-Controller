@@ -4,6 +4,11 @@ using System.Text;
 
 namespace PMRUDPConnector
 {
+	public class UDPProtocol
+	{
+		public const int Version = 1;
+	}
+	
     public enum UDPPacketType : byte
     {
         RaceInfo = 0,
@@ -33,9 +38,9 @@ namespace PMRUDPConnector
         public float Overtime;
         public float AmbientTemperature;
         public float TrackTemperature;
-        public float SessionTimeElapsed;
+        public float SessionTimeElapsed = 0;
         public float TrackGrip = 1.0f;
-        public byte WeatherId;
+        public byte WeatherId = 0;
         public bool IsLaps;
         public bool SessionIsLaps;
         public UDPRaceSessionState State;
@@ -56,11 +61,20 @@ namespace PMRUDPConnector
             info.Overtime = BitConverter.ToSingle(data, offset); offset += 4;
             info.AmbientTemperature = BitConverter.ToSingle(data, offset); offset += 4;
             info.TrackTemperature = BitConverter.ToSingle(data, offset); offset += 4;
-            info.SessionTimeElapsed = BitConverter.ToSingle(data, offset); offset += 4;
-            info.TrackGrip = BitConverter.ToSingle(data, offset); offset += 4;
-            info.WeatherId = data[offset++];
+			
+			if (UDPProtocol.Version > 0) {
+				info.SessionTimeElapsed = BitConverter.ToSingle(data, offset); offset += 4;
+				info.TrackGrip = BitConverter.ToSingle(data, offset); offset += 4;
+				info.WeatherId = data[offset++];
+			}
+			
             info.IsLaps = data[offset++] != 0;
-            info.SessionIsLaps = data[offset++] != 0;
+            
+			if (UDPProtocol.Version > 0)
+				info.SessionIsLaps = data[offset++] != 0;
+			else
+				info.SessionIsLaps = info.IsLaps;
+			
             info.State = (UDPRaceSessionState)data[offset++];
             info.NumParticipants = data[offset++];
             return info;
@@ -103,8 +117,8 @@ namespace PMRUDPConnector
         public bool SessionFinished;
         public bool DQ;
         public uint Flags;
-        public float AeroDamage;
-        public float EngineDamage;
+        public float AeroDamage = 0;
+        public float EngineDamage = 0;
 
         public static UDPParticipantRaceState Decode(byte[] data, ref int offset)
         {
@@ -120,7 +134,13 @@ namespace PMRUDPConnector
             state.CurrentLap = BitConverter.ToInt32(data, offset); offset += 4;
             state.CurrentLapTime = BitConverter.ToSingle(data, offset); offset += 4;
             state.BestLapTime = BitConverter.ToSingle(data, offset); offset += 4;
-            state.LastLapTime = BitConverter.ToSingle(data, offset); offset += 4;
+			
+			if (UDPProtocol.Version > 0) {
+				state.LastLapTime = BitConverter.ToSingle(data, offset); offset += 4;
+			}
+			else
+				state.LastLapTime = state.BestLapTime;
+			
             state.LapProgress = BitConverter.ToSingle(data, offset); offset += 4;
             
             if (state.LapProgress < 0.0f)
@@ -144,24 +164,40 @@ namespace PMRUDPConnector
                 offset += 4;
             }
             
-            numSectors = data[offset++];
-            for (int i = 0; i < numSectors; i++)
-            {
-                state.LastSectorTimes.Add(BitConverter.ToSingle(data, offset));
-                offset += 4;
-            }
+            if (UDPProtocol.Version > 0) {
+				numSectors = data[offset++];
+				for (int i = 0; i < numSectors; i++)
+				{
+					state.LastSectorTimes.Add(BitConverter.ToSingle(data, offset));
+					offset += 4;
+				}
+			}
+			else
+				state.LastSectorTimes = state.BestSectorTimes;
             
-            state.TyreCompoundFront = ReadString(data, ref offset);
-            state.TyreCompoundRear = ReadString(data, ref offset);
+            if (UDPProtocol.Version > 0) {
+				state.TyreCompoundFront = ReadString(data, ref offset);
+				state.TyreCompoundRear = ReadString(data, ref offset);
+			}
             
             state.InPits = data[offset++] != 0;
-            state.InPitLane = data[offset++] != 0;
-            state.LapValid = data[offset++] != 0;
+            
+			if (UDPProtocol.Version > 0) {
+				state.InPitLane = data[offset++] != 0;
+				state.LapValid = data[offset++] != 0;
+			}
+			else
+				state.InPitLane = state.InPits;
+			
             state.SessionFinished = data[offset++] != 0;
             state.DQ = data[offset++] != 0;
             state.Flags = BitConverter.ToUInt32(data, offset); offset += 4;
-            state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
-            state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
+            
+			if (UDPProtocol.Version > 0) {
+				state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
+				state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
+			}
+			
             return state;
         }
 

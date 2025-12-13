@@ -192,7 +192,7 @@ namespace PMRUDPConnector
                     sb.AppendFormat("TyrePressure={0},{1},{2},{3}\n",
                         F(w[0].Pressure), F(w[1].Pressure), F(w[2].Pressure), F(w[3].Pressure));
                     
-                    sb.Append("TyreWear=0,0,0,0\n");
+                    // sb.Append("TyreWear=0,0,0,0\n");
                     
                     sb.AppendFormat("TyreCompound={0}\n", !string.IsNullOrEmpty(playerState.TyreCompoundFront) ? playerState.TyreCompoundFront : "Dry");
                     sb.AppendFormat("TyreCompoundColor={0}\n", "Black");
@@ -249,7 +249,9 @@ namespace PMRUDPConnector
             sb.AppendFormat("Weather30Min={0}\n", "Dry"); // raceInfo.Weather);
 
             sb.Append("[Debug Data]\n");
-            sb.AppendFormat("Mode={0}\n", raceInfo.GameMode);
+            sb.AppendFormat("GameMode={0}\n", raceInfo.GameMode);
+            sb.AppendFormat("Weathher={0}\n", raceInfo.Weather);
+            sb.AppendFormat("AeroDamage={0}\n", playerState.AeroDamage);
 
             return sb.ToString();
         }

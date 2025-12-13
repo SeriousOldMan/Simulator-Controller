@@ -33,7 +33,11 @@ namespace PMRUDPConnector
         public float Overtime;
         public float AmbientTemperature;
         public float TrackTemperature;
+        public float SessionTimeElapsed;
+        public float TrackGrip = 1.0f;
+        public byte WeatherId;
         public bool IsLaps;
+        public bool SessionIsLaps;
         public UDPRaceSessionState State;
         public byte NumParticipants;
 
@@ -52,7 +56,11 @@ namespace PMRUDPConnector
             info.Overtime = BitConverter.ToSingle(data, offset); offset += 4;
             info.AmbientTemperature = BitConverter.ToSingle(data, offset); offset += 4;
             info.TrackTemperature = BitConverter.ToSingle(data, offset); offset += 4;
+            info.SessionTimeElapsed = BitConverter.ToSingle(data, offset); offset += 4;
+            info.TrackGrip = BitConverter.ToSingle(data, offset); offset += 4;
+            info.WeatherId = data[offset++];
             info.IsLaps = data[offset++] != 0;
+            info.SessionIsLaps = data[offset++] != 0;
             info.State = (UDPRaceSessionState)data[offset++];
             info.NumParticipants = data[offset++];
             return info;
@@ -81,14 +89,22 @@ namespace PMRUDPConnector
         public int CurrentLap;
         public float CurrentLapTime;
         public float BestLapTime;
+        public float LastLapTime;
         public float LapProgress;
         public int CurrentSector;
         public List<float> CurrentSectorTimes = new List<float>();
         public List<float> BestSectorTimes = new List<float>();
+        public List<float> LastSectorTimes = new List<float>();
+        public string TyreCompoundFront = "";
+        public string TyreCompoundRear = "";
         public bool InPits;
+        public bool InPitLane;
+        public bool LapValid = true;
         public bool SessionFinished;
         public bool DQ;
         public uint Flags;
+        public float AeroDamage;
+        public float EngineDamage;
 
         public static UDPParticipantRaceState Decode(byte[] data, ref int offset)
         {
@@ -104,7 +120,14 @@ namespace PMRUDPConnector
             state.CurrentLap = BitConverter.ToInt32(data, offset); offset += 4;
             state.CurrentLapTime = BitConverter.ToSingle(data, offset); offset += 4;
             state.BestLapTime = BitConverter.ToSingle(data, offset); offset += 4;
+            state.LastLapTime = BitConverter.ToSingle(data, offset); offset += 4;
             state.LapProgress = BitConverter.ToSingle(data, offset); offset += 4;
+            
+            if (state.LapProgress < 0.0f)
+                state.LapProgress = 0.0f;
+            else if (state.LapProgress > 1.0f)
+                state.LapProgress = 1.0f;
+            
             state.CurrentSector = BitConverter.ToInt32(data, offset); offset += 4;
             
             byte numSectors = data[offset++];
@@ -121,10 +144,24 @@ namespace PMRUDPConnector
                 offset += 4;
             }
             
+            numSectors = data[offset++];
+            for (int i = 0; i < numSectors; i++)
+            {
+                state.LastSectorTimes.Add(BitConverter.ToSingle(data, offset));
+                offset += 4;
+            }
+            
+            state.TyreCompoundFront = ReadString(data, ref offset);
+            state.TyreCompoundRear = ReadString(data, ref offset);
+            
             state.InPits = data[offset++] != 0;
+            state.InPitLane = data[offset++] != 0;
+            state.LapValid = data[offset++] != 0;
             state.SessionFinished = data[offset++] != 0;
             state.DQ = data[offset++] != 0;
             state.Flags = BitConverter.ToUInt32(data, offset); offset += 4;
+            state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
+            state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
             return state;
         }
 

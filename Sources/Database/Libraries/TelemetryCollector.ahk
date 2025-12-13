@@ -427,24 +427,26 @@ class TelemetryCollector {
 				try {
 					protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
-					exePath := protocol.File
-					protocol := protocol.Protocol
+					if protocol {
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					if !FileExist(exePath)
-						throw "File not found..."
+						if !FileExist(exePath)
+							throw "File not found..."
 
-					DirCreate(this.TelemetryDirectory)
+						DirCreate(this.TelemetryDirectory)
 
-					trackData := sessionDB.getTrackData(code, this.Track)
+						trackData := sessionDB.getTrackData(code, this.Track)
 
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
-					
-					Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
-					  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
-					  , kBinariesDirectory, "Hide", &pid)
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+						
+						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
+						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
+						  , kBinariesDirectory, "Hide", &pid)
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)

@@ -42,10 +42,13 @@ class PMRProvider extends SimulatorProvider {
 							  , Instance: "PMRUDPConnector.PMRUDPConnector", Arguments: arguments}
 				  , Provider: {Type: "EXE", Protocol: "UDP"
 							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe", Arguments: arguments}
+				   }
+			/*
 				  , Spotter: {Type: "EXE", Protocol: "UDP"
 							, File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe", Arguments: arguments}
 				  , Coach: {Type: "EXE", Protocol: "UDP"
 						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}, Arguments: arguments}
+			*/
 		}
 	}
 

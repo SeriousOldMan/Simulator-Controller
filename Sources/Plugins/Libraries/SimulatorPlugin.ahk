@@ -1047,8 +1047,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local hasProvider := false
 		
 		try
-			hasProvider := (FileExist(SimulatorProvider.getProtocol(this.Code, "Provider").File)
-						 || FileExist(SimulatorProvider.getProtocol(this.Code, "Connector").File))
+			hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Provider").File)
+			
+		if !hasProvider
+			try
+				hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Connector").File)
 		
 		if (isSet(kRaceSpotterPlugin) && (assistantPlugin = kRaceSpotterPlugin))
 			try

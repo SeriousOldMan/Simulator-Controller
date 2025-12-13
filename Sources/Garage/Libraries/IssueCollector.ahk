@@ -304,24 +304,27 @@ class IssueCollector {
 
 				protocol := "SHM"
 				exePath := "..."
+				pid := false
 
 				protocol := SimulatorProvider.getProtocol(code, "Coach")
 
-				exePath := protocol.File
-				protocol := protocol.Protocol
+				if protocol {
+					exePath := protocol.File
+					protocol := protocol.Protocol
 
-				if !FileExist(exePath)
-					throw "File not found..."
+					if !FileExist(exePath)
+						throw "File not found..."
 
-				if protocol.HasProp("Arguments")
-					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-				else
-					arguments := ""
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
 
-				Run("`"" . exePath . "`" " . arguments . A_Space . options, kBinariesDirectory, "Hide", &pid)
+					Run("`"" . exePath . "`" " . arguments . A_Space . options, kBinariesDirectory, "Hide", &pid)
 
-				this.iCalibrate := calibrate
-				this.iDataFile := dataFile
+					this.iCalibrate := calibrate
+					this.iDataFile := dataFile
+				}
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -345,12 +348,12 @@ class IssueCollector {
 
 					OnExit(this.iExitCallback)
 				}
-			}
 
-			if (!calibrate && this.iSampleFrequency) {
-				this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
+				if (!calibrate && this.iSampleFrequency) {
+					this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
 
-				this.iSampleTask.start()
+					this.iSampleTask.start()
+				}
 			}
 		}
 	}

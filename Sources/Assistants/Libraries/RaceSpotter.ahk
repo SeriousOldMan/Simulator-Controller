@@ -3727,38 +3727,45 @@ class RaceSpotter extends GridRaceAssistant {
 			try {
 				protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
-				exePath := protocol.File
-				protocol := protocol.Protocol
+				if protocol {
+					exePath := protocol.File
+					protocol := protocol.Protocol
 
-				if !FileExist(exePath)
-					throw "File not found..."
+					if !FileExist(exePath)
+						throw "File not found..."
 
-				this.shutdownSpotter(forceShutdown)
+					this.shutdownSpotter(forceShutdown)
 
-				trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.Track)
+					trackData := this.SettingsDatabase.getTrackData(this.Simulator, this.Track)
 
-				if isDebug()
-					deleteFile(kTempDirectory . "Race Spotter.trace")
+					if isDebug()
+						deleteFile(kTempDirectory . "Race Spotter.trace")
 
-				deleteFile(kTempDirectory . "Race Spotter.semaphore")
+					deleteFile(kTempDirectory . "Race Spotter.semaphore")
 
-				if protocol.HasProp("Arguments")
-					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+
+					Run("`"" . exePath . "`" " . arguments . A_Space . this.TrackLength . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
+											   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
+											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
+											   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
+											   . (trackData ? (" `"" . trackData . "`"") : "")
+					  , kBinariesDirectory, "Hide", &pid)
+				}
 				else
-					arguments := ""
+					pid := false
 
-				Run("`"" . exePath . "`" " . arguments . A_Space . this.TrackLength . A_Space
-										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
-										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Behind.Threshold", 500) . A_Space
-										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "SlowCar.Distance.Ahead.Threshold", 500) . A_Space
-										   . ("`"" . kTempDirectory . "Race Spotter.semaphore`"") . A_Space
-										   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Activation.Speed", 60) . A_Space
-										   . (isDebug() ? ("`"" . kTempDirectory . "Race Spotter.trace`"") : "-")
-										   . (trackData ? (" `"" . trackData . "`"") : "")
-				  , kBinariesDirectory, "Hide", &pid)
-
-				if pid
+				if pid {
 					this.iSpotterPID := pid
+					
+					return true
+				}
 			}
 			catch Any as exception {
 				logError(exception, true)

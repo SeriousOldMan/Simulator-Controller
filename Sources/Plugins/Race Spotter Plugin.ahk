@@ -546,21 +546,23 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 				try {
 					protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
-					exePath := protocol.File
-					protocol := protocol.Protocol
+					if protocol {
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					if !FileExist(exePath)
-						throw "File not found..."
+						if !FileExist(exePath)
+							throw "File not found..."
 
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
-						
-					if data
-						Run("`"" . exePath . "`" " . arguments . " -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
-					else
-						Run("`"" . exePath . "`" " . arguments . " -Automation " . positions, kBinariesDirectory, "Hide", &pid)
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+							
+						if data
+							Run("`"" . exePath . "`" " . arguments . " -Automation `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+						else
+							Run("`"" . exePath . "`" " . arguments . " -Automation " . positions, kBinariesDirectory, "Hide", &pid)
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -576,10 +578,15 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
-				if pid
+				if pid {
 					this.iAutomationPID := pid
+					
+					return true
+				}
 			}
 		}
+		
+		return false
 	}
 
 	shutdownTrackAutomation(force := false, arguments*) {
@@ -699,24 +706,27 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 				protocol := "SHM"
 				exePath := "..."
+				pid := false
 
 				try {
 					protocol := SimulatorProvider.getProtocol(simulatorCode, "Spotter")
 
-					exePath := protocol.File
-					protocol := protocol.Protocol
+					if protocol {
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					if !FileExist(exePath)
-						throw "File not found..."
+						if !FileExist(exePath)
+							throw "File not found..."
 
-					this.iMapperPhase := "Collect"
-					
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
+						this.iMapperPhase := "Collect"
+						
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
 
-					Run(A_ComSpec . " /c `"`"" . exePath . "`" " . arguments . " -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
+						Run(A_ComSpec . " /c `"`"" . exePath . "`" " . arguments . " -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
+					}
 
 					this.iMapperPID := pid
 				}
@@ -738,9 +748,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					mapperState := newMultiMap()
 
 					Task.startTask(createTrackMap, 0, kLowPriority)
+					
+					return true
 				}
 			}
 		}
+		
+		return false
 	}
 
 	shutdownTrackMapper(force := false, arguments*) {

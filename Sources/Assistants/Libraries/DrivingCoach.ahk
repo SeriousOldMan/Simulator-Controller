@@ -1893,7 +1893,6 @@ class DrivingCoach extends GridRaceAssistant {
 		local sections, positions, sessionDB, code, data, exePath, protocol, pid, arguments
 		local ignore, section, x, y
 
-
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
 
@@ -1930,21 +1929,23 @@ class DrivingCoach extends GridRaceAssistant {
 				try {
 					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
-					exePath := protocol.File
-					protocol := protocol.Protocol
+					if protocol {
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					if !FileExist(protocol.File)
-						throw "File not found..."
+						if !FileExist(protocol.File)
+							throw "File not found..."
 
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
 
-					if data
-						Run("`"" . exePath . "`" " . arguments . " -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
-					else
-						Run("`"" . exePath . "`" " . arguments . " -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+						if data
+							Run("`"" . exePath . "`" " . arguments . " -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+						else
+							Run("`"" . exePath . "`" " . arguments . " -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -2026,30 +2027,32 @@ class DrivingCoach extends GridRaceAssistant {
 				try {
 					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
-					exePath := protocol.File
-					protocol := protocol.Protocol
+					if protocol {
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					if !FileExist(exePath)
-						throw "File not found..."
+						if !FileExist(exePath)
+							throw "File not found..."
 
-					if this.AudioSettings {
-						if kSox
-							SplitPath(kSox, , &workingDirectory)
+						if this.AudioSettings {
+							if kSox
+								SplitPath(kSox, , &workingDirectory)
+							else
+								workingDirectory := A_WorkingDir
+
+							options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+						}
+
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 						else
-							workingDirectory := A_WorkingDir
+							arguments := ""
 
-						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+						if data
+							Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						else
+							Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 					}
-
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
-
-					if data
-						Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
-					else
-						Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)

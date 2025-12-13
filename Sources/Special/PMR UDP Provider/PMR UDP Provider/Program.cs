@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 
-namespace PMR_UDP_Provider
+namespace PMRUDPProvider
 {
     class Program
     {

@@ -80,7 +80,7 @@ class PMRProvider extends SimulatorProvider {
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
-		mixedCompounds := false
+		mixedCompounds := "Axle"
 		tyreSets := false
 
 		return true
@@ -88,5 +88,66 @@ class PMRProvider extends SimulatorProvider {
 
 	supportsTrackMap() {
 		return true
+	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
+		local data := super.readSessionData(options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, section, postFix
+
+		static tyres := ["Front", "Rear"]
+
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
+
+		for ignore, section in ["Car Data", "Setup Data"] {
+			tyreCompound := getMultiMapValue(data, section, "TyreCompound", kUndefined)
+
+			if (tyreCompound = kUndefined) {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
+
+				if (tyreCompound != kUndefined) {
+					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+					if tyreCompound {
+						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+						setMultiMapValue(data, section, "TyreCompound", tyreCompound)
+						setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
+					}
+				}
+			}
+
+			for ignore, postfix in tyres {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if (tyreCompound != kUndefined)
+						if tyreCompound {
+							tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+							if tyreCompound {
+								splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+								setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+								setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+							}
+						}
+						else {
+							setMultiMapValue(data, section, "TyreCompound" . postFix, false)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, false)
+						}
+				}
+			}
+		}
+
+		return data
 	}
 }

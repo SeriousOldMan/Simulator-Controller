@@ -194,8 +194,11 @@ namespace PMRUDPConnector
                     
                     // sb.Append("TyreWear=0,0,0,0\n");
                     
-                    sb.AppendFormat("TyreCompound={0}\n", !string.IsNullOrEmpty(playerState.TyreCompoundFront) ? playerState.TyreCompoundFront : "Dry");
-                    sb.AppendFormat("TyreCompoundColor={0}\n", "Black");
+                    string tyreCompoundFront = !string.IsNullOrEmpty(playerState.TyreCompoundFront) ? playerState.TyreCompoundFront : "Dry";
+					
+					sb.AppendFormat("TyreCompoundRaw={0}\n", tyreCompoundFront);
+					sb.AppendFormat("TyreCompoundRawFront={0}\n", tyreCompoundFront);
+					sb.AppendFormat("TyreCompoundRawRear={0}\n", !string.IsNullOrEmpty(playerState.TyreCompoundRear) ? playerState.TyreCompoundRear : "Dry");
                     
                     sb.AppendFormat("BrakeTemperature={0},{1},{2},{3}\n",
                         F(w[0].BrakeTemp), F(w[1].BrakeTemp), F(w[2].BrakeTemp), F(w[3].BrakeTemp));

@@ -358,7 +358,7 @@ bool checkPositions() {
 		carBehindLeft = false;
 		carBehindRight = false;
 
-		for (int id = 0; id < gf->activeCars; id++) {
+		for (int id = 0; id < min(gf->activeCars, 60); id++) {
 			if (id != carID) {
 				float otherSpeed = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
 												lastCoordinates[id][2] - gf->carCoordinates[id][2]);

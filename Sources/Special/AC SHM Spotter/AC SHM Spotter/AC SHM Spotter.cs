@@ -514,7 +514,7 @@ namespace ACSHMSpotter {
 				carBehindLeft = false;
 				carBehindRight = false;
 
-				for (int id = 0; id < cars.numVehicles; id++)
+				for (int id = 0; id < Math.Min(cars.numVehicles, lastCoordinates.Length); id++)
 				{
 					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{

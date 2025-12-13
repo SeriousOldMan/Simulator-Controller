@@ -419,7 +419,7 @@ namespace RF2SHMSpotter {
 					if (speed == 0)
 						skip = true;
 					else
-						for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+						for (int i = 0; i < Math.Min(scoring.mScoringInfo.mNumVehicles, lastCoordinates.Length); ++i)
 						{
 							var vehicle = scoring.mVehicles[i];
 

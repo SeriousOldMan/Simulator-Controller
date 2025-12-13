@@ -80,7 +80,7 @@ class PMRProvider extends SimulatorProvider {
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
-		mixedCompounds := "Axle"
+		mixedCompounds := false
 		tyreSets := false
 
 		return true

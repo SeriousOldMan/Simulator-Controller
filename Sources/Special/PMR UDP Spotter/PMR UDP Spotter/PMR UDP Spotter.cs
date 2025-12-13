@@ -871,23 +871,23 @@ namespace PMRUDPSpotter {
             return false;
         }
 
-		/*
-        float lastTopSpeed = 0;
+		float lastTopSpeed = 0;
         int lastLaps = 0;
 
-        void updateTopSpeed(ref rF2VehicleScoring playerScoring)
+        void updateTopSpeed(ref UDPParticipantRaceState playerVehicle)
         {
-            float speed = (float)vehicleSpeed(ref playerScoring);
+            UDPVehicleTelemetry telemetry = receiver.GetPlayerTelemetry();
+            float speed = (float)vehicleSpeed(ref telemetry);
 
             if (speed > lastTopSpeed)
                 lastTopSpeed = speed;
 
-            if (playerScoring.mTotalLaps > lastLaps)
+            if (Math.Max(0, playerVehicle.CurrentLap - 1) > lastLaps)
             {
                 SendSpotterMessage("speedUpdate:" + lastTopSpeed);
 
                 lastTopSpeed = 0;
-                lastLaps = playerScoring.mTotalLaps;
+                lastLaps = Math.Max(0, playerVehicle.CurrentLap - 1);
             }
         }
 
@@ -897,7 +897,8 @@ namespace PMRUDPSpotter {
 		bool mapStarted = false;
 		int mapLap = -1;
 
-		bool writeCoordinates(ref rF2VehicleScoring playerScoring)
+        /*
+        bool writeCoordinates(ref rF2VehicleScoring playerScoring)
 		{
 			double lVelocityX = playerScoring.mLocalVel.x;
 			double lVelocityY = playerScoring.mLocalVel.y;
@@ -951,6 +952,7 @@ namespace PMRUDPSpotter {
 
 			return true;
 		}
+		*/
 
 		float[] xCoordinates = new float[60];
 		float[] yCoordinates = new float[60];
@@ -958,6 +960,7 @@ namespace PMRUDPSpotter {
 		long lastUpdate = 0;
 		string triggerType = "Automation";
 
+		/*
 		void checkCoordinates(ref rF2VehicleScoring playerScoring)
 		{
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
@@ -1002,6 +1005,7 @@ namespace PMRUDPSpotter {
 				}
 			}
         }
+		*/
 
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
@@ -1009,6 +1013,7 @@ namespace PMRUDPSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
+		/*
         void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
         {
             int playerID = playerScoring.mID;
@@ -1115,12 +1120,11 @@ namespace PMRUDPSpotter {
         }
 		*/
 
-        public void initializeTrigger(string type, string[] args, int startIndex)
+        public void initializeTrigger(string type, string[] args, int index)
         {
-			/*
 			triggerType = type;
 
-			for (int i = 1; i < (args.Length - 1); i += 2)
+			for (int i = index; i < (args.Length - 1); i += 2)
 			{
 				xCoordinates[numCoordinates] = float.Parse(args[i]);
 				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
@@ -1128,46 +1132,40 @@ namespace PMRUDPSpotter {
                 if (++numCoordinates > 59)
                     break;
             }
-			*/
         }
 
-        public void initializeSpotter(string[] args, int startIndex)
+        public void initializeSpotter(string[] args, int index)
         {
-			/*
-			if (args.Length > 0)
+			if (args.Length > index)
 			{
-				string trackLength = args[0];
+				string trackLength = args[index++];
 			}
 
-            if (args.Length > 1)
-                aheadAccidentDistance = int.Parse(args[1]);
+            if (args.Length > index)
+                aheadAccidentDistance = int.Parse(args[index++]);
 
-            if (args.Length > 2)
-                behindAccidentDistance = int.Parse(args[2]);
+            if (args.Length > index)
+                behindAccidentDistance = int.Parse(args[index++]);
 
-            if (args.Length > 3)
-                slowCarDistance = int.Parse(args[3]);
+            if (args.Length > index)
+                slowCarDistance = int.Parse(args[index++]);
 
-            if (args.Length > 4)
-                semFileName = args[4];
+            if (args.Length > index)
+                semFileName = args[index++];
 
-            if (args.Length > 5)
-                thresholdSpeed = int.Parse(args[5]);
-			*/
+            if (args.Length > index)
+                thresholdSpeed = int.Parse(args[index++]);
         }
 
         bool started = false;
 
         public bool active() {
-			/*
 			if (started)
 				return true;
-			else if ((scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
-						&& (scoring.mScoringInfo.mGamePhase != (byte)rF2GamePhase.GreenFlag) && (GetPlayerScoring(ref scoring).mTotalLaps == 0))
+			else if (receiver.GetRaceInfo().State != UDPRaceSessionState.Active)
 				return false;
 			
 			started = true;
-			*/
 
 			return true;
 		}

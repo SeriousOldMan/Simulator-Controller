@@ -47,7 +47,7 @@ namespace PMRUDPSpotter {
                 spotter.Run(false, false, args[5]);
             else
             {
-                spotter.initializeSpotter(args, 4);
+                spotter.initializeSpotter(args, 3);
 
                 spotter.Run(false, false);
             }

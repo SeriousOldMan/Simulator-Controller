@@ -325,6 +325,7 @@ class LLMConnector {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := {model: this.Model, temperature: this.Temperature}
 			local toolCall := false
+			local answer
 
 			if this.MaxTokens
 				body.max_tokens := this.MaxTokens
@@ -428,8 +429,7 @@ class LLMConnector {
 					}
 				}
 				else {
-					if isDebug()
-						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in HTTPConnector.Ask...")
+					throw ("LLM API call returned " . answer.Status . " in HTTPConnector.Ask...")
 
 					this.Manager.connectorState("Error", "Connection", answer.Status)
 

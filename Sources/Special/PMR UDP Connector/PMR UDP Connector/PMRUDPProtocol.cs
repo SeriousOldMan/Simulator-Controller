@@ -62,7 +62,7 @@ namespace PMRUDPConnector
             info.AmbientTemperature = BitConverter.ToSingle(data, offset); offset += 4;
             info.TrackTemperature = BitConverter.ToSingle(data, offset); offset += 4;
 			
-			if (UDPProtocol.Version > 0) {
+			if (UDPProtocol.Version > 1) {
 				info.SessionTimeElapsed = BitConverter.ToSingle(data, offset); offset += 4;
 				info.TrackGrip = BitConverter.ToSingle(data, offset); offset += 4;
 				info.WeatherId = data[offset++];
@@ -70,7 +70,7 @@ namespace PMRUDPConnector
 			
             info.IsLaps = data[offset++] != 0;
             
-			if (UDPProtocol.Version > 0)
+			if (UDPProtocol.Version > 1)
 				info.SessionIsLaps = data[offset++] != 0;
 			else
 				info.SessionIsLaps = info.IsLaps;
@@ -135,7 +135,7 @@ namespace PMRUDPConnector
             state.CurrentLapTime = BitConverter.ToSingle(data, offset); offset += 4;
             state.BestLapTime = BitConverter.ToSingle(data, offset); offset += 4;
 			
-			if (UDPProtocol.Version > 0) {
+			if (UDPProtocol.Version > 1) {
 				state.LastLapTime = BitConverter.ToSingle(data, offset); offset += 4;
 			}
 			else
@@ -164,7 +164,7 @@ namespace PMRUDPConnector
                 offset += 4;
             }
             
-            if (UDPProtocol.Version > 0) {
+            if (UDPProtocol.Version > 1) {
 				numSectors = data[offset++];
 				for (int i = 0; i < numSectors; i++)
 				{
@@ -175,14 +175,14 @@ namespace PMRUDPConnector
 			else
 				state.LastSectorTimes = state.BestSectorTimes;
             
-            if (UDPProtocol.Version > 0) {
+            if (UDPProtocol.Version > 1) {
 				state.TyreCompoundFront = ReadString(data, ref offset);
 				state.TyreCompoundRear = ReadString(data, ref offset);
 			}
             
             state.InPits = data[offset++] != 0;
             
-			if (UDPProtocol.Version > 0) {
+			if (UDPProtocol.Version > 1) {
 				state.InPitLane = data[offset++] != 0;
 				state.LapValid = data[offset++] != 0;
 			}
@@ -193,7 +193,7 @@ namespace PMRUDPConnector
             state.DQ = data[offset++] != 0;
             state.Flags = BitConverter.ToUInt32(data, offset); offset += 4;
             
-			if (UDPProtocol.Version > 0) {
+			if (UDPProtocol.Version > 1) {
 				state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
 				state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
 			}

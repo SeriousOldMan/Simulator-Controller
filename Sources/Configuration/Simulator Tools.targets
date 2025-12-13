@@ -64,6 +64,7 @@ Data Provider.38=%kBinariesDirectory%Providers\LMU SHM Coach.exe <- %kSourcesDir
 Data Provider.39=%kBinariesDirectory%Connectors\PMR UDP Connector.dll <- %kSourcesDirectory%Special\PMR UDP Connector\Release\PMR UDP Connector.dll
 Data Provider.40=%kBinariesDirectory%Providers\PMR UDP Connector.dll <- %kSourcesDirectory%Special\PMR UDP Provider\Release\PMR UDP Connector.dll
 Data Provider.41=%kBinariesDirectory%Providers\PMR UDP Provider.exe <- %kSourcesDirectory%Special\PMR UDP Provider\Release\PMR UDP Provider.exe
+Data Provider.42=%kBinariesDirectory%Providers\PMR UDP Spotter.exe <- %kSourcesDirectory%Special\PMR UDP Spotter\Release\PMR UDP Spotter.exe
 Speech Interface.1=%kBinariesDirectory%Microsoft\Microsoft.Speech.Recognizer.dll <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Speech Recognizer.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft\Microsoft.Speech.dll <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Microsoft.Speech.dll
 Speech Interface.3=%kBinariesDirectory%Microsoft\ <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Microsoft.*

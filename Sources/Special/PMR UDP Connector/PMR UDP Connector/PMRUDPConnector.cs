@@ -19,18 +19,20 @@ namespace PMRUDPConnector
 
         public int GetTimeIntoSession()
         {
-            return 0; // Actually wrong, but not available...
+            var raceInfo = receiver?.GetRaceInfo();
+            return raceInfo != null ? (int)(raceInfo.SessionTimeElapsed * 1000) : 0;
         }
 
         public int GetRemainingLaps()
         {
             var raceInfo = receiver.GetRaceInfo();
+            var playerState = receiver.GetPlayerState();
 
-            if (raceInfo.IsLaps)
-                return (int)(raceInfo.Duration - (receiver.GetPlayerState().CurrentLap - 1));
+            if (raceInfo.SessionIsLaps)
+                return (int)(raceInfo.Duration - (playerState.CurrentLap - 1));
             else
                 try {
-                    return (int)(GetRemainingTime() / (receiver.GetPlayerState().BestLapTime * 1000));
+                    return (int)(GetRemainingTime() / (playerState.BestLapTime * 1000));
                 }
                 catch {
                     return 1;
@@ -40,10 +42,11 @@ namespace PMRUDPConnector
         public long GetRemainingTime()
         {
             var raceInfo = receiver.GetRaceInfo();
+            var playerState = receiver.GetPlayerState();
 
-            if (raceInfo.IsLaps)
+            if (raceInfo.SessionIsLaps)
                 try {
-                    return (long)(GetRemainingLaps() * receiver.GetPlayerState().BestLapTime * 1000);
+                    return (long)(GetRemainingLaps() * playerState.BestLapTime * 1000);
                 }
                 catch {
                     return 60000;
@@ -153,9 +156,9 @@ namespace PMRUDPConnector
             sb.AppendFormat("Car={0}\n", NormalizeName(playerState.VehicleName));
             sb.AppendFormat("Track={0}-{1}\n", NormalizeName(raceInfo.Track), NormalizeName(raceInfo.Layout));
 
-            sb.AppendFormat("FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
+            sb.AppendFormat("	FuelAmount={0}\n", F(playerTelem.Constant.FuelCapacity));
 
-            sb.AppendFormat("SessionFormat={0}\n", raceInfo.IsLaps ? "Laps" : "Time");
+            sb.AppendFormat("SessionFormat={0}\n", raceInfo.SessionIsLaps ? "Laps" : "Time");
             sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("SessionLapsRemaining={0}\n", I(GetRemainingLaps()));
 
@@ -165,7 +168,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("ABS={0}\n", (playerTelem.Setup.ABSLevel >= 0) ? I(playerTelem.Setup.ABSLevel) : "n/a");
             sb.Append("BodyworkDamage=0,0,0,0,0\n");
             sb.Append("SuspensionDamage=0,0,0,0\n");
-            sb.Append("EngineDamage=0\n");
+            sb.AppendFormat("EngineDamage={0}\n", F(playerState.EngineDamage * 100));
 
             if (playerTelem != null)
             {
@@ -191,6 +194,9 @@ namespace PMRUDPConnector
                     
                     sb.Append("TyreWear=0,0,0,0\n");
                     
+                    sb.AppendFormat("TyreCompound={0}\n", !string.IsNullOrEmpty(playerState.TyreCompoundFront) ? playerState.TyreCompoundFront : "Dry");
+                    sb.AppendFormat("TyreCompoundColor={0}\n", "Black");
+                    
                     sb.AppendFormat("BrakeTemperature={0},{1},{2},{3}\n",
                         F(w[0].BrakeTemp), F(w[1].BrakeTemp), F(w[2].BrakeTemp), F(w[3].BrakeTemp));
                 }
@@ -210,20 +216,20 @@ namespace PMRUDPConnector
             sb.AppendFormat("DriverSurname={0}\n", surname);
             sb.AppendFormat("DriverNickname={0}\n", nickname);
             sb.AppendFormat("Position={0}\n", playerState.RacePos);
-            sb.Append("LapValid=true\n");
-            sb.AppendFormat("LapLastTime={0}\n", I(playerState.BestLapTime * 1000));
+            sb.AppendFormat("LapValid={0}\n", playerState.LapValid ? "true" : "false");
+            sb.AppendFormat("LapLastTime={0}\n", I(playerState.LastLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
             sb.AppendFormat("Laps={0}\n", playerState.CurrentLap - 1);
             sb.AppendFormat("StintTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("DriverTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("InPit={0}\n", playerState.InPits ? "true" : "false");
-            sb.AppendFormat("InPitLane={0}\n", playerState.InPits ? "true" : "false");
+            sb.AppendFormat("InPitLane={0}\n", playerState.InPitLane ? "true" : "false");
 
             sb.Append("[Track Data]\n");
             sb.AppendFormat("Length={0}\n", F(raceInfo.LayoutLength));
             sb.AppendFormat("Temperature={0}\n", F(raceInfo.TrackTemperature));
-            sb.Append("Grip=Optimum\n");
+            sb.AppendFormat("Grip={0}\n", raceInfo.TrackGrip >= 0.9f ? "Optimum" : raceInfo.TrackGrip >= 0.7f ? "Green" : "Greasy");
 
             for (int i = 0; i < participants.Count; i++)
             {
@@ -290,16 +296,16 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.Class={1}\n", carNum, p.VehicleClass);
                 sb.AppendFormat("Car.{0}.Position={1}\n", carNum, p.RacePos);
                 sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, p.CurrentLap - 1);
-                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));// Need to be tested...
-                sb.AppendFormat("Car.{0}.Lap.Running.Valid=true\n", carNum);
+                sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));
+                sb.AppendFormat("Car.{0}.Lap.Running.Valid={1}\n", carNum, p.LapValid ? "true" : "false");
                 sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));
 
-                if (p.CurrentSectorTimes.Count >= 3) // Need to be tested...
+                if (p.LastSectorTimes.Count >= 3) // Need to be tested...
                 {
                     sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
-                        I(p.CurrentSectorTimes[0] * 1000),
-                        I(p.CurrentSectorTimes[1] * 1000),
-                        I(p.CurrentSectorTimes[2] * 1000));
+                        I(p.LastSectorTimes[0] * 1000),
+                        I(p.LastSectorTimes[1] * 1000),
+                        I(p.LastSectorTimes[2] * 1000));
                 }
 
                 sb.AppendFormat("Car.{0}.Car={1}\n", carNum, NormalizeName(p.VehicleName));
@@ -308,7 +314,7 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.Driver.Forname={1}\n", carNum, forename);
                 sb.AppendFormat("Car.{0}.Driver.Surname={1}\n", carNum, surname);
                 sb.AppendFormat("Car.{0}.Driver.Nickname={1}\n", carNum, nickname);
-                sb.AppendFormat("Car.{0}.InPitLane={1}\n", carNum, p.InPits ? "true" : "false");
+                sb.AppendFormat("Car.{0}.InPitLane={1}\n", carNum, p.InPitLane ? "true" : "false");
                 sb.AppendFormat("Car.{0}.InPit={1}\n", carNum, p.InPits ? "true" : "false");
             }
 

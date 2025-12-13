@@ -32,14 +32,19 @@ namespace PMRUDPConnector
         {
             try
             {
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+                
                 if (useMulticast)
                 {
-                    udpClient = new UdpClient(port);
+                    udpClient = new UdpClient();
+                    udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    udpClient.ExclusiveAddressUse = false;
+                    udpClient.Client.Bind(endPoint);
                     udpClient.JoinMulticastGroup(IPAddress.Parse(multicastGroup));
                 }
                 else
                 {
-                    udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, port));
+                    udpClient = new UdpClient(endPoint);
                 }
 
                 isRunning = true;

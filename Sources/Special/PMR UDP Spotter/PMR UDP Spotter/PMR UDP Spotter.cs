@@ -339,10 +339,8 @@ namespace PMRUDPSpotter {
 		double[,] lastCoordinates;
 		bool hasLastCoordinates = false;
 
-		bool checkPositions()
+		bool checkPositions(ref UDPParticipantRaceState playerVehicle, ref UDPVehicleTelemetry playerTelemetry)
         {
-            var playerVehicle = receiver.GetPlayerState();
-            var playerTelemetry = receiver.GetPlayerTelemetry();
             var participantStates = receiver.GetAllParticipantStates();
 
             if (!hasLastCoordinates)
@@ -661,7 +659,7 @@ namespace PMRUDPSpotter {
 
 		int thresholdSpeed = 60;
 
-        bool checkAccident(ref UDPParticipantRaceState playerVehicle)
+        bool checkAccident(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle)
         {
 			bool accident = false;
 
@@ -676,7 +674,7 @@ namespace PMRUDPSpotter {
             List<SlowCarInfo> accidentsBehind = new List<SlowCarInfo>();
             List<SlowCarInfo> slowCarsAhead = new List<SlowCarInfo>();
 
-            var trackLength = receiver.GetRaceInfo().LayoutLength;
+            var trackLength = raceInfo.LayoutLength;
 
             if (idealLine.Count == 0)
 			{
@@ -1131,8 +1129,8 @@ namespace PMRUDPSpotter {
                 thresholdSpeed = int.Parse(args[index++]);
         }
 
-        public bool active() {
-			return (receiver.GetRaceInfo().State == UDPRaceSessionState.Active);
+        public bool active(ref UDPRaceInfo raceInfo) {
+			return (raceInfo.State == UDPRaceSessionState.Active) && receiver.HasReceivedData();
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {
@@ -1152,6 +1150,7 @@ namespace PMRUDPSpotter {
 				if (connected) {
 					bool wait = true;
 
+					var raceInfo = receiver.GetRaceInfo();
 					var playerVehicle = receiver.GetPlayerState();
 					var playerTelemetry = receiver.GetPlayerTelemetry();
 
@@ -1165,22 +1164,21 @@ namespace PMRUDPSpotter {
 					}
 					else if (positionTrigger)
 						checkCoordinates(ref playerTelemetry);
-					else if (active())
+					else if (active(ref raceInfo))
 					{
 						if (running)
 						{
                             if (carTelemetry)
-                                collectCarTelemetry(ref playerScoring);
+                                collectCarTelemetry(ref playerVehicle, ref playerTelemetry);
                             else
                             {
-                                if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-									playerScoring.mPitState < (byte)Entering)
+                                if (!playerVehicle.InPits && !playerVehicle.InPits)
 								{
-									updateTopSpeed(ref playerScoring);
+									updateTopSpeed(ref playerVehicle, ref playerTelemetry);
 
                                     if (cycle > nextSpeedUpdate)
                                     {
-										float speed = (float)vehicleSpeed(ref playerScoring);
+										float speed = (float)vehicleSpeed(ref playerTelemetry);
 
                                         nextSpeedUpdate = cycle + 50;
 
@@ -1200,14 +1198,13 @@ namespace PMRUDPSpotter {
 
                                     cycle += 1;
 
-									if (!startGo || !greenFlag())
-										if (enabled)
-											if (checkAccident(ref playerScoring))
-												wait = false;
-											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-												wait = false;
-											else
-												wait = !checkPitWindow(ref playerScoring);
+									if (enabled)
+										if (checkAccident(ref raceInfo, ref playerVehicle))
+											wait = false;
+										else if (checkFlagState(ref raceInfo) || checkPositions(ref playerVehicle, ref playerTelemetry))
+											wait = false;
+										else
+											wait = !checkPitWindow(ref raceInfo);
 								}
 								else
 								{

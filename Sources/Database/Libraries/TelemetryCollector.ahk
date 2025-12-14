@@ -428,6 +428,11 @@ class TelemetryCollector {
 					protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
 					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+						
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
@@ -438,11 +443,6 @@ class TelemetryCollector {
 
 						trackData := sessionDB.getTrackData(code, this.Track)
 
-						if protocol.HasProp("Arguments")
-							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-						else
-							arguments := ""
-						
 						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
 						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
 						  , kBinariesDirectory, "Hide", &pid)

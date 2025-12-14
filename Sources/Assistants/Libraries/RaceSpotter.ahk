@@ -3728,6 +3728,11 @@ class RaceSpotter extends GridRaceAssistant {
 				protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
 				if protocol {
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+
 					exePath := protocol.File
 					protocol := protocol.Protocol
 
@@ -3742,11 +3747,6 @@ class RaceSpotter extends GridRaceAssistant {
 						deleteFile(kTempDirectory . "Race Spotter.trace")
 
 					deleteFile(kTempDirectory . "Race Spotter.semaphore")
-
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
 
 					Run("`"" . exePath . "`" " . arguments . A_Space . this.TrackLength . A_Space
 											   . getMultiMapValue(this.Settings, "Assistant.Spotter", "Accident.Distance.Ahead.Threshold", 800) . A_Space
@@ -3763,7 +3763,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if pid {
 					this.iSpotterPID := pid
-					
+
 					return true
 				}
 			}

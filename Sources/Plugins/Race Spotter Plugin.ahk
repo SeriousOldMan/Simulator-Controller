@@ -547,6 +547,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
 					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+							
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
@@ -712,6 +717,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					protocol := SimulatorProvider.getProtocol(simulatorCode, "Spotter")
 
 					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
@@ -720,11 +730,6 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 						this.iMapperPhase := "Collect"
 						
-						if protocol.HasProp("Arguments")
-							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-						else
-							arguments := ""
-
 						Run(A_ComSpec . " /c `"`"" . exePath . "`" " . arguments . " -Map `"" . trackType . "`" " . trackLength . " > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 					}
 

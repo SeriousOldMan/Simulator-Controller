@@ -309,16 +309,16 @@ class IssueCollector {
 				protocol := SimulatorProvider.getProtocol(code, "Coach")
 
 				if protocol {
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+
 					exePath := protocol.File
 					protocol := protocol.Protocol
 
 					if !FileExist(exePath)
 						throw "File not found..."
-
-					if protocol.HasProp("Arguments")
-						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-					else
-						arguments := ""
 
 					Run("`"" . exePath . "`" " . arguments . A_Space . options, kBinariesDirectory, "Hide", &pid)
 

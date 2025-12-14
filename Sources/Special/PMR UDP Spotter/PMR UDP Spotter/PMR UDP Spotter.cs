@@ -984,12 +984,12 @@ namespace PMRUDPSpotter {
         StreamWriter telemetryFile = null;
 		int startTelemetryLap = -1;
         int telemetryLap = -1;
-		double lastRunning = -1;
+        DateTime startTime;
+        double lastRunning = -1;
 
         void collectCarTelemetry(ref UDPParticipantRaceState playerVehicle,
 								 ref UDPVehicleTelemetry playerTelemetry)
         {
-            int playerID = playerTelemetry.VehicleId;
 			int lastLap = Math.Max(0, playerVehicle.CurrentLap - 1);
             var trackLength = receiver.GetRaceInfo().LayoutLength;
 
@@ -998,7 +998,7 @@ namespace PMRUDPSpotter {
 
             try
             {
-                if (lastLap != telemetryLap)
+                if ((lastLap + 1) != telemetryLap)
                 {
                     try
                     {
@@ -1019,6 +1019,8 @@ namespace PMRUDPSpotter {
                     }
 
                     telemetryLap = (lastLap + 1);
+
+					startTime = DateTime.Now;
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 					
@@ -1046,7 +1048,9 @@ namespace PMRUDPSpotter {
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[0] + ";");
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-					telemetryFile.WriteLine(playerVehicle.CurrentLapTime * 1000);
+					TimeSpan difference = DateTime.Now.Subtract(startTime);
+
+                    telemetryFile.WriteLine(difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try

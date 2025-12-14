@@ -35,7 +35,17 @@ class PMRProvider extends SimulatorProvider {
 
 	static Protocols {
 		Get {
-			local arguments := [PMRProvider.sMultiCastGroup, PMRProvider.sMultiCastPort, PMRProvider.sMultiCast]
+			local arguments
+
+			if !PMRProvider.sMultiCastGroup {
+				configuration := readMultiMap(kUserConfigDirectory . "PMR Configuration.ini")
+
+				PMRProvider.sMultiCastGroup := getMultiMapValue(configuration, "UDP", "MultiCastGroup", "224.0.0.150")
+				PMRProvider.sMultiCastPort := getMultiMapValue(configuration, "UDP", "Port", 7576)
+				PMRProvider.sMultiCast := getMultiMapValue(configuration, "UDP", "MultiCast", true)
+			}
+
+			arguments := [PMRProvider.sMultiCastGroup, PMRProvider.sMultiCastPort, PMRProvider.sMultiCast]
 
 			return {Connector: {Type: "CLR", Protocol: "UDP"
 							  , File: kBinariesDirectory . "Connectors\PMR UDP Connector.dll"
@@ -51,20 +61,6 @@ class PMRProvider extends SimulatorProvider {
 
 	static __New(arguments*) {
 		SimulatorProvider.registerSimulatorProvider("PMR", PMRProvider)
-	}
-
-	__New(arguments*) {
-		local configuration
-
-		if !PMRProvider.sMultiCastGroup {
-			configuration := readMultiMap(kUserConfigDirectory . "PMR Configuration.ini")
-
-			PMRProvider.sMultiCastGroup := getMultiMapValue(configuration, "UDP", "MultiCastGroup", "224.0.0.150")
-			PMRProvider.sMultiCastPort := getMultiMapValue(configuration, "UDP", "Port", 7576)
-			PMRProvider.sMultiCast := getMultiMapValue(configuration, "UDP", "MultiCast", true)
-		}
-
-		super.__New(arguments*)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

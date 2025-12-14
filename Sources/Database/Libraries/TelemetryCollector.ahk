@@ -432,7 +432,7 @@ class TelemetryCollector {
 							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 						else
 							arguments := ""
-						
+
 						exePath := protocol.File
 						protocol := protocol.Protocol
 

@@ -1113,9 +1113,7 @@ namespace PMRUDPSpotter {
         public void initializeSpotter(string[] args, int index)
         {
 			if (args.Length > index)
-			{
-				string trackLength = args[index++];
-			}
+				index++; // trackLength
 
             if (args.Length > index)
                 aheadAccidentDistance = int.Parse(args[index++]);

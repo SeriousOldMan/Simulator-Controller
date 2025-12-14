@@ -186,7 +186,8 @@ namespace PMRUDPConnector
                         F(w[0].TreadTemp[2]), F(w[1].TreadTemp[0]), F(w[2].TreadTemp[2]), F(w[3].TreadTemp[0]));
                     
                     sb.AppendFormat("TyrePressure={0},{1},{2},{3}\n",
-                        F(w[0].Pressure), F(w[1].Pressure), F(w[2].Pressure), F(w[3].Pressure));
+                        F(w[0].Pressure / 100000 * 14.5038f), F(w[1].Pressure / 100000 * 14.5038f),
+                        F(w[2].Pressure / 100000 * 14.5038f), F(w[3].Pressure / 100000 * 14.5038f));
                     
                     // sb.Append("TyreWear=0,0,0,0\n");
                     

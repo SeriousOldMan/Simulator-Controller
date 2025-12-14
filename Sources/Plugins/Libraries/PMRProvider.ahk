@@ -42,10 +42,10 @@ class PMRProvider extends SimulatorProvider {
 							  , Instance: "PMRUDPConnector.PMRUDPConnector", Arguments: arguments}
 				  , Provider: {Type: "EXE", Protocol: "UDP"
 							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe", Arguments: arguments}
-				   }
-			/*
 				  , Spotter: {Type: "EXE", Protocol: "UDP"
 							, File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe", Arguments: arguments}
+				   }
+			/*
 				  , Coach: {Type: "EXE", Protocol: "UDP"
 						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}, Arguments: arguments}
 			*/
@@ -105,24 +105,7 @@ class PMRProvider extends SimulatorProvider {
 		if !track
 			track := getMultiMapValue(data, "Session Data", "Track", false)
 
-		for ignore, section in ["Car Data", "Setup Data"] {
-			tyreCompound := getMultiMapValue(data, section, "TyreCompound", kUndefined)
-
-			if (tyreCompound = kUndefined) {
-				tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw", kUndefined)
-
-				if (tyreCompound != kUndefined) {
-					tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
-
-					if tyreCompound {
-						splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
-
-						setMultiMapValue(data, section, "TyreCompound", tyreCompound)
-						setMultiMapValue(data, section, "TyreCompoundColor", tyreCompoundColor)
-					}
-				}
-			}
-
+		for ignore, section in ["Car Data", "Setup Data"]
 			for ignore, postfix in tyres {
 				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
 
@@ -146,7 +129,6 @@ class PMRProvider extends SimulatorProvider {
 						}
 				}
 			}
-		}
 
 		return data
 	}

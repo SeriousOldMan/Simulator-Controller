@@ -16,13 +16,21 @@ namespace PMRUDPSpotter {
         private PMRUDPReceiver receiver;
 
         bool connected = false;
+		
+		string multiCastGroup;
+		int multiCastPort;
+		bool useMultiCast;
 
-		public UDPSpotter(string multiCastGroup = "224.0.0.150", int multiCastPort = 7576, bool useMultiCast = true) {
-			if (!this.connected)
-				this.Connect(multiCastGroup, multiCastPort, useMultiCast);
+        public UDPSpotter(string multiCastGroup = "224.0.0.150", int multiCastPort = 7576, bool useMultiCast = true) {
+            this.multiCastGroup = multiCastGroup;
+            this.multiCastPort = multiCastPort;
+            this.useMultiCast = useMultiCast;
+
+            if (!this.connected)
+				this.Connect();
 		}
 
-		private void Connect(string multiCastGroup, int multiCastPort, bool useMultiCast) {
+		private void Connect() {
 			if (!this.connected) {
 				try {
                     if (receiver != null)
@@ -874,10 +882,10 @@ namespace PMRUDPSpotter {
 		float lastTopSpeed = 0;
         int lastLaps = 0;
 
-        void updateTopSpeed(ref UDPParticipantRaceState playerVehicle)
+        void updateTopSpeed(ref UDPParticipantRaceState playerVehicle,
+                            ref UDPVehicleTelemetry playerTelemetry)
         {
-            UDPVehicleTelemetry telemetry = receiver.GetPlayerTelemetry();
-            float speed = (float)vehicleSpeed(ref telemetry);
+            float speed = (float)vehicleSpeed(ref playerTelemetry);
 
             if (speed > lastTopSpeed)
                 lastTopSpeed = speed;
@@ -897,43 +905,27 @@ namespace PMRUDPSpotter {
 		bool mapStarted = false;
 		int mapLap = -1;
 
-        /*
-        bool writeCoordinates(ref rF2VehicleScoring playerScoring)
+        bool writeCoordinates(ref UDPParticipantRaceState playerVehicle,
+                              ref UDPVehicleTelemetry playerTelemetry)
 		{
-			double lVelocityX = playerScoring.mLocalVel.x;
-			double lVelocityY = playerScoring.mLocalVel.y;
-			double lVelocityZ = playerScoring.mLocalVel.z;
+            double velocityX = playerTelemetry.Chassis.VelocityWS[0];
+            double velocityY = playerTelemetry.Chassis.VelocityWS[1];
+            double velocityZ = playerTelemetry.Chassis.VelocityWS[2];
 
             if (!mapStarted)
                 if (mapLap == -1)
                 {
-                    mapLap = playerScoring.mTotalLaps;
+                    mapLap = Math.Max(0, playerVehicle.CurrentLap - 1);
 
                     return true;
                 }
-                else if (playerScoring.mTotalLaps == mapLap)
+                else if (Math.Max(0, playerVehicle.CurrentLap - 1) == mapLap)
                     return true;
-
-            int carID = 0;
-
-			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-				if (scoring.mVehicles[i].mIsPlayer != 0)
-				{
-					carID = i;
-
-					break;
-				}
-
-			var ori = playerScoring.mOri;
-
-			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 			{
-				double coordinateX = playerScoring.mPos.x;
-				double coordinateY = (-playerScoring.mPos.z);
+				double coordinateX = playerTelemetry.Chassis.PosWS[0];
+				double coordinateY = playerTelemetry.Chassis.PosWS[2];
 
 				mapStarted = true;
 
@@ -952,7 +944,6 @@ namespace PMRUDPSpotter {
 
 			return true;
 		}
-		*/
 
 		float[] xCoordinates = new float[60];
 		float[] yCoordinates = new float[60];
@@ -960,37 +951,22 @@ namespace PMRUDPSpotter {
 		long lastUpdate = 0;
 		string triggerType = "Automation";
 
-		/*
-		void checkCoordinates(ref rF2VehicleScoring playerScoring)
+		void checkCoordinates(ref UDPVehicleTelemetry playerTelemetry)
 		{
 			if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > (lastUpdate + 2000))
 			{
-				double lVelocityX = playerScoring.mLocalVel.x;
-				double lVelocityY = playerScoring.mLocalVel.y;
-				double lVelocityZ = playerScoring.mLocalVel.z;
+				var participantStates = receiver.GetAllParticipantStates();
 
-				int carID = 0;
+                double velocityX = playerTelemetry.Chassis.VelocityWS[0];
+                double velocityY = playerTelemetry.Chassis.VelocityWS[1];
+                double velocityZ = playerTelemetry.Chassis.VelocityWS[2];
 
-				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-					if (scoring.mVehicles[i].mIsPlayer != 0)
-					{
-						carID = i;
-
-						break;
-					}
-
-				var ori = playerScoring.mOri;
-
-				double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-				double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-				double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
-
-				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+                if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 				{
-					double coordinateX = playerScoring.mPos.x;
-					double coordinateY = (- playerScoring.mPos.z);
+					double coordinateX = playerTelemetry.Chassis.PosWS[0];
+					double coordinateY = playerTelemetry.Chassis.PosWS[2];
 
-					for (int i = 0; i < numCoordinates; i += 1)
+                    for (int i = 0; i < numCoordinates; i += 1)
 					{
 						if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 						{
@@ -1005,7 +981,6 @@ namespace PMRUDPSpotter {
 				}
 			}
         }
-		*/
 
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
@@ -1013,17 +988,19 @@ namespace PMRUDPSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
-		/*
-        void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
+        void collectCarTelemetry(ref UDPParticipantRaceState playerVehicle,
+								 ref UDPVehicleTelemetry playerTelemetry)
         {
-            int playerID = playerScoring.mID;
-			
-			if (playerScoring.mTotalLaps < startTelemetryLap)
+            int playerID = playerTelemetry.VehicleId;
+			int lastLap = Math.Max(0, playerVehicle.CurrentLap - 1);
+            var trackLength = receiver.GetRaceInfo().LayoutLength;
+
+            if (lastLap < startTelemetryLap)
 				return;
 
             try
             {
-                if ((playerScoring.mTotalLaps + 1) != telemetryLap)
+                if (lastLap != telemetryLap)
                 {
                     try
                     {
@@ -1043,61 +1020,59 @@ namespace PMRUDPSpotter {
                     {
                     }
 
-                    telemetryLap = (playerScoring.mTotalLaps + 1);
+                    telemetryLap = (lastLap + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 					
 					lastRunning = -1;
                 }
 
-				if (playerScoring.mLapDist > lastRunning)
+				if (playerVehicle.LapProgress > lastRunning)
                 {
-                    ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
-
-                    lastRunning = playerScoring.mLapDist;
+                    lastRunning = playerVehicle.LapProgress;
 					
-					telemetryFile.Write(playerScoring.mLapDist + ";");
-					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");
-					telemetryFile.Write((float)vehicle.mFilteredBrake + ";");
-					telemetryFile.Write((float)vehicle.mFilteredSteering + ";");
-					telemetryFile.Write((float)vehicle.mGear + ";");
-					telemetryFile.Write((float)vehicle.mEngineRPM + ";");
-					telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
+					telemetryFile.Write(lastRunning * trackLength + ";");
+					telemetryFile.Write((float)playerTelemetry.Input.Accelerator + ";");
+					telemetryFile.Write((float)playerTelemetry.Input.Brake + ";");
+					telemetryFile.Write((float)playerTelemetry.Input.Steering + ";");
+					telemetryFile.Write((float)playerTelemetry.Input.Gear + ";");
+					telemetryFile.Write((float)playerTelemetry.Drivetrain.EngineRPM + ";");
+					telemetryFile.Write(vehicleSpeed(ref playerTelemetry) + ";");
 
 					telemetryFile.Write("n/a;");
 					telemetryFile.Write("n/a;");
 
-					telemetryFile.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
-					telemetryFile.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
+					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[2] / 9.807f) + ";");
+					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[0] / 9.807f) + ";");
 
-					telemetryFile.Write(playerScoring.mPos.x + ";");
-					telemetryFile.Write(-playerScoring.mPos.z + ";");
+					telemetryFile.Write(playerTelemetry.Chassis.PosWS[0] + ";");
+					telemetryFile.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+					telemetryFile.WriteLine(playerVehicle.CurrentLapTime * 1000);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
                         {
                             StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 
-                            file.Write(playerScoring.mLapDist + ";");
-                            file.Write((float)vehicle.mFilteredThrottle + ";");
-                            file.Write((float)vehicle.mFilteredBrake + ";");
-                            file.Write((float)vehicle.mFilteredSteering + ";");
-                            file.Write((float)vehicle.mGear + ";");
-                            file.Write((float)vehicle.mEngineRPM + ";");
-                            file.Write(vehicleSpeed(ref playerScoring) + ";");
+                            file.Write(lastRunning * trackLength + ";");
+                            file.Write((float)playerTelemetry.Input.Accelerator + ";");
+                            file.Write((float)playerTelemetry.Input.Brake + ";");
+                            file.Write((float)playerTelemetry.Input.Steering + ";");
+                            file.Write((float)playerTelemetry.Input.Gear + ";");
+                            file.Write((float)playerTelemetry.Drivetrain.EngineRPM + ";");
+                            file.Write(vehicleSpeed(ref playerTelemetry) + ";");
 
                             file.Write("n/a;");
                             file.Write("n/a;");
 
-                            file.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
-                            file.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
+                            file.Write((playerTelemetry.Chassis.AccelerationLS[2] / 9.807f) + ";");
+                            file.Write((playerTelemetry.Chassis.AccelerationLS[0] / 9.807f) + ";");
 
-                            file.Write(playerScoring.mPos.x + ";");
-                            file.Write(-playerScoring.mPos.z + ";");
+                            file.Write(playerTelemetry.Chassis.PosWS[0] + ";");
+                            file.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-                            file.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+                            file.WriteLine(playerVehicle.CurrentLapTime * 1000);
 
                             file.Close();
                         }
@@ -1118,7 +1093,6 @@ namespace PMRUDPSpotter {
                 // retry next round...
             }
         }
-		*/
 
         public void initializeTrigger(string type, string[] args, int index)
         {
@@ -1157,22 +1131,12 @@ namespace PMRUDPSpotter {
                 thresholdSpeed = int.Parse(args[index++]);
         }
 
-        bool started = false;
-
         public bool active() {
-			if (started)
-				return true;
-			else if (receiver.GetRaceInfo().State != UDPRaceSessionState.Active)
-				return false;
-			
-			started = true;
-
-			return true;
+			return (receiver.GetRaceInfo().State == UDPRaceSessionState.Active);
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {
-			/*
-            bool running = false;
+			bool running = true;
 			int countdown = 4000;
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
@@ -1185,124 +1149,92 @@ namespace PMRUDPSpotter {
 				if (!connected)
 					Connect();
 
-				if (connected)
-				{
-					try
-					{
-						if (!extendedBuffer.GetMappedData(ref extended) || !scoringBuffer.GetMappedData(ref scoring)
-																	    || !telemetryBuffer.GetMappedData(ref telemetry))
-							continue;
-                    }
-					catch (Exception)
-					{
-						this.Disconnect();
-					}
+				if (connected) {
+					bool wait = true;
 
-					if (connected) {
-						bool wait = true;
+					var playerVehicle = receiver.GetPlayerState();
+					var playerTelemetry = receiver.GetPlayerTelemetry();
 
-						ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
-
-						if (startTelemetryLap == -1)
-							startTelemetryLap = playerScoring.mTotalLaps + 1;
+					if (startTelemetryLap == -1)
+						startTelemetryLap = Math.Max(0, playerVehicle.CurrentLap - 1) + 1;
 						
-                        if (mapTrack)
+                    if (mapTrack)
+					{
+						if (!writeCoordinates(ref playerVehicle, ref playerTelemetry))
+							break;
+					}
+					else if (positionTrigger)
+						checkCoordinates(ref playerTelemetry);
+					else if (active())
+					{
+						if (running)
 						{
-							if (!writeCoordinates(ref playerScoring))
-								break;
-						}
-						else if (positionTrigger)
-							checkCoordinates(ref playerScoring);
-						else if (active())
-						{
-							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
-
-							if (!greenFlagReported && (counter > 8000))
-								greenFlagReported = true;
-
-							if (!running)
-							{
-								countdown -= 1;
-
-								if (startGo || (countdown <= 0))
-									running = true;
-							}
-
-							if (scoring.mScoringInfo.mGamePhase <= (byte)GridWalk || scoring.mScoringInfo.mGamePhase == (byte)PausedOrHeartbeat)
-								running = false;
-
-                            if (running)
-							{
-                                if (carTelemetry)
-                                    collectCarTelemetry(ref playerScoring);
-                                else
-                                {
-                                    if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
-										playerScoring.mPitState < (byte)Entering)
-									{
-										updateTopSpeed(ref playerScoring);
-
-                                        if (cycle > nextSpeedUpdate)
-                                        {
-											float speed = (float)vehicleSpeed(ref playerScoring);
-
-                                            nextSpeedUpdate = cycle + 50;
-
-                                            if ((speed >= thresholdSpeed) && !enabled)
-                                            {
-                                                enabled = true;
-
-                                                SendSpotterMessage("enableSpotter");
-                                            }
-                                            else if ((speed < thresholdSpeed) && enabled)
-                                            {
-                                                enabled = false;
-
-                                                SendSpotterMessage("disableSpotter");
-                                            }
-                                        }
-
-                                        cycle += 1;
-
-										if (!startGo || !greenFlag())
-											if (enabled)
-												if (checkAccident(ref playerScoring))
-													wait = false;
-												else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
-													wait = false;
-												else
-													wait = !checkPitWindow(ref playerScoring);
-									}
-									else
-									{
-										longitudinalRearDistance = 5;
-
-										lastSituation = CLEAR;
-										carBehind = false;
-										carBehindReported = false;
-
-										lastFlagState = 0;
-									}
-								}
-                            }
+                            if (carTelemetry)
+                                collectCarTelemetry(ref playerScoring);
                             else
-                                wait = true;
+                            {
+                                if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
+									playerScoring.mPitState < (byte)Entering)
+								{
+									updateTopSpeed(ref playerScoring);
+
+                                    if (cycle > nextSpeedUpdate)
+                                    {
+										float speed = (float)vehicleSpeed(ref playerScoring);
+
+                                        nextSpeedUpdate = cycle + 50;
+
+                                        if ((speed >= thresholdSpeed) && !enabled)
+                                        {
+                                            enabled = true;
+
+                                            SendSpotterMessage("enableSpotter");
+                                        }
+                                        else if ((speed < thresholdSpeed) && enabled)
+                                        {
+                                            enabled = false;
+
+                                            SendSpotterMessage("disableSpotter");
+                                        }
+                                    }
+
+                                    cycle += 1;
+
+									if (!startGo || !greenFlag())
+										if (enabled)
+											if (checkAccident(ref playerScoring))
+												wait = false;
+											else if (checkFlagState(ref playerScoring) || checkPositions(ref playerScoring))
+												wait = false;
+											else
+												wait = !checkPitWindow(ref playerScoring);
+								}
+								else
+								{
+									longitudinalRearDistance = 5;
+
+									lastSituation = CLEAR;
+									carBehind = false;
+									carBehindReported = false;
+
+									lastFlagState = 0;
+								}
+							}
                         }
                         else
                             wait = true;
+                    }
+                    else
+                        wait = true;
 
-						if (carTelemetry || positionTrigger)
-                            Thread.Sleep(10);
-                        else if (wait)
-							Thread.Sleep(50);
-					}
-					else
-						Thread.Sleep(1000);
+					if (carTelemetry || positionTrigger)
+                        Thread.Sleep(10);
+                    else if (wait)
+						Thread.Sleep(50);
 				}
 				else
 					Thread.Sleep(1000);
             }
-			*/
 		}
     }
 }

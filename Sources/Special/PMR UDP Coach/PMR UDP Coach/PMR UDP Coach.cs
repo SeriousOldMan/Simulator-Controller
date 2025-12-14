@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PMRUDPSpotter;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
@@ -12,44 +13,51 @@ using System.Text;
 using System.Threading;
 
 namespace PMRUDPCoach {
-	public class SHMCoach {
-		bool connected = false;
+	public class UDPCoach
+    {
+        private PMRUDPReceiver receiver;
 
-        public SHMCoach() {
-			if (!this.connected)
+        bool connected = false;
+
+        string multiCastGroup;
+        int multiCastPort;
+        bool useMultiCast;
+
+        public UDPCoach(string multiCastGroup = "224.0.0.150", int multiCastPort = 7576, bool useMultiCast = true) {
+            this.multiCastGroup = multiCastGroup;
+            this.multiCastPort = multiCastPort;
+            this.useMultiCast = useMultiCast;
+
+            if (!this.connected)
 				this.Connect();
-		}
-
-		private static string GetStringFromBytes(byte[] bytes) {
-			if (bytes == null)
-				return "";
-
-			var nullIdx = Array.IndexOf(bytes, (byte)0);
-
-			return nullIdx >= 0 ? Encoding.Default.GetString(bytes, 0, nullIdx) : Encoding.Default.GetString(bytes);
-		}
-
-		static rF2VehicleTelemetry noTelemetry = new rF2VehicleTelemetry();
-
-        public static ref rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry) {
-			for (int i = 0; i < telemetry.mNumVehicles; ++i) {
-				if (telemetry.mVehicles[i].mID == id)
-					return ref telemetry.mVehicles[i];
-			}
-
-			return ref noTelemetry;
 		}
 
 		private void Connect() {
 			if (!this.connected) {
 				try {
-					// Extended buffer is the last one constructed, so it is an indicator RF2SM is ready.
-					this.extendedBuffer.Connect();
-                    this.scoringBuffer.Connect();
-                    this.telemetryBuffer.Connect();
+                    if (receiver != null)
+                        receiver.Stop();
 
-                    this.connected = true;
-				}
+                    receiver = new PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
+
+                    bool started = receiver.Start();
+
+                    if (started)
+                    {
+                        started = false;
+
+                        for (int i = 0; i <= 3 && !started; i++)
+                            if (receiver.HasReceivedData())
+                                started = true;
+                            else
+                                Thread.Sleep(200);
+                    }
+
+                    if (!started)
+                        receiver = null;
+                    else
+                        this.connected = true;
+                }
 				catch (Exception) {
 					this.Disconnect();
 				}
@@ -57,24 +65,10 @@ namespace PMRUDPCoach {
 		}
 
 		private void Disconnect() {
-			this.extendedBuffer.Disconnect();
-            this.scoringBuffer.Disconnect();
-            this.telemetryBuffer.Disconnect();
+            receiver?.Stop();
+            receiver = null;
 
             this.connected = false;
-        }
-
-        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
-
-        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring)
-        {
-            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-            {
-                if (scoring.mVehicles[i].mIsPlayer == 1)
-                    return ref scoring.mVehicles[i];
-            }
-
-            return ref noPlayer;
         }
 
         const int WM_COPYDATA = 0x004A;
@@ -186,18 +180,13 @@ namespace PMRUDPCoach {
             }
         }
 
-        double vehicleSpeed(ref rF2VehicleScoring vehicle)
+        double vehicleSpeed(ref UDPVehicleTelemetry telemetry)
         {
-            rF2Vec3 localVel = vehicle.mLocalVel;
+            var chassis = telemetry.Chassis;
 
-            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
-        }
-
-        double vehicleSpeed(ref rF2VehicleTelemetry vehicle)
-        {
-            rF2Vec3 localVel = vehicle.mLocalVel;
-
-            return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+            return Math.Sqrt(chassis.VelocityLS[0] * chassis.VelocityLS[0] +
+                             chassis.VelocityLS[1] * chassis.VelocityLS[1] +
+                             chassis.VelocityLS[2] * chassis.VelocityLS[2]) * 3.6;
         }
 
         const int MAXVALUES = 6;
@@ -305,33 +294,23 @@ namespace PMRUDPCoach {
             return true;
 		}
 
-		bool collectTelemetry(string soundsDirectory, string audioDevice)
-		{
-            int carID = 0;
-
-            for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-                if (scoring.mVehicles[i].mIsPlayer != 0)
-                {
-                    carID = i;
-
-                    break;
-                }
-
-            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
-
-            if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
+		bool collectTelemetry(ref UDPParticipantRaceState playerVehicle,
+                              ref UDPVehicleTelemetry playerTelemetry,
+                              string soundsDirectory, string audioDevice)
+        {
+            if (playerVehicle.InPits || playerVehicle.InPitLane)
                 return true;
 
-			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
+			float steerAngle = smoothValue(recentSteerAngles, playerTelemetry.Input.Steering);
 
-            float speed = (float)vehicleSpeed(ref telemetry.mVehicles[carID]);
+            float speed = (float)vehicleSpeed(ref playerTelemetry);
             float acceleration = (float)speed - lastSpeed;
 
 			lastSpeed = speed;
 
             pushValue(recentGLongs, acceleration);
 
-            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double angularVelocity = smoothValue(recentRealAngVels, playerTelemetry.Chassis.AngularVelocityLS[2]);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
             double wheelBaseMeter = (float)wheelbase / 100;
@@ -359,7 +338,7 @@ namespace PMRUDPCoach {
                         phase = 1;
                     }
 
-                CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
+                CornerDynamics cd = new CornerDynamics(speed, 0, Math.Max(0, playerVehicle.CurrentLap - 1), phase);
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
@@ -429,7 +408,7 @@ namespace PMRUDPCoach {
 				if (cd != null)
 					cornerDynamicsList.Add(cd);
 
-				int completedLaps = playerScoring.mTotalLaps;
+				int completedLaps = Math.Max(0, playerVehicle.CurrentLap - 1);
 
 				if (lastCompletedLaps != completedLaps) {
 					lastCompletedLaps = completedLaps;
@@ -724,36 +703,21 @@ namespace PMRUDPCoach {
 
 		System.Media.SoundPlayer lastPlayer = null;
 
-        void checkCoordinates(ref rF2VehicleScoring playerScoring)
+        void checkCoordinates(ref UDPParticipantRaceState playerVehicle,
+							  ref UDPVehicleTelemetry playerTelemetry)
 		{
             if (DateTimeOffset.Now.ToUnixTimeMilliseconds() > nextUpdate)
             {
-                double lVelocityX = playerScoring.mLocalVel.x;
-				double lVelocityY = playerScoring.mLocalVel.y;
-				double lVelocityZ = playerScoring.mLocalVel.z;
-
-				int carID = 0;
-
-				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-					if (scoring.mVehicles[i].mIsPlayer != 0)
-					{
-						carID = i;
-
-						break;
-					}
-
-				var ori = playerScoring.mOri;
-
-				double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
-				double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
-				double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
+                double velocityX = playerTelemetry.Chassis.VelocityLS[0];
+				double velocityY = playerTelemetry.Chassis.VelocityLS[1];
+                double velocityZ = playerTelemetry.Chassis.VelocityLS[2];
 
 				if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
 				{
-					double coordinateX = playerScoring.mPos.x;
-					double coordinateY = (- playerScoring.mPos.z);
+					double coordinateX = playerTelemetry.Chassis.PosWS[0];
+					double coordinateY = playerTelemetry.Chassis.PosWS[2];
 
-					if (triggerType == "Trigger") {
+                    if (triggerType == "Trigger") {
 						for (int i = 0; i < numCoordinates; i += 1)
 						{
 							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
@@ -767,9 +731,9 @@ namespace PMRUDPCoach {
 						}
 					}
 					else {
-						if (lastLap != playerScoring.mTotalLaps)
+						if (lastLap != Math.Max(0, playerVehicle.CurrentLap - 1))
 						{
-							lastLap = playerScoring.mTotalLaps;
+							lastLap = Math.Max(0, playerVehicle.CurrentLap - 1);
 
 							lastHint = -1;
 						}
@@ -883,11 +847,11 @@ namespace PMRUDPCoach {
 			} 
 		}
 
-        public void initializeTrigger(string type, string[] args)
+        public void initializeTrigger(string type, string[] args, int index)
         {
 			triggerType = type;
 
-			for (int i = 1; i < (args.Length - 1); i += 3)
+			for (int i = index; i < (args.Length - 1); i += 3)
 			{
 				tIndices[numCoordinates] = int.Parse(args[i]);
 				xCoordinates[numCoordinates] = float.Parse(args[i + 1]);
@@ -907,69 +871,74 @@ namespace PMRUDPCoach {
         float volume = 0;
 		string hintFile = string.Empty;
 
-        public void initializeTrackHints(string type, string[] args)
+        public void initializeTrackHints(string type, string[] args, int index)
         {
             triggerType = type;
 
-            hintFile = args[1];
+            hintFile = args[index++];
 
-            if (args.Length > 2)
-                audioDevice = args[2];
+            if (args.Length > index)
+                audioDevice = args[index++];
 
-            if (args.Length > 3)
-                volume = float.Parse(args[3]);
+            if (args.Length > index)
+                volume = float.Parse(args[index++]);
 
-            if (args.Length > 4)
-                player = args[4];
+            if (args.Length > index)
+                player = args[index++];
 
-            if (args.Length > 5)
-                workingDirectory = args[5];
+            if (args.Length > index)
+                workingDirectory = args[index++];
 
             Thread.Sleep(10000);
         }
 
-        public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
+        public void initializeAnalyzer(bool calibrateTelemetry, string[] args, int index)
         {
-            dataFile = args[1];
+            dataFile = args[index++];
 			
 			calibrate = calibrateTelemetry;
 			
 			if (calibrate) {
-				lowspeedThreshold = int.Parse(args[2]);
-				steerLock = int.Parse(args[3]);
-				steerRatio = int.Parse(args[4]);
-				wheelbase = int.Parse(args[5]);
-				trackWidth = int.Parse(args[6]);
+				lowspeedThreshold = int.Parse(args[index++]);
+				steerLock = int.Parse(args[index++]);
+				steerRatio = int.Parse(args[index++]);
+				wheelbase = int.Parse(args[index++]);
+				trackWidth = int.Parse(args[index++]);
 			}
 			else {
-				understeerLightThreshold = int.Parse(args[2]);
-				understeerMediumThreshold = int.Parse(args[3]);
-				understeerHeavyThreshold = int.Parse(args[4]);
-				oversteerLightThreshold = int.Parse(args[5]);
-				oversteerMediumThreshold = int.Parse(args[6]);
-				oversteerHeavyThreshold = int.Parse(args[7]);
-				lowspeedThreshold = int.Parse(args[8]);
-				steerLock = int.Parse(args[9]);
-				steerRatio = int.Parse(args[10]);
-				wheelbase = int.Parse(args[11]);
-				trackWidth = int.Parse(args[12]);
+				understeerLightThreshold = int.Parse(args[index++]);
+				understeerMediumThreshold = int.Parse(args[index++]);
+				understeerHeavyThreshold = int.Parse(args[index++]);
+				oversteerLightThreshold = int.Parse(args[index++]);
+				oversteerMediumThreshold = int.Parse(args[index++]);
+				oversteerHeavyThreshold = int.Parse(args[index++]);
+				lowspeedThreshold = int.Parse(args[index++]);
+				steerLock = int.Parse(args[index++]);
+				steerRatio = int.Parse(args[index++]);
+				wheelbase = int.Parse(args[index++]);
+				trackWidth = int.Parse(args[index++]);
 
-                if (args.Length > 13) {
-                    soundsDirectory = args[13];
+                if (args.Length > index) {
+                    soundsDirectory = args[index++];
 
-                    if (args.Length > 14)
-                        audioDevice = args[14];
+                    if (args.Length > index)
+                        audioDevice = args[index++];
 
-                    if (args.Length > 15)
-                        volume = float.Parse(args[15]);
+                    if (args.Length > index)
+                        volume = float.Parse(args[index++]);
 
-                    if (args.Length > 16)
-                        player = args[16];
+                    if (args.Length > index)
+                        player = args[index++];
 
-                    if (args.Length > 17)
-                        workingDirectory = args[17];
+                    if (args.Length > index)
+                        workingDirectory = args[index++];
                 }
             }
+        }
+
+        public bool active(ref UDPRaceInfo raceInfo)
+        {
+            return (raceInfo != null) && (raceInfo.State == UDPRaceSessionState.Active) && receiver.HasReceivedData();
         }
 
         public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer) {
@@ -982,46 +951,38 @@ namespace PMRUDPCoach {
 					Connect();
 
 				if (connected)
-				{
-					try
-					{
-						if (!extendedBuffer.GetMappedData(ref extended) || !scoringBuffer.GetMappedData(ref scoring)
-																	    || !telemetryBuffer.GetMappedData(ref telemetry))
-							continue;
-                    }
-					catch (Exception)
-					{
-						this.Disconnect();
-					}
+                {
+                    var raceInfo = receiver.GetRaceInfo();
+                    var playerVehicle = receiver.GetPlayerState();
+                    var playerTelemetry = receiver.GetPlayerTelemetry();
 
-					if (connected) {
-						ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
-
+					if (active(ref raceInfo)) {
 						if (positionTrigger)
 						{
-							checkCoordinates(ref playerScoring);
+							checkCoordinates(ref playerVehicle, ref playerTelemetry);
 
 							Thread.Sleep(10);
 						}
 						else if (handlingAnalyzer)
-                        {
-                            if (collectTelemetry(soundsDirectory, audioDevice))
+						{
+							if (collectTelemetry(ref playerVehicle, ref playerTelemetry,
+												 soundsDirectory, audioDevice))
 							{
-                                if (counter % 20 == 0)
-                                    writeTelemetry();
+								if (counter % 20 == 0)
+									writeTelemetry();
 
 								Thread.Sleep(10);
-                            }
-                            else
-                                break;
-                        }
-                        else if (trackHints)
+							}
+							else
+								break;
+						}
+						else if (trackHints)
 						{
 							loadTrackHints();
 
-                            checkCoordinates(ref playerScoring);
+							checkCoordinates(ref playerVehicle, ref playerTelemetry);
 
-                            Thread.Sleep(10);
+							Thread.Sleep(10);
                         }
 					}
 					else

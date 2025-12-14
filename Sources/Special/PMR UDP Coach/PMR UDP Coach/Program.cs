@@ -1,17 +1,10 @@
-﻿/*
-RF2 SHM Coach entry point.
-
-Based partly upon the work of: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.org)
-*/
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using PMRUDPCoach.rFactor2Data;
-using static PMRUDPCoach.rFactor2Constants;
 
 namespace PMRUDPCoach {
     static class Program {
@@ -19,29 +12,47 @@ namespace PMRUDPCoach {
         static void Main(string[] args) {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-            SHMCoach coach = new SHMCoach();
+            string multiCastGroup = args[0];
+            int multiCastPort = int.Parse(args[1]);
+            bool useMultiCast = true;
 
-            if (args.Length > 0 && args[0] == "-Trigger")
+            if (args[2].ToLower() == "true")
+                useMultiCast = true;
+            else if (args[2].ToLower() == "false")
+                useMultiCast = false;
+            else
             {
-                coach.initializeTrigger("Trigger", args);
+                try
+                {
+                    if (int.Parse(args[2]) == 0)
+                        useMultiCast = false;
+                }
+                catch { }
+            }
+
+            UDPCoach coach = new UDPCoach(multiCastGroup, multiCastPort, useMultiCast);
+
+            if (args.Length > 3 && args[3] == "-Trigger")
+            {
+                coach.initializeTrigger("Trigger", args, 3);
 
                 coach.Run(true, false, false);
             }
-            else if (args.Length > 0 && args[0] == "-Calibrate")
+            else if (args.Length > 3 && args[3] == "-Calibrate")
             {
-                coach.initializeAnalyzer(true, args);
+                coach.initializeAnalyzer(true, args, 3);
 
                 coach.Run(false, false, true);
             }
-            else if (args.Length > 0 && args[0] == "-Analyze")
+            else if (args.Length > 3 && args[3] == "-Analyze")
             {
-                coach.initializeAnalyzer(false, args);
+                coach.initializeAnalyzer(false, args, 3);
 
                 coach.Run(false, false, true);
             }
-            else if (args.Length > 0 && args[0] == "-TrackHints")
+            else if (args.Length > 3 && args[3] == "-TrackHints")
             {
-                coach.initializeTrackHints("TrackHints", args);
+                coach.initializeTrackHints("TrackHints", args, 3);
 
                 coach.Run(false, true, false);
             }

@@ -1,9 +1,4 @@
-﻿/*
-RF2 SHM Spotter entry point.
-
-Based partly upon the work of: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.org)
-*/
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;

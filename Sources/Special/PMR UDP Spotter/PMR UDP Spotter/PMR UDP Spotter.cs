@@ -1130,12 +1130,11 @@ namespace PMRUDPSpotter {
         }
 
         public bool active(ref UDPRaceInfo raceInfo) {
-			return (raceInfo.State == UDPRaceSessionState.Active) && receiver.HasReceivedData();
+			return (raceInfo != null) && (raceInfo.State == UDPRaceSessionState.Active) && receiver.HasReceivedData();
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {
 			bool running = true;
-			int countdown = 4000;
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
 
@@ -1154,49 +1153,44 @@ namespace PMRUDPSpotter {
 					var playerVehicle = receiver.GetPlayerState();
 					var playerTelemetry = receiver.GetPlayerTelemetry();
 
-					if (startTelemetryLap == -1)
-						startTelemetryLap = Math.Max(0, playerVehicle.CurrentLap - 1) + 1;
-						
-                    if (mapTrack)
-					{
-						if (!writeCoordinates(ref playerVehicle, ref playerTelemetry))
-							break;
-					}
-					else if (positionTrigger)
-						checkCoordinates(ref playerTelemetry);
-					else if (active(ref raceInfo))
-					{
-						if (running)
-						{
-                            if (carTelemetry)
-                                collectCarTelemetry(ref playerVehicle, ref playerTelemetry);
-                            else
-                            {
-                                if (!playerVehicle.InPits && !playerVehicle.InPits)
-								{
+					if (active(ref raceInfo)) {
+						if (startTelemetryLap == -1)
+							startTelemetryLap = Math.Max(0, playerVehicle.CurrentLap - 1) + 1;
+
+						if (mapTrack) {
+							if (!writeCoordinates(ref playerVehicle, ref playerTelemetry))
+								break;
+						}
+						else if (positionTrigger)
+							checkCoordinates(ref playerTelemetry);
+						else if (running) {
+							if (carTelemetry)
+								collectCarTelemetry(ref playerVehicle, ref playerTelemetry);
+							else {
+								if (!playerVehicle.InPits && !playerVehicle.InPits) {
 									updateTopSpeed(ref playerVehicle, ref playerTelemetry);
 
-                                    if (cycle > nextSpeedUpdate)
-                                    {
+									if (cycle > nextSpeedUpdate)
+									{
 										float speed = (float)vehicleSpeed(ref playerTelemetry);
 
-                                        nextSpeedUpdate = cycle + 50;
+										nextSpeedUpdate = cycle + 50;
 
-                                        if ((speed >= thresholdSpeed) && !enabled)
-                                        {
-                                            enabled = true;
+										if ((speed >= thresholdSpeed) && !enabled)
+										{
+											enabled = true;
 
-                                            SendSpotterMessage("enableSpotter");
-                                        }
-                                        else if ((speed < thresholdSpeed) && enabled)
-                                        {
-                                            enabled = false;
+											SendSpotterMessage("enableSpotter");
+										}
+										else if ((speed < thresholdSpeed) && enabled)
+										{
+											enabled = false;
 
-                                            SendSpotterMessage("disableSpotter");
-                                        }
-                                    }
+											SendSpotterMessage("disableSpotter");
+										}
+									}
 
-                                    cycle += 1;
+									cycle += 1;
 
 									if (enabled)
 										if (checkAccident(ref raceInfo, ref playerVehicle))
@@ -1217,18 +1211,16 @@ namespace PMRUDPSpotter {
 									lastFlagState = 0;
 								}
 							}
-                        }
-                        else
-                            wait = true;
+						}
+
+						if (carTelemetry || positionTrigger)
+							Thread.Sleep(10);
+						else if (wait)
+							Thread.Sleep(50);
                     }
                     else
-                        wait = true;
-
-					if (carTelemetry || positionTrigger)
-                        Thread.Sleep(10);
-                    else if (wait)
-						Thread.Sleep(50);
-				}
+                        Thread.Sleep(1000);
+                }
 				else
 					Thread.Sleep(1000);
             }

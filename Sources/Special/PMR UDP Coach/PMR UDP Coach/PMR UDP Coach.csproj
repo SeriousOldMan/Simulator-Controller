@@ -53,12 +53,14 @@
     <Compile Include="..\PMR UDP Coach\Program.cs" />
     <Compile Include="..\PMR UDP Coach\Properties\AssemblyInfo.cs" />
     <Compile Include="PMR UDP Coach.cs" />
+    <Compile Include="PMRUDPProtocol.cs" />
+    <Compile Include="PMRUDPReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\PMR UDP Coach\App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Binocular.ico" />
+    <Content Include="Coach.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

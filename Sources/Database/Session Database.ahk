@@ -1353,6 +1353,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						FileCopy(fileName, fileName . ".zip", 1)
 
 						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+						deleteFile(fileName . ".zip")
 					}
 					catch Any {
 						folder := ""

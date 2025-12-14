@@ -23,7 +23,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Project CARS 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. integration of the Race Assistants and the Driving Coach. Functionality is almost identical to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
-| [PMR](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pmr) | Full support for *Project Motor Racing* incl. integration of the Race Assistants. |
+| [PMR](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pmr) | Support for *Project Motor Racing* incl. integration of the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
@@ -1224,7 +1224,7 @@ Not complying with this requirements will give you funny results at least.
 
 ## Plugin *PCARS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
+This plugin handles the *Project CARS 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
 

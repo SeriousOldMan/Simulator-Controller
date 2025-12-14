@@ -173,25 +173,25 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate |
-| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- |
-| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Ahead (7)             | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
-| Accidents Behind (7) (10)       | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              |
-| Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               |
-| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              |
-| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             | No               |
-| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              |
-| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          |
-| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               |
-| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
-| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              |
+| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate | Project Motor Racing (11) |
+| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- | ------------------------- |
+| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Accidents Ahead (7)             | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Accidents Behind (7) (10)       | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        |
+| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               | No                        |
+| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              | No                        |
+| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             | No               | No                        |
+| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        |
+| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              | No                        |
+| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        |
+| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        |
+| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        |
+| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 
 ##### Notes
 
@@ -341,7 +341,8 @@ For Track Automations to be active, you must enable them, when you are on the tr
 
 ### Choosing between different Track Automations
 
-As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) action function. To use this, you must create an entry in your configuration like:
+As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling
+) action function. To use this, you must create an entry in your configuration like:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%201.JPG)
 

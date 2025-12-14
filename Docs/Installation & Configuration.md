@@ -96,7 +96,7 @@ Release 2.1 introduced Jona, an AI Race Engineer as an optional component of the
 
 #### Installation of Telemetry Providers
 
-The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
+The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2*, *Project CARS 2* and *Project Motor Racing* a change in the settings is necessary.
 
   1. *Assetto Corsa*
   
@@ -113,6 +113,10 @@ The Assistants acquire telemetry data from the different simulation games using 
   3. *Automobilista 2* and *Project CARS 2*
   
      You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
+	 
+  4. *Project Motor Racing*
+  
+     You have to enable the UDP access int the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 
@@ -225,6 +229,7 @@ Please note, that you can remove presets later on. But depending on the type of 
 | iRacing                     | iRacingUI.exe        | This file is located in a subfolder named "ui".       |
 | Automobilista 2             | AMS2.exe             |                                                       |
 | Project Cars 2              | pcars2avx.exe        |                                                       |
+| Project Motor Racing        | ProjectMotorRacingGame.exe | This file is located in a subfolder named "x64". |
 | Rennsport                   | Rennsport.exe        |                                                       |
 
 #### Patching the configuration

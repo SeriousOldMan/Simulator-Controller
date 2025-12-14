@@ -444,7 +444,8 @@ class TelemetryCollector {
 						trackData := sessionDB.getTrackData(code, this.Track)
 
 						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
-						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
+						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+						  . (trackData ? (" `"" . trackData . "`"") : "")
 						  , kBinariesDirectory, "Hide", &pid)
 					}
 				}

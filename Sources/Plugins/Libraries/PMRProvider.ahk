@@ -44,11 +44,8 @@ class PMRProvider extends SimulatorProvider {
 							 , File: kBinariesDirectory . "Providers\PMR UDP Provider.exe", Arguments: arguments}
 				  , Spotter: {Type: "EXE", Protocol: "UDP"
 							, File: kBinariesDirectory . "Providers\PMR UDP Spotter.exe", Arguments: arguments}
-				   }
-			/*
 				  , Coach: {Type: "EXE", Protocol: "UDP"
-						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe"}, Arguments: arguments}
-			*/
+						  , File: kBinariesDirectory . "Providers\PMR UDP Coach.exe", Arguments: arguments}}
 		}
 	}
 

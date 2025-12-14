@@ -102,6 +102,9 @@
   <ItemGroup>
     <ResourceCompile Include="R3E SHM Spotter.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Binocular.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

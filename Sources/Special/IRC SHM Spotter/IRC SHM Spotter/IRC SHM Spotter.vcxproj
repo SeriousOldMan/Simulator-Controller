@@ -130,7 +130,7 @@
     <ResourceCompile Include="IRC SHM Spotter.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Engine.ico" />
+    <Image Include="Binocular.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,8 +7,8 @@
     <ProjectGuid>{17FC2626-EA21-43ED-BC84-BE0B8545FC2D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RF2SHMCoach</RootNamespace>
-    <AssemblyName>RF2 SHM Coach</AssemblyName>
+    <RootNamespace>PMRUDPCoach</RootNamespace>
+    <AssemblyName>PMR UDP Coach</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -50,17 +50,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\RF2 SHM Coach\Program.cs" />
-    <Compile Include="..\RF2 SHM Coach\Properties\AssemblyInfo.cs" />
-    <Compile Include="..\RF2 SHM Coach\rF2Data.cs" />
-    <Compile Include="..\RF2 SHM Coach\MappedBuffer.cs" />
-    <Compile Include="RF2 SHM Coach.cs" />
+    <Compile Include="..\PMR UDP Coach\Program.cs" />
+    <Compile Include="..\PMR UDP Coach\Properties\AssemblyInfo.cs" />
+    <Compile Include="PMR UDP Coach.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\RF2 SHM Coach\App.config" />
+    <None Include="..\PMR UDP Coach\App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Coach.ico" />
+    <Content Include="Binocular.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

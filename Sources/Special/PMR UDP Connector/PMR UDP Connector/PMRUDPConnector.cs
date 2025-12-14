@@ -116,10 +116,6 @@ namespace PMRUDPConnector
             {
                 return "[Session Data]\nActive=false\n";
             }
-            finally
-            {
-                Close(); // Not really good for performance, but otherwise errors on Open...
-            }
         }
 
         private string GenerateTelemetry()

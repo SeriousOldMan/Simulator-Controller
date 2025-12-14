@@ -1930,16 +1930,16 @@ class DrivingCoach extends GridRaceAssistant {
 					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
 					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+							
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
 						if !FileExist(protocol.File)
 							throw "File not found..."
-
-						if protocol.HasProp("Arguments")
-							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-						else
-							arguments := ""
 
 						if data
 							Run("`"" . exePath . "`" " . arguments . " -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
@@ -2028,6 +2028,11 @@ class DrivingCoach extends GridRaceAssistant {
 					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
 					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+							
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
@@ -2042,11 +2047,6 @@ class DrivingCoach extends GridRaceAssistant {
 
 							options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
 						}
-
-						if protocol.HasProp("Arguments")
-							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
-						else
-							arguments := ""
 
 						if data
 							Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)

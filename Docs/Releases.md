@@ -28,7 +28,7 @@
 
 #### Changes
 
-  - Support for *Project Motor Racing* has been added. The API provided by the game is far from being complete, so many restrictions apply. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing) for more information.
+  - With a great contribution of @Awesome-XV we added support for *Project Motor Racing*. However, the API provided by the game is far from being complete, so many restrictions apply. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing) for more information.
   - [Internal] The logging of HTTP errors when calling GPT services has been extended.
   - [Developer] The API protocol for simulator integration has been extended. API connectors and providers can have additional protocol specific arguments, in the case of *Project Motor Racing* the UDP connection settings.
 

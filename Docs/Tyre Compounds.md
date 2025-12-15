@@ -179,13 +179,17 @@ As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every c
 
 Unfortunately, this simulator does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
 
+### Special notes for *Automobilista 2*
+
+The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compound must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
+
 ### Special notes for *iRacing*
 
 Tyre compounds are identified by an integer in *iRacing*. As mentioned above, the order of the tyre compounds in the tyre compound rule therefore must resemble the order of available tyre compounds for the given car. The default compound "Dry" is always available. The most simple rule for a car which provides a dry and a wet compound will typically look like this:
 
 	Dry->Dry (M);Wet->Wet (M)
 
-## Handling of Tyre Compounds on inidividual wheels
+## Handling of Tyre Compounds on individual wheels
 
 All applications of Simulator Controller can handle individual tyre compounds for each wheel. Of course, it depends on the simulator, whether indivdual tyre compounds can be specified. See the following table:
 

@@ -15,7 +15,22 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.7.5.0
+
+#### Date: 12/19/25 (planned)
+
+#### Fixes
+
+  - The Spotter no longer raises errors when set to muted or silent in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
+  - Fixed several errors in the grammars of the Spotter.
+  - Temporary files created while importing into the "Session Database" are now removed correctly.
+  - The low level Spotter process no longer crashes when cars join a session after the session has been started already.
+
+#### Changes
+
+  - Support for *Project Motor Racing* has been added. The API provided by the game is far from being complete, so many restrictions apply. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing) for more information.
+  - [Internal] The logging of HTTP errors when calling GPT services has been extended.
+  - [Developer] The API protocol for simulator integration has been extended. API connectors and providers can have additional protocol specific arguments, in the case of *Project Motor Racing* the UDP connection settings.
 
 # Release history
 

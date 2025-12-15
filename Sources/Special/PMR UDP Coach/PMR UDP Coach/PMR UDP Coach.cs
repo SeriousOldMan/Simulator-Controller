@@ -1,21 +1,15 @@
-﻿using PMRUDPSpotter;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Threading;
+using PMRUDPProtocol;
 
 namespace PMRUDPCoach {
 	public class UDPCoach
     {
-        private PMRUDPReceiver receiver;
+        private PMRUDPReceiver.PMRUDPReceiver receiver;
 
         bool connected = false;
 
@@ -38,7 +32,7 @@ namespace PMRUDPCoach {
                     if (receiver != null)
                         receiver.Stop();
 
-                    receiver = new PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
+                    receiver = new PMRUDPReceiver.PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
 
                     bool started = receiver.Start();
 

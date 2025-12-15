@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using PMRUDPProtocol;
 
-namespace PMRUDPSpotter
+namespace PMRUDPReceiver
 {
     public class PMRUDPReceiver
     {

@@ -2,12 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PMRUDPSpotter
+namespace PMRUDPProtocol
 {
 	public class UDPProtocol
 	{
 		public const int Version = 1;
-	}
+
+        public const bool hasSessionTime = false;
+        public const bool hasSessionIsLaps = false;
+        public const bool hasInPitlane = false;
+        public const bool hasTrackGrip = false;
+        public const bool hasLastLap = false;
+        public const bool hasTCSActive = false;
+        public const bool hasTyreCompounds = false;
+        public const bool hasAeroDamage = false;
+        public const bool hasSuspensionDamage = false;
+        public const bool hasEngineDamage = false;
+    }
 	
     public enum UDPPacketType : byte
     {
@@ -40,7 +51,6 @@ namespace PMRUDPSpotter
         public float TrackTemperature;
         public float SessionTimeElapsed = 0;
         public float TrackGrip = 1.0f;
-        public byte WeatherId = 0;
         public bool IsLaps;
         public bool SessionIsLaps;
         public UDPRaceSessionState State;
@@ -65,7 +75,6 @@ namespace PMRUDPSpotter
 			if (UDPProtocol.Version > 1) {
 				info.SessionTimeElapsed = BitConverter.ToSingle(data, offset); offset += 4;
 				info.TrackGrip = BitConverter.ToSingle(data, offset); offset += 4;
-				info.WeatherId = data[offset++];
 			}
 			
             info.IsLaps = data[offset++] != 0;
@@ -118,6 +127,7 @@ namespace PMRUDPSpotter
         public bool DQ;
         public uint Flags;
         public float AeroDamage = 0;
+        public float SuspensionDamage = 0;
         public float EngineDamage = 0;
 
         public static UDPParticipantRaceState Decode(byte[] data, ref int offset)
@@ -193,9 +203,11 @@ namespace PMRUDPSpotter
             state.DQ = data[offset++] != 0;
             state.Flags = BitConverter.ToUInt32(data, offset); offset += 4;
             
-			if (UDPProtocol.Version > 1) {
-				state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
-				state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
+			if (UDPProtocol.Version > 1)
+            {
+                state.AeroDamage = BitConverter.ToSingle(data, offset); offset += 4;
+                state.SuspensionDamage = BitConverter.ToSingle(data, offset); offset += 4;
+                state.EngineDamage = BitConverter.ToSingle(data, offset); offset += 4;
 			}
 			
             return state;
@@ -349,6 +361,7 @@ namespace PMRUDPSpotter
             public float EstRollingSpeed;
             public float EstLinearSpeed;
             public float TotalBrakeForce;
+            public bool TCSActive;
             public bool ABSActive;
         }
 
@@ -529,6 +542,12 @@ namespace PMRUDPSpotter
             gen.EstRollingSpeed = BitConverter.ToSingle(data, offset); offset += 4;
             gen.EstLinearSpeed = BitConverter.ToSingle(data, offset); offset += 4;
             gen.TotalBrakeForce = BitConverter.ToSingle(data, offset); offset += 4;
+
+            if (UDPProtocol.Version > 1)
+                gen.TCSActive = data[offset++] != 0;
+            else
+                gen.TCSActive = false;
+
             gen.ABSActive = data[offset++] != 0;
         }
 

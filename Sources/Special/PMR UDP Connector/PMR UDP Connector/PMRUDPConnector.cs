@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using PMRUDPProtocol;
 
 namespace PMRUDPConnector
 {
     public class PMRUDPConnector
     {
-        private PMRUDPReceiver receiver;
+        private PMRUDPReceiver.PMRUDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
         public PMRUDPConnector()
@@ -55,6 +53,22 @@ namespace PMRUDPConnector
                 return (long)(raceInfo.Duration * 1000 - GetTimeIntoSession());
         }
 
+        private string GetWeather(string weather)
+        {
+            switch (weather.ToLower()) {
+                case "hot":
+                case "cold":
+                    return "Dry";
+                case "light rain":
+                case "lightrain":
+                    return "LightRain";
+                case "rainfall":
+                    return "HeavyRain";
+                default:
+                    return "Dry";
+            }
+        }
+
         public bool Open(string multiCastGroup = "224.0.0.150", int multiCastPort = 7576, bool useMultiCast = true)
         {
             try
@@ -62,7 +76,7 @@ namespace PMRUDPConnector
                 if (receiver != null)
                     receiver.Stop();
 
-                receiver = new PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
+                receiver = new PMRUDPReceiver.PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
                 
                 bool started = receiver.Start();
 				
@@ -244,15 +258,13 @@ namespace PMRUDPConnector
 
             sb.Append("[Weather Data]\n");
             sb.AppendFormat("Temperature={0}\n", F(raceInfo.AmbientTemperature));
-            sb.AppendFormat("Weather={0}\n", "Dry"); // raceInfo.Weather);
-            sb.AppendFormat("Weather10Min={0}\n", "Dry"); // raceInfo.Weather);
-            sb.AppendFormat("Weather30Min={0}\n", "Dry"); // raceInfo.Weather);
+            sb.AppendFormat("Weather={0}\n", GetWeather(raceInfo.Weather));
+            sb.AppendFormat("Weather10Min={0}\n", GetWeather(raceInfo.Weather));
+            sb.AppendFormat("Weather30Min={0}\n", GetWeather(raceInfo.Weather));
 
             sb.Append("[Debug Data]\n");
             sb.AppendFormat("GameMode={0}\n", raceInfo.GameMode);
-            sb.AppendFormat("Weather={0}\n", raceInfo.Weather);
-            sb.AppendFormat("WeatherID={0}\n", raceInfo.WeatherId);
-            sb.AppendFormat("AeroDamage={0}\n", playerState.AeroDamage);
+            sb.AppendFormat("Flags={0}\n", playerState.Flags);
 
             return sb.ToString();
         }

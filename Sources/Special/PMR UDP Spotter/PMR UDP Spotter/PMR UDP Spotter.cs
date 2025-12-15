@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Threading;
+using PMRUDPProtocol;
 
 namespace PMRUDPSpotter {
 	public class UDPSpotter
     {
-        private PMRUDPReceiver receiver;
+        private PMRUDPReceiver.PMRUDPReceiver receiver;
 
         bool connected = false;
 		
@@ -36,7 +31,7 @@ namespace PMRUDPSpotter {
                     if (receiver != null)
                         receiver.Stop();
 
-                    receiver = new PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
+                    receiver = new PMRUDPReceiver.PMRUDPReceiver(multiCastPort, multiCastGroup, useMultiCast);
 
                     bool started = receiver.Start();
 
@@ -1039,8 +1034,11 @@ namespace PMRUDPSpotter {
 					telemetryFile.Write((float)playerTelemetry.Drivetrain.EngineRPM + ";");
 					telemetryFile.Write(vehicleSpeed(ref playerTelemetry) + ";");
 
-					telemetryFile.Write("n/a;");
-					telemetryFile.Write("n/a;");
+					if (UDPProtocol.hasTCSActive)
+                        telemetryFile.Write(playerTelemetry.General.TCSActive);
+					else
+						telemetryFile.Write("n/a;");
+					telemetryFile.Write(playerTelemetry.General.ABSActive);
 
 					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[2] / 9.807f) + ";");
 					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[0] / 9.807f) + ";");

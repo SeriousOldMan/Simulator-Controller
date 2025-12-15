@@ -9,7 +9,7 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-;@SC-IF %configuration% == Develop`ment
+;@SC-IF %configuration% == Development
 #Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 

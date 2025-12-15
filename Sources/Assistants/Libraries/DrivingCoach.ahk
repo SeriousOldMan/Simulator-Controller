@@ -1934,11 +1934,11 @@ class DrivingCoach extends GridRaceAssistant {
 							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 						else
 							arguments := ""
-							
+
 						exePath := protocol.File
 						protocol := protocol.Protocol
 
-						if !FileExist(protocol.File)
+						if !FileExist(exePath)
 							throw "File not found..."
 
 						if data
@@ -2032,7 +2032,7 @@ class DrivingCoach extends GridRaceAssistant {
 							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 						else
 							arguments := ""
-							
+
 						exePath := protocol.File
 						protocol := protocol.Protocol
 

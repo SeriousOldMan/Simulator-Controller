@@ -1033,16 +1033,10 @@ namespace PMRUDPSpotter {
 					telemetryFile.Write((float)playerTelemetry.Input.Gear + ";");
 					telemetryFile.Write((float)playerTelemetry.Drivetrain.EngineRPM + ";");
 					telemetryFile.Write(vehicleSpeed(ref playerTelemetry) + ";");
-
-					if (UDPProtocol.hasTCSActive)
-                        telemetryFile.Write(playerTelemetry.General.TCSActive);
-					else
-						telemetryFile.Write("n/a;");
-					telemetryFile.Write(playerTelemetry.General.ABSActive);
-
+					telemetryFile.Write(playerTelemetry.Drivetrain.TractionControlActive ? "1;" : "0;");
+					telemetryFile.Write(playerTelemetry.General.ABSActive ? "1;" : "0;");
 					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[2] / 9.807f) + ";");
 					telemetryFile.Write((playerTelemetry.Chassis.AccelerationLS[0] / 9.807f) + ";");
-
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[0] + ";");
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 

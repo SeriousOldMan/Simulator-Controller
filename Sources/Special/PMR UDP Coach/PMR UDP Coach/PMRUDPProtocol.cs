@@ -13,7 +13,6 @@ namespace PMRUDPProtocol
         public const bool hasInPitlane = false;
         public const bool hasTrackGrip = false;
         public const bool hasLastLap = false;
-        public const bool hasTCSActive = false;
         public const bool hasTyreCompounds = false;
         public const bool hasAeroDamage = false;
         public const bool hasSuspensionDamage = false;
@@ -361,7 +360,6 @@ namespace PMRUDPProtocol
             public float EstRollingSpeed;
             public float EstLinearSpeed;
             public float TotalBrakeForce;
-            public bool TCSActive;
             public bool ABSActive;
         }
 
@@ -542,12 +540,6 @@ namespace PMRUDPProtocol
             gen.EstRollingSpeed = BitConverter.ToSingle(data, offset); offset += 4;
             gen.EstLinearSpeed = BitConverter.ToSingle(data, offset); offset += 4;
             gen.TotalBrakeForce = BitConverter.ToSingle(data, offset); offset += 4;
-
-            if (UDPProtocol.Version > 1)
-                gen.TCSActive = data[offset++] != 0;
-            else
-                gen.TCSActive = false;
-
             gen.ABSActive = data[offset++] != 0;
         }
 

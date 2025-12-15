@@ -265,6 +265,7 @@ namespace PMRUDPConnector
             sb.Append("[Debug Data]\n");
             sb.AppendFormat("GameMode={0}\n", raceInfo.GameMode);
             sb.AppendFormat("Flags={0}\n", playerState.Flags);
+            sb.AppendFormat("LF Material={0}\n", playerTelem.Wheels[0].ContactMaterialHash);
 
             return sb.ToString();
         }

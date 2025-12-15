@@ -154,11 +154,7 @@ namespace PMRUDPSpotter {
 		int carBehindCount = 0;
 		long nextCarBehind = 0;
 
-		const int YELLOW_SECTOR_1 = 1;
-		const int YELLOW_SECTOR_2 = 2;
-		const int YELLOW_SECTOR_3 = 4;
-
-		const int YELLOW_ALL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
+		const int YELLOW = 1;
 
 		const int BLUE = 16;
 
@@ -850,12 +846,86 @@ namespace PMRUDPSpotter {
             return false;
 		}
 
-        bool checkFlagState(ref UDPRaceInfo raceInfo)
+        bool checkFlagState(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle)
 		{
-            // No support by Project Motor Recing
+            if ((waitYellowFlagState & YELLOW) != 0)
+            {
+                if (yellowCount > 50)
+                {
+                    if ((playerVehicle.Flags & 2) == 0)
+                        waitYellowFlagState &= ~YELLOW;
+
+                    yellowCount = 0;
+
+                    if ((waitYellowFlagState & YELLOW) != 0)
+                    {
+                        SendSpotterMessage("yellowFlag:Ahead");
+
+                        waitYellowFlagState &= ~YELLOW;
+
+                        return true;
+                    }
+                }
+                else
+                    yellowCount += 1;
+            }
+            else
+                yellowCount = 0;
+
+            if ((playerVehicle.Flags & 8) != 0)
+            {
+                if ((lastFlagState & BLUE) == 0 && cycle > nextBlueFlag)
+                {
+                    nextBlueFlag = cycle + 400;
+
+                    SendSpotterMessage("blueFlag");
+
+                    lastFlagState |= BLUE;
+
+                    return true;
+                }
+                else if (blueCount > 1000)
+                {
+                    lastFlagState &= ~BLUE;
+
+                    blueCount = 0;
+                }
+                else
+                    blueCount += 1;
+            }
+            else
+            {
+                lastFlagState &= ~BLUE;
+
+                blueCount = 0;
+            }
+
+            if ((playerVehicle.Flags & 2) == 2)
+            {
+                if ((lastFlagState & YELLOW) == 0)
+                {
+                    lastFlagState |= YELLOW;
+                    waitYellowFlagState |= YELLOW;
+                    yellowCount = 0;
+                }
+            }
+            else
+            {
+                if ((lastFlagState & YELLOW) != 0)
+                {
+                    if (waitYellowFlagState != lastFlagState)
+                        SendSpotterMessage("yellowFlag:Clear");
+
+                    lastFlagState &= ~YELLOW;
+                    waitYellowFlagState &= ~YELLOW;
+                    yellowCount = 0;
+
+                    return true;
+                }
+            }
 
             return false;
-		}
+        }
 
 		bool checkPitWindow(ref UDPRaceInfo raceInfo)
 		{
@@ -1189,7 +1259,7 @@ namespace PMRUDPSpotter {
 									if (enabled)
 										if (checkAccident(ref raceInfo, ref playerVehicle))
 											wait = false;
-										else if (checkFlagState(ref raceInfo) || checkPositions(ref playerVehicle, ref playerTelemetry))
+										else if (checkFlagState(ref raceInfo, ref playerVehicle) || checkPositions(ref playerVehicle, ref playerTelemetry))
 											wait = false;
 										else
 											wait = !checkPitWindow(ref raceInfo);

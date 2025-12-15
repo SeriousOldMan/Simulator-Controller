@@ -95,6 +95,8 @@ global gBuildSettings := CaseInsenseWeakMap()
 
 global gProgressCount := 0
 
+global gBuilding := false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -3866,6 +3868,8 @@ startupSimulatorTools() {
 		if forceExit
 			exitProcesses("", "", true, true, ["Simulator Tools"])
 
+		gBuilding := true
+
 		runCleanTargets(&buildProgress)
 
 		if (gSpecialTargets.Length > 0)
@@ -3922,7 +3926,8 @@ startupSimulatorTools()
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 Escape:: {
-	cancelBuild()
+	if gBuilding
+		cancelBuild()
 
 	return
 }

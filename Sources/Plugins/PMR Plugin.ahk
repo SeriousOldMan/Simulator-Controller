@@ -10,8 +10,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Libraries\SimulatorPlugin.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,22 +26,6 @@ global kPMRPlugin := "PMR"
 ;;;-------------------------------------------------------------------------;;;
 
 class PMRPlugin extends RaceAssistantSimulatorPlugin {
-	iSettingsDatabase := false
-
-	SettingsDatabase {
-		Get {
-			local settingsDB := this.iSettingsDatabase
-
-			if !settingsDB {
-				settingsDB := SettingsDatabase()
-
-				this.iSettingsDatabase := settingsDB
-			}
-
-			return settingsDB
-		}
-	}
-
 	__New(controller, name, simulator, configuration := false) {
 		local multiCastGroup := "224.0.0.150"
 		local multiCastPort := 7576

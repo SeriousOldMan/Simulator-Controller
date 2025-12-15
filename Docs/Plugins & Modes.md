@@ -1524,6 +1524,23 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
+### Special notes for *Project Motor Racing*
+
+1. When the UDP port is not configured to 127.0.0.1 (localhost), the Firewall will ask for permission to open this port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
+
+2. The current implementation of the UDP API lack many important information at the time of this writing.
+
+   - There is no way to detect a paused session, so the Assistants are active and, for example, the Spotter may tell you about cars nearby in a paused game.
+   - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, will fail.
+   - Information about the timings of the last lap are not available, only for the best lap so far, which will be used instead. Obviously not the best alternative, but the only one at the moment.
+   - Information about the mouunted tyres is not available, so tyre compounds will always be recognized as "Dry (Black)".
+   - The API does not report about any type of damage on the car. 
+   - Track Grip is not available as well.
+   - Weather information is given by the API in the localized string (for example "Heiß" for "Hot", if UI settings are in German). So weather information is unreliable at least. Additionally, no forecast is available.
+   - No support for pitstop handling in any way.
+   
+   The developer team of the studio is informed. Let's see what they come up with.
+
 ## Plugin *Integration*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.

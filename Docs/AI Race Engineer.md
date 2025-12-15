@@ -603,7 +603,7 @@ The following statistical models are currently implemented:
 	   
 	 - *Project Motor Racing*
 	   
-	   At the time of this writing, *Project Motor Racing* only supplies weather information in the API for the current weather. Furthermore, this information is supplied in a language-localized string, so in effect, this information is unusable.
+	   At the time of this writing, *Project Motor Racing* only supplies weather information in the API for the current weather. Furthermore, this information is supplied in a language-localized string, so in effect, this information is unreliable in most case. When *Project Motor Racing* has been configured for *English* in the *Steam* settings, "Dry", "Light Raing" and "Rainfall" conditions will be detected for the current weather.
 	 
 Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always double-check under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
 

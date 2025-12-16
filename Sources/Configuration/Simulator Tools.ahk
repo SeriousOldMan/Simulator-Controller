@@ -3004,6 +3004,17 @@ updateConfigurationForV400() {
 }
 */
 
+updatePluginsForV675() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+
+	if ((userConfiguration.Count > 0) && !getMultiMapValue(userConfiguration, "Plugins", "PMR", false)) {
+		Plugin("PMR", false, false, "Project Motor Racing").saveToConfiguration(userConfiguration)
+
+		writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV613() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

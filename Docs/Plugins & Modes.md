@@ -1528,7 +1528,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 1. When the UDP port is not configured to 127.0.0.1 (localhost), the Firewall will ask for permission to open this port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-2. The current implementation of the UDP API lack many important information at the time of this writing.
+2. The current implementation of the UDP API still has many gaps regarding important information at the time of writing.
 
    - There is no way to detect a paused session, so the Assistants are active and, for example, the Spotter may tell you about cars nearby in a paused game.
    - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, will fail.

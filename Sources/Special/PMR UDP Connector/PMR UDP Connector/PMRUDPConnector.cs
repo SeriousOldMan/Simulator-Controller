@@ -15,12 +15,6 @@ namespace PMRUDPConnector
         {
         }
 
-        public int GetTimeIntoSession()
-        {
-            var raceInfo = receiver?.GetRaceInfo();
-            return raceInfo != null ? (int)(raceInfo.SessionTimeElapsed * 1000) : 0;
-        }
-
         public int GetRemainingLaps()
         {
             var raceInfo = receiver.GetRaceInfo();
@@ -50,7 +44,7 @@ namespace PMRUDPConnector
                     return 60000;
                 }
             else
-                return (long)(raceInfo.Duration * 1000 - GetTimeIntoSession());
+                return (long)((raceInfo.Duration - (int)(raceInfo.SessionTimeElapsed * 1000)) * 1000);
         }
 
         private string GetWeather(string weather)

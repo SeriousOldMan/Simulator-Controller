@@ -384,7 +384,7 @@ class SetupWorkbench extends ConfigurationItem {
 		OnExit((*) {
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
-				
+
 			return false
 		})
 	}
@@ -3980,6 +3980,7 @@ if kLogStartup
 #Include "Libraries\GenericIssueAnalyzer.ahk"
 #Include "Libraries\IRCIssueAnalyzer.ahk"
 #Include "Libraries\R3EIssueAnalyzer.ahk"
+#Include "Libraries\PMRIssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
 #Include "Libraries\LMUSetupEditor.ahk"

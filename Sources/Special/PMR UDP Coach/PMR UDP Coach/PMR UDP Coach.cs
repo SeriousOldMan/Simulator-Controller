@@ -236,8 +236,9 @@ namespace PMRUDPCoach {
         int lowspeedThreshold = 100;
         int steerLock = 900;
         int steerRatio = 14;
-        int wheelbase = 270;
-        int trackWidth = 150;
+        
+		// int wheelbase = 270;
+        // int trackWidth = 150;
 
         int lastCompletedLaps = 0;
         float lastSpeed = 0.0f;
@@ -307,7 +308,7 @@ namespace PMRUDPCoach {
             double angularVelocity = smoothValue(recentRealAngVels, playerTelemetry.Chassis.AngularVelocityLS[2]);
             double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
             double steerAngleRadians = -steeredAngleDegs / 57.2958;
-            double wheelBaseMeter = (float)wheelbase / 100;
+            double wheelBaseMeter = (float)playerTelemetry.Constant.Wheelbase / 100;
             double radius = wheelBaseMeter / steerAngleRadians;
             double perimeter = radius * PI * 2;
             double perimeterSpeed = lastSpeed / 3.6;
@@ -896,8 +897,11 @@ namespace PMRUDPCoach {
 				lowspeedThreshold = int.Parse(args[index++]);
 				steerLock = int.Parse(args[index++]);
 				steerRatio = int.Parse(args[index++]);
+
+				/*
 				wheelbase = int.Parse(args[index++]);
 				trackWidth = int.Parse(args[index++]);
+				*/
 			}
 			else {
 				understeerLightThreshold = int.Parse(args[index++]);
@@ -909,8 +913,11 @@ namespace PMRUDPCoach {
 				lowspeedThreshold = int.Parse(args[index++]);
 				steerLock = int.Parse(args[index++]);
 				steerRatio = int.Parse(args[index++]);
+
+				/*
 				wheelbase = int.Parse(args[index++]);
 				trackWidth = int.Parse(args[index++]);
+				*/
 
                 if (args.Length > index) {
                     soundsDirectory = args[index++];

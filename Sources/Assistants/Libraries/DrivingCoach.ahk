@@ -26,6 +26,7 @@
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "..\..\Garage\Libraries\PMRIssueCollector.ahk"
 #Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "RaceAssistant.ahk"
 
@@ -113,6 +114,8 @@ class DrivingCoach extends GridRaceAssistant {
 					return "IRCIssueCollector"
 				case "R3E":
 					return "R3EIssueCollector"
+				case "PMR":
+					return "PMRIssueCollector"
 				default:
 					return "IssueCollector"
 			}
@@ -1122,7 +1125,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if knowledgeBase {
 			this.iIssueCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-															, {Handling: true, Frequency: 5000})
+														, {Handling: true, Frequency: 5000})
 
 			this.iIssueCollector.loadFromSettings()
 

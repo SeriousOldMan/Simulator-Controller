@@ -116,7 +116,7 @@ The Assistants acquire telemetry data from the different simulation games using 
 	 
   4. *Project Motor Racing*
   
-     You have to enable the UDP access int the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
+     You have to enable the UDP access in the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 

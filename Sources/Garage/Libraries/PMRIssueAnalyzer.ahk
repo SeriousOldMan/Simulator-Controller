@@ -28,9 +28,11 @@ class PMRIssueAnalyzer extends GenericIssueAnalyzer {
 	}
 
 	settingAvailable(setting) {
+		/*
 		if ((setting = "Wheelbase") || (setting = "TrackWidth"))
 			return false
 		else
+		*/
 			return super.settingAvailable(setting)
 	}
 }

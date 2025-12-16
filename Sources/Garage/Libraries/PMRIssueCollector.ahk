@@ -15,9 +15,11 @@
 
 class PMRIssueCollector extends IssueCollector {
 	settingAvailable(setting, force := false) {
+		/*
 		if ((setting = "Wheelbase") || (setting = "TrackWidth"))
 			return false
 		else
+		*/
 			return super.settingAvailable(setting, force)
 	}
 }

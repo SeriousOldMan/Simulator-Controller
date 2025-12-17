@@ -3907,17 +3907,18 @@ cancelBuild() {
 
 	protectionOn()
 
-	try {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgBox, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
-		OnMessage(0x44, translateYesNoButtons, 0)
+	if gBuilding
+		try {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := withBlockedWindows(MsgBox, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-		if (msgResult = "Yes")
-			ExitApp(0)
-	}
-	finally {
-		protectionOff()
-	}
+			if (msgResult = "Yes")
+				ExitApp(0)
+		}
+		finally {
+			protectionOff()
+		}
 }
 
 
@@ -3937,8 +3938,7 @@ startupSimulatorTools()
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 Escape:: {
-	if gBuilding
-		cancelBuild()
+	cancelBuild()
 
 	return
 }

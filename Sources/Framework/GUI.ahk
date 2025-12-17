@@ -1954,6 +1954,8 @@ class Window extends Gui {
 		local x, y, cWidth, cHeight, width, height
 		local fullHeight, clientHeight
 
+		SetWindowAttribute(dwAttribute, pvAttribute?) => DllCall("dwmapi\DwmSetWindowAttribute", 'ptr', this.Hwnd, "uint", dwAttribute, "uint*", pvAttribute, "int", 4)
+
 		this.Theme.InitializeControls(this)
 
 		super.Show(arguments*)
@@ -1965,6 +1967,9 @@ class Window extends Gui {
 		if !this.OrigWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
+
+			if (VerCompare(A_OSVersion, "10.0.22000") >= 0)
+				SetWindowAttribute(33, 2)
 
 			width := screen2Window(width)
 			height := screen2Window(height)

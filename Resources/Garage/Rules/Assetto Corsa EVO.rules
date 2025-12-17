@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Project Motor Racing            ;;;
+;;;   Modular Simulator Controller System - Assetto Corsa EVO               ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,14 +10,14 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator("Project Motor Racing")),
-				 (Prove: addCharacteristics("Project Motor Racing", *, *, *)),
-				 (Prove: addSettings("Project Motor Racing", *, *)),
-				 (Prove: removeSettings("Project Motor Racing", *, [Brake.Duct.Front, Brake.Duct.Rear,
-																	Radiator.Blanket.Water, Radiator.Blanket.Oil,
-																	Aero.Wing.Front.Left, Aero.Wing.Front.Right,
-																	Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
-																	Aero.Height.Front, Aero.Height.Rear]))
+[?Initialize] => (Prove: addSimulator("Assetto Corsa EVO")),
+				 (Prove: addCharacteristics("Assetto Corsa EVO", *, *, *)),
+				 (Prove: addSettings("Assetto Corsa EVO", *, *)),
+				 (Prove: removeSettings("Assetto Corsa EVO", *, [Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+																 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+																 Aero.Height.Front.Left, Aero.Height.Front.Right,
+																 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+																 Radiator.Blanket.Water, Radiator.Blanket.Oil]))
 
 
 ;;;-------------------------------------------------------------------------;;;

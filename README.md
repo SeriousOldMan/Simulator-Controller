@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/2Sy6WiQj/Releases/Simulator%20Controller%206.7.5.0-dev.zip) (Early build for 6.7.5. Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs.)
+[6.7.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/PmBcpyd4/Releases/Simulator%20Controller%206.7.5.0-beta.zip) (Test build for 6.7.5. Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6750) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-675) of this version and all the versions you might have skipped, before installing and using this version.
 

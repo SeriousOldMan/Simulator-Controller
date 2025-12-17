@@ -29,6 +29,7 @@
 #### Changes
 
   - When a call to a GPT service provider fails due to rate limiting, the system will retry the call several times with an exponentially increasing waiting time between the calls.
+  - All windows are forced to have rounded corners when running on Windows 11.
   - With a great contribution of @Awesome-XV we added support for *Project Motor Racing*. However, the API provided by the game is far from being complete, so many restrictions apply. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing) for more information.
   - New article for *News, tips and tricks* about coaching sessions.
   - [Internal] The logging of HTTP errors when calling GPT services has been extended.

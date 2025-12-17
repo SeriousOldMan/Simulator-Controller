@@ -1,0 +1,27 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa EVO               ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator("Assetto Corsa EVO")),
+				 (Prove: addCharacteristics("Assetto Corsa EVO", *, *, *)),
+				 (Prove: addSettings("Assetto Corsa EVO", *, *)),
+				 (Prove: removeSettings("Assetto Corsa EVO", *, [Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+																 Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+																 Aero.Height.Front.Left, Aero.Height.Front.Right,
+																 Aero.Height.Rear.Left, Aero.Height.Rear.Right,
+																 Radiator.Blanket.Water, Radiator.Blanket.Oil]))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

@@ -30,6 +30,7 @@
 
   - When a call to a GPT service provider fails due to rate limiting, the system will retry the call several times with an exponentially increasing waiting time between the calls.
   - With a great contribution of @Awesome-XV we added support for *Project Motor Racing*. However, the API provided by the game is far from being complete, so many restrictions apply. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing) for more information.
+  - Generic handling issues have been added in the "Setup Workbench" for *Assetto Corsa EVO*. Still no telemetry support in the API.
   - New article for *News, tips and tricks* about coaching sessions.
   - [Internal] The logging of HTTP errors when calling GPT services has been extended.
   - [Developer] The API protocol for simulator integration has been extended. API connectors and providers can have additional protocol specific arguments, in the case of *Project Motor Racing* the UDP connection settings.

@@ -386,6 +386,12 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
+			if !getMultiMapValue(data, "Car Data", "TC", false)
+				setMultiMapValue(data, "Car Data", "TC", "n/a")
+
+			if !getMultiMapValue(data, "Car Data", "ABS", false)
+				setMultiMapValue(data, "Car Data", "ABS", "n/a")
+
 			switch sessionData.State, false {
 				case "Driving":
 					setMultiMapValue(data, "Session Data", "Active", true)

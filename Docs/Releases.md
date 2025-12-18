@@ -1,23 +1,8 @@
 # Latest stable release
 
-## 6.7.1.0
-
-#### Date: 12/12/25
-
-#### Fixes
-
-  - None this time...
-
-#### Changes
-
-  - It is now possible to specifically activate/deactivate sections on the track map, that are used by the Driving Coach for the coaching sessions. This allows you to define sections for each corner, thereby having the correct corner numbers all the time, but only have those section active, for which you want to get instructions. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
-  - [Expert] The documentation for all internal controller action functions, which can be used for scripting, defining your own voice commands, etc. have been rearranged for more clarity. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) the new documentation for all these functions.
-
-# Upcoming release
-
 ## 6.7.5.0
 
-#### Date: 12/19/25 (planned)
+#### Date: 12/19/25
 
 #### Fixes
 
@@ -36,7 +21,24 @@
   - [Internal] The logging of HTTP errors when calling GPT services has been extended.
   - [Developer] The API protocol for simulator integration has been extended. API connectors and providers can have additional protocol specific arguments, in the case of *Project Motor Racing* the UDP connection settings.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 6.7.1.0
+
+#### Date: 12/12/25
+
+#### Fixes
+
+  - None this time...
+
+#### Changes
+
+  - It is now possible to specifically activate/deactivate sections on the track map, that are used by the Driving Coach for the coaching sessions. This allows you to define sections for each corner, thereby having the correct corner numbers all the time, but only have those section active, for which you want to get instructions. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation) for more information.
+  - [Expert] The documentation for all internal controller action functions, which can be used for scripting, defining your own voice commands, etc. have been rearranged for more clarity. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) the new documentation for all these functions.
 
 ## 6.7.0.0
 

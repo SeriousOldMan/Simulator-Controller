@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+[6.7.5.0-release](https://cutt.ly/9taJiWca) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6710) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-671) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6750) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-675) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
+[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
 
-[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter.)
+[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
 
 #### Latest development build
 
-[6.7.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/PmBcpyd4/Releases/Simulator%20Controller%206.7.5.0-beta.zip) (Test build for 6.7.5. Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6750) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-675) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

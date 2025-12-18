@@ -470,9 +470,10 @@ class RF2Plugin extends Sector397Plugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRF2() {
+startRF2(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRF2Plugin).Simulator
-													 , "Simulator Splash Images\RF2 Splash.jpg")
+													 , "Simulator Splash Images\RF2 Splash.jpg"
+													 , executable)
 }
 
 

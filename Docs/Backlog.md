@@ -1,7 +1,6 @@
 #### General
   1. Support for unit conversions per simulator
   2. Make the location of the local data folder configurable during installation process
-  3. Support steam link game starting like "steam://run/<id>" in the application startup hook
 
 #### Voice System
   1. Support automatic language translation when using Whisper voice recognition

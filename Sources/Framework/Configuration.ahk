@@ -209,7 +209,13 @@ class Application extends ConfigurationItem {
 
 		if (special && (specialStartup && specialStartup != "")) {
 			try {
-				processID := %specialStartup%()
+				if InStr(specialStartup, "steam:") {
+					Run(specialStartup)
+
+					return true
+				}
+				else
+					processID := %specialStartup%()
 			}
 			catch Any as exception {
 				logError(exception)

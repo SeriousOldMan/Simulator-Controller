@@ -283,15 +283,20 @@ class BasicStepWizard extends StepWizard {
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VbasicUILanguageDropDown Hidden", choices)
 
 		widget8 := window.Add("Text", "x" . x . " yp+24 w100 h23 +0x200 Hidden", translate("Push-To-Talk"))
+		widget8.Info := "Basic.Push-To-Talk.Info"
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VbasicPushToTalkButton Hidden")
+		widget9.Info := "Basic.Push-To-Talk.Info"
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
 		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VbasicPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
+		widget10.Info := "Basic.Push-To-Talk.Info"
 		widget10.OnEvent("Change", updateP2T)
 		widget51 := window.Add("Button", "xp+99 yp w23 h23 Hidden")
+		widget51.Info := "Basic.Push-To-Talk.Info"
 		widget51.OnEvent("Click", (*) => this.testPushToTalk())
 		setButtonIcon(widget51, kIconsDirectory . "Start.ico", 1)
 		widget11 := window.Add("Edit", "xp+24 yp w72 h21 VbasicPushToTalkEdit Hidden")
+		widget11.Info := "Basic.Push-To-Talk.Info"
 
 		window.SetFont("Bold", "Arial")
 

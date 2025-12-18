@@ -386,12 +386,6 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
-			if !getMultiMapValue(data, "Car Data", "TC", false)
-				setMultiMapValue(data, "Car Data", "TC", "n/a")
-
-			if !getMultiMapValue(data, "Car Data", "ABS", false)
-				setMultiMapValue(data, "Car Data", "ABS", "n/a")
-
 			switch sessionData.State, false {
 				case "Driving":
 					setMultiMapValue(data, "Session Data", "Active", true)
@@ -415,6 +409,12 @@ class LMUProvider extends Sector397Provider {
 					setMultiMapValue(data, "Session Data", "Track", track)
 				else
 					track := this.Track
+
+				if !getMultiMapValue(data, "Car Data", "TC", false)
+					setMultiMapValue(data, "Car Data", "TC", "n/a")
+
+				if !getMultiMapValue(data, "Car Data", "ABS", false)
+					setMultiMapValue(data, "Car Data", "ABS", "n/a")
 
 				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
 				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)

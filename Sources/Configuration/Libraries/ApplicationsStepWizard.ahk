@@ -257,6 +257,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local definition := this.Definition
 		local check := (initialize = "CHECK")
+		local steamIDs := getSteamIDs()
 		local application, ignore, section, application, category
 
 		if check
@@ -268,6 +269,9 @@ class ApplicationsStepWizard extends StepWizard {
 			for application, ignore in getMultiMapValues(wizard.Definition, section) {
 				if (check || !wizard.isApplicationInstalled(application)) {
 					wizard.locateApplication(application, check ? "CHECK" : false, false)
+
+					if steamIDs.Has(application)
+						wizard.setApplicationValue(application, "steamID", steamIDs[application])
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)

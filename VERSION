@@ -1,9 +1,9 @@
 [Development]
-Version=6.7.5.0-release
-Target=6.7.5.0-release
+Version=6.7.6.0-dev
+Target=6.7.6.0-release
 Date=12/19/2025
-Download=https://cutt.ly/9taJiWca;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DtmZ2DDg/Releases/Simulator Controller 6.7.5.0-release.zip;https://www.dropbox.com/scl/fi/dk0p55o37koa4qnz7r4we/Simulator-Controller-6.7.5.0-release.zip?rlkey=8ehtmwtqy5wi6ocjtktycsumr&st=75dejy91&dl=1;http://%master%/Releases/Simulator Controller 6.7.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.5.0-release.zip
-Changes=Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo
+Download=
+Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a/ form LMU 
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.7.5.0-release
@@ -22,7 +22,7 @@ Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.7.5.0-release
+Development=6.7.6.0-dev
 Release=6.7.5.0-release

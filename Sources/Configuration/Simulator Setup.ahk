@@ -1678,6 +1678,24 @@ class SetupWizard extends ConfiguratorPanel {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 
+	setApplicationValue(application, key, value, update := true) {
+		this.KnowledgeBase.setFact("Application." . application . ".Key." . key, value)
+
+		if update
+			this.updateState()
+	}
+
+	getApplicationValue(application, key, default := "") {
+		return this.KnowledgeBase.getValue("Application." . application . ".Key." . key, default)
+	}
+
+	clearApplicationValue(application, key, update := true) {
+		this.KnowledgeBase.removeFact("Application." . application . ".Key." . key, "")
+
+		if update
+			this.updateState()
+	}
+
 	isBasicSetupAvailable() {
 		; return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 
@@ -3266,8 +3284,6 @@ getSteamIDs() {
 
 			libraryPaths.Push(steamPath)
 
-			pos := 1
-
 			while (pos := RegExMatch(vdfContent, 'i)"path"\s+"(.+?)"', &match, pos)) {
 				path := StrReplace(match[1], "\\", "\")
 
@@ -3278,7 +3294,7 @@ getSteamIDs() {
 			}
 
 			for ignore, library in libraryPaths {
-				appsFolder := (library. (SubStr(library, -1) = "\" ? "" : "\") . "steamapps")
+				appsFolder := (library . (SubStr(library, -1) = "\" ? "" : "\") . "steamapps")
 
 				if !DirExist(appsFolder)
 					continue

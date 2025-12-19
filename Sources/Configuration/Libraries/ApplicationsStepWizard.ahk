@@ -30,7 +30,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local simulators := []
 		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group
-		local specialStartup
+		local specialStartup, steamID
 
 		super.saveToConfiguration(configuration)
 
@@ -51,7 +51,7 @@ class ApplicationsStepWizard extends StepWizard {
 					specialStartup := hooks[1]
 
 					if (descriptor.Length > 5) {
-						steamID := wizard.getSimulatorValue(theApplication, "SteamID", kUndefined)
+						steamID := wizard.getApplicationValue(theApplication, "SteamID", kUndefined)
 
 						if (steamID != kUndefined)
 							specialStartup .= ("(" . substituteVariables(hooks[6], {id: steamID}) . ")")
@@ -281,7 +281,7 @@ class ApplicationsStepWizard extends StepWizard {
 					wizard.locateApplication(application, check ? "CHECK" : false, false)
 
 					if steamIDs.Has(application)
-						wizard.setApplicationValue(application, "steamID", steamIDs[application])
+						wizard.setApplicationValue(application, "SteamID", steamIDs[application])
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)

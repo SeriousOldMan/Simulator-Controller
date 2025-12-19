@@ -203,19 +203,29 @@ class Application extends ConfigurationItem {
 
 	startup(special := true, wait := false, options := "") {
 		local specialStartup := this.iSpecialStartup
-		local processID
+		local processID, arguments
 
 		logMessage(kLogInfo, "Starting application " . this.Application)
 
 		if (special && (specialStartup && specialStartup != "")) {
 			try {
+				if (special != true)
+					specialStartup := special
+
+				if Instr(specialStartup, "(") {
+					specialStartup := StrSplit(specialStartup, "(", " `t", 2)
+
+					arguments := StrSplit(Trim(StrReplace(specialStartup[2], ")", "")), ",", " `t")
+					specialStartup := specialStartup[1]
+				}
+
 				if InStr(specialStartup, "steam:") {
 					Run(specialStartup)
 
 					return true
 				}
 				else
-					processID := %specialStartup%()
+					processID := %specialStartup%(arguments*)
 			}
 			catch Any as exception {
 				logError(exception)

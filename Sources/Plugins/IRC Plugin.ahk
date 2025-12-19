@@ -366,9 +366,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startIRC() {
+startIRC(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator
-													 , "Simulator Splash Images\IRC Splash.jpg")
+													 , "Simulator Splash Images\IRC Splash.jpg"
+													 , executable)
 }
 
 

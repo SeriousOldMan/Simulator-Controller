@@ -758,9 +758,10 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startR3E() {
+startR3E(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kR3EPlugin).Simulator
-													 , "Simulator Splash Images\R3E Splash.jpg")
+													 , "Simulator Splash Images\R3E Splash.jpg"
+													 , executable)
 }
 
 

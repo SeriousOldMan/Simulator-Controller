@@ -890,11 +890,11 @@ class SimulatorController extends ConfigurationItem {
 		this.setModes()
 	}
 
-	startSimulator(application, splashImage := false) {
+	startSimulator(application, splashImage := false, executable := false) {
 		local splashScreen, songFile, name, started
 
 		if !application.isRunning()
-			if (application.startup(false))
+			if (application.startup(executable))
 				if (!kSilentMode && splashImage) {
 					protectionOff()
 

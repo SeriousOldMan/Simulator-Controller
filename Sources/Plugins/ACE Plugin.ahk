@@ -33,9 +33,10 @@ class ACEPlugin extends SimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startACE() {
+startACE(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACEPlugin).Simulator
-													 , "Simulator Splash Images\ACE Splash.jpg")
+													 , "Simulator Splash Images\ACE Splash.jpg"
+													 , executable)
 }
 
 

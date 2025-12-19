@@ -339,9 +339,10 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startAMS2() {
+startAMS2(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kAMS2Plugin).Simulator
-													 , "Simulator Splash Images\AMS2 Splash.jpg")
+													 , "Simulator Splash Images\AMS2 Splash.jpg"
+													 , executable)
 }
 
 

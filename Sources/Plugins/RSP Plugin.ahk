@@ -33,9 +33,10 @@ class RSPPlugin extends SimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startRSP() {
+startRSP(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kRSPPlugin).Simulator
-													 , "Simulator Splash Images\RSP Splash.jpg")
+													 , "Simulator Splash Images\RSP Splash.jpg"
+													 , executable)
 }
 
 

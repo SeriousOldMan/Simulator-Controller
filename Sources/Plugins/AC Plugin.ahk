@@ -404,9 +404,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startAC() {
+startAC(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).Simulator
-													 , "Simulator Splash Images\AC Splash.jpg")
+													 , "Simulator Splash Images\AC Splash.jpg"
+													 , executable)
 }
 
 

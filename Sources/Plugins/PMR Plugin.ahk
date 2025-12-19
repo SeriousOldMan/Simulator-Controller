@@ -62,9 +62,10 @@ class PMRPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startPMR() {
+startPMR(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kPMRPlugin).Simulator
-													 , "Simulator Splash Images\PMR Splash.jpg")
+													 , "Simulator Splash Images\PMR Splash.jpg"
+													 , executable)
 }
 
 

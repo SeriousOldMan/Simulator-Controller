@@ -1792,7 +1792,7 @@ class SessionDatabase extends ConfigurationItem {
 			local steerLock := this.getCarSteerLock(simulator, car, track)
 			local channels := CaseInsenseMap()
 			local time := 0
-			local trackFile, trackData, index, column, entry, line
+			local trackFile, trackData, index, column, entry, line, index
 
 			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
 								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
@@ -1834,12 +1834,10 @@ class SessionDatabase extends ConfigurationItem {
 								if isNumber(value) {
 									switch channel, false {
 										case "DISTANCE":
-											if !iRacing {
-												running += 0.0001
+											running += 0.0001
 
-												if (running > 1)
-													running := 0
-											}
+											if (running > 1)
+												running := 0
 										case "STEERANGLE":
 											value *= 57.296
 
@@ -1863,10 +1861,10 @@ class SessionDatabase extends ConfigurationItem {
 						}
 
 						if (iRacing && isNumber(line[1])) {
-							running := (Max(1, Min(1000, Round(line[1] * 1000))) / 1000)
+							index := Max(1, Min(1000, Round(line[1] * 1000)))
 
-							line[12] := trackData[running][1]
-							line[13] := trackData[running][2]
+							line[12] := trackData[index][1]
+							line[13] := trackData[index][2]
 						}
 
 						FileAppend(values2String(";", line*) . "`n", importFileName)

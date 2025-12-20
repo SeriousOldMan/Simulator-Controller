@@ -52,7 +52,7 @@ When creating the tyre compound rule as in the examples above, it is **important
 
 A very special case is *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
 
-The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compoung must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
+The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compound must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
 
 ### *Tyre Data* files
 
@@ -151,9 +151,9 @@ When a tyre compound will be selected for a given weather condition, the followi
 | Heavy Rain   | Wet               | Wet              |
 | Thunderstorm | Wet               | Wet              |
 
-(1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
+(1) If no Intermediates are available, Dry Tyres will be recommended in Drizzle conditions and Wet Tyres in Light Rain conditions.
 
-When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation. A notable exception is the pitstop management in "Team Center", where you can manually select the desired tyre compound for the next pitstop.
+When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation, but it will also choose a tyre compound based on the number of laps for a given stint. If you have configured soft tyres to be usable for 15 laps and a stint has less than these laps, soft tyres will be chosen over hard tyres, which may be used more than these 15 laps. However, in "Team Center", you can manually select the desired tyre compound for the next pitstop.
 
 Looking at the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Team Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
 
@@ -179,13 +179,17 @@ As already mentioned, the world is easy in *Assetto Corsa Competizione*. Every c
 
 Unfortunately, this simulator does not provide any information about the currently mounted tyre compound in the data available through the API. So make sure, that you have set the mounted tyre compound with the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), before you head out onto the track, otherwise you will end up with a wrong compound chosen during the next pitstop, or the control of tyre compounds in the ICM might fail completely.
 
+### Special notes for *Automobilista 2*
+
+The situation is a bit different for *Automobilista 2*. Mounted tyre compounds can be identified, but when it comes to set the tyre compound for the next pitstop the tyre compound must be identified by its index, which means, that the order of the different entries in the tyre compound rule is very important.
+
 ### Special notes for *iRacing*
 
 Tyre compounds are identified by an integer in *iRacing*. As mentioned above, the order of the tyre compounds in the tyre compound rule therefore must resemble the order of available tyre compounds for the given car. The default compound "Dry" is always available. The most simple rule for a car which provides a dry and a wet compound will typically look like this:
 
 	Dry->Dry (M);Wet->Wet (M)
 
-## Handling of Tyre Compounds on inidividual wheels
+## Handling of Tyre Compounds on individual wheels
 
 All applications of Simulator Controller can handle individual tyre compounds for each wheel. Of course, it depends on the simulator, whether indivdual tyre compounds can be specified. See the following table:
 

@@ -23,6 +23,7 @@ The distribution of Simulator Controller includes a set of predefined plugins, w
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist and also Elisa, the AI Race Spotter. The Driving Coach Aiden also is integrated with *Project CARS 2*. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
 | [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. integration of the Race Assistants and the Driving Coach. Functionality is almost identical to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
+| [PMR](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pmr) | Support for *Project Motor Racing* incl. integration of the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 All plugins can be configured in the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
@@ -1223,7 +1224,7 @@ Not complying with this requirements will give you funny results at least.
 
 ## Plugin *PCARS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
+This plugin handles the *Project CARS 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
 
@@ -1469,6 +1470,76 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
    - The available tyre compounds for LMP2, GTE and GT3 are currently restricted to Medium and Wet, whic are mapped to Dry (M) and Wet.
 
 Lastly, the API of *Le Mans Ultimate* is partly based on a shared memory interface as *rFactor 2* and partly on a REST/JSON interface provided by the simulation engine. Especially the later requires a lot of text processing and therefore consumes quite some CPU cycles. Please test in practice sessions, whether your PC can handle all that, before using it in an important race.
+
+## Plugin *PMR*
+
+This plugin handles the *Project Motor Racing* simulation game. An application with the name "Project Motor Racing" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPMR" as a special function hook in this configuration.
+
+### Mode *Pitstop*
+
+Not yet available...
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
+### Configuration
+
+*Project Motor Racing* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 224.0.0.150,7576,true (where the last argument, *multiCast*, specifies whether *MultiCast* mode is used). If you have changed the connection information in the PMR configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
+
+	udpConnection: *ip*, *port*, *multiCast*
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported Assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
+| PitstopRecommend | Asks the AI Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the AI Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
+| StrategyCancel | Asks the AI Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the AI Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the AI Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| Accept | Accepts the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+
+### Special notes for *Project Motor Racing*
+
+1. When the UDP port is not configured to 127.0.0.1 (localhost), the Firewall will ask for permission to open this port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
+
+2. The current implementation of the UDP API still has many gaps regarding important information at the time of writing.
+
+   - There is no way to detect a paused session, so the Assistants are active and, for example, the Spotter may tell you about cars nearby in a paused game.
+   - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, will fail.
+   - Information about the timings of the last lap are not available, only for the best lap so far, which will be used instead. Obviously not the best alternative, but the only one at the moment.
+   - Information about the mouunted tyres is not available, so tyre compounds will always be recognized as "Dry (Black)".
+   - The API does not report about any type of damage on the car. 
+   - Track Grip is not available as well.
+   - Weather information is given by the API in the localized string (for example "Heiß" for "Hot", if UI settings are in German). So weather information is unreliable at least. Additionally, no forecast is available.
+   - No support for pitstop handling in any way.
+   
+   The developer team of the studio is informed. Let's see what they come up with.
 
 ## Plugin *Integration*
 

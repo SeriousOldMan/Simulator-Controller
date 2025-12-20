@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\HTTP.ahk"
+#Include "..\..\Plugins\Simulator Providers.ahk"
 #Include "SessionDatabase.ahk"
 
 
@@ -407,7 +408,7 @@ class TelemetryCollector {
 
 	startup(restart := false) {
 		local sessionDB := SessionDatabase()
-		local code, exePath, pid, trackData
+		local code, exePath, protocol, arguments, pid, trackData
 
 		if (this.Provider = "Internal") {
 			if (this.iTelemetryCollectorPID && restart)
@@ -418,32 +419,47 @@ class TelemetryCollector {
 
 			if !this.iTelemetryCollectorPID {
 				code := sessionDB.getSimulatorCode(this.iSimulator)
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe")
+
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
-					if !FileExist(exePath)
-						throw "File not found..."
+					protocol := SimulatorProvider.getProtocol(code, "Spotter")
 
-					DirCreate(this.TelemetryDirectory)
+					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
 
-					trackData := sessionDB.getTrackData(code, this.Track)
+						exePath := protocol.File
+						protocol := protocol.Protocol
 
-					Run("`"" . exePath . "`" -Telemetry " . this.iTrackLength
-					  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`"" . (trackData ? (" `"" . trackData . "`"") : "")
-					  , kBinariesDirectory, "Hide", &pid)
+						if !FileExist(exePath)
+							throw "File not found..."
+
+						DirCreate(this.TelemetryDirectory)
+
+						trackData := sessionDB.getTrackData(code, this.Track)
+
+						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
+						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
+						  . (trackData ? (" `"" . trackData . "`"") : "")
+						  , kBinariesDirectory, "Hide", &pid)
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 

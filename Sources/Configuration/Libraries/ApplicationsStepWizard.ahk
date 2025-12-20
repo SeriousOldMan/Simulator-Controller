@@ -30,6 +30,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local simulators := []
 		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group
+		local specialStartup, steamID
 
 		super.saveToConfiguration(configuration)
 
@@ -47,7 +48,16 @@ class ApplicationsStepWizard extends StepWizard {
 
 					hooks := string2Values(";", descriptor[5])
 
-					Application(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
+					specialStartup := hooks[1]
+
+					if (descriptor.Length > 5) {
+						steamID := wizard.getApplicationValue(theApplication, "SteamID", kUndefined)
+
+						if (steamID != kUndefined)
+							specialStartup .= ("(" . substituteVariables(descriptor[6], {id: steamID}) . ")")
+					}
+
+					Application(theApplication, false, exePath, workingDirectory, descriptor[4], specialStartup, hooks[2], hooks[3]).saveToConfiguration(configuration)
 
 					group := ConfigurationItem.splitDescriptor(applications)[2]
 
@@ -257,6 +267,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local definition := this.Definition
 		local check := (initialize = "CHECK")
+		local steamIDs := getSteamIDs()
 		local application, ignore, section, application, category
 
 		if check
@@ -268,6 +279,9 @@ class ApplicationsStepWizard extends StepWizard {
 			for application, ignore in getMultiMapValues(wizard.Definition, section) {
 				if (check || !wizard.isApplicationInstalled(application)) {
 					wizard.locateApplication(application, check ? "CHECK" : false, false)
+
+					if steamIDs.Has(application)
+						wizard.setApplicationValue(application, "SteamID", steamIDs[application])
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)

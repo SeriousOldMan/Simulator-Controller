@@ -329,10 +329,13 @@ The following table shows, which simulator supports which damage type:
 | RaceRoom Racing Experience | Yes      | Yes        | Yes    |
 | rFactor 2                  | Yes      | No         | No     |
 | Le Mans Ultimate           | Yes      | Yes        | No     |
+| Project Motor Racing (2)   | -        | -          | -      |
 
 ##### Notes
 
 (1) Supported but not reported in the data API.
+
+(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
 
 The choice in the "Change Tyres" dropdown menu tells Jona, how to decide, wether a given tyre should be changed at the next pitstop. *Wear*, which is the default, will change a tyre, when the expected tyre wear at the end of the next stint will exceed the maximum tyre as defined by the [setting "Engineer: Threshold value for tyre wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The choice *Laps* will ask Jona to change tyres depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the race rules (see above) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
@@ -382,6 +385,7 @@ Please note, that the range of supported pitstop services depends on the specifi
 | RaceRoom Racing Experience | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
 | rFactor 2                  | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
 | Le Mans Ultimate           | Yes    | Wheel           | Wheel             | Yes            | Yes         | Yes        |
+| Project Motor Racing (5)   | -      | -               | -                 | -              | -           | -          |
 
 ##### Notes
 
@@ -392,6 +396,8 @@ Please note, that the range of supported pitstop services depends on the specifi
 (3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section above about the pitstop settings.
 
 (4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
+
+(5) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
@@ -414,10 +420,13 @@ Some final notes: If you ever perform a pitstop, which has not been planned and 
 | RaceRoom Racing Experience | No   | No            | -        | No             | No      | No      |
 | rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     | Yes     |
 | Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | No      | Yes     |
+| Project Motor Racing (2)   | -    | -             | -        | -              | -       | -       |
 
 ##### Notes
 
 (1) Change is detected only, if triggered by a controller action using a Button Box or a Stream Deck and alike.
+
+(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
 
 It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
 
@@ -448,6 +457,10 @@ No special setup required for *iRacing*, since this simulation has an integrated
 Both siimulator do not provide any data interface for initial setup information. Therefore you must take care here as well, that everything is entered correctly into the settings tool, before you head out onto the track.
 
 Furthermore, it is very important, that you do not use the *Automobilista 2* and *Project CARS 2* ICM yourself, while you want Jona to control the pitstop settings or want to use the "Pitstop" mode of the "AMS2" plugin. Additionally, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+
+#### *Project Motor Racing*
+
+No support for pitstop handling and also for the initial tyre setup at the time of this writing.
 
 ### How it works
 
@@ -495,6 +508,7 @@ The following statistical models are currently implemented:
      | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes                     | Yes                  | No     |
+     | Project Motor Racing       | No                      | No                   | No     |
 	 
 	 Notes:
 	 
@@ -533,6 +547,10 @@ The following statistical models are currently implemented:
 	 - *Le Mans Ultimate*
 	 
 	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
+	   
+	 - *Project Motor Racing*
+	 
+	   No damage information is supplied by the API of *Project Motor Racing* at the time of this writing.
 	 
   7. Tyre pressure gambling
   
@@ -582,6 +600,10 @@ The following statistical models are currently implemented:
 	 - *rFactor 2* and *Le Mans Ultimate*
 	   
 	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter. Weather information for *rFactor 2* is not available for the future, so weather warnings might come in a *little bit* late. There might be a possibility to parse the weather control history, this will be implemented in a future release.
+	   
+	 - *Project Motor Racing*
+	   
+	   At the time of this writing, *Project Motor Racing* only supplies weather information in the API for the current weather. Furthermore, this information is supplied in a language-localized string, so in effect, this information is unreliable in most case. When *Project Motor Racing* has been configured for *English* in the *Steam* settings, "Dry", "Light Raing" and "Rainfall" conditions will be detected for the current weather.
 	 
 Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always double-check under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
 
@@ -647,7 +669,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2* and *Project CARS 2* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications like "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project CARS 2* and *Project Motor Racing* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications like "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

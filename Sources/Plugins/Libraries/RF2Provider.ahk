@@ -17,6 +17,18 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Sector397Provider extends SimulatorProvider {
+	static Protocols {
+		Get {
+			local protocols := super.Protocols
+
+			protocols.Connector := {Type: "CLR", Protocol: "SHM"
+								  , File: kBinariesDirectory . "Connectors\%simulator% SHM Connector.dll"
+								  , Instance: "SHMConnector.SHMConnector"}
+
+			return protocols
+		}
+	}
+
 	supportsTrackMap() {
 		return true
 	}
@@ -321,10 +333,20 @@ class Sector397Provider extends SimulatorProvider {
 }
 
 class RF2Provider extends Sector397Provider {
-	Simulator {
+	static Simulator {
 		Get {
 			return "rFactor 2"
 		}
+	}
+
+	Simulator {
+		Get {
+			return RF2Provider.Simulator
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("RF2", RF2Provider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

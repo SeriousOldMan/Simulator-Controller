@@ -330,9 +330,10 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startPCARS2() {
+startPCARS2(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kPCARS2Plugin).Simulator
-													 , "Simulator Splash Images\PCARS2 Splash.jpg")
+													 , "Simulator Splash Images\PCARS2 Splash.jpg"
+													 , executable)
 }
 
 

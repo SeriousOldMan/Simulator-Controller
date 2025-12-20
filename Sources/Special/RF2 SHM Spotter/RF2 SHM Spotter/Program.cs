@@ -28,9 +28,9 @@ namespace RF2SHMSpotter {
                 spotter.Run(false, true);
             }
             else if (args.Length > 0 && args[0] == "-Map")
-                new SHMSpotter().Run(true, false);
+                spotter.Run(true, false);
             else if (args.Length > 0 && args[0] == "-Telemetry")
-                new SHMSpotter().Run(false, false, args[2]);
+                spotter.Run(false, false, args[2]);
             else
             {
                 spotter.initializeSpotter(args);

@@ -26,9 +26,15 @@ class ACCProvider extends SimulatorProvider {
 
 	iLastDriverCar := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "Assetto Corsa Competizione"
+		}
+	}
+
+	Simulator {
+		Get {
+			return ACCProvider.Simulator
 		}
 	}
 
@@ -36,6 +42,10 @@ class ACCProvider extends SimulatorProvider {
 		Get {
 			return this.iUDPProvider
 		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("ACC", ACCProvider)
 	}
 
 	__New(car, track, provider := false) {
@@ -68,11 +78,11 @@ class ACCProvider extends SimulatorProvider {
 
 		return true
 	}
-	
+
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
 		mixedCompounds := false
 		tyreSets := true
-		
+
 		return true
 	}
 

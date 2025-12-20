@@ -586,13 +586,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", dryRearLeft), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", dryRearRight), false))
 
-					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2"], simulator)) {
+					/*
+					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
 						message := (translate("Tyre setup imported: ") . translate(compound(tyreCompound, tyreCompoundColor)))
 
 						showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
 										    . dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
 											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.ico", 5000)
 					}
+					*/
 				}
 
 				result := tyreCompound
@@ -609,13 +611,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", wetRearLeft), false))
 					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", wetRearRight), false))
 
-					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2"], simulator)) {
+					/*
+					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
 						message := (translate("Tyre setup imported: ") . compound(tyreCompound, tyreCompoundColor))
 
 						showMessage(message . translate("; ")
 											. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
 											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.ico", 5000)
 					}
+					*/
 				}
 
 				result := tyreCompound

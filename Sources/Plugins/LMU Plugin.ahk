@@ -564,9 +564,10 @@ class LMUPlugin extends Sector397Plugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startLMU() {
+startLMU(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kLMUPlugin).Simulator
-													 , "Simulator Splash Images\LMU Splash.jpg")
+													 , "Simulator Splash Images\LMU Splash.jpg"
+													 , executable)
 }
 
 

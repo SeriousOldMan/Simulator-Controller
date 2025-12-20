@@ -485,12 +485,12 @@ systemMonitor(command := false, arguments*) {
 			else
 				remainingSessionTime := "-"
 
-			if (isNumber(stintTime) && isNumber(lastTime))
+			if (isNumber(stintTime) && isNumber(lastTime) && (lastTime > 0))
 				remainingStintTime := ((((stintTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", stintTime) . (((stintTime / lastTime) < 4) ? "</font>" : ""))
 			else
 				remainingStintTime := "-"
 
-			if (isNumber(driverTime) && isNumber(lastTime))
+			if (isNumber(driverTime) && isNumber(lastTime) && (lastTime > 0))
 				remainingDriverTime := ((((driverTime / lastTime) < 4) ? "<font color=`"red`">" : "") . displayValue("Time", driverTime) . (((driverTime / lastTime) < 4) ? "</font>" : ""))
 			else
 				remainingDriverTime := "-"
@@ -1041,6 +1041,7 @@ systemMonitor(command := false, arguments*) {
 		local brakeService := false
 		local repairService := []
 		local tyreSet := false
+		local hasPitstop := true
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
 		local driverRequest, driver
 
@@ -1088,120 +1089,66 @@ systemMonitor(command := false, arguments*) {
 			html .= "<table class=`"table-std`">"
 
 			if provider {
-				provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
+				hasPitstop := provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 				provider.supportsTyreManagement( , &tyreSet)
 			}
 
-			if pitstopNr {
-				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Nr.") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
+			if hasPitstop
+				if pitstopNr {
+					html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . "</i></div></th></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Nr.") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopNr . "</td></tr>")
 
-				if pitstopLap
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
+					if pitstopLap
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`" colspan=`"2`">" . pitstopLap . "</td></tr>")
 
-				driverRequest := getMultiMapValue(sessionState, "Pitstop", "Planned.Driver.Request", false)
+					driverRequest := getMultiMapValue(sessionState, "Pitstop", "Planned.Driver.Request", false)
 
-				if driverRequest {
-					driverRequest := string2Values("|", driverRequest)
+					if driverRequest {
+						driverRequest := string2Values("|", driverRequest)
 
-					driver := string2Values(":", driverRequest[2])[1]
+						driver := string2Values(":", driverRequest[2])[1]
 
-					if (driver != string2Values(":", driverRequest[1])[1])
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`" colspan=`"2`">" . driver . "</td></tr>")
-				}
-
-				if fuelService
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
-
-				if (tyreService = "Wheel") {
-					tyreCompounds := CaseInsenseMap()
-					fragment := ""
-
-					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-						if ((index = 1) || (index = 3))
-							fragment .= "<tr>"
-
-						if (index = 1)
-							fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
-
-						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . tyre)
-
-						if (tyreCompound && (tyreCompound != "-")) {
-							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
-
-							tyreCompounds[tyreCompound] := true
-
-							fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . tyreCompound . "</td>")
-						}
-						else {
-							fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td>")
-
-							tyreCompounds[translate("No")] := true
-						}
-
-						if ((index = 2) || (index = 4))
-							fragment .= "</tr>"
+						if (driver != string2Values(":", driverRequest[1])[1])
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`" colspan=`"2`">" . driver . "</td></tr>")
 					}
 
-					if (tyreCompounds.Count > 1)
-						html .= fragment
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
+					if fuelService
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
 
-					if tyreSet {
-						tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
+					if (tyreService = "Wheel") {
+						tyreCompounds := CaseInsenseMap()
+						fragment := ""
 
-						if tyreSet
-							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
-					}
-				}
-				else if (tyreService = "Axle") {
-					tyreCompounds := CaseInsenseMap()
-					fragment := ""
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							if ((index = 1) || (index = 3))
+								fragment .= "<tr>"
 
-					for index, axle in ["Front", "Rear"] {
-						fragment .= "<tr>"
+							if (index = 1)
+								fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
 
-						if (index = 1)
-							fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
+							tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . tyre)
 
-						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . axle)
+							if (tyreCompound && (tyreCompound != "-")) {
+								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
 
-						if (tyreCompound && (tyreCompound != "-")) {
-							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
+								tyreCompounds[tyreCompound] := true
 
-							tyreCompounds[tyreCompound] := true
+								fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . tyreCompound . "</td>")
+							}
+							else {
+								fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td>")
 
-							fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td>")
-						}
-						else {
-							fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . translate("No") . "</td>")
+								tyreCompounds[translate("No")] := true
+							}
 
-							tyreCompounds[translate("No")] := true
+							if ((index = 2) || (index = 4))
+								fragment .= "</tr>"
 						}
 
-						fragment .= "</tr>"
-					}
-
-					if (tyreCompounds.Count > 1)
-						html .= fragment
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
-
-					if tyreSet {
-						tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
-
-						if tyreSet
-							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
-					}
-				}
-				else if tyreService {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound")
-
-					if (tyreCompound && (tyreCompound != "-")) {
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
-
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td></tr>")
+						if (tyreCompounds.Count > 1)
+							html .= fragment
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
 
 						if tyreSet {
 							tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
@@ -1210,132 +1157,132 @@ systemMonitor(command := false, arguments*) {
 								html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
 						}
 					}
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
-				}
+					else if (tyreService = "Axle") {
+						tyreCompounds := CaseInsenseMap()
+						fragment := ""
 
-				if (tyreService && exist([computePressure("Planned.Tyre.Pressure.FL"), computePressure("Planned.Tyre.Pressure.FR")
-										, computePressure("Planned.Tyre.Pressure.RL"), computePressure("Planned.Tyre.Pressure.RR")]
-									   , nonZero)) {
-					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Planned.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Planned.Tyre.Pressure.FR") . "</td></tr>")
-					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Planned.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Planned.Tyre.Pressure.RR") . "</td></tr>")
-				}
-
-				if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false))
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
-
-				if (repairService.Length > 0)
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
-																 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
-																				, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Suspension")
-																				, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Engine"))
-																 . "</td></tr>")
-
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Prepared") . "</th><td class=`"td-wdg`" colspan=`"2`">"
-															 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
-															 . "</td></tr>")
-
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
-			}
-			else {
-				html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
-
-				if fuelService
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Target.Fuel.Amount"))) . "</td></tr>")
-
-				if (tyreService = "Wheel") {
-					tyreCompounds := CaseInsenseMap()
-					fragment := ""
-
-					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-						if ((index = 1) || (index = 3))
+						for index, axle in ["Front", "Rear"] {
 							fragment .= "<tr>"
 
-						if (index = 1)
-							fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
+							if (index = 1)
+								fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
 
-						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . tyre)
+							tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound." . axle)
 
-						if (tyreCompound && (tyreCompound != "-")) {
-							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
+							if (tyreCompound && (tyreCompound != "-")) {
+								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
 
-							tyreCompounds[tyreCompound] := true
+								tyreCompounds[tyreCompound] := true
 
-							fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . tyreCompound . "</td>")
-						}
-						else {
-							fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td>")
+								fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td>")
+							}
+							else {
+								fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . translate("No") . "</td>")
 
-							tyreCompounds[translate("No")] := true
-						}
+								tyreCompounds[translate("No")] := true
+							}
 
-						if ((index = 2) || (index = 4))
 							fragment .= "</tr>"
+						}
+
+						if (tyreCompounds.Count > 1)
+							html .= fragment
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
+
+						if tyreSet {
+							tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
+
+							if tyreSet
+								html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+						}
 					}
-
-					if (tyreCompounds.Count > 1)
-						html .= fragment
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
-
-					if tyreSet {
-						tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
-
-						if tyreSet
-							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
-					}
-				}
-				else if (tyreService = "Axle") {
-					tyreCompounds := CaseInsenseMap()
-					fragment := ""
-
-					for index, axle in ["Front", "Rear"] {
-						fragment .= "<tr>"
-
-						if (index = 1)
-							fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
-
-						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)
+					else if tyreService {
+						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound")
 
 						if (tyreCompound && (tyreCompound != "-")) {
-							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . axle)))
+							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Compound.Color")))
 
-							tyreCompounds[tyreCompound] := true
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td></tr>")
 
-							fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td>")
+							if tyreSet {
+								tyreSet := getMultiMapValue(sessionState, "Pitstop", "Planned.Tyre.Set")
+
+								if tyreSet
+									html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+							}
 						}
-						else {
-							fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . translate("No") . "</td>")
-
-							tyreCompounds[translate("No")] := true
-						}
-
-						fragment .= "</tr>"
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
 					}
 
-					if (tyreCompounds.Count > 1)
-						html .= fragment
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
-
-					if tyreSet {
-						tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
-
-						if tyreSet
-							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+					if (tyreService && exist([computePressure("Planned.Tyre.Pressure.FL"), computePressure("Planned.Tyre.Pressure.FR")
+											, computePressure("Planned.Tyre.Pressure.RL"), computePressure("Planned.Tyre.Pressure.RR")]
+										   , nonZero)) {
+						html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Planned.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Planned.Tyre.Pressure.FR") . "</td></tr>")
+						html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Planned.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Planned.Tyre.Pressure.RR") . "</td></tr>")
 					}
+
+					if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false))
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
+
+					if (repairService.Length > 0)
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Repairs") . "</th><td class=`"td-wdg`" colspan=`"2`">"
+																	 . computeRepairs(getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Bodywork")
+																					, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Suspension")
+																					, getMultiMapValue(sessionState, "Pitstop", "Planned.Repair.Engine"))
+																	 . "</td></tr>")
+
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Prepared") . "</th><td class=`"td-wdg`" colspan=`"2`">"
+																 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
+																 . "</td></tr>")
+
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 				}
-				else if tyreService {
-					tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound")
+				else {
+					html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
 
-					if (tyreCompound && (tyreCompound != "-")) {
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color")))
+					if fuelService
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Target.Fuel.Amount"))) . "</td></tr>")
 
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td></tr>")
+					if (tyreService = "Wheel") {
+						tyreCompounds := CaseInsenseMap()
+						fragment := ""
+
+						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+							if ((index = 1) || (index = 3))
+								fragment .= "<tr>"
+
+							if (index = 1)
+								fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
+
+							tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . tyre)
+
+							if (tyreCompound && (tyreCompound != "-")) {
+								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
+
+								tyreCompounds[tyreCompound] := true
+
+								fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . tyreCompound . "</td>")
+							}
+							else {
+								fragment .= ("<td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td>")
+
+								tyreCompounds[translate("No")] := true
+							}
+
+							if ((index = 2) || (index = 4))
+								fragment .= "</tr>"
+						}
+
+						if (tyreCompounds.Count > 1)
+							html .= fragment
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
 
 						if tyreSet {
 							tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
@@ -1344,26 +1291,81 @@ systemMonitor(command := false, arguments*) {
 								html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
 						}
 					}
-					else
-						html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
+					else if (tyreService = "Axle") {
+						tyreCompounds := CaseInsenseMap()
+						fragment := ""
+
+						for index, axle in ["Front", "Rear"] {
+							fragment .= "<tr>"
+
+							if (index = 1)
+								fragment .= "<th class=`"th-std th-left`" rowspan=`"2`">" . translate("Tyres") . "</th>"
+
+							tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound." . axle)
+
+							if (tyreCompound && (tyreCompound != "-")) {
+								tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color." . axle)))
+
+								tyreCompounds[tyreCompound] := true
+
+								fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td>")
+							}
+							else {
+								fragment .= ("<td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . translate("No") . "</td>")
+
+								tyreCompounds[translate("No")] := true
+							}
+
+							fragment .= "</tr>"
+						}
+
+						if (tyreCompounds.Count > 1)
+							html .= fragment
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . getKeys(tyreCompounds)[1] . "</td></tr>")
+
+						if tyreSet {
+							tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
+
+							if tyreSet
+								html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+						}
+					}
+					else if tyreService {
+						tyreCompound := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound")
+
+						if (tyreCompound && (tyreCompound != "-")) {
+							tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Compound.Color")))
+
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" colspan=`"2`" style=`"text-align: center`">" . tyreCompound . "</td></tr>")
+
+							if tyreSet {
+								tyreSet := getMultiMapValue(sessionState, "Pitstop", "Target.Tyre.Set")
+
+								if tyreSet
+									html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyre Set") . "</th><td class=`"td-wdg`" colspan=`"2`">" . tyreSet . "</td></tr>")
+							}
+						}
+						else
+							html .= ("<tr><th class=`"th-std th-left`">" . translate("Tyres") . "</th><td class=`"td-wdg`" style=`"text-align: center`">" . translate("No") . "</td></tr>")
+					}
+
+					if (tyreService && exist([computePressure("Target.Tyre.Pressure.FL"), computePressure("Target.Tyre.Pressure.FR")
+											, computePressure("Target.Tyre.Pressure.RL"), computePressure("Target.Tyre.Pressure.RR")]
+										   , nonZero)) {
+						html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Target.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Target.Tyre.Pressure.FR") . "</td></tr>")
+						html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Target.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
+							   . computePressure("Target.Tyre.Pressure.RR") . "</td></tr>")
+					}
+
+					if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false))
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
+
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
 				}
-
-				if (tyreService && exist([computePressure("Target.Tyre.Pressure.FL"), computePressure("Target.Tyre.Pressure.FR")
-										, computePressure("Target.Tyre.Pressure.RL"), computePressure("Target.Tyre.Pressure.RR")]
-									   , nonZero)) {
-					html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures") . "</th><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Target.Tyre.Pressure.FL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Target.Tyre.Pressure.FR") . "</td></tr>")
-					html .= ("<tr><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Target.Tyre.Pressure.RL") . "</td><td class=`"td-wdg`" style=`"text-align: right`">"
-						   . computePressure("Target.Tyre.Pressure.RR") . "</td></tr>")
-				}
-
-				if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false))
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
-
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
-			}
 		}
 		catch Any as exception {
 			logError(exception)

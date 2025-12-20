@@ -325,7 +325,8 @@ class LLMConnector {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := {model: this.Model, temperature: this.Temperature}
 			local toolCall := false
-			local answer
+			local tries := 5
+			local answer, wait
 
 			if this.MaxTokens
 				body.max_tokens := this.MaxTokens
@@ -349,22 +350,34 @@ class LLMConnector {
 						FileAppend(body, kTempDirectory . "LLM.request")
 				}
 
-				if this.Certificate {
-					try {
-						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]
-												, Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server)
-																					 , body, headers, {Object: true, Encoding: "UTF-8"})
-					}
-					catch Any as exception {
-						logError(exception, true)
+				while (tries-- > 0) {
+					if this.Certificate {
+						try {
+							answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]
+													, Certificate: this.Certificate}).POST(this.CreateServiceURL(this.Server)
+																						 , body, headers, {Object: true, Encoding: "UTF-8"})
+						}
+						catch Any as exception {
+							logError(exception, true)
 
-						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]}).POST(this.CreateServiceURL(this.Server)
-																						  , body, headers, {Object: true, Encoding: "UTF-8"})
+							answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]}).POST(this.CreateServiceURL(this.Server)
+																							  , body, headers, {Object: true, Encoding: "UTF-8"})
+						}
 					}
+					else
+						answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]}).POST(this.CreateServiceURL(this.Server)
+																						   , body, headers, {Object: true, Encoding: "UTF-8"})
+
+					if (answer.Status = 429) {
+						wait := (5 - tries)
+
+						wait *= wait
+
+						Sleep(wait * 500)
+					}
+					else
+						break
 				}
-				else
-					answer := WinHttpRequest({Timeouts: [0, 60000, 30000, 600000]}).POST(this.CreateServiceURL(this.Server)
-																					   , body, headers, {Object: true, Encoding: "UTF-8"})
 
 				if ((answer.Status >= 200) && (answer.Status < 300)) {
 					this.Manager.connectorState("Active")

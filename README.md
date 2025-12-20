@@ -34,15 +34,15 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+[6.7.5.0-release](https://cutt.ly/9taJiWca) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6710) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-671) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6750) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-675) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
+[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
 
-[6.6.7.0-release](https://cutt.ly/Ytt6M71H) (Changes: Support for Hello/Hallo in activation phrase, Increased stability of MoTeC importer, New generic CSV telemetry importer, Default for community sharing, Fixed ghost cars in AC reported by the Spotter.)
+[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
 
 #### Latest development build
 
@@ -50,7 +50,7 @@ None for the moment...
 
 ### Documentation
 
-A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 500 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [developers guide & reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 500 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
@@ -231,7 +231,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
     - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins are supplied out of the box:
-    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow, when they become available
+    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project Motor Racing*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow, when they become available
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
 	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard
@@ -281,7 +281,8 @@ These plugins are part of the Simulator Controller distribution. Beside providin
 | [R3E](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rre) | Similar to the ACC, IRC and RF2 plugins provides this plugin start and stop support for *RaceRoom Racing Experience*. A "Pitstop" mode is available to control the pitstop settings from your controller hardware and an integration with Jona, the AI Race Engineer, with Cato, the AI Race Strategist, with Aiden, the AI Driving Coach and also with Elisa, the AI Race Spotter is available as well. The "Assistant" mode can handle most of the Race Assistant commands from your hardware controller. |
 | RSP | Simple integration for Rennsport. No functionality beside starting and stopping from a hardware controller. |
 | [PCARS2](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-PCARS2) | Integration for *Project CARS 2*, which supports  Jona, the AI Race Engineer, Cato, the AI Race Strategist, with Aiden, the AI Driving Coach and also Elisa, the AI Race Spotter. The plugin also supports a "Pitstop" mode for adjusting pitstop settings and a "Assistant" mode to interact with the Race Assistants. |
-| [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. pitstop automation and integration of the Race Assistants. Functionality is identical to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
+| [LMU](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) | Full support for *Le Mans Ultimate* incl. pitstop automation and integration of the Race Assistants. Functionality is comparable to that of the plugin for *rFactor 2*, since *Le Mans Ultimate* is based on the same engine. |
+| [PMR](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pmr) | Support for *Project Motor Racing* incl. integration of the Race Assistants. |
 | [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) | This plugin implements interoperability with other applications like SimHub. |
 
 ### Third party applications

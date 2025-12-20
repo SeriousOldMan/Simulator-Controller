@@ -1,5 +1,4 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Simulator Plugin                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -1045,12 +1044,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	supportsRaceAssistant(assistantPlugin) {
-		local hasProvider := (FileExist(kBinariesDirectory . "Providers\" . this.Code . " SHM Provider.exe") || FileExist(kBinariesDirectory . "Connectors\" . this.Code . " SHM Connector.dll"))
-
-		if (assistantPlugin = kRaceSpotterPlugin)
-			return (hasProvider && FileExist(kBinariesDirectory . "Providers\" . this.Code . " SHM Spotter.exe"))
-		else
-			return hasProvider
+		local hasProvider := false
+		
+		try
+			hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Provider").File)
+			
+		if !hasProvider
+			try
+				hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Connector").File)
+		
+		if (isSet(kRaceSpotterPlugin) && (assistantPlugin = kRaceSpotterPlugin))
+			try
+				hasProvider := (hasProvider && FileExist(SimulatorProvider.getProtocol(this.Code, "Spotter").File))
+				
+		return hasProvider
 	}
 
 	updateSession(session, force := false) {

@@ -17,10 +17,20 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class PCARS2Provider extends SimulatorProvider {
-	Simulator {
+	static Simulator {
 		Get {
 			return "Project CARS 2"
 		}
+	}
+
+	Simulator {
+		Get {
+			return PCARS2Provider.Simulator
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("PCARS2", PCARS2Provider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

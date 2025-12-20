@@ -1710,6 +1710,24 @@ class SetupWizard extends ConfiguratorPanel {
 		return this.KnowledgeBase.getValue("Application." . application . ".Path", false)
 	}
 
+	setApplicationValue(application, key, value, update := true) {
+		this.KnowledgeBase.setFact("Application." . application . ".Key." . key, value)
+
+		if update
+			this.updateState()
+	}
+
+	getApplicationValue(application, key, default := "") {
+		return this.KnowledgeBase.getValue("Application." . application . ".Key." . key, default)
+	}
+
+	clearApplicationValue(application, key, update := true) {
+		this.KnowledgeBase.removeFact("Application." . application . ".Key." . key, "")
+
+		if update
+			this.updateState()
+	}
+
 	isBasicSetupAvailable() {
 		; return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 
@@ -3326,6 +3344,55 @@ standardApplication(definition, categories, executable) {
 		}
 
 	return false
+}
+
+getSteamIDs() {
+	local libraryPaths := []
+	local pos := 1
+	local steamIDs := CaseInsenseMap()
+	local steamPath, vdfPath, vdfContent, acfContent, match, path, ignore, library, appsFolder
+	local idMatch, nameMatch
+
+	try {
+		steamPath := StrReplace(RegRead("HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath"), "/", "\")
+		vdfPath := (steamPath . "\steamapps\libraryfolders.vdf")
+
+		if FileExist(vdfPath) {
+			vdfContent := FileRead(vdfPath)
+
+			libraryPaths.Push(steamPath)
+
+			while (pos := RegExMatch(vdfContent, 'i)"path"\s+"(.+?)"', &match, pos)) {
+				path := StrReplace(match[1], "\\", "\")
+
+				if !inList(libraryPaths, path)
+					libraryPaths.Push(path)
+
+				pos += match.Len
+			}
+
+			for ignore, library in libraryPaths {
+				appsFolder := (library . (SubStr(library, -1) = "\" ? "" : "\") . "steamapps")
+
+				if !DirExist(appsFolder)
+					continue
+
+				loop Files, appsFolder . "\appmanifest_*.acf"
+					try {
+						acfContent := FileRead(A_LoopFileFullPath)
+
+						if (RegExMatch(acfContent, 'i)"appid"\s+"(\d+)"', &idMatch)
+						 && RegExMatch(acfContent, 'i)"name"\s+"(.+?)"', &nameMatch))
+							steamIDs[nameMatch[1]] := idMatch[1]
+					}
+			}
+		}
+	}
+	catch Any as exception {
+		logError(exception)
+	}
+
+	return steamIDs
 }
 
 findSoftware(definition, software) {

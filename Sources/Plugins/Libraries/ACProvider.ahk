@@ -21,10 +21,32 @@ class ACProvider extends SimulatorProvider {
 
 	static sCarData := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "Assetto Corsa"
 		}
+	}
+
+	Simulator {
+		Get {
+			return ACProvider.Simulator
+		}
+	}
+
+	static Protocols {
+		Get {
+			local protocols := super.Protocols
+
+			protocols.Connector := {Type: "CLR", Protocol: "SHM"
+								  , File: kBinariesDirectory . "Connectors\AC SHM Connector.dll"
+								  , Instance: "SHMConnector.SHMConnector"}
+
+			return protocols
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("AC", ACProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

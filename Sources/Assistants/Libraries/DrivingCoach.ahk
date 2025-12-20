@@ -26,6 +26,8 @@
 #Include "..\..\Garage\Libraries\IssueCollector.ahk"
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
+#Include "..\..\Garage\Libraries\PMRIssueCollector.ahk"
+#Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "RaceAssistant.ahk"
 
 
@@ -112,6 +114,8 @@ class DrivingCoach extends GridRaceAssistant {
 					return "IRCIssueCollector"
 				case "R3E":
 					return "R3EIssueCollector"
+				case "PMR":
+					return "PMRIssueCollector"
 				default:
 					return "IssueCollector"
 			}
@@ -1121,7 +1125,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if knowledgeBase {
 			this.iIssueCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-															, {Handling: true, Frequency: 5000})
+														, {Handling: true, Frequency: 5000})
 
 			this.iIssueCollector.loadFromSettings()
 
@@ -1889,9 +1893,8 @@ class DrivingCoach extends GridRaceAssistant {
 		local distance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Distance", 400))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
-		local sections, positions, sessionDB, code, data, exePath, pid
+		local sections, positions, sessionDB, code, data, exePath, protocol, pid, arguments
 		local ignore, section, x, y
-
 
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
@@ -1922,29 +1925,42 @@ class DrivingCoach extends GridRaceAssistant {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
-					if !FileExist(exePath)
-						throw "File not found..."
+					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
-					if data
-						Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
-					else
-						Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+						else
+							arguments := ""
+
+						exePath := protocol.File
+						protocol := protocol.Protocol
+
+						if !FileExist(exePath)
+							throw "File not found..."
+
+						if data
+							Run("`"" . exePath . "`" " . arguments . " -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
+						else
+							Run("`"" . exePath . "`" " . arguments . " -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
+					}
 				}
 				catch Any as exception {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
@@ -1996,6 +2012,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local player := requireSoundPlayer("DCTriggerPlayer.exe")
 		local options := ""
 		local sessionDB, code, data, options, telemetry, reference, workingDirectory
+		local exePath, protocol, pid, arguments
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -2006,38 +2023,51 @@ class DrivingCoach extends GridRaceAssistant {
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, this.Track)
 
-				exePath := (kBinariesDirectory . "Providers\" . code . " SHM Coach.exe")
+				protocol := "SHM"
+				exePath := "..."
 				pid := false
 
 				try {
-					if !FileExist(exePath)
-						throw "File not found..."
+					protocol := SimulatorProvider.getProtocol(code, "Coach")
 
-					if this.AudioSettings {
-						if kSox
-							SplitPath(kSox, , &workingDirectory)
+					if protocol {
+						if protocol.HasProp("Arguments")
+							arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
 						else
-							workingDirectory := A_WorkingDir
+							arguments := ""
 
-						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+						exePath := protocol.File
+						protocol := protocol.Protocol
+
+						if !FileExist(exePath)
+							throw "File not found..."
+
+						if this.AudioSettings {
+							if kSox
+								SplitPath(kSox, , &workingDirectory)
+							else
+								workingDirectory := A_WorkingDir
+
+							options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+						}
+
+						if data
+							Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						else
+							Run("`"" . exePath . "`" " . arguments . " -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 					}
-
-					if data
-						Run("`"" . exePath . "`" -TrackHints `"" . data . "`" `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
-					else
-						Run("`"" . exePath . "`" -TrackHints `"" . this.iBrakeTriggerFile . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logError(exception, true)
 
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
-															   , {simulator: code, protocol: "SHM"})
+															   , {simulator: code, protocol: protocol})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 										   . kBinariesDirectory . translate(")"))
 
 					if !kSilentMode
 						showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-													  , {exePath: exePath, simulator: code, protocol: "SHM"})
+													  , {exePath: exePath, simulator: code, protocol: protocol})
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 

@@ -56,7 +56,7 @@ substituteString(text, pattern, replacement) {
 	return result
 }
 
-substituteVariables(text, values := false) {
+substituteVariables(text, values := false, quoted := true) {
 	local result := text
 	local startPos := 1
 	local hasPercent := false
@@ -73,7 +73,7 @@ substituteVariables(text, values := false) {
 			if (startPos > 2) {
 				pChar := SubStr(result, startPos - 2, 1)
 
-				if ((pChar = "``") || (pChar = "\")) {
+				if (((pChar = "``") || (pChar = "\")) && quoted) {
 					hasPercent := true
 
 					continue
@@ -121,7 +121,7 @@ substituteVariables(text, values := false) {
 			break
 	}
 
-	return (hasPercent ? StrReplace(result, "``%", "%") : result)
+	return (hasPercent ? StrReplace(StrReplace(result, "\%", "%"), "``%", "%") : result)
 }
 
 string2Values(delimiter, text, count := false, class := Array) {

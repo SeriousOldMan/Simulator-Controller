@@ -41,7 +41,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	iPitstopAutoClose := false
 
-	iSettingsDatabase := false
 	iCarMetaData := CaseInsenseMap()
 
 	static sCarData := false
@@ -73,20 +72,6 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
-		}
-	}
-
-	SettingsDatabase {
-		Get {
-			local settingsDB := this.iSettingsDatabase
-
-			if !settingsDB {
-				settingsDB := SettingsDatabase()
-
-				this.iSettingsDatabase := settingsDB
-			}
-
-			return settingsDB
 		}
 	}
 
@@ -168,14 +153,13 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		local car := (this.Car ? this.Car : "*")
 		local track := (this.Track ? this.Track : "*")
 		local key := (car . "." . track . "." . meta)
-		local value, settings
+		local value
 
 		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
-			settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*", "*")
-
-			value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
+			value := getMultiMapValue(SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
+									, "Simulator.Assetto Corsa", "Pitstop." . meta, kUndefined)
 
 			if (value == kUndefined) {
 				ACPlugin.requireCarDatabase()
@@ -420,9 +404,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startAC() {
+startAC(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kACPlugin).Simulator
-													 , "Simulator Splash Images\AC Splash.jpg")
+													 , "Simulator Splash Images\AC Splash.jpg"
+													 , executable)
 }
 
 

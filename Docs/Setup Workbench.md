@@ -109,6 +109,10 @@ Please, note that all of this also applies to the AI Race Assistants, but you ha
   
      You have to enable Shared Memory access in the game settings. Please use the PCars 2 mode.
 
+  3. *Project Motor Racing*
+  
+     You have to enable the UDP access in the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
+
 ### Telemetry Viewer
 
 Another valuable tool to improve your lap times is the integrated Telemetry Viewer, which can be opened and activated by choosing the "Telemetry..." command from the "Session" menu.

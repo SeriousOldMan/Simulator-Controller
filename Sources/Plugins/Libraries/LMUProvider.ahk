@@ -29,9 +29,15 @@ class LMUProvider extends Sector397Provider {
 
 	iFuelRatio := false
 
-	Simulator {
+	static Simulator {
 		Get {
 			return "Le Mans Ultimate"
+		}
+	}
+
+	Simulator {
+		Get {
+			return LMUProvider.Simulator
 		}
 	}
 
@@ -75,6 +81,10 @@ class LMUProvider extends Sector397Provider {
 		Get {
 			return this.iStandingsData
 		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("LMU", LMUProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
@@ -399,6 +409,12 @@ class LMUProvider extends Sector397Provider {
 					setMultiMapValue(data, "Session Data", "Track", track)
 				else
 					track := this.Track
+
+				if !getMultiMapValue(data, "Car Data", "TC", false)
+					setMultiMapValue(data, "Car Data", "TC", "n/a")
+
+				if !getMultiMapValue(data, "Car Data", "ABS", false)
+					setMultiMapValue(data, "Car Data", "ABS", "n/a")
 
 				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
 				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)

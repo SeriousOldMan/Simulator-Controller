@@ -31,6 +31,7 @@
 #Include "PCARS2 Plugin.ahk"
 #Include "RSP Plugin.ahk"
 #Include "LMU Plugin.ahk"
+#Include "PMR Plugin.ahk"
 
 #Include "RST Plugin.ahk"
 

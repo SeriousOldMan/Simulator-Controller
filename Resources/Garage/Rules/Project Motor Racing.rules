@@ -1,0 +1,27 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Project Motor Racing            ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator("Project Motor Racing")),
+				 (Prove: addCharacteristics("Project Motor Racing", *, *, *)),
+				 (Prove: addSettings("Project Motor Racing", *, *)),
+				 (Prove: removeSettings("Project Motor Racing", *, [Brake.Duct.Front, Brake.Duct.Rear,
+																	Radiator.Blanket.Water, Radiator.Blanket.Oil,
+																	Aero.Wing.Front.Left, Aero.Wing.Front.Right,
+																	Aero.Wing.Rear.Left, Aero.Wing.Rear.Right,
+																	Aero.Height.Front, Aero.Height.Rear]))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

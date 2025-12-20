@@ -80,9 +80,9 @@ Focus.1=Foco.
 Focus.2=Controle-se.
 Focus.3=Vamos lá.
 LastLapLeader.1=O líder está na última volta.
-LastLapLeader.1=Líder está na última volta.
+LastLapLeader.2=Líder está na última volta.
 LastLapDriver.1=Você está na última volta.
-LastLapDriver.1=Última volta agora.
+LastLapDriver.2=Última volta agora.
 // Weather Information //
 Temperature.1=Aqui é %name%. Temos %air% graus de temperatura do ar e %track% graus de temperatura na pista.
 Temperature.2=Aqui é %name%. Atualmente temos %air% graus de temperatura do ar e %track% graus de temperatura na pista.

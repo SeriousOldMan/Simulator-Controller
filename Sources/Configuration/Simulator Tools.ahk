@@ -95,6 +95,8 @@ global gBuildSettings := CaseInsenseWeakMap()
 
 global gProgressCount := 0
 
+global gBuilding := false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
@@ -3002,6 +3004,17 @@ updateConfigurationForV400() {
 }
 */
 
+updatePluginsForV675() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+
+	if ((userConfiguration.Count > 0) && !getMultiMapValue(userConfiguration, "Plugins", "PMR", false)) {
+		Plugin("PMR", false, false, "Project Motor Racing").saveToConfiguration(userConfiguration)
+
+		writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV613() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -3866,6 +3879,8 @@ startupSimulatorTools() {
 		if forceExit
 			exitProcesses("", "", true, true, ["Simulator Tools"])
 
+		gBuilding := true
+
 		runCleanTargets(&buildProgress)
 
 		if (gSpecialTargets.Length > 0)
@@ -3892,17 +3907,18 @@ cancelBuild() {
 
 	protectionOn()
 
-	try {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgBox, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
-		OnMessage(0x44, translateYesNoButtons, 0)
+	if gBuilding
+		try {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := withBlockedWindows(MsgBox, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-		if (msgResult = "Yes")
-			ExitApp(0)
-	}
-	finally {
-		protectionOff()
-	}
+			if (msgResult = "Yes")
+				ExitApp(0)
+		}
+		finally {
+			protectionOff()
+		}
 }
 
 

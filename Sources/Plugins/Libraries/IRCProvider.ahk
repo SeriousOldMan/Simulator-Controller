@@ -17,10 +17,20 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class IRCProvider extends SimulatorProvider {
-	Simulator {
+	static Simulator {
 		Get {
 			return "iRacing"
 		}
+	}
+
+	Simulator {
+		Get {
+			return IRCProvider.Simulator
+		}
+	}
+
+	static __New(arguments*) {
+		SimulatorProvider.registerSimulatorProvider("IRC", IRCProvider)
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

@@ -22,6 +22,7 @@
 #Include "..\..\Framework\Extensions\Database.ahk"
 #Include "SettingsDatabase.ahk"
 #Include "..\..\Garage\Libraries\CarInformation.ahk"
+#Include "..\..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,16 +45,6 @@ global kWetRaceSetup := "WR"
 global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
 global kSessionSchemas := CaseInsenseMap("Drivers", ["ID", "Forname", "Surname", "Nickname", "Identifier", "Synchronized"])
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kSimulatorCodes := Map("Assetto Corsa", "AC", "Assetto Corsa EVO", "ACE", "Assetto Corsa Competizione", "ACC"
-							, "Automobilista 2", "AMS2"
-							, "iRacing", "IRC", "RaceRoom Racing Experience", "R3E", "rFactor 2", "RF2", "Project CARS 2", "PCARS2"
-							, "Rennsport", "RSP", "Le Mans Ultimate", "LMU")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -94,6 +85,23 @@ class SessionDatabase extends ConfigurationItem {
 				super.updateProgress(this.iOptionsCallback.Call())
 			else
 				super.updateProgress()
+		}
+	}
+
+	static SimulatorCodes {
+		Get {
+			local code, class
+
+			static simulatorCodes := false
+
+			if !simulatorCodes {
+				simulatorCodes := CaseInsenseMap()
+
+				for code, class in SimulatorProvider.SimulatorProviders
+					simulatorCodes[class.Simulator] := code
+			}
+
+			return simulatorCodes
 		}
 	}
 
@@ -1001,7 +1009,7 @@ class SessionDatabase extends ConfigurationItem {
 					if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 						return name
 
-			for name, code in kSimulatorCodes
+			for name, code in SessionDatabase.SimulatorCodes
 				if ((simulatorCode = name) || (simulatorCode = code))
 					return name
 
@@ -1019,7 +1027,7 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
-			for name, code in kSimulatorCodes
+			for name, code in SessionDatabase.SimulatorCodes
 				if ((simulatorName = name) || (simulatorName = code))
 					return code
 
@@ -1056,7 +1064,7 @@ class SessionDatabase extends ConfigurationItem {
 				simulators.Push(simulator)
 
 		if (force || (simulators.Length = 0))
-			for name, code in kSimulatorCodes
+			for name, code in SessionDatabase.SimulatorCodes
 				if (force || FileExist(kDatabaseDirectory . "User\" . code))
 					simulators.Push(name)
 

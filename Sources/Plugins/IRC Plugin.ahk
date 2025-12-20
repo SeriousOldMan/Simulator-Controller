@@ -78,7 +78,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		local exePath := (kBinariesDirectory . "Connectors\" . "IRC SHM Connector.dll")
 
 		try {
-			callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "DLL")
+			callSimulator(this.Code, command . "=" . operation . "=" . message . ":" . values2String(";", arguments*), "Connector")
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -366,9 +366,10 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 ;;;                     Function Hook Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-startIRC() {
+startIRC(executable := false) {
 	return SimulatorController.Instance.startSimulator(SimulatorController.Instance.findPlugin(kIRCPlugin).Simulator
-													 , "Simulator Splash Images\IRC Splash.jpg")
+													 , "Simulator Splash Images\IRC Splash.jpg"
+													 , executable)
 }
 
 

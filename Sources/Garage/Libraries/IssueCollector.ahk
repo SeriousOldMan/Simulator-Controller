@@ -249,7 +249,7 @@ class IssueCollector {
 	startIssueCollector(calibrate := false) {
 		local dataFile := temporaryFileName("Telemetry", "data")
 		local player := requireSoundPlayer("DCAnalyzerPlayer.exe")
-		local pid, options, code, message, audioDevice, workingDirectory
+		local exePath, protocol, arguments, pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
 			this.updateSamples()
@@ -302,16 +302,35 @@ class IssueCollector {
 
 				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
-				Run(kBinariesDirectory . "Providers\" . code . " SHM Coach.exe " . options, kBinariesDirectory, "Hide", &pid)
+				protocol := "SHM"
+				exePath := "..."
+				pid := false
 
-				this.iCalibrate := calibrate
-				this.iDataFile := dataFile
+				protocol := SimulatorProvider.getProtocol(code, "Coach")
+
+				if protocol {
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
+					if !FileExist(exePath)
+						throw "File not found..."
+
+					Run("`"" . exePath . "`" " . arguments . A_Space . options, kBinariesDirectory, "Hide", &pid)
+
+					this.iCalibrate := calibrate
+					this.iDataFile := dataFile
+				}
 			}
 			catch Any as exception {
 				logError(exception, true)
 
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
-											 , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . "Providers\" . code . " SHM Spotter.exe"})
+											 , {simulator: code, protocol: protocol, exePath: exePath})
 
 				logMessage(kLogCritical, StrReplace(message, translate("..."), ""))
 
@@ -329,12 +348,12 @@ class IssueCollector {
 
 					OnExit(this.iExitCallback)
 				}
-			}
 
-			if (!calibrate && this.iSampleFrequency) {
-				this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
+				if (!calibrate && this.iSampleFrequency) {
+					this.iSampleTask := PeriodicTask(collectSamples, isDebug() ? this.iSampleFrequency : 180000, kLowPriority)
 
-				this.iSampleTask.start()
+					this.iSampleTask.start()
+				}
 			}
 		}
 	}

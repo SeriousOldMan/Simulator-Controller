@@ -219,7 +219,7 @@ Returns the pattern used to identify an active window for the given application.
 	
 #### *SpecialStartup*
 Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
-Important: Script functions used as special startup handler must return the rpocess id of the started application.
+Important: Script functions used as special startup handler must accept optional arguments (which can be ignored) and return the process id of the started application.
 
 #### *SpecialShutdown*
 Returns the name of a script function to be invoked as a special shutdown method, or *false*, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.

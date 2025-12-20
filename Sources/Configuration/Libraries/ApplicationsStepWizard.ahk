@@ -54,7 +54,7 @@ class ApplicationsStepWizard extends StepWizard {
 						steamID := wizard.getApplicationValue(theApplication, "SteamID", kUndefined)
 
 						if (steamID != kUndefined)
-							specialStartup .= ("(" . substituteVariables(hooks[6], {id: steamID}) . ")")
+							specialStartup .= ("(" . substituteVariables(descriptor[6], {id: steamID}) . ")")
 					}
 
 					Application(theApplication, false, exePath, workingDirectory, descriptor[4], specialStartup, hooks[2], hooks[3]).saveToConfiguration(configuration)

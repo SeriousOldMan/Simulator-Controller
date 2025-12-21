@@ -1,9 +1,9 @@
 [Development]
 Version=6.7.6.0-dev
 Target=6.7.6.0-release
-Date=12/19/2025
+Date=12/21/2025
 Download=
-Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files
+Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup"
 Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
 [Release]
 Version=6.7.5.0-release

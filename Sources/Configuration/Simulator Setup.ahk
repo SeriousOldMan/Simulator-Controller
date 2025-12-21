@@ -3434,9 +3434,11 @@ findSoftware(definition, software) {
 						locator := substituteVariables(Trim(StrReplace(locator, "Steam:", "")))
 
 						try {
-							installPath := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam", "InstallPath")
+							installPath := StrReplace(RegRead("HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath"), "/", "\")
 						}
 						catch Any as exception {
+							logError(exception, true)
+
 							installPath := ""
 						}
 
@@ -3446,12 +3448,12 @@ findSoftware(definition, software) {
 
 								jsScript := convertVDF2JSON(script)
 
-								folders := JSON.parse(jsScript)
-								folders := folders["LibraryFolders"]
-
 								deleteFile(kTempDirectory . "Steam.library")
 
 								FileAppend(jsScript, kTempDirectory . "Steam.library")
+
+								folders := JSON.parse(jsScript)
+								folders := folders["LibraryFolders"]
 
 								for ignore, folder in folders {
 									if isObject(folder)

@@ -821,32 +821,7 @@ class SetupWizard extends ConfiguratorPanel {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, w, h, posX, page, step
-
-		showInfo(*) {
-			local x, y, widget, info
-
-			MouseGetPos(&x, &y)
-
-			try {
-				if (widget := this.Step.findWidget(screen2Window(x), screen2Window(y)
-												 , (w) => (w.Visible && w.HasProp("Info")))) {
-					info := getMultiMapValue(this.Definition, "Setup." . this.Step.Step
-															, widget.Info . "." . getLanguage()
-															, false)
-
-					if info
-						this.setInfo(info, false)
-					else
-						this.restoreInfo()
-				}
-				else
-					this.restoreInfo()
-			}
-			catch Any as exception {
-				showMessage(exception.Message)
-			}
-		}
+		local x, y, w, h, posX, page, step, hoverInfo
 
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
@@ -895,11 +870,13 @@ class SetupWizard extends ConfiguratorPanel {
 						this.showPage(step, 1)
 				}
 
+		hoverInfo := (*) => this.showInfo()
+
 		PeriodicTask(() {
 			if WinActive(wizardWindow)
-				OnMessage(0x0200, showInfo)
+				OnMessage(0x0200, hoverInfo)
 			else
-				OnMessage(0x0200, showInfo, 0)
+				OnMessage(0x0200, hoverInfo, 0)
 		}, 1000, kLowPriority).start()
 	}
 
@@ -2412,6 +2389,28 @@ class SetupWizard extends ConfiguratorPanel {
 
 	setSubtitle(subtitle) {
 		this.HelpWindow["stepSubtitle"].Text := translate("Step ") . this.Steps[this.Step] . translate(": ") . subtitle
+	}
+
+	showInfo() {
+		local x, y, widget, info
+
+		MouseGetPos(&x, &y)
+
+		try {
+			if (widget := this.Step.findWidget(screen2Window(x), screen2Window(y)
+											 , (w) => (w.Visible && w.HasProp("Info")))) {
+				info := getMultiMapValue(this.Definition, "Setup." . this.Step.Step
+														, widget.Info . "." . getLanguage()
+														, false)
+
+				if info
+					this.setInfo(info, false)
+				else
+					this.restoreInfo()
+			}
+			else
+				this.restoreInfo()
+		}
 	}
 
 	setInfo(html, general := true) {

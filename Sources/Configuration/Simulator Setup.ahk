@@ -3449,6 +3449,10 @@ findSoftware(definition, software) {
 								folders := JSON.parse(jsScript)
 								folders := folders["LibraryFolders"]
 
+								deleteFile(kTempDirectory . "Steam.library")
+
+								FileAppend(jsScript, kTempDirectory . "Steam.library")
+
 								for ignore, folder in folders {
 									if isObject(folder)
 										folder := folder["path"]

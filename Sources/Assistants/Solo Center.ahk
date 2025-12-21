@@ -2507,7 +2507,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			this.Providers.supportsTyreManagement( , &tyreSets)
+			this.Provider.supportsTyreManagement( , &tyreSets)
 
 			if tyreSets {
 				window["tyreSetEdit"].Enabled := true

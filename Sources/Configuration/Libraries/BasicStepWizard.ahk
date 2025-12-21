@@ -28,6 +28,8 @@ class BasicStepWizard extends StepWizard {
 	iAssistants := CaseInsenseMap()
 	iKeys := CaseInsenseMap()
 
+	iSynthesizerEditor := false
+
 	Pages {
 		Get {
 			if this.SetupWizard.Initialize
@@ -445,6 +447,16 @@ class BasicStepWizard extends StepWizard {
 			this.Keys[assistant] := key
 			this.Assistants[key] := assistant
 		}
+	}
+
+	findWidget(x, y, test := (*) => true) {
+		if WinActive(this.SetupWizard.Window)
+			return super.findWidget(x, y, test)
+		else if (this.iSynthesizerEditor && this.iSynthesizerEditor.Window
+										 && WinActive(this.iSynthesizerEditor.Window))
+			return this.iSynthesizerEditor.findWidget(x, y, test)
+		else
+			return false
 	}
 
 	showPage(page) {
@@ -1070,7 +1082,14 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
 			}
 
-			configuration := VoiceSynthesizerEditor(this, configuration).editSynthesizer(window)
+			this.iSynthesizerEditor := VoiceSynthesizerEditor(this, configuration)
+
+			try {
+				configuration := this.iSynthesizerEditor.editSynthesizer(window)
+			}
+			finally {
+				this.iSynthesizerEditor := false
+			}
 
 			if configuration {
 				wizard.setModuleValue(assistant, "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))
@@ -1334,32 +1353,45 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		chosen := 0
 
 		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
+		widget1.Info := "Basic.Synthesizer.Info"
 		widget2 := editorGui.Add("DropDownList", "x" . x1 . " yp w156 W:Grow(0.3) Choose" . chosen . "  VbasicVoiceSynthesizerDropDown Hidden", choices)
+		widget2.Info := "Basic.Synthesizer.Info"
 		widget2.LastValue := chosen
 		widget2.OnEvent("Change", chooseVoiceSynthesizer)
 
-		editorGui.Add("Button", "xp+157 yp-1 w23 h23 X:Move(0.3) vbasicWindowsSettingsButton Hidden").OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
-		setButtonIcon(editorGui["basicWindowsSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
+		widget3 := editorGui.Add("Button", "xp+157 yp-1 w23 h23 X:Move(0.3) vbasicWindowsSettingsButton Hidden")
+		widget3.Info := "Basic.Synthesizer.Settings.Info"
+		widget3.OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
+		setButtonIcon(widget3, kIconsDirectory . "General Settings.ico", 1)
 
-		this.iTopWidgets := [[widget1, widget2, editorGui["basicWindowsSettingsButton"]]]
+		this.iTopWidgets := [[widget1, widget2, widget3]]
 
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget3 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerLabel Hidden", translate("Voice"))
+		widget3.Info := "Basic.Synthesizer.Info"
 		widget4 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicWindowsSpeakerDropDown Hidden", voices)
+		widget4.Info := "Basic.Synthesizer.Info"
 
 		widget17 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
+		widget17.Info := "Basic.Synthesizer.Play.Info"
 		widget17.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget17, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerVolumeLabel Hidden", translate("Level"))
+		widget5.Info := "Basic.Synthesizer.Vocalics.Info"
 		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range0-100 ToolTip VbasicSpeakerVolumeSlider Hidden")
+		widget6.Info := "Basic.Synthesizer.Vocalics.Info"
 
 		widget7 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VbasicWindowsSpeakerPitchLabel Hidden", translate("Pitch"))
+		widget7.Info := "Basic.Synthesizer.Vocalics.Info"
 		widget8 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VbasicSpeakerPitchSlider Hidden")
+		widget8.Info := "Basic.Synthesizer.Vocalics.Info"
 
 		widget9 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VbasicWindowsSpeakerSpeedLabel Hidden", translate("Speed"))
+		widget9.Info := "Basic.Synthesizer.Vocalics.Info"
 		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VbasicSpeakerSpeedSlider Hidden")
+		widget10.Info := "Basic.Synthesizer.Vocalics.Info"
 
 		this.iWindowsSynthesizerWidgets := [[editorGui["basicWindowsSpeakerLabel"], editorGui["basicWindowsSpeakerDropDown"], widget17]]
 
@@ -1368,19 +1400,26 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 							 , [editorGui["basicWindowsSpeakerSpeedLabel"], editorGui["basicSpeakerSpeedSlider"]]]
 
 		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget11.Info := "Basic.Synthesizer.Info"
 		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicAzureSubscriptionKeyEdit Hidden")
+		widget12.Info := "Basic.Synthesizer.Info"
 		widget12.OnEvent("Change", updateAzureVoices)
 
 		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w140 h23 +0x200 VbasicAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
+		widget13.Info := "Basic.Synthesizer.Info"
 		widget14 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicAzureTokenIssuerEdit Hidden")
+		widget14.Info := "Basic.Synthesizer.Info"
 		widget14.OnEvent("Change", updateAzureVoices)
 
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget15 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicAzureSpeakerLabel Hidden", translate("Voice"))
+		widget15.Info := "Basic.Synthesizer.Info"
 		widget16 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicAzureSpeakerDropDown Hidden", voices)
+		widget16.Info := "Basic.Synthesizer.Info"
 
 		widget18 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
+		widget18.Info := "Basic.Synthesizer.Play.Info"
 		widget18.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget18, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
@@ -1394,18 +1433,24 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
 
 		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Service Key"))
+		widget19.Info := "Basic.Synthesizer.Info"
 		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
+		widget20.Info := "Basic.Synthesizer.Info"
 		widget20.OnEvent("Change", updateGoogleVoices)
 
 		widget21 := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move Disabled VbasicGoogleAPIKeyFilePathButton Hidden", translate("..."))
+		widget21.Info := "Basic.Synthesizer.Info"
 		widget21.OnEvent("Click", chooseAPIKeyFilePath)
 
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget22 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicGoogleSpeakerLabel Hidden", translate("Voice"))
+		widget22.Info := "Basic.Synthesizer.Info"
 		widget23 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicGoogleSpeakerDropDown Hidden", voices)
+		widget23.Info := "Basic.Synthesizer.Info"
 
 		widget24 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget24.Info := "Basic.Synthesizer.Play.Info"
 		widget24.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget24, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
@@ -1413,23 +1458,32 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										 , [editorGui["basicGoogleSpeakerLabel"], editorGui["basicGoogleSpeakerDropDown"], widget24]]
 
 		widget30 := editorGui.Add("Text", "x" . x0 . " ys+24 w112 h23 +0x200 VbasicOpenAISpeakerServerURLLabel Hidden", translate("Server URL"))
+		widget30.Info := "Basic.Synthesizer.Info"
 		widget31 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicOpenAISpeakerServerURLEdit Hidden")
+		widget31.Info := "Basic.Synthesizer.Info"
 
 		widget32 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicOpenAISpeakerAPIKeyLabel Hidden", translate("Service Key"))
+		widget32.Info := "Basic.Synthesizer.Info"
 		widget33 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicOpenAISpeakerAPIKeyEdit Hidden")
+		widget33.Info := "Basic.Synthesizer.Info"
 
 		widget34 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicOpenAISpeakerLabel Hidden", translate("Model / Voice"))
+		widget34.Info := "Basic.Synthesizer.Info"
 
 		halfWidth := (Floor((w1 - 48) / 2) - 2)
 
 		widget35 := editorGui.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VbasicOpenAISpeakerModelEdit Hidden")
+		widget35.Info := "Basic.Synthesizer.Info"
 		widget36 := editorGui.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 1) . " X:Move(0.5) W:Grow(0.5) VbasicOpenAISpeakerVoiceEdit Hidden")
+		widget36.Info := "Basic.Synthesizer.Info"
 
 		widget37 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget37.Info := "Basic.Synthesizer.Play.Info"
 		widget37.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget37, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
 		widget38 := editorGui.Add("Button", "x" . (x1 + 24 + 5) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
+		widget38.Info := "Basic.Synthesizer.Info"
 		widget38.OnEvent("Click", (*) => this.editInstructions())
 		setButtonIcon(widget38, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
@@ -1439,15 +1493,20 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 										  , editorGui["basicOpenAISpeakerVoiceEdit"], widget37, widget38]]
 
 		widget25 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicElevenLabsAPIKeyLabel Hidden", translate("Service Key"))
+		widget25.Info := "Basic.Synthesizer.Info"
 		widget26 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicElevenLabsAPIKeyEdit Hidden")
+		widget26.Info := "Basic.Synthesizer.Info"
 		widget26.OnEvent("Change", updateElevenLabsVoices)
 
 		voices := [translate("Random"), translate("Deactivated")]
 
 		widget27 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicElevenLabsSpeakerLabel Hidden", translate("Voice"))
+		widget27.Info := "Basic.Synthesizer.Info"
 		widget28 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicElevenLabsSpeakerDropDown Hidden", voices)
+		widget28.Info := "Basic.Synthesizer.Info"
 
 		widget29 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget29.Info := "Basic.Synthesizer.Play.Info"
 		widget29.OnEvent("Click", (*) => this.testSpeaker())
 		setButtonIcon(widget29, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
 
@@ -1698,8 +1757,27 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicSpeakerSpeedSlider"].Value := this.Value["speakerSpeed"]
 	}
 
+	findWidget(x, y, test := (*) => true) {
+		local ignore, widget, cX, cY, cW, cH
+
+		try {
+			for ignore, widget in this.Window {
+				ControlGetPos(&cX, &cY, &cW, &cH, widget)
+
+				if ((x >= cX) && (x <= (cX + cW)) && (y >= cY) && (y <= (cY + cH)))
+					if test(widget)
+						return widget
+			}
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+
+		return false
+	}
+
 	editSynthesizer(owner := false) {
-		local window, x, y, w, h, configuration
+		local window, x, y, w, h, configuration, hoverInfo, hoverTask
 
 		this.createGui(this.Configuration)
 
@@ -1717,9 +1795,26 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.showWidgets()
 
-		loop
-			Sleep(200)
-		until this.iResult
+		hoverInfo := (*) => this.StepWizard.SetupWizard.showInfo()
+		hoverTask := PeriodicTask(() {
+						 if WinActive(window)
+							 OnMessage(0x0200, hoverInfo)
+						 else
+							 OnMessage(0x0200, hoverInfo, 0)
+					 }, 1000, kLowPriority)
+
+		hoverTask.Start()
+
+		try {
+			loop
+				Sleep(200)
+			until this.iResult
+		}
+		finally {
+			hoverTask.Stop()
+
+			OnMessage(0x0200, hoverInfo, 0)
+		}
 
 		try {
 			if (this.iResult = kOk) {

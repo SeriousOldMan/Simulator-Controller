@@ -277,21 +277,29 @@ class BasicStepWizard extends StepWizard {
 			choices.Push(language)
 
 		widget5 := window.Add("Text", "x" . x . " yp+10 w100 h23 +0x200 Hidden", translate("Localization"))
+		widget5.Info := "Basic.Localization.Info"
 		widget6 := window.Add("Button", "xp+106 yp w23 h23 Hidden")
+		widget6.Info := "Basic.Localization.Info"
 		widget6.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VbasicUILanguageDropDown Hidden", choices)
+		widget7.Info := "Basic.Localization.Info"
 
 		widget8 := window.Add("Text", "x" . x . " yp+24 w100 h23 +0x200 Hidden", translate("Push-To-Talk"))
+		widget8.Info := "Basic.Push-To-Talk.Info"
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VbasicPushToTalkButton Hidden")
+		widget9.Info := "Basic.Push-To-Talk.Info"
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
 		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VbasicPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
+		widget10.Info := "Basic.Push-To-Talk.Info"
 		widget10.OnEvent("Change", updateP2T)
 		widget51 := window.Add("Button", "xp+99 yp w23 h23 Hidden")
+		widget51.Info := "Basic.Push-To-Talk.Info"
 		widget51.OnEvent("Click", (*) => this.testPushToTalk())
 		setButtonIcon(widget51, kIconsDirectory . "Start.ico", 1)
 		widget11 := window.Add("Edit", "xp+24 yp w72 h21 VbasicPushToTalkEdit Hidden")
+		widget11.Info := "Basic.Push-To-Talk.Info"
 
 		window.SetFont("Bold", "Arial")
 
@@ -301,6 +309,7 @@ class BasicStepWizard extends StepWizard {
 		window.SetFont("Norm", "Arial")
 
 		widget34 := window.Add("ListView", "x" . col2X . " yp+10 w" . col2Width . " h110 W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
+		widget34.Info := "Basic.Simulators.Info"
 		widget34.OnEvent("Click", noSelect)
 		widget34.OnEvent("DoubleClick", noSelect)
 		widget34.OnEvent("ContextMenu", noSelect)
@@ -308,6 +317,7 @@ class BasicStepWizard extends StepWizard {
 		this.iSimulatorsListView := widget34
 
 		widget35 := window.Add("Button", "x" . (col2X + col2Width - 90) . " yp+117 w90 h23 X:Move Hidden", translate("Locate..."))
+		widget35.Info := "Basic.Simulators.Info"
 		widget35.OnEvent("Click", locateSimulator)
 
 		window.SetFont("Bold", "Arial")
@@ -322,58 +332,86 @@ class BasicStepWizard extends StepWizard {
 		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
 
 		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
+		widget41.Info := "Basic.Assistants.Info"
 		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
 		widget42 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Driving Coach"))
+		widget42.Info := "Basic.Assistants.Info"
 		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
+		widget43.Info := "Basic.Assistants.Info"
 		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
+		widget44.Info := "Basic.Assistants.Info"
 		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
 		widget45 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicDCVoiceDropDown Hidden")
+		widget45.Info := "Basic.Assistants.Info"
 		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget46.Info := "Basic.Assistants.Voice.Info"
 		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
 		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
 		widget47 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicDCBoosterButton Hidden")
+		widget47.Info := "Basic.Assistants.Boosters.Info"
 		widget47.OnEvent("Click", editBooster.Bind("Driving Coach"))
 		setButtonIcon(widget47, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget14.Info := "Basic.Assistants.Info"
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
 		widget15 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Engineer"))
+		widget15.Info := "Basic.Assistants.Info"
 		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
+		widget16.Info := "Basic.Assistants.Info"
 		widget17 := window.Add("DropDownList", "xp+98 yp w96 VbasicRELanguageDropDown Hidden")
+		widget17.Info := "Basic.Assistants.Info"
 		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
 		widget18 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicREVoiceDropDown Hidden")
+		widget18.Info := "Basic.Assistants.Info"
 		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
+		widget19.Info := "Basic.Assistants.Voice.Info"
 		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
 		widget48 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicREBoosterButton Hidden")
+		widget48.Info := "Basic.Assistants.Boosters.Info"
 		widget48.OnEvent("Click", editBooster.Bind("Race Engineer"))
 		setButtonIcon(widget48, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
+		widget20.Info := "Basic.Assistants.Info"
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
 		widget21 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Strategist"))
+		widget21.Info := "Basic.Assistants.Info"
 		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
+		widget22.Info := "Basic.Assistants.Info"
 		widget23 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSLanguageDropDown Hidden")
+		widget23.Info := "Basic.Assistants.Info"
 		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
 		widget24 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSVoiceDropDown Hidden")
+		widget24.Info := "Basic.Assistants.Info"
 		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
+		widget25.Info := "Basic.Assistants.Voice.Info"
 		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
 		widget49 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSBoosterButton Hidden")
+		widget49.Info := "Basic.Assistants.Boosters.Info"
 		widget49.OnEvent("Click", editBooster.Bind("Race Strategist"))
 		setButtonIcon(widget49, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
+		widget26.Info := "Basic.Assistants.Info"
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
 		widget27 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Spotter"))
+		widget27.Info := "Basic.Assistants.Info"
 		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")
+		widget28.Info := "Basic.Assistants.Info"
 		widget29 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSPLanguageDropDown Hidden")
+		widget29.Info := "Basic.Assistants.Info"
 		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
 		widget30 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSPVoiceDropDown Hidden")
+		widget30.Info := "Basic.Assistants.Info"
 		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
+		widget31.Info := "Basic.Assistants.Voice.Info"
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 		widget50 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSPBoosterButton Hidden")
+		widget50.Info := "Basic.Assistants.Boosters.Info"
 		widget50.OnEvent("Click", editBooster.Bind("Race Spotter"))
 		setButtonIcon(widget50, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 

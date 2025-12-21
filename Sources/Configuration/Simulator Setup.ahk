@@ -823,6 +823,31 @@ class SetupWizard extends ConfiguratorPanel {
 		local helpWindow := this.HelpWindow
 		local x, y, w, h, posX, page, step
 
+		showInfo(*) {
+			local x, y, widget, info
+
+			MouseGetPos(&x, &y)
+
+			try {
+				if (widget := this.Step.findWidget(screen2Window(x), screen2Window(y)
+												 , (w) => (w.Visible && w.HasProp("Info")))) {
+					info := getMultiMapValue(this.Definition, "Setup." . this.Step.Step
+															, widget.Info . "." . getLanguage()
+															, false)
+
+					if info
+						this.setInfo(info, false)
+					else
+						this.restoreInfo()
+				}
+				else
+					this.restoreInfo()
+			}
+			catch Any as exception {
+				showMessage(exception.Message)
+			}
+		}
+
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
 		else {
@@ -869,6 +894,13 @@ class SetupWizard extends ConfiguratorPanel {
 					if (step.Active && (step.Step = page))
 						this.showPage(step, 1)
 				}
+
+		PeriodicTask(() {
+			if WinActive(wizardWindow)
+				OnMessage(0x0200, showInfo)
+			else
+				OnMessage(0x0200, showInfo, 0)
+		}, 1000, kLowPriority).start()
 	}
 
 	hide() {
@@ -2382,12 +2414,36 @@ class SetupWizard extends ConfiguratorPanel {
 		this.HelpWindow["stepSubtitle"].Text := translate("Step ") . this.Steps[this.Step] . translate(": ") . subtitle
 	}
 
-	setInfo(html) {
+	setInfo(html, general := true) {
 		html := "<html><body style='background-color: #" . this.HelpWindow.Theme.WindowBackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, p, body { color: #" . this.HelpWindow.Theme.TextColor . "}</style>" . html . "</body></html>"
+
+		if general {
+			this.HelpWindow.General := html
+			this.HelpWindow.Context := false
+			this.HelpWindow.Mode := "General"
+		}
+		else {
+			try
+				if ((this.HelpWindow.Mode = "Context") && (this.HelpWindow.Context = html))
+					return
+
+			this.HelpWindow.Context := html
+			this.HelpWindow.Mode := "Context"
+		}
 
 		this.HelpWindow["infoViewer"].document.open()
 		this.HelpWindow["infoViewer"].document.write(html)
 		this.HelpWindow["infoViewer"].document.close()
+	}
+
+	restoreInfo() {
+		if (this.HelpWindow.HasProp("Mode") && this.HelpWindow.HasProp("General") && (this.HelpWindow.Mode != "General")) {
+			this.HelpWindow.Mode := "General"
+
+			this.HelpWindow["infoViewer"].document.open()
+			this.HelpWindow["infoViewer"].document.write(this.HelpWindow.General)
+			this.HelpWindow["infoViewer"].document.close()
+		}
 	}
 
 	saveKnowledgeBase() {
@@ -2529,6 +2585,28 @@ class StepWizard extends ConfiguratorPanel {
 
 	deleteWidgets(page) {
 		this.iWidgets.Delete(page)
+	}
+
+	findWidgets(x, y, test := (*) => true) {
+		local result := []
+		local ignore, widgets, widget, cX, cY, cW, cH
+
+		for ignore, widgets in this.iWidgets
+			for ignore, widget in widgets {
+				ControlGetPos(&cX, &cY, &cW, &cH, widget)
+
+				if ((x >= cX) && (x <= (cX + cW)) && (y >= cY) && (y <= (cY + cH)))
+					if test(widget)
+						result.Push(widget)
+			}
+
+		return result
+	}
+
+	findWidget(x, y, test := (*) => true) {
+		local widgets := this.findWidgets(x, y, test)
+
+		return ((widgets.Length > 0) ? widgets[1] : false)
 	}
 
 	startSetup(new) {

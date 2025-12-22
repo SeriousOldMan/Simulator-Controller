@@ -11,7 +11,7 @@
 
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
-#Include "..\..\Framework\Extensions\TranslationPipeline.ahk"
+#Include "..\..\Framework\Extensions\TranslationService.ahk"
 #Include "AssistantBoosterEditor.ahk"
 #Include "TranslatorEditor.ahk"
 

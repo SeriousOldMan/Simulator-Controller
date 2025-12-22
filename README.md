@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.6.0-dev]() (Early build for 6.7.6. Changes: Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys.)
+[6.7.6.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OLDE8F1Z/Releases/Simulator%20Controller%206.7.6.0-dev.zip) (Early build for 6.7.6. Changes: Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6756) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676) of this version and all the versions you might have skipped, before installing and using this version.
 

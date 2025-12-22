@@ -23,7 +23,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.7.6.0
+
+#### Date: 12/26/25 (planned)
+
+#### Fixes
+
+  - Fixed an error, when reporting unknown car numbers given in voice commands.
+  - The CSV importer has been fixed, when importing telemetry data for *iRacing*. 
+  - Several grammar files has been fixed, where duplicate keys occluded some of the phrases.
+
+#### Changes
+
+  - Missing TC and ABS settings are now reported as "n/a" in various applications and no longer as **0**.
+  - Steam IDs are now used when starting a simulator and the startup process is handled by Steam. This is necessary, when additional software is started, for example an Anti-Cheat system. To use this new process, you have to re-generate yur configuration using "Simulator Setup".
+  - "Simulator Setup" now providex context sensitive help on the *Basic* configuration page.
 
 # Release history
 

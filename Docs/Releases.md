@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.7.5.1
+
+#### Date: 12/22/25
+
+#### Fixes
+
+  - Fixed a critical bug that prevented "Simulator Setup" to detect *Projct Motor Racing* correctly.
+  
 ## 6.7.5.0
 
 #### Date: 12/19/25

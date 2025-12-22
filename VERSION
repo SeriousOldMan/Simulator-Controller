@@ -1,10 +1,10 @@
 [Development]
 Version=6.7.6.0-dev
 Target=6.7.6.0-release
-Date=12/21/2025
+Date=12/22/2025
 Download=
-Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup"
-Components=Media->5.6.1,Configuration->6.5.5,Utilities->6.6.4
+Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys
+Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.5.0-release
 Date=12/19/2025
@@ -18,6 +18,9 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.5.5.Path=Resources
 Configuration.6.5.5.Content=Setup
 Configuration.6.5.5.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/7q55WHB0;https://www.dropbox.com/scl/fi/99gczarjkbbc716odq3g9/Configuration-6.5.5.zip?rlkey=h9paqd97fkge7i2ga3oc2ykfi&st=svk8rolq&dl=1;http://%master%/Components/Configuration 6.5.5.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.5.5.zip
+Configuration.6.7.6.Path=Resources
+Configuration.6.7.6.Content=Setup
+Configuration.6.7.6.Download=
 Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip

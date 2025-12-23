@@ -45,6 +45,7 @@
 
 #### Changes
 
+  - OpenAI compatible GPT service providers can now be referenced using there base UDL. The extension "v1/chat/completions" is no longer required.
   - Missing TC and ABS settings are now reported as "n/a" in various applications and no longer as **0**.
   - Steam IDs are now used when starting a simulator and the startup process is handled by Steam. This is necessary, when additional software is started, for example an Anti-Cheat system. To use this new process, you have to re-generate yur configuration using "Simulator Setup".
   - "Simulator Setup" now providex context sensitive help on the *Basic* configuration page.

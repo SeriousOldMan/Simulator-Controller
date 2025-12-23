@@ -3310,7 +3310,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if (setting.Length = 7)
 							settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6], setting[7])
 						else
-							settingsDB.setSettingValue(simulator, setting[1], setting[2], setting[3], setting[4], setting[5], setting[6])
+							settingsDB.setSettingValue(simulator, setting[1], setting[2], "*", setting[3], setting[4], setting[5], setting[6])
 					}
 				}
 				catch Any as exception {
@@ -6958,7 +6958,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 					showProgress({Progress: Min(A_Index, 100)})
 
 					for key, value in values {
-						settings.Push(Array(car, track, weather, section, key, value))
+						settings.Push(Array(car, track, weather, mode, section, key, value))
 
 						type := editor.getSettingType(section, key, &default)
 

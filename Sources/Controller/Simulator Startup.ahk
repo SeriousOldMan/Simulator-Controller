@@ -1369,7 +1369,7 @@ launchPad(command := false, arguments*) {
 			launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceReports", icons["RaceReports"]).OnEvent("Click", launchApplication.Bind("RaceReports"))
 		}
 
-		startupButton := launchPadGui.Add("Text", "x16 yp+64 w60 h60 Center", "Startup")
+		startupButton := launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Startup")
 
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")

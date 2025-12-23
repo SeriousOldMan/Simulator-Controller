@@ -38,9 +38,10 @@
 #### Fixes
 
   - Fixed an error, when reporting unknown car numbers given in voice commands.
-  - The CSV importer has been fixed, when importing telemetry data for *iRacing*. 
-  - Several grammar files has been fixed, where duplicate keys occluded some of the phrases.
-  - Fixed a crash in "Solo Center" when selecting a fixed tyre compound for the next stint.
+  - The CSV importer has been fixed, when telemetry data for *iRacing* was imported. 
+  - Several grammar files have been fixed where duplicate keys occluded some of the phrases.
+  - Fixed a crash in "Solo Center" when a fixed tyre compound for the next stint was selected.
+  - Fixed import of exported settings into the session database for "All" selections.
 
 #### Changes
 

@@ -56,7 +56,7 @@ downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
 	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, ignore, url
+	local directory, currentDirectory, ignore, url, urls
 
 	exitOthers() {
 		loop 20
@@ -119,11 +119,16 @@ downloadSimulatorController() {
 	devVersion := (cState || inList(A_Args, "-Development"))
 
 	deleteFile(kTempDirectory . "VERSION")
-	
-	for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
-					  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
-					  , "http://" . MASTER . "/Releases/VERSION"
-					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+
+	if devVersion
+		urls := ["https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/VERSION"]
+	else
+		urls := ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
+			   , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+			   , "http://" . MASTER . "/Releases/VERSION"
+			   , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+
+	for ignore, url in urls
 		try {
 			error := false
 
@@ -158,7 +163,7 @@ downloadSimulatorController() {
 
 		if package {
 			package := substituteVariables(package, {master: MASTER})
-			
+
 			exitOthers()
 
 			for ignore, url in string2Values(";", package)

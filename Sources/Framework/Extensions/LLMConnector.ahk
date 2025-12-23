@@ -300,7 +300,7 @@ class LLMConnector {
 		}
 
 		CreateServiceURL(server) {
-			return this.GetServerURL(server)
+			return this.CreateServerURL(server)
 		}
 
 		CreateHeaders(headers?) {
@@ -481,11 +481,11 @@ class LLMConnector {
 		}
 
 		CreateServiceURL(server) {
-			return (this.GetServerURL(server) . "/v1/chat/completions")
+			return (this.CreateServerURL(server) . "/v1/chat/completions")
 		}
 
 		CreateModelsURL(server) {
-			return (this.GetServerURL(server) . "/v1/models")
+			return (this.CreateServerURL(server) . "/v1/models")
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
@@ -754,11 +754,11 @@ class LLMConnector {
 		}
 
 		CreateServiceURL(server) {
-			return (this.GetServerURL(server) . "/v1beta/openai/chat/completions")
+			return (this.CreateServerURL(server) . "/v1beta/openai/chat/completions")
 		}
 
 		CreateModelsURL(server) {
-			return (this.GetServerURL(server) . "/v1beta/openai/models")
+			return (this.CreateServerURL(server) . "/v1beta/openai/models")
 		}
 
 		ParseModels(response) {

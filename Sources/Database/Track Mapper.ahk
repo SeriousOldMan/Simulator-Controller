@@ -137,7 +137,8 @@ createTrackMap(simulator, track, fileName) {
 	writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 	loop Read, fileName {
-		coordinates.Push(string2Values(",", A_LoopReadLine))
+		if (Trim(A_LoopReadLine) != "")
+			coordinates.Push(string2Values(",", A_LoopReadLine))
 
 		Sleep(1)
 

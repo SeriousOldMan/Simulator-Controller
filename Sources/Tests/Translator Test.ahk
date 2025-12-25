@@ -39,8 +39,9 @@ global kAzureAPIKey := ""
 global kAzureEndpoint := "https://api.cognitive.microsofttranslator.com/"
 global kAzureRegion := ""
 global kDeepLAPIKey := ""
-global kOpenRouterAPIKey := ""
-global kOpenRouterModel := ""
+global kOpenAIAPIKey := ""
+global kOpenAIURL := "https://api.openai.com"
+global kOpenAIModel := "gpt-4o-mini"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -114,36 +115,36 @@ class TranslatorTest extends Assert {
 
 	; Test 5: Multiple service configurations
 	MultipleServices_Test() {
-		local google, azure, deepl, openrouter
+		local google, azure, deepl, openAI
 
 		google := Translator("Google", "English", "Spanish", "google-key")
 		azure := Translator("Azure", "English", "French", "azure-key", "https://endpoint", "region")
 		deepl := Translator("DeepL", "English", "German", "deepl-key", "https://api-free.deepl.com")
-		openrouter := Translator("OpenRouter", "English", "Italian", "or-key", "llama-3")
+		openAI := Translator("OpenAI", "English", "Italian", "or-key", "llama-3")
 
 		this.AssertEqual("Google", google.Service, "Google service")
 		this.AssertEqual("Azure", azure.Service, "Azure service")
 		this.AssertEqual("DeepL", deepl.Service, "DeepL service")
-		this.AssertEqual("OpenRouter", openrouter.Service, "OpenRouter service")
+		this.AssertEqual("OpenAI", openAI.Service, "OpenAI service")
 
 		this.AssertEqual("es", google.TargetLanguageCode, "Spanish code")
 		this.AssertEqual("fr", azure.TargetLanguageCode, "French code")
 		this.AssertEqual("de", deepl.TargetLanguageCode, "German code")
-		this.AssertEqual("it", openrouter.TargetLanguageCode, "Italian code")
+		this.AssertEqual("it", openAI.TargetLanguageCode, "Italian code")
 	}
 
-	; Test 6: Live OpenRouter test (optional - requires API key)
-	LiveOpenRouter_Test() {
+	; Test 6: Live OpenAI test (optional - requires API key)
+	LiveOpenAI_Test() {
 		local theTranslator, result
 
-		if (kOpenRouterAPIKey = "") {
-			; this.Skip("OpenRouter API key not configured")
+		if (kOpenAIAPIKey = "") {
+			; this.Skip("OpenAI API key not configured")
 
 			return
 		}
 
-		theTranslator := Translator("OpenRouter", "English", "Spanish"
-								  , kOpenRouterAPIKey, kOpenRouterModel)
+		theTranslator := Translator("OpenAI", "English", "Spanish"
+								  , kOpenAIAPIKey, kOpenAIURL, kOpenAIModel)
 
 		result := theTranslator.translate("Hello")
 

@@ -5,7 +5,7 @@
 ;;;   - Google Cloud Translation API v2                                     ;;;
 ;;;   - Azure Cognitive Services Translator                                 ;;;
 ;;;   - DeepL Translation API                                               ;;;
-;;;   - OpenRouter (LLM-based translation)                                  ;;;
+;;;   - OpenAI (LLM-based translation)                                      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
@@ -169,19 +169,13 @@ class Translator {
 				if !apiKey
 					throw "Invalid Azure API key detected in Translator.__New..."
 
-				endpoint := Trim(arguments[1])
-
-				if !endpoint
+				if ((arguments.Length = 0) || (Trim(arguments[1]) = ""))
 					throw "Invalid Azure Endpoint detected in Translator.__New..."
+				else
+					endpoint := Trim(arguments[1])
 
-				if !Trim(arguments[2])
+				if ((arguments.Length < 2) || (Trim(arguments[2]) = ""))
 					throw "Invalid Azure Region detected in Translator.__New..."
-
-				/*
-				if ((endpoint != "") && !InStr(endpoint, "translator/text/v3.0"))
-					endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "translator/text/v3.0"
-																			   : "/translator/text/v3.0")
-				*/
 
 				if (SubStr(endpoint, StrLen(endpoint), 1) != "/")
 					endpoint .= "/"
@@ -191,9 +185,7 @@ class Translator {
 				this.iServiceURL := (endpoint . (!InStr(endpoint, "/translate") ? "translate" : "")
 											  . "?api-version=3.0&from=" . this.SourceLanguageCode
 											  . "&to=" . this.TargetLanguageCode)
-
-				; this.iServiceURL := (endpoint . "&to=" . this.TargetLanguageCode)
-			case "deepL":
+			case "DeepL":
 				if !apiKey
 					throw "Invalid deepL API key detected in Translator.__New..."
 
@@ -201,14 +193,28 @@ class Translator {
 					this.iServiceURL := Trim(arguments[1])
 				else
 					this.iServiceURL := "https://api-free.deepl.com/v2/translate"
-			case "OpenRouter":
+			case "OpenAI":
 				if !apiKey
-					throw "Invalid OpenRouter API key detected in Translator.__New..."
+					throw "Invalid OpenAI API key detected in Translator.__New..."
 
-				if ((arguments.Length = 0) && (Trim(arguments[1]) = ""))
-					throw "Invalid OpenRouter model detected in Translator.__New..."
+				if ((arguments.Length = 0) || (Trim(arguments[1]) = ""))
+					throw "Invalid OpenAI URL detected in Translator.__New..."
+				else {
+					url := Trim(arguments[1])
 
-				this.iServiceURL := "https://openrouter.ai/api/v1/chat/completions"
+					if InStr(url, "/v1/chat/completions")
+						url := StrReplace(url, "/v1/chat/completions", "")
+
+					if (SubStr(url, StrLen(url)) = "/")
+						url := SubStr(url, 1, StrLen(url) - 1)
+				}
+
+				if ((arguments.Length < 2) || (Trim(arguments[2]) = ""))
+					throw "Invalid OpenAI model detected in Translator.__New..."
+				else
+					arguments := [Trim(arguments[2])]
+
+				this.iServiceURL := (url . "/v1/chat/completions")
 			default:
 				throw "Unsupported service detected in Translator.__New..."
 		}
@@ -253,8 +259,8 @@ class Translator {
 					result := this.translateAzure(text)
 				case "DeepL":
 					result := this.translateDeepL(text)
-				case "OpenRouter":
-					result := this.translateOpenRouter(text)
+				case "OpenAI":
+					result := this.translateOpenAI(text)
 			}
 
 			; Cache the result
@@ -363,9 +369,9 @@ class Translator {
 	}
 
 	/**
-	 * OpenRouter (LLM-based translation via chat completion)
+	 * OpenAI (LLM-based translation via chat completion)
 	 */
-	translateOpenRouter(text) {
+	translateOpenAI(text) {
 		local prompt, body, result
 
 		try {
@@ -383,7 +389,7 @@ class Translator {
 			if ((result.Status >= 200) && (result.Status < 300))
 				return this.json2Text(JSON.parse(result.Text)["choices"][1]["message"]["content"])
 			else
-				throw "Translation failed in Translator.translateOpenRouter..."
+				throw "Translation failed in Translator.translateOpenAI..."
 		}
 		catch Any as exception {
 			logError(exception, true)

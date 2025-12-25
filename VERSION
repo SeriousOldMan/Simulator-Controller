@@ -1,9 +1,9 @@
 [Development]
-Version=6.7.6.0-dev
+Version=6.7.6.0-beta
 Target=6.7.6.0-release
-Date=12/23/2025
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OLDE8F1Z/Releases/Simulator Controller 6.7.6.0-dev.zip
-Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed compound selection in "Solo Center", Fixed import of exported settings, Support base URLs for GPT service providers
+Date=12/25/2025
+Download=
+Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed compound selection in "Solo Center", Fixed import of exported settings, Support base URLs for GPT service providers, New tyre data for AMS2
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.5.1-release
@@ -27,5 +27,5 @@ Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.7.6.0-dev
+Development=6.7.6.0-beta
 Release=6.7.5.1-release

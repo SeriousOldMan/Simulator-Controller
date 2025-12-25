@@ -39,6 +39,8 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 Everyhing handled automatically, but you may want to re-generate your configuration using "Simulator Setup" to include the Steam IDs during the startup process of the games.
 
+You may also want to review the AMS2 tyre compound mapping, if you have created your own ones in the past. Most probably, these are now obsolete and are covered by the default mappings provided by Simulator Controller. You may have created personal mappings as settings in the !Session Database" or you may have edit the file [Documents]\Simulator Controller\Simulator Data\AMS2\Tyre Data.ini, which can be edited using a text editor. More information about tyre compound mappings can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#creating-own-compound-rules).
+
 ***
 
 ## Release 6.7.5

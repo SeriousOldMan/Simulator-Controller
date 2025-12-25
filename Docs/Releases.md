@@ -49,6 +49,7 @@
   - Missing TC and ABS settings are now reported as "n/a" in various applications and no longer as **0**.
   - Steam IDs are now used when starting a simulator and the startup process is handled by Steam. This is necessary, when additional software is started, for example an Anti-Cheat system. To use this new process, you have to re-generate yur configuration using "Simulator Setup".
   - "Simulator Setup" now provides context sensitive help on the *Basic* configuration page.
+  - "Simulator Setup" no longer allows the *Basic* configuration page to be skipped during the first run.
   - [Imporant] The tyre compound mappings for *Automobilista 2* have completely overhauled by @inthebagbud UK to match the latest additions and revisions by the game. We tried to preserve all previously available mappings where possible, so that no recorded data will be inaccessible due to a new tyre compound name. But that was not possible in all cases, especially when car names have change as well.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676), if you have created your own tyre compound mappings for *Automobilista 2* in the past.

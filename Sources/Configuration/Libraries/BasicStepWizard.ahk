@@ -151,19 +151,29 @@ class BasicStepWizard extends StepWizard {
 			}
 		}
 
-		loadVoice(assistant, *) {
+		loadVoices(assistant, *) {
 			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
 			local selectedText := dropDown.Text
 
-			if (selectedText = translate("Translator...")) {
-				this.editTranslator(assistant)
-				; Restore previous selection
-				dropDown.Choose(dropDown.LastValue ? dropDown.LastValue : 1)
+			if InStr(selectedText, translate("Translator")) {
+				if this.editTranslator(assistant)
+					this.updateState()
+				else if dropDown.HasProp("LastValue")
+					dropDown.Choose(dropDown.LastValue)
+				else
+					dropDown.Choose(1)
+
 			}
-			else {
-				dropDown.LastValue := dropDown.Value
+			else if InStr(selectedText, translate("---------------------------------------------")) {
+				if dropDown.HasProp("LastValue")
+					dropDown.Choose(dropDown.LastValue)
+				else
+					dropDown.Choose(1)
+			}
+			else
 				this.loadVoices(assistant)
-			}
+
+			dropDown.LastValue := dropDown.Value
 		}
 
 		chooseMethod(method, *) {
@@ -337,8 +347,7 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		; Position Assistants section below both columns - start from Locate button position
-		widget12 := window.Add("Text", "x" . x . " yp+30 w140 h23 +0x200 Hidden Section", translate("Assistants"))
+		widget12 := window.Add("Text", "x" . x . " yp+20 w140 h23 +0x200 Hidden Section", translate("Assistants"))
 		widget13 := window.Add("Text", "yp+20 xp w" . width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -356,7 +365,7 @@ class BasicStepWizard extends StepWizard {
 		widget43.Info := "Basic.Assistants.Info"
 		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
 		widget44.Info := "Basic.Assistants.Info"
-		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
+		widget44.OnEvent("Change", loadVoices.Bind("Driving Coach"))
 		widget45 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicDCVoiceDropDown Hidden")
 		widget45.Info := "Basic.Assistants.Info"
 		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
@@ -377,7 +386,7 @@ class BasicStepWizard extends StepWizard {
 		widget16.Info := "Basic.Assistants.Info"
 		widget17 := window.Add("DropDownList", "xp+98 yp w96 VbasicRELanguageDropDown Hidden")
 		widget17.Info := "Basic.Assistants.Info"
-		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
+		widget17.OnEvent("Change", loadVoices.Bind("Race Engineer"))
 		widget18 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicREVoiceDropDown Hidden")
 		widget18.Info := "Basic.Assistants.Info"
 		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
@@ -398,7 +407,7 @@ class BasicStepWizard extends StepWizard {
 		widget22.Info := "Basic.Assistants.Info"
 		widget23 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSLanguageDropDown Hidden")
 		widget23.Info := "Basic.Assistants.Info"
-		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
+		widget23.OnEvent("Change", loadVoices.Bind("Race Strategist"))
 		widget24 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSVoiceDropDown Hidden")
 		widget24.Info := "Basic.Assistants.Info"
 		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
@@ -419,7 +428,7 @@ class BasicStepWizard extends StepWizard {
 		widget28.Info := "Basic.Assistants.Info"
 		widget29 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSPLanguageDropDown Hidden")
 		widget29.Info := "Basic.Assistants.Info"
-		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
+		widget29.OnEvent("Change", loadVoices.Bind("Race Spotter"))
 		widget30 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSPVoiceDropDown Hidden")
 		widget30.Info := "Basic.Assistants.Info"
 		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
@@ -645,6 +654,18 @@ class BasicStepWizard extends StepWizard {
 			return this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
 	}
 
+	assistantTranslator(assistant, editor := true) {
+		local service := this.SetupWizard.getModuleValue(assistant, "Translator.Service", false)
+
+		if service
+			return {Service: service
+				  , Language: this.SetupWizard.getModuleValue(assistant, "Translator.Language")
+				  , APIKey: this.SetupWizard.getModuleValue(assistant, "Translator.API Key")
+				  , Arguments: string2Values(",", this.SetupWizard.getModuleValue(assistant, "Translator.Arguments"))}
+		else
+			return false
+	}
+
 	assistantSynthesizer(assistant, editor := true) {
 		if this.SetupWizard.isModuleSelected("Voice Control")
 			return this.SetupWizard.getModuleValue(assistant, "Synthesizer", this.assistantDefaults(assistant).Synthesizer)
@@ -822,10 +843,15 @@ class BasicStepWizard extends StepWizard {
 
 	loadVoices(assistant := false, editor := true) {
 		local assistants := (assistant ? [assistant] : this.Definition)
-		local voices, language, ignore, dropDown, index, voice
+		local voices, language, ignore, dropDown, index, voice, translator
 
 		for ignore, assistant in assistants {
-			language := this.assistantLanguage(assistant, editor)
+			translator := this.assistantTranslator(assistant, editor)
+
+			if translator
+				language := kTranslatorLanguages[translator.Language].Code
+			else
+				language := this.assistantLanguage(assistant, editor)
 
 			voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
 
@@ -843,6 +869,8 @@ class BasicStepWizard extends StepWizard {
 			}
 			else if (!editor && (voices.Length > 1))
 				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
+
+			dropDown.LastValue := dropDown.Value
 		}
 	}
 
@@ -901,7 +929,7 @@ class BasicStepWizard extends StepWizard {
 		local choices := []
 		local languages := []
 		local allLanguages := availableLanguages()
-		local assistantLanguage, code, language, ignore, grammarFile
+		local assistantLanguage, code, language, ignore, grammarFile, assistantTranslator
 
 		for ignore, assistant in this.Definition
 			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
@@ -921,10 +949,23 @@ class BasicStepWizard extends StepWizard {
 		this.Control["basic" . key . "NameEdit"].Text := this.assistantName(assistant, false)
 
 		assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
+		assistantTranslator := this.assistantTranslator(assistant, false)
 
 		this.Control["basic" . key . "LanguageDropDown"].Delete()
-		this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("Translator...")]))
-		this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+
+		if assistantTranslator {
+			translator := (translate("Translator") . translate(" (") . kTranslatorLanguages[translator.Language].Name
+												   . translate(")") . translate("..."))
+
+			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
+																					 , translator]))
+			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length + 2)
+		}
+		else {
+			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
+																					 , translate("Translator") . translate("...")]))
+			this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+		}
 
 		this.loadVoices(assistant, false)
 	}
@@ -1231,14 +1272,25 @@ class BasicStepWizard extends StepWizard {
 			if configuration {
 				writeMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini", configuration)
 
-				; Store translation settings in wizard module values
-				wizard.setModuleValue(assistant, "Translation.Enabled", getMultiMapValue(configuration, assistant . ".Translation", "Enabled", false))
-				wizard.setModuleValue(assistant, "Translation.TargetLanguage", getMultiMapValue(configuration, assistant . ".Translation", "TargetLanguage", ""))
-				wizard.setModuleValue(assistant, "Translation.Service", getMultiMapValue(configuration, assistant . ".Translation", "Service", ""))
-				wizard.setModuleValue(assistant, "Translation.Endpoint", getMultiMapValue(configuration, assistant . ".Translation", "Endpoint", ""))
-				wizard.setModuleValue(assistant, "Translation.APIKey", getMultiMapValue(configuration, assistant . ".Translation", "APIKey", ""))
-				wizard.setModuleValue(assistant, "Translation.Additional", getMultiMapValue(configuration, assistant . ".Translation", "Additional", ""))
+				if getMultiMapValue(configuration, assistant . ".Translator", "Service", false) {
+					wizard.setModuleValue(assistant, "Translator.Service", getMultiMapValue(configuration, assistant . ".Translator", "Service"))
+					wizard.setModuleValue(assistant, "Translator.Language", getMultiMapValue(configuration, assistant . ".Translator", "Language"))
+					wizard.setModuleValue(assistant, "Translator.API Key", getMultiMapValue(configuration, assistant . ".Translator", "API Key"))
+					wizard.setModuleValue(assistant, "Translator.Arguments", getMultiMapValue(configuration, assistant . ".Translator", "Arguments", ""))
+
+					return true
+				}
+				else {
+					wizard.clearModuleValue(assistant, "Translator.Service", false)
+					wizard.clearModuleValue(assistant, "Translator.Language", false)
+					wizard.clearModuleValue(assistant, "Translator.API Key", false)
+					wizard.clearModuleValue(assistant, "Translator.Arguments", false)
+
+					return false
+				}
 			}
+			else
+				return false
 		}
 		finally {
 			window.Unblock()

@@ -27,34 +27,33 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Private Constant Section                         ;;;
+;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; Language code mappings for different services
-global kSupportedLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
-											 "Spanish", {Code: "es", Name: "Spanish"},
-											 "French", {Code: "fr", Name: "French"},
-											 "German", {Code: "de", Name: "German"},
-											 "Italian", {Code: "it", Name: "Italian"},
-											 "Portuguese", {Code: "pt", Name: "Portuguese"},
-											 "Japanese", {Code: "ja", Name: "Japanese"},
-											 "Chinese", {Code: "zh", Name: "Chinese"},
-											 "Korean", {Code: "ko", Name: "Korean"},
-											 "Russian", {Code: "ru", Name: "Russian"},
-											 "Arabic", {Code: "ar", Name: "Arabic"},
-											 "Dutch", {Code: "nl", Name: "Dutch"},
-											 "Polish", {Code: "pl", Name: "Polish"},
-											 "Swedish", {Code: "sv", Name: "Swedish"},
-											 "Turkish", {Code: "tr", Name: "Turkish"},
-											 "Hindi", {Code: "hi", Name: "Hindi"},
-											 "Thai", {Code: "th", Name: "Thai"},
-											 "Vietnamese", {Code: "vi", Name: "Vietnamese"},
-											 "Czech", {Code: "cs", Name: "Czech"},
-											 "Danish", {Code: "da", Name: "Danish"},
-											 "Finnish", {Code: "fi", Name: "Finnish"},
-											 "Norwegian", {Code: "no", Name: "Norwegian"},
-											 "Hungarian", {Code: "hu", Name: "Hungarian"},
-											 "Romanian", {Code: "ro", Name: "Romanian"})
+global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
+											  "Spanish", {Code: "es", Name: "Spanish"},
+											  "French", {Code: "fr", Name: "French"},
+											  "German", {Code: "de", Name: "German"},
+											  "Italian", {Code: "it", Name: "Italian"},
+											  "Portuguese", {Code: "pt", Name: "Portuguese"},
+											  "Japanese", {Code: "ja", Name: "Japanese"},
+											  "Chinese", {Code: "zh", Name: "Chinese"},
+											  "Korean", {Code: "ko", Name: "Korean"},
+											  "Russian", {Code: "ru", Name: "Russian"},
+											  "Arabic", {Code: "ar", Name: "Arabic"},
+											  "Dutch", {Code: "nl", Name: "Dutch"},
+											  "Polish", {Code: "pl", Name: "Polish"},
+											  "Swedish", {Code: "sv", Name: "Swedish"},
+											  "Turkish", {Code: "tr", Name: "Turkish"},
+											  "Hindi", {Code: "hi", Name: "Hindi"},
+											  "Thai", {Code: "th", Name: "Thai"},
+											  "Vietnamese", {Code: "vi", Name: "Vietnamese"},
+											  "Czech", {Code: "cs", Name: "Czech"},
+											  "Danish", {Code: "da", Name: "Danish"},
+											  "Finnish", {Code: "fi", Name: "Finnish"},
+											  "Norwegian", {Code: "no", Name: "Norwegian"},
+											  "Hungarian", {Code: "hu", Name: "Hungarian"},
+											  "Romanian", {Code: "ro", Name: "Romanian"})
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -145,17 +144,17 @@ class Translator {
 	__New(service, sourceLanguage, targetLanguage, apiKey := "", arguments*) {
 		local endpoint, region, model, url
 
-		if !kSupportedLanguages.Has(sourceLanguage)
+		if !kTranslatorLanguages.Has(sourceLanguage)
 			throw "Source language not recognized in Translator.__New..."
 
-		if !kSupportedLanguages.Has(targetLanguage)
+		if !kTranslatorLanguages.Has(targetLanguage)
 			throw "Target language not recognized in Translator.__New..."
 
 		this.iSourceLanguage := sourceLanguage
-		this.iSourceLanguageCode := kSupportedLanguages[sourceLanguage].Code
+		this.iSourceLanguageCode := kTranslatorLanguages[sourceLanguage].Code
 
 		this.iTargetLanguage := targetLanguage
-		this.iTargetLanguageCode := kSupportedLanguages[targetLanguage].Code
+		this.iTargetLanguageCode := kTranslatorLanguages[targetLanguage].Code
 
 		apiKey := Trim(apiKey)
 

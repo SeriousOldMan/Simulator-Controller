@@ -16,7 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Framework\Extensions\TranslationService.ahk"
+#Include "..\..\Framework\Extensions\Translator.ahk"
 #Include "ConfigurationEditor.ahk"
 
 

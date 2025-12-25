@@ -11,7 +11,7 @@
 
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
-#Include "..\..\Framework\Extensions\TranslationService.ahk"
+#Include "..\..\Framework\Extensions\Translator.ahk"
 #Include "AssistantBoosterEditor.ahk"
 #Include "TranslatorEditor.ahk"
 
@@ -154,7 +154,7 @@ class BasicStepWizard extends StepWizard {
 		loadVoice(assistant, *) {
 			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
 			local selectedText := dropDown.Text
-			
+
 			if (selectedText = translate("Translator...")) {
 				this.editTranslator(assistant)
 				; Restore previous selection

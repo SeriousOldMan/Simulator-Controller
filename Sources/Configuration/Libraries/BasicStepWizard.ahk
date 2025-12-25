@@ -11,7 +11,9 @@
 
 #Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
+#Include "..\..\Framework\Extensions\TranslationService.ahk"
 #Include "AssistantBoosterEditor.ahk"
+#Include "TranslatorEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -150,7 +152,18 @@ class BasicStepWizard extends StepWizard {
 		}
 
 		loadVoice(assistant, *) {
-			this.loadVoices(assistant)
+			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
+			local selectedText := dropDown.Text
+			
+			if (selectedText = translate("Translator...")) {
+				this.editTranslator(assistant)
+				; Restore previous selection
+				dropDown.Choose(dropDown.LastValue ? dropDown.LastValue : 1)
+			}
+			else {
+				dropDown.LastValue := dropDown.Value
+				this.loadVoices(assistant)
+			}
 		}
 
 		chooseMethod(method, *) {
@@ -324,7 +337,8 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Bold", "Arial")
 
-		widget12 := window.Add("Text", "x" . x . " yp+20 w140 h23 +0x200 Hidden Section", translate("Assistants"))
+		; Position Assistants section below both columns - start from Locate button position
+		widget12 := window.Add("Text", "x" . x . " yp+30 w140 h23 +0x200 Hidden Section", translate("Assistants"))
 		widget13 := window.Add("Text", "yp+20 xp w" . width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
@@ -909,7 +923,7 @@ class BasicStepWizard extends StepWizard {
 		assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
 
 		this.Control["basic" . key . "LanguageDropDown"].Delete()
-		this.Control["basic" . key . "LanguageDropDown"].Add(choices)
+		this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("Translator...")]))
 		this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
 
 		this.loadVoices(assistant, false)
@@ -1193,6 +1207,37 @@ class BasicStepWizard extends StepWizard {
 				wizard.setModuleValue(assistant, "Agent Booster", map2String("|||", "--->>>", agentBooster))
 
 				this.loadAssistant(assistant)
+			}
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editTranslator(assistant) {
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local configuration
+
+		window.Block()
+
+		try {
+			this.saveSetup()
+
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini")
+
+			configuration := TranslatorEditor(assistant, configuration).editTranslator(window)
+
+			if configuration {
+				writeMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini", configuration)
+
+				; Store translation settings in wizard module values
+				wizard.setModuleValue(assistant, "Translation.Enabled", getMultiMapValue(configuration, assistant . ".Translation", "Enabled", false))
+				wizard.setModuleValue(assistant, "Translation.TargetLanguage", getMultiMapValue(configuration, assistant . ".Translation", "TargetLanguage", ""))
+				wizard.setModuleValue(assistant, "Translation.Service", getMultiMapValue(configuration, assistant . ".Translation", "Service", ""))
+				wizard.setModuleValue(assistant, "Translation.Endpoint", getMultiMapValue(configuration, assistant . ".Translation", "Endpoint", ""))
+				wizard.setModuleValue(assistant, "Translation.APIKey", getMultiMapValue(configuration, assistant . ".Translation", "APIKey", ""))
+				wizard.setModuleValue(assistant, "Translation.Additional", getMultiMapValue(configuration, assistant . ".Translation", "Additional", ""))
 			}
 		}
 		finally {

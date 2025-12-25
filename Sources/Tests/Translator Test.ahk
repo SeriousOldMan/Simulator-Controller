@@ -36,10 +36,10 @@ global kBuildConfiguration := "Development"
 ; API keys for live testing (optional - tests will skip if not provided)
 global kGoogleAPIKey := ""
 global kAzureAPIKey := ""
-global kAzureEndpoint := ""
+global kAzureEndpoint := "https://api.cognitive.microsofttranslator.com/"
 global kAzureRegion := ""
 global kDeepLAPIKey := ""
-global kOpenRouterAPIKey := ""  ; Add your OpenRouter API key here
+global kOpenRouterAPIKey := ""
 global kOpenRouterModel := ""
 
 
@@ -163,6 +163,42 @@ class TranslatorTest extends Assert {
 		}
 
 		theTranslator := Translator("Google", "English", "Spanish", kGoogleAPIKey)
+
+		result := theTranslator.translate("Good morning")
+
+		this.AssertTrue(result != "", "Translation should not be empty")
+		this.AssertTrue(result != "Good morning", "Translation should be different from input")
+	}
+
+	; Test 8: Live Azure test (optional - requires API key)
+	LiveAzure_Test() {
+		local theTranslator, result
+
+		if (kAzureAPIKey = "") {
+			; this.Skip("Azure API key not configured")
+
+			return
+		}
+
+		theTranslator := Translator("Azure", "English", "Spanish", kAzureAPIKey, kAzureEndpoint, kAzureRegion)
+
+		result := theTranslator.translate("Good morning")
+
+		this.AssertTrue(result != "", "Translation should not be empty")
+		this.AssertTrue(result != "Good morning", "Translation should be different from input")
+	}
+
+	; Test 9: Live deepL test (optional - requires API key)
+	LiveDeepL_Test() {
+		local theTranslator, result
+
+		if (kDeepLAPIKey = "") {
+			; this.Skip("DeepL API key not configured")
+
+			return
+		}
+
+		theTranslator := Translator("DeepL", "English", "Spanish", kDeepLAPIKey)
 
 		result := theTranslator.translate("Good morning")
 

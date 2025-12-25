@@ -177,10 +177,22 @@ class Translator {
 				if !Trim(arguments[2])
 					throw "Invalid Azure Region detected in Translator.__New..."
 
+				/*
+				if ((endpoint != "") && !InStr(endpoint, "translator/text/v3.0"))
+					endpoint .= ((SubStr(endpoint, StrLen(endpoint), 1) = "/") ? "translator/text/v3.0"
+																			   : "/translator/text/v3.0")
+				*/
+
+				if (SubStr(endpoint, StrLen(endpoint), 1) != "/")
+					endpoint .= "/"
+
 				arguments[1] := endpoint
 
-				this.iServiceURL := (endpoint . (!InStr(endpoint, "/translate") ? "/translate" : "")
-											  . "?api-version=3.0&from=" . this.SourceLanguage . "&to=" . this.TargetLanguage)
+				this.iServiceURL := (endpoint . (!InStr(endpoint, "/translate") ? "translate" : "")
+											  . "?api-version=3.0&from=" . this.SourceLanguageCode
+											  . "&to=" . this.TargetLanguageCode)
+
+				; this.iServiceURL := (endpoint . "&to=" . this.TargetLanguageCode)
 			case "deepL":
 				if !apiKey
 					throw "Invalid deepL API key detected in Translator.__New..."
@@ -281,10 +293,10 @@ class Translator {
 												 . '", "target": "' . this.TargetLanguageCode . '", "format": "text"}'
 
 		try {
-			result := WinHttpRequest().POST(this.SericeURL, body, Map("Content-Type", "application/json"), {Encoding: "UTF-8"})
+			result := WinHttpRequest().POST(this.ServiceURL, body, Map("Content-Type", "application/json"), {Encoding: "UTF-8"})
 
 			if ((result.Status >= 200) && (result.Status < 300))
-				return this.json2Text(JSON.parse(result.Text)["translatedText"])
+				return this.json2Text(JSON.parse(result.Text)["data"]["translations"][1]["translatedText"])
 			else
 				throw "Translation failed in Translator.translateGoogle..."
 		}
@@ -310,7 +322,7 @@ class Translator {
 										  , {Encoding: "UTF-8"})
 
 			if ((result.Status >= 200) && (result.Status < 300))
-				return this.json2Text(JSON.parse(result.Text)["text"])
+				return this.json2Text(JSON.parse(result.Text)[1]["translations"][1]["text"])
 			else
 				throw "Translation failed in Translator.translateAzure..."
 		}
@@ -328,18 +340,18 @@ class Translator {
 		local body, result
 
 		try {
-			; Build request body (URL encoded)
-			; DeepL uses uppercase language codes for target
-			body := ("text=" . this.Text2URL(text) . "&source_lang=" . StrUpper(this.SourceLanguageCode)
-												   . "&target_lang=" . StrUpper(this.TargetLanguageCode) . "&auth_key=" . this.APIKey)
+			; Build request body (JSON encoded)
+			body := '{"text": ["' . this.text2JSON(text) . '"], "source_lang": "' . StrUpper(this.SourceLanguageCode)
+														 . '", "target_lang": "' . StrUpper(this.TargetLanguageCode) . '"}'
 
 			; Make API request
 			result := WinHttpRequest().POST(this.ServiceURL, body
-										  , Map("Content-Type", "application/x-www-form-urlencoded")
+										  , Map("Content-Type", "application/json"
+											  , "Authorization", "DeepL-Auth-Key " . this.APIKey)
 										  , {Encoding: "UTF-8"})
 
 			if ((result.Status >= 200) && (result.Status < 300))
-				return this.json2Text(JSON.parse(result.Text)["text"])
+				return this.json2Text(JSON.parse(result.Text)["translations"][1]["text"])
 			else
 				throw "Translation failed in Translator.translateDeepL..."
 		}

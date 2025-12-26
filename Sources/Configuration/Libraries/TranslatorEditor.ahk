@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\..\Framework\Extensions\Translator.ahk"
 #Include "ConfigurationEditor.ahk"
 
@@ -78,9 +79,17 @@ class TranslatorEditor extends ConfiguratorPanel {
 		updateTranslatorFields(*) {
 			local service := editorGui["translatorServiceDropDown"].Text
 
+			if (service = "LLM (OpenAI)")
+				service := "OpenAI"
+
 			this.saveConfigurator(this.SelectedService)
 
 			this.loadConfigurator((service = translate("None")) ? false : service)
+		}
+
+		updateTranslatorModels(*) {
+			if (editorGui["translatorServiceDropDown"].Text = "LLM (OpenAI)")
+				this.loadModels(editorGui["translatorModelEdit"].Text)
 		}
 
 		editorGui := Window({Descriptor: "Translator Editor", Options: "0x400000"})
@@ -100,9 +109,9 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x8 yp+30 w400 0x10")
 
-		translatorServices := [translate("None"), "Google", "Azure", "DeepL", "OpenAI"]
+		translatorServices := [translate("None"), "Google", "Azure", "DeepL", "LLM (OpenAI)"]
 
-		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200", translate("Translator"))
+		editorGui.Add("Text", "x8 yp+10 w100 h23 +0x200", translate("Translator"))
 		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorServiceDropDown", translatorServices)
 		editorGui["translatorServiceDropDown"].OnEvent("Change", updateTranslatorFields)
 
@@ -111,7 +120,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		; API Key field (always visible)
 		editorGui.Add("Text", "x8 yp+30 w100 h23 Section +0x200 VtranslatorAPIKeyLabel", translate("API Key"))
-		editorGui.Add("Edit", "x120 yp w280 h21 Password VtranslatorAPIKeyEdit")
+		editorGui.Add("Edit", "x120 yp w280 h21 Password VtranslatorAPIKeyEdit").OnEvent("Change", updateTranslatorModels)
 
 		; Endpoint/Region field (visible for Azure)
 		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorEndpointLabel", translate("Endpoint"))
@@ -121,11 +130,11 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		; URL (visible for DeepL and OpenAI)
 		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorServiceURLLabel", translate("Service URL"))
-		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorServiceURLEdit")
+		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorServiceURLEdit").OnEvent("Change", updateTranslatorModels)
 
 		; Model (visible for OpenAI)
 		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorModelLabel", translate("Model"))
-		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorModelEdit")
+		editorGui.Add("ComboBox", "x120 yp w280 VtranslatorModelEdit")
 
 		editorGui.Add("Text", "x8 yp+35 w400 0x10")
 
@@ -158,20 +167,23 @@ class TranslatorEditor extends ConfiguratorPanel {
 		modelEdit.Visible := false
 
 		if service {
-			this.Control["translatorLanguageLabel"].Visible := true
-			this.Control["translatorLanguageDropDown"].Visible := true
-			this.Control["translatorAPIKeyLabel"].Visible := true
-			this.Control["translatorAPIKeyEdit"].Visible := true
+			this.Control["translatorServiceDropDown"].Choose(1 + inList(["Google", "Azure", "DeepL", "OpenAI"], service))
+
+			this.Control["translatorLanguageDropDown"].Enabled := true
+			this.Control["translatorAPIKeyEdit"].Enabled := true
 
 			this.Control["translatorLanguageDropDown"].Choose(inList(getKeys(kTranslatorLanguages)
 																   , this.Value["translatorLanguage"]))
 			this.Control["translatorAPIKeyEdit"].Text := this.Value["translatorAPIKey"]
 		}
 		else {
-			this.Control["translatorLanguageLabel"].Visible := false
-			this.Control["translatorLanguageDropDown"].Visible := false
-			this.Control["translatorAPIKeyLabel"].Visible := false
-			this.Control["translatorAPIKeyEdit"].Visible := false
+			this.Control["translatorServiceDropDown"].Choose(1)
+
+			this.Control["translatorLanguageDropDown"].Enabled := false
+			this.Control["translatorAPIKeyEdit"].Enabled := false
+
+			this.Control["translatorLanguageDropDown"].Choose(0)
+			this.Control["translatorAPIKeyEdit"].Text := ""
 		}
 
 		; Update and show fields based on selected service
@@ -196,7 +208,10 @@ class TranslatorEditor extends ConfiguratorPanel {
 			serviceURLEdit.Visible := true
 
 			try
-				this.Control["serviceURLEdit"].Text := this.Value["translatorArguments"][1]
+				this.Control["translatorServiceURLEdit"].Text := this.Value["translatorArguments"][1]
+
+			if !InStr(this.Control["translatorServiceURLEdit"].Text, "deepl")
+				this.Control["translatorServiceURLEdit"].Text := "https://api-free.deepl.com"
 		}
 		else if (service = "OpenAI") {
 			; OpenAI needs model selection
@@ -205,10 +220,19 @@ class TranslatorEditor extends ConfiguratorPanel {
 			modelLabel.Visible := true
 			modelEdit.Visible := true
 
-			try {
-				this.Control["serviceURLEdit"].Text := this.Value["translatorArguments"][1]
-				this.Control["modelEdit"].Text := this.Value["translatorArguments"][2]
-			}
+			try
+				this.Control["translatorServiceURLEdit"].Text := this.Value["translatorArguments"][1]
+
+			if (this.Control["translatorServiceURLEdit"].Text = "")
+				this.Control["translatorServiceURLEdit"].Text := "https://api.openai.com"
+
+			try
+				this.Control["translatorModelEdit"].Text := this.Value["translatorArguments"][2]
+
+			if InStr(this.Control["translatorServiceURLEdit"].Text, "deepl")
+				this.Control["translatorServiceURLEdit"].Text := "https://api.openai.com"
+
+			this.loadModels(this.Control["translatorModelEdit"].Text)
 		}
 	}
 
@@ -222,13 +246,13 @@ class TranslatorEditor extends ConfiguratorPanel {
 			if (service = "Google")
 				this.Value["translatorArguments"] := []
 			else if (service = "Azure")
-				this.Value["translatorArguments"] := [this.Control["translatorEndpointEdit"]
-													, this.Control["translatorRegionEdit"]]
+				this.Value["translatorArguments"] := [this.Control["translatorEndpointEdit"].Text
+													, this.Control["translatorRegionEdit"].Text]
 			else if (service = "DeepL")
-				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"]]
+				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"].Text]
 			else if (service = "OpenAI")
-				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"]
-													, this.Control["translatorModelEdit"]]
+				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"].Text
+													, this.Control["translatorModelEdit"].Text]
 		}
 	}
 
@@ -257,10 +281,35 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		if service {
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "Language", this.Value["translatorLanguage"])
+			setMultiMapValue(configuration, this.Assistant . ".Translator", "Code"
+										  , kTranslatorLanguages[this.Value["translatorLanguage"]].Code)
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "API Key", this.Value["translatorAPIKey"])
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "Arguments"
 										  , values2String(",", this.Value["translatorArguments"]*))
 		}
+	}
+
+	loadModels(model := false) {
+		local models := []
+		local connector
+
+		this.Control["translatorModelEdit"].Delete()
+
+		try {
+			connector := LLMConnector.APIConnector(false, model)
+
+			connector.Connect(this.Control["translatorServiceURLEdit"].Text, this.Control["translatorAPIKeyEdit"].Text)
+
+			models := connector.Models
+		}
+
+		this.Control["translatorModelEdit"].Delete()
+		this.Control["translatorModelEdit"].Add(models)
+
+		if Trim(model)
+			this.Control["translatorModelEdit"].Text := model
+		else if (models.Length > 0)
+			this.Control["translatorModelEdit"].Choose(1)
 	}
 
 	editTranslator(assistant := false) {
@@ -275,15 +324,15 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		window.Show("AutoSize Center")
 
-		loop {
+		loop
 			Sleep(100)
-		}
 		until this.iResult
 
 		try {
 			if (this.iResult = kSaveEditor) {
 				configuration := this.Configuration.Clone()
 
+				this.saveConfigurator(this.SelectedService)
 				this.saveToConfiguration(configuration)
 
 				return configuration

@@ -67,7 +67,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local assistantActive := false
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
-		local speakerBooster, listenerBooster, conversationBooster, agentBooster
+		local speakerBooster, listenerBooster, conversationBooster, agentBooster, language, translator
 
 		super.saveToConfiguration(configuration)
 
@@ -128,7 +128,21 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments .= ("; assistantCommands: " . actions)
 
 				if wizard.isModuleSelected("Voice Control") {
-					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
+					translator := wizard.getModuleValue(assistant, "Translator.Service", false)
+
+					if translator {
+						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Translator.Code"))
+						arguments .= ("; translator: " . assistant)
+
+						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Service", service)
+						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Language"
+																			  , wizard.getModuleValue(assistant, "Translator.Language"))
+						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.API Key"
+																			  , wizard.getModuleValue(assistant, "Translator.API Key"))
+						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Arguments"
+																			  , wizard.getModuleValue(assistant, "Translator.Arguments"))
+					}
+					else if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
 						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Language"))
 
 					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)

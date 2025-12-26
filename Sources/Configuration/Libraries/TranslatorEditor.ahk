@@ -85,11 +85,15 @@ class TranslatorEditor extends ConfiguratorPanel {
 			this.saveConfigurator(this.SelectedService)
 
 			this.loadConfigurator((service = translate("None")) ? false : service)
+
+			this.updateTranslation()
 		}
 
 		updateTranslatorModels(*) {
 			if (editorGui["translatorServiceDropDown"].Text = "LLM (OpenAI)")
 				this.loadModels(editorGui["translatorModelEdit"].Text)
+
+			this.updateTranslation()
 		}
 
 		editorGui := Window({Descriptor: "Translator Editor", Options: "0x400000"})
@@ -117,6 +121,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorLanguageLabel", translate("Target Language"))
 		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorLanguageDropDown", collect(kTranslatorLanguages, (l) => l.Name))
+		editorGui["translatorLanguageDropDown"].OnEvent("Change", (*) => this.updateTranslation())
 
 		; API Key field (always visible)
 		editorGui.Add("Text", "x8 yp+30 w100 h23 Section +0x200 VtranslatorAPIKeyLabel", translate("API Key"))
@@ -125,8 +130,10 @@ class TranslatorEditor extends ConfiguratorPanel {
 		; Endpoint/Region field (visible for Azure)
 		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorEndpointLabel", translate("Endpoint"))
 		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorEndpointEdit")
+		editorGui["translatorEndpointEdit"].OnEvent("Change", (*) => this.updateTranslation())
 		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorRegionLabel", translate("Region"))
 		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorRegionEdit")
+		editorGui["translatorRegionEdit"].OnEvent("Change", (*) => this.updateTranslation())
 
 		; URL (visible for DeepL and OpenAI)
 		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorServiceURLLabel", translate("Service URL"))
@@ -135,8 +142,14 @@ class TranslatorEditor extends ConfiguratorPanel {
 		; Model (visible for OpenAI)
 		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorModelLabel", translate("Model"))
 		editorGui.Add("ComboBox", "x120 yp w280 VtranslatorModelEdit")
+		editorGui["translatorModelEdit"].OnEvent("Change", (*) => this.updateTranslation())
 
-		editorGui.Add("Text", "x8 yp+35 w400 0x10")
+		editorGui.Add("Text", "x48 yp+35 w320 0x10")
+
+		editorGui.Add("Text", "x8 yp+10 w100 h23 +0x200", translate("Translation"))
+		editorGui.Add("Edit", "x120 yp w280 h70 Center ReadOnly +0x200 VtranslatorTranslation")
+
+		editorGui.Add("Text", "x8 yp+70 w400 0x10")
 
 		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => (this.iResult := kSaveEditor))
 		editorGui.Add("Button", "x208 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => (this.iResult := kCancelEditor))
@@ -234,6 +247,8 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 			this.loadModels(this.Control["translatorModelEdit"].Text)
 		}
+
+		this.updateTranslation()
 	}
 
 	saveConfigurator(service) {
@@ -289,6 +304,27 @@ class TranslatorEditor extends ConfiguratorPanel {
 		}
 	}
 
+	updateTranslation() {
+		local text := "The quick brown fox jumps over the lazy dog."
+		local translation
+
+		if this.SelectedService {
+			this.saveConfigurator(this.SelectedService)
+
+			try {
+				translation := Translator(this.Value["translatorService"], "English", this.Value["translatorLanguage"]
+										, this.Value["translatorAPIKey"], this.Value["translatorArguments"]*).translate(text)
+			}
+			catch Any {
+				translation := translate("Failed")
+			}
+		}
+		else
+			translation := translate("Failed")
+
+		this.Control["translatorTranslation"].Value := (text . "`n=>`n" . translation)
+	}
+
 	loadModels(model := false) {
 		local models := []
 		local connector
@@ -312,7 +348,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 			this.Control["translatorModelEdit"].Choose(1)
 	}
 
-	editTranslator(assistant := false) {
+	editTranslator(assistant := false, owner := false) {
 		local window
 
 		if !assistant
@@ -320,9 +356,15 @@ class TranslatorEditor extends ConfiguratorPanel {
 
 		window := this.Window
 
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
 		this.loadFromConfiguration(this.Configuration)
 
-		window.Show("AutoSize Center")
+		if getWindowPosition("Translator Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
 
 		loop
 			Sleep(100)

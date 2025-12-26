@@ -151,14 +151,13 @@ class BasicStepWizard extends StepWizard {
 			}
 		}
 
-		loadVoices(assistant, *) {
+		chooseLanguage(assistant, *) {
 			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
 			local selectedText := dropDown.Text
 
-			if InStr(selectedText, translate("Translator")) {
+			if InStr(selectedText, translate("Translator"))
 				if this.editTranslator(assistant)
-					this.loadAssistant(assistant)
-			}
+					this.loadVoices(assistant)
 			else if InStr(selectedText, translate("---------------------------------------------")) {
 				if dropDown.HasProp("LastValue")
 					dropDown.Choose(dropDown.LastValue)
@@ -360,10 +359,10 @@ class BasicStepWizard extends StepWizard {
 		widget43.Info := "Basic.Assistants.Info"
 		widget44 := window.Add("DropDownList", "xp+78 yp w146 VbasicDCLanguageDropDown Hidden")
 		widget44.Info := "Basic.Assistants.Info"
-		widget44.OnEvent("Change", loadVoices.Bind("Driving Coach"))
-		widget45 := window.Add("DropDownList", "xp+148 yp w299 W:Grow VbasicDCVoiceDropDown Hidden")
+		widget44.OnEvent("Change", chooseLanguage.Bind("Driving Coach"))
+		widget45 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicDCVoiceDropDown Hidden")
 		widget45.Info := "Basic.Assistants.Info"
-		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget46 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
 		widget46.Info := "Basic.Assistants.Voice.Info"
 		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
 		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
@@ -381,10 +380,10 @@ class BasicStepWizard extends StepWizard {
 		widget16.Info := "Basic.Assistants.Info"
 		widget17 := window.Add("DropDownList", "xp+78 yp w146 VbasicRELanguageDropDown Hidden")
 		widget17.Info := "Basic.Assistants.Info"
-		widget17.OnEvent("Change", loadVoices.Bind("Race Engineer"))
-		widget18 := window.Add("DropDownList", "xp+148 yp w299 W:Grow VbasicREVoiceDropDown Hidden")
+		widget17.OnEvent("Change", chooseLanguage.Bind("Race Engineer"))
+		widget18 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicREVoiceDropDown Hidden")
 		widget18.Info := "Basic.Assistants.Info"
-		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
+		widget19 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
 		widget19.Info := "Basic.Assistants.Voice.Info"
 		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
@@ -402,10 +401,10 @@ class BasicStepWizard extends StepWizard {
 		widget22.Info := "Basic.Assistants.Info"
 		widget23 := window.Add("DropDownList", "xp+78 yp w146 VbasicRSLanguageDropDown Hidden")
 		widget23.Info := "Basic.Assistants.Info"
-		widget23.OnEvent("Change", loadVoices.Bind("Race Strategist"))
-		widget24 := window.Add("DropDownList", "xp+148 yp w299 W:Grow VbasicRSVoiceDropDown Hidden")
+		widget23.OnEvent("Change", chooseLanguage.Bind("Race Strategist"))
+		widget24 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicRSVoiceDropDown Hidden")
 		widget24.Info := "Basic.Assistants.Info"
-		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
+		widget25 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
 		widget25.Info := "Basic.Assistants.Voice.Info"
 		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
@@ -423,10 +422,10 @@ class BasicStepWizard extends StepWizard {
 		widget28.Info := "Basic.Assistants.Info"
 		widget29 := window.Add("DropDownList", "xp+78 yp w146 VbasicRSPLanguageDropDown Hidden")
 		widget29.Info := "Basic.Assistants.Info"
-		widget29.OnEvent("Change", loadVoices.Bind("Race Spotter"))
-		widget30 := window.Add("DropDownList", "xp+148 yp w299 W:Grow VbasicRSPVoiceDropDown Hidden")
+		widget29.OnEvent("Change", chooseLanguage.Bind("Race Spotter"))
+		widget30 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicRSPVoiceDropDown Hidden")
 		widget30.Info := "Basic.Assistants.Info"
-		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
+		widget31 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
 		widget31.Info := "Basic.Assistants.Voice.Info"
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
@@ -1100,7 +1099,7 @@ class BasicStepWizard extends StepWizard {
 
 			if isObject(language)
 				language := language.Code
-msgbox language
+
 			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
 
 			setMultiMapValue(configuration, "Voice Control", "Language", language)
@@ -1285,10 +1284,6 @@ msgbox language
 					wizard.setModuleValue(assistant, "Translator.Code", getMultiMapValue(configuration, assistant . ".Translator", "Code"))
 					wizard.setModuleValue(assistant, "Translator.API Key", getMultiMapValue(configuration, assistant . ".Translator", "API Key"))
 					wizard.setModuleValue(assistant, "Translator.Arguments", getMultiMapValue(configuration, assistant . ".Translator", "Arguments", ""))
-
-					this.loadAssistant(assistant)
-
-					return true
 				}
 				else {
 					wizard.clearModuleValue(assistant, "Translator.Service", false)
@@ -1296,11 +1291,11 @@ msgbox language
 					wizard.clearModuleValue(assistant, "Translator.Code", false)
 					wizard.clearModuleValue(assistant, "Translator.API Key", false)
 					wizard.clearModuleValue(assistant, "Translator.Arguments", false)
-
-					this.loadAssistant(assistant)
-
-					return false
 				}
+
+				this.loadAssistant(assistant)
+
+				return true
 			}
 			else
 				return false
@@ -2169,7 +2164,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 					return grammarLanguageCode
 			}
 
-		return "en"
+		return voiceLanguage
 	}
 
 	updateLanguage() {

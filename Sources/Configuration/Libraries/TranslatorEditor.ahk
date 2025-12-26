@@ -149,7 +149,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x8 yp+10 w100 h23 +0x200", translate("Translation"))
 		editorGui.Add("Edit", "x120 yp w280 h70 Center ReadOnly +0x200 VtranslatorTranslation")
 
-		editorGui.Add("Text", "x8 yp+70 w400 0x10")
+		editorGui.Add("Text", "x8 yp+80 w400 0x10")
 
 		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => (this.iResult := kSaveEditor))
 		editorGui.Add("Button", "x208 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => (this.iResult := kCancelEditor))
@@ -316,11 +316,11 @@ class TranslatorEditor extends ConfiguratorPanel {
 										, this.Value["translatorAPIKey"], this.Value["translatorArguments"]*).translate(text)
 			}
 			catch Any {
-				translation := translate("Failed")
+				translation := translate("Error")
 			}
 		}
 		else
-			translation := translate("Failed")
+			translation := translate("Error")
 
 		this.Control["translatorTranslation"].Value := (text . "`n=>`n" . translation)
 	}

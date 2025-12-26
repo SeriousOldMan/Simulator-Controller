@@ -365,8 +365,12 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		if (value = "") {
 			try {
-				if isSet(SetupWizard)
-					language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+				if isSet(SetupWizard) {
+					if  SetupWizard.Instance.getModuleValue("Driving Coach", "Language.Translated", false)
+						language := "EN"
+					else
+						language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+				}
 				else if isSet(PluginsConfigurator) {
 					configuration := newMultiMap()
 
@@ -399,7 +403,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local theConfiguration, thePlugin
 
 		if isSet(SetupWizard) {
-			if SetupWizard.Instance.getModuleValue("Driving Coach", "Translator.Service", false)
+			if SetupWizard.Instance.getModuleValue("Driving Coach", "Language.Translated", false)
 				language := "EN"
 			else
 				language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())

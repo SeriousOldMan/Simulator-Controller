@@ -23,6 +23,7 @@
 
 class PluginsConfigurator extends ConfigurationItemList {
 	iConversationBoosterConfiguration := false
+	iAssistantTranslatorSettings := false
 
 	Plugins {
 		Get {
@@ -153,6 +154,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		setMultiMapValues(this.iConversationBoosterConfiguration, "Conversation Booster", getMultiMapValues(configuration, "Conversation Booster"))
 		setMultiMapValues(this.iConversationBoosterConfiguration, "Agent Booster", getMultiMapValues(configuration, "Agent Booster"))
+
+		this.iAssistantTranslatorSettings := getMultiMapValues(configuration, "Assistant Translator")
 	}
 
 	saveToConfiguration(configuration) {
@@ -164,6 +167,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 			thePlugin.saveToConfiguration(configuration)
 
 		addMultiMapValues(configuration, this.iConversationBoosterConfiguration)
+		setMultiMapValues(configuration, "Assistant Translator", this.iAssistantTranslatorSettings)
 	}
 
 	updateState() {

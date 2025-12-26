@@ -155,9 +155,14 @@ class BasicStepWizard extends StepWizard {
 			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
 			local selectedText := dropDown.Text
 
-			if InStr(selectedText, translate("Translator"))
+			if InStr(selectedText, translate("Translator")) {
 				if this.editTranslator(assistant)
 					this.loadVoices(assistant)
+				else if dropDown.HasProp("LastValue")
+					dropDown.Choose(dropDown.LastValue)
+				else
+					dropDown.Choose(1)
+			}
 			else if InStr(selectedText, translate("---------------------------------------------")) {
 				if dropDown.HasProp("LastValue")
 					dropDown.Choose(dropDown.LastValue)
@@ -624,13 +629,14 @@ class BasicStepWizard extends StepWizard {
 		local languages, found, code, language, ignore, grammarFile, grammarLanguageCode, voiceLanguage
 
 		if editor {
-			languages := availableLanguages()
 			voiceLanguage := this.Control["basic" . this.Keys[assistant] . "LanguageDropDown"].Text
 
 			if InStr(voiceLanguage, "Translator")
 				return this.assistantTranslator(assistant, editor)
-			else
-				for code, language in availableLanguages()
+			else {
+				languages := availableLanguages()
+
+				for code, language in languages
 					if (language = voiceLanguage)
 						return code
 
@@ -646,7 +652,10 @@ class BasicStepWizard extends StepWizard {
 						if (language = voiceLanguage)
 							return grammarLanguageCode
 					}
+			}
 		}
+		else if this.SetupWizard.getModuleValue(assistant, "Language.Translated", false)
+			return this.assistantTranslator(assistant, false)
 		else
 			return this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
 	}
@@ -965,6 +974,8 @@ class BasicStepWizard extends StepWizard {
 		else
 			this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
 
+		this.Control["basic" . key . "LanguageDropDown"].LastValue := this.Control["basic" . key . "LanguageDropDown"].Value
+
 		this.loadVoices(assistant, false)
 	}
 
@@ -1018,12 +1029,21 @@ class BasicStepWizard extends StepWizard {
 		for key, assistant in this.Assistants {
 			wizard.selectModule(assistant, assistantSetups.%key%.Enabled, false)
 
-			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"] {
-				if ((value = "Language") && isObject(value))
-					value := "Translator"
+			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
+				if (value = "Language") {
+					value := assistantSetups.%key%.Language
 
-				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
-			}
+					if isObject(value) {
+						wizard.setModuleValue(assistant, "Language", value.Code, false)
+						wizard.setModuleValue(assistant, "Language.Translated", true, false)
+					}
+					else {
+						wizard.setModuleValue(assistant, "Language", value, false)
+						wizard.setModuleValue(assistant, "Language.Translated", false, false)
+					}
+				}
+				else
+					wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
 
 			if assistantSetups.%key%.HasProp("SpeakerBooster")
 				wizard.setModuleValue(assistant, "Speaker Booster"

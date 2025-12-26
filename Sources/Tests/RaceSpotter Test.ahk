@@ -61,10 +61,10 @@ class UnknownProvider extends SimulatorProvider {
 }
 
 class TestRaceSpotter extends RaceSpotter {
-	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
+	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, translator := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+		super.__New(configuration, remoteHandler, name, language, translator, synthesizer, speaker, vocalics, speakerBooster
 				  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
 				  , muted, voiceServer)
 
@@ -84,7 +84,7 @@ class TestRaceSpotter extends RaceSpotter {
 raceNr := 23  ; (22, 23)
 
 spotter := TestRaceSpotter(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Spotter.settings")
-						   , false, "Peter", "EN", true, true, false, true, true, true, true, true, true)
+						   , false, "Peter", "EN", false, true, true, false, true, true, true, true, true, true)
 
 spotter.VoiceManager.setDebug(kDebugGrammars, false)
 

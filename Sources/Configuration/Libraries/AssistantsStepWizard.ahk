@@ -128,22 +128,24 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments .= ("; assistantCommands: " . actions)
 
 				if wizard.isModuleSelected("Voice Control") {
-					translator := wizard.getModuleValue(assistant, "Translator.Service", false)
-
-					if translator {
-						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Translator.Code"))
-						arguments .= ("; translator: " . assistant)
-
-						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Service", service)
-						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Language"
-																			  , wizard.getModuleValue(assistant, "Translator.Language"))
-						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.API Key"
-																			  , wizard.getModuleValue(assistant, "Translator.API Key"))
-						setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Arguments"
-																			  , wizard.getModuleValue(assistant, "Translator.Arguments"))
-					}
-					else if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
+					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined) {
 						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Language"))
+
+						if wizard.getModuleValue(assistant, "Language.Translated", false) {
+							arguments .= ("; translator: " . assistant)
+
+							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Service"
+																				  , wizard.getModuleValue(assistant, "Translator.Service"))
+							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Language"
+																				  , wizard.getModuleValue(assistant, "Translator.Language"))
+							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Code"
+																				  , wizard.getModuleValue(assistant, "Translator.Code"))
+							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.API Key"
+																				  , wizard.getModuleValue(assistant, "Translator.API Key"))
+							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Arguments"
+																				  , wizard.getModuleValue(assistant, "Translator.Arguments"))
+						}
+					}
 
 					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)
 						arguments .= ("; synthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))

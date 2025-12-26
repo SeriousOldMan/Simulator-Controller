@@ -88,6 +88,7 @@ startupRaceEngineer() {
 	local engineerName := "Jona"
 	local engineerLogo := false
 	local engineerLanguage := false
+	local engineerTranslator := false
 	local engineerSynthesizer := true
 	local engineerSpeaker := false
 	local engineerSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupRaceEngineer() {
 				index += 2
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				engineerTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				engineerSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupRaceEngineer() {
 
 	engineer := RaceEngineer(kSimulatorConfiguration
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-						   , engineerName, engineerLanguage
+						   , engineerName, engineerLanguage, engineerTranslator
 						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster
 						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerConversationBooster, engineerAgentBooster
 						   , engineerMuted, voiceServer)

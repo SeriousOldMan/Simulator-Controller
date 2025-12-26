@@ -53,6 +53,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iName := false
 	iLogo := false
 	iLanguage := false
+	iTranslator := false
 	iSynthesizer := false
 	iSpeaker := false
 	iSpeakerVocalics := false
@@ -731,6 +732,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	Translator {
+		Get {
+			return this.iTranslator
+		}
+	}
+
 	Synthesizer {
 		Get {
 			return this.iSynthesizer
@@ -837,6 +844,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.iName := this.getArgumentValue("name", this.getArgumentValue("raceAssistantName", false))
 			this.iLogo := this.getArgumentValue("logo", this.getArgumentValue("raceAssistantLogo", false))
 			this.iLanguage := this.getArgumentValue("language", this.getArgumentValue("raceAssistantLanguage", false))
+			this.iTranslator := this.getArgumentValue("translator", this.getArgumentValue("raceAssistantTranslator", false))
 
 			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
 
@@ -1993,7 +2001,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					options := " -Remote " . pid
 
-					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
+					for ignore, parameter in ["Name", "Logo", "Language", "Translator"
+											, "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
 											, "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 						if this.%parameter%
 							options .= (" -" . parameter . " `"" . this.%parameter% . "`"")

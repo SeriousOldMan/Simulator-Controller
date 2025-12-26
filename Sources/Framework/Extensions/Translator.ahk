@@ -55,6 +55,18 @@ global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "Eng
 											  "Hungarian", {Code: "hu", Name: "Magyar"},
 											  "Romanian", {Code: "ro", Name: "Română"})
 
+initializeTranslatorLanguages() {
+	local ignore, identifier, language
+
+	for identifier, language in kTranslatorLanguages
+		language.Identifier := identifier
+
+	for ignore, language in getValues(kTranslatorLanguages)
+		kTranslatorLanguages[language.Code] := language
+}
+
+initializeTranslatorLanguages()
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -150,10 +162,10 @@ class Translator {
 		if !kTranslatorLanguages.Has(targetLanguage)
 			throw "Target language not recognized in Translator.__New..."
 
-		this.iSourceLanguage := sourceLanguage
+		this.iSourceLanguage := kTranslatorLanguages[sourceLanguage].Identifier
 		this.iSourceLanguageCode := kTranslatorLanguages[sourceLanguage].Code
 
-		this.iTargetLanguage := targetLanguage
+		this.iTargetLanguage := kTranslatorLanguages[targetLanguage].Identifier
 		this.iTargetLanguageCode := kTranslatorLanguages[targetLanguage].Code
 
 		apiKey := Trim(apiKey)

@@ -1023,7 +1023,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					synthesizer := RaceSpotter.SpotterVoiceManager.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+					synthesizer := RaceSpotter.SpotterVoiceManager.FastSpeaker(this, this.Synthesizer, this.Speaker
+																			 , this.Language["Original"], this.Language["Translated"]
 																			 , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
 					this.iFastSpeechSynthesizer := synthesizer

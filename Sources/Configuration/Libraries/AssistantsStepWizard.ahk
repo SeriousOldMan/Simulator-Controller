@@ -134,16 +134,16 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if wizard.getModuleValue(assistant, "Language.Translated", false) {
 							arguments .= ("; translator: " . assistant)
 
-							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Service"
-																				  , wizard.getModuleValue(assistant, "Translator.Service"))
-							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Language"
-																				  , wizard.getModuleValue(assistant, "Translator.Language"))
-							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Code"
-																				  , wizard.getModuleValue(assistant, "Translator.Code"))
-							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.API Key"
-																				  , wizard.getModuleValue(assistant, "Translator.API Key"))
-							setMultiMapValue(configuration, "Assistant Translator", assistant . ".Translator.Arguments"
-																				  , wizard.getModuleValue(assistant, "Translator.Arguments"))
+							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Service"
+																		, wizard.getModuleValue(assistant, "Translator.Service"))
+							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Language"
+																		, wizard.getModuleValue(assistant, "Translator.Language"))
+							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Code"
+																		, wizard.getModuleValue(assistant, "Translator.Code"))
+							setMultiMapValue(configuration, "Translator", assistant . ".Translator.API Key"
+																		, wizard.getModuleValue(assistant, "Translator.API Key"))
+							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Arguments"
+																		, wizard.getModuleValue(assistant, "Translator.Arguments"))
 						}
 					}
 

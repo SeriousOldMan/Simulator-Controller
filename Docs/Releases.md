@@ -1,5 +1,34 @@
 # Latest stable release
 
+## 6.7.6.0
+
+#### Date: 12/26/25
+
+#### Fixes
+
+  - Fixed an error, when reporting unknown car numbers given in voice commands.
+  - The CSV importer has been fixed, when telemetry data for *iRacing* was imported. 
+  - Several grammar files have been fixed where duplicate keys occluded some of the phrases.
+  - Fixed a crash in "Solo Center" when a fixed tyre compound for the next stint was selected.
+  - Fixed import of exported settings into the session database for "All" selections.
+
+#### Changes
+
+  - OpenAI compatible GPT service providers can now be referenced using theie base UDL. The extension "v1/chat/completions" is no longer required, but still supported for backward compatibility.
+  - Missing TC and ABS settings are now reported as "n/a" in various applications and no longer as **0**.
+  - Steam IDs are now used when starting a simulator and the startup process is handled by Steam. This is necessary, when additional software is started, for example an Anti-Cheat system. To use this new process, you have to re-generate yur configuration using "Simulator Setup".
+  - "Simulator Setup" now provides context sensitive help on the *Basic* configuration page.
+  - "Simulator Setup" no longer allows the *Basic* configuration page to be skipped during the first run.
+  - [Imporant] The tyre compound mappings for *Automobilista 2* have completely overhauled by @inthebagbud UK to match the latest additions and revisions by the game. We tried to preserve all previously available mappings where possible, so that no recorded data will be inaccessible due to a new tyre compound name. But that was not possible in all cases, especially when car names have change as well.
+  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676), if you have created your own tyre compound mappings for *Automobilista 2* in the past.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.7.5.1
 
 #### Date: 12/22/25
@@ -28,33 +57,6 @@
   - New article for *News, tips and tricks* about coaching sessions.
   - [Internal] The logging of HTTP errors when calling GPT services has been extended.
   - [Developer] The API protocol for simulator integration has been extended. API connectors and providers can have additional protocol specific arguments, in the case of *Project Motor Racing* the UDP connection settings.
-
-# Upcoming release
-
-## 6.7.6.0
-
-#### Date: 12/26/25 (planned)
-
-#### Fixes
-
-  - Fixed an error, when reporting unknown car numbers given in voice commands.
-  - The CSV importer has been fixed, when telemetry data for *iRacing* was imported. 
-  - Several grammar files have been fixed where duplicate keys occluded some of the phrases.
-  - Fixed a crash in "Solo Center" when a fixed tyre compound for the next stint was selected.
-  - Fixed import of exported settings into the session database for "All" selections.
-
-#### Changes
-
-  - OpenAI compatible GPT service providers can now be referenced using theie base UDL. The extension "v1/chat/completions" is no longer required, but still supported for backward compatibility.
-  - Missing TC and ABS settings are now reported as "n/a" in various applications and no longer as **0**.
-  - Steam IDs are now used when starting a simulator and the startup process is handled by Steam. This is necessary, when additional software is started, for example an Anti-Cheat system. To use this new process, you have to re-generate yur configuration using "Simulator Setup".
-  - "Simulator Setup" now provides context sensitive help on the *Basic* configuration page.
-  - "Simulator Setup" no longer allows the *Basic* configuration page to be skipped during the first run.
-  - [Imporant] The tyre compound mappings for *Automobilista 2* have completely overhauled by @inthebagbud UK to match the latest additions and revisions by the game. We tried to preserve all previously available mappings where possible, so that no recorded data will be inaccessible due to a new tyre compound name. But that was not possible in all cases, especially when car names have change as well.
-  
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676), if you have created your own tyre compound mappings for *Automobilista 2* in the past.
-
-# Release history
 
 ## 6.7.1.0
 

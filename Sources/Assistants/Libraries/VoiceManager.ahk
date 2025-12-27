@@ -21,6 +21,7 @@
 #Include "..\..\Framework\Extensions\Messages.ahk"
 #Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\..\Framework\Extensions\Translator.ahk"
 #Include "..\..\Framework\Extensions\LLMBooster.ahk"
 
 
@@ -44,7 +45,11 @@ class VoiceManager extends ConfigurationItem {
 
 	iDebug := kDebugOff
 
-	iLanguage := "en"
+	iOriginalLanguage := "en"
+	iTranslatedLanguage := "en"
+	iTranslator := "en"
+	iSpeakerTranslator := false
+	iListenerTranslator := false
 
 	iName := false
 
@@ -87,7 +92,9 @@ class VoiceManager extends ConfigurationItem {
 		iPhrases := CaseInsenseMap()
 
 		iSpeaker := false
-		iLanguage := false
+
+		iOriginalLanguage := false
+		iTranslatedLanguage := false
 
 		iIsTalking := false
 		iText := ""
@@ -134,14 +141,15 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+		__New(voiceManager, synthesizer, speaker, originalLanguage, translatedLanguage, fragments, phrases) {
 			this.iVoiceManager := voiceManager
 			this.iFragments := toMap(fragments, CaseInsenseWeakMap)
 			this.iFragments.Default := ""
 			this.iPhrases := phrases
 
 			this.iSpeaker := speaker
-			this.iLanguage := language
+			this.iOriginalLanguage := originalLanguage
+			this.iTranslatedLanguage := translatedLanguage
 		}
 
 		beginTalk(force := false) {
@@ -304,7 +312,7 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
+		__New(voiceManager, synthesizer, speaker, sourceLanguage, targetLanguage, fragments, phrases) {
 			local booster
 
 			this.iVoiceManager := voiceManager
@@ -312,13 +320,15 @@ class VoiceManager extends ConfigurationItem {
 			this.iPhrases := phrases
 
 			if voiceManager.SpeakerBooster {
-				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration, this.VoiceManager.Language)
+				booster := SpeechBooster(voiceManager.SpeakerBooster, voiceManager.Configuration, sourceLanguage)
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
 			}
 
-			super.__New(synthesizer, speaker, language)
+			super.__New(synthesizer, speaker, targetLanguage)
+
+			this.setTranslator(voiceManager.SpeakerTranslator)
 		}
 
 		beginTalk(options := false) {
@@ -492,13 +502,15 @@ class VoiceManager extends ConfigurationItem {
 			this.iVoiceManager := voiceManager
 
 			if voiceManager.ListenerBooster {
-				booster := RecognitionBooster(voiceManager.ListenerBooster, voiceManager.Configuration, voiceManager.Language)
+				booster := RecognitionBooster(voiceManager.ListenerBooster, voiceManager.Configuration, voiceManager.Language["Original"])
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
 			}
 
 			super.__New(arguments*)
+
+			this.setTranslator(voiceManager.ListenerTranslator)
 		}
 
 		textRecognized(text) {
@@ -627,9 +639,45 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	Language {
+	Language[mode := "Original"] {
 		Get {
-			return this.iLanguage
+			return ((mode = "Original") ? this.iOriginalLanguage : this.iTranslatedLanguage)
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
+		}
+	}
+
+	SpeakerTranslator {
+		Get {
+			local translator
+
+			if (!this.iSpeakerTranslator && this.Translator) {
+				translator := string2Values("|", this.Translator)
+
+				this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
+													, translator[4], string2Values(",", translator[5])*)
+			}
+
+			return this.iSpeakerTranslator
+		}
+	}
+
+	ListenerTranslator {
+		Get {
+			local translator
+
+			if (!this.iListenerTranslator && this.Translator) {
+				translator := string2Values("|", this.Translator)
+
+				this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
+													 , translator[4], string2Values(",", translator[5])*)
+			}
+
+			return this.iListenerTranslator
 		}
 	}
 
@@ -728,7 +776,7 @@ class VoiceManager extends ConfigurationItem {
 			local booster
 
 			if (this.ListenerBooster && !this.iBooster) {
-				booster := RecognitionBooster(this.ListenerBooster, this.Configuration, this.Language)
+				booster := RecognitionBooster(this.ListenerBooster, this.Configuration, this.Language["Original"])
 
 				if (booster.Model && booster.Active)
 					this.iBooster := booster
@@ -859,7 +907,15 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		if options.Has("Language")
-			this.iLanguage := options["Language"]
+			this.iTranslatedLanguage := options["Language"]
+
+		if options.Has("Translator")
+			this.iTranslator := options["Translator"]
+
+		if this.Translator
+			this.iOriginalLanguage := "en"
+		else
+			this.iOriginalLanguage := this.iTranslatedLanguage
 
 		if options.Has("Synthesizer")
 			this.iSynthesizer := options["Synthesizer"]
@@ -1133,9 +1189,10 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	getRemoteSpeaker() {
+		local grammars := this.getGrammars(this.Language["Original"])
 		local pid := ProcessExist()
-		local mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
-		local activationCommand := substituteVariables(getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
+		local activationCommand := substituteVariables(getMultiMapValue(grammars, "Listener Grammars", "Call", false)
 													 , {name: this.Name})
 
 		if (mode = "Mixed")
@@ -1146,24 +1203,29 @@ class VoiceManager extends ConfigurationItem {
 																			, StrReplace(activationCommand, ";", ",")
 																			, "remoteActivationRecognized", "remoteDeactivationRecognized"
 																			, "remoteSpeakingStatusUpdate"
-																			, this.Language, this.Synthesizer, this.Speaker
+																			, this.Language["Original"]
+																			, this.Language["Translated"]
+																			, this.Translator
+																			, this.Synthesizer, this.Speaker
 																			, this.Recognizer, this.Listener
 																			, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed
 																			, this.SpeakerBooster, this.ListenerBooster
 																			, mode)
 								, this.VoiceServer)
 
-		return VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-											  , this.buildFragments(this.Language)
-											  , this.buildPhrases(this.Language))
+		return VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker
+											  , this.Language["Original"], this.Language["Translated"]
+											  , this.buildFragments(this.Language["Original"])
+											  , this.buildPhrases(this.Language["Original"]))
 	}
 
 	getLocalSpeaker() {
 		local speaker
 
-		speaker := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-												 , this.buildFragments(this.Language)
-												 , this.buildPhrases(this.Language))
+		speaker := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker
+												 , this.Language["Original"], this.Language["Translated"]
+												 , this.buildFragments(this.Language["Original"])
+												 , this.buildPhrases(this.Language["Original"]))
 
 		speaker.setVolume(this.SpeakerVolume)
 		speaker.setPitch(this.SpeakerPitch)
@@ -1173,7 +1235,7 @@ class VoiceManager extends ConfigurationItem {
 	}
 
 	startListener() {
-		local recognizer, mode
+		local recognizer, mode, translator
 
 		static initialized := false
 
@@ -1181,16 +1243,16 @@ class VoiceManager extends ConfigurationItem {
 			initialized := true
 
 			if this.VoiceServer
-				this.buildGrammars(false, this.Language)
+				this.buildGrammars(false, this.Language["Original"])
 			else {
-				mode := getMultiMapValue(this.getGrammars(this.Language), "Configuration", "Recognizer", "Grammar")
+				mode := getMultiMapValue(this.getGrammars(this.Language["Original"]), "Configuration", "Recognizer", "Grammar")
 
 				if (mode = "Mixed")
 					mode := "Text"
 
-				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language, false, mode)
+				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language["Translated"], false, mode)
 
-				this.buildGrammars(recognizer, this.Language)
+				this.buildGrammars(recognizer, this.Language["Original"])
 
 				if !this.PushToTalk
 					recognizer.startRecognizer()
@@ -1351,7 +1413,7 @@ class VoiceManager extends ConfigurationItem {
 	buildGrammars(spRecognizer, language) {
 		local grammars := this.getGrammars(language)
 		local mode := getMultiMapValue(grammars, "Configuration", "Recognizer", "Grammar")
-		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
+		local compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language["Original"], false, "Text")
 		local booster := this.Booster
 		local grammar, definition, name, choices, nextCharIndex
 
@@ -1385,7 +1447,7 @@ class VoiceManager extends ConfigurationItem {
 
 			if (mode = "Mixed") {
 				if !compilerRecognizer {
-					compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language, false, "Text")
+					compilerRecognizer := SpeechRecognizer("Compiler", true, this.Language["Original"], false, "Text")
 
 					for name, choices in getMultiMapValues(grammars, "Choices")
 						compilerRecognizer.setChoices(name, choices)

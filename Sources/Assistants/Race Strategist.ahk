@@ -88,6 +88,7 @@ startupRaceStrategist() {
 	local strategistName := "Cato"
 	local strategistLogo := false
 	local strategistLanguage := false
+	local strategistTranslator := false
 	local strategistSynthesizer := true
 	local strategistSpeaker := false
 	local strategistSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupRaceStrategist() {
 				index += 2
 			case "-Language":
 				strategistLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				strategistTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				strategistSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupRaceStrategist() {
 
 	strategist := RaceStrategist(kSimulatorConfiguration
 							   , remotePID ? RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
-							   , strategistName, strategistLanguage
+							   , strategistName, strategistLanguage, strategistTranslator
 							   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics, strategistSpeakerBooster
 							   , strategistRecognizer, strategistListener, strategistListenerBooster, strategistConversationBooster, strategistAgentBooster
 							   , strategistMuted, voiceServer)

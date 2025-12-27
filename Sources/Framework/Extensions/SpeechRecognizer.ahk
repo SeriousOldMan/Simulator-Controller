@@ -24,6 +24,7 @@
 #Include "HTTP.ahk"
 #Include "Task.ahk"
 #Include "SpeechSynthesizer.ahk"
+#Include "Translator.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -199,6 +200,7 @@ global kElevenLabsModels := ["scribe_v1", "scribe_v1_experimental"]
 class SpeechRecognizer {
 	iEngine := false
 	iLanguage := "en"
+	iTranslator := false
 	iModel := false
 
 	iServerURL := ""
@@ -308,6 +310,12 @@ class SpeechRecognizer {
 	Language {
 		Get {
 			return this.iLanguage
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
 		}
 	}
 
@@ -809,6 +817,10 @@ class SpeechRecognizer {
 		return recognizerList
 	}
 
+	setTranslator(translator) {
+		this.iTranslator := translator
+	}
+
 	setRecognizer(id, log := true) {
 		local recognizer
 
@@ -1256,7 +1268,7 @@ class SpeechRecognizer {
 	}
 
 	recognize(text) {
-		this._onTextCallback(text)
+		this.processText(text)
 	}
 
 	allMatches(string, minRating, maxRating, strings*) {
@@ -1334,13 +1346,29 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		if (this.iMode = "Text")
-			this.textRecognized(values2String(A_Space, this.getWords(wordArr)*))
+		local text, translator
+
+		if (this.iMode = "Text") {
+			text := values2String(A_Space, this.getWords(wordArr)*)
+
+			translator := this.Translator
+
+			if translator
+				text := translator.translate(text)
+
+			this.textRecognized(text)
+		}
 		else
 			this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {
+		local translator := this.Translator
+
+		this.processText(translator ? translator.translate(text) : text)
+	}
+
+	processText(text) {
 		local originalText := text
 		local words, ignore, name, grammar, rating, bestRating, bestMatch, handler
 

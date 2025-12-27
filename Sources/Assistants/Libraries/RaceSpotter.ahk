@@ -951,6 +951,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			__New(voiceManager, arguments*) {
+				this.iSpotter := voiceManager.RaceAssistant
+
+				super.__New(voiceManager, arguments*)
+			}
+
 			speak(text, focus := false, cache := false, options := false) {
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
 					super.speak(text, focus, cache, options)
@@ -1010,12 +1016,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 				this.Spotter.clearAlerts()
 			}
-
-			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
-				this.iSpotter := voiceManager.RaceAssistant
-
-				super.__New(voiceManager, synthesizer, speaker, language, fragments, phrases)
-			}
 		}
 
 		getSpeaker(fast := false) {
@@ -1023,7 +1023,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					synthesizer := RaceSpotter.SpotterVoiceManager.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+					synthesizer := RaceSpotter.SpotterVoiceManager.FastSpeaker(this, this.Synthesizer, this.Speaker
+																			 , this.Language["Original"], this.Language["Translated"]
 																			 , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
 					this.iFastSpeechSynthesizer := synthesizer
@@ -1211,11 +1212,12 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	__New(configuration, remoteHandler, name := false, language := kUndefined
+	__New(configuration, remoteHandler, name := false, language := kUndefined, translator := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
-		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+		super.__New(configuration, "Race Spotter", remoteHandler, name, language, translator
+												 , synthesizer, speaker, vocalics, speakerBooster
 												 , recognizer, listener, listenerBooster, conversationBooster, agentBooster
 												 , muted, voiceServer)
 

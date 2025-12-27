@@ -2,10 +2,6 @@
   1. Support for unit conversions per simulator
   2. Make the location of the local data folder configurable during installation process
 
-#### Voice System
-  1. Support automatic language translation when using Whisper voice recognition
-  2. New GPT booster that supports automatic translation to a different language for voice generation
-
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
   2. Full support for hybrid and fully electric cars

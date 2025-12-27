@@ -137,7 +137,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chooseVoiceRecognizer(update, *) {
 			local voiceRecognizerDropDown := this.Control["voiceRecognizerDropDown"]
 			local oldChoice := voiceRecognizerDropDown.LastValue
-			local recognizers, chosen, raceAssistant
+			local recognizers, raceAssistant
 
 			if update
 				if (oldChoice == 1)
@@ -260,14 +260,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 
 			if (voiceRecognizerDropDown.Value != 6) {
-				recognizers.InsertAt(1, translate("Deactivated"))
 				recognizers.InsertAt(1, translate("Automatic"))
-
-				chosen := 1
+				recognizers.InsertAt(1, translate("Deactivated"))
 
 				this.Control["listenerDropDown"].Delete()
 				this.Control["listenerDropDown"].Add(recognizers)
-				this.Control["listenerDropDown"].Choose(1)
+				this.Control["listenerDropDown"].Choose(2)
 			}
 
 			voiceRecognizerDropDown.LastValue := voiceRecognizerDropDown.Value
@@ -401,7 +399,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iTopWidgets := [[widget1, widget2], [widget3, widget4, widget64]]
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget5 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VwindowsSpeakerLabel Hidden", translate("Voice"))
 		widget6 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VwindowsSpeakerDropDown Hidden", voices)
@@ -453,8 +451,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		recognizers := []
 
-		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
+		recognizers.InsertAt(1, translate("Deactivated"))
 
 		chosen := 0
 
@@ -498,7 +496,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget29 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VazureTokenIssuerEdit Hidden")
 		widget29.OnEvent("Change", updateAzureVoices)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget30 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
 		widget31 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VazureSpeakerDropDown Hidden", voices)
@@ -520,7 +518,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget37 := window.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move VgoogleAPIKeyFilePathButton Hidden", translate("..."))
 		widget37.OnEvent("Click", chooseAPIKeyFilePath)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget38 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VgoogleSpeakerLabel Hidden", translate("Voice"))
 		widget39 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VgoogleSpeakerDropDown Hidden", voices)
@@ -575,7 +573,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget45 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VelevenLabsAPIKeyEdit Hidden")
 		widget45.OnEvent("Change", updateElevenLabsVoices)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget46 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VelevenLabsSpeakerLabel Hidden", translate("Voice"))
 		widget47 := window.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VelevenLabsSpeakerDropDown Hidden", voices)
@@ -1001,13 +999,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			recognizers := []
 		}
 
-		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
+		recognizers.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(recognizers, listener)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["listenerDropDown"].Delete()
 		this.Control["listenerDropDown"].Add(recognizers)
@@ -1982,12 +1980,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				recognizers := []
 			}
 
-			recognizers.InsertAt(1, translate("Deactivated"))
 			recognizers.InsertAt(1, translate("Automatic"))
+			recognizers.InsertAt(1, translate("Deactivated"))
 
 			this.Control["listenerDropDown"].Delete()
 			this.Control["listenerDropDown"].Add(recognizers)
-			this.Control["listenerDropDown"].Choose(1)
+			this.Control["listenerDropDown"].Choose(2)
 		}
 	}
 
@@ -2004,8 +2002,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			voices := []
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		return voices
 	}
@@ -2041,7 +2039,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := inList(voices, windowsSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["windowsSpeakerDropDown"].Delete()
 		this.Control["windowsSpeakerDropDown"].Add(voices)
@@ -2055,7 +2053,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := inList(voices, dotNETSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["windowsSpeakerDropDown"].Delete()
 		this.Control["windowsSpeakerDropDown"].Add(voices)
@@ -2090,13 +2088,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, azureSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["azureSpeakerDropDown"].Delete()
 		this.Control["azureSpeakerDropDown"].Add(voices)
@@ -2131,13 +2129,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, googleSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["googleSpeakerDropDown"].Delete()
 		this.Control["googleSpeakerDropDown"].Add(voices)
@@ -2175,13 +2173,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, elevenLabsSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["elevenLabsSpeakerDropDown"].Delete()
 		this.Control["elevenLabsSpeakerDropDown"].Add(voices)

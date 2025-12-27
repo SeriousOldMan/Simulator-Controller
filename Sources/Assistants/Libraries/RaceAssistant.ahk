@@ -948,7 +948,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
+	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined, translator := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
@@ -979,6 +979,7 @@ class RaceAssistant extends ConfigurationItem {
 			listener := ((speaker != false) ? listener : false)
 
 			options["Language"] := ((language != false) ? language : options["Language"])
+			options["Translator"] := ((translator == true) ? options["Translator"] : translator)
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := speaker ; ((speaker == true) ? options["Speaker"] : speaker)
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)

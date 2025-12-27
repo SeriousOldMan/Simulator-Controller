@@ -544,7 +544,7 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 	}
 }
 
-testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
+testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
 	local thePlugin, ignore, assistant, options, parameter, value, found
@@ -597,8 +597,8 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 					}
 				}
 
-				if booster
-					for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+				if extended
+					for ignore, parameter in ["Translator", "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
 						found := false
 
 						if thePlugin.hasArgument(parameter) {

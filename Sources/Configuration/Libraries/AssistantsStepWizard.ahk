@@ -67,7 +67,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local assistantActive := false
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments, voice, actions
-		local speakerBooster, listenerBooster, conversationBooster, agentBooster
+		local speakerBooster, listenerBooster, conversationBooster, agentBooster, language, translator
 
 		super.saveToConfiguration(configuration)
 
@@ -128,8 +128,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					arguments .= ("; assistantCommands: " . actions)
 
 				if wizard.isModuleSelected("Voice Control") {
-					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined)
+					if (wizard.getModuleValue(assistant, "Language", kUndefined) != kUndefined) {
 						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Language"))
+
+						if wizard.getModuleValue(assistant, "Language.Translated", false) {
+							arguments .= ("; translator: " . values2String("|", wizard.getModuleValue(assistant, "Translator.Service")
+																			  , "en"
+																			  , wizard.getModuleValue(assistant, "Translator.Code")
+																			  , wizard.getModuleValue(assistant, "Translator.API Key")
+																			  , wizard.getModuleValue(assistant, "Translator.Arguments")))
+						}
+					}
 
 					if (wizard.getModuleValue(assistant, "Synthesizer", kUndefined) != kUndefined)
 						arguments .= ("; synthesizer: " . wizard.getModuleValue(assistant, "Synthesizer"))

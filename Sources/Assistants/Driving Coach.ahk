@@ -88,6 +88,7 @@ startupDrivingCoach() {
 	local coachName := "Aiden"
 	local coachLogo := false
 	local coachLanguage := false
+	local coachTranslator := false
 	local coachSynthesizer := true
 	local coachSpeaker := false
 	local coachSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupDrivingCoach() {
 				index += 2
 			case "-Language":
 				coachLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				coachTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				coachSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupDrivingCoach() {
 
 	coach := DrivingCoach(kSimulatorConfiguration
 						, remotePID ? DrivingCoach.DrivingCoachRemoteHandler(remotePID) : false
-						, coachName, coachLanguage
+						, coachName, coachLanguage, coachTranslator
 						, coachSynthesizer, coachSpeaker, coachSpeakerVocalics, coachSpeakerBooster
 						, coachRecognizer, coachListener, coachListenerBooster, coachConversationBooster, coachAgentBooster
 						, coachMuted, voiceServer)

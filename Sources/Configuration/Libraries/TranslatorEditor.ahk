@@ -1,0 +1,391 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Translator Editor               ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\..\Framework\Framework.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\..\Framework\Extensions\Translator.ahk"
+#Include "ConfigurationEditor.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kSaveEditor := "Save"
+global kCancelEditor := "Cancel"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Public Classes Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TranslatorEditor                                                        ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class TranslatorEditor extends ConfiguratorPanel {
+	iAssistant := false
+
+	iSelectedService := false
+
+	iResult := false
+	iWindow := false
+
+	Assistant {
+		Get {
+			return this.iAssistant
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	SelectedService {
+		Get {
+			return this.iSelectedService
+		}
+	}
+
+	__New(assistant, configuration := false) {
+		this.iAssistant := assistant
+
+		super.__New(configuration)
+
+		TranslatorEditor.Instance := this
+
+		this.createGui(this.Configuration)
+	}
+
+	createGui(configuration) {
+		local editorGui, x, y, w, h, translationLanguages, translatorServices
+
+		updateTranslatorFields(*) {
+			local service := editorGui["translatorServiceDropDown"].Text
+
+			if (service = "LLM (OpenAI)")
+				service := "OpenAI"
+
+			this.saveConfigurator(this.SelectedService)
+
+			this.loadConfigurator((service = translate("None")) ? false : service)
+
+			this.updateTranslation()
+		}
+
+		updateTranslatorModels(*) {
+			if (editorGui["translatorServiceDropDown"].Text = "LLM (OpenAI)")
+				this.loadModels(editorGui["translatorModelEdit"].Text)
+
+			this.updateTranslation()
+		}
+
+		editorGui := Window({Descriptor: "Translator Editor", Options: "0x400000"})
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Translator Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x138 YP+20 w128 H:Center Center", translate("Translator Configuration")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w400 0x10")
+
+		translatorServices := [translate("None"), "Google", "Azure", "DeepL", "LLM (OpenAI)"]
+
+		editorGui.Add("Text", "x8 yp+10 w100 h23 +0x200", translate("Translator"))
+		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorServiceDropDown", translatorServices)
+		editorGui["translatorServiceDropDown"].OnEvent("Change", updateTranslatorFields)
+
+		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorLanguageLabel", translate("Target Language"))
+		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorLanguageDropDown", collect(kTranslatorLanguages, (l) => l.Name))
+		editorGui["translatorLanguageDropDown"].OnEvent("Change", (*) => this.updateTranslation())
+
+		; API Key field (always visible)
+		editorGui.Add("Text", "x8 yp+30 w100 h23 Section +0x200 VtranslatorAPIKeyLabel", translate("API Key"))
+		editorGui.Add("Edit", "x120 yp w280 h21 Password VtranslatorAPIKeyEdit").OnEvent("Change", updateTranslatorModels)
+
+		; Endpoint/Region field (visible for Azure)
+		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorEndpointLabel", translate("Endpoint"))
+		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorEndpointEdit")
+		editorGui["translatorEndpointEdit"].OnEvent("Change", (*) => this.updateTranslation())
+		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorRegionLabel", translate("Region"))
+		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorRegionEdit")
+		editorGui["translatorRegionEdit"].OnEvent("Change", (*) => this.updateTranslation())
+
+		; URL (visible for DeepL and OpenAI)
+		editorGui.Add("Text", "x8 ys+30 w100 h23 +0x200 VtranslatorServiceURLLabel", translate("Service URL"))
+		editorGui.Add("Edit", "x120 yp w280 h21 VtranslatorServiceURLEdit").OnEvent("Change", updateTranslatorModels)
+
+		; Model (visible for OpenAI)
+		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorModelLabel", translate("Model"))
+		editorGui.Add("ComboBox", "x120 yp w280 VtranslatorModelEdit")
+		editorGui["translatorModelEdit"].OnEvent("Change", (*) => this.updateTranslation())
+
+		editorGui.Add("Text", "x48 yp+35 w320 0x10")
+
+		editorGui.Add("Text", "x8 yp+10 w100 h23 +0x200", translate("Translation"))
+		editorGui.Add("Edit", "x120 yp w280 h70 Center ReadOnly +0x200 VtranslatorTranslation")
+
+		editorGui.Add("Text", "x8 yp+80 w400 0x10")
+
+		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => (this.iResult := kSaveEditor))
+		editorGui.Add("Button", "x208 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => (this.iResult := kCancelEditor))
+
+		return editorGui
+	}
+
+	loadConfigurator(service) {
+		local endpointLabel := this.Control["translatorEndpointLabel"]
+		local endpointEdit := this.Control["translatorEndpointEdit"]
+		local regionLabel := this.Control["translatorRegionLabel"]
+		local regionEdit := this.Control["translatorRegionEdit"]
+		local serviceURLLabel := this.Control["translatorServiceURLLabel"]
+		local serviceURLEdit := this.Control["translatorServiceURLEdit"]
+		local modelLabel := this.Control["translatorModelLabel"]
+		local modelEdit := this.Control["translatorModelEdit"]
+
+		this.iSelectedService := service
+
+		; Hide all optional fields by default
+		endpointLabel.Visible := false
+		endpointEdit.Visible := false
+		regionLabel.Visible := false
+		regionEdit.Visible := false
+		serviceURLLabel.Visible := false
+		serviceURLEdit.Visible := false
+		modelLabel.Visible := false
+		modelEdit.Visible := false
+
+		if service {
+			this.Control["translatorServiceDropDown"].Choose(1 + inList(["Google", "Azure", "DeepL", "OpenAI"], service))
+
+			this.Control["translatorLanguageDropDown"].Enabled := true
+			this.Control["translatorAPIKeyEdit"].Enabled := true
+
+			this.Control["translatorLanguageDropDown"].Choose(inList(getKeys(kTranslatorLanguages)
+																   , this.Value["translatorLanguage"]))
+			this.Control["translatorAPIKeyEdit"].Text := this.Value["translatorAPIKey"]
+		}
+		else {
+			this.Control["translatorServiceDropDown"].Choose(1)
+
+			this.Control["translatorLanguageDropDown"].Enabled := false
+			this.Control["translatorAPIKeyEdit"].Enabled := false
+
+			this.Control["translatorLanguageDropDown"].Choose(0)
+			this.Control["translatorAPIKeyEdit"].Text := ""
+		}
+
+		; Update and show fields based on selected service
+		if (service = "Google") {
+			; Nothing to do here
+		}
+		else if (service = "Azure") {
+			; Azure needs endpoint and region
+			endpointLabel.Visible := true
+			endpointEdit.Visible := true
+			regionLabel.Visible := true
+			regionEdit.Visible := true
+
+			try {
+				this.Control["translatorEndpointEdit"].Text := this.Value["translatorArguments"][1]
+				this.Control["translatorRegionEdit"].Text := this.Value["translatorArguments"][2]
+			}
+
+			if !InStr(this.Control["translatorEndpointEdit"].Text, "microsoft")
+				this.Control["translatorEndpointEdit"].Text := "https://api.cognitive.microsofttranslator.com/"
+		}
+		else if (service = "DeepL") {
+			; DeepL has optional custom endpoint
+			serviceURLLabel.Visible := true
+			serviceURLEdit.Visible := true
+
+			try
+				this.Control["translatorServiceURLEdit"].Text := this.Value["translatorArguments"][1]
+
+			if !InStr(this.Control["translatorServiceURLEdit"].Text, "deepl")
+				this.Control["translatorServiceURLEdit"].Text := "https://api-free.deepl.com"
+		}
+		else if (service = "OpenAI") {
+			; OpenAI needs model selection
+			serviceURLLabel.Visible := true
+			serviceURLEdit.Visible := true
+			modelLabel.Visible := true
+			modelEdit.Visible := true
+
+			try {
+				this.Control["translatorServiceURLEdit"].Text := this.Value["translatorArguments"][1]
+				this.Control["translatorModelEdit"].Text := this.Value["translatorArguments"][2]
+			}
+
+			if !InStr(this.Control["translatorServiceURLEdit"].Text, "openai")
+				this.Control["translatorServiceURLEdit"].Text := "https://api.openai.com"
+
+			this.loadModels(this.Control["translatorModelEdit"].Text)
+		}
+
+		this.updateTranslation()
+	}
+
+	saveConfigurator(service) {
+		this.Value["translatorService"] := service
+
+		if service {
+			this.Value["translatorLanguage"] := getKeys(kTranslatorLanguages)[this.Control["translatorLanguageDropDown"].Value]
+			this.Value["translatorAPIKey"] := this.Control["translatorAPIKeyEdit"].Text
+
+			if (service = "Google")
+				this.Value["translatorArguments"] := []
+			else if (service = "Azure")
+				this.Value["translatorArguments"] := [this.Control["translatorEndpointEdit"].Text
+													, this.Control["translatorRegionEdit"].Text]
+			else if (service = "DeepL")
+				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"].Text]
+			else if (service = "OpenAI")
+				this.Value["translatorArguments"] := [this.Control["translatorServiceURLEdit"].Text
+													, this.Control["translatorModelEdit"].Text]
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		super.loadFromConfiguration(configuration)
+
+		; Load translation settings for this assistant
+		this.Value["translatorService"] := getMultiMapValue(configuration, this.Assistant . ".Translator", "Service", false)
+		this.Value["translatorLanguage"] := getMultiMapValue(configuration, this.Assistant . ".Translator", "Language", "English")
+		this.Value["translatorAPIKey"] := getMultiMapValue(configuration, this.Assistant . ".Translator", "API Key", "")
+		this.Value["translatorArguments"] := string2Values(",", getMultiMapValue(configuration, this.Assistant . ".Translator", "Arguments", ""))
+
+		if this.Window
+			this.loadConfigurator(this.Value["translatorService"])
+	}
+
+	saveToConfiguration(configuration) {
+		local service := this.Value["translatorService"]
+
+		super.saveToConfiguration(configuration)
+
+		; Save translation settings for this assistant
+		removeMultiMapValues(configuration, this.Assistant . ".Translator")
+
+		setMultiMapValue(configuration, this.Assistant . ".Translator", "Service", service)
+
+		if service {
+			setMultiMapValue(configuration, this.Assistant . ".Translator", "Language", this.Value["translatorLanguage"])
+			setMultiMapValue(configuration, this.Assistant . ".Translator", "Code"
+										  , kTranslatorLanguages[this.Value["translatorLanguage"]].Code)
+			setMultiMapValue(configuration, this.Assistant . ".Translator", "API Key", this.Value["translatorAPIKey"])
+			setMultiMapValue(configuration, this.Assistant . ".Translator", "Arguments"
+										  , values2String(",", this.Value["translatorArguments"]*))
+		}
+	}
+
+	updateTranslation() {
+		local text := "The quick brown fox jumps over the lazy dog."
+		local translation
+
+		if this.SelectedService {
+			this.saveConfigurator(this.SelectedService)
+
+			try {
+				translation := Translator(this.Value["translatorService"], "English", this.Value["translatorLanguage"]
+										, this.Value["translatorAPIKey"], this.Value["translatorArguments"]*).translate(text)
+
+				if ((this.Value["translatorLanguage"] != "English") && (text = "Translation"))
+					translation := translate("Error")
+			}
+			catch Any {
+				translation := translate("Error")
+			}
+		}
+		else
+			translation := translate("Error")
+
+		this.Control["translatorTranslation"].Value := (text . "`n=>`n" . translation)
+	}
+
+	loadModels(model := false) {
+		local models := []
+		local connector
+
+		this.Control["translatorModelEdit"].Delete()
+
+		try {
+			connector := LLMConnector.APIConnector(false, model)
+
+			connector.Connect(this.Control["translatorServiceURLEdit"].Text, this.Control["translatorAPIKeyEdit"].Text)
+
+			models := connector.Models
+		}
+
+		this.Control["translatorModelEdit"].Delete()
+		this.Control["translatorModelEdit"].Add(models)
+
+		if Trim(model)
+			this.Control["translatorModelEdit"].Text := model
+		else if (models.Length > 0)
+			this.Control["translatorModelEdit"].Choose(1)
+	}
+
+	editTranslator(assistant := false, owner := false) {
+		local window
+
+		if !assistant
+			assistant := this.Assistant
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		this.loadFromConfiguration(this.Configuration)
+
+		if getWindowPosition("Translator Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		loop
+			Sleep(100)
+		until this.iResult
+
+		try {
+			if (this.iResult = kSaveEditor) {
+				configuration := this.Configuration.Clone()
+
+				this.saveConfigurator(this.SelectedService)
+				this.saveToConfiguration(configuration)
+
+				return configuration
+			}
+			else
+				return false
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+}

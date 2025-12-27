@@ -23,7 +23,7 @@
 
 class PluginsConfigurator extends ConfigurationItemList {
 	iConversationBoosterConfiguration := false
-
+	
 	Plugins {
 		Get {
 			local result := []

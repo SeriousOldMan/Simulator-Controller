@@ -40,6 +40,7 @@
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\Translator.ahk"
 #Include "..\Framework\Extensions\LLMBooster.ahk"
 
 
@@ -103,7 +104,13 @@ class VoiceServer extends ConfigurationItem {
 		iDescriptor := false
 		iPID := 0
 
-		iLanguage := "en"
+		iOriginalLanguage := "en"
+		iTranslatedLanguage := "en"
+
+		iTranslator := false
+		iSpeakerTranslator := false
+		iListenerTranslator := false
+
 		iSynthesizer := "dotNET"
 		iSpeaker := true
 		iSpeakerVolume := 100
@@ -163,7 +170,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.SpeakerBooster {
-					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language)
+					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language["Original"])
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster
@@ -172,6 +179,12 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setVolume(voiceClient.SpeakerVolume)
+				this.setPitch(voiceClient.SpeakerPitch)
+				this.setRate(voiceClient.SpeakerSpeed)
+
+				this.setTranslator(voiceClient.SpeakerTranslator)
 			}
 		}
 
@@ -201,7 +214,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.ListenerBooster {
-					booster := RecognitionBooster(voiceClient.ListenerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language)
+					booster := RecognitionBooster(voiceClient.ListenerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language["Original"])
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster
@@ -210,9 +223,11 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setTranslator(voiceClient.ListenerTranslator)
 			}
 
-			_onTextCallback(text) {
+			processText(text) {
 				local words := this.parseText(&text, false)
 				local target
 
@@ -228,7 +243,7 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 
-				super._onTextCallBack(values2String(A_Space, words*))
+				super.processText(values2String(A_Space, words*))
 			}
 
 			textRecognized(text) {
@@ -304,9 +319,45 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		Language {
+		Language[mode] {
 			Get {
-				return this.iLanguage
+				return ((mode = "Original") ? this.iOriginalLanguage : this.iTranslatedLanguage)
+			}
+		}
+
+		Translator {
+			Get {
+				return this.iTranslator
+			}
+		}
+
+		SpeakerTranslator {
+			Get {
+				local translator
+
+				if (!this.iSpeakerTranslator && this.Translator) {
+					translator := string2Values("|", this.Translator)
+
+					this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
+														, translator[4], string2Values(",", translator[5])*)
+				}
+
+				return this.iSpeakerTranslator
+			}
+		}
+
+		ListenerTranslator {
+			Get {
+				local translator
+
+				if (!this.iListenerTranslator && this.Translator) {
+					translator := string2Values("|", this.Translator)
+
+					this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
+														 , translator[4], string2Values(",", translator[5])*)
+				}
+
+				return this.iListenerTranslator
 			}
 		}
 
@@ -418,13 +469,8 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechSynthesizer[create := false] {
 			Get {
-				if (!this.iSpeechSynthesizer && create && this.Speaker) {
-					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
-
-					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-				}
+				if (!this.iSpeechSynthesizer && create && this.Speaker)
+					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language["Translated"])
 
 				return this.iSpeechSynthesizer
 			}
@@ -451,22 +497,26 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
-																						   , this.Language, false, this.RecognizerMode)
+					this.iSpeechRecognizer
+						:= VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
+																			  , this.Language["Translated"]
+																			  , false, this.RecognizerMode)
 
 				return this.iSpeechRecognizer
 			}
 		}
 
 		__New(voiceServer, descriptor, routing, pid
-			, language, synthesizer, speaker, recognizer, listener
+			, originalLanguage, translatedLanguage, translator, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 			, activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
 			this.iPID := pid
-			this.iLanguage := language
+			this.iOriginalLanguage := originalLanguage
+			this.iTranslatedLanguage := translatedLanguage
+			this.iTranslator := translator
 			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker
 			this.iRecognizer := recognizer
@@ -485,7 +535,7 @@ class VoiceServer extends ConfigurationItem {
 		speak(text, options := false) {
 			local speaker := this.SpeechSynthesizer[true]
 			local booster := speaker.Booster
-			local tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
+			local translator, tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
 
 			if booster {
 				if options {
@@ -775,7 +825,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		_onTextCallback(text) {
+		processText(text) {
 			local words := this.parseText(&text, false)
 			local target
 
@@ -791,7 +841,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
-			super._onTextCallBack(values2String(A_Space, words*))
+			super.processText(values2String(A_Space, words*))
 		}
 	}
 
@@ -1449,7 +1499,8 @@ class VoiceServer extends ConfigurationItem {
 
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, speakingStatusCallback := false
-					  , language := false, synthesizer := true, speaker := true, recognizer := false, listener := false
+					  , originalLanguage := false, translatedLanguage := false, translator := false
+					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , speakerBooster := false, listenerBooster := false
 					  , recognizerMode := "Grammar") {
@@ -1479,15 +1530,19 @@ class VoiceServer extends ConfigurationItem {
 		if (listener == true)
 			listener := this.Listener
 
-		if (language == false)
-			language := this.Language
+		if (originalLanguage == false)
+			originalLanguage := this.Language
+
+		if (translatedLanguage == false)
+			translatedLanguage := this.Language
 
 		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, originalLanguage, translatedLanguage, translator
+											  , synthesizer, speaker, recognizer, listener
 											  , speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 											  , activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode)
 

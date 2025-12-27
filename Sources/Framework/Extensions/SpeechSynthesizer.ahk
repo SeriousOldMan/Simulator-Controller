@@ -26,6 +26,7 @@
 #Include "JSON.ahk"
 #Include "Task.ahk"
 #Include "CLR.ahk"
+#Include "Translator.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,6 +59,7 @@ class SpeechSynthesizer {
 	iVoices := []
 
 	iLanguage := ""
+	iTranslator := false
 	iLocale := ""
 	iVoice := ""
 
@@ -193,6 +195,12 @@ class SpeechSynthesizer {
 	Language {
 		Get {
 			return this.iLanguage
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
 		}
 	}
 
@@ -493,6 +501,10 @@ class SpeechSynthesizer {
 			SpeechSynthesizer.sFilterLowpass := 1800
 	}
 
+	setTranslator(translator) {
+		this.iTranslator := translator
+	}
+
 	getVoices() {
 		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
@@ -729,7 +741,7 @@ class SpeechSynthesizer {
 	speak(text, wait := true, cache := false, options := false) {
 		global kSox
 
-		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
+		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume, translator
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static sOverdriveGain, sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
@@ -776,6 +788,11 @@ class SpeechSynthesizer {
 		}
 		else
 			cacheFileName := false
+
+		translator := this.Translator
+
+		if translator
+			text := translator.translate(text)
 
 		if kSoX {
 			temp1Name := temporaryFileName("temp1", "wav")

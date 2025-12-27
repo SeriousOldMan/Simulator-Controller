@@ -179,6 +179,12 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setVolume(voiceClient.SpeakerVolume)
+				this.setPitch(voiceClient.SpeakerPitch)
+				this.setRate(voiceClient.SpeakerSpeed)
+			
+				this.setTranslator(voiceClient.SpeakerTranslator)
 			}
 		}
 
@@ -217,6 +223,8 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+				
+				this.setTranslator(voiceClient.ListenerTranslator)
 			}
 
 			processText(text) {
@@ -467,13 +475,8 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechSynthesizer[create := false] {
 			Get {
-				if (!this.iSpeechSynthesizer && create && this.Speaker) {
+				if (!this.iSpeechSynthesizer && create && this.Speaker)
 					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language["Translated"])
-
-					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-				}
 
 				return this.iSpeechSynthesizer
 			}
@@ -499,19 +502,11 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechRecognizer[create := false] {
 			Get {
-				local translator
-
-				if (!this.iSpeechRecognizer && create && this.Listener) {
+				if (!this.iSpeechRecognizer && create && this.Listener)
 					this.iSpeechRecognizer
 						:= VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
 																			  , this.Language["Translated"]
 																			  , false, this.RecognizerMode)
-
-					translator := this.ListenerTranslator
-
-					if translator
-						this.iSpeechRecognizer.setTranslator(translator)
-				}
 
 				return this.iSpeechRecognizer
 			}
@@ -559,11 +554,6 @@ class VoiceServer extends ConfigurationItem {
 				else
 					text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
 			}
-
-			translator := this.SpeakerTranslator
-
-			if translator
-				text := translator.translate(text)
 
 			while this.Muted
 				Sleep(100)

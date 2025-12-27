@@ -313,6 +313,12 @@ class SpeechRecognizer {
 		}
 	}
 
+	Translator {
+		Get {
+			return this.iTranslator
+		}
+	}
+
 	Model {
 		Get {
 			return this.iModel
@@ -1340,12 +1346,14 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		local text
+		local text, translator
 
 		if (this.iMode = "Text") {
 			text := values2String(A_Space, this.getWords(wordArr)*)
 
-			if this.iTranslator
+			translator := this.Translator
+
+			if translator
 				text := translator.translate(text)
 
 			this.textRecognized(text)
@@ -1355,7 +1363,9 @@ class SpeechRecognizer {
 	}
 
 	_onTextCallback(text) {
-		this.processText(this.iTranslator ? translator.translate(text) : text)
+		local translator := this.Translator
+
+		this.processText(translator ? translator.translate(text) : text)
 	}
 
 	processText(text) {

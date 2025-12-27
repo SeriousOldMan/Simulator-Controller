@@ -960,10 +960,10 @@ class BasicStepWizard extends StepWizard {
 
 		if assistantTranslator
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , kTranslatorLanguages[assistantTranslator.Language].Name . translate(" (translated)...")]))
+										   , kTranslatorLanguages[assistantTranslator.Language].Name . translate(" (translated)...")])
 		else
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , translate("Translator") . translate("...")]))
+										   , translate("Translator") . translate("...")])
 
 		this.Control["basic" . key . "LanguageDropDown"].Add(choices)
 

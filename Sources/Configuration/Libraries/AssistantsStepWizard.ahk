@@ -132,18 +132,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						arguments .= ("; language: " . wizard.getModuleValue(assistant, "Language"))
 
 						if wizard.getModuleValue(assistant, "Language.Translated", false) {
-							arguments .= ("; translator: " . assistant)
-
-							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Service"
-																		, wizard.getModuleValue(assistant, "Translator.Service"))
-							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Language"
-																		, wizard.getModuleValue(assistant, "Translator.Language"))
-							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Code"
-																		, wizard.getModuleValue(assistant, "Translator.Code"))
-							setMultiMapValue(configuration, "Translator", assistant . ".Translator.API Key"
-																		, wizard.getModuleValue(assistant, "Translator.API Key"))
-							setMultiMapValue(configuration, "Translator", assistant . ".Translator.Arguments"
-																		, wizard.getModuleValue(assistant, "Translator.Arguments"))
+							arguments .= ("; translator: " . values2String("|", wizard.getModuleValue(assistant, "Translator.Service")
+																			  , "en"
+																			  , wizard.getModuleValue(assistant, "Translator.Code")
+																			  , wizard.getModuleValue(assistant, "Translator.API Key")
+																			  , wizard.getModuleValue(assistant, "Translator.Arguments")))
 						}
 					}
 

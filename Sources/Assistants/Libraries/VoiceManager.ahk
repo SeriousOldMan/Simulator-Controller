@@ -653,16 +653,13 @@ class VoiceManager extends ConfigurationItem {
 
 	SpeakerTranslator {
 		Get {
-			local key
+			local translator
 
 			if (!this.iSpeakerTranslator && this.Translator) {
-				key := (this.Translator . ".Translator.")
+				translator := string2Values("|", this.Translator)
 
-				this.iSpeakerTranslator
-					:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-								, this.Language["Original"], this.Language["Translated"]
-								, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-								, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+				this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
+													, translator[4], string2Values(",", translator[5])*)
 			}
 
 			return this.iSpeakerTranslator
@@ -671,16 +668,13 @@ class VoiceManager extends ConfigurationItem {
 
 	ListenerTranslator {
 		Get {
-			local key
+			local translator
 
 			if (!this.iListenerTranslator && this.Translator) {
-				key := (this.Translator . ".Translator.")
+				translator := string2Values("|", this.Translator)
 
-				this.iListenerTranslator
-					:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-								, this.Language["Translated"], this.Language["Original"]
-								, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-								, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+				this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
+													 , translator[4], string2Values(",", translator[5])*)
 			}
 
 			return this.iListenerTranslator

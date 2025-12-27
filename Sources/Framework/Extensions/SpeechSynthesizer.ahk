@@ -1097,8 +1097,11 @@ class SpeechSynthesizer {
 		}
 	}
 
-	speakTest() {
-		switch this.Language, false {
+	speakTest(language := false) {
+		if !language
+			language := this.Language
+			
+		switch language, false {
 			case "DE":
 				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
 			case "ES":

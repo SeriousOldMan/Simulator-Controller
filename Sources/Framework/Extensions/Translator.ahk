@@ -155,8 +155,25 @@ class Translator {
 		}
 	}
 
-	__New(service, sourceLanguage, targetLanguage, apiKey := "", arguments*) {
+	__New(service, sourceLanguage := false, targetLanguage := false, apiKey := false, arguments*) {
 		local endpoint, region, model, url
+
+		if InStr(service, "|") {
+			service := strning2Values("|", service)
+
+			if (service.Length = 5) {
+				sourceLanguage := service[2]
+				targetLanguage := service[3]
+				apiKey := service[4]
+				arguments := string2Values(",", service[5])
+			}
+			else {
+				sourceLanguage := "English"
+				targetLanguage := service[2]
+				apiKey := service[3]
+				arguments := string2Values(",", service[4])
+			}
+		}
 
 		if !Translator.sTranslatorLanguages.Has(sourceLanguage)
 			throw "Source language not recognized in Translator.__New..."

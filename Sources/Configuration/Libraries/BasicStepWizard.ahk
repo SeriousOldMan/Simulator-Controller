@@ -958,19 +958,17 @@ class BasicStepWizard extends StepWizard {
 
 		this.Control["basic" . key . "LanguageDropDown"].Delete()
 
-		if assistantTranslator {
-			translator := (translate("Translator") . translate(" (") . kTranslatorLanguages[assistantTranslator.Language].Name
-												   . translate(")") . translate("..."))
-
-			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
-																					 , translator]))
-		}
+		if assistantTranslator
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , kTranslatorLanguages[assistantTranslator.Language].Name . translate(" (translated)...")]))
 		else
-			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
-																					, translate("Translator") . translate("...")]))
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , translate("Translator") . translate("...")]))
+
+		this.Control["basic" . key . "LanguageDropDown"].Add(choices)
 
 		if (!assistantLanguage && assistantTranslator)
-			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length + 2)
+			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length)
 		else
 			this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
 
@@ -1163,7 +1161,7 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
 			}
 
-			this.iSynthesizerEditor := VoiceSynthesizerEditor(this, configuration)
+			this.iSynthesizerEditor := VoiceSynthesizerEditor(this, assistant, configuration)
 
 			try {
 				configuration := this.iSynthesizerEditor.editSynthesizer(window)
@@ -1334,6 +1332,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 	iResult := false
 
 	iStepWizard := false
+	iAssistant := false
 	iLanguage := "English"
 
 	iWindow := false
@@ -1360,14 +1359,21 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 	}
 
+	Assistant {
+		Get {
+			return this.iAssistant
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	__New(stepWizard, configuration := false) {
+	__New(stepWizard, assistant, configuration := false) {
 		this.iStepWizard := stepWizard
+		this.iAssistant := assistant
 
 		super.__New(configuration)
 	}
@@ -2431,7 +2437,15 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
 
-			synthesizer.speakTest()
+			language := this.StepWizard.assistantLanguage(this.Assistant, true)
+
+			if isObject(language) {
+				synthesizer.setTranslator(Translator(language.Service, "English", language.Language, language.APIKey, language.Arguments*))
+
+				synthesizer.speakTest("en")
+			}
+			else
+				synthesizer.speakTest()
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration

@@ -615,7 +615,7 @@ class BasicStepWizard extends StepWizard {
 
 		this.saveSetup()
 
-		testAssistants(this.SetupWizard, , GetKeyState("Ctrl"))
+		testAssistants(this.SetupWizard, , !GetKeyState("Ctrl"))
 	}
 
 	assistantEnabled(assistant, editor := true) {

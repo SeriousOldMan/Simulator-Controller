@@ -27,7 +27,7 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                        Public Constant Section                          ;;;
+;;;                       Private Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
@@ -77,6 +77,13 @@ class Translator {
 	iTargetLanguageCode := "nl"
 
 	iCache := CaseInsenseMap()
+
+	static Languages[coded := false] {
+		Get {
+			return (coded ? this.sTranslatorLanguages : kTranslatorLanguages)
+		}
+	}
+
 
 	Service {
 		Get {

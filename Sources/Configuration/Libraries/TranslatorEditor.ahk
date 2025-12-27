@@ -120,7 +120,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		editorGui["translatorServiceDropDown"].OnEvent("Change", updateTranslatorFields)
 
 		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorLanguageLabel", translate("Target Language"))
-		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorLanguageDropDown", collect(kTranslatorLanguages, (l) => l.Name))
+		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorLanguageDropDown", collect(Translator.Languages, (l) => l.Name))
 		editorGui["translatorLanguageDropDown"].OnEvent("Change", (*) => this.updateTranslation())
 
 		; API Key field (always visible)
@@ -185,8 +185,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 			this.Control["translatorLanguageDropDown"].Enabled := true
 			this.Control["translatorAPIKeyEdit"].Enabled := true
 
-			this.Control["translatorLanguageDropDown"].Choose(inList(getKeys(kTranslatorLanguages)
-																   , this.Value["translatorLanguage"]))
+			this.Control["translatorLanguageDropDown"].Choose(inList(getKeys(Translator.Languages), this.Value["translatorLanguage"]))
 			this.Control["translatorAPIKeyEdit"].Text := this.Value["translatorAPIKey"]
 		}
 		else {
@@ -254,7 +253,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		this.Value["translatorService"] := service
 
 		if service {
-			this.Value["translatorLanguage"] := getKeys(kTranslatorLanguages)[this.Control["translatorLanguageDropDown"].Value]
+			this.Value["translatorLanguage"] := getKeys(Translator.Languages)[this.Control["translatorLanguageDropDown"].Value]
 			this.Value["translatorAPIKey"] := this.Control["translatorAPIKeyEdit"].Text
 
 			if (service = "Google")
@@ -296,7 +295,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		if service {
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "Language", this.Value["translatorLanguage"])
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "Code"
-										  , kTranslatorLanguages[this.Value["translatorLanguage"]].Code)
+										  , Translator.Languages[true][this.Value["translatorLanguage"]].Code)
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "API Key", this.Value["translatorAPIKey"])
 			setMultiMapValue(configuration, this.Assistant . ".Translator", "Arguments"
 										  , values2String(",", this.Value["translatorArguments"]*))

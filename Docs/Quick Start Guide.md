@@ -17,6 +17,8 @@ You probably already have understood, that Simulator Controller is a quite sophi
    Also for experts: If your preferred spoken language is not available, you still can use the "Translator..." item from the Assistants language drop down menu and configure an automatic translator, for example by using *DeepL*. Please note, that this slows down the voice interaction a bit and may also generate some costs depending on the chosen service. *DeepL*, for example, offers 500.000 characters for free per month.
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translator.JPG)
+   
+   Please note, that translation will only work reliable with voice recognition methods, that support free speech (all cloud services and Whisper).
 
 2. Select modules
 

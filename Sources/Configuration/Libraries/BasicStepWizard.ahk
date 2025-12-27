@@ -155,7 +155,7 @@ class BasicStepWizard extends StepWizard {
 			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
 			local selectedText := dropDown.Text
 
-			if InStr(selectedText, translate("Translator")) {
+			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
 				if this.editTranslator(assistant)
 					this.loadVoices(assistant)
 				else if dropDown.HasProp("LastValue")
@@ -960,7 +960,7 @@ class BasicStepWizard extends StepWizard {
 
 		if assistantTranslator
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , kTranslatorLanguages[assistantTranslator.Language].Name . translate(" (translated)...")])
+										   , Translator.Languages[true][assistantTranslator.Language].Name . translate(" (translated)...")])
 		else
 			choices := concatenate(choices, [translate("---------------------------------------------")
 										   , translate("Translator") . translate("...")])

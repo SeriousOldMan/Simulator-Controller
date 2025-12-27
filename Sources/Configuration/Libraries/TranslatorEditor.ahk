@@ -107,7 +107,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x138 YP+20 w128 H:Center Center", translate("Translator Configuration")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -214,6 +214,9 @@ class TranslatorEditor extends ConfiguratorPanel {
 				this.Control["translatorEndpointEdit"].Text := this.Value["translatorArguments"][1]
 				this.Control["translatorRegionEdit"].Text := this.Value["translatorArguments"][2]
 			}
+
+			if !InStr(this.Control["translatorEndpointEdit"].Text, "microsoft")
+				this.Control["translatorEndpointEdit"].Text := "https://api.cognitive.microsofttranslator.com/"
 		}
 		else if (service = "DeepL") {
 			; DeepL has optional custom endpoint
@@ -233,16 +236,12 @@ class TranslatorEditor extends ConfiguratorPanel {
 			modelLabel.Visible := true
 			modelEdit.Visible := true
 
-			try
+			try {
 				this.Control["translatorServiceURLEdit"].Text := this.Value["translatorArguments"][1]
-
-			if (this.Control["translatorServiceURLEdit"].Text = "")
-				this.Control["translatorServiceURLEdit"].Text := "https://api.openai.com"
-
-			try
 				this.Control["translatorModelEdit"].Text := this.Value["translatorArguments"][2]
+			}
 
-			if InStr(this.Control["translatorServiceURLEdit"].Text, "deepl")
+			if !InStr(this.Control["translatorServiceURLEdit"].Text, "openai")
 				this.Control["translatorServiceURLEdit"].Text := "https://api.openai.com"
 
 			this.loadModels(this.Control["translatorModelEdit"].Text)

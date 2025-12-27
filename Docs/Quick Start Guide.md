@@ -4,9 +4,9 @@ You probably already have understood, that Simulator Controller is a quite sophi
 
    At the end of the initial installation of Simulator Controller using the automated installer, the configuration wizard "Simmulator Setup" is run automatically, unless you uncheck this option in the installer. This wizard will guide you through the configuration and will offer you configuration options for even the most sophisticated environments. We will disable almost all this stuff for an initial and simple configuration. You can always visit "Simulator Setup" again to enable additional functionality later on.
    
-   There are two ways to get to a basic working setup with a few clicks. "Simulator Setup" offers a basic setup page, which does all the work for you, but you do not have any control where all the software components are installed. This is in general no problem, since the software components will be installed in the typical locations used by the Windows operating system.
+   The first page will allow you to unblock aal applications and other binary files to make the Windows security system happy. This is normally unnecessary, if Simulator Controller was installed with the automated installer, but it may be necessary, if you have installed the software manually.
    
-   If you want to use the basic setup select the "Basic" option when asked by "Simulator Setup" and continue. On the next page, you can take all decisions for your initial setup. Then use this configuration for your initial experiences with Simulator Controller. When you feel comfortable, you can come back to "Simulator Setup" and complete your configuration.
+   On the next page, you can take all decisions for your initial setup. Then use this configuration for your initial experiences with Simulator Controller. When you feel comfortable, you can come back to "Simulator Setup" and complete your configuration.
    
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Quick%20Start%204.JPG)
    
@@ -14,7 +14,9 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    For experts: You can choose the speech generation method for each Assistant independently by clicking on the small settings button with the "Gear" symbol. To the right of this button, you find another button with a small "Rocket" symbol. This allows you to add additional intelligence by configuring several so-called boosters. See the documentation about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
    
-   If you don't want to use the basic configuration page, simply select "Extended" and continue to the next page. Then go through the following steps for a basic configuration.
+   Also for experts: If your preferred spoken language is not available, you still can use the "Translator..." item from the Assistants language drop down menu and configure an automatic translator, for example by using *DeepL*. Please note, that this slows down the voice interaction a bit and may also generate some costs depending on the chosen service. *DeepL*, for example, offers 500.000 characters for free per month.
+   
+   ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translator.JPG)
 
 2. Select modules
 

@@ -53,7 +53,8 @@ global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "Eng
 											  "Finnish", {Code: "fi", Name: "Suomi"},
 											  "Norwegian", {Code: "no", Name: "Norsk"},
 											  "Hungarian", {Code: "hu", Name: "Magyar"},
-											  "Romanian", {Code: "ro", Name: "Română"})
+											  "Romanian", {Code: "ro", Name: "Română"},
+											  "Lithuanian", {Code: "lt", Name: "Lietuvių"})
 
 initializeTranslatorLanguages() {
 	local ignore, identifier, language

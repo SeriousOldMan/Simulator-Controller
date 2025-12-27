@@ -331,10 +331,10 @@ class VoiceServer extends ConfigurationItem {
 					key := (this.Translator . ".Translator.")
 
 					this.iSpeakerTranslator
-						:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
+						:= Translator(getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "Service")
 									, this.Language["Original"], this.Language["Translated"]
-									, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-									, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+									, getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "API Key")
+									, string2Values(",", getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "Arguments"))*)
 				}
 
 				return this.iSpeakerTranslator
@@ -349,10 +349,10 @@ class VoiceServer extends ConfigurationItem {
 					key := (this.Translator . ".Translator.")
 
 					this.iListenerTranslator
-						:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
+						:= Translator(getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "Service")
 									, this.Language["Translated"], this.Language["Original"]
-									, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-									, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+									, getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "API Key")
+									, string2Values(",", getMultiMapValue(this.VoiceServer.Configuration, "Translator", key . "Arguments"))*)
 				}
 
 				return this.iListenerTranslator
@@ -518,14 +518,15 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		__New(voiceServer, descriptor, routing, pid
-			, language, trnslator, synthesizer, speaker, recognizer, listener
+			, originalLanguage, translatedLanguage, translator, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 			, activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
 			this.iPID := pid
-			this.iLanguage := language
+			this.iOriginalLanguage := originalLanguage
+			this.iTranslatedLanguage := translatedLanguage
 			this.iTranslator := translator
 			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker

@@ -951,6 +951,12 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
+			__New(voiceManager, arguments*) {
+				this.iSpotter := voiceManager.RaceAssistant
+
+				super.__New(voiceManager, arguments*)
+			}
+
 			speak(text, focus := false, cache := false, options := false) {
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
 					super.speak(text, focus, cache, options)
@@ -1009,12 +1015,6 @@ class RaceSpotter extends GridRaceAssistant {
 				super.endTalk(options?)
 
 				this.Spotter.clearAlerts()
-			}
-
-			__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
-				this.iSpotter := voiceManager.RaceAssistant
-
-				super.__New(voiceManager, synthesizer, speaker, language, fragments, phrases)
 			}
 		}
 

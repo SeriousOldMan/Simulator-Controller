@@ -47,7 +47,7 @@ class VoiceManager extends ConfigurationItem {
 
 	iOriginalLanguage := "en"
 	iTranslatedLanguage := "en"
-	iTranslator := "en"
+	iTranslator := false
 	iSpeakerTranslator := false
 	iListenerTranslator := false
 
@@ -653,13 +653,13 @@ class VoiceManager extends ConfigurationItem {
 
 	SpeakerTranslator {
 		Get {
-			local translator
+			local arguments
 
 			if (!this.iSpeakerTranslator && this.Translator) {
-				translator := string2Values("|", this.Translator)
+				arguments := string2Values("|", this.Translator)
 
-				this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
-													, translator[4], string2Values(",", translator[5])*)
+				this.iSpeakerTranslator := Translator(arguments[1], arguments[2], arguments[3]
+													, arguments[4], string2Values(",", arguments[5])*)
 			}
 
 			return this.iSpeakerTranslator
@@ -668,13 +668,13 @@ class VoiceManager extends ConfigurationItem {
 
 	ListenerTranslator {
 		Get {
-			local translator
+			local arguments
 
 			if (!this.iListenerTranslator && this.Translator) {
-				translator := string2Values("|", this.Translator)
+				arguments := string2Values("|", this.Translator)
 
-				this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
-													 , translator[4], string2Values(",", translator[5])*)
+				this.iListenerTranslator := Translator(arguments[1], arguments[3], arguments[2]
+													 , arguments[4], string2Values(",", arguments[5])*)
 			}
 
 			return this.iListenerTranslator

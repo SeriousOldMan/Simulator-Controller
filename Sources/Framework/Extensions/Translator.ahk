@@ -40,7 +40,7 @@ class Translator {
 												  "Japanese", {Code: "ja", Name: "日本語"},
 												  "Chinese", {Code: "zh", Name: "简体中文"},
 												  "Korean", {Code: "ko", Name: "한국어"},
-												  "Russian", {Code: "ru", Name: "Русский язык"},
+												  "Russian", {Code: "ru", Name: "Русский"},
 												  "Arabic", {Code: "ar", Name: "اَلْعَرَبِيَّةُ"},
 												  "Dutch", {Code: "nl", Name: "Nederlands"},
 												  "Polish", {Code: "pl", Name: "Polski"},
@@ -76,13 +76,17 @@ class Translator {
 		Get {
 			local identifier, language
 
-			if (this.sTranslatorLanguages.Count = 0)
+			if (this.sTranslatorLanguages.Count = 0) {
 				for identifier, language in this.kTranslatorLanguages {
 					language.Identifier := identifier
 
 					this.sTranslatorLanguages[identifier] := language
 					this.sTranslatorLanguages[language.Code] := language
 				}
+
+				if isDebug()
+					logMessage(kLogDebug, "Language keys: " . values2String(", ", getKeys(this.sTranslatorLanguages)*))
+			}
 
 			if type
 				return this.sTranslatorLanguages
@@ -177,17 +181,17 @@ class Translator {
 			}
 		}
 
-		if !Translator.sTranslatorLanguages.Has(sourceLanguage)
-			throw "Source language not recognized in Translator.__New..."
+		if !Translator.Languages["All"].Has(sourceLanguage)
+			throw "Source language '" . sourceLanguage . "' not recognized in Translator.__New..."
 
-		if !Translator.sTranslatorLanguages.Has(targetLanguage)
-			throw "Target language not recognized in Translator.__New..."
+		if !Translator.Languages["All"].Has(targetLanguage)
+			throw "Target language '" . targetLanguage . "' not recognized in Translator.__New..."
 
-		this.iSourceLanguage := Translator.sTranslatorLanguages[sourceLanguage].Identifier
-		this.iSourceLanguageCode := Translator.sTranslatorLanguages[sourceLanguage].Code
+		this.iSourceLanguage := Translator.Languages["All"][sourceLanguage].Identifier
+		this.iSourceLanguageCode := Translator.Languages["All"][sourceLanguage].Code
 
-		this.iTargetLanguage := Translator.sTranslatorLanguages[targetLanguage].Identifier
-		this.iTargetLanguageCode := Translator.sTranslatorLanguages[targetLanguage].Code
+		this.iTargetLanguage := Translator.Languages["All"][targetLanguage].Identifier
+		this.iTargetLanguageCode := Translator.Languages["All"][targetLanguage].Code
 
 		apiKey := Trim(apiKey)
 
@@ -303,6 +307,9 @@ class Translator {
 				case "OpenAI":
 					result := this.translateOpenAI(text)
 			}
+
+			if isDebug()
+				logMessage(kLogDebug, "Translating `"" . SubStr(text, 1, 20) . "...`" to `"" . SubStr(result, 1, 20) . "...`"")
 
 			; Cache the result
 			if (result != text)

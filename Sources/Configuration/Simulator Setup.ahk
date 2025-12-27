@@ -3437,7 +3437,7 @@ findSoftware(definition, software) {
 							installPath := StrReplace(RegRead("HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath"), "/", "\")
 						}
 						catch Any as exception {
-							logError(exception, true)
+							logError(exception)
 
 							installPath := ""
 						}

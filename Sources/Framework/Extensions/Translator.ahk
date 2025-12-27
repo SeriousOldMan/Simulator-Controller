@@ -27,41 +27,35 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                       Private Constant Section                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
-											  "Spanish", {Code: "es", Name: "Español"},
-											  "French", {Code: "fr", Name: "Français"},
-											  "German", {Code: "de", Name: "Deutsch"},
-											  "Italian", {Code: "it", Name: "Italiano"},
-											  "Portuguese", {Code: "pt", Name: "Português"},
-											  "Japanese", {Code: "ja", Name: "日本語"},
-											  "Chinese", {Code: "zh", Name: "简体中文"},
-											  "Korean", {Code: "ko", Name: "한국어"},
-											  "Russian", {Code: "ru", Name: "Русский язык"},
-											  "Arabic", {Code: "ar", Name: "اَلْعَرَبِيَّةُ"},
-											  "Dutch", {Code: "nl", Name: "Nederlands"},
-											  "Polish", {Code: "pl", Name: "Polski"},
-											  "Swedish", {Code: "sv", Name: "Svenska"},
-											  "Turkish", {Code: "tr", Name: "Türkçe"},
-											  "Hindi", {Code: "hi", Name: "हिन्दी"},
-											  "Thai", {Code: "th", Name: "ภาษาไทย"},
-											  "Vietnamese", {Code: "vi", Name: "Tiếng Việt"},
-											  "Czech", {Code: "cs", Name: "Čeština"},
-											  "Danish", {Code: "da", Name: "Dansk"},
-											  "Finnish", {Code: "fi", Name: "Suomi"},
-											  "Norwegian", {Code: "no", Name: "Norsk"},
-											  "Hungarian", {Code: "hu", Name: "Magyar"},
-											  "Romanian", {Code: "ro", Name: "Română"},
-											  "Lithuanian", {Code: "lt", Name: "Lietuvių"})
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class Translator {
+	static kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
+												  "Spanish", {Code: "es", Name: "Español"},
+												  "French", {Code: "fr", Name: "Français"},
+												  "German", {Code: "de", Name: "Deutsch"},
+												  "Italian", {Code: "it", Name: "Italiano"},
+												  "Portuguese", {Code: "pt", Name: "Português"},
+												  "Japanese", {Code: "ja", Name: "日本語"},
+												  "Chinese", {Code: "zh", Name: "简体中文"},
+												  "Korean", {Code: "ko", Name: "한국어"},
+												  "Russian", {Code: "ru", Name: "Русский язык"},
+												  "Arabic", {Code: "ar", Name: "اَلْعَرَبِيَّةُ"},
+												  "Dutch", {Code: "nl", Name: "Nederlands"},
+												  "Polish", {Code: "pl", Name: "Polski"},
+												  "Swedish", {Code: "sv", Name: "Svenska"},
+												  "Turkish", {Code: "tr", Name: "Türkçe"},
+												  "Hindi", {Code: "hi", Name: "हिन्दी"},
+												  "Thai", {Code: "th", Name: "ภาษาไทย"},
+												  "Vietnamese", {Code: "vi", Name: "Tiếng Việt"},
+												  "Czech", {Code: "cs", Name: "Čeština"},
+												  "Danish", {Code: "da", Name: "Dansk"},
+												  "Finnish", {Code: "fi", Name: "Suomi"},
+												  "Norwegian", {Code: "no", Name: "Norsk"},
+												  "Hungarian", {Code: "hu", Name: "Magyar"},
+												  "Romanian", {Code: "ro", Name: "Română"},
+												  "Lithuanian", {Code: "lt", Name: "Lietuvių"})
 	static sTranslatorLanguages := CaseInsenseMap()
 
 	iService := "Google"
@@ -78,12 +72,24 @@ class Translator {
 
 	iCache := CaseInsenseMap()
 
-	static Languages[coded := false] {
+	static Languages[type := false] {
 		Get {
-			return (coded ? this.sTranslatorLanguages : kTranslatorLanguages)
+			local identifier, language
+
+			if (this.sTranslatorLanguages.Count = 0)
+				for identifier, language in this.kTranslatorLanguages {
+					language.Identifier := identifier
+
+					this.sTranslatorLanguages[identifier] := language
+					this.sTranslatorLanguages[language.Code] := language
+				}
+
+			if type
+				return this.sTranslatorLanguages
+			else
+				return this.kTranslatorLanguages
 		}
 	}
-
 
 	Service {
 		Get {
@@ -151,22 +157,11 @@ class Translator {
 		}
 	}
 
-	static __New() {
-		local identifier, language
-
-		for identifier, language in kTranslatorLanguages {
-			language.Identifier := identifier
-
-			Translator.sTranslatorLanguages[identifier] := language
-			Translator.sTranslatorLanguages[language.Code] := language
-		}
-	}
-
 	__New(service, sourceLanguage := false, targetLanguage := false, apiKey := false, arguments*) {
 		local endpoint, region, model, url
 
 		if InStr(service, "|") {
-			service := strning2Values("|", service)
+			service := string2Values("|", service)
 
 			if (service.Length = 5) {
 				sourceLanguage := service[2]

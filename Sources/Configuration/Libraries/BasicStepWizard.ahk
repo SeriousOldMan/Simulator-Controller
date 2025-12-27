@@ -158,10 +158,14 @@ class BasicStepWizard extends StepWizard {
 			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
 				if this.editTranslator(assistant)
 					this.loadVoices(assistant)
-				else if dropDown.HasProp("LastValue")
-					dropDown.Choose(dropDown.LastValue)
-				else
-					dropDown.Choose(1)
+				else {
+					this.SetupWizard.setModuleValue(assistant, "Language.Translated", false, false)
+
+					if dropDown.HasProp("LastValue")
+						dropDown.Choose(dropDown.LastValue)
+					else
+						dropDown.Choose(1)
+				}
 			}
 			else if InStr(selectedText, translate("---------------------------------------------")) {
 				if dropDown.HasProp("LastValue")
@@ -169,8 +173,11 @@ class BasicStepWizard extends StepWizard {
 				else
 					dropDown.Choose(1)
 			}
-			else
+			else {
+				this.SetupWizard.setModuleValue(assistant, "Language.Translated", false, false)
+
 				this.loadVoices(assistant)
+			}
 
 			dropDown.LastValue := dropDown.Value
 		}
@@ -631,7 +638,7 @@ class BasicStepWizard extends StepWizard {
 		if editor {
 			voiceLanguage := this.Control["basic" . this.Keys[assistant] . "LanguageDropDown"].Text
 
-			if InStr(voiceLanguage, "Translator")
+			if (InStr(voiceLanguage, translate("Translator")) || InStr(voiceLanguage, translate(" (translated)...")))
 				return this.assistantTranslator(assistant, editor)
 			else {
 				languages := availableLanguages()
@@ -788,8 +795,10 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	assistantSetup(assistant, editor := true) {
-		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
-			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
+		return {Enabled: this.assistantEnabled(assistant, editor)
+			  , Name: this.assistantName(assistant, editor)
+			  , Language: this.assistantLanguage(assistant, editor)
+			  , Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
 			  , SpeakerBooster: this.assistantSpeakerBooster(assistant)
@@ -858,7 +867,12 @@ class BasicStepWizard extends StepWizard {
 			if isObject(language)
 				language := language.Code
 
-			voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
+			try {
+				voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
+			}
+			catch Any {
+				voices := []
+			}
 
 			dropDown := this.Control["basic" . this.Keys[assistant] . "VoiceDropDown"]
 
@@ -960,7 +974,7 @@ class BasicStepWizard extends StepWizard {
 
 		if assistantTranslator
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , Translator.Languages[true][assistantTranslator.Language].Name . translate(" (translated)...")])
+										   , Translator.Languages["All"][assistantTranslator.Language].Name . translate(" (translated)...")])
 		else
 			choices := concatenate(choices, [translate("---------------------------------------------")
 										   , translate("Translator") . translate("...")])
@@ -1302,6 +1316,8 @@ class BasicStepWizard extends StepWizard {
 					wizard.setModuleValue(assistant, "Translator.Code", getMultiMapValue(configuration, assistant . ".Translator", "Code"))
 					wizard.setModuleValue(assistant, "Translator.API Key", getMultiMapValue(configuration, assistant . ".Translator", "API Key"))
 					wizard.setModuleValue(assistant, "Translator.Arguments", getMultiMapValue(configuration, assistant . ".Translator", "Arguments", ""))
+
+					wizard.setModuleValue(assistant, "Language.Translated", true)
 				}
 				else {
 					wizard.clearModuleValue(assistant, "Translator.Service", false)
@@ -1309,6 +1325,8 @@ class BasicStepWizard extends StepWizard {
 					wizard.clearModuleValue(assistant, "Translator.Code", false)
 					wizard.clearModuleValue(assistant, "Translator.API Key", false)
 					wizard.clearModuleValue(assistant, "Translator.Arguments", false)
+
+					wizard.setModuleValue(assistant, "Language.Translated", false)
 				}
 
 				this.loadAssistant(assistant)

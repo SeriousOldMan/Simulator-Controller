@@ -611,7 +611,8 @@ testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 
 							found := true
 						}
-
+if (parameter = "Translator")
+	msgbox assistant ": " value
 						if found {
 							if ((value = "On") || (value = kTrue))
 								value := true

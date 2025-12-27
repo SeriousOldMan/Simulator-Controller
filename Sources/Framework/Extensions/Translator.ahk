@@ -304,6 +304,9 @@ class Translator {
 					result := this.translateOpenAI(text)
 			}
 
+			if isDebug()
+				logMessage(kLogDebug, "Translating `"" . SubStr(text, 1, 20) . "...`" to `"" . SubStr(text, 1, 20) . "...`"")
+
 			; Cache the result
 			if (result != text)
 				this.iCache[cacheKey] := result

@@ -491,7 +491,7 @@ class BasicStepWizard extends StepWizard {
 
 		static installed := false
 
-		if !this.SetupWizard.Initialize
+		; if !this.SetupWizard.Initialize
 			page := 2
 
 		if (page = 2) {

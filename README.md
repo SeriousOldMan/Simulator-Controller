@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.5.1-release](https://cutt.ly/ttsVJKiP) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
+[6.7.6.0-release](https://cutt.ly/ptdNFDM1) (Changes: Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed import of exported settings, Support base URLs for GPT service providers, New tyre data for AMS2.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6750) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-675) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6760) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+[6.7.5.1-release](https://cutt.ly/ttsVJKiP) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
 
-[6.7.0.0-release](https://cutt.ly/1tuF4i7o) (Changes: New coaching mode for braking points, New voice command to activate brake coaching, New function for brake coaching in Startup Profiles, New item in tray menu of Simulator Controller, New action "BrakeCoaching" for Driving Coach plugin, New icon in Stream Deck icon set, Extended controller acion function "startTelemetryCoaching", Updated Japanese voice commands for the Driving Coach, Better start coaching feedback, Fixed an error in telemetry viewer for zoom factor, Limit simulation fuel to fuel capacity in "Strategy Workbench", Pause Assistants if not driving the car in a team race in Solo mode, Prevent incomplete telemetry laps, Support for Time channel for iRacing telemetry, Fixed track automation for iRacing, Optimized coaching mode labels in Button Box visual representation, Fixed telemetry for invalid laps in R3E.)
+[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
 
 #### Latest development build
 
-[6.7.6.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OLDE8F1Z/Releases/Simulator%20Controller%206.7.6.0-dev.zip) (Early build for 6.7.6. Changes: Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed import of exported settings, Support base URLs for GPT service providers.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6756) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

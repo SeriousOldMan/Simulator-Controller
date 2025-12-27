@@ -327,6 +327,8 @@ class VoiceManager extends ConfigurationItem {
 			}
 
 			super.__New(synthesizer, speaker, targetLanguage)
+
+			this.setTranslator(voiceManager.SpeakerTranslator)
 		}
 
 		beginTalk(options := false) {
@@ -356,7 +358,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speak(text, focus := false, cache := false, options := false) {
-			local booster, stopped, ignore, part, translator
+			local booster, stopped, ignore, part
 
 			if this.Talking {
 				this.iText .= (A_Space . text)
@@ -388,11 +390,6 @@ class VoiceManager extends ConfigurationItem {
 						else
 							text := booster.speak(text, Map("Variables", {assistant: this.VoiceManager.Routing}))
 					}
-
-					translator := this.VoiceManager.SpeakerTranslator
-
-					if translator
-						text := translator.translate(text)
 
 					this.Speaking := true
 
@@ -512,6 +509,8 @@ class VoiceManager extends ConfigurationItem {
 			}
 
 			super.__New(arguments*)
+
+			this.setTranslator(voiceManager.ListenerTranslator)
 		}
 
 		textRecognized(text) {
@@ -654,16 +653,13 @@ class VoiceManager extends ConfigurationItem {
 
 	SpeakerTranslator {
 		Get {
-			local key
+			local translator
 
 			if (!this.iSpeakerTranslator && this.Translator) {
-				key := (this.Translator . ".Translator.")
+				translator := string2Values("|", this.Translator)
 
-				this.iSpeakerTranslator
-					:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-								, this.Language["Original"], this.Language["Translated"]
-								, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-								, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+				this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
+													, translator[4], string2Values(",", translator[5])*)
 			}
 
 			return this.iSpeakerTranslator
@@ -672,16 +668,13 @@ class VoiceManager extends ConfigurationItem {
 
 	ListenerTranslator {
 		Get {
-			local key
+			local translator
 
 			if (!this.iListenerTranslator && this.Translator) {
-				key := (this.Translator . ".Translator.")
+				translator := string2Values("|", this.Translator)
 
-				this.iListenerTranslator
-					:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-								, this.Language["Translated"], this.Language["Original"]
-								, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-								, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+				this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
+													 , translator[4], string2Values(",", translator[5])*)
 			}
 
 			return this.iListenerTranslator
@@ -1258,11 +1251,6 @@ class VoiceManager extends ConfigurationItem {
 					mode := "Text"
 
 				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language["Translated"], false, mode)
-
-				translator := this.ListenerTranslator
-
-				if translator
-					recognizer.setTranslator(translator)
 
 				this.buildGrammars(recognizer, this.Language["Original"])
 

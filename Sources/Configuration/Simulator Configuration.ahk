@@ -94,7 +94,7 @@ class GeneralTab extends ConfiguratorPanel {
 		}
 
 		chooseNirCmdPath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 

@@ -179,6 +179,12 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setVolume(voiceClient.SpeakerVolume)
+				this.setPitch(voiceClient.SpeakerPitch)
+				this.setRate(voiceClient.SpeakerSpeed)
+
+				this.setTranslator(voiceClient.SpeakerTranslator)
 			}
 		}
 
@@ -217,6 +223,8 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setTranslator(voiceClient.ListenerTranslator)
 			}
 
 			processText(text) {
@@ -325,16 +333,13 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeakerTranslator {
 			Get {
-				local key
+				local translator
 
 				if (!this.iSpeakerTranslator && this.Translator) {
-					key := (this.Translator . ".Translator.")
+					translator := string2Values("|", this.Translator)
 
-					this.iSpeakerTranslator
-						:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-									, this.Language["Original"], this.Language["Translated"]
-									, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-									, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+					this.iSpeakerTranslator := Translator(translator[1], translator[2], translator[3]
+														, translator[4], string2Values(",", translator[5])*)
 				}
 
 				return this.iSpeakerTranslator
@@ -343,16 +348,13 @@ class VoiceServer extends ConfigurationItem {
 
 		ListenerTranslator {
 			Get {
-				local key
+				local translator
 
 				if (!this.iListenerTranslator && this.Translator) {
-					key := (this.Translator . ".Translator.")
+					translator := string2Values("|", this.Translator)
 
-					this.iListenerTranslator
-						:= Translator(getMultiMapValue(this.Configuration, "Translator", key . "Service")
-									, this.Language["Translated"], this.Language["Original"]
-									, getMultiMapValue(this.Configuration, "Translator", key . "API Key")
-									, string2Values(",", getMultiMapValue(this.Configuration, "Translator", key . "Arguments"))*)
+					this.iListenerTranslator := Translator(translator[1], translator[3], translator[2]
+														 , translator[4], string2Values(",", translator[5])*)
 				}
 
 				return this.iListenerTranslator
@@ -467,13 +469,8 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechSynthesizer[create := false] {
 			Get {
-				if (!this.iSpeechSynthesizer && create && this.Speaker) {
+				if (!this.iSpeechSynthesizer && create && this.Speaker)
 					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language["Translated"])
-
-					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-				}
 
 				return this.iSpeechSynthesizer
 			}
@@ -499,33 +496,26 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechRecognizer[create := false] {
 			Get {
-				local translator
-
-				if (!this.iSpeechRecognizer && create && this.Listener) {
+				if (!this.iSpeechRecognizer && create && this.Listener)
 					this.iSpeechRecognizer
 						:= VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
 																			  , this.Language["Translated"]
 																			  , false, this.RecognizerMode)
-
-					translator := this.ListenerTranslator
-
-					if translator
-						this.iSpeechRecognizer.setTranslator(translator)
-				}
 
 				return this.iSpeechRecognizer
 			}
 		}
 
 		__New(voiceServer, descriptor, routing, pid
-			, language, trnslator, synthesizer, speaker, recognizer, listener
+			, originalLanguage, translatedLanguage, translator, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 			, activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
 			this.iPID := pid
-			this.iLanguage := language
+			this.iOriginalLanguage := originalLanguage
+			this.iTranslatedLanguage := translatedLanguage
 			this.iTranslator := translator
 			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker
@@ -558,11 +548,6 @@ class VoiceServer extends ConfigurationItem {
 				else
 					text := booster.speak(text, Map("Variables", {assistant: this.Routing}))
 			}
-
-			translator := this.SpeakerTranslator
-
-			if translator
-				text := translator.translate(text)
 
 			while this.Muted
 				Sleep(100)

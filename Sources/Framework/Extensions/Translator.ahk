@@ -53,19 +53,8 @@ global kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "Eng
 											  "Finnish", {Code: "fi", Name: "Suomi"},
 											  "Norwegian", {Code: "no", Name: "Norsk"},
 											  "Hungarian", {Code: "hu", Name: "Magyar"},
-											  "Romanian", {Code: "ro", Name: "Română"})
-
-initializeTranslatorLanguages() {
-	local ignore, identifier, language
-
-	for identifier, language in kTranslatorLanguages
-		language.Identifier := identifier
-
-	for ignore, language in getValues(kTranslatorLanguages)
-		kTranslatorLanguages[language.Code] := language
-}
-
-initializeTranslatorLanguages()
+											  "Romanian", {Code: "ro", Name: "Română"},
+											  "Lithuanian", {Code: "lt", Name: "Lietuvių"})
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -73,6 +62,8 @@ initializeTranslatorLanguages()
 ;;;-------------------------------------------------------------------------;;;
 
 class Translator {
+	static sTranslatorLanguages := CaseInsenseMap()
+
 	iService := "Google"
 
 	iServiceURL := false
@@ -153,20 +144,48 @@ class Translator {
 		}
 	}
 
-	__New(service, sourceLanguage, targetLanguage, apiKey := "", arguments*) {
+	static __New() {
+		local identifier, language
+
+		for identifier, language in kTranslatorLanguages {
+			language.Identifier := identifier
+
+			Translator.sTranslatorLanguages[identifier] := language
+			Translator.sTranslatorLanguages[language.Code] := language
+		}
+	}
+
+	__New(service, sourceLanguage := false, targetLanguage := false, apiKey := false, arguments*) {
 		local endpoint, region, model, url
 
-		if !kTranslatorLanguages.Has(sourceLanguage)
+		if InStr(service, "|") {
+			service := strning2Values("|", service)
+
+			if (service.Length = 5) {
+				sourceLanguage := service[2]
+				targetLanguage := service[3]
+				apiKey := service[4]
+				arguments := string2Values(",", service[5])
+			}
+			else {
+				sourceLanguage := "English"
+				targetLanguage := service[2]
+				apiKey := service[3]
+				arguments := string2Values(",", service[4])
+			}
+		}
+
+		if !Translator.sTranslatorLanguages.Has(sourceLanguage)
 			throw "Source language not recognized in Translator.__New..."
 
-		if !kTranslatorLanguages.Has(targetLanguage)
+		if !Translator.sTranslatorLanguages.Has(targetLanguage)
 			throw "Target language not recognized in Translator.__New..."
 
-		this.iSourceLanguage := kTranslatorLanguages[sourceLanguage].Identifier
-		this.iSourceLanguageCode := kTranslatorLanguages[sourceLanguage].Code
+		this.iSourceLanguage := Translator.sTranslatorLanguages[sourceLanguage].Identifier
+		this.iSourceLanguageCode := Translator.sTranslatorLanguages[sourceLanguage].Code
 
-		this.iTargetLanguage := kTranslatorLanguages[targetLanguage].Identifier
-		this.iTargetLanguageCode := kTranslatorLanguages[targetLanguage].Code
+		this.iTargetLanguage := Translator.sTranslatorLanguages[targetLanguage].Identifier
+		this.iTargetLanguageCode := Translator.sTranslatorLanguages[targetLanguage].Code
 
 		apiKey := Trim(apiKey)
 
@@ -200,8 +219,17 @@ class Translator {
 				if !apiKey
 					throw "Invalid deepL API key detected in Translator.__New..."
 
-				if ((arguments.Length > 0) && (Trim(arguments[1]) != ""))
-					this.iServiceURL := Trim(arguments[1])
+				if ((arguments.Length > 0) && (Trim(arguments[1]) != "")) {
+					url := Trim(arguments[1])
+
+					if InStr(url, "/v2/translate")
+						url := StrReplace(url, "/v2/translate", "")
+
+					if (SubStr(url, StrLen(url)) = "/")
+						url := SubStr(url, 1, StrLen(url) - 1)
+
+					this.iServiceURL := (url . "/v2/translate")
+				}
 				else
 					this.iServiceURL := "https://api-free.deepl.com/v2/translate"
 			case "OpenAI":

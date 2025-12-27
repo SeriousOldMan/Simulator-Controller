@@ -958,19 +958,17 @@ class BasicStepWizard extends StepWizard {
 
 		this.Control["basic" . key . "LanguageDropDown"].Delete()
 
-		if assistantTranslator {
-			translator := (translate("Translator") . translate(" (") . kTranslatorLanguages[assistantTranslator.Language].Name
-												   . translate(")") . translate("..."))
-
-			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
-																					 , translator]))
-		}
+		if assistantTranslator
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , kTranslatorLanguages[assistantTranslator.Language].Name . translate(" (translated)...")]))
 		else
-			this.Control["basic" . key . "LanguageDropDown"].Add(concatenate(choices, [translate("---------------------------------------------")
-																					, translate("Translator") . translate("...")]))
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , translate("Translator") . translate("...")]))
+
+		this.Control["basic" . key . "LanguageDropDown"].Add(choices)
 
 		if (!assistantLanguage && assistantTranslator)
-			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length + 2)
+			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length)
 		else
 			this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
 
@@ -1163,7 +1161,7 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
 			}
 
-			this.iSynthesizerEditor := VoiceSynthesizerEditor(this, configuration)
+			this.iSynthesizerEditor := VoiceSynthesizerEditor(this, assistant, configuration)
 
 			try {
 				configuration := this.iSynthesizerEditor.editSynthesizer(window)
@@ -1334,6 +1332,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 	iResult := false
 
 	iStepWizard := false
+	iAssistant := false
 	iLanguage := "English"
 
 	iWindow := false
@@ -1360,14 +1359,21 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		}
 	}
 
+	Assistant {
+		Get {
+			return this.iAssistant
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	__New(stepWizard, configuration := false) {
+	__New(stepWizard, assistant, configuration := false) {
 		this.iStepWizard := stepWizard
+		this.iAssistant := assistant
 
 		super.__New(configuration)
 	}
@@ -1491,7 +1497,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 
 		this.iTopWidgets := [[widget1, widget2, widget3]]
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget3 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerLabel Hidden", translate("Voice"))
 		widget3.Info := "Basic.Synthesizer.Info"
@@ -1536,7 +1542,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget14.Info := "Basic.Synthesizer.Info"
 		widget14.OnEvent("Change", updateAzureVoices)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget15 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicAzureSpeakerLabel Hidden", translate("Voice"))
 		widget15.Info := "Basic.Synthesizer.Info"
@@ -1567,7 +1573,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget21.Info := "Basic.Synthesizer.Info"
 		widget21.OnEvent("Click", chooseAPIKeyFilePath)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget22 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicGoogleSpeakerLabel Hidden", translate("Voice"))
 		widget22.Info := "Basic.Synthesizer.Info"
@@ -1623,7 +1629,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		widget26.Info := "Basic.Synthesizer.Info"
 		widget26.OnEvent("Change", updateElevenLabsVoices)
 
-		voices := [translate("Random"), translate("Deactivated")]
+		voices := [translate("Deactivated"), translate("Random")]
 
 		widget27 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicElevenLabsSpeakerLabel Hidden", translate("Voice"))
 		widget27.Info := "Basic.Synthesizer.Info"
@@ -2203,8 +2209,8 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		local language := this.getCurrentLanguage()
 		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		return voices
 	}
@@ -2240,7 +2246,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		chosen := inList(voices, windowsSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["basicWindowsSpeakerDropDown"].Delete()
 		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
@@ -2254,7 +2260,7 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 		chosen := inList(voices, dotNETSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["basicWindowsSpeakerDropDown"].Delete()
 		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
@@ -2282,13 +2288,13 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			voices := SpeechSynthesizer("Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, googleSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["basicGoogleSpeakerDropDown"].Delete()
 		this.Control["basicGoogleSpeakerDropDown"].Add(voices)
@@ -2316,13 +2322,13 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			voices := SpeechSynthesizer("Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, azureSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["basicAzureSpeakerDropDown"].Delete()
 		this.Control["basicAzureSpeakerDropDown"].Add(voices)
@@ -2353,13 +2359,13 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
 		}
 
-		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
 
 		chosen := inList(voices, elevenLabsSpeaker)
 
 		if (chosen == 0)
-			chosen := 1
+			chosen := 2
 
 		this.Control["basicElevenLabsSpeakerDropDown"].Delete()
 		this.Control["basicElevenLabsSpeakerDropDown"].Add(voices)
@@ -2431,7 +2437,15 @@ class VoiceSynthesizerEditor extends ConfiguratorPanel {
 			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
 
-			synthesizer.speakTest()
+			language := this.StepWizard.assistantLanguage(this.Assistant, true)
+
+			if isObject(language) {
+				synthesizer.setTranslator(Translator(language.Service, "English", language.Language, language.APIKey, language.Arguments*))
+
+				synthesizer.speakTest("en")
+			}
+			else
+				synthesizer.speakTest()
 		}
 		finally {
 			kSimulatorConfiguration := curSimulatorConfiguration

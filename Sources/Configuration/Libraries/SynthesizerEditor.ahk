@@ -949,10 +949,15 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		local windowsSpeaker, voices, chosen
 
 		voices := this.loadWindowsVoices(configuration, &windowsSpeaker)
-		chosen := inList(voices, windowsSpeaker)
 
-		if (chosen == 0)
-			chosen := 2
+		if (windowsSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, windowsSpeaker)
+
+			if (chosen == 0)
+				chosen := 2
+		}
 
 		this.Control["basicWindowsSpeakerDropDown"].Delete()
 		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
@@ -963,10 +968,15 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		local dotNETSpeaker, voices, chosen
 
 		voices := this.loadDotNETVoices(configuration, &dotNETSpeaker)
-		chosen := inList(voices, dotNETSpeaker)
 
-		if (chosen == 0)
-			chosen := 2
+		if (dotNETSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, dotNETSpeaker)
+
+			if (chosen == 0)
+				chosen := 2
+		}
 
 		this.Control["basicWindowsSpeakerDropDown"].Delete()
 		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
@@ -997,10 +1007,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		voices.InsertAt(1, translate("Random"))
 		voices.InsertAt(1, translate("Deactivated"))
 
-		chosen := inList(voices, googleSpeaker)
+		if (googleSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, googleSpeaker)
 
-		if (chosen == 0)
-			chosen := 2
+			if (chosen == 0)
+				chosen := 2
+		}
 
 		this.Control["basicGoogleSpeakerDropDown"].Delete()
 		this.Control["basicGoogleSpeakerDropDown"].Add(voices)
@@ -1031,10 +1045,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		voices.InsertAt(1, translate("Random"))
 		voices.InsertAt(1, translate("Deactivated"))
 
-		chosen := inList(voices, azureSpeaker)
+		if (azureSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, azureSpeaker)
 
-		if (chosen == 0)
-			chosen := 2
+			if (chosen == 0)
+				chosen := 2
+		}
 
 		this.Control["basicAzureSpeakerDropDown"].Delete()
 		this.Control["basicAzureSpeakerDropDown"].Add(voices)
@@ -1068,10 +1086,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		voices.InsertAt(1, translate("Random"))
 		voices.InsertAt(1, translate("Deactivated"))
 
-		chosen := inList(voices, elevenLabsSpeaker)
+		if (elevenLabsSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, elevenLabsSpeaker)
 
-		if (chosen == 0)
-			chosen := 2
+			if (chosen == 0)
+				chosen := 2
+		}
 
 		this.Control["basicElevenLabsSpeakerDropDown"].Delete()
 		this.Control["basicElevenLabsSpeakerDropDown"].Add(voices)

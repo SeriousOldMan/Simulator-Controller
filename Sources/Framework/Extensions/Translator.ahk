@@ -270,11 +270,11 @@ class Translator {
 
 						if (language.Length = 3)
 							if this.kTranslatorLanguages.Has(language[1]) {
-								kTranslatorLanguages[language[1]].Code := language[2]
-								kTranslatorLanguages[language[1]].Name := language[3]
+								this.kTranslatorLanguages[language[1]].Code := language[2]
+								this.kTranslatorLanguages[language[1]].Name := language[3]
 							}
 							else
-								kTranslatorLanguages[language[1]] := {Code: language[2], Name: language[3]}
+								this.kTranslatorLanguages[language[1]] := {Code: language[2], Name: language[3]}
 					}
 
 		for identifier, language in this.kTranslatorLanguages {

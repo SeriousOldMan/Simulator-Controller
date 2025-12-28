@@ -25,7 +25,21 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.7.7.0
+
+#### Date: 01/02/26 (planned)
+
+#### Fixes
+
+  - None this time...
+
+#### Changes
+
+  - The function of the Control key has been reverted when running the Assistant test mode from "Simulator Setup" and "Simulator Configuration". By default configured boosters and all translators (see below) are active and can be disabled by holding down the Control key when clicking the "Play" button.
+  - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GpT service providers, it is possible to support any lanaguage, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL have a really huge free contingent.
+  
+    See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator.
+  - [Internal] Updated all copyright notes to 2026.
 
 # Release history
 

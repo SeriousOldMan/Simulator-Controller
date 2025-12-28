@@ -16,11 +16,13 @@ Read all available help texts to understand what each configuration option on th
 - To the right of this button, you find another button with a small "Rocket" symbol. This allows you to add additional intelligence for the Assistans by configuring several so-called boosters. This is definitely not recommended until you have read the documentation about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
 - If your preferred spoken language is not available in the list of supplied languages, you still can use the "Translator..." item from the Assistants language drop down menu and configure an automatic translator, for example by using *DeepL*. Please note, that this slows down the voice interaction a bit and may also generate some costs depending on the chosen service. *DeepL*, for example, offers 500.000 characters for free per month.
 
- ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translator.JPG)
+  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translator.JPG)
 
- Please note, that translation will only work reliable with voice recognition methods, that support free speech (all cloud services and Whisper - Note #1).
+  Please note, that translation will only work reliable with voice recognition methods, that support free speech (all cloud services and Whisper - Note #1).
 
-Once, you have dialed everything perfectly, click on the flag. Done, you have created a first runnable configuration. Next step is to run "Simulator Startup". There you press the play button (the one with a green triangle). This starts all the background processes of Simulator Controller, which connect to the simulation. After that, you can start your favourite game and head out to the track where you will be greated by the Spotter during the formation lap.
+  By the way, the list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
+
+Once, you have dialed everything perfectly, click on the big button with the flag. Done, you have created a first runnable configuration. Next step is to run "Simulator Startup". There you press the play button (the one with a green triangle). This starts all the background processes of Simulator Controller, which connect to the simulation. After that, you can start your favourite game and head out to the track where you will be greated by the Spotter during the formation lap.
 
 ## Disclaimer
 

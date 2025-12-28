@@ -74,19 +74,8 @@ class Translator {
 
 	static Languages[type := false] {
 		Get {
-			local identifier, language
-
-			if (this.sTranslatorLanguages.Count = 0) {
-				for identifier, language in this.kTranslatorLanguages {
-					language.Identifier := identifier
-
-					this.sTranslatorLanguages[identifier] := language
-					this.sTranslatorLanguages[language.Code] := language
-				}
-
-				if isDebug()
-					logMessage(kLogDebug, "Language keys: " . values2String(", ", getKeys(this.sTranslatorLanguages)*))
-			}
+			if (this.sTranslatorLanguages.Count = 0)
+				this.initializeLanguages()
 
 			if type
 				return this.sTranslatorLanguages
@@ -267,6 +256,36 @@ class Translator {
 		this.iService := service
 		this.iAPIKey := apiKey
 		this.iArguments := arguments
+	}
+
+	static initializeLanguages() {
+		local identifier, language, ignore, fileName
+
+		for ignore, fileName in [kTranslationsDirectory . "Translator Languages.csv"
+							   , kUserTranslationsDirectory . "Translator Languages.csv"]
+			if FileExist(fileName)
+				loop Read, fileName
+					if ((Trim(A_LoopReadLine) != "") && (SubStr(Trim(A_LoopReadLine), 1, 1) != ";")) {
+						language := string2Values(",", Trim(A_LoopReadLine))
+
+						if (language.Length = 3)
+							if this.kTranslatorLanguages.Has(language[1]) {
+								kTranslatorLanguages[language[1]].Code := language[2]
+								kTranslatorLanguages[language[1]].Name := language[3]
+							}
+							else
+								kTranslatorLanguages[language[1]] := {Code: language[2], Name: language[3]}
+					}
+
+		for identifier, language in this.kTranslatorLanguages {
+			language.Identifier := identifier
+
+			this.sTranslatorLanguages[identifier] := language
+			this.sTranslatorLanguages[language.Code] := language
+		}
+
+		if isDebug()
+			logMessage(kLogDebug, "Language keys: " . values2String(", ", getKeys(this.sTranslatorLanguages)*))
 	}
 
 	/**

@@ -333,7 +333,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 				translation := Translator(this.Value["translatorService"], "English", this.Value["translatorLanguage"]
 										, this.Value["translatorAPIKey"], this.Value["translatorArguments"]*).translate(text)
 
-				if ((this.Value["translatorLanguage"] != "English") && (text = "Translation"))
+				if ((this.Value["translatorLanguage"] != "English") && (text = translation))
 					translation := translate("Error")
 			}
 			catch Any {

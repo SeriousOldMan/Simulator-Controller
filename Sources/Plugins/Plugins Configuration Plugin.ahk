@@ -9,8 +9,11 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\Translator.ahk"
 #Include "..\Configuration\Libraries\ControllerActionsEditor.ahk"
 #Include "..\Configuration\Libraries\AssistantBoosterEditor.ahk"
+#Include "..\Configuration\Libraries\TranslatorEditor.ahk"
+#Include "..\Configuration\Libraries\SynthesizerEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -23,7 +26,7 @@
 
 class PluginsConfigurator extends ConfigurationItemList {
 	iConversationBoosterConfiguration := false
-	
+
 	Plugins {
 		Get {
 			local result := []
@@ -112,8 +115,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 		window.Add("Edit", "x110 y383 w339 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
 
 		widget1 := window.Add("Button", "x450 y383 w23 h23 X:Move Y:Move vpluginBoosterButton")
-		widget1.OnEvent("Click", (*) => this.editBooster())
-		setButtonIcon(widget1, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
+		widget1.OnEvent("Click", (*) => this.editAssistant())
+		setButtonIcon(widget1, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
 
 		window.SetFont("Underline", "Arial")
 
@@ -279,6 +282,203 @@ class PluginsConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
+		}
+	}
+
+	getConfiguration() {
+		return this.Editor.getSimulatorConfiguration()
+	}
+
+	getLanguage() {
+		local thePlugin := this.buildItemFromEditor()
+		local arguments, language
+
+		getCurrentLanguage() {
+			if isSet(VoiceControlConfigurator)
+				return VoiceControlConfigurator.Instance.getCurrentLanguage()
+			else
+				return getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
+		}
+
+		if thePlugin {
+			arguments := string2Values("|", thePlugin.getArgumentValue("translator", ""))
+
+			if (arguments.Length = 5)
+				return {Service: arguments[1], Language: arguments[3]
+					  , Code: Translator.Languages["All"][arguments[3]].Code
+					  , APIKey: arguments[4], Arguments: string2Values(",", arguments[5])}
+			else
+				return thePlugin.getArgumentValue("language", getCurrentLanguage())
+		}
+	}
+
+	editAssistant() {
+		local assistantMenu := Menu()
+
+		assistantMenu.Add(translate("Voice Configuration") . translate("..."), (*) => this.editSynthesizer())
+		assistantMenu.Add(translate("Translator Configuration") . translate("..."), (*) => this.editTranslator())
+		assistantMenu.Add(translate("Assistant Booster") . translate("..."), (*) => this.editBooster())
+
+		assistantMenu.Add()
+
+		assistantMenu.Add(translate("Cancel"), (*) => true)
+
+		assistantMenu.Show( , , true)
+	}
+
+	editSynthesizer() {
+		local assistant := this.Control["pluginEdit"].Text
+		local window := this.Window
+		local configuration, thePlugin, arguments, language, synthesizer, vocalics, voice, setup
+
+		getCurrentLanguage() {
+			if isSet(VoiceControlConfigurator)
+				return VoiceControlConfigurator.Instance.getCurrentLanguage()
+			else
+				return getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
+		}
+
+		if !inList(kRaceAssistants, assistant)
+			return
+
+		window.Block()
+
+		try {
+			configuration := newMultiMap()
+
+			thePlugin := this.buildItemFromEditor()
+
+			if thePlugin {
+				arguments := string2Values("|", thePlugin.getArgumentValue("translator", ""))
+				synthesizer := thePlugin.getArgumentValue("synthesizer", "dotNet")
+				voice := thePlugin.getArgumentValue("speaker", true)
+				vocalics := string2Values(",", thePlugin.getArgumentValue("speakerVocalics", "100,0,0"))
+
+				if (arguments.Length = 5)
+					language := Translator.Languages["All"][arguments[3]].Code
+				else
+					language := thePlugin.getArgumentValue("language", getCurrentLanguage())
+
+				if (vocalics.Length != 3)
+					vocalics := [100, 0, 0]
+
+				if (voice = "On")
+					voice := true
+				else if (voice = "Off")
+					voice := false
+
+				setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+
+				setMultiMapValue(configuration, "Voice Control", "Language", language)
+				setMultiMapValue(configuration, "Voice Control", "Synthesizer", synthesizer)
+				setMultiMapValue(configuration, "Voice Control", "Speaker", voice)
+				setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", (vocalics[1] = "*") ? 100 : vocalics[1])
+				setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", (vocalics[2] = "*") ? 0 : vocalics[2])
+				setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", (vocalics[3] = "*") ? 0 : vocalics[3])
+
+				if (InStr(synthesizer, "Azure") = 1) {
+					setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", voice)
+
+					setup := string2Values("|", synthesizer)
+
+					setMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey", setup[3])
+					setMultiMapValue(configuration, "Voice Control", "Azure.TokenIssuer", setup[2])
+				}
+				else if (synthesizer = "dotNET")
+					setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", voice)
+				else if (synthesizer = "Windows")
+					setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", voice)
+				else if (InStr(synthesizer, "Google") = 1) {
+					setMultiMapValue(configuration, "Voice Control", "Speaker.Google", voice)
+
+					setup := string2Values("|", synthesizer)
+
+					setMultiMapValue(configuration, "Voice Control", "Google.APIKeyFile", setup[2])
+				}
+				else if (InStr(setup.Synthesizer, "OpenAI") = 1) {
+					setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", voice)
+
+					setup := string2Values("|", synthesizer)
+
+					setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", setup[4])
+				}
+				else {
+					setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", voice)
+
+					setup := string2Values("|", synthesizer)
+
+					setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
+				}
+
+				configuration := SynthesizerEditor(this, assistant, configuration).editSynthesizer(window)
+
+				if configuration {
+					voice := getMultiMapValue(configuration, "Voice Control", "Speaker")
+
+					if (voice == true)
+						voice := "On"
+					else if (voice == false)
+						voice := "Off"
+
+					thePlugin.setArgumentValue("synthesizer", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))
+					thePlugin.setArgumentValue("speaker", voice)
+					thePlugin.setArgumentValue("speakerVocalics"
+											 , values2String(",", getMultiMapValue(configuration, "Voice Control", "SpeakerVolume")
+																, getMultiMapValue(configuration, "Voice Control", "SpeakerPitch")
+																, getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed")))
+
+					this.loadEditor(thePlugin)
+				}
+			}
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editTranslator() {
+		local assistant := this.Control["pluginEdit"].Text
+		local window := this.Window
+		local configuration, thePlugin, arguments
+
+		if !inList(kRaceAssistants, assistant)
+			return
+
+		window.Block()
+
+		try {
+			configuration := newMultiMap()
+
+			thePlugin := this.buildItemFromEditor()
+
+			if thePlugin {
+				arguments := string2Values("|", thePlugin.getArgumentValue("translator", ""))
+
+				if (arguments.Length = 5) {
+					setMultiMapValue(configuration, assistant . ".Translator", "Service", arguments[1])
+					setMultiMapValue(configuration, assistant . ".Translator", "Language", arguments[3])
+					setMultiMapValue(configuration, assistant . ".Translator", "API Key", arguments[4])
+					setMultiMapValue(configuration, assistant . ".Translator", "Arguments", arguments[4])
+				}
+
+				configuration := TranslatorEditor(assistant, configuration).editTranslator(window)
+
+				if configuration {
+					thePlugin.setArgumentValue("language"
+											 , Translator.Languages["All"][getMultiMapValue(configuration, assistant . ".Translator", "Language")].Code)
+					thePlugin.setArgumentValue("translator"
+											 , values2String("|", getMultiMapValue(configuration, assistant . ".Translator", "Service")
+																, "en"
+																, getMultiMapValue(configuration, assistant . ".Translator", "Language")
+																, getMultiMapValue(configuration, assistant . ".Translator", "API Key")
+																, getMultiMapValue(configuration, assistant . ".Translator", "Arguments", "")))
+
+					this.loadEditor(thePlugin)
+				}
+			}
+		}
+		finally {
+			window.Unblock()
 		}
 	}
 

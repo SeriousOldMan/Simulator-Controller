@@ -475,9 +475,31 @@ In this tab you can configure the plugins currently in use by the Simulator Cont
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%202.JPG)
 
-Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. The most important field here is the *Arguments* field. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins.
+Beside temporarily deactivating a plugin and all its modes, you can define a comma separated list of simulator names. This will restrict the modes of the plugin to only be available, when these simulators are running. But the most important field is the *Arguments* field below. Here you can supply values for all the configuration parameters of the given plugin. The format is like this: "parameter1: value11, value12, value13; parameter2: value21, value22; ...". Please take a look at the [plugin reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for an in depth explanation of all the parameters of the bundled plugins.
 
-A special editor is available by clicking on the small button with the launching rocket icon, when you have selected a plugin for one of the Race Assistants. This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the Assistant Booster.
+Special editors are available by clicking on the settings button with the small gear icon, when you have selected a plugin for one of the Race Assistants:
+
+- *Voice Configuration*
+
+  Using this editor, you can easily select and configure the voie synthesizer used for this Assistant.
+  
+  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Voice%20Editor.JPG)
+  
+  See the above documentation for the [*Voice Control* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information.
+  
+  Important: If you have changed the languge, either direct by editing the argument for the *language* parameter, or by chosing a translator (see next item), you have to update the selected voice.
+  
+- *Translator Configuration*
+
+  If the language, you want to use to interact with your Assistants, a mchine translator can be used.
+  
+  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translator.JPG)
+  
+  More information about using a translator can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Supported-languages-and-commands).
+  
+- *Assistant Booster*
+
+  This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the Assistant Booster.
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 
@@ -684,6 +706,7 @@ Some words about using the editor:
 After definition of a splash screen, you can choose it for the [startup sequence](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#other-settings) or even while the build tool is currently compiling your favorite plugin, if you are a developer.
 
 ### Translations Editor
+
 Another special editor is used for maintaining different language translations for the user interface. In the translation process, you can provide a language specific translated text for each user interface element or other texts used by the Simulator Controller. English is the original language, on which the translation is based upon. A translation must be identified by its [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes), for example "EN", and also has a user understandable language identfier, for example "English". The translation information is stored by the *Translations Editor* in the *Simulator Controller\Translations* folder in your user *Documents* folder in a file named "Translations.LC", where LC is the given ISO language code.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Translations%20Editor.JPG)

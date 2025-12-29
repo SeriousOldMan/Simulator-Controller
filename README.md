@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.7.7.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HnhAgEWk/Releases/Simulator%20Controller%206.7.7.0-dev.zip) (Early build for 6.7.7. Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

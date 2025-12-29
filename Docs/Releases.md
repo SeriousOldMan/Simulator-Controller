@@ -39,6 +39,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GpT service providers, it is possible to support any lanaguage, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL have a really huge free contingent.
   
     See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator.
+  - More in-place editors are available on the *Plugins* tab when a Race Assistant plugin is selected in "Simulator Configuration". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   - [Internal] Updated all copyright notes to 2026.
 
 # Release history

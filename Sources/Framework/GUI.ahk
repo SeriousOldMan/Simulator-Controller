@@ -98,19 +98,19 @@ class Theme {
 			if (!iconFile && InStr(_this.Name, "MsgBox") && (params.Length > 2))
 				if (params[3] & 16) {
 					iconNumber := 1
-					iconFile := (kIconsDirectory . "Dlg Error.png")
+					iconFile := (kIconsDirectory . "Dlg Error.ico")
 				}
 				else if (params[3] & 32) {
 					iconNumber := 2
-					iconFile := (kIconsDirectory . "Dlg Question.png")
+					iconFile := (kIconsDirectory . "Dlg Question.ico")
 				}
 				else if (params[3] & 48) {
 					iconNumber := 3
-					iconFile := (kIconsDirectory . "Dlg Warning.png")
+					iconFile := (kIconsDirectory . "Dlg Warning.ico")
 				}
 				else if (params[3] & 64) {
 					iconNumber := 4
-					iconFile := (kIconsDirectory . "Dlg Info.png")
+					iconFile := (kIconsDirectory . "Dlg Info.ico")
 				}
 
 			SetThreadDpiAwarenessContext(-5)
@@ -213,10 +213,10 @@ class Theme {
 				}
 
 				/*
-				if (iconFile && iconHwnd) {
-					icon := LoadPicture(iconFile, , &imgType)
+				If WinExist("ahk_class #32770 ahk_pid " . ProcessExist()) {
+					hIcon := LoadPicture(iconFile, "w32", &ignore)
 
-					result := SendMessage(0x172, imgType, icon, iconHwnd)
+					SendMessage(0x172, 1, hIcon, "Static1") ; STM_SETIMAGE
 				}
 				*/
 

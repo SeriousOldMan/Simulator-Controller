@@ -98,19 +98,19 @@ class Theme {
 			if (!iconFile && InStr(_this.Name, "MsgBox") && (params.Length > 2))
 				if (params[3] & 16) {
 					iconNumber := 1
-					iconFile := (kIconsDirectory . "Dlg Error.ico")
+					iconFile := (kIconsDirectory . "Dlg Error.png")
 				}
 				else if (params[3] & 32) {
 					iconNumber := 2
-					iconFile := (kIconsDirectory . "Dlg Question.ico")
+					iconFile := (kIconsDirectory . "Dlg Question.png")
 				}
 				else if (params[3] & 48) {
 					iconNumber := 3
-					iconFile := (kIconsDirectory . "Dlg Warning.ico")
+					iconFile := (kIconsDirectory . "Dlg Warning.png")
 				}
 				else if (params[3] & 64) {
 					iconNumber := 4
-					iconFile := (kIconsDirectory . "Dlg Info.ico")
+					iconFile := (kIconsDirectory . "Dlg Info.png")
 				}
 
 			SetThreadDpiAwarenessContext(-5)
@@ -211,6 +211,14 @@ class Theme {
 
 					btns.Push(btnHwnd := ctrl)
 				}
+
+				/*
+				if (iconFile && iconHwnd) {
+					icon := LoadPicture(iconFile, , &imgType)
+
+					result := SendMessage(0x172, imgType, icon, iconHwnd)
+				}
+				*/
 
 				WindowProcOld := SetWindowLong(winId, -4, CallbackCreate(WNDPROC))
 

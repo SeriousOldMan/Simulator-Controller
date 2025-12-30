@@ -317,6 +317,8 @@ class Theme {
 		}
 
 		Set {
+			value.InitializeTheme()
+
 			return (Theme.sCurrentTheme := value)
 		}
 	}
@@ -427,6 +429,9 @@ class Theme {
 		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
 
 		return (asText ? Format("{:06X}", BGR) : BGR)
+	}
+
+	InitializeTheme() {
 	}
 
 	InitializeWindow(window) {
@@ -1069,6 +1074,44 @@ class DarkTheme extends Theme {
 
 				control.Opt("+Redraw")
 		}
+	}
+
+	InitializeTheme() {
+		local AHK_NOTIFYICON := 0x0404
+		local _trayMenuBaseShow := A_TrayMenu.base.show
+
+		SetMenuTheme(appMode := 0) {
+			local prev
+
+			static preferredAppMode := {Default: 0, AllowDark: 1, ForceDark: 2, ForceLight: 3, Max: 4}
+			static uxtheme := DllCall("Kernel32.dll\GetModuleHandle", "Str","uxtheme", "Ptr")
+			static fnSetPreferredAppMode := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																							, "Ptr", 135, "Ptr")
+													 : 0)
+			static fnFlushMenuThemes := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																						, "Ptr", 136, "Ptr")
+												 : 0)
+
+			if (preferredAppMode.hasProp(appMode))
+				appMode := preferredAppMode.%appMode%
+
+			return ((fnSetPreferredAppMode && fnFlushMenuThemes)
+						? (prev := DllCall(fnSetPreferredAppMode, "Int", appMode), DllCall(fnFlushMenuThemes), prev)
+						: -1)
+		}
+
+		A_TrayMenu.base.defineProp("Show", {call:(x?, y?) => (prevMenuTheme := setMenuTheme("ForceDark")
+															, _trayMenuBaseShow(x?, y?)
+															, setMenuTheme(prevMenuTheme), "")})
+
+		OnMessage(AHK_NOTIFYICON, (wParam, lParam, msg, hWnd) {
+			local WM_RBUTTONUP := 0x0205
+
+			switch (lParam) {
+				case WM_RBUTTONUP:
+					return (A_TrayMenu.show(), true)
+			}
+		})
 	}
 
 	InitializeWindow(window) {

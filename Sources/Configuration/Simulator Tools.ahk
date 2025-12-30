@@ -132,7 +132,7 @@ installOptions(options, *) {
 
 			if InStr(directory, A_MyDocuments) {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				valid := false
@@ -143,7 +143,7 @@ installOptions(options, *) {
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
+					withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					valid := false
@@ -160,7 +160,7 @@ installOptions(options, *) {
 				installGui["installLocationPathEdit"].Text := directory
 			else if (!empty && !update) {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The installation folder must be empty."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -179,7 +179,7 @@ installOptions(options, *) {
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must enter a valid directory."), translate("Error"), 262160)
+					withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					valid := false
@@ -196,7 +196,7 @@ installOptions(options, *) {
 			result := kOk
 		else if (!empty && !update) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("The installation folder must be empty."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("The installation folder must be empty."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -463,7 +463,7 @@ checkInstallation() {
 
 		if error {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Cannot download additional files, because the download repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Cannot download additional files, because the download repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -486,7 +486,7 @@ checkInstallation() {
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -551,7 +551,7 @@ checkInstallation() {
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -644,7 +644,7 @@ checkInstallation() {
 		if install {
 			if !A_Is64bitOS {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit..."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("Simulator Controller can only be installed on a 64-bit Windows installation. Setup will exit..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(1)
@@ -653,7 +653,7 @@ checkInstallation() {
 			if !A_IsAdmin {
 				if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+					withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)
@@ -702,7 +702,7 @@ checkInstallation() {
 
 			if !InStr(version, "-release") {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, substituteVariables(translate("This is a %version% version. Do you really want to install it?")
+				msgResult := withBlockedWindows(MsgDlg, substituteVariables(translate("This is a %version% version. Do you really want to install it?")
 																		  , {version: StrTitle(string2Values("-", version)[2])})
 													  , translate("Update"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
@@ -817,7 +817,7 @@ checkInstallation() {
 							removeDirectory(packageLocation)
 						else {
 							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
 							OnMessage(0x44, translateYesNoButtons, 0)
 
 							if (msgResult = "Yes")
@@ -829,7 +829,7 @@ checkInstallation() {
 					logError(exception, true)
 
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
+					withBlockedWindows(MsgDlg, translate("An error occured during installation. The current installation files may be corrupted. Please retry the installation or run a manual installation."), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)
@@ -865,7 +865,7 @@ checkInstallation() {
 					removeDirectory(packageLocation)
 				else {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to remove the folder with the installation files?"), translate("Installation"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -3213,7 +3213,7 @@ updatePluginsForV402() {
 
 updateToV500() {
 	OnMessage(0x44, translateOkButton)
-	withBlockedWindows(MsgBox, translate("Your installed version is too old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
+	withBlockedWindows(MsgDlg, translate("Your installed version is too old to be updated automatically. Please remove the `"Simulator Controller`" folder in your user `"Documents`" folder and restart the application. Application will exit..."), translate("Error"), 262160)
 	OnMessage(0x44, translateOkButton, 0)
 
 	ExitApp(0)
@@ -3926,7 +3926,7 @@ cancelBuild() {
 	if gBuilding
 		try {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
+			msgResult := withBlockedWindows(MsgDlg, translate("Cancel target processing?"), translate("Modular Simulator Controller System"), 262180)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")

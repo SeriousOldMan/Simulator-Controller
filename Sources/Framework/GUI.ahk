@@ -2478,7 +2478,6 @@ class RecolorizerTask extends PeriodicTask {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
 MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
 
 InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
@@ -2652,7 +2651,7 @@ setScrollPosition(edit, pos) {
 	SendMessage(WM_VSCROLL, (pos * 65536) + SB_THUMBPOSITION, , edit)
 }
 
-translateMsgBoxButtons(buttonLabels, *) {
+translateMsgDlgButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
@@ -2674,12 +2673,12 @@ translateMsgBoxButtons(buttonLabels, *) {
 	}
 }
 
-translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
-translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
-translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
-translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
-translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
-translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
+translateYesNoButtons := translateMsgDlgButtons.Bind(["Yes", "No"])
+translateOkButton := translateMsgDlgButtons.Bind(["Ok"])
+translateOkCancelButtons := translateMsgDlgButtons.Bind(["Ok", "Cancel"])
+translateLoadCancelButtons := translateMsgDlgButtons.Bind(["Load", "Cancel"])
+translateSaveCancelButtons := translateMsgDlgButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 withBlockedWindows(function, arguments*) {
 	local windows := []

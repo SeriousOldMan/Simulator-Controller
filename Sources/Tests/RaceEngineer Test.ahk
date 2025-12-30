@@ -162,7 +162,7 @@ class TestRaceEngineer extends RaceEngineer {
 			vDamageStintLaps := stintLaps
 		}
 		else
-			MsgBox("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
+			MsgDlg("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
 	}
 }
 
@@ -1156,7 +1156,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
+	withBlockedWindows(MsgDlg, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
@@ -1196,7 +1196,7 @@ else {
 					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
-					withBlockedWindows(MsgBox, "Lap " . A_Index . " loaded - Continue?")
+					withBlockedWindows(MsgDlg, "Lap " . A_Index . " loaded - Continue?")
 			}
 		}
 
@@ -1347,7 +1347,7 @@ else {
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1383,7 +1383,7 @@ else {
 						if engineer.Debug[kDebugKnowledgeBase]
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 					}
 
 					if isDebug()
@@ -1419,7 +1419,7 @@ else {
 
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 					}
 
 					if isDebug()
@@ -1455,13 +1455,13 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 24) {
 							engineer.performPitstop(23)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 					}
 					else if (raceNr = 11) {
@@ -1469,34 +1469,34 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 11) {
 							engineer.performPitstop(11)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 
 						if (lap = 19)
-							withBlockedWindows(MsgBox, "Inspect")
+							withBlockedWindows(MsgDlg, "Inspect")
 					}
 					else if (raceNr = 12) {
 						if (lap = 21) {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 22) {
 							engineer.performPitstop(22)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 
 						if (lap = 24)
-							withBlockedWindows(MsgBox, "Inspect")
+							withBlockedWindows(MsgDlg, "Inspect")
 					}
 
 					if isDebug()
@@ -1604,7 +1604,7 @@ else {
 	}
 
 	if isDebug()
-		withBlockedWindows(MsgBox, "Done...")
+		withBlockedWindows(MsgDlg, "Done...")
 
 	ExitApp()
 }

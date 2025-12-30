@@ -2294,7 +2294,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			if (fileName != "")
 				if (profiles.Length > 0) {
-					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
+					translator := translateMsgDlgButtons.Bind(["Insert", "Replace", "Cancel"])
 
 					OnMessage(0x44, translator)
 					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)

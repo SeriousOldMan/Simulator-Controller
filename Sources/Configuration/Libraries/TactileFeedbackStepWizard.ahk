@@ -203,7 +203,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		if super.savePage(page) {
 			if !this.SetupWizard.isSoftwareInstalled("SimHub") {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("SimHub cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("SimHub cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")
@@ -415,7 +415,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 	changeEffects(mode) {
 		local actions := values2String(", ", this.getActions(mode)*)
-		local result := withBlockedWindows(InputBox, translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
+		local result := withBlockedWindows(InputDlg, translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
 
 		if (result.Result = "Ok") {
 			this.saveActions()

@@ -146,7 +146,7 @@ else if (raceNr == 23) {
 }
 
 if isDebug()
-	withBlockedWindows(MsgBox, "Done...")
+	withBlockedWindows(MsgDlg, "Done...")
 
 ExitApp()
 

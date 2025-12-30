@@ -76,7 +76,7 @@ downloadSimulatorController() {
 	if !A_IsAdmin {
 		if RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)") {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			ExitApp(0)
@@ -109,7 +109,7 @@ downloadSimulatorController() {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -146,7 +146,7 @@ downloadSimulatorController() {
 			logError(error, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(0)
@@ -216,7 +216,7 @@ downloadSimulatorController() {
 							logError(exception, true)
 
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+							withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
 							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
@@ -240,7 +240,7 @@ downloadSimulatorController() {
 				logError(error, true)
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -266,7 +266,7 @@ downloadSimulatorController() {
 			}
 			catch Any as exception {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")

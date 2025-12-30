@@ -1,9 +1,9 @@
 [Development]
 Version=6.7.7.0-dev
 Target=6.7.7.0-release
-Date=12/28/2025
+Date=12/30/2025
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HnhAgEWk/Releases/Simulator Controller 6.7.7.0-dev.zip
-Changes=Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration"
+Changes=Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Dark theme dialog boxes
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.6.0-release

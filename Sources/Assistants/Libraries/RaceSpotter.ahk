@@ -3730,7 +3730,7 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	debugMessage(arguments*) {
-		MsgBox("Debug: " . values2String(A_Space, arguments*))
+		MsgDlg("Debug: " . values2String(A_Space, arguments*))
 	}
 
 	startupSpotter(forceShutdown := false) {

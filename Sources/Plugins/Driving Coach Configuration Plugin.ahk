@@ -146,7 +146,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 			window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Select", "Select", "Cancel"])
 
 			OnMessage(0x44, translator)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")

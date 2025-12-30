@@ -295,11 +295,11 @@ logError(exception, unexpected := false, report := true) {
 
 	if (verbose && (unexpected || report))
 		if isObject(exception)
-			withBlockedWindows(MsgBox, translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
+			withBlockedWindows(MsgDlg, translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
 									 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
 									 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
 		else
-			withBlockedWindows(MsgBox, translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
+			withBlockedWindows(MsgDlg, translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)
 
 	if debug
 		return (A_IsCompiled ? -1 : false)

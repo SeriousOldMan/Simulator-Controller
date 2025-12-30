@@ -122,6 +122,8 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
 
+Important: These menus are not working correctly, if scaling has been actived for the current monitor.
+
 ### Startup Profiles
 
 Managing the different functions, as well as some function specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:

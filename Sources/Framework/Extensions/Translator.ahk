@@ -31,32 +31,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class Translator {
-	static kTranslatorLanguages := CaseInsenseMap("English", {Code: "en", Name: "English"},
-												  "Spanish", {Code: "es", Name: "Español"},
-												  "French", {Code: "fr", Name: "Français"},
-												  "German", {Code: "de", Name: "Deutsch"},
-												  "Italian", {Code: "it", Name: "Italiano"},
-												  "Portuguese", {Code: "pt", Name: "Português"},
-												  "Japanese", {Code: "ja", Name: "日本語"},
-												  "Chinese", {Code: "zh", Name: "简体中文"},
-												  "Korean", {Code: "ko", Name: "한국어"},
-												  "Russian", {Code: "ru", Name: "Русский"},
-												  "Arabic", {Code: "ar", Name: "اَلْعَرَبِيَّةُ"},
-												  "Dutch", {Code: "nl", Name: "Nederlands"},
-												  "Polish", {Code: "pl", Name: "Polski"},
-												  "Swedish", {Code: "sv", Name: "Svenska"},
-												  "Turkish", {Code: "tr", Name: "Türkçe"},
-												  "Hindi", {Code: "hi", Name: "हिन्दी"},
-												  "Thai", {Code: "th", Name: "ภาษาไทย"},
-												  "Vietnamese", {Code: "vi", Name: "Tiếng Việt"},
-												  "Czech", {Code: "cs", Name: "Čeština"},
-												  "Danish", {Code: "da", Name: "Dansk"},
-												  "Finnish", {Code: "fi", Name: "Suomi"},
-												  "Norwegian", {Code: "no", Name: "Norsk"},
-												  "Hungarian", {Code: "hu", Name: "Magyar"},
-												  "Romanian", {Code: "ro", Name: "Română"},
-												  "Lithuanian", {Code: "lt", Name: "Lietuvių"})
-	static sTranslatorLanguages := CaseInsenseMap()
+	static sLanguages := false
+	static sLanguageLookup := CaseInsenseMap()
 
 	iService := "Google"
 
@@ -72,15 +48,12 @@ class Translator {
 
 	iCache := CaseInsenseMap()
 
-	static Languages[type := false] {
+	static Languages {
 		Get {
-			if (this.sTranslatorLanguages.Count = 0)
+			if !this.sLanguages
 				this.initializeLanguages()
 
-			if type
-				return this.sTranslatorLanguages
-			else
-				return this.kTranslatorLanguages
+			return this.sLanguages
 		}
 	}
 
@@ -170,17 +143,19 @@ class Translator {
 			}
 		}
 
-		if !Translator.Languages["All"].Has(sourceLanguage)
+		Translator.initializeLanguages()
+
+		if !Translator.sLanguageLookup.Has(sourceLanguage)
 			throw "Source language '" . sourceLanguage . "' not recognized in Translator.__New..."
 
-		if !Translator.Languages["All"].Has(targetLanguage)
+		if !Translator.sLanguageLookup.Has(targetLanguage)
 			throw "Target language '" . targetLanguage . "' not recognized in Translator.__New..."
 
-		this.iSourceLanguage := Translator.Languages["All"][sourceLanguage].Identifier
-		this.iSourceLanguageCode := Translator.Languages["All"][sourceLanguage].Code
+		this.iSourceLanguage := Translator.sLanguageLookup[sourceLanguage].Identifier
+		this.iSourceLanguageCode := Translator.sLanguageLookup[sourceLanguage].Code
 
-		this.iTargetLanguage := Translator.Languages["All"][targetLanguage].Identifier
-		this.iTargetLanguageCode := Translator.Languages["All"][targetLanguage].Code
+		this.iTargetLanguage := Translator.sLanguageLookup[targetLanguage].Identifier
+		this.iTargetLanguageCode := Translator.sLanguageLookup[targetLanguage].Code
 
 		apiKey := Trim(apiKey)
 
@@ -259,33 +234,34 @@ class Translator {
 	}
 
 	static initializeLanguages() {
+		local languages := CaseInsenseMap()
 		local identifier, language, ignore, fileName
 
-		for ignore, fileName in [kTranslationsDirectory . "Translator Languages.csv"
-							   , kUserTranslationsDirectory . "Translator Languages.csv"]
-			if FileExist(fileName)
-				loop Read, fileName
-					if ((Trim(A_LoopReadLine) != "") && (SubStr(Trim(A_LoopReadLine), 1, 1) != ";")) {
-						language := string2Values(",", Trim(A_LoopReadLine))
+		if !this.sLanguages {
+			for ignore, fileName in [kTranslationsDirectory . "Languages.csv"
+								   , kUserTranslationsDirectory . "Languages.csv"]
+				if FileExist(fileName)
+					loop Read, fileName
+						if ((Trim(A_LoopReadLine) != "") && (SubStr(Trim(A_LoopReadLine), 1, 1) != ";")) {
+							language := string2Values(",", Trim(A_LoopReadLine))
 
-						if (language.Length = 3)
-							if this.kTranslatorLanguages.Has(language[1]) {
-								this.kTranslatorLanguages[language[1]].Code := language[2]
-								this.kTranslatorLanguages[language[1]].Name := language[3]
+							if (language.Length > 2) {
+								language := {Identifier: language[1], Code: language[2], Name: language[3]}
+
+								languages[language.Identifier] := language
+
+								this.sLanguageLookup[language.Identifier] := language
+								this.sLanguageLookup[language.Code] := language
 							}
-							else
-								this.kTranslatorLanguages[language[1]] := {Code: language[2], Name: language[3]}
-					}
+						}
 
-		for identifier, language in this.kTranslatorLanguages {
-			language.Identifier := identifier
+			if isDebug()
+				logMessage(kLogDebug, "Language keys: " . values2String(", ", getKeys(this.sLanguageLookup)*))
 
-			this.sTranslatorLanguages[identifier] := language
-			this.sTranslatorLanguages[language.Code] := language
+			this.sLanguages := getValues(languages)
+
+			this.sLanguages := bubbleSort(&this.sLanguages, (l1, l2) => strGreater(l1.Identifier, l2.Identifier))
 		}
-
-		if isDebug()
-			logMessage(kLogDebug, "Language keys: " . values2String(", ", getKeys(this.sTranslatorLanguages)*))
 	}
 
 	/**

@@ -89,13 +89,13 @@ class Theme {
 			iconNumber := 1
 			iconFile   := ""
 
-			if (params.length = (_this.MaxParams + 2))
+			if (params.Length = (_this.MaxParams + 2))
 				iconNumber := params.Pop()
 
-			if (params.length = (_this.MaxParams + 1))
+			if (params.Length = (_this.MaxParams + 1))
 				iconFile := params.Pop()
 
-			if (!iconFile && InStr(_this.Name, "MsgBox") && (params.Length > 2))
+			if (!iconFile && InStr(_this.Name, "MsgBox") && params.Has(3))
 				if (params[3] & 16) {
 					iconNumber := 1
 					iconFile := (kIconsDirectory . "Dlg Error.ico")
@@ -1078,7 +1078,7 @@ class DarkTheme extends Theme {
 
 	InitializeTheme() {
 		local AHK_NOTIFYICON := 0x0404
-		local _trayMenuBaseShow := A_TrayMenu.base.show
+		local _trayMenuBaseShow := A_TrayMenu.base.Show
 
 		SetMenuTheme(appMode := 0) {
 			local prev
@@ -1092,7 +1092,7 @@ class DarkTheme extends Theme {
 																						, "Ptr", 136, "Ptr")
 												 : 0)
 
-			if (preferredAppMode.hasProp(appMode))
+			if (preferredAppMode.HasProp(appMode))
 				appMode := preferredAppMode.%appMode%
 
 			return ((fnSetPreferredAppMode && fnFlushMenuThemes)
@@ -1100,18 +1100,50 @@ class DarkTheme extends Theme {
 						: -1)
 		}
 
-		A_TrayMenu.base.defineProp("Show", {call:(x?, y?) => (prevMenuTheme := setMenuTheme("ForceDark")
-															, _trayMenuBaseShow(x?, y?)
-															, setMenuTheme(prevMenuTheme), "")})
+		A_TrayMenu.base.defineProp("Show", {call: (x?, y?) => (prevMenuTheme := SetMenuTheme("ForceDark")
+															 , _trayMenuBaseShow(x?, y?)
+															 , SetMenuTheme(prevMenuTheme), "")})
 
 		OnMessage(AHK_NOTIFYICON, (wParam, lParam, msg, hWnd) {
 			local WM_RBUTTONUP := 0x0205
 
 			switch (lParam) {
 				case WM_RBUTTONUP:
-					return (A_TrayMenu.show(), true)
+					return (A_TrayMenu.Show(), true)
 			}
 		})
+
+		GroupAdd("tooltips_class32", "ahk_class tooltips_class32")
+
+		this.HTT := DllCall("User32.dll\CreateWindowEx", "UInt", 8, "Ptr", StrPtr("tooltips_class32")
+													   , "Ptr", 0, "UInt", 3, "Int", 0, "Int", 0, "Int", 0, "Int", 0
+													   , "Ptr", A_ScriptHwnd, "Ptr", 0, "Ptr", 0, "Ptr", 0)
+
+		this.SubWndProc := CallbackCreate(TT_WNDPROC, , 4)
+
+		this.OriWndProc := DllCall((A_PtrSize = 8) ? "SetClassLongPtr" : "SetClassLongW", "Ptr", this.HTT
+																						, "Int", -24
+																						, "Ptr", this.SubWndProc
+																						, "UPtr")
+
+		TT_WNDPROC(hWnd, uMsg, wParam, lParam) {
+			static WM_CREATE := 0x0001
+
+			if (uMsg = WM_CREATE) {
+				SetDarkToolTip(hWnd)
+
+				if (VerCompare(A_OSVersion, "10.0.22000") > 0)
+					SetRoundedCorner(hWnd, 3)
+			}
+
+			return DllCall(This.OriWndProc, "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "UInt")
+		}
+
+		SetDarkToolTip(hWnd) => DllCall("UxTheme\SetWindowTheme", "Ptr", hWnd, "Ptr", StrPtr("DarkMode_Explorer")
+																, "Ptr", StrPtr("ToolTip"))
+
+		SetRoundedCorner(hwnd, level := 3) => DllCall("Dwmapi\DwmSetWindowAttribute", "Ptr" , hwnd, "UInt", 33
+																					, "Ptr*", level, "UInt", 4)
 	}
 
 	InitializeWindow(window) {
@@ -2860,7 +2892,9 @@ initializeGUI() {
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 	}
-	catch Any {
+	catch Any as exception {
+		logError(exception, true)
+
 		Theme.CurrentTheme := ClassicTheme()
 	}
 

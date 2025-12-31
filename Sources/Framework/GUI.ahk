@@ -1100,9 +1100,9 @@ class DarkTheme extends Theme {
 						: -1)
 		}
 
-		A_TrayMenu.base.defineProp("Show", {call: (x?, y?) => (prevMenuTheme := SetMenuTheme("ForceDark")
-															 , _trayMenuBaseShow(x?, y?)
-															 , SetMenuTheme(prevMenuTheme), "")})
+		A_TrayMenu.base.defineProp("Show", {call: (x?, y?, args*) => (prevMenuTheme := SetMenuTheme("ForceDark")
+																	, _trayMenuBaseShow(x?, y?, args*)
+																	, SetMenuTheme(prevMenuTheme), "")})
 
 		OnMessage(AHK_NOTIFYICON, (wParam, lParam, msg, hWnd) {
 			local WM_RBUTTONUP := 0x0205

@@ -3210,7 +3210,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.selectStrategy(strategy)
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgDlg, translate("There is no current scenario. Please run a simulation first..."), translate("Warning"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no current scenario. Please run a simulation first..."), translate("Error"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}

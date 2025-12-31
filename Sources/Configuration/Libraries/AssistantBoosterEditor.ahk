@@ -164,7 +164,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			editorGui.Opt("+OwnDialogs")
 
-			translator := translateMsgDlgButtons.Bind(["Select", "Select", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 			OnMessage(0x44, translator)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")

@@ -231,11 +231,11 @@ class Theme {
 							SetTextColor(wParam, 0xFFFFFF)
 
 							for _hwnd in btns
-								PostMessage(WM_SETREDRAW,,,_hwnd)
+								PostMessage(WM_SETREDRAW, , , _hwnd)
 
 							GetClientRect(winId, rcC := this.RECT())
 
-							ControlGetPos(, &btnY,, &btnH, btnHwnd)
+							ControlGetPos(, &btnY, , &btnH, btnHwnd)
 
 							hdc        := GetDC(winId)
 							rcC.top    := btnY - (rcC.bottom - (btnY+btnH))
@@ -261,7 +261,7 @@ class Theme {
 							return hbrush
 						case WM_DESTROY:
 							for v in hIcons
-								(v??0) && DestroyIcon(v)
+								(v ?? 0) && DestroyIcon(v)
 					}
 
 					return CallWindowProc(WindowProcOld, hwnd, uMsg, wParam, lParam)
@@ -1631,7 +1631,8 @@ class Window extends Gui {
 		}
 
 		SetScrollInfo(typeOfScrollBar, redraw) {
-			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
+			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar
+								   , "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
 		}
 
 		GetScrollRange(typeOfScrollBar, &minPos, &maxPos) {

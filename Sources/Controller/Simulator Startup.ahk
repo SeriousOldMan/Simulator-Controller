@@ -858,7 +858,7 @@ launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
 	local ignore, theApplication, startupConfig, x, y
-	local infoButton, profileButton, settingsButton, docsButton
+	local infoButton, profileButton, settingsButton, docsButton, shortcutsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
 	static result := false
@@ -1326,6 +1326,10 @@ launchPad(command := false, arguments*) {
 		docsButton := launchPadGui.Add("Button", "x8 yp+4 w23 h23")
 		docsButton.OnEvent("Click", (*) => (GetKeyState("Ctrl") ? showNews() : Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Overview")))
 		setButtonIcon(docsButton, kIconsDirectory . "Book.ico", 1)
+
+		shortcutsButton := launchPadGui.Add("Button", "xp+24 yp w23 h23")
+		shortcutsButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers"))
+		setButtonIcon(shortcutsButton, kIconsDirectory . "Keyboard.ico", 1)
 
 		infoButton := launchPadGui.Add("Button", "xp+24 yp w23 h23")
 		infoButton.OnEvent("Click", (*) => Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Credits"))

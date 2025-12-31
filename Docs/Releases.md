@@ -37,6 +37,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Message dialog boxes and input boxes are now also use a dark theme, if activated.
   - Tool tips now also adapt to the chosen theme.
+  - A new button in the top left corner of the "Simulator Startup" window opens the documentation for the keyboard modifiers.
   - The function of the Control key has been reverted when running the Assistant test mode from "Simulator Setup" and "Simulator Configuration". By default configured boosters and all translators (see below) are active and can be disabled by holding down the Control key when clicking the "Play" button.
   - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GpT service providers, it is possible to support any lanaguage, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL have a really huge free contingent.
   

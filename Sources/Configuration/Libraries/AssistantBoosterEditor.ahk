@@ -216,7 +216,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x158 YP+20 w168 H:Center Center", translate("Assistant Booster")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-an-llm")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-a-llm")
 
 		editorGui.SetFont("Norm", "Arial")
 

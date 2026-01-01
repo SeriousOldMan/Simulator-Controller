@@ -499,7 +499,7 @@ Special editors are available by clicking on the settings button with the small 
   
 - *Assistant Booster*
 
-  This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. Please see the separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information about the Assistant Booster.
+  This editor allows you to link a GPT service to this Assistant which can dramatically improve the conversation experience with the Assistant. See the above [explanation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-a-llm) for more information.
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 

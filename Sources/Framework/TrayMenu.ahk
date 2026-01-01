@@ -55,7 +55,7 @@ hasTrayMenu() {
 
 installTrayMenu(update := false) {
 	global gHasTrayMenu
-	local icon := kIconsDirectory . "Pause.ico"
+	local icon := kIconsDirectory . "Start.ico"
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel
 

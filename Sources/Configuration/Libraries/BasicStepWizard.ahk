@@ -973,7 +973,8 @@ class BasicStepWizard extends StepWizard {
 
 		if assistantTranslator
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , Translator.Languages["All"][assistantTranslator.Language].Name . translate(" (translated)...")])
+										   , first(Translator.Languages, (l) => ((l.Identifier = assistantTranslator.Language)
+																			  || (l.Code = assistantTranslator.Language))).Name . translate(" (translated)...")])
 		else
 			choices := concatenate(choices, [translate("---------------------------------------------")
 										   , translate("Translator") . translate("...")])

@@ -250,9 +250,11 @@ The Simulator Controller framework supports a sophisticated natural language int
 
 The Assistants of your virtual pit crew can interact with you, the driver, in several different languages. At the time of this writing, 8 languages are supported: English, German, Spanish, French, Italian, Japanese, Portuguese and Chinese. For each of these languages, the list of available commands can be found in the documentation of the different Assistants. Beside the builtin languages, an integrated translator can be used for many additional languages. This translator supports translation services of Azure, Google, DeepL and any OpenAI compatible GPT service. The results of this *on-the-fly* translation are not perfect, of course, and some latency is added as well, but hey, it is better than no support of the given language.
 
-Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). But this requires a good technical understanding. Much better and much easier is to use the simple configuration dialog on the "Basic" configuration page in "Simulator Setup". For all the above mentioned services you need to create an account on the website of the given provider and in all cases, you must register a credit card. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
+Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). Of course, the translator configuration dialog is also available on the "Basic" configuration page in "Simulator Setup". For all the above mentioned services you need to create an account on the website of the given provider and in all cases, you must register a credit card. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
 
 The list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
+
+Important: Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
 
 #### Talking with your *crew*
 
@@ -282,6 +284,14 @@ This activates Jona, the Race Engineer, and immediately asks Jona to plan a pits
 
 1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").
 2. The combined phrase is only recognized, if the first word is the name of the Assistant. For example: "Hey Jona, can you plan a pitstop?" or "Can you plan a pitstop, Jona?" won't be recognized.
+
+#### *Activation* listener
+
+Now it gets a bit complicated, sorry. Every Assistant and all other dialog partners are using there own listener. This listener uses the configured language of the corresponding Assistant, even if this language is *translated*. Additionally there is a so called activation listener, which is used when you are pressing the *Push-To-Talk* button twice **or** at a fresh start, when no dialog partner has been yet activated. This activation listener uses the language selected from the general voice configuration and this language is not (yet) translatable. By the way, the recognizer method of the activation listener can be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). But this is only required in very rare cases.
+
+What does this mean: Let's assume, you are using translated Korean language for all your Assistants. Since this language is not available for the activation listener, you need to select English here and you need to call your Engineer with "Hello Jona" (or any other name) for the first time. Once an Assistant is active, his listener will be used to process activation commands. Therefore, if you want to talk to your Strategist then, you need to call: "안녕하세요 차토" (annyeonghaseyo chato). Similar rules apply, if your Assistants are configured with different languages (which I do sometimes for testing purposes).
+
+Fortunately, all this is totally irrelevant and transparent, when everything is configured with one language, which is supported out of the box.
 
 #### Using the Push-To-Talk button
 

@@ -673,9 +673,9 @@ class LightTheme extends Theme {
 }
 
 class DarkTheme extends Theme {
-	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
+	static sDarkColors := CaseInsenseMap("Background", "2B2B2B", "AltBackground", "2F2F2F", "Controls", "404040"
 									   , "Font", "D0D0D0", "DsbldFont", "808080", "PssvFont", "505050")
-	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
+	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", Integer("0x" . DarkTheme.sDarkColors["Background"]), "Ptr")
 
 	class DarkCheckBox extends Gui.CheckBox {
 		static kCheckWidth := 23
@@ -917,7 +917,7 @@ class DarkTheme extends Theme {
 		Get {
 			local value := DarkTheme.sDarkColors[key]
 
-			return (asNumber ? ("0x" . value) : value)
+			return (asNumber ? Integer("0x" . value) : value)
 		}
 	}
 
@@ -1041,7 +1041,7 @@ class DarkTheme extends Theme {
 		static GetWindowLong      := A_PtrSize = 8 ? "GetWindowLongPtr" : "GetWindowLong"
 
 		switch control.Type, false {
-			case "Button", "CheckBox", "ListBox", "UpDown", "DateTime":
+			case "Button", "CheckBox", "ListBox", "UpDown":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
 			case "ComboBox", "DDL":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
@@ -1067,6 +1067,8 @@ class DarkTheme extends Theme {
 
 				control.Opt("+Redraw")
 			case "DateTime":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+
 				control.Opt("-Redraw")
 
 				SendMessage(DTM_SETMCCOLOR, MCSC_BACKGROUND, this.DarkColors["BackGround"], control.Hwnd)

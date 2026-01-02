@@ -18,6 +18,8 @@ If you don't want to use the launch window and want "Simulator Startup" to run t
 
 You can open the entry page of the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, incl. those, that already have been marked as read, in case you want to re-visit one of those articles.
 
+The next button with the small keyboard symbol opens the documentation of all available keyboard modifiers.
+
 Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
 
 ## Managing your *privacy*
@@ -121,6 +123,8 @@ Simulataor Controller is a modular software and consists of many functions, whic
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Controller%20Menu.JPG)
 
 Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
+
+Important: These menus are not working correctly, if scaling has been actived for the current monitor.
 
 ### Startup Profiles
 
@@ -246,9 +250,11 @@ The Simulator Controller framework supports a sophisticated natural language int
 
 The Assistants of your virtual pit crew can interact with you, the driver, in several different languages. At the time of this writing, 8 languages are supported: English, German, Spanish, French, Italian, Japanese, Portuguese and Chinese. For each of these languages, the list of available commands can be found in the documentation of the different Assistants. Beside the builtin languages, an integrated translator can be used for many additional languages. This translator supports translation services of Azure, Google, DeepL and any OpenAI compatible GPT service. The results of this *on-the-fly* translation are not perfect, of course, and some latency is added as well, but hey, it is better than no support of the given language.
 
-Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). But this requires a good technical understanding. Much better and much easier is to use the simple configuration dialog on the "Basic" configuration page in "Simulator Setup". For all the above mentioned services you need to create an account on the website of the given provider and in all cases, you must register a credit card. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
+Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). Of course, the translator configuration dialog is also available on the "Basic" configuration page in "Simulator Setup". For all the above mentioned services you need to create an account on the website of the given provider and in all cases, you must register a credit card. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
 
 The list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
+
+Important: Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
 
 #### Talking with your *crew*
 
@@ -279,6 +285,14 @@ This activates Jona, the Race Engineer, and immediately asks Jona to plan a pits
 1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").
 2. The combined phrase is only recognized, if the first word is the name of the Assistant. For example: "Hey Jona, can you plan a pitstop?" or "Can you plan a pitstop, Jona?" won't be recognized.
 
+#### *Activation* listener
+
+Now it gets a bit complicated, sorry. Every Assistant and all other dialog partners are using there own listener. This listener uses the configured language of the corresponding Assistant, even if this language is *translated*. Additionally there is a so called activation listener, which is used when you are pressing the *Push-To-Talk* button twice **or** at a fresh start, when no dialog partner has been yet activated. This activation listener uses the language selected from the general voice configuration and this language is not (yet) translatable. By the way, the recognizer method of the activation listener can be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). But this is only required in very rare cases.
+
+What does this mean: Let's assume, you are using translated Korean language for all your Assistants. Since this language is not available for the activation listener, you need to select English here and you need to call your Engineer with "Hello Jona" (or any other name) for the first time. Once an Assistant is active, his listener will be used to process activation commands. Therefore, if you want to talk to your Strategist then, you need to call: "안녕하세요 차토" (annyeonghaseyo chato). Similar rules apply, if your Assistants are configured with different languages (which I do sometimes for testing purposes).
+
+Fortunately, all this is totally irrelevant and transparent, when everything is configured with one language, which is supported out of the box.
+
 #### Using the Push-To-Talk button
 
 Beside the behavior of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
@@ -308,6 +322,8 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 ##### Troubleshooting
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
+
+Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask my why...
 
 #### Non-standard voice configurations
 

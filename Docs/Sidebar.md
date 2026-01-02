@@ -20,7 +20,7 @@
 	  - [OpenAI API](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#openai-api)
 	  - [ElevenLabs](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#elevenlabs)
 	  - [Whisper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime)
-	  - [Boosting with a LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-an-llm)
+	  - [Boosting with a LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-a-llm)
     - [Plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)
     - [Applications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications)
     - [Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller)

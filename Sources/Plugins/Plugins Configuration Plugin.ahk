@@ -278,7 +278,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -305,7 +305,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 			if (arguments.Length = 5)
 				return {Service: arguments[1], Language: arguments[3]
-					  , Code: Translator.Languages["All"][arguments[3]].Code
+					  , Code: first(Translator.Languages, (l) => ((l.Identifier = arguments[3])
+															   || (l.Code = arguments[3]))).Code
 					  , APIKey: arguments[4], Arguments: string2Values(",", arguments[5])}
 			else
 				return thePlugin.getArgumentValue("language", getCurrentLanguage())
@@ -355,7 +356,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 				vocalics := string2Values(",", thePlugin.getArgumentValue("speakerVocalics", "100,0,0"))
 
 				if (arguments.Length = 5)
-					language := Translator.Languages["All"][arguments[3]].Code
+					language := first(Translator.Languages, (l) => ((l.Identifier = arguments[3])
+																 || (l.Code = arguments[3]))).Code
 				else
 					language := thePlugin.getArgumentValue("language", getCurrentLanguage())
 
@@ -439,7 +441,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 	editTranslator() {
 		local assistant := this.Control["pluginEdit"].Text
 		local window := this.Window
-		local configuration, thePlugin, arguments
+		local configuration, thePlugin, arguments, language
 
 		if !inList(kRaceAssistants, assistant)
 			return
@@ -464,8 +466,11 @@ class PluginsConfigurator extends ConfigurationItemList {
 				configuration := TranslatorEditor(assistant, configuration).editTranslator(window)
 
 				if configuration {
+					language := getMultiMapValue(configuration, assistant . ".Translator", "Language")
+					
 					thePlugin.setArgumentValue("language"
-											 , Translator.Languages["All"][getMultiMapValue(configuration, assistant . ".Translator", "Language")].Code)
+											 , first(Translator.Languages, (l) => ((l.Identifier = language)
+																				|| (l.Code = language))).Code)
 					thePlugin.setArgumentValue("translator"
 											 , values2String("|", getMultiMapValue(configuration, assistant . ".Translator", "Service")
 																, "en"

@@ -164,7 +164,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			editorGui.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 			OnMessage(0x44, translator)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
@@ -216,7 +216,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Documentation", "x158 YP+20 w168 H:Center Center", translate("Assistant Booster")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-an-llm")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-an-assistant-to-a-llm")
 
 		editorGui.SetFont("Norm", "Arial")
 
@@ -1268,10 +1268,10 @@ class CallbacksEditor {
 			local translator
 
 			if this.Closeable {
-				translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you want to save your changes?"), translate("Close"), 262179)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?"), translate("Close"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Yes")
@@ -2325,7 +2325,7 @@ class CallbacksEditor {
 				errorMessage := ("`n" . errorMessage)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -2410,7 +2410,7 @@ class CallbacksEditor {
 				errorMessage := ("`n" . errorMessage)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -2497,7 +2497,7 @@ class CallbacksEditor {
 						}
 						catch Any as exception {
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, "Error in builtin rule " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
+							withBlockedWindows(MsgDlg, "Error in builtin rule " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 						}
 
@@ -2526,7 +2526,7 @@ class CallbacksEditor {
 						}
 						catch Any as exception {
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, "Error in builtin script " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
+							withBlockedWindows(MsgDlg, "Error in builtin script " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 						}
 

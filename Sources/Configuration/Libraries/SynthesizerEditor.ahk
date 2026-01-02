@@ -140,7 +140,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 			OnMessage(0x44, translator)
 			file := withBlockedWindows(FileSelect, 1, this.Control["basicGoogleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")

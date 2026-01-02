@@ -427,7 +427,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
+	withBlockedWindows(MsgDlg, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := 25
@@ -479,7 +479,7 @@ else {
 			if (A_Index = 19) {
 				strategist.performPitstop()
 
-				withBlockedWindows(MsgBox, "Pitstop...")
+				withBlockedWindows(MsgDlg, "Pitstop...")
 			}
 		}
 		until done
@@ -598,7 +598,7 @@ else {
 				if (lap == 19 && A_Index == 1) {
 					strategist.performPitstop()
 
-					withBlockedWindows(MsgBox, "Pitstop...")
+					withBlockedWindows(MsgDlg, "Pitstop...")
 				}
 
 				if (lap == 21 && A_Index == 1)
@@ -632,7 +632,7 @@ else {
 	}
 
 	if isDebug()
-		withBlockedWindows(MsgBox, "Done...")
+		withBlockedWindows(MsgDlg, "Done...")
 
 	ExitApp()
 }

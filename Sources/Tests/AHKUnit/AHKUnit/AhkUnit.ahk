@@ -42,7 +42,7 @@ class AhkUnit {
 	
 	End(runner = false) {
 		if (AhkUnit.nesting == 0) {
-			MsgBox,AhkUnit.Begin() not called.
+			MsgDlg,AhkUnit.Begin() not called.
 			Exit
 		}
 		AhkUnit.nesting--

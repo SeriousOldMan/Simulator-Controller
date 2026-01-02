@@ -107,7 +107,13 @@ class ProgressWindow extends Window {
 
 		progressGui.iTitle := progressGui.Add("Text", "x10 w" . (w - 20) . " Center")
 
-		progressGui.iProgressBar := progressGui.Add("Progress", "x10 y30 w" . (w - 20) . " h20 c" . color . " BackgroundGray", "0")
+		if A_IconFile {
+			progressGui.Add("Picture", "x10 y30 w20 h20", A_IconFile)
+
+			progressGui.iProgressBar := progressGui.Add("Progress", "x32 y30 w" . (w - 20 - 22) . " h20 c" . color . " BackgroundGray", "0")
+		}
+		else
+			progressGui.iProgressBar := progressGui.Add("Progress", "x10 y30 w" . (w - 20) . " h20 c" . color . " BackgroundGray", "0")
 
 		progressGui.SetFont("s8 Norm", "Arial")
 

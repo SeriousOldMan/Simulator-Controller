@@ -758,13 +758,13 @@ else {
 	rs := kb.prove(g)
 
 	while (rs != false) {
-		withBlockedWindows(MsgBox, g.toString(rs))
+		withBlockedWindows(MsgDlg, g.toString(rs))
 
 		if !rs.nextResult()
 			rs := false
 	}
 
-	withBlockedWindows(MsgBox, "Done")
+	withBlockedWindows(MsgDlg, "Done")
 	*/
 
 	kb.setFact("Input", 5)

@@ -824,7 +824,7 @@ class SpeechRecognizer {
 	setRecognizer(id, log := true) {
 		local recognizer
 
-		; MsgBox id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)
+		; MsgDlg id . " " . this.Engine . " " . this.RecognizerList.Length . " " . values2String("; ", collect(this.RecognizerList, (r) => r.Name)*)
 
 		if this.Instance
 			if ((this.Engine = "Azure") || (this.Engine = "Compiler"))

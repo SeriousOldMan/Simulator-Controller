@@ -204,7 +204,7 @@ class BasicStepWizard extends StepWizard {
 			wizard.Window.Show()
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
+			msgResult := withBlockedWindows(MsgDlg, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -973,7 +973,8 @@ class BasicStepWizard extends StepWizard {
 
 		if assistantTranslator
 			choices := concatenate(choices, [translate("---------------------------------------------")
-										   , Translator.Languages["All"][assistantTranslator.Language].Name . translate(" (translated)...")])
+										   , first(Translator.Languages, (l) => ((l.Identifier = assistantTranslator.Language)
+																			  || (l.Code = assistantTranslator.Language))).Name . translate(" (translated)...")])
 		else
 			choices := concatenate(choices, [translate("---------------------------------------------")
 										   , translate("Translator") . translate("...")])

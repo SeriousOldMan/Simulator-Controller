@@ -89,13 +89,13 @@ class Theme {
 			iconNumber := 1
 			iconFile   := ""
 
-			if (params.length = (_this.MaxParams + 2))
+			if (params.Length = (_this.MaxParams + 2))
 				iconNumber := params.Pop()
 
-			if (params.length = (_this.MaxParams + 1))
+			if (params.Length = (_this.MaxParams + 1))
 				iconFile := params.Pop()
 
-			if (!iconFile && InStr(_this.Name, "MsgBox") && (params.Length > 2))
+			if (!iconFile && InStr(_this.Name, "MsgBox") && params.Has(3))
 				if (params[3] & 16) {
 					iconNumber := 1
 					iconFile := (kIconsDirectory . "Dlg Error.ico")
@@ -212,13 +212,8 @@ class Theme {
 					btns.Push(btnHwnd := ctrl)
 				}
 
-				/*
-				If WinExist("ahk_class #32770 ahk_pid " . ProcessExist()) {
-					hIcon := LoadPicture(iconFile, "w32", &ignore)
-
-					SendMessage(0x172, 1, hIcon, "Static1") ; STM_SETIMAGE
-				}
-				*/
+				if (iconFile && iconHwnd)
+					SendMessage(0x172, 1, LoadPicture(iconFile, "W32", &ignore), iconHwnd, winId)
 
 				WindowProcOld := SetWindowLong(winId, -4, CallbackCreate(WNDPROC))
 
@@ -236,11 +231,11 @@ class Theme {
 							SetTextColor(wParam, 0xFFFFFF)
 
 							for _hwnd in btns
-								PostMessage(WM_SETREDRAW,,,_hwnd)
+								PostMessage(WM_SETREDRAW, , , _hwnd)
 
 							GetClientRect(winId, rcC := this.RECT())
 
-							ControlGetPos(, &btnY,, &btnH, btnHwnd)
+							ControlGetPos(, &btnY, , &btnH, btnHwnd)
 
 							hdc        := GetDC(winId)
 							rcC.top    := btnY - (rcC.bottom - (btnY+btnH))
@@ -266,7 +261,7 @@ class Theme {
 							return hbrush
 						case WM_DESTROY:
 							for v in hIcons
-								(v??0) && DestroyIcon(v)
+								(v ?? 0) && DestroyIcon(v)
 					}
 
 					return CallWindowProc(WindowProcOld, hwnd, uMsg, wParam, lParam)
@@ -322,6 +317,8 @@ class Theme {
 		}
 
 		Set {
+			value.InitializeTheme()
+
 			return (Theme.sCurrentTheme := value)
 		}
 	}
@@ -432,6 +429,9 @@ class Theme {
 		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
 
 		return (asText ? Format("{:06X}", BGR) : BGR)
+	}
+
+	InitializeTheme() {
 	}
 
 	InitializeWindow(window) {
@@ -1076,6 +1076,76 @@ class DarkTheme extends Theme {
 		}
 	}
 
+	InitializeTheme() {
+		local AHK_NOTIFYICON := 0x0404
+		local _trayMenuBaseShow := A_TrayMenu.base.Show
+
+		SetMenuTheme(appMode := 0) {
+			local prev
+
+			static preferredAppMode := {Default: 0, AllowDark: 1, ForceDark: 2, ForceLight: 3, Max: 4}
+			static uxtheme := DllCall("Kernel32.dll\GetModuleHandle", "Str","uxtheme", "Ptr")
+			static fnSetPreferredAppMode := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																							, "Ptr", 135, "Ptr")
+													 : 0)
+			static fnFlushMenuThemes := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																						, "Ptr", 136, "Ptr")
+												 : 0)
+
+			if (preferredAppMode.HasProp(appMode))
+				appMode := preferredAppMode.%appMode%
+
+			return ((fnSetPreferredAppMode && fnFlushMenuThemes)
+						? (prev := DllCall(fnSetPreferredAppMode, "Int", appMode), DllCall(fnFlushMenuThemes), prev)
+						: -1)
+		}
+
+		A_TrayMenu.base.defineProp("Show", {call: (x?, y?, args*) => (prevMenuTheme := SetMenuTheme("ForceDark")
+																	, _trayMenuBaseShow(x?, y?, args*)
+																	, SetMenuTheme(prevMenuTheme), "")})
+
+		OnMessage(AHK_NOTIFYICON, (wParam, lParam, msg, hWnd) {
+			local WM_RBUTTONUP := 0x0205
+
+			switch (lParam) {
+				case WM_RBUTTONUP:
+					return (A_TrayMenu.Show(), true)
+			}
+		})
+
+		GroupAdd("tooltips_class32", "ahk_class tooltips_class32")
+
+		this.HTT := DllCall("User32.dll\CreateWindowEx", "UInt", 8, "Ptr", StrPtr("tooltips_class32")
+													   , "Ptr", 0, "UInt", 3, "Int", 0, "Int", 0, "Int", 0, "Int", 0
+													   , "Ptr", A_ScriptHwnd, "Ptr", 0, "Ptr", 0, "Ptr", 0)
+
+		this.SubWndProc := CallbackCreate(TT_WNDPROC, , 4)
+
+		this.OriWndProc := DllCall((A_PtrSize = 8) ? "SetClassLongPtr" : "SetClassLongW", "Ptr", this.HTT
+																						, "Int", -24
+																						, "Ptr", this.SubWndProc
+																						, "UPtr")
+
+		TT_WNDPROC(hWnd, uMsg, wParam, lParam) {
+			static WM_CREATE := 0x0001
+
+			if (uMsg = WM_CREATE) {
+				SetDarkToolTip(hWnd)
+
+				if (VerCompare(A_OSVersion, "10.0.22000") > 0)
+					SetRoundedCorner(hWnd, 3)
+			}
+
+			return DllCall(This.OriWndProc, "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "UInt")
+		}
+
+		SetDarkToolTip(hWnd) => DllCall("UxTheme\SetWindowTheme", "Ptr", hWnd, "Ptr", StrPtr("DarkMode_Explorer")
+																, "Ptr", StrPtr("ToolTip"))
+
+		SetRoundedCorner(hwnd, level := 3) => DllCall("Dwmapi\DwmSetWindowAttribute", "Ptr" , hwnd, "UInt", 33
+																					, "Ptr*", level, "UInt", 4)
+	}
+
 	InitializeWindow(window) {
 		this.SetWindowAttribute(window)
 	}
@@ -1561,7 +1631,8 @@ class Window extends Gui {
 		}
 
 		SetScrollInfo(typeOfScrollBar, redraw) {
-			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
+			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar
+								   , "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
 		}
 
 		GetScrollRange(typeOfScrollBar, &minPos, &maxPos) {
@@ -2483,7 +2554,6 @@ class RecolorizerTask extends PeriodicTask {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
 MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
 
 InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
@@ -2657,7 +2727,7 @@ setScrollPosition(edit, pos) {
 	SendMessage(WM_VSCROLL, (pos * 65536) + SB_THUMBPOSITION, , edit)
 }
 
-translateMsgBoxButtons(buttonLabels, *) {
+translateMsgDlgButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
@@ -2679,12 +2749,12 @@ translateMsgBoxButtons(buttonLabels, *) {
 	}
 }
 
-translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
-translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
-translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
-translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
-translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
-translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
+translateYesNoButtons := translateMsgDlgButtons.Bind(["Yes", "No"])
+translateOkButton := translateMsgDlgButtons.Bind(["Ok"])
+translateOkCancelButtons := translateMsgDlgButtons.Bind(["Ok", "Cancel"])
+translateLoadCancelButtons := translateMsgDlgButtons.Bind(["Load", "Cancel"])
+translateSaveCancelButtons := translateMsgDlgButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 withBlockedWindows(function, arguments*) {
 	local windows := []
@@ -2823,7 +2893,9 @@ initializeGUI() {
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 	}
-	catch Any {
+	catch Any as exception {
+		logError(exception, true)
+
 		Theme.CurrentTheme := ClassicTheme()
 	}
 

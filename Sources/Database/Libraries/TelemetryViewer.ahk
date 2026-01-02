@@ -930,7 +930,7 @@ class TelemetryViewer {
 			if this.SelectedLap {
 				if isNumber(this.SelectedLap) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2490,7 +2490,7 @@ class TrackMap {
 					if section {
 						if (false && GetKeyState("Ctrl")) {
 							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
 							OnMessage(0x44, translateYesNoButtons, 0)
 
 							if (msgResult = "Yes")
@@ -3325,7 +3325,7 @@ class TrackMap {
 					section := section.Clone()
 
 					if ((result = "Corner") && (section.Type = "Corner")) {
-						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+						result := withBlockedWindows(InputDlg, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
 						if (result.Result = "Ok")
 							section.Name := result.Value
@@ -3333,7 +3333,7 @@ class TrackMap {
 						result := "Corner"
 					}
 					else if ((result = "Straight") && (section.Type = "Straight")) {
-						result := withBlockedWindows(InputBox, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+						result := withBlockedWindows(InputDlg, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
 						if (result.Result = "Ok")
 							section.Name := result.Value
@@ -3592,7 +3592,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			channelsListView.Modify(arguments[2], "Check")
 	}
 	else if (telemetryViewerOrCommand = "LayoutNew") {
-		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
+		inputResult := withBlockedWindows(InputDlg, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
 			if layout

@@ -1,15 +1,16 @@
 [Development]
-Version=6.7.7.0-beta
+Version=6.7.7.0-release
 Target=6.7.7.0-release
-Date=01/01/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QsbgnON_/Releases/Simulator Controller 6.7.7.0-beta.zip
+Date=01/02/2026
+Download=https://cutt.ly/WtgnyBe2;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0csQqXwR/Releases/Simulator Controller 6.7.7.0-release.zip;https://www.dropbox.com/scl/fi/vdrwk3gpdh7fgo8dz3ppe/Simulator-Controller-6.7.7.0-release.zip?rlkey=0b4pqbvta76rm290xmr06rlqy&st=ene8io0p&dl=1;http://%master%/Releases/Simulator Controller 6.7.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.7.0-release.zip
 Changes=Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup"
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
-Version=6.7.6.0-release
-Date=12/26/2025
-Download=https://cutt.ly/ptdNFDM1;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/c5WqhBk6/Releases/Simulator Controller 6.7.6.0-release.zip;https://www.dropbox.com/scl/fi/g04x65p08dut5yra38e49/Simulator-Controller-6.7.6.0-release.zip?rlkey=sx1co7z7hq23pua810atqti3n&st=aaqgjs2s&dl=1;http://%master%/Releases/Simulator Controller 6.7.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.6.0-release.zip
-Changes=Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed compound selection in "Solo Center", Fixed import of exported settings, Support base URLs for GPT service providers, New tyre data for AMS2
+Version=6.7.7.0-release
+Target=6.7.7.0-release
+Date=01/02/2026
+Download=https://cutt.ly/WtgnyBe2;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0csQqXwR/Releases/Simulator Controller 6.7.7.0-release.zip;https://www.dropbox.com/scl/fi/vdrwk3gpdh7fgo8dz3ppe/Simulator-Controller-6.7.7.0-release.zip?rlkey=0b4pqbvta76rm290xmr06rlqy&st=ene8io0p&dl=1;http://%master%/Releases/Simulator Controller 6.7.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.7.0-release.zip
+Changes=Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup"
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +23,7 @@ Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.7.7.0-beta
-Release=6.7.6.0-release
+Development=6.7.7.0-release
+Release=6.7.7.0-release

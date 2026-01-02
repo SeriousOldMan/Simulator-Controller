@@ -1,5 +1,31 @@
 # Latest stable release
 
+## 6.7.7.0
+
+#### Date: 01/02/26
+
+#### Fixes
+
+  - None this time...
+
+#### Changes
+
+  - Message dialog boxes and input boxes now also use a dark theme, if activated.
+  - Tool tips now also adapt to the chosen theme.
+  - A new button in the top left corner of the "Simulator Startup" window opens the documentation for the keyboard modifiers.
+  - The function of the Control key has been reverted when running the Assistant test mode from "Simulator Setup" and "Simulator Configuration". By default configured boosters and all translators (see below) are now active and can be disabled by holding down the Control key when clicking the "Play" button.
+  - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GPT service providers, it is possible to support any language, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL all have a really huge free contingent.
+  
+    See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator. Also read [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Supported-languages-and-commands) and [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-listener) part of the documentaion, to understand all the consequences of using translated languages.
+  - More in-place editors are available on the *Plugins* tab when a Race Assistant plugin is selected in "Simulator Configuration". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
+  - [Internal] Updated all copyright notes to 2026.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.7.6.0
 
 #### Date: 12/26/25
@@ -22,30 +48,6 @@
   - [Imporant] The tyre compound mappings for *Automobilista 2* have completely overhauled by @inthebagbud UK to match the latest additions and revisions by the game. We tried to preserve all previously available mappings where possible, so that no recorded data will be inaccessible due to a new tyre compound name. But that was not possible in all cases, especially when car names have change as well.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676), if you have created your own tyre compound mappings for *Automobilista 2* in the past.
-
-# Upcoming release
-
-## 6.7.7.0
-
-#### Date: 01/02/26 (planned)
-
-#### Fixes
-
-  - None this time...
-
-#### Changes
-
-  - Message dialog boxes and input boxes now also use a dark theme, if activated.
-  - Tool tips now also adapt to the chosen theme.
-  - A new button in the top left corner of the "Simulator Startup" window opens the documentation for the keyboard modifiers.
-  - The function of the Control key has been reverted when running the Assistant test mode from "Simulator Setup" and "Simulator Configuration". By default configured boosters and all translators (see below) are now active and can be disabled by holding down the Control key when clicking the "Play" button.
-  - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GPT service providers, it is possible to support any language, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL all have a really huge free contingent.
-  
-    See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator. Also read [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Supported-languages-and-commands) and [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-listener) part of the documentaion, to understand all the consequences of using translated languages.
-  - More in-place editors are available on the *Plugins* tab when a Race Assistant plugin is selected in "Simulator Configuration". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
-  - [Internal] Updated all copyright notes to 2026.
-
-# Release history
 
 ## 6.7.5.1
 

@@ -34,9 +34,9 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.6.0-release](https://cutt.ly/ptdNFDM1) (Changes: Fixed reporting of unknown car numbers, TC and ABS are now reported as "n/a" form LMU, Support for steam IDs in special startups, Fixed import of iRacing telemetry from CSV files, Context sensitive help text in "Simulator Setup", Fixed several duplicate grammar keys, Fixed import of exported settings, Support base URLs for GPT service providers, New tyre data for AMS2.)
+[6.7.7.0-release](https://cutt.ly/WtgnyBe2) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6760) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-676) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
@@ -46,9 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.7.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QsbgnON_/Releases/Simulator%20Controller%206.7.7.0-beta.zip) (Test build for 6.7.7. Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

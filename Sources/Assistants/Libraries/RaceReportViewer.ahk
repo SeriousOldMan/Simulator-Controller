@@ -1,4 +1,4 @@
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Race Report Viewer              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -108,15 +108,17 @@ class RaceReportViewer extends RaceReportReader {
 								border-spacing: 0;
 							}
 						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
-				)"
+						%chartScript%
+					<script type="text/javascript">
+						%chartLoad%
+					)"
 
-				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
-													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+					before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("corechart, bar, table")
+											 , fontColor: this.Window.Theme.TextColor
+											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 				after := "
 				(

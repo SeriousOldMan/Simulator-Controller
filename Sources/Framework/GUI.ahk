@@ -673,7 +673,7 @@ class LightTheme extends Theme {
 }
 
 class DarkTheme extends Theme {
-	static sDarkColors := CaseInsenseMap("Background", "2B2B2B", "AltBackground", "2F2F2F", "Controls", "404040"
+	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
 									   , "Font", "D0D0D0", "DsbldFont", "808080", "PssvFont", "505050")
 	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", Integer("0x" . DarkTheme.sDarkColors["Background"]), "Ptr")
 

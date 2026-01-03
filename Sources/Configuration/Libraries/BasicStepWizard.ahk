@@ -157,14 +157,12 @@ class BasicStepWizard extends StepWizard {
 			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
 				if this.editTranslator(assistant)
 					this.loadVoices(assistant)
-				else {
-					this.SetupWizard.setModuleValue(assistant, "Language.Translated", false, false)
 
+				if !this.SetupWizard.getModuleValue(assistant, "Language.Translated", false)
 					if dropDown.HasProp("LastValue")
 						dropDown.Choose(dropDown.LastValue)
 					else
 						dropDown.Choose(1)
-				}
 			}
 			else if InStr(selectedText, translate("---------------------------------------------")) {
 				if dropDown.HasProp("LastValue")

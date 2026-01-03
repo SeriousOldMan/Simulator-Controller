@@ -2070,7 +2070,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 						:= {Service: getMultiMapValue(configuration, "*.Translator", "Service")
 						  , SourceLanguage: "EN"
 						  , TargetLanguage: getMultiMapValue(configuration, "*.Translator", "Language")
-						  , APIKey: getMultiMapValue(configuration, ".Translator", "API Key")
+						  , APIKey: getMultiMapValue(configuration, "*.Translator", "API Key")
 						  , Arguments: getMultiMapValue(configuration, "*.Translator", "Arguments", "")}
 				else
 					this.Value["voiceTranslator"] := false
@@ -2448,6 +2448,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			synthesizer.setVolume(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
 			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+			if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false) {
+				arguments := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Translator", ""))
+
+				synthesizer.setTranslator(Translator(arguments[1], arguments[2], arguments[3]
+												   , arguments[4], string2Values(",", arguments[5])*))
+			}
 
 			synthesizer.speakTest()
 		}

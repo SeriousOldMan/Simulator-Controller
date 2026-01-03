@@ -382,6 +382,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				}
 				else if isSet(VoiceControlConfigurator)
 					language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+				else if getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language.Translated", false)
+					language := "EN"
 				else
 					language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 			}
@@ -419,6 +421,8 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 		else if isSet(VoiceControlConfigurator)
 			language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+		else if getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language.Translated", false)
+			language := "EN"
 		else
 			language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 

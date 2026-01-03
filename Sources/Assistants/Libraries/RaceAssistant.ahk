@@ -1045,7 +1045,10 @@ class RaceAssistant extends ConfigurationItem {
 		options := this.Options
 
 		options["Language"] := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-		options["Translator"] := false
+		
+		if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false)
+			options["Translator"] := getMultiMapValue(configuration, "Voice Control", "Translator")
+			
 		options["Synthesizer"] := getMultiMapValue(configuration, "Voice Control", "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
 		options["Speaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)

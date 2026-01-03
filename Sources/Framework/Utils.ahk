@@ -565,8 +565,6 @@ testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 
 		Sleep(2000)
 
-		language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-
 		for ignore, assistant in assistants {
 			thePlugin := Plugin(assistant, configuration)
 

@@ -7390,7 +7390,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
-		pitstopSettings("Update", this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
+		pitstopSettings("Update", this.iPendingPitstop ? combine(this.iPendingPitstop, settings) : settings)
 	}
 
 	updatePitstopState(lap, data) {

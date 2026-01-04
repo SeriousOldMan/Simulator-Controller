@@ -2167,6 +2167,7 @@ CoTaskMem_String(ptr) {
 
 fixIE(version := 0, exeName := "") {
 	local previousValue := ""
+	local ahkExe := false
 
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
 	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
@@ -2180,6 +2181,9 @@ fixIE(version := 0, exeName := "") {
 		else
 			SplitPath(A_AhkPath, &exeName)
 	}
+	
+	if A_AhkPath
+		SplitPath(A_AhkPath, &ahkExe)
 
 	try {
 		previousValue := RegRead("HKCU\" . key, exeName, "")
@@ -2191,10 +2195,22 @@ fixIE(version := 0, exeName := "") {
 	if A_IsAdmin
 		try {
 			if (version = "") {
+				if ahkExe
+					try {
+						RegDelete("HKCU\" . key, ahkExe)
+						RegDelete("HKLM\" . key, ahkExe)
+					}
+					
 				RegDelete("HKCU\" . key, exeName)
 				RegDelete("HKLM\" . key, exeName)
 			}
 			else {
+				if ahkExe
+					try {
+						RegWrite(version, "REG_DWORD", "HKCU\" . key, ahkExe)
+						RegWrite(version, "REG_DWORD", "HKLM\" . key, ahkExe)
+					}
+					
 				RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
 				RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
 			}

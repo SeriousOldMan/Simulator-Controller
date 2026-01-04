@@ -1,4 +1,4 @@
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Team Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10794,15 +10794,17 @@ class TeamCenter extends ConfigurationItem {
 							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+						%chartScript%
 						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+							%chartLoad%
 				)"
 
-				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
-													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+				before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("corechart, table, scatter")
+												 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 				after := "
 				(
@@ -10983,12 +10985,10 @@ class TeamCenter extends ConfigurationItem {
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-
-						function drawCharts() {
-			)"
+						%chartLoad%
+					)"
 
 			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
 												 , fontColor: this.Window.Theme.TextColor

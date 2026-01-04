@@ -1,4 +1,4 @@
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -718,21 +718,21 @@ class SetupWorkbench extends ConfigurationItem {
 								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 							</style>
-							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+							%chartScript%
 							<script type="text/javascript">
-								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
-					)"
+								%chartLoad%
+							)"
 
-					before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
-														 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+							before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("corechart, table, bar")
+												 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 					width := this.SettingsViewer.getWidth() - 4
-					height := (this.SettingsViewer.getHeight() - 110 - 4)
-
-					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
-
+					height := this.SettingsViewer.getHeight() - 4
+					info := ""
 					iWidth := width - 10
 					iHeight := 90
 

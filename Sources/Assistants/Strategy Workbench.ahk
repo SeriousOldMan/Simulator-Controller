@@ -1,4 +1,4 @@
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Strategy Workbench Tool         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -1719,9 +1719,9 @@ class StrategyWorkbench extends ConfigurationItem {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+					%chartScript%
+			<script type="text/javascript">
+				%chartLoad%
 			)"
 
 			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
@@ -2059,21 +2059,17 @@ class StrategyWorkbench extends ConfigurationItem {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+					%chartScript%
+			<script type="text/javascript">
+				%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
-												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-
-			after := "
-			(
-					</script>
-				</head>
-			)"
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("corechart, table")
+											 , fontColor: this.Window.Theme.TextColor
+											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			timeSeries := []
 			lapSeries := []
@@ -3485,12 +3481,15 @@ class StrategyWorkbench extends ConfigurationItem {
 					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 				</style>
-				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+				%chartScript%
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-		)"
+					%chartLoad%
 
-		before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+					function drawCharts() {"
+
+		before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("corechart, table, scatter")
+											 , fontColor: this.Window.Theme.TextColor
 											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})

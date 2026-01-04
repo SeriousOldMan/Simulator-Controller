@@ -37,12 +37,14 @@ A couple functions which let you enable or disable track automation and select a
 | enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
 | disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
 
-### Assistant rule engine interface
+### Assistant interface
 
 Each Race Assistant is running an internal rule engine. These functions can be used to interface with the rules in the rule set of a given Assistant to implement custom behavior or create custom events. 
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |
+| ask    | assistant, question | Driving Coach, Race Engineer, Race Strategist, Race Spotter | This function will send the given *question* to the specified *assistant* as if it has been given by voice. The *question* will be processed by the *Conversation* booster and therefore the answer will be supplied by the attached LLM. |
+| command | assistant, grammar, [Optional] command | Driving Coach, Race Engineer, Race Strategist, Race Spotter | This function will trigger the command with the name *grammar* for the specified *assistant* as if it has been given by voice. If the definition for the *grammar* requires variable parts in the command text, for example a number of liters for refueling, a full command text, that matches the defined grammar, must be supplied with *command*. Otherwise, it is optional. Example (for Race Engineer):<br><br>command("PitstopAdjustPressureUp", "Can we increase front left by 0.4?" |
 | raiseEvent | assistant, event, [Optional] arguments... | Driving Coach, Race Engineer, Race Strategist, Race Spotter | Raises *event* in the *Reasoning* booster of the given *assistant*. Any number of arguments can be supplied as defined for the given *event*. See the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information. |
 | triggerAction | assistant, action, [Optional] arguments... | Driving Coach, Race Engineer, Race Strategist, Race Spotter | Triggers *action* in the *Reasoning* booster of the given *assistant*. Any number of arguments can be supplied as defined for the given *action*. See the documentation on [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information. |
 

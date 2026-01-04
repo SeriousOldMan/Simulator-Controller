@@ -4438,7 +4438,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if hasDriver {
-				bubbleSort(&carPositions, (a, b) => a[3] < b[3])
+				bubbleSort(&carPositions
+						 , (a, b) => (isNumber(a[3]) && isNumber(b[3])) ? (a[3] < b[3])
+																		: !strGreater(a[3], b[3]))
 
 				positions["Driver"] := driver
 				positions["Count"] := count

@@ -1759,6 +1759,21 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	ask(grammar, question) {
+		local words, index, literal
+
+		if (grammar = "TEXT")
+			this.handleVoiceText("TEXT", question)
+		else {
+			words := string2Values(A_Space, question)
+
+			for index, literal in words
+				words[index] := RegExReplace(literal, "[:!?¿\-;。，！？：；]", "")
+
+			this.handleVoiceCommand(grammar, words)
+		}
+	}
+
 	timeRecognized(words) {
 		local time
 

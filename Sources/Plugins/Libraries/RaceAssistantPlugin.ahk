@@ -172,6 +172,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.callRemote("unmute", arguments*)
 		}
 
+		ask(arguments*) {
+			this.callRemote("ask", arguments*)
+		}
+
 		raiseEvent(arguments*) {
 			this.callRemote("handleEvent", arguments*)
 		}
@@ -2333,6 +2337,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.RaceAssistant.unmute()
 	}
 
+	ask(question) {
+		if this.RaceAssistant
+			this.RaceAssistant.ask("Text", question)
+	}
+
+	command(grammar, command := "") {
+		if this.RaceAssistant
+			this.RaceAssistant.ask(grammar, command)
+	}
+
 	raiseEvent(event, arguments*) {
 		if this.RaceAssistant
 			this.RaceAssistant.raiseEvent(event, arguments*)
@@ -3303,6 +3317,36 @@ enableDataCollection(type) {
 
 disableDataCollection(type) {
 	RaceAssistantPlugin.CollectData[type] := false
+}
+
+ask(name, question) {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.ask(question)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+command(name, grammar, command := "") {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.command(grammar, command)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 raiseEvent(name, event, arguments*) {

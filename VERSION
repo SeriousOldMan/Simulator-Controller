@@ -1,9 +1,9 @@
 [Development]
-Version=6.7.7.1-release
-Target=6.7.7.1-release
+Version=6.7.8.0-dev
+Target=6.7.8.0-release
 Date=01/05/2026
-Download=https://cutt.ly/EthyIeFt;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/V7lX9ABs/Releases/Simulator Controller 6.7.7.1-release.zip;https://www.dropbox.com/scl/fi/no7iqhbhhy0om4ssiafun/Simulator-Controller-6.7.7.1-release.zip?rlkey=oz4mjetf48lwn61umgdv88imq&st=cvz84d2j&dl=1;http://%master%/Releases/Simulator Controller 6.7.7.1-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.7.1-release.zip
-Changes=Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup"
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cZl8NqkA/Releases/Simulator Controller 6.7.8.0-dev.zip
+Changes=Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.7.1-release
@@ -23,7 +23,7 @@ Utilities.6.6.4.Path=.
 Utilities.6.6.4.Content=Utilities
 Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.7.7.1-release
+Development=6.7.8.0-dev
 Release=6.7.7.1-release

@@ -7390,7 +7390,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	updatePitstopSettings(settings) {
-		pitstopSettings("Update", this.iPendingPitstop ? combine(settings, this.iPendingPitstop) : settings)
+		pitstopSettings("Update", this.iPendingPitstop ? combine(this.iPendingPitstop, settings) : settings)
 	}
 
 	updatePitstopState(lap, data) {
@@ -10786,37 +10786,40 @@ class TeamCenter extends ConfigurationItem {
 			if (drawChartFunction && (drawChartFunction != "")) {
 				before := "
 				(
-				<html>
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+					<html>
+						<meta charset='utf-8'>
+						<head>
+							<style>
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							</style>
+							%chartScript%
+							<script type="text/javascript">
+								%chartLoad%
 				)"
 
-				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+				before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+													 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																							 , "corechart", "table", "scatter")
+													 , fontColor: this.Window.Theme.TextColor
 													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 				after := "
 				(
-						</script>
-					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						</style>
-						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-					</body>
-				</html>
+							</script>
+						</head>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<style>
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							</style>
+							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+						</body>
+					</html>
 				)"
 
 				html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5)
@@ -10983,14 +10986,17 @@ class TeamCenter extends ConfigurationItem {
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-
+						%chartLoad%
+						
 						function drawCharts() {
 			)"
 
-			script := substituteVariables(script, {tableCSS: this.StrategyViewer.getTableCSS()
+			script := substituteVariables(script, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawCharts"
+																						 , "corechart", "table", "scatter")
+												 , tableCSS: this.StrategyViewer.getTableCSS()
 												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
@@ -14444,8 +14450,15 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 				tCenter.Provider.supportsTyreManagement( , &tyreSet)
 
-				if (fuelService && arguments[1].Has("FuelAmount"))
-					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
+				if fuelService
+					if arguments[1].Has("RefuelAmount")
+						settingsListView.Add("", translate("Refuel")
+											   , displayValue("Float", convertUnit("Volume", arguments[1]["RefuelAmount"]))
+											   . A_Space . getUnit("Volume", true))
+					else if arguments[1].Has("FuelAmount")
+						settingsListView.Add("", translate("Refuel")
+											   , displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"]))
+											   . A_Space . getUnit("Volume", true))
 
 				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) {
 					if arguments[1].Has("Pitstop.Planned.Tyre.Compound") {

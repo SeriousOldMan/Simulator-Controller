@@ -36,6 +36,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 	iManager := false
 	iAssistant := false
 	iLanguage := "English"
+	iTranslator := false
 
 	iWindow := false
 
@@ -373,6 +374,9 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			else
 				this.iLanguage := languageCode
 
+			if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false)
+				this.iTranslator := getMultiMapValue(configuration, "Voice Control", "Translator")
+
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 
 			if (InStr(synthesizer, "Azure") == 1)
@@ -464,6 +468,11 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		super.saveToConfiguration(configuration)
 
 		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
+
+		if this.iTranslator {
+			setMultiMapValue(configuration, "Voice Control", "Language.Translated", true)
+			setMultiMapValue(configuration, "Voice Control", "Translator", this.iTranslator)
+		}
 
 		if (windowsSpeaker = translate("Random"))
 			windowsSpeaker := true
@@ -1142,15 +1151,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 	testSpeaker() {
 		global kSimulatorConfiguration
 
-		local configuration, synthesizer, language, voice, curSimulatorConfiguration
-
-		if (isSet(StepWizard) && isInstance(this.Manager, StepWizard)) {
-			configuration := newMultiMap()
-
-			this.Manager.SetupWizard.saveToConfiguration(configuration)
-		}
-		else
-			configuration := this.Manager.getConfiguration()
+		local configuration := newMultiMap()
+		local configuration, synthesizer, language, voice, curSimulatorConfiguration, arguments
 
 		this.saveToConfiguration(configuration)
 
@@ -1171,13 +1173,11 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
 
-			if (isSet(StepWizard) && isInstance(this.Manager, StepWizard))
-				language := this.Manager.assistantLanguage(this.Assistant, true)
-			else
-				language := this.Manager.getLanguage()
+			if this.iTranslator {
+				arguments := string2Values("|", this.iTranslator)
 
-			if isObject(language) {
-				synthesizer.setTranslator(Translator(language.Service, "English", language.Language, language.APIKey, language.Arguments*))
+				synthesizer.setTranslator(Translator(arguments[1], "English", arguments[3], arguments[4]
+												   , string2Values(",", arguments[5])*))
 
 				synthesizer.speakTest("en")
 			}

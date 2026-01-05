@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Pressures Editor                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -523,23 +523,23 @@ class PressuresEditor {
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
 			(
-			<html>
-				<meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						.cellStyle { border: none; }
-						table, p, div { color: #%fontColor% }
-					</style>
-					%chartScript%
-					<script type="text/javascript">
-						%chartLoad%
-					)"
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							.cellStyle { border: none; }
+							table, p, div { color: #%fontColor% }
+						</style>
+						%chartScript%
+						<script type="text/javascript">
+							%chartLoad%
+			)"
 
 			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
-												 , chartLoad: getGoogleChartsLoadStatement("corechart, bar, table")
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart", "corechart", "bar", "table")
 												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
@@ -547,12 +547,12 @@ class PressuresEditor {
 
 			after := "
 			(
-					</script>
-				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-				</body>
-			</html>
+						</script>
+					</head>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+					</body>
+				</html>
 			)"
 
 			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.getWidth() - 4, height: this.PressuresViewer.getHeight() - 4, backColor: this.Window.AltBackColor}))

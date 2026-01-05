@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Telemetry Viewer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -189,27 +189,38 @@ class TelemetryChart {
 					%chartScript%
 					<script type="text/javascript">
 						%chartLoad%
-					)"
+			)"
 
-					before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
-										 , chartLoad: getGoogleChartsLoadStatement("corechart, table, scatter")
-										 , fontColor: this.Window.Theme.TextColor
-										 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-										 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-										 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
+			after := "
+			(
+					</script>
+				</head>
+			)"
+
+			margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 										 , {margin: margin})
 
-		before .= "`n function drawChart() {"
+			before .= "`n function drawChart() {"
+			
+			loop chartFunctions.Length
+				before .= (" drawChart" . A_Index . "();")
+
+			before .= " }`n"
+			
 			before .= "`n function selectTelemetry(row) {"
 
 			loop chartFunctions.Length
 				before .= (" selectTelemetry" . A_Index . "(row);")
 
 			before .= " }`n"
-
-			after := "</script></head>"
 
 			return ("<html>" . before . values2String(A_Space, chartFunctions*) . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . values2String("", chartAreas*) . "</body></html>")
 		}

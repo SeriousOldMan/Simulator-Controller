@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -710,48 +710,51 @@ class SetupWorkbench extends ConfigurationItem {
 				if isChart {
 					before := "
 					(
-					<html>
-						<meta charset='utf-8'>
-						<head>
-							<style>
-								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							</style>
-							%chartScript%
-							<script type="text/javascript">
-								%chartLoad%
-							)"
+						<html>
+							<meta charset='utf-8'>
+							<head>
+								<style>
+									.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+									.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+									.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+								</style>
+								%chartScript%
+								<script type="text/javascript">
+									%chartLoad%
+					)"
 
-							before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
-												 , chartLoad: getGoogleChartsLoadStatement("corechart, table, bar")
-												 , fontColor: this.Window.Theme.TextColor
-												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+					before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+														 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																								 , "corechart", "table", "bar")
+														 , fontColor: this.Window.Theme.TextColor
+														 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 					width := this.SettingsViewer.getWidth() - 4
-					height := this.SettingsViewer.getHeight() - 4
-					info := ""
+					height := (this.SettingsViewer.getHeight() - 110 - 4)
+					
+					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
+					
 					iWidth := width - 10
 					iHeight := 90
 
 					after := "
 					(
-							</script>
-						</head>
-						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-							<style> table, p, div { color: #%fontColor% } </style>
-							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-							<div style="width: %iWidth%px; height: %iHeight%px">
-								<p style="font-family: Arial; font-size: 16px; margin: 5px">
-									<br>
-									<br>
-									%info%
-								</p>
-							</div>
-						</body>
-					</html>
+								</script>
+							</head>
+							<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+								<style> table, p, div { color: #%fontColor% } </style>
+								<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+								<div style="width: %iWidth%px; height: %iHeight%px">
+									<p style="font-family: Arial; font-size: 16px; margin: 5px">
+										<br>
+										<br>
+										%info%
+									</p>
+								</div>
+							</body>
+						</html>
 					)"
 
 					after := substituteVariables(after, {fontColor: this.Window.Theme.TextColor

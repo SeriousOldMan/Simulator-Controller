@@ -378,7 +378,7 @@ Beside manual translating the grammar files, an integrated translator can be use
 
 Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). A simple configuration dialog is also available on the "Basic" configuration page in "Simulator Setup" for the non-technical user. For all the above mentioned services an account on the website of the given service provider needs to be created and in all cases, a credit card must be registered. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
 
-The supported languages for the translator can be extended by placing a file named "Translator Languages.csv" in the *Simulator Controller\Translations* folder, which is located in your *Documents* folder. The content must look like:
+The supported languages for the translator can be extended by placing a file named "Languages.csv" in the *Simulator Controller\Translations* folder, which is located in your *Documents* folder. The content must look like:
 
 	Armenian,hy,Հայերեն
 	Avestan,ae,Upastawakaēna

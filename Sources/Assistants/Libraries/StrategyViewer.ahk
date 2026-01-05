@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Strategy Viewer                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -310,15 +310,19 @@ class StrategyViewer {
 					</style>
 					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {packages:['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
-					)"
+						%chartLoad%
+			)"
 
-					before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
-										 , fontColor: this.Window.Theme.TextColor
-										 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-										 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-										 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-										 , chartID: chartID})
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart%chartID%"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+												 , chartID: chartID})
+			
+			after := "
 			(
 					</script>
 				</head>

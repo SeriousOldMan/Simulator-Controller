@@ -2154,6 +2154,44 @@ class IEViewer extends HTMLViewer {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Function Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getGoogleChartsScriptTag(offline?) {
+	; Returns the Google Charts loader script tag
+	;
+	; If offline is supplied
+	;	offline = true  -> Uses local files from Resources\Charts\
+	; 	offline = false -> Uses online CDN (default)
+	; else
+	;	us default from core settings
+
+	static offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
+																						  , kConfigDirectory))
+											, "HTML", "Charts", "Online")
+
+	if !isSet(offline)
+		offline := (offlineDefault = "Offline")
+
+	if offline
+		return ('<script type="text/javascript" src="' . kResourcesDirectory . 'Charts\loader.js"></script>')
+	else
+		return ('<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>')
+}
+
+getGoogleChartsLoadStatement(drawFunction, packages*) {
+	; Returns the google.charts.load statement for the specified packages
+	; packages can be any number of package names like "corechart", "table", "bar"
+	;
+	; After that, the function specified by drawFunction is called
+
+	packages := values2String(", ", collect(packages, (p) => ("'" . p . "'"))*)
+
+	return ("google.charts.load('current', {packages:[" . packages . "]}).then(" . drawFunction . ");")
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -2181,7 +2219,7 @@ fixIE(version := 0, exeName := "") {
 		else
 			SplitPath(A_AhkPath, &exeName)
 	}
-	
+
 	if A_AhkPath
 		SplitPath(A_AhkPath, &ahkExe)
 
@@ -2200,7 +2238,7 @@ fixIE(version := 0, exeName := "") {
 						RegDelete("HKCU\" . key, ahkExe)
 						RegDelete("HKLM\" . key, ahkExe)
 					}
-					
+
 				RegDelete("HKCU\" . key, exeName)
 				RegDelete("HKLM\" . key, exeName)
 			}
@@ -2210,7 +2248,7 @@ fixIE(version := 0, exeName := "") {
 						RegWrite(version, "REG_DWORD", "HKCU\" . key, ahkExe)
 						RegWrite(version, "REG_DWORD", "HKLM\" . key, ahkExe)
 					}
-					
+
 				RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
 				RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
 			}

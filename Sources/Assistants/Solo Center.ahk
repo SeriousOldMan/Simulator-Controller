@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Solo Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -5576,11 +5576,15 @@ class SoloCenter extends ConfigurationItem {
 			)"
 
 			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
-											 	, chartLoad: getGoogleChartsLoadStatement("corechart, table, scatter")
-											 	, fontColor: this.Window.Theme.TextColor
-												, headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												, evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												, oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+											 	 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+											 	 , fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+			
+			after := "
+			(
 					</script>
 				</head>
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
@@ -5841,15 +5845,22 @@ class SoloCenter extends ConfigurationItem {
 					%chartScript%
 					<script type="text/javascript">
 						%chartLoad%
-					)"
+						
+						function drawCharts() {
+			)"
 
-script := substituteVariables(script, {chartScript: getGoogleChartsScriptTag()
-											 , chartLoad: getGoogleChartsLoadStatement("corechart, table, scatter")
-											 , tableCSS: getTableCSS()
+			script := substituteVariables(script, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawCharts"
+																						 , "corechart", "table", "scatter")
+												 , tableCSS: getTableCSS()
 												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+			
+			for ignore, chart in charts
+				script .= (A_Space . "drawChart" . chart[1] . "();")
+				
 			script .= "}`n"
 
 			for ignore, chart in charts {

@@ -39,7 +39,7 @@ A couple functions which let you enable or disable track automation and select a
 
 ### Assistant interface
 
-Each Race Assistant is running an internal rule engine. These functions can be used to interface with the rules in the rule set of a given Assistant to implement custom behavior or create custom events. 
+These functions allow you two simulate voice input for a given Assistant and you can interact with the AI by triggering events and activating actions. Using this, it is possible to implement almost any custom behavior or create custom events, that are triggered by a push of a button. 
 
 | Function | Parameter(s) | Plugin | Description |
 | ------ | ------ | ------ | ------ |

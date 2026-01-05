@@ -14444,8 +14444,15 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 				tCenter.Provider.supportsPitstop(&fuelService, &tyreService, &brakeService, &repairService)
 				tCenter.Provider.supportsTyreManagement( , &tyreSet)
 
-				if (fuelService && arguments[1].Has("FuelAmount"))
-					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])) . A_Space . getUnit("Volume", true))
+				if fuelService
+					if arguments[1].Has("RefuelAmount")
+						settingsListView.Add("", translate("Refuel")
+											   , displayValue("Float", convertUnit("Volume", arguments[1]["RefuelAmount"]))
+											   . A_Space . getUnit("Volume", true))
+					else if arguments[1].Has("FuelAmount")
+						settingsListView.Add("", translate("Refuel")
+											   , displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"]))
+											   . A_Space . getUnit("Volume", true))
 
 				if inList(["ACC", "Assetto Corsa Competizione"], tCenter.Simulator) {
 					if arguments[1].Has("Pitstop.Planned.Tyre.Compound") {

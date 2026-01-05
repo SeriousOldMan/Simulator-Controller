@@ -625,3 +625,46 @@ testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 		}
 	}
 }
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Google Charts Helper Functions                       ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getGoogleChartsScriptTag(offline := false) {
+	; Returns the Google Charts loader script tag
+	; offline = true: Uses local files from Resources/Charts/
+	; offline = false: Uses online CDN (default)
+	
+	if (offline) {
+		local resourcesPath := A_WorkingDir . "\Resources\Charts"
+		return '<script type="text/javascript" src="' . resourcesPath . '\loader.js"></script>'
+	}
+	else
+		return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
+}
+
+getGoogleChartsLoadStatement(packages := "corechart", offline := false) {
+	; Returns the google.charts.load statement for the specified packages
+	; packages can be a comma-separated string like "corechart, table, bar"
+	; offline = true: Uses 'current' version (works with offline files)
+	; offline = false: Uses 'current' version from CDN (default)
+	local pkgArray := []
+	
+	for _, pkg in StrSplit(packages, ",") {
+		pkg := Trim(pkg)
+		
+		if (pkg != "")
+			pkgArray.Push(pkg)
+	}
+	
+	local jsPackages := ""
+	
+	for i, pkg in pkgArray {
+		if (i > 1)
+			jsPackages .= ", "
+			
+		jsPackages .= "'" . pkg . "'"
+	}
+	
+	return "google.charts.load('current', {packages:[" . jsPackages . "]}).then(drawChart);"
+}

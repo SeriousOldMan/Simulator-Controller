@@ -943,11 +943,16 @@ class SpeechSynthesizer {
 			}
 		}
 		else if inList(["dotNet", "Azure", "Google"], this.Synthesizer) {
-			if ((this.Synthesizer = "Google") && (this.iGoogleMode = "RPC")) {
-				name := string2Values(" - ", this.Voice)
-				voice := string2Values("-", this.Voice)
+			try {
+				if ((this.Synthesizer = "Google") && (this.iGoogleMode = "RPC")) {
+					name := string2Values(" - ", this.Voice)
+					voice := string2Values("-", this.Voice)
 
-				this.iSpeechSynthesizer.SetVoice(name[1], name[2], voice[1] . "-" . voice[2])
+					this.iSpeechSynthesizer.SetVoice(name[1], name[2], voice[1] . "-" . voice[2])
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 
 			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
@@ -1100,24 +1105,29 @@ class SpeechSynthesizer {
 	speakTest(language := false) {
 		if !language
 			language := this.Language
-			
-		switch language, false {
-			case "DE":
-				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
-			case "ES":
-				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
-			case "FR":
-				this.speak("Portez ce vieux whisky au juge blond qui fume")
-			case "IT":
-				this.speak("Che tempi brevi zio, quando solfeggi")
-			case "PT":
-				this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
-			case "ZH":
-				this.speak("潮水冲淡了他们留在沙滩上的脚印")
-			case "JA":
-				this.speak("素早い茶色のキツネが怠け者の犬を飛び越える")
-			default:
-				this.speak("The quick brown fox jumps over the lazy dog")
+
+		try	{
+			switch language, false {
+				case "DE":
+					this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
+				case "ES":
+					this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
+				case "FR":
+					this.speak("Portez ce vieux whisky au juge blond qui fume")
+				case "IT":
+					this.speak("Che tempi brevi zio, quando solfeggi")
+				case "PT":
+					this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
+				case "ZH":
+					this.speak("潮水冲淡了他们留在沙滩上的脚印")
+				case "JA":
+					this.speak("素早い茶色のキツネが怠け者の犬を飛び越える")
+				default:
+					this.speak("The quick brown fox jumps over the lazy dog")
+			}
+		}
+		catch Any as exception {
+			logError(exception, true)
 		}
 	}
 

@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.7.7.1
+
+#### Date: 01/05/26
+
+#### Fixes
+
+  - Fixed an endless loop introduced with the last release, that crashed "Simulator Setup" while scanning the Steam library for new applications.
+  
 ## 6.7.7.0
 
 #### Date: 01/02/26

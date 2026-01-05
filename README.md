@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.7.0-release](https://cutt.ly/WtgnyBe2) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
+[6.7.7.1-release](https://cutt.ly/EthyIeFt) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
 

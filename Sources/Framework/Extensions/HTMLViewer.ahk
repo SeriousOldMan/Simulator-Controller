@@ -2166,17 +2166,38 @@ getGoogleChartsScriptTag(offline?) {
 	; else
 	;	us default from core settings
 
-	static offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
-																						  , kConfigDirectory))
-											, "HTML", "Charts", "Online")
+	patchURI(fileName) {
+		local text := FileRead(fileName)
 
+		text := StrReplace(text, "%chartsRoot%", "./Charts")
+
+		deleteFile(fileName)
+
+		FileAppend(text, fileName, "UTF-8-RAW")
+	}
+
+	static offlineDefault := kUndefined
+
+	if (offlineDefault = kUndefined) {
+		offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
+																					   , kConfigDirectory))
+										 , "HTML", "Charts", "Online")
+
+		if !FileExist(kUserHomeDirectory . "Charts") {
+			DirCopy(kResourcesDirectory . "Charts", kUserHomeDirectory . "Charts")
+
+			; patchURI(kUserHomeDirectory . "Charts\loader.js")
+			; patchURI(kUserHomeDirectory . "Charts\offline\loader.js")
+		}
+	}
+msgbox A_WorkingDir
 	if !isSet(offline)
 		offline := (offlineDefault = "Offline")
 
 	if offline
-		return ('<script type="text/javascript" src="' . kResourcesDirectory . 'Charts\loader.js"></script>')
+		return ('<script type="text/javascript" src="' . kUserHomeDirectory . 'Charts/loader.js"></script>')
 	else
-		return ('<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>')
+		return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
 }
 
 getGoogleChartsLoadStatement(drawFunction, packages*) {

@@ -353,6 +353,8 @@ initializeEnvironment() {
 		FileCopy(kResourcesDirectory . "Templates\UPDATES", kUserConfigDirectory)
 
 	registerMessageHandler("Core", functionMessageHandler)
+
+	SetWorkingDir(kUserHomeDirectory)
 }
 
 

@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cZl8NqkA/Releases/Simulator%20Controller%206.7.8.0-dev.zip) (Early build for 6.7.8. Changes: Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2.)
+[6.7.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cZl8NqkA/Releases/Simulator%20Controller%206.7.8.0-dev.zip) (Early build for 6.7.8. Changes: Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6780) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-678) of this version and all the versions you might have skipped, before installing and using this version.
 

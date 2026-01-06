@@ -2273,6 +2273,8 @@ fixIE(version := 0, exeName := "") {
 }
 
 initializeHTMLViewer() {
+	local settings
+	
 	AddHTMLViewer(window, arguments*) {
 		return createWebView2Viewer(window, arguments*)
 	}
@@ -2385,11 +2387,13 @@ initializeHTMLViewer() {
 	Window.DefineCustomControl("WebView2Viewer", createWebView2Viewer)
 	Window.DefineCustomControl("IE11Viewer", createIEViewer)
 
-	if ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11") = "WebView2") ||
-		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-						, "General", "HTML Viewer", "IE11") = "WebView2")) {
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+			
+	if ((getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+								  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")) = "WebView2")
+	 || (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+						, "General", "HTML Viewer", "IE11") = "WebView2"))
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
-	}
 	else
 		Window.DefineCustomControl("HTMLViewer", createIEViewer)
 }

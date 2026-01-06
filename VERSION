@@ -3,7 +3,7 @@ Version=6.7.8.0-dev
 Target=6.7.8.0-release
 Date=01/06/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cZl8NqkA/Releases/Simulator Controller 6.7.8.0-dev.zip
-Changes=Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation
+Changes=Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation, Application discrimininator for HTML->Viewer core setting
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.7.1-release

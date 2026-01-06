@@ -469,9 +469,16 @@ class TelemetryChart {
 	}
 
 	selectRow(row) {
-		local data, x
+		local settings, data, x
 
-		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
+		static htmlViewer := false
+		
+		if !htmlViewer {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+			
+			htmlViewer := getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+												   , getMultiMapValue(settings, "HTML", "Viewer", "IE11"))
+		}
 
 		if (false && (htmlViewer = "WebView2"))
 			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)

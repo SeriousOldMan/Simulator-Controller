@@ -2166,26 +2166,24 @@ getGoogleChartsScriptTag(offline?) {
 	; else
 	;	us default from core settings
 
-	patchURI(fileName) {
-		local text := FileRead(fileName)
-
-		text := StrReplace(text, "%chartsRoot%", "./Charts")
-
-		deleteFile(fileName)
-
-		FileAppend(text, fileName, "UTF-8-RAW")
-	}
+	local ignore
 
 	static offlineDefault := kUndefined
 
-	if (offlineDefault = kUndefined) {
+	if (offlineDefault = kUndefined)
 		offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
 																					   , kConfigDirectory))
 										 , "HTML", "Charts", "Online")
-	}
 
-	if !isSet(offline)
-		offline := (offlineDefault = "Offline")
+	if !isSet(offline) {
+		if Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+			offline := (offlineDefault = "Offline")
+		else
+			offline := true
+	}
+	else if !offline
+		if !Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+			offline := true
 
 	if offline
 		return ('<script type="text/javascript" src="./Charts/loader.js"></script>')

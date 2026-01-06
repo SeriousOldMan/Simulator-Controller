@@ -2182,16 +2182,6 @@ getGoogleChartsScriptTag(offline?) {
 		offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
 																					   , kConfigDirectory))
 										 , "HTML", "Charts", "Online")
-
-		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts") {
-			DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
-
-			SetWorkingDir(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-
-			; patchURI(kUserHomeDirectory . "Charts\loader.js")
-			; patchURI(kUserHomeDirectory . "Charts\offline\loader.js")
-		}
 	}
 
 	if !isSet(offline)
@@ -2290,8 +2280,16 @@ initializeHTMLViewer() {
 	}
 
 	createWebView2Viewer(window, arguments*) {
-		local control := window.Add("Picture", arguments*)
-		local viewer := WebView2Viewer(control)
+		local control, viewer
+
+		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts") {
+			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
+
+			SetWorkingDir(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+		}
+
+		control := window.Add("Picture", arguments*)
+		viewer := WebView2Viewer(control)
 
 		viewer.Navigate("about:blank")
 
@@ -2337,9 +2335,17 @@ initializeHTMLViewer() {
 	}
 
 	createIEViewer(window, options) {
-		local control := window.Add("ActiveX", options, "shell.explorer")
-		local viewer := IEViewer(control)
-		local explorer := viewer.Explorer
+		local control, viewer, explorer
+
+		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts") {
+			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
+
+			SetWorkingDir(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+		}
+
+		control := window.Add("ActiveX", options, "shell.explorer")
+		viewer := IEViewer(control)
+		explorer := viewer.Explorer
 
 		explorer.navigate("about:blank")
 

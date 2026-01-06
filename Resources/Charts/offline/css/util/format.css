@@ -1,0 +1,53 @@
+.google-visualization-formatters-arrow-dr {
+  padding-left: 13px !important;
+  background: url(arrow_dr.png) no-repeat left;
+  border: 1px solid #eee;
+}
+
+.google-visualization-formatters-arrow-ug {
+  padding-left: 13px !important;
+  background: url(arrow_ug.png) no-repeat left;
+  border: 1px solid #eee;
+}
+
+.google-visualization-formatters-arrow-empty {
+  padding-left: 13px !important;
+  border: 1px solid #eee;
+}
+
+.google-visualization-formatters-bars {
+  padding: 0;
+  float: left;
+  white-space: nowrap;
+}
+
+.google-visualization-formatters-bars > span {
+  display: inline-block;
+  height: 12px;
+  padding: 0;
+  background: url("bar_w.png") repeat-x left bottom;
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-b {
+  background-image: url("bar_b.png");
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-g {
+  background-image: url("bar_g.png");
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-r {
+  background-image: url("bar_r.png");
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-s {
+  background-image: url("bar_s.png");
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-w {
+  background-image: url("bar_w.png");
+}
+
+.google-visualization-formatters-bars > .google-charts-bar-z {
+  background-image: url("bar_z.png");
+}

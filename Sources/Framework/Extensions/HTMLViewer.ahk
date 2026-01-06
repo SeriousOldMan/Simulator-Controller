@@ -24,6 +24,7 @@
 global kExplorerVersions := CaseInsenseMap("Simulator Setup", 10)
 
 kExplorerVersions.Default := 11
+kHTMLViewer := "IE11"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2170,25 +2171,27 @@ getGoogleChartsScriptTag(offline?) {
 
 	static offlineDefault := kUndefined
 
-	if (offlineDefault = kUndefined)
-		offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
-																					   , kConfigDirectory))
-										 , "HTML", "Charts", "Online")
+	if (kHTMLViewer = "WebView2") {
+		if (offlineDefault = kUndefined)
+			offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
+																						   , kConfigDirectory))
+											 , "HTML", "Charts", "Online")
 
-	if !isSet(offline) {
-		if Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
-			offline := (offlineDefault = "Offline")
-		else
-			offline := true
+		if !isSet(offline) {
+			if Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+				offline := (offlineDefault = "Offline")
+			else
+				offline := true
+		}
+		else if !offline
+			if !Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+				offline := true
+
+		if offline
+			return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
 	}
-	else if !offline
-		if !Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
-			offline := true
 
-	if offline
-		return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
-	else
-		return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
+	return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
 }
 
 getGoogleChartsLoadStatement(drawFunction, packages*) {
@@ -2273,8 +2276,10 @@ fixIE(version := 0, exeName := "") {
 }
 
 initializeHTMLViewer() {
+	global kHTMLViewer
+
 	local settings
-	
+
 	AddHTMLViewer(window, arguments*) {
 		return createWebView2Viewer(window, arguments*)
 	}
@@ -2334,12 +2339,6 @@ initializeHTMLViewer() {
 	createIEViewer(window, options) {
 		local control, viewer, explorer
 
-		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts") {
-			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
-
-			SetWorkingDir(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-		}
-
 		control := window.Add("ActiveX", options, "shell.explorer")
 		viewer := IEViewer(control)
 		explorer := viewer.Explorer
@@ -2388,14 +2387,19 @@ initializeHTMLViewer() {
 	Window.DefineCustomControl("IE11Viewer", createIEViewer)
 
 	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-			
+
 	if ((getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
 								  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")) = "WebView2")
 	 || (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-						, "General", "HTML Viewer", "IE11") = "WebView2"))
+						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
-	else
+
+		kHTMLViewer := "WebView2"
+	}
+	else {
 		Window.DefineCustomControl("HTMLViewer", createIEViewer)
+
+	}
 }
 
 

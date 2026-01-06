@@ -37,9 +37,8 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.7.8
 
-If you are using the dark Windows 11 them and have added some of the Simulator Controller to your Windows task bar, you can use the Windows "Disk Cleanup" application to clear the "Tumbnails", so that the Explorer reloads the icons from all applications. On WIndows 11, you can achieve the same on the System > Storage page of the Windows settings.
-
-All this is completely optional and only cosmetic, of course.
+1. [Optional] If you are using the dark Windows 11 them and have added some of the Simulator Controller to your Windows task bar, you can use the Windows "Disk Cleanup" application to clear the "Tumbnails", so that the Explorer reloads the icons from all applications. On WIndows 11, you can achieve the same on the System > Storage page of the Windows settings.
+2. A file with all official track names has been added for *Automobilista 2*. Because Simulator Controller has already collected names for all tracks, you already have used, you may want to delete the file "Track Data.ini" which is located in the [Documents]\Simulator Controller\Simulator Data\AMS2*.
 
 ***
 

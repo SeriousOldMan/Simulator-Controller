@@ -2186,7 +2186,7 @@ getGoogleChartsScriptTag(offline?) {
 			offline := true
 
 	if offline
-		return ('<script type="text/javascript" src="./Charts/loader.js"></script>')
+		return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
 	else
 		return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
 }
@@ -2280,11 +2280,8 @@ initializeHTMLViewer() {
 	createWebView2Viewer(window, arguments*) {
 		local control, viewer
 
-		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts") {
+		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
 			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
-
-			SetWorkingDir(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
-		}
 
 		control := window.Add("Picture", arguments*)
 		viewer := WebView2Viewer(control)

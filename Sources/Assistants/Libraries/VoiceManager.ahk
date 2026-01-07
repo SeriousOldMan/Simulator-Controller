@@ -1671,7 +1671,7 @@ class VoiceManager extends ConfigurationItem {
 
 	recognize(text) {
 		if this.VoiceServer
-			messageSend(kFileMessage, "Voice", "recognize:" . values2String(";", this.VoiceManager.Name, text), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "recognize:" . values2String(";", this.Name, text), this.VoiceServer)
 		else
 			this.iSpeechRecognizer.recognize(text)
 	}

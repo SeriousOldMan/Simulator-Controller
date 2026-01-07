@@ -86,7 +86,7 @@ The topic "Interaction" allows a general interaction with an Assistant by simula
 
 | Function      | Arguments                                  | Description |
 |---------------|--------------------------------------------|-------------|
-| Ask           | assistant, question                        | This function will send the given *question* to the specified *assistant* as if it has been given by voice. The *question* will be processed by the *Conversation* booster and therefore the answer will be supplied by the attached LLM. |
+| Ask           | assistant, question                        | This function will send the given *question* to the specified *assistant* as if it has been given by voice. |
 | Command       | assistant, grammar, [Optional] command     | This function will trigger the command with the name *grammar* for the specified *assistant* as if it has been given by voice. If the definition for the *grammar* requires variable parts in the command text, for example a number of liters for refueling, a full command text, that matches the defined grammar, must be supplied with *command*. Otherwise, it is optional. Example (for Race Engineer):<br><br>command("Race Engineer", "PitstopAdjustPressureUp", "Can we increase front left by 0.4?")<br><br>The names of the different command grammars can be found by looking into grammar files of the corresponding Assistant, which can be found in the *Resources\Grammars* folder which is located in the installation folder of Simulator Controller. |
 
 #### Reasoning

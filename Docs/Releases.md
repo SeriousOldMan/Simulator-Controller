@@ -48,8 +48,8 @@
   - Thanks again to @inthebagbud UK, who compiled a complete file of all current track names for *Automobilista 2* this time.
   - Also many thanks to @rysimabd, who provided a full update of the Chinese translation files.
   - [Experts] Two new controller action functions ["ask" and "command"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#Assistant-interface) let you generate synthetical voice input by any external trigger, for example a press of a button on your Stream Deck. This allows you to use the Assistants without voice control for even the most exotic cases.
-  - [Experts] The [integrated HTML engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#HTML-Engine-Settings) can now be configured individually for each application.
-  - [Internal] Extensive preparation for running the charts engine offline without a network connection to Google. See the new [core setting "HTML" -> "Charts"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#HTML-Engine-Settings) for more information.
+  - [Experts] The [integrated HTML engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#html-engine-settings) can now be configured individually for each application.
+  - [Internal] Extensive preparation for running the charts engine offline without a network connection to Google. See the new [core setting "HTML" -> "Charts"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#html-engine-settings) for more information.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-678), for information how to delete the Windows task bar icon cache and also how to activate the new track names for *Automobilista 2*. 
 

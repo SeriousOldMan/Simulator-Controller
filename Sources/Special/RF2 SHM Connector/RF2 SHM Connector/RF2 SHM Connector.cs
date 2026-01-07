@@ -408,6 +408,7 @@ namespace SHMConnector {
 				strWriter.WriteLine("MAP=n/a");
 				strWriter.Write("TC="); strWriter.WriteLine(extended.mPhysics.mTractionControl);
 				strWriter.Write("ABS="); strWriter.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				strWriter.Write("BB="); strWriter.WriteLine(Math.Round(playerTelemetry.mRearBrakeBias, 2));
 
 				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
 				strWriter.Write("TyreTemperature=");

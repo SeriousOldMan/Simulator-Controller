@@ -21,6 +21,8 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 The "Session" module for the integrated script engine defines three global objects (named topic in the following documentation), which can be used to access important information about the current session.
 
+Important: This moule is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
+
 ### Topics
 
 In the following sections you will find an overview for all objects. Please note that not every property may be available for all simulators or that individual properties will have individual value ranges for a specific simulator.
@@ -76,7 +78,20 @@ The "Assistants" module which can be used in scripts started from the controller
 
 ### Topics
 
-Only one topic is defined, which is named "Reasoning". It defines the following functions:
+Two topics are defined, which allow an interaction with a rnning Assistant.
+
+#### Interaction
+
+The topic "Interaction" allows a general interaction with an Assistant by simulating a voice command.
+
+| Function      | Arguments                                  | Description |
+|---------------|--------------------------------------------|-------------|
+| Ask           | assistant, question                        | This function will send the given *question* to the specified *assistant* as if it has been given by voice. The *question* will be processed by the *Conversation* booster and therefore the answer will be supplied by the attached LLM. |
+| Command       | assistant, grammar, [Optional] command     | This function will trigger the command with the name *grammar* for the specified *assistant* as if it has been given by voice. If the definition for the *grammar* requires variable parts in the command text, for example a number of liters for refueling, a full command text, that matches the defined grammar, must be supplied with *command*. Otherwise, it is optional. Example (for Race Engineer):<br><br>command("Race Engineer", "PitstopAdjustPressureUp", "Can we increase front left by 0.4?")<br><br>The names of the different command grammars can be found by looking into grammar files of the corresponding Assistant, which can be found in the *Resources\Grammars* folder which is located in the installation folder of Simulator Controller. |
+
+#### Reasoning
+
+The topic "Reasoning" serves as an interface to the *Reasoning* booster and defines the following functions:
 
 | Function      | Arguments                                  | Description |
 |---------------|--------------------------------------------|-------------|

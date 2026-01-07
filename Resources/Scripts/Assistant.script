@@ -22,6 +22,8 @@ Rules = {}
 
 Assistant.Ask = __Assistant_Ask
 
+Assistant.Command = __Assistant_Command
+
 function Assistant.Speak(message, ...)
 	local arguments = table.pack(...)
 	

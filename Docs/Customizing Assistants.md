@@ -538,6 +538,10 @@ Additionally you can export and import actions here to build a library for you a
    
      Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
 	 
+   - Assistant.Command(grammar [, command])
+   
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. If the grammar reacts to variable parts in the command text, this text can be passed as the optional second argument.
+	 
    - Controller.Call(method, p1, p2, ...)
    
      Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
@@ -573,6 +577,10 @@ Additionally you can export and import actions here to build a library for you a
    - Assistant.Ask(question :: \<string\>)
    
      Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+	 
+   - Assistant.Command(grammar :: \<string\> [, command :: \<string\>])
+   
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
    - Controller.Call(method :: \<string\>, p1, p2, ...)
    

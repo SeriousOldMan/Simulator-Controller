@@ -568,7 +568,7 @@ Last but not lest, you can extend the reasoning process of a Race Assistant by c
 
 ## Execution of Scripts by the Rule Engine
 
-When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua]() scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
+When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua](https://www.lua.org) scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
 
 When this script is executed, the following global variables and functions are available:
 
@@ -586,11 +586,13 @@ When this script is executed, the following global variables and functions are a
 	 
    - Assistant.Ask(question :: \<string\>)
    
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. This function will have no effect, if the Assistant is not configured for listening.
 	 
    - Assistant.Command(grammar :: \<string\> [, command :: \<string\>])
    
-     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. This function will have no effect, if the Assistant is not configured for listening.
+	 
+	 If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
    - Controller.Call(method :: \<string\>, p1, p2, ...)
    

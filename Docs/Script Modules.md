@@ -21,7 +21,7 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 The "Session" module for the integrated script engine defines three global objects (named topic in the following documentation), which can be used to access important information about the current session.
 
-Important: This moule is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
+Important: This module is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
 
 ### Topics
 
@@ -72,7 +72,7 @@ This topic gives you access to the current standings including information about
 | Position        | Synonymous for *OverallPosition*. |
 | Standings       | Returns the full table of standings, sorted by the overall position. It contains objects for each car with the following properties::<br><br>1.*overallPosition* = the current overall position<br>2.*classPosition* = the current position with regards to the class-specific standings<br>3.*car* = the car in this position<br>4.*nr* = the race number of the car in this position<br>5.*driver* = the name of the driver in this position<br>6.*laps* = the number of laps the car in this position already has driven<br>7.*time* = the last lap time of the car in this position |
 
-## Module Assistants
+## Module *Assistants*
 
 The "Assistants" module which can be used in scripts started from the controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions) or started as action in the currently active [track automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation).
 

@@ -3,7 +3,7 @@ All applications have been implemented on top of a specialized framework especia
 To change any of the low level configuration options, create a file named "Core Settings.ini" and place it in the *Simulator Controller\Config* folder which resides in your *Documents* folder. Then insert the options you want to change, but be sure to preceed them with the correct category header. Example:
 
 	[HTML]
-	Viewer=WebView2
+	Viewer.*=WebView2
 
 Please note, that all this confguration options are documented here for the experienced user with technical skills. Do not change any of them, until you are told so by me, or you do know what you are doing.
 
@@ -92,7 +92,7 @@ Some applications of Simulator Controller uses an integrated HTML renderer to di
 
 | Category      | Setting        | Default | Description |
 |---------------|----------------|---------|-------------|
-| HTML          | Viewer         | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. Beside specifying the engine for all applications using the "Viewer" setting, individual applications can be configured by appending the application name. Example: "Viewer.Setup Workbench" |
+| HTML          | Viewer.\*      | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. Beside specifying the engine for all applications using the "Viewer.\*" setting, individual applications can be configured by appending the application name. Example: "Viewer.Setup Workbench"<br><br>Note: The setting "Viewer" is still supported and equal to "Viewer.\*", but deprecated. |
 |               | Charts         | Online  | The value, which must be one of *Online* or *Offline*, specifies how the Google Charts library is loaded. *Offline* will only work, if the HTML Viewer is set to *WebView*, and is ignored for *IE11*. Do **not** change this setting unless told so by the development team. |
 
 ### Miscellaneous Settings

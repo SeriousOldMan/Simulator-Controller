@@ -2389,7 +2389,9 @@ initializeHTMLViewer() {
 	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
 	if ((getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
-								  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")) = "WebView2")
+								  , getMultiMapValue(settings, "HTML", "Viewer.*"
+															 , getMultiMapValue(settings, "HTML", "Viewer"
+																						, "IE11"))) = "WebView2")
 	 || (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)

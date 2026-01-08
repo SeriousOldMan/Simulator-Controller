@@ -527,6 +527,8 @@ callSimulator(simulator, options := "", protocol?) {
 	}
 }
 
+_callSimulator := callSimulator
+
 readSimulator(simulator, car, track, format := "Object") {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 	local data := provider.readSessionData("Setup=true")
@@ -551,4 +553,8 @@ readSimulator(simulator, car, track, format := "Object") {
 	addMultiMapValues(data, standingsData)
 
 	return ((format = "Text") ? printMultiMap(data) : data)
+}
+
+_readSimulator(simulator, car := false, track := false) {
+	return readSimulator(simulator, car, track, "Text")
 }

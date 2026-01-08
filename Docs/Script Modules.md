@@ -15,7 +15,7 @@ Only one topic is defined, which is named "Enviroment". It defines the following
 | Function | Arguments                      | Description |
 |----------|--------------------------------|-------------|
 | Get      | name, [Optional] default       | Returns the global value for the given *name*. If no value is defined, either the value *default* (if provided) or *nil* is returned. |
-| Set      | name, value                    | Sets the global value for the given *name*. *value* maybe of type string, number, boolean or simple arrays, that consists of values of these types. Please note, that the names are case-sensitive. |
+| Set      | name, value                    | Sets the global value for the given *name*. *value* may be of type string, number or simple arrays, that consists of values of these types. Please note, that *name* is case-sensitive. |
 
 ## Module *Simulator*
 

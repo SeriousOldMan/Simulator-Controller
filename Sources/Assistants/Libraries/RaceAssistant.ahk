@@ -537,7 +537,7 @@ class RaceAssistant extends ConfigurationItem {
 						scriptSetGlobal(context, "__Rules_Execute")
 
 						scriptPushValue(context, (c) {
-							askAssistant(this.RaceAssistant, scriptGetString(c))
+							ask(this.RaceAssistant, scriptGetString(c))
 
 							return Integer(0)
 						})
@@ -5380,7 +5380,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				scriptSetGlobal(context, "__Rules_Execute")
 
 				scriptPushValue(context, (c) {
-					askAssistant(assistant, scriptGetString(c))
+					ask(assistant, scriptGetString(c))
 
 					return Integer(0)
 				})

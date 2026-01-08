@@ -1765,16 +1765,17 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	ask(grammar, question) {
+	ask(grammar, question, command?) {
 		local words, index, literal
 
 		if (grammar = "TEXT") {
 			if this.Listener
-				this.VoiceManager.recognize(question)
-			else
-				this.handleVoiceText("TEXT", question)
+				if (isSet(command) && command)
+					this.VoiceManager.recognize(question)
+				else
+					this.handleVoiceText("TEXT", question)
 		}
-		else {
+		else if this.Listener {
 			words := string2Values(A_Space, question)
 
 			for index, literal in words
@@ -4985,18 +4986,6 @@ callController(context, method, arguments*) {
 
 Controller_Call := callController
 
-askAssistant(context, question) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
-	local remoteHandler := assistant.RemoteHandler
-
-	if assistant.Listener
-		assistant.VoiceManager.recognize(question)
-
-	return true
-}
-
-Assistant_Ask := askAssistant
-
 speakAssistant(context, message, force := false) {
 	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
 	local speaker, ignore, part
@@ -5093,19 +5082,28 @@ triggerAction(context, action, arguments*) {
 
 Assistant_Trigger:= triggerAction
 
-ask(assistant, question) {
+ask(assistant, question, command?) {
 	local pid
 
 	try {
-		pid := ProcessExist(assistant . ".exe")
+		if inList(kRaceAssistants, assistant) {
+			pid := ProcessExist(assistant . ".exe")
 
-		if pid {
-			messageSend(kFileMessage, assistant, "ask:TEXT;" . question, pid)
+			if pid {
+				messageSend(kFileMessage, assistant, "ask:TEXT;" . question . (isSet(command) ? (";" . command) : ""), pid)
+
+				return true
+			}
+			else
+				return false
+		}
+		else {
+			assistant := (isInstance(assistant, RaceAssistant) ? assistant : assistant.KnowledgeBase.RaceAssistant)
+
+			assistant.ask("TEXT", question, command?)
 
 			return true
 		}
-		else
-			return false
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -5113,6 +5111,8 @@ ask(assistant, question) {
 		return false
 	}
 }
+
+Assistant_Ask := ask
 
 command(assistant, grammar, command := false) {
 	local pid

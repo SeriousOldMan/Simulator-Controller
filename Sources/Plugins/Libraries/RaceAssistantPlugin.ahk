@@ -2338,9 +2338,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.RaceAssistant.unmute()
 	}
 
-	ask(question) {
+	ask(question, command?) {
 		if this.RaceAssistant
-			this.RaceAssistant.ask("Text", question)
+			if isSet(command) {
+				if (command = kTrue)
+					command := true
+				else if (command = kFalse)
+					command := false
+
+				this.RaceAssistant.ask("Text", question, command)
+			}
+			else
+				this.RaceAssistant.ask("Text", question)
 	}
 
 	command(grammar, command := "") {

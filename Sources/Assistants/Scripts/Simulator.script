@@ -31,6 +31,8 @@ Simulator.Read = function (simulator, car, track)
 	return __read_simulator(simulator, car, track, "Text")
 end
 
-Simulator.Call = function (simulator, command)
-	return __call_simulator(simulator, command)
+Simulator.Call = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __call_simulator(simulator, tables.unpack(arguments))
 end

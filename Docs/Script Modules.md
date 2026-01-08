@@ -14,8 +14,8 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 | Function | Arguments                      | Description |
 |----------|--------------------------------|-------------|
-| Read     | simulator, car, track          | Returns the full set of data provided by the *simulator* for the given *car* and *track* combination. The data is returned as string coded in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). |
-| Call     | simulator, command             | Sends the given command to the simulator. See the examples below to see some of the available commands. |
+| Read     | simulator, car, track          | Returns the full set of data provided by the *simulator* for the given *car* and *track* combination incl. all post processing for tyre compound names, track names, etc. The data is returned as string coded in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). |
+| Call     | simulator, [Optional] command  | Sends the given command to the simulator and returns the result (if any). See the examples below to see some of the available commands. The most basic command is the empty string (or no command at all). In this case, *Call* returns the raw data in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) without any post processing. |
 
 ## Module *Session*
 

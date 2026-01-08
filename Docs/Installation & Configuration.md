@@ -584,7 +584,7 @@ Note: The handling of voice hotkeys follow the general rules of voice commands. 
 
 ##### Actions
 
-An action looks like this: *setMode("Tactile Feedback", "Pedal Vibration")*, which means, that the "Pedal Vibration" mode of the "Tactile Feedback" plugin should be selected as the active layer for your hardware controller. You can provide zero or more arguments to the function call. All arguments will be passed as strings to the function with the exception of *true* and *false*, which will be passed as literal values (1 and 0). Although you may call any globally defined function, you should use only the following functions for your actions, since they are specially prepared to be called from an external source.
+An action looks like this: *setMode("Tactile Feedback", "Pedal Vibration")*, which means, that the "Pedal Vibration" mode of the "Tactile Feedback" plugin should be selected as the active layer for your hardware controller. You can provide zero or more arguments to the function call. All arguments will be passed as strings to the function with the exception of *true* and *false*, which will be passed as literal values (1 and 0). Although you may call any globally defined function, you is advised to use only functions for your actions, which are specially prepared to be called from an external source.
 
 Please see the [separate documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for a complete reference of all available controller action functions.
 

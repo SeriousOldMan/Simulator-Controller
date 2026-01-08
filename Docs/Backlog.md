@@ -1,6 +1,7 @@
 #### General
   1. Support for unit conversions per simulator
   2. Make the location of the local data folder configurable during installation process
+  3. Make the driver name editable in the profile dialog
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -26,6 +27,7 @@
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
   3. Engineer's Diary with change history, lap times after change, notes and so on
+  4. Support for crucial meta data like steer lock, wheelbase, etc. for all sims
 
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.7.1-release](https://cutt.ly/EthyIeFt) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
+[6.7.8.0-release](https://cutt.ly/8thMnbim) (Changes: Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation, Application discrimininator for HTML->Viewer core setting, New functions "Ask" and "Command" in Lua Assistats module, New predicates/functions "Assistant.Ask" and "Assitant.Command" for booster rules and scripts, New predicates "Assistant.Ask" and "Assitant.Command" in the rule engine of an Assistant.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6780) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-678) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.7.5.1-release](https://cutt.ly/ttsVJKiP) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
+[6.7.7.1-release](https://cutt.ly/EthyIeFt) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
 
-[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+[6.7.5.1-release](https://cutt.ly/ttsVJKiP) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
 
 #### Latest development build
 
-[6.7.8.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/n2fGwidr/Releases/Simulator%20Controller%206.7.8.0-beta.zip) (Test build for 6.7.8. Changes: Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation, Application discrimininator for HTML->Viewer core setting, New functions "Ask" and "Command" in Lua Assistats module, New predicates/functions "Assistant.Ask" and "Assitant.Command" for booster rules and scripts, New predicates "Assistant.Ask" and "Assitant.Command" in the rule engine of an Assistant.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6780) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-678) of this version and all the versions you might have skipped, before installing and using this version.
+None at the moment...
 
 ### Documentation
 

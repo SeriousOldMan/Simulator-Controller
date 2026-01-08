@@ -3,7 +3,7 @@
 ;;;                                         Include Sequence                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #Include "Libraries\SimulatorProvider.ahk"	; Required, must be loaded before all other provides

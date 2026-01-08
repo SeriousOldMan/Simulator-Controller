@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Applications Step Wizard        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -54,7 +54,7 @@ class ApplicationsStepWizard extends StepWizard {
 						steamID := wizard.getApplicationValue(theApplication, "SteamID", kUndefined)
 
 						if (steamID != kUndefined)
-							specialStartup .= ("(" . substituteVariables(hooks[6], {id: steamID}) . ")")
+							specialStartup .= ("(" . substituteVariables(descriptor[6], {id: steamID}) . ")")
 					}
 
 					Application(theApplication, false, exePath, workingDirectory, descriptor[4], specialStartup, hooks[2], hooks[3]).saveToConfiguration(configuration)
@@ -268,7 +268,8 @@ class ApplicationsStepWizard extends StepWizard {
 		local definition := this.Definition
 		local check := (initialize = "CHECK")
 		local steamIDs := getSteamIDs()
-		local application, ignore, section, application, category
+		local installInfo := ""
+		local application, ignore, section, id, application, category
 
 		if check
 			initialize := false
@@ -277,19 +278,35 @@ class ApplicationsStepWizard extends StepWizard {
 			category := ConfigurationItem.splitDescriptor(section)[2]
 
 			for application, ignore in getMultiMapValues(wizard.Definition, section) {
+				installInfo .= (application . ": ")
+
 				if (check || !wizard.isApplicationInstalled(application)) {
 					wizard.locateApplication(application, check ? "CHECK" : false, false)
 
 					if steamIDs.Has(application)
-						wizard.setApplicationValue(application, "SteamID", steamIDs[application])
+						wizard.setApplicationValue(application, "SteamID", steamIDs[application], false)
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)
 				}
 				else if initialize
 					wizard.selectApplication(application, true, false)
+
+				if wizard.isApplicationInstalled(application)
+					installInfo .= (" Installed: Yes; Path: " . wizard.applicationPath(application) . "`n")
+				else
+					installInfo .= " Installed: No`n"
 			}
 		}
+
+		installInfo .= "`nSteam IDs:"
+
+		for application, id in steamIDs
+			installInfo .= ("`n" . id . " -> " . application)
+
+		deleteFile(kTempDirectory . "Applications.install")
+
+		FileAppend(installInfo, kTempDirectory . "Applications.install")
 	}
 
 	updateSelectedApplications(page, update := true) {

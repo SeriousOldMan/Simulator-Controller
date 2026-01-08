@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - GUI Functions                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -25,6 +25,8 @@
 
 #Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\GDIP.ahk"
+
+#DllLoad gdi32.dll
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -69,12 +71,254 @@ getControllerActionDefinitions(type) {
 class Theme {
 	static sCurrentTheme := false
 
+	class ThemedDialog {
+		class RECT {
+			left: i32, top: i32, right: i32, bottom: i32
+		}
+
+		static Call(_this, params*) {
+			static WM_COMMNOTIFY := 0x44
+			static WM_INITDIALOG := 0x0110
+
+			if !isInstance(Theme.CurrentTheme, DarkTheme)
+				if InStr(_this.Name, "MsgBox")
+					return MsgBox(params*)
+				else
+					return InputBox(params*)
+
+			iconNumber := 1
+			iconFile   := ""
+
+			if (params.Length = (_this.MaxParams + 2))
+				iconNumber := params.Pop()
+
+			if (params.Length = (_this.MaxParams + 1))
+				iconFile := params.Pop()
+
+			if (!iconFile && InStr(_this.Name, "MsgBox") && params.Has(3))
+				if (params[3] & 16) {
+					iconNumber := 1
+					iconFile := (kIconsDirectory . "Dlg Error.ico")
+				}
+				else if (params[3] & 32) {
+					iconNumber := 2
+					iconFile := (kIconsDirectory . "Dlg Question.ico")
+				}
+				else if (params[3] & 48) {
+					iconNumber := 3
+					iconFile := (kIconsDirectory . "Dlg Warning.ico")
+				}
+				else if (params[3] & 64) {
+					iconNumber := 4
+					iconFile := (kIconsDirectory . "Dlg Info.ico")
+				}
+
+			SetThreadDpiAwarenessContext(-5)
+
+			if InStr(_this.Name, "MsgBox")
+				OnMessage(WM_COMMNOTIFY, ON_WM_COMMNOTIFY, -1)
+			else
+				OnMessage(WM_INITDIALOG, ON_WM_INITDIALOG, -1)
+
+			return _this(params*)
+
+			ON_WM_INITDIALOG(wParam, lParam, msg, hwnd) {
+				OnMessage(WM_INITDIALOG, ON_WM_INITDIALOG, 0)
+
+				WNDENUMPROC(hwnd)
+			}
+
+			ON_WM_COMMNOTIFY(wParam, lParam, msg, hwnd) {
+				DetectHiddenWindows(true)
+
+				if ((msg = 68) && (wParam = 1027))
+					OnMessage(0x44, ON_WM_COMMNOTIFY, 0), EnumThreadWindows(GetCurrentThreadId(), CallbackCreate(WNDENUMPROC), 0)
+			}
+
+			WNDENUMPROC(hwnd, *) {
+				static SM_CICON         := "W" SysGet(11) " H" SysGet(12)
+				static SM_CSMICON       := "W" SysGet(49) " H" SysGet(50)
+				static ICON_BIG         := 1
+				static ICON_SMALL       := 0
+				static WM_SETICON       := 0x80
+				static WS_CLIPCHILDREN  := 0x02000000
+				static WS_CLIPSIBLINGS  := 0x04000000
+				static WS_EX_COMPOSITED := 0x02000000
+				static WS_VSCROLL       := 0x00200000
+				static winAttrMap       := Map(2, 2, 4, 0, 10, true, 17, true, 20, true, 38, 4, 35, 0x2b2b2b)
+
+				SetWinDelay(-1)
+				SetControlDelay(-1)
+
+				DetectHiddenWindows(true)
+
+				if !WinExist("ahk_class #32770 ahk_id" hwnd)
+					return 1
+
+				WinSetStyle("+" (WS_CLIPCHILDREN | WS_CLIPSIBLINGS))
+				WinSetExStyle("+" (WS_EX_COMPOSITED))
+
+				SetWindowTheme(hwnd, "DarkMode_Explorer")
+
+				/*
+				if iconFile {
+					hICON_SMALL := LoadPicture(iconFile, , &handleType) ; , SM_CSMICON " Icon" iconNumber, &handleType)
+					hICON_BIG   := LoadPicture(iconFile, , &handleType) ; , SM_CICON " Icon" iconNumber, &handleType)
+
+					PostMessage(WM_SETICON, ICON_SMALL, hICON_SMALL)
+					PostMessage(WM_SETICON, ICON_BIG, hICON_BIG)
+				}
+				*/
+
+				for dwAttribute, pvAttribute in winAttrMap
+					DwmSetWindowAttribute(hwnd, dwAttribute, pvAttribute)
+
+				GWL_WNDPROC(hwnd, hICON_SMALL?, hICON_BIG?)
+
+				return 0
+			}
+
+			GWL_WNDPROC(winId := "", hIcons*) {
+				static SetWindowLong     := DllCall.Bind(A_PtrSize = 8 ? "SetWindowLongPtr" : "SetWindowLong", "ptr", , "int", , "ptr", , "ptr")
+				static BS_FLAT           := 0x8000
+				static BS_BITMAP         := 0x0080
+				static DPI               := (A_ScreenDPI / 96)
+				static WM_CLOSE          := 0x0010
+				static WM_CTLCOLORBTN    := 0x0135
+				static WM_CTLCOLORDLG    := 0x0136
+				static WM_CTLCOLOREDIT   := 0x0133
+				static WM_CTLCOLORSTATIC := 0x0138
+				static WM_DESTROY        := 0x0002
+				static WM_SETREDRAW      := 0x000B
+
+				DetectHiddenWindows(true)
+				SetControlDelay(-1)
+
+				btns     := []
+				btnHwnd  := ""
+				iconHwnd := ""
+
+				for ctrl in WinGetControlsHwnd(winId) {
+					classNN := ControlGetClassNN(ctrl)
+
+					SetWindowTheme(ctrl, !InStr(classNN, "Edit") ? "DarkMode_Explorer" : "DarkMode_CFD")
+
+					if InStr(classNN, "Static1")
+						iconHwnd := ctrl
+
+					if !InStr(classNN, "B")
+						continue
+
+					btns.Push(btnHwnd := ctrl)
+				}
+
+				if (iconFile && iconHwnd)
+					SendMessage(0x172, 1, LoadPicture(iconFile, "W32", &ignore), iconHwnd, winId)
+
+				WindowProcOld := SetWindowLong(winId, -4, CallbackCreate(WNDPROC))
+
+				WNDPROC(hwnd, uMsg, wParam, lParam)
+				{
+					SetWinDelay(-1)
+					SetControlDelay(-1)
+
+					switch uMsg {
+						case WM_CTLCOLORSTATIC:
+							hbrush := SelectObject(wParam, GetStockObject(18))
+
+							SetDCBrushColor(wParam, 0x2b2b2b)
+							SetBkMode(wParam, 0)
+							SetTextColor(wParam, 0xFFFFFF)
+
+							for _hwnd in btns
+								PostMessage(WM_SETREDRAW, , , _hwnd)
+
+							GetClientRect(winId, rcC := this.RECT())
+
+							ControlGetPos(, &btnY, , &btnH, btnHwnd)
+
+							hdc        := GetDC(winId)
+							rcC.top    := btnY - (rcC.bottom - (btnY+btnH))
+							rcC.bottom *= 2
+							rcC.right  *= 2
+
+							SetBkMode(hdc, 0)
+							SelectObject(hdc, hbrush := GetStockObject(18))
+							SetDCBrushColor(hdc, 0x202020)
+							FillRect(hdc, rcC, hbrush)
+							ReleaseDC(winId, hdc)
+
+							for _hwnd in btns
+								PostMessage(WM_SETREDRAW, 1,,_hwnd)
+
+							return hbrush
+						case WM_CTLCOLORBTN, WM_CTLCOLORDLG, WM_CTLCOLOREDIT:
+							SelectObject(wParam, hbrush := GetStockObject(18))
+							SetDCBrushColor(wParam, 0x2b2b2b)
+							SetBkMode(wParam, 0)
+							SetTextColor(wParam, 0xFFFFFF)
+
+							return hbrush
+						case WM_DESTROY:
+							for v in hIcons
+								(v ?? 0) && DestroyIcon(v)
+					}
+
+					return CallWindowProc(WindowProcOld, hwnd, uMsg, wParam, lParam)
+				}
+			}
+
+			CallWindowProc(lpPrevWndFunc, hWnd, uMsg, wParam, lParam) => DllCall("CallWindowProc", "Ptr", lpPrevWndFunc, "Ptr", hwnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam)
+
+			DestroyIcon(hIcon) => DllCall("DestroyIcon", "ptr", hIcon)
+
+			DWMSetWindowAttribute(hwnd, dwAttribute, pvAttribute, cbAttribute := 4) => DllCall("Dwmapi\DwmSetWindowAttribute", "Ptr" , hwnd, "UInt", dwAttribute
+																															 , "Ptr*", &pvAttribute, "UInt", cbAttribute)
+
+			DeleteObject(hObject) => DllCall('Gdi32\DeleteObject', 'ptr', hObject, 'int')
+
+			EnumThreadWindows(dwThreadId, lpfn, lParam) => DllCall("User32\EnumThreadWindows", "uint", dwThreadId, "ptr", lpfn, "uptr", lParam, "int")
+
+			FillRect(hDC, lprc, hbr) => DllCall("User32\FillRect", "ptr", hDC, "ptr", lprc, "ptr", hbr, "int")
+
+			GetClientRect(hWnd, lpRect) => DllCall("User32\GetClientRect", "ptr", hWnd, "ptr", lpRect, "int")
+
+			GetCurrentThreadId() => DllCall("Kernel32\GetCurrentThreadId", "uint")
+
+			GetDC(hwnd := 0) => DllCall("GetDC", "ptr", hwnd, "ptr")
+
+			GetStockObject(fnObject) => DllCall('Gdi32\GetStockObject', 'int', fnObject, 'ptr')
+
+			GetWindowRect(hWnd, lpRect) => DllCall("User32\GetWindowRect", "ptr", hWnd, "ptr", lpRect, "uptr")
+
+			ReleaseDC(hWnd, hDC) => DllCall("User32\ReleaseDC", "ptr", hWnd, "ptr", hDC, "int")
+
+			SelectObject(hdc, hgdiobj) => DllCall('Gdi32\SelectObject', 'ptr', hdc, 'ptr', hgdiobj, 'ptr')
+
+			SetBkColor(hdc, crColor) => DllCall('Gdi32\SetBkColor', 'ptr', hdc, 'uint', crColor, 'uint')
+
+			SetBkMode(hdc, iBkMode) => DllCall('Gdi32\SetBkMode', 'ptr', hdc, 'int', iBkMode, 'int')
+
+			SetDCBrushColor(hdc, crColor) => DllCall('Gdi32\SetDCBrushColor', 'ptr', hdc, 'uint', crColor, 'uint')
+
+			SetTextColor(hdc, crColor) => DllCall('Gdi32\SetTextColor', 'ptr', hdc, 'uint', crColor, 'uint')
+
+			SetThreadDpiAwarenessContext(dpiContext) => DllCall("SetThreadDpiAwarenessContext", "ptr", dpiContext, "ptr")
+
+			SetWindowTheme(hwnd, pszSubAppName, pszSubIdList := "") => (!DllCall("uxtheme\SetWindowTheme", "ptr", hwnd, "ptr", StrPtr(pszSubAppName)
+																										 , "ptr", pszSubIdList ? StrPtr(pszSubIdList) : 0)
+																	    ? true : false)
+		}
+	}
+
 	static CurrentTheme {
 		Get {
 			return Theme.sCurrentTheme
 		}
 
 		Set {
+			value.InitializeTheme()
+
 			return (Theme.sCurrentTheme := value)
 		}
 	}
@@ -185,6 +429,9 @@ class Theme {
 		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
 
 		return (asText ? Format("{:06X}", BGR) : BGR)
+	}
+
+	InitializeTheme() {
 	}
 
 	InitializeWindow(window) {
@@ -426,9 +673,9 @@ class LightTheme extends Theme {
 }
 
 class DarkTheme extends Theme {
-	static sDarkColors := CaseInsenseMap("Background", "202020", "AltBackground", "2F2F2F", "Controls", "404040"
+	static sDarkColors := CaseInsenseMap("Background", "2B2B2B", "AltBackground", "2F2F2F", "Controls", "404040"
 									   , "Font", "D0D0D0", "DsbldFont", "808080", "PssvFont", "505050")
-	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", DarkTheme.sDarkColors["Background"], "Ptr")
+	static sTextBackgroundBrush := DllCall("gdi32\CreateSolidBrush", "UInt", Integer("0x" . DarkTheme.sDarkColors["Background"]), "Ptr")
 
 	class DarkCheckBox extends Gui.CheckBox {
 		static kCheckWidth := 23
@@ -670,7 +917,7 @@ class DarkTheme extends Theme {
 		Get {
 			local value := DarkTheme.sDarkColors[key]
 
-			return (asNumber ? ("0x" . value) : value)
+			return (asNumber ? Integer("0x" . value) : value)
 		}
 	}
 
@@ -794,7 +1041,7 @@ class DarkTheme extends Theme {
 		static GetWindowLong      := A_PtrSize = 8 ? "GetWindowLongPtr" : "GetWindowLong"
 
 		switch control.Type, false {
-			case "Button", "CheckBox", "ListBox", "UpDown", "DateTime":
+			case "Button", "CheckBox", "ListBox", "UpDown":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
 			case "ComboBox", "DDL":
 				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_CFD", "Ptr", 0)
@@ -820,6 +1067,8 @@ class DarkTheme extends Theme {
 
 				control.Opt("+Redraw")
 			case "DateTime":
+				DllCall("uxtheme\SetWindowTheme", "Ptr", control.Hwnd, "Str", "DarkMode_Explorer", "Ptr", 0)
+
 				control.Opt("-Redraw")
 
 				SendMessage(DTM_SETMCCOLOR, MCSC_BACKGROUND, this.DarkColors["BackGround"], control.Hwnd)
@@ -827,6 +1076,76 @@ class DarkTheme extends Theme {
 
 				control.Opt("+Redraw")
 		}
+	}
+
+	InitializeTheme() {
+		local AHK_NOTIFYICON := 0x0404
+		local _trayMenuBaseShow := A_TrayMenu.base.Show
+
+		SetMenuTheme(appMode := 0) {
+			local prev
+
+			static preferredAppMode := {Default: 0, AllowDark: 1, ForceDark: 2, ForceLight: 3, Max: 4}
+			static uxtheme := DllCall("Kernel32.dll\GetModuleHandle", "Str","uxtheme", "Ptr")
+			static fnSetPreferredAppMode := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																							, "Ptr", 135, "Ptr")
+													 : 0)
+			static fnFlushMenuThemes := (uxtheme ? DllCall("Kernel32.dll\GetProcAddress", "Ptr", uxtheme
+																						, "Ptr", 136, "Ptr")
+												 : 0)
+
+			if (preferredAppMode.HasProp(appMode))
+				appMode := preferredAppMode.%appMode%
+
+			return ((fnSetPreferredAppMode && fnFlushMenuThemes)
+						? (prev := DllCall(fnSetPreferredAppMode, "Int", appMode), DllCall(fnFlushMenuThemes), prev)
+						: -1)
+		}
+
+		A_TrayMenu.base.defineProp("Show", {call: (x?, y?, args*) => (prevMenuTheme := SetMenuTheme("ForceDark")
+																	, _trayMenuBaseShow(x?, y?, args*)
+																	, SetMenuTheme(prevMenuTheme), "")})
+
+		OnMessage(AHK_NOTIFYICON, (wParam, lParam, msg, hWnd) {
+			local WM_RBUTTONUP := 0x0205
+
+			switch (lParam) {
+				case WM_RBUTTONUP:
+					return (A_TrayMenu.Show(), true)
+			}
+		})
+
+		GroupAdd("tooltips_class32", "ahk_class tooltips_class32")
+
+		this.HTT := DllCall("User32.dll\CreateWindowEx", "UInt", 8, "Ptr", StrPtr("tooltips_class32")
+													   , "Ptr", 0, "UInt", 3, "Int", 0, "Int", 0, "Int", 0, "Int", 0
+													   , "Ptr", A_ScriptHwnd, "Ptr", 0, "Ptr", 0, "Ptr", 0)
+
+		this.SubWndProc := CallbackCreate(TT_WNDPROC, , 4)
+
+		this.OriWndProc := DllCall((A_PtrSize = 8) ? "SetClassLongPtr" : "SetClassLongW", "Ptr", this.HTT
+																						, "Int", -24
+																						, "Ptr", this.SubWndProc
+																						, "UPtr")
+
+		TT_WNDPROC(hWnd, uMsg, wParam, lParam) {
+			static WM_CREATE := 0x0001
+
+			if (uMsg = WM_CREATE) {
+				SetDarkToolTip(hWnd)
+
+				if (VerCompare(A_OSVersion, "10.0.22000") > 0)
+					SetRoundedCorner(hWnd, 3)
+			}
+
+			return DllCall(This.OriWndProc, "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "UInt")
+		}
+
+		SetDarkToolTip(hWnd) => DllCall("UxTheme\SetWindowTheme", "Ptr", hWnd, "Ptr", StrPtr("DarkMode_Explorer")
+																, "Ptr", StrPtr("ToolTip"))
+
+		SetRoundedCorner(hwnd, level := 3) => DllCall("Dwmapi\DwmSetWindowAttribute", "Ptr" , hwnd, "UInt", 33
+																					, "Ptr*", level, "UInt", 4)
 	}
 
 	InitializeWindow(window) {
@@ -1314,7 +1633,8 @@ class Window extends Gui {
 		}
 
 		SetScrollInfo(typeOfScrollBar, redraw) {
-			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar, "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
+			DllCall("SetScrollInfo", "Ptr", this.Window.Hwnd, "Int", typeOfScrollBar
+								   , "Ptr", this.iScrollInfo.Ptr, "Int", redraw)
 		}
 
 		GetScrollRange(typeOfScrollBar, &minPos, &maxPos) {
@@ -2236,6 +2556,10 @@ class RecolorizerTask extends PeriodicTask {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
+
+InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
+
 getAllUIThemes(configuration) {
 	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]
 }
@@ -2405,7 +2729,7 @@ setScrollPosition(edit, pos) {
 	SendMessage(WM_VSCROLL, (pos * 65536) + SB_THUMBPOSITION, , edit)
 }
 
-translateMsgBoxButtons(buttonLabels, *) {
+translateMsgDlgButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
@@ -2427,12 +2751,12 @@ translateMsgBoxButtons(buttonLabels, *) {
 	}
 }
 
-translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
-translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
-translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
-translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
-translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
-translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
+translateYesNoButtons := translateMsgDlgButtons.Bind(["Yes", "No"])
+translateOkButton := translateMsgDlgButtons.Bind(["Ok"])
+translateOkCancelButtons := translateMsgDlgButtons.Bind(["Ok", "Cancel"])
+translateLoadCancelButtons := translateMsgDlgButtons.Bind(["Load", "Cancel"])
+translateSaveCancelButtons := translateMsgDlgButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 withBlockedWindows(function, arguments*) {
 	local windows := []
@@ -2571,7 +2895,9 @@ initializeGUI() {
 	try {
 		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
 	}
-	catch Any {
+	catch Any as exception {
+		logError(exception, true)
+
 		Theme.CurrentTheme := ClassicTheme()
 	}
 

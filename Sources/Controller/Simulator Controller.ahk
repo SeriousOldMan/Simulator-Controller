@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Simulator Controller            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -963,7 +963,7 @@ class SimulatorController extends ConfigurationItem {
 					activationCommand := StrReplace(getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false), ";", ",")
 
 					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
-																								 , activationCommand, "activationCommand", false, false
+																								 , activationCommand, "activationCommand", false, false, false, false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)
 
@@ -1243,7 +1243,7 @@ class SimulatorController extends ConfigurationItem {
 		if (show != kUndefined)
 			this.iShowLogo := show
 		else if (this.iShowLogo && !this.iLogoIsVisible) {
-			info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
+			info := kVersion . " - 2026, Oliver Juwig`nCreative Commons - BY-NC-SA"
 
 			MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
@@ -2300,7 +2300,7 @@ initializeSimulatorController() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -2333,7 +2333,7 @@ startupSimulatorController() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

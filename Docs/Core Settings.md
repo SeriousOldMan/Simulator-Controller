@@ -1,9 +1,9 @@
-All applications have been implemented on top of a specialized framework especially built for Simulator Controller. This framework itself provide a couple of configuration options, which can be tweaked to adapt the Simulator Controller applications to slower or even to very fast PCs. The standard configuration is good for a typical gaming PC setup from 2021, for example a Ryzen 5 3600 CPU with 32 GB RAM.
+All applications were implemented on a framework specifically developed for Simulator Controller. This framework itself provides a couple of configuration options, which can be tweaked to adapt the Simulator Controller applications to slower or even to very fast PCs. The standard configuration is good for a typical gaming PC setup from 2021, for example a Ryzen 5 3600 CPU with 32 GB RAM.
 
 To change any of the low level configuration options, create a file named "Core Settings.ini" and place it in the *Simulator Controller\Config* folder which resides in your *Documents* folder. Then insert the options you want to change, but be sure to preceed them with the correct category header. Example:
 
 	[HTML]
-	Viewer=WebView2
+	Viewer.*=WebView2
 
 Please note, that all this confguration options are documented here for the experienced user with technical skills. Do not change any of them, until you are told so by me, or you do know what you are doing.
 
@@ -86,6 +86,15 @@ The Script Engine used by the Assistants is based on the well-known *Lua* script
 | Script Engine | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\\?.script;%homePath%\Documents\Simulator Controller\Scripts\\?.lua;%APPDATA%\luarocks\share\lua\5.4\\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. When placing scripts in the %homePath%\Documents\Simulator Controller\Scripts direectory, they can have also the extension ".script". The default value contains the local script folder and also the default location for *luarocks* modules. |
 |               | Libraries Path | %APPDATA%\luarocks\lib\lua\5.4\\?.lua | The path to search for libraries written in other languages which can be used by *Lua*. Please note the "?.dll". The default value points to the default location of *luarocks* libraries. |
 
+### HTML Engine Settings
+
+Some applications of Simulator Controller uses an integrated HTML renderer to display complex documents or graphs and diagrams. By default this engine is based on the old IE 11, which is still integrated in Windows, but the newer WebView2 engine can also be used. But this one requires a lot more resources. Also, the runtime for the Google Charts library can be confired here.
+
+| Category      | Setting        | Default | Description |
+|---------------|----------------|---------|-------------|
+| HTML          | Viewer.\*      | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. Beside specifying the engine for all applications using the "Viewer.\*" setting, individual applications can be configured by appending the application name. Example: "Viewer.Setup Workbench"<br><br>Note: The setting "Viewer" is still supported and equal to "Viewer.\*", but deprecated. |
+|               | Charts         | Online  | The value, which must be one of *Online* or *Offline*, specifies how the Google Charts library is loaded. *Offline* will only work, if the HTML Viewer is set to *WebView*, and is ignored for *IE11*. Do **not** change this setting unless told so by the development team. |
+
 ### Miscellaneous Settings
 
 And finally a couple of other settings which configure low level components of Simulator Controller:
@@ -93,7 +102,6 @@ And finally a couple of other settings which configure low level components of S
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Controller  | External Dispatch | 100   | Specifies how long the central event loop waits in milliseconds before it checks again for external controller commands as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands). |
-| HTML     | Viewer  | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. |
 | Simulator | Data Provider  | Connector    | This defines the integration method used to acquire data from the different simulators. "Provider" (or "EXE") is more reliable, but somewhat slower than "Connector" (or "DLL"), which is the default. If you encounter obviously wrong or missing data in race reports, for example, you can use the other method. |
 | Stream Deck     | Protocol  | Message    | Specifies the communication method between Stream Deck and Simulator Controller. "Message", the default uses traditional message-based inter-process communication, whereas "File" writes the messages to a shared file. Use "File" only, if you encounter stability issues with message-based communication. |
 | Team Server | Update Frequency  | 10    | Specifies the minimum number of seconds to wait between each update of the data acquired from the currently running simulator, when running a team session. This value (which you should only change by being told so), restricts the value set in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool for the Data Update Frequency, so that the update frequency cannot get smaller in team sessions to protect the Team Server from update stalling. |

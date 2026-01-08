@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Spotter                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,7 +48,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	local info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local info := kVersion . " - 2026, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local title1 := translate("Modular Simulator Controller System")
 	local title2 := substituteVariables(translate("%name% - The AI Race Spotter"), {name: name})
@@ -88,6 +88,7 @@ startupRaceSpotter() {
 	local spotterName := "Elisa"
 	local spotterLogo := false
 	local spotterLanguage := false
+	local spotterTranslator := false
 	local spotterSynthesizer := true
 	local spotterSpeaker := false
 	local spotterSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupRaceSpotter() {
 				index += 2
 			case "-Language":
 				spotterLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				spotterTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				spotterSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupRaceSpotter() {
 
 	spotter := RaceSpotter(kSimulatorConfiguration
 						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
-						 , spotterName, spotterLanguage
+						 , spotterName, spotterLanguage, spotterTranslator
 						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics, spotterSpeakerBooster
 						 , spotterRecognizer, spotterListener, spotterListenerBooster, spotterConversationBooster, spotterAgentBooster
 						 , spotterMuted, voiceServer)

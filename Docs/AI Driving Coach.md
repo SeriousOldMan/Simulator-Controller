@@ -153,7 +153,7 @@ Please be aware, that running a large language model locally puts heavy load on 
 
 ### Using the Driving Coach without a LLM
 
-It is possible to use the Driving Coach without a large language model. This configuration supplies only a very [restricted version of the on-track coaching functionality](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#restricted-mode-without-an-llm) and only pre-defined voice commands will be supported. Of course, you will miss all the fun of a natural conversation with a very skilled racing expert as demonstrated above, but it is a starting point.
+It is possible to use the Driving Coach without a large language model. This configuration supplies only a very [restricted version of the on-track coaching functionality](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#restricted-mode-without-a-llm) and only pre-defined voice commands will be supported. Of course, you will miss all the fun of a natural conversation with a very skilled racing expert as demonstrated above, but it is a starting point.
 
 To use this restricted mode, select the *Generic* GPT provider in the configuration, but leave all fields like Service URL and the Model empty. As this is actual the default for a new installation, the restricted mode will be available out of the box.
 
@@ -455,7 +455,7 @@ Normally you will only use the telemetry-based coaching during practice sessions
 
 ### Restricted mode without a LLM
 
-As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-an-llm), the Driving Coach can also be used without a LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the Coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
+As mentioned [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#using-the-driving-coach-without-a-llm), the Driving Coach can also be used without a LLM and will supply a basic and somewhat restricted support for on-track coaching. All the intelligence supplied by the LLM will be missing and the recommendations given by the Coach will be very simple and kind of repetitve. Since this functionality uses a rule based approach when judging the performance of a given corner, it will only work when a reference with a better performance at that given point on the track is available.
 
 ### Special notes for *Assetto Corsa Competizione*
 

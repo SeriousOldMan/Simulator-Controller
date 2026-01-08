@@ -347,6 +347,7 @@ namespace RF2SHMProvider {
 				Console.WriteLine("MAP=n/a");
 				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
 				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				Console.Write("BB="); Console.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 2));
 				
 				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
 				Console.Write("TyreTemperature=");

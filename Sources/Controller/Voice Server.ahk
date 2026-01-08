@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Voice Server                    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -40,6 +40,7 @@
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\Translator.ahk"
 #Include "..\Framework\Extensions\LLMBooster.ahk"
 
 
@@ -68,7 +69,11 @@ class VoiceServer extends ConfigurationItem {
 
 	iActivationGrammars := []
 
-	iLanguage := "en"
+	iOriginalLanguage := "en"
+	iTranslatedLanguage := "en"
+
+	iTranslator := false
+		
 	iSynthesizer := "dotNET"
 	iSpeaker := true
 	iSpeakerVolume := 100
@@ -80,6 +85,7 @@ class VoiceServer extends ConfigurationItem {
 	iPushToTalkMode := false
 
 	iSpeechRecognizer := false
+	iActivationTranslator := false
 
 	iSpeaking := false
 	iListening := false
@@ -103,7 +109,13 @@ class VoiceServer extends ConfigurationItem {
 		iDescriptor := false
 		iPID := 0
 
-		iLanguage := "en"
+		iOriginalLanguage := "en"
+		iTranslatedLanguage := "en"
+
+		iTranslator := false
+		iSpeakerTranslator := false
+		iListenerTranslator := false
+
 		iSynthesizer := "dotNET"
 		iSpeaker := true
 		iSpeakerVolume := 100
@@ -163,7 +175,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.SpeakerBooster {
-					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language)
+					booster := SpeechBooster(voiceClient.SpeakerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language["Original"])
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster
@@ -172,6 +184,12 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setVolume(voiceClient.SpeakerVolume)
+				this.setPitch(voiceClient.SpeakerPitch)
+				this.setRate(voiceClient.SpeakerSpeed)
+
+				this.setTranslator(voiceClient.SpeakerTranslator)
 			}
 		}
 
@@ -201,7 +219,7 @@ class VoiceServer extends ConfigurationItem {
 				local booster
 
 				if voiceClient.ListenerBooster {
-					booster := RecognitionBooster(voiceClient.ListenerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language)
+					booster := RecognitionBooster(voiceClient.ListenerBooster, voiceClient.VoiceServer.Configuration, voiceClient.Language["Original"])
 
 					if (booster.Model && booster.Active)
 						this.iBooster := booster
@@ -210,9 +228,11 @@ class VoiceServer extends ConfigurationItem {
 				this.iVoiceClient := voiceClient
 
 				super.__New(arguments*)
+
+				this.setTranslator(voiceClient.ListenerTranslator)
 			}
 
-			_onTextCallback(text) {
+			processText(text) {
 				local words := this.parseText(&text, false)
 				local target
 
@@ -228,7 +248,7 @@ class VoiceServer extends ConfigurationItem {
 					}
 				}
 
-				super._onTextCallBack(values2String(A_Space, words*))
+				super.processText(values2String(A_Space, words*))
 			}
 
 			textRecognized(text) {
@@ -304,9 +324,45 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		Language {
+		Language[mode] {
 			Get {
-				return this.iLanguage
+				return ((mode = "Original") ? this.iOriginalLanguage : this.iTranslatedLanguage)
+			}
+		}
+
+		Translator {
+			Get {
+				return this.iTranslator
+			}
+		}
+
+		SpeakerTranslator {
+			Get {
+				local arguments
+
+				if (!this.iSpeakerTranslator && this.Translator) {
+					arguments := string2Values("|", this.Translator)
+
+					this.iSpeakerTranslator := Translator(arguments[1], arguments[2], arguments[3]
+														, arguments[4], string2Values(",", arguments[5])*)
+				}
+
+				return this.iSpeakerTranslator
+			}
+		}
+
+		ListenerTranslator {
+			Get {
+				local arguments
+
+				if (!this.iListenerTranslator && this.Translator) {
+					arguments := string2Values("|", this.Translator)
+
+					this.iListenerTranslator := Translator(arguments[1], arguments[3], arguments[2]
+														 , arguments[4], string2Values(",", arguments[5])*)
+				}
+
+				return this.iListenerTranslator
 			}
 		}
 
@@ -418,13 +474,8 @@ class VoiceServer extends ConfigurationItem {
 
 		SpeechSynthesizer[create := false] {
 			Get {
-				if (!this.iSpeechSynthesizer && create && this.Speaker) {
-					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
-
-					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
-					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
-					this.iSpeechSynthesizer.setRate(this.SpeakerSpeed)
-				}
+				if (!this.iSpeechSynthesizer && create && this.Speaker)
+					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language["Translated"])
 
 				return this.iSpeechSynthesizer
 			}
@@ -451,22 +502,26 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
-																						   , this.Language, false, this.RecognizerMode)
+					this.iSpeechRecognizer
+						:= VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener
+																			  , this.Language["Translated"]
+																			  , false, this.RecognizerMode)
 
 				return this.iSpeechRecognizer
 			}
 		}
 
 		__New(voiceServer, descriptor, routing, pid
-			, language, synthesizer, speaker, recognizer, listener
+			, originalLanguage, translatedLanguage, translator, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 			, activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
 			this.iPID := pid
-			this.iLanguage := language
+			this.iOriginalLanguage := originalLanguage
+			this.iTranslatedLanguage := translatedLanguage
+			this.iTranslator := translator
 			this.iSynthesizer := synthesizer
 			this.iSpeaker := speaker
 			this.iRecognizer := recognizer
@@ -485,7 +540,7 @@ class VoiceServer extends ConfigurationItem {
 		speak(text, options := false) {
 			local speaker := this.SpeechSynthesizer[true]
 			local booster := speaker.Booster
-			local tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
+			local translator, tries, stopped, oldSpeaking, oldInterruptable, parts, ignore, part
 
 			if booster {
 				if options {
@@ -775,7 +830,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		_onTextCallback(text) {
+		processText(text) {
 			local words := this.parseText(&text, false)
 			local target
 
@@ -791,7 +846,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
-			super._onTextCallBack(values2String(A_Space, words*))
+			super.processText(values2String(A_Space, words*))
 		}
 	}
 
@@ -823,9 +878,15 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	Language {
+	Language[mode] {
 		Get {
-			return this.iLanguage
+			return ((mode = "Original") ? this.iOriginalLanguage : this.iTranslatedLanguage)
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
 		}
 	}
 
@@ -940,7 +1001,7 @@ class VoiceServer extends ConfigurationItem {
 
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine
 																					   , getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Listener", true)
-																					   , this.Language, true)
+																					   , this.Language["Translated"], true)
 
 						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
@@ -948,21 +1009,38 @@ class VoiceServer extends ConfigurationItem {
 					catch Any as exception {
 						logError(exception, true)
 
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language["Translated"], true)
 
 						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
 					}
 				}
 				catch Any as exception {
-					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language["Translated"])
 				}
+																					   
+				this.iSpeechRecognizer.setTranslator(this.ActivationTranslator)
 
 				if !this.hasPushToTalk()
 					this.startListening()
 			}
 
 			return this.iSpeechRecognizer
+		}
+	}
+
+	ActivationTranslator {
+		Get {
+			local arguments
+
+			if (!this.iActivationTranslator && this.Translator) {
+				arguments := string2Values("|", this.Translator)
+
+				this.iActivationTranslator := Translator(arguments[1], arguments[3], arguments[2]
+													   , arguments[4], string2Values(",", arguments[5])*)
+			}
+
+			return this.iActivationTranslator
 		}
 	}
 
@@ -985,7 +1063,16 @@ class VoiceServer extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		this.iLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iTranslatedLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		
+		if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false) {
+			this.iOriginalLanguage := "en"
+			
+			this.iTranslator := getMultiMapValue(configuration, "Voice Control", "Translator")
+		}
+		else
+			this.iOriginalLanguage := this.iTranslatedLanguage
+			
 		this.iSynthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer"
 											, getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
 		this.iSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
@@ -1449,7 +1536,8 @@ class VoiceServer extends ConfigurationItem {
 
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, speakingStatusCallback := false
-					  , language := false, synthesizer := true, speaker := true, recognizer := false, listener := false
+					  , originalLanguage := false, translatedLanguage := false, translator := false
+					  , synthesizer := true, speaker := true, recognizer := false, listener := false
 					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined
 					  , speakerBooster := false, listenerBooster := false
 					  , recognizerMode := "Grammar") {
@@ -1479,15 +1567,19 @@ class VoiceServer extends ConfigurationItem {
 		if (listener == true)
 			listener := this.Listener
 
-		if (language == false)
-			language := this.Language
+		if (originalLanguage == false)
+			originalLanguage := this.Language["Original"]
+
+		if (translatedLanguage == false)
+			translatedLanguage := this.Language["Translated"]
 
 		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, originalLanguage, translatedLanguage, translator
+											  , synthesizer, speaker, recognizer, listener
 											  , speakerVolume, speakerPitch, speakerSpeed, speakerBooster, listenerBooster
 											  , activationCallback, deactivationCallback, speakingStatusCallback, recognizerMode)
 
@@ -1855,7 +1947,7 @@ startupVoiceServer() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Voice Server"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Voice Server"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

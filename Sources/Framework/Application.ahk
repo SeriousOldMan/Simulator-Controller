@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Global Application Framework    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -310,7 +310,7 @@ checkForUpdates() {
 
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("A newer version of Simulator Controller is available. Do you want to download it now?"), translate("Update"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("A newer version of Simulator Controller is available. Do you want to download it now?"), translate("Update"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
@@ -396,7 +396,7 @@ startupApplication() {
 
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl")) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
+			withBlockedWindows(MsgDlg, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return true

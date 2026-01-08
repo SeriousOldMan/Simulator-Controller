@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - LMU Provider                    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -409,6 +409,12 @@ class LMUProvider extends Sector397Provider {
 					setMultiMapValue(data, "Session Data", "Track", track)
 				else
 					track := this.Track
+
+				if !getMultiMapValue(data, "Car Data", "TC", false)
+					setMultiMapValue(data, "Car Data", "TC", "n/a")
+
+				if !getMultiMapValue(data, "Car Data", "ABS", false)
+					setMultiMapValue(data, "Car Data", "ABS", "n/a")
 
 				setMultiMapValue(data, "Weather Data", "Weather", lastWeather)
 				setMultiMapValue(data, "Weather Data", "Weather10Min", lastWeather10Min)

@@ -2,16 +2,17 @@
 ;;;   Modular Simulator Controller System - Basic Step Wizard               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\..\Framework\Extensions\Task.ahk"
 #Include "..\..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "AssistantBoosterEditor.ahk"
+#Include "TranslatorEditor.ahk"
+#Include "SynthesizerEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,6 +28,8 @@ class BasicStepWizard extends StepWizard {
 
 	iAssistants := CaseInsenseMap()
 	iKeys := CaseInsenseMap()
+
+	iSynthesizerEditor := false
 
 	Pages {
 		Get {
@@ -147,8 +150,33 @@ class BasicStepWizard extends StepWizard {
 			}
 		}
 
-		loadVoice(assistant, *) {
-			this.loadVoices(assistant)
+		chooseLanguage(assistant, *) {
+			local dropDown := window["basic" . this.Keys[assistant] . "LanguageDropDown"]
+			local selectedText := dropDown.Text
+
+			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
+				if this.editTranslator(assistant)
+					this.loadVoices(assistant)
+
+				if !this.SetupWizard.getModuleValue(assistant, "Language.Translated", false)
+					if dropDown.HasProp("LastValue")
+						dropDown.Choose(dropDown.LastValue)
+					else
+						dropDown.Choose(1)
+			}
+			else if InStr(selectedText, translate("---------------------------------------------")) {
+				if dropDown.HasProp("LastValue")
+					dropDown.Choose(dropDown.LastValue)
+				else
+					dropDown.Choose(1)
+			}
+			else {
+				this.SetupWizard.setModuleValue(assistant, "Language.Translated", false, false)
+
+				this.loadVoices(assistant)
+			}
+
+			dropDown.LastValue := dropDown.Value
 		}
 
 		chooseMethod(method, *) {
@@ -174,7 +202,7 @@ class BasicStepWizard extends StepWizard {
 			wizard.Window.Show()
 
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
+			msgResult := withBlockedWindows(MsgDlg, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -277,21 +305,29 @@ class BasicStepWizard extends StepWizard {
 			choices.Push(language)
 
 		widget5 := window.Add("Text", "x" . x . " yp+10 w100 h23 +0x200 Hidden", translate("Localization"))
+		widget5.Info := "Basic.Localization.Info"
 		widget6 := window.Add("Button", "xp+106 yp w23 h23 Hidden")
+		widget6.Info := "Basic.Localization.Info"
 		widget6.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 		widget7 := window.Add("DropDownList", "xp+24 yp w96 VbasicUILanguageDropDown Hidden", choices)
+		widget7.Info := "Basic.Localization.Info"
 
 		widget8 := window.Add("Text", "x" . x . " yp+24 w100 h23 +0x200 Hidden", translate("Push-To-Talk"))
+		widget8.Info := "Basic.Push-To-Talk.Info"
 		widget9 := window.Add("Button", "xp+106 yp-1 w23 h23 VbasicPushToTalkButton Hidden")
+		widget9.Info := "Basic.Push-To-Talk.Info"
 		widget9.OnEvent("Click", getPTTHotkey)
 		setButtonIcon(widget9, kIconsDirectory . "Key.ico", 1)
 		widget10 := window.Add("DropDownList", "xp+24 yp w96 Choose1 VbasicPushToTalkModeDropDown Hidden", collect(["Hold & Talk", "Press & Talk", "Custom"], translate))
+		widget10.Info := "Basic.Push-To-Talk.Info"
 		widget10.OnEvent("Change", updateP2T)
 		widget51 := window.Add("Button", "xp+99 yp w23 h23 Hidden")
+		widget51.Info := "Basic.Push-To-Talk.Info"
 		widget51.OnEvent("Click", (*) => this.testPushToTalk())
 		setButtonIcon(widget51, kIconsDirectory . "Start.ico", 1)
 		widget11 := window.Add("Edit", "xp+24 yp w72 h21 VbasicPushToTalkEdit Hidden")
+		widget11.Info := "Basic.Push-To-Talk.Info"
 
 		window.SetFont("Bold", "Arial")
 
@@ -301,6 +337,7 @@ class BasicStepWizard extends StepWizard {
 		window.SetFont("Norm", "Arial")
 
 		widget34 := window.Add("ListView", "x" . col2X . " yp+10 w" . col2Width . " h110 W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
+		widget34.Info := "Basic.Simulators.Info"
 		widget34.OnEvent("Click", noSelect)
 		widget34.OnEvent("DoubleClick", noSelect)
 		widget34.OnEvent("ContextMenu", noSelect)
@@ -308,6 +345,7 @@ class BasicStepWizard extends StepWizard {
 		this.iSimulatorsListView := widget34
 
 		widget35 := window.Add("Button", "x" . (col2X + col2Width - 90) . " yp+117 w90 h23 X:Move Hidden", translate("Locate..."))
+		widget35.Info := "Basic.Simulators.Info"
 		widget35.OnEvent("Click", locateSimulator)
 
 		window.SetFont("Bold", "Arial")
@@ -317,63 +355,91 @@ class BasicStepWizard extends StepWizard {
 
 		window.SetFont("Norm", "Arial")
 
-		widget38 := window.Add("Text", "x" . (x + 16 + 114) . " yp+10 w96 h23 +0x200 Hidden", translate("Name"))
-		widget39 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Language"))
-		widget40 := window.Add("Text", "xp+98 yp w96 h23 +0x200 Hidden", translate("Voice"))
+		widget38 := window.Add("Text", "x" . (x + 16 + 114) . " yp+10 w76 h23 +0x200 Hidden", translate("Name"))
+		widget39 := window.Add("Text", "xp+78 yp w96 h23 +0x200 Hidden", translate("Language"))
+		widget40 := window.Add("Text", "xp+148 yp w96 h23 +0x200 Hidden", translate("Voice"))
 
 		widget41 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicDCEnabledCheck Hidden" . (wizard.isModuleSelected("Driving Coach") ? " Checked" : ""))
+		widget41.Info := "Basic.Assistants.Info"
 		widget41.OnEvent("Click", updateAssistant.Bind("Driving Coach"))
 		widget42 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Driving Coach"))
-		widget43 := window.Add("Edit", "xp+114 yp w96 VbasicDCNameEdit Hidden", "Aiden")
-		widget44 := window.Add("DropDownList", "xp+98 yp w96 VbasicDCLanguageDropDown Hidden")
-		widget44.OnEvent("Change", loadVoice.Bind("Driving Coach"))
-		widget45 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicDCVoiceDropDown Hidden")
-		widget46 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget42.Info := "Basic.Assistants.Info"
+		widget43 := window.Add("Edit", "xp+114 yp w76 VbasicDCNameEdit Hidden", "Aiden")
+		widget43.Info := "Basic.Assistants.Info"
+		widget44 := window.Add("DropDownList", "xp+78 yp w146 VbasicDCLanguageDropDown Hidden")
+		widget44.Info := "Basic.Assistants.Info"
+		widget44.OnEvent("Change", chooseLanguage.Bind("Driving Coach"))
+		widget45 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicDCVoiceDropDown Hidden")
+		widget45.Info := "Basic.Assistants.Info"
+		widget46 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicDCSettingsButton Hidden")
+		widget46.Info := "Basic.Assistants.Voice.Info"
 		widget46.OnEvent("Click", editSynthesizer.Bind("Driving Coach"))
 		setButtonIcon(widget46, kIconsDirectory . "General Settings.ico", 1)
 		widget47 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicDCBoosterButton Hidden")
+		widget47.Info := "Basic.Assistants.Boosters.Info"
 		widget47.OnEvent("Click", editBooster.Bind("Driving Coach"))
 		setButtonIcon(widget47, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget14 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicREEnabledCheck Hidden" . (wizard.isModuleSelected("Race Engineer") ? " Checked" : ""))
+		widget14.Info := "Basic.Assistants.Info"
 		widget14.OnEvent("Click", updateAssistant.Bind("Race Engineer"))
 		widget15 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Engineer"))
-		widget16 := window.Add("Edit", "xp+114 yp w96 VbasicRENameEdit Hidden", "Jona")
-		widget17 := window.Add("DropDownList", "xp+98 yp w96 VbasicRELanguageDropDown Hidden")
-		widget17.OnEvent("Change", loadVoice.Bind("Race Engineer"))
-		widget18 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicREVoiceDropDown Hidden")
-		widget19 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
+		widget15.Info := "Basic.Assistants.Info"
+		widget16 := window.Add("Edit", "xp+114 yp w76 VbasicRENameEdit Hidden", "Jona")
+		widget16.Info := "Basic.Assistants.Info"
+		widget17 := window.Add("DropDownList", "xp+78 yp w146 VbasicRELanguageDropDown Hidden")
+		widget17.Info := "Basic.Assistants.Info"
+		widget17.OnEvent("Change", chooseLanguage.Bind("Race Engineer"))
+		widget18 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicREVoiceDropDown Hidden")
+		widget18.Info := "Basic.Assistants.Info"
+		widget19 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRESettingsButton Hidden")
+		widget19.Info := "Basic.Assistants.Voice.Info"
 		widget19.OnEvent("Click", editSynthesizer.Bind("Race Engineer"))
 		setButtonIcon(widget19, kIconsDirectory . "General Settings.ico", 1)
 		widget48 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicREBoosterButton Hidden")
+		widget48.Info := "Basic.Assistants.Boosters.Info"
 		widget48.OnEvent("Click", editBooster.Bind("Race Engineer"))
 		setButtonIcon(widget48, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget20 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSEnabledCheck Hidden" . (wizard.isModuleSelected("Race Strategist") ? " Checked" : ""))
+		widget20.Info := "Basic.Assistants.Info"
 		widget20.OnEvent("Click", updateAssistant.Bind("Race Strategist"))
 		widget21 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Strategist"))
-		widget22 := window.Add("Edit", "xp+114 yp w96 VbasicRSNameEdit Hidden", "Khato")
-		widget23 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSLanguageDropDown Hidden")
-		widget23.OnEvent("Change", loadVoice.Bind("Race Strategist"))
-		widget24 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSVoiceDropDown Hidden")
-		widget25 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
+		widget21.Info := "Basic.Assistants.Info"
+		widget22 := window.Add("Edit", "xp+114 yp w76 VbasicRSNameEdit Hidden", "Khato")
+		widget22.Info := "Basic.Assistants.Info"
+		widget23 := window.Add("DropDownList", "xp+78 yp w146 VbasicRSLanguageDropDown Hidden")
+		widget23.Info := "Basic.Assistants.Info"
+		widget23.OnEvent("Change", chooseLanguage.Bind("Race Strategist"))
+		widget24 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicRSVoiceDropDown Hidden")
+		widget24.Info := "Basic.Assistants.Info"
+		widget25 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRSSettingsButton Hidden")
+		widget25.Info := "Basic.Assistants.Voice.Info"
 		widget25.OnEvent("Click", editSynthesizer.Bind("Race Strategist"))
 		setButtonIcon(widget25, kIconsDirectory . "General Settings.ico", 1)
 		widget49 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSBoosterButton Hidden")
+		widget49.Info := "Basic.Assistants.Boosters.Info"
 		widget49.OnEvent("Click", editBooster.Bind("Race Strategist"))
 		setButtonIcon(widget49, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
 		widget26 := window.Add("CheckBox", "x" . x . " yp+24 w16 h21 vbasicRSPEnabledCheck Hidden" . (wizard.isModuleSelected("Race Spotter") ? " Checked" : ""))
+		widget26.Info := "Basic.Assistants.Info"
 		widget26.OnEvent("Click", updateAssistant.Bind("Race Spotter"))
 		widget27 := window.Add("Text", "xp+16 yp w110 h23 +0x200 Hidden", translate("Race Spotter"))
-		widget28 := window.Add("Edit", "xp+114 yp w96 VbasicRSPNameEdit Hidden", "Elisa")
-		widget29 := window.Add("DropDownList", "xp+98 yp w96 VbasicRSPLanguageDropDown Hidden")
-		widget29.OnEvent("Change", loadVoice.Bind("Race Spotter"))
-		widget30 := window.Add("DropDownList", "xp+98 yp w309 W:Grow VbasicRSPVoiceDropDown Hidden")
-		widget31 := window.Add("Button", "xp+311 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
+		widget27.Info := "Basic.Assistants.Info"
+		widget28 := window.Add("Edit", "xp+114 yp w76 VbasicRSPNameEdit Hidden", "Elisa")
+		widget28.Info := "Basic.Assistants.Info"
+		widget29 := window.Add("DropDownList", "xp+78 yp w146 VbasicRSPLanguageDropDown Hidden")
+		widget29.Info := "Basic.Assistants.Info"
+		widget29.OnEvent("Change", chooseLanguage.Bind("Race Spotter"))
+		widget30 := window.Add("DropDownList", "xp+148 yp w279 W:Grow VbasicRSPVoiceDropDown Hidden")
+		widget30.Info := "Basic.Assistants.Info"
+		widget31 := window.Add("Button", "xp+281 yp-1 w23 h23 X:Move vbasicRSPSettingsButton Hidden")
+		widget31.Info := "Basic.Assistants.Voice.Info"
 		widget31.OnEvent("Click", editSynthesizer.Bind("Race Spotter"))
 		setButtonIcon(widget31, kIconsDirectory . "General Settings.ico", 1)
 		widget50 := window.Add("Button", "xp+24 yp w23 h23 X:Move vbasicRSPBoosterButton Hidden")
+		widget50.Info := "Basic.Assistants.Boosters.Info"
 		widget50.OnEvent("Click", editBooster.Bind("Race Spotter"))
 		setButtonIcon(widget50, kIconsDirectory . "Booster.ico", 1, "L4 T4 R4 B4")
 
@@ -409,6 +475,16 @@ class BasicStepWizard extends StepWizard {
 		}
 	}
 
+	findWidget(x, y, test := (*) => true) {
+		if WinActive(this.SetupWizard.Window)
+			return super.findWidget(x, y, test)
+		else if (this.iSynthesizerEditor && this.iSynthesizerEditor.Window
+										 && WinActive(this.iSynthesizerEditor.Window))
+			return this.iSynthesizerEditor.findWidget(x, y, test)
+		else
+			return false
+	}
+
 	showPage(page) {
 		local wizard := this.SetupWizard
 		local chosen := 0
@@ -419,7 +495,7 @@ class BasicStepWizard extends StepWizard {
 
 		static installed := false
 
-		if !this.SetupWizard.Initialize
+		; if !this.SetupWizard.Initialize
 			page := 2
 
 		if (page = 2) {
@@ -536,7 +612,7 @@ class BasicStepWizard extends StepWizard {
 
 		this.saveSetup()
 
-		testAssistants(this.SetupWizard, , GetKeyState("Ctrl"))
+		testAssistants(this.SetupWizard, , !GetKeyState("Ctrl"))
 	}
 
 	assistantEnabled(assistant, editor := true) {
@@ -557,28 +633,48 @@ class BasicStepWizard extends StepWizard {
 		local languages, found, code, language, ignore, grammarFile, grammarLanguageCode, voiceLanguage
 
 		if editor {
-			languages := availableLanguages()
 			voiceLanguage := this.Control["basic" . this.Keys[assistant] . "LanguageDropDown"].Text
 
-			for code, language in availableLanguages()
-				if (language = voiceLanguage)
-					return code
+			if (InStr(voiceLanguage, translate("Translator")) || InStr(voiceLanguage, translate(" (translated)...")))
+				return this.assistantTranslator(assistant, editor)
+			else {
+				languages := availableLanguages()
 
-			for ignore, assistant in this.Definition
-				for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-					SplitPath(grammarFile, , , &grammarLanguageCode)
-
-					if languages.Has(grammarLanguageCode)
-						language := languages[grammarLanguageCode]
-					else
-						language := grammarLanguageCode
-
+				for code, language in languages
 					if (language = voiceLanguage)
-						return grammarLanguageCode
-				}
+						return code
+
+				for ignore, assistant in this.Definition
+					for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+						SplitPath(grammarFile, , , &grammarLanguageCode)
+
+						if languages.Has(grammarLanguageCode)
+							language := languages[grammarLanguageCode]
+						else
+							language := grammarLanguageCode
+
+						if (language = voiceLanguage)
+							return grammarLanguageCode
+					}
+			}
 		}
+		else if this.SetupWizard.getModuleValue(assistant, "Language.Translated", false)
+			return this.assistantTranslator(assistant, false)
 		else
 			return this.SetupWizard.getModuleValue(assistant, "Language", getLanguage())
+	}
+
+	assistantTranslator(assistant, editor := true) {
+		local service := this.SetupWizard.getModuleValue(assistant, "Translator.Service", false)
+
+		if service
+			return {Service: service
+				  , Language: this.SetupWizard.getModuleValue(assistant, "Translator.Language")
+				  , Code: this.SetupWizard.getModuleValue(assistant, "Translator.Code")
+				  , APIKey: this.SetupWizard.getModuleValue(assistant, "Translator.API Key")
+				  , Arguments: string2Values(",", this.SetupWizard.getModuleValue(assistant, "Translator.Arguments"))}
+		else
+			return false
 	}
 
 	assistantSynthesizer(assistant, editor := true) {
@@ -696,8 +792,10 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	assistantSetup(assistant, editor := true) {
-		return {Enabled: this.assistantEnabled(assistant, editor), Name: this.assistantName(assistant, editor)
-			  , Language: this.assistantLanguage(assistant, editor), Synthesizer: this.assistantSynthesizer(assistant, editor)
+		return {Enabled: this.assistantEnabled(assistant, editor)
+			  , Name: this.assistantName(assistant, editor)
+			  , Language: this.assistantLanguage(assistant, editor)
+			  , Synthesizer: this.assistantSynthesizer(assistant, editor)
 			  , Voice: this.assistantVoice(assistant, editor)
 			  , Volume: this.assistantVolume(assistant), Pitch: this.assistantPitch(assistant), Speed: this.assistantSpeed(assistant)
 			  , SpeakerBooster: this.assistantSpeakerBooster(assistant)
@@ -763,7 +861,15 @@ class BasicStepWizard extends StepWizard {
 		for ignore, assistant in assistants {
 			language := this.assistantLanguage(assistant, editor)
 
-			voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
+			if isObject(language)
+				language := language.Code
+
+			try {
+				voices := SpeechSynthesizer(this.assistantSynthesizer(assistant, editor), true, language).Voices[language]
+			}
+			catch Any {
+				voices := []
+			}
 
 			dropDown := this.Control["basic" . this.Keys[assistant] . "VoiceDropDown"]
 
@@ -779,6 +885,8 @@ class BasicStepWizard extends StepWizard {
 			}
 			else if (!editor && (voices.Length > 1))
 				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
+
+			dropDown.LastValue := dropDown.Value
 		}
 	}
 
@@ -837,7 +945,7 @@ class BasicStepWizard extends StepWizard {
 		local choices := []
 		local languages := []
 		local allLanguages := availableLanguages()
-		local assistantLanguage, code, language, ignore, grammarFile
+		local assistantLanguage, code, language, ignore, grammarFile, assistantTranslator
 
 		for ignore, assistant in this.Definition
 			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
@@ -857,10 +965,26 @@ class BasicStepWizard extends StepWizard {
 		this.Control["basic" . key . "NameEdit"].Text := this.assistantName(assistant, false)
 
 		assistantLanguage := inList(languages, this.assistantLanguage(assistant, false))
+		assistantTranslator := this.assistantTranslator(assistant, false)
 
 		this.Control["basic" . key . "LanguageDropDown"].Delete()
+
+		if assistantTranslator
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , first(Translator.Languages, (l) => ((l.Identifier = assistantTranslator.Language)
+																			  || (l.Code = assistantTranslator.Language))).Name . translate(" (translated)...")])
+		else
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   , translate("Translator") . translate("...")])
+
 		this.Control["basic" . key . "LanguageDropDown"].Add(choices)
-		this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+
+		if (!assistantLanguage && assistantTranslator)
+			this.Control["basic" . key . "LanguageDropDown"].Choose(choices.Length)
+		else
+			this.Control["basic" . key . "LanguageDropDown"].Choose(assistantLanguage ? assistantLanguage : 1)
+
+		this.Control["basic" . key . "LanguageDropDown"].LastValue := this.Control["basic" . key . "LanguageDropDown"].Value
 
 		this.loadVoices(assistant, false)
 	}
@@ -916,7 +1040,20 @@ class BasicStepWizard extends StepWizard {
 			wizard.selectModule(assistant, assistantSetups.%key%.Enabled, false)
 
 			for ignore, value in ["Name", "Language", "Synthesizer", "Voice", "Volume", "Pitch", "Speed"]
-				wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
+				if (value = "Language") {
+					value := assistantSetups.%key%.Language
+
+					if isObject(value) {
+						wizard.setModuleValue(assistant, "Language", value.Code, false)
+						wizard.setModuleValue(assistant, "Language.Translated", true, false)
+					}
+					else {
+						wizard.setModuleValue(assistant, "Language", value, false)
+						wizard.setModuleValue(assistant, "Language.Translated", false, false)
+					}
+				}
+				else
+					wizard.setModuleValue(assistant, value, assistantSetups.%key%.%value%, false)
 
 			if assistantSetups.%key%.HasProp("SpeakerBooster")
 				wizard.setModuleValue(assistant, "Speaker Booster"
@@ -978,7 +1115,7 @@ class BasicStepWizard extends StepWizard {
 	editSynthesizer(assistant) {
 		local wizard := this.SetupWizard
 		local window := this.Window
-		local configuration, setup
+		local configuration, setup, language
 
 		window.Block()
 
@@ -988,10 +1125,20 @@ class BasicStepWizard extends StepWizard {
 			configuration := newMultiMap()
 
 			setup := this.assistantSetup(assistant)
+			language := setup.Language
+
+			if isObject(language) {
+				language := language.Code
+			
+				setMultiMapValue(configuration, "Voice Control", "Language.Translated", true)
+				setMultiMapValue(configuration, "Voice Control", "Translator"
+											  , values2String("|", language.Service, "English", language.Language
+																 , language.APIKey, values2String(",", language.Arguments*)))
+			}
 
 			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
 
-			setMultiMapValue(configuration, "Voice Control", "Language", setup.Language)
+			setMultiMapValue(configuration, "Voice Control", "Language", language)
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", setup.Synthesizer)
 			setMultiMapValue(configuration, "Voice Control", "Speaker", setup.Voice)
 			setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", (setup.Volume = "*") ? 100 : setup.Volume)
@@ -1032,7 +1179,14 @@ class BasicStepWizard extends StepWizard {
 				setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
 			}
 
-			configuration := VoiceSynthesizerEditor(this, configuration).editSynthesizer(window)
+			this.iSynthesizerEditor := SynthesizerEditor(this, assistant, configuration)
+
+			try {
+				configuration := this.iSynthesizerEditor.editSynthesizer(window)
+			}
+			finally {
+				this.iSynthesizerEditor := false
+			}
 
 			if configuration {
 				wizard.setModuleValue(assistant, "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))
@@ -1142,1099 +1296,52 @@ class BasicStepWizard extends StepWizard {
 			window.Unblock()
 		}
 	}
-}
 
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; VoiceSynthesizerEditor                                                  ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+	editTranslator(assistant) {
+		local wizard := this.SetupWizard
+		local window := this.Window
+		local configuration
 
-class VoiceSynthesizerEditor extends ConfiguratorPanel {
-	iResult := false
-
-	iStepWizard := false
-	iLanguage := "English"
-
-	iWindow := false
-
-	iSynthesizerMode := false
-
-	iTopWidgets := []
-	iBottomWidgets := []
-	iWindowsSynthesizerWidgets := []
-	iAzureSynthesizerWidgets := []
-	iGoogleSynthesizerWidgets := []
-	iOpenAISynthesizerWidgets := []
-	iElevenLabsSynthesizerWidgets := []
-	iOtherWidgets := []
-
-	iTopAzureCredentialsVisible := false
-	iTopGoogleCredentialsVisible := false
-	iTopOpenAICredentialsVisible := false
-	iTopElevenLabsCredentialsVisible := false
-
-	StepWizard {
-		Get {
-			return this.iStepWizard
-		}
-	}
-
-	Window {
-		Get {
-			return this.iWindow
-		}
-	}
-
-	__New(stepWizard, configuration := false) {
-		this.iStepWizard := stepWizard
-
-		super.__New(configuration)
-	}
-
-	createGui(configuration) {
-		local choices := []
-		local chosen := 0
-		local x := 8
-		local width := 380
-		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4, voices, halfWidth
-
-		updateAzureVoices(*) {
-			this.updateAzureVoices()
-		}
-
-		updateGoogleVoices(*) {
-			this.updateGoogleVoices()
-		}
-
-		updateElevenLabsVoices(*) {
-			this.updateElevenLabsVoices()
-		}
-
-		chooseVoiceSynthesizer(*) {
-			local voiceSynthesizerDropDown := this.Control["basicVoiceSynthesizerDropDown"]
-			local oldChoice := voiceSynthesizerDropDown.LastValue
-
-			if (oldChoice == 1)
-				this.hideWindowsSynthesizerEditor()
-			else if (oldChoice == 2)
-				this.hideDotNETSynthesizerEditor()
-			else if (oldChoice == 3)
-				this.hideAzureSynthesizerEditor()
-			else if (oldChoice == 4)
-				this.hideGoogleSynthesizerEditor()
-			else if (oldChoice == 5)
-				this.hideOpenAISynthesizerEditor()
-			else
-				this.hideElevenLabsSynthesizerEditor()
-
-			if (voiceSynthesizerDropDown.Value == 1)
-				this.showWindowsSynthesizerEditor()
-			else if (voiceSynthesizerDropDown.Value == 2)
-				this.showDotNETSynthesizerEditor()
-			else if (voiceSynthesizerDropDown.Value == 3)
-				this.showAzureSynthesizerEditor()
-			else if (voiceSynthesizerDropDown.Value == 4)
-				this.showGoogleSynthesizerEditor()
-			else if (voiceSynthesizerDropDown.Value == 5)
-				this.showOpenAISynthesizerEditor()
-			else
-				this.showElevenLabsSynthesizerEditor()
-
-			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 4))
-				this.updateLanguage()
-
-			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
-		}
-
-		chooseAPIKeyFilePath(*) {
-			local file, translator
-
-			this.Window.Opt("+OwnDialogs")
-
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-
-			OnMessage(0x44, translator)
-			file := withBlockedWindows(FileSelect, 1, this.Control["basicGoogleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
-			OnMessage(0x44, translator, 0)
-
-			if (file != "") {
-				this.Control["basicGoogleAPIKeyFileEdit"].Text := file
-
-				this.updateGoogleVoices()
-			}
-		}
-
-		editorGui := Window({Descriptor: "Synthesizer Editor", Options: "0x400000"})
-
-		this.iWindow := editorGui
-
-		editorGui.SetFont("Bold", "Arial")
-
-		editorGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Synthesizer Editor"))
-
-		editorGui.SetFont("Norm", "Arial")
-
-		editorGui.Add("Documentation", "x138 YP+20 w128 H:Center Center", translate("Voice Configuration")
-					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control")
-
-		editorGui.SetFont("Norm", "Arial")
-
-		editorGui.Add("Text", "x8 yp+30 w388 W:Grow 0x10")
-
-		x0 := x + 8
-		x1 := x + 118
-		x2 := x + 230
-
-		w1 := width - (x1 - x)
-		w2 := w1 - 26 - 26
-
-		x3 := x1 + w2 + 2
-		x4 := x2 + 24 + 8
-		w4 := width - (x4 - x)
-		x5 := x3 + 24
-
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs"]
-		chosen := 0
-
-		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
-		widget2 := editorGui.Add("DropDownList", "x" . x1 . " yp w156 W:Grow(0.3) Choose" . chosen . "  VbasicVoiceSynthesizerDropDown Hidden", choices)
-		widget2.LastValue := chosen
-		widget2.OnEvent("Change", chooseVoiceSynthesizer)
-
-		editorGui.Add("Button", "xp+157 yp-1 w23 h23 X:Move(0.3) vbasicWindowsSettingsButton Hidden").OnEvent("Click", (*) => Run("explorer.exe ms-settings:speech"))
-		setButtonIcon(editorGui["basicWindowsSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
-
-		this.iTopWidgets := [[widget1, widget2, editorGui["basicWindowsSettingsButton"]]]
-
-		voices := [translate("Random"), translate("Deactivated")]
-
-		widget3 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerLabel Hidden", translate("Voice"))
-		widget4 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicWindowsSpeakerDropDown Hidden", voices)
-
-		widget17 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
-		widget17.OnEvent("Click", (*) => this.testSpeaker())
-		setButtonIcon(widget17, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
-
-		widget5 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicWindowsSpeakerVolumeLabel Hidden", translate("Level"))
-		widget6 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range0-100 ToolTip VbasicSpeakerVolumeSlider Hidden")
-
-		widget7 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VbasicWindowsSpeakerPitchLabel Hidden", translate("Pitch"))
-		widget8 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VbasicSpeakerPitchSlider Hidden")
-
-		widget9 := editorGui.Add("Text", "x" . x0 . " yp+22 w110 h23 +0x200 VbasicWindowsSpeakerSpeedLabel Hidden", translate("Speed"))
-		widget10 := editorGui.Add("Slider", "Center Thick15 x" . x1 . " yp+2 w180 W:Grow(0.3) 0x10 Range-10-10 ToolTip VbasicSpeakerSpeedSlider Hidden")
-
-		this.iWindowsSynthesizerWidgets := [[editorGui["basicWindowsSpeakerLabel"], editorGui["basicWindowsSpeakerDropDown"], widget17]]
-
-		this.iOtherWidgets := [[editorGui["basicWindowsSpeakerVolumeLabel"], editorGui["basicSpeakerVolumeSlider"]]
-							 , [editorGui["basicWindowsSpeakerPitchLabel"], editorGui["basicSpeakerPitchSlider"]]
-							 , [editorGui["basicWindowsSpeakerSpeedLabel"], editorGui["basicSpeakerSpeedSlider"]]]
-
-		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
-		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicAzureSubscriptionKeyEdit Hidden")
-		widget12.OnEvent("Change", updateAzureVoices)
-
-		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w140 h23 +0x200 VbasicAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
-		widget14 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicAzureTokenIssuerEdit Hidden")
-		widget14.OnEvent("Change", updateAzureVoices)
-
-		voices := [translate("Random"), translate("Deactivated")]
-
-		widget15 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicAzureSpeakerLabel Hidden", translate("Voice"))
-		widget16 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicAzureSpeakerDropDown Hidden", voices)
-
-		widget18 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default")
-		widget18.OnEvent("Click", (*) => this.testSpeaker())
-		setButtonIcon(widget18, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
-
-		editorGui.Add("Text", "x8 yp+106 w388 W:Grow 0x10")
-
-		editorGui.Add("Button", "x120 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
-		editorGui.Add("Button", "x206 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
-
-		this.iAzureSynthesizerWidgets := [[editorGui["basicAzureSubscriptionKeyLabel"], editorGui["basicAzureSubscriptionKeyEdit"]]
-										, [editorGui["basicAzureTokenIssuerLabel"], editorGui["basicAzureTokenIssuerEdit"]]
-										, [editorGui["basicAzureSpeakerLabel"], editorGui["basicAzureSpeakerDropDown"], widget18]]
-
-		widget19 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicGoogleAPIKeyFileLabel Hidden", translate("Service Key"))
-		widget20 := editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " h21 Password W:Grow VbasicGoogleAPIKeyFileEdit Hidden")
-		widget20.OnEvent("Change", updateGoogleVoices)
-
-		widget21 := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp w23 h23 X:Move Disabled VbasicGoogleAPIKeyFilePathButton Hidden", translate("..."))
-		widget21.OnEvent("Click", chooseAPIKeyFilePath)
-
-		voices := [translate("Random"), translate("Deactivated")]
-
-		widget22 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicGoogleSpeakerLabel Hidden", translate("Voice"))
-		widget23 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicGoogleSpeakerDropDown Hidden", voices)
-
-		widget24 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget24.OnEvent("Click", (*) => this.testSpeaker())
-		setButtonIcon(widget24, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
-
-		this.iGoogleSynthesizerWidgets := [[editorGui["basicGoogleAPIKeyFileLabel"], editorGui["basicGoogleAPIKeyFileEdit"], widget21]
-										 , [editorGui["basicGoogleSpeakerLabel"], editorGui["basicGoogleSpeakerDropDown"], widget24]]
-
-		widget30 := editorGui.Add("Text", "x" . x0 . " ys+24 w112 h23 +0x200 VbasicOpenAISpeakerServerURLLabel Hidden", translate("Server URL"))
-		widget31 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicOpenAISpeakerServerURLEdit Hidden")
-
-		widget32 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicOpenAISpeakerAPIKeyLabel Hidden", translate("Service Key"))
-		widget33 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicOpenAISpeakerAPIKeyEdit Hidden")
-
-		widget34 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicOpenAISpeakerLabel Hidden", translate("Model / Voice"))
-
-		halfWidth := (Floor((w1 - 48) / 2) - 2)
-
-		widget35 := editorGui.Add("Edit", "x" . (x1 + 24) . " yp w" . halfWidth . " W:Grow(0.5) VbasicOpenAISpeakerModelEdit Hidden")
-		widget36 := editorGui.Add("Edit", "x" . ((x1 + 24) + (halfWidth + 3)) . " yp w" . (halfWidth - 1) . " X:Move(0.5) W:Grow(0.5) VbasicOpenAISpeakerVoiceEdit Hidden")
-
-		widget37 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget37.OnEvent("Click", (*) => this.testSpeaker())
-		setButtonIcon(widget37, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
-
-		widget38 := editorGui.Add("Button", "x" . (x1 + 24 + 5) + (halfWidth * 2) . " yp w23 h23 X:Move Default Hidden")
-		widget38.OnEvent("Click", (*) => this.editInstructions())
-		setButtonIcon(widget38, kIconsDirectory . "General Settings.ico", 1, "L4 T4 R4 B4")
-
-		this.iOpenAISynthesizerWidgets := [[editorGui["basicOpenAISpeakerServerURLLabel"], editorGui["basicOpenAISpeakerServerURLEdit"]]
-										 , [editorGui["basicOpenAISpeakerAPIKeyLabel"], editorGui["basicOpenAISpeakerAPIKeyEdit"]]
-										 , [editorGui["basicOpenAISpeakerLabel"], editorGui["basicOpenAISpeakerModelEdit"]
-										  , editorGui["basicOpenAISpeakerVoiceEdit"], widget37, widget38]]
-
-		widget25 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicElevenLabsAPIKeyLabel Hidden", translate("Service Key"))
-		widget26 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicElevenLabsAPIKeyEdit Hidden")
-		widget26.OnEvent("Change", updateElevenLabsVoices)
-
-		voices := [translate("Random"), translate("Deactivated")]
-
-		widget27 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicElevenLabsSpeakerLabel Hidden", translate("Voice"))
-		widget28 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicElevenLabsSpeakerDropDown Hidden", voices)
-
-		widget29 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
-		widget29.OnEvent("Click", (*) => this.testSpeaker())
-		setButtonIcon(widget29, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
-
-		this.iElevenLabsSynthesizerWidgets := [[editorGui["basicElevenLabsAPIKeyLabel"], editorGui["basicElevenLabsAPIKeyEdit"]]
-											 , [editorGui["basicElevenLabsSpeakerLabel"], editorGui["basicElevenLabsSpeakerDropDown"], widget29]]
-
-		this.updateLanguage()
-
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iWindowsSynthesizerWidgets)
-		this.hideControls(this.iAzureSynthesizerWidgets)
-		this.hideControls(this.iGoogleSynthesizerWidgets)
-		this.hideControls(this.iOpenAISynthesizerWidgets)
-		this.hideControls(this.iElevenLabsSynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		this.iSynthesizerMode := "Init"
-	}
-
-	loadFromConfiguration(configuration, load := false) {
-		local synthesizer, languageCode, languages, ignore, speaker
-
-		super.loadFromConfiguration(configuration)
-
-		if load {
-			languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-			languages := availableLanguages()
-
-			if languages.Has(languageCode)
-				this.iLanguage := languages[languageCode]
-			else
-				this.iLanguage := languageCode
-
-			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
-
-			if (InStr(synthesizer, "Azure") == 1)
-				synthesizer := "Azure"
-
-			if (InStr(synthesizer, "Google") == 1)
-				synthesizer := "Google"
-
-			if (InStr(synthesizer, "OpenAI") == 1)
-				synthesizer := "OpenAI"
-
-			if (InStr(synthesizer, "ElevenLabs") == 1)
-				synthesizer := "ElevenLabs"
-
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs"], synthesizer)
-
-			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
-			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
-			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			this.Value["openAISpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-
-			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey"
-																				, getMultiMapValue(configuration, "Voice Control"
-																												, "SubscriptionKey", ""))
-			this.Value["azureTokenIssuer"] := getMultiMapValue(configuration, "Voice Control", "Azure.TokenIssuer"
-																			, getMultiMapValue(configuration, "Voice Control"
-																											, "TokenIssuer", ""))
-
-			this.Value["googleAPIKeyFile"] := getMultiMapValue(configuration, "Voice Control", "Google.APIKeyFile"
-																			, getMultiMapValue(configuration, "Voice Control"
-																											, "APIKeyFile", ""))
-
-			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
-			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
-			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
-			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
-			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
-
-			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
-																			, getMultiMapValue(configuration, "Voice Control", "APIKey", ""))
-
-			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
-			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
-			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
-
-			this.Value[synthesizer . "Speaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker"
-																				 , this.Value[synthesizer . "Speaker"])
-
-			switch synthesizer, false {
-				case "Azure":
-					this.Value["azureSubscriptionKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
-					this.Value["azureAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
-				case "Google":
-					this.Value["googleAPIKeyFile"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
-				case "OpenAI":
-					this.Value["openAISpeakerServerURL"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
-					this.Value["openAISpeakerAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
-
-					try
-						this.Value["openAISpeakerModel"] := string2Values("/", getMultiMapValue(configuration, "Voice Control", "Speaker"
-																											 , this.Value["openAISpeakerModel"] . "/"))[1]
-
-					try
-						this.Value["openAISpeakerVoice"] := string2Values("/", getMultiMapValue(configuration, "Voice Control", "Speaker"
-																											 , "/" . this.Value["openAISpeakerVoice"]))[2]
-
-					this.Value["openAISpeakerInstructions"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[4]
-				case "ElevenLabs":
-					this.Value["elevenLabsAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
-			}
-
-			if this.Configuration
-				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
-					if (this.Value[speaker] == true)
-						this.Value[speaker] := translate("Random")
-					else if (this.Value[speaker] == false)
-						this.Value[speaker] := translate("Deactivated")
-		}
-	}
-
-	saveToConfiguration(configuration) {
-		local windowsSpeaker := this.Control["basicWindowsSpeakerDropDown"].Text
-		local azureSpeaker := this.Control["basicAzureSpeakerDropDown"].Text
-		local googleSpeaker := this.Control["basicGoogleSpeakerDropDown"].Text
-		local elevenLabsSpeaker := this.Control["basicElevenLabsSpeakerDropDown"].Text
-
-		super.saveToConfiguration(configuration)
-
-		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
-
-		if (windowsSpeaker = translate("Random"))
-			windowsSpeaker := true
-		else if ((windowsSpeaker = translate("Deactivated")) || (windowsSpeaker = A_Space))
-			windowsSpeaker := false
-
-		if (azureSpeaker = translate("Random"))
-			azureSpeaker := true
-		else if ((azureSpeaker = translate("Deactivated")) || (azureSpeaker = A_Space))
-			azureSpeaker := false
-
-		if (this.Control["basicVoiceSynthesizerDropDown"].Value = 1) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Windows")
-			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-		}
-		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 2) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
-			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-		}
-		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 3) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text))
-			setMultiMapValue(configuration, "Voice Control", "Speaker", azureSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-		}
-		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 4) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
-			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-		}
-		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 5) {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
-										  , "OpenAI|" . Trim(this.Control["basicOpenAISpeakerServerURLEdit"].Text) . "|"
-													  . Trim(this.Control["basicOpenAISpeakerAPIKeyEdit"].Text) . "|"
-													  . StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
-			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-		}
-		else {
-			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
-			setMultiMapValue(configuration, "Voice Control", "Speaker", elevenLabsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
-		}
-
-		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
-		setMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey", Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "Azure.TokenIssuer", Trim(this.Control["basicAzureTokenIssuerEdit"].Text))
-
-		setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
-		setMultiMapValue(configuration, "Voice Control", "Google.APIKeyFile", Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
-
-		setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", Trim(this.Control["basicOpenAISpeakerServerURLEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", Trim(this.Control["basicOpenAISpeakerAPIKeyEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", Trim(this.Control["basicOpenAISpeakerModelEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", Trim(this.Control["basicOpenAISpeakerVoiceEdit"].Text))
-		setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions"
-													   , StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
-
-		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
-		setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
-
-		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["basicSpeakerVolumeSlider"].Value)
-		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["basicSpeakerPitchSlider"].Value)
-		setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", this.Control["basicSpeakerSpeedSlider"].Value)
-	}
-
-	loadConfigurator(configuration) {
-		this.loadFromConfiguration(configuration, true)
-
-		this.Control["basicVoiceSynthesizerDropDown"].Choose(this.Value["voiceSynthesizer"])
-		this.Control["basicVoiceSynthesizerDropDown"].LastValue := this.Value["voiceSynthesizer"]
-
-		this.Control["basicAzureSubscriptionKeyEdit"].Text := this.Value["azureSubscriptionKey"]
-		this.Control["basicAzureTokenIssuerEdit"].Text := this.Value["azureTokenIssuer"]
-
-		this.Control["basicGoogleAPIKeyFileEdit"].Text := this.Value["googleAPIKeyFile"]
-
-		this.Control["basicGoogleAPIKeyFilePathButton"].Enabled := false
-
-		this.Control["basicOpenAISpeakerServerURLEdit"].Text := this.Value["openAISpeakerServerURL"]
-		this.Control["basicOpenAISpeakerAPIKeyEdit"].Text := this.Value["openAISpeakerAPIKey"]
-		this.Control["basicOpenAISpeakerModelEdit"].Text := this.Value["openAISpeakerModel"]
-		this.Control["basicOpenAISpeakerVoiceEdit"].Text := this.Value["openAISpeakerVoice"]
-
-		this.Control["basicElevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
-
-		if (this.Value["voiceSynthesizer"] = 1)
-			this.updateWindowsVoices(configuration)
-		else if (this.Value["voiceSynthesizer"] = 2)
-			this.updateDotNETVoices(configuration)
-
-		this.updateAzureVoices(configuration)
-		this.updateGoogleVoices(configuration)
-		this.updateOpenAIVoices(configuration)
-		this.updateElevenLabsVoices(configuration)
-
-		this.Control["basicSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
-		this.Control["basicSpeakerPitchSlider"].Value := this.Value["speakerPitch"]
-		this.Control["basicSpeakerSpeedSlider"].Value := this.Value["speakerSpeed"]
-	}
-
-	editSynthesizer(owner := false) {
-		local window, x, y, w, h, configuration
-
-		this.createGui(this.Configuration)
-
-		window := this.Window
-
-		if owner
-			window.Opt("+Owner" . owner.Hwnd)
-
-		if getWindowPosition("Synthesizer Editor", &x, &y)
-			window.Show("x" . x . " y" . y)
-		else
-			window.Show()
-
-		this.loadConfigurator(this.Configuration)
-
-		this.showWidgets()
-
-		loop
-			Sleep(200)
-		until this.iResult
+		window.Block()
 
 		try {
-			if (this.iResult = kOk) {
-				configuration := newMultiMap()
+			this.saveSetup()
 
-				this.saveToConfiguration(configuration)
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini")
 
-				return configuration
+			configuration := TranslatorEditor(assistant, configuration).editTranslator(window)
+
+			if configuration {
+				writeMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini", configuration)
+
+				if getMultiMapValue(configuration, assistant . ".Translator", "Service", false) {
+					wizard.setModuleValue(assistant, "Translator.Service", getMultiMapValue(configuration, assistant . ".Translator", "Service"))
+					wizard.setModuleValue(assistant, "Translator.Language", getMultiMapValue(configuration, assistant . ".Translator", "Language"))
+					wizard.setModuleValue(assistant, "Translator.Code", getMultiMapValue(configuration, assistant . ".Translator", "Code"))
+					wizard.setModuleValue(assistant, "Translator.API Key", getMultiMapValue(configuration, assistant . ".Translator", "API Key"))
+					wizard.setModuleValue(assistant, "Translator.Arguments", getMultiMapValue(configuration, assistant . ".Translator", "Arguments", ""))
+
+					wizard.setModuleValue(assistant, "Language.Translated", true)
+				}
+				else {
+					wizard.clearModuleValue(assistant, "Translator.Service", false)
+					wizard.clearModuleValue(assistant, "Translator.Language", false)
+					wizard.clearModuleValue(assistant, "Translator.Code", false)
+					wizard.clearModuleValue(assistant, "Translator.API Key", false)
+					wizard.clearModuleValue(assistant, "Translator.Arguments", false)
+
+					wizard.setModuleValue(assistant, "Language.Translated", false)
+				}
+
+				this.loadAssistant(assistant)
+
+				return true
 			}
 			else
 				return false
 		}
 		finally {
-			window.Destroy()
-		}
-	}
-
-	showWidgets() {
-		local voiceSynthesizer := this.Control["basicVoiceSynthesizerDropDown"].Value
-
-		if !voiceSynthesizer
-			voiceSynthesizer := 1
-
-		if (voiceSynthesizer == 1)
-			this.showWindowsSynthesizerEditor()
-		else if (voiceSynthesizer == 2)
-			this.showDotNETSynthesizerEditor()
-		else if (voiceSynthesizer == 3)
-			this.showAzureSynthesizerEditor()
-		else if (voiceSynthesizer == 4)
-			this.showGoogleSynthesizerEditor()
-		else if (voiceSynthesizer == 5)
-			this.showOpenAISynthesizerEditor()
-		else
-			this.showElevenLabsSynthesizerEditor()
-	}
-
-	showWindowsSynthesizerEditor() {
-		this.showControls(this.iTopWidgets)
-		this.showControls(this.iWindowsSynthesizerWidgets)
-
-		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
-			this.transposeControls(this.iOtherWidgets, 24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else
-			throw "Internal error detected in VoiceSynthesizerEditor.showWindowsSynthesizerEditor..."
-
-		this.showControls(this.iOtherWidgets)
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := "Windows"
-	}
-
-	showDotNETSynthesizerEditor() {
-		this.showWindowsSynthesizerEditor()
-
-		this.Control["basicWindowsSettingsButton"].Enabled := true
-
-		this.iSynthesizerMode := "dotNET"
-	}
-
-	hideWindowsSynthesizerEditor() {
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iWindowsSynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		if ((this.iSynthesizerMode == "Windows") || (this.iSynthesizerMode == "dotNET"))
-			this.transposeControls(this.iOtherWidgets, -24 * this.iWindowsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceSynthesizerEditor.hideWindowsSynthesizerEditor..."
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := false
-	}
-
-	hideDotNETSynthesizerEditor() {
-		this.hideWindowsSynthesizerEditor()
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-	}
-
-	showAzureSynthesizerEditor() {
-		this.showControls(this.iTopWidgets)
-		this.showControls(this.iAzureSynthesizerWidgets)
-
-		this.iTopAzureCredentialsVisible := true
-
-		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
-			this.transposeControls(this.iOtherWidgets, 24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else
-			throw "Internal error detected in VoiceSynthesizerEditor.showAzureSynthesizerEditor..."
-
-		this.showControls(this.iOtherWidgets)
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := "Azure"
-	}
-
-	hideAzureSynthesizerEditor() {
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iAzureSynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		this.iTopAzureCredentialsVisible := false
-
-		if (this.iSynthesizerMode == "Azure")
-			this.transposeControls(this.iOtherWidgets, -24 * this.iAzureSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceSynthesizerEditor.hideAzureSynthesizerEditor..."
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := false
-	}
-
-	showGoogleSynthesizerEditor() {
-		this.showControls(this.iTopWidgets)
-		this.showControls(this.iGoogleSynthesizerWidgets)
-
-		this.iTopGoogleCredentialsVisible := true
-
-		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
-			this.transposeControls(this.iOtherWidgets, 24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else
-			throw "Internal error detected in VoiceSynthesizerEditor.showGoogleSynthesizerEditor..."
-
-		this.showControls(this.iOtherWidgets)
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := "Google"
-	}
-
-	hideGoogleSynthesizerEditor() {
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iGoogleSynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		this.iTopGoogleCredentialsVisible := false
-
-		if (this.iSynthesizerMode == "Google")
-			this.transposeControls(this.iOtherWidgets, -24 * this.iGoogleSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceSynthesizerEditor.hideGoogleSynthesizerEditor..."
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := false
-	}
-
-	showOpenAISynthesizerEditor() {
-		this.showControls(this.iTopWidgets)
-		this.showControls(this.iOpenAISynthesizerWidgets)
-
-		this.iTopOpenAICredentialsVisible := true
-
-		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
-			this.transposeControls(this.iOtherWidgets, 24 * this.iOpenAISynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else
-			throw "Internal error detected in VoiceSynthesizerEditor.showOpenAISynthesizerEditor..."
-
-		this.showControls(this.iOtherWidgets)
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := "OpenAI"
-	}
-
-	hideOpenAISynthesizerEditor() {
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iOpenAISynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		this.iTopOpenAICredentialsVisible := false
-
-		if (this.iSynthesizerMode == "OpenAI")
-			this.transposeControls(this.iOtherWidgets, -24 * this.iOpenAISynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceSynthesizerEditor.hideOpenAISynthesizerEditor..."
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := false
-	}
-
-	showElevenLabsSynthesizerEditor() {
-		this.showControls(this.iTopWidgets)
-		this.showControls(this.iElevenLabsSynthesizerWidgets)
-
-		this.iTopElevenLabsCredentialsVisible := true
-
-		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
-			this.transposeControls(this.iOtherWidgets, 24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else
-			throw "Internal error detected in VoiceSynthesizerEditor.showElevenLabsSynthesizerEditor..."
-
-		this.showControls(this.iOtherWidgets)
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := "ElevenLabs"
-	}
-
-	hideElevenLabsSynthesizerEditor() {
-		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iElevenLabsSynthesizerWidgets)
-		this.hideControls(this.iOtherWidgets)
-
-		this.iTopElevenLabsCredentialsVisible := false
-
-		if (this.iSynthesizerMode == "ElevenLabs")
-			this.transposeControls(this.iOtherWidgets, -24 * this.iElevenLabsSynthesizerWidgets.Length, this.Window.TitleBarHeight)
-		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceSynthesizerEditor.hideWindowsSynthesizerEditor..."
-
-		this.Control["basicWindowsSettingsButton"].Enabled := false
-
-		this.iSynthesizerMode := false
-	}
-
-	getCurrentLanguage() {
-		local voiceLanguage := this.iLanguage
-		local languages := availableLanguages()
-		local languageCode, code, language, ignore, assistant, grammarFile, grammarLanguageCode
-
-		for code, language in availableLanguages()
-			if (language = voiceLanguage)
-				return code
-
-		for ignore, assistant in this.StepWizard.Definition
-			for ignore, grammarFile in getFileNames(assistant . ".grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-				SplitPath(grammarFile, , , &grammarLanguageCode)
-
-				if languages.Has(grammarLanguageCode)
-					language := languages[grammarLanguageCode]
-				else
-					language := grammarLanguageCode
-
-				if (language = voiceLanguage)
-					return grammarLanguageCode
-			}
-
-		return "en"
-	}
-
-	updateLanguage() {
-		if (this.Control["basicVoiceSynthesizerDropDown"].Value = 1)
-			this.updateWindowsVoices()
-		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 2)
-			this.updateDotNETVoices()
-
-		this.updateAzureVoices()
-		this.updateGoogleVoices()
-		this.updateOpenAIVoices()
-		this.updateElevenLabsVoices()
-	}
-
-	loadVoices(synthesizer, configuration) {
-		local language := this.getCurrentLanguage()
-		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
-
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Random"))
-
-		return voices
-	}
-
-	loadWindowsVoices(configuration, &windowsSpeaker) {
-		if configuration
-			windowsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(this.Configuration, "Voice Control", "Speaker", true))
-		else {
-			windowsSpeaker := this.Control["basicWindowsSpeakerDropDown"].Text
-
-			configuration := this.Configuration
-		}
-
-		return this.loadVoices("Windows", configuration)
-	}
-
-	loadDotNETVoices(configuration, &dotNETSpeaker)	{
-		if configuration
-			dotNETSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
-		else {
-			dotNETSpeaker := this.Control["basicWindowsSpeakerDropDown"].Text
-
-			configuration := this.Configuration
-		}
-
-		return this.loadVoices("dotNET", configuration)
-	}
-
-	updateWindowsVoices(configuration := false) {
-		local windowsSpeaker, voices, chosen
-
-		voices := this.loadWindowsVoices(configuration, &windowsSpeaker)
-		chosen := inList(voices, windowsSpeaker)
-
-		if (chosen == 0)
-			chosen := 1
-
-		this.Control["basicWindowsSpeakerDropDown"].Delete()
-		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
-		this.Control["basicWindowsSpeakerDropDown"].Choose(chosen)
-	}
-
-	updateDotNETVoices(configuration := false) {
-		local dotNETSpeaker, voices, chosen
-
-		voices := this.loadDotNETVoices(configuration, &dotNETSpeaker)
-		chosen := inList(voices, dotNETSpeaker)
-
-		if (chosen == 0)
-			chosen := 1
-
-		this.Control["basicWindowsSpeakerDropDown"].Delete()
-		this.Control["basicWindowsSpeakerDropDown"].Add(voices)
-		this.Control["basicWindowsSpeakerDropDown"].Choose(chosen)
-	}
-
-	updateGoogleVoices(configuration := false) {
-		local voices := []
-		local googleSpeaker, chosen, language
-
-		if configuration
-			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-		else {
-			googleSpeaker := this.Control["basicGoogleSpeakerDropDown"].Text
-
-			configuration := this.Configuration
-		}
-
-		if (configuration && !googleSpeaker)
-			googleSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
-
-		if (Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text) != "") {
-			language := this.getCurrentLanguage()
-
-			voices := SpeechSynthesizer("Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
-		}
-
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Random"))
-
-		chosen := inList(voices, googleSpeaker)
-
-		if (chosen == 0)
-			chosen := 1
-
-		this.Control["basicGoogleSpeakerDropDown"].Delete()
-		this.Control["basicGoogleSpeakerDropDown"].Add(voices)
-		this.Control["basicGoogleSpeakerDropDown"].Choose(chosen)
-	}
-
-	updateAzureVoices(configuration := false) {
-		local voices := []
-		local language, chosen, azureSpeaker
-
-		if configuration
-			azureSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
-		else {
-			configuration := this.Configuration
-
-			azureSpeaker := this.Control["basicAzureSpeakerDropDown"].Text
-		}
-
-		if (configuration && !azureSpeaker)
-			azureSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
-
-		if ((Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text) != "") && (Trim(this.Control["basicAzureTokenIssuerEdit"].Text) != "")) {
-			language := this.getCurrentLanguage()
-
-			voices := SpeechSynthesizer("Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
-		}
-
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Random"))
-
-		chosen := inList(voices, azureSpeaker)
-
-		if (chosen == 0)
-			chosen := 1
-
-		this.Control["basicAzureSpeakerDropDown"].Delete()
-		this.Control["basicAzureSpeakerDropDown"].Add(voices)
-		this.Control["basicAzureSpeakerDropDown"].Choose(chosen)
-	}
-
-	updateOpenAIVoices(configuration := false) {
-	}
-
-	updateElevenLabsVoices(configuration := false) {
-		local voices := []
-		local elevenLabsSpeaker, chosen, language
-
-		if configuration
-			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-		else {
-			elevenLabsSpeaker := this.Control["basicElevenLabsSpeakerDropDown"].Text
-
-			configuration := this.Configuration
-		}
-
-		if (configuration && !elevenLabsSpeaker)
-			elevenLabsSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
-
-		if (Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text) != "") {
-			language := this.getCurrentLanguage()
-
-			voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
-		}
-
-		voices.InsertAt(1, translate("Deactivated"))
-		voices.InsertAt(1, translate("Random"))
-
-		chosen := inList(voices, elevenLabsSpeaker)
-
-		if (chosen == 0)
-			chosen := 1
-
-		this.Control["basicElevenLabsSpeakerDropDown"].Delete()
-		this.Control["basicElevenLabsSpeakerDropDown"].Add(voices)
-		this.Control["basicElevenLabsSpeakerDropDown"].Choose(chosen)
-	}
-
-	showControls(widgets) {
-		local ignore, widget, widgetPart
-
-		for ignore, widget in widgets
-			for ignore, widgetPart in widget {
-				widgetPart.Enabled := true
-				widgetPart.Visible := true
-			}
-	}
-
-	hideControls(widgets) {
-		local ignore, widget, widgetPart
-
-		for ignore, widget in widgets
-			for ignore, widgetPart in widget {
-				widgetPart.Enabled := false
-				widgetPart.Visible := false
-			}
-	}
-
-	transposeControls(widgets, offset, correction) {
-		local ignore, widget, widgetPart
-		local posY
-
-		correction := 0
-
-		for ignore, widget in widgets
-			for ignore, widgetPart in widget {
-				ControlGetPos( , &posY, , , widgetPart)
-
-				posY := (posY + offset - correction)
-
-				ControlMove( , posY, , , widgetPart)
-
-				for ignore, resizer in this.Window.Resizers[widgetPart]
-					resizer.OriginalY := posY
-			}
-	}
-
-	testSpeaker() {
-		global kSimulatorConfiguration
-
-		local configuration := newMultiMap()
-		local synthesizer, language, voice, curSimulatorConfiguration
-
-		this.StepWizard.SetupWizard.saveToConfiguration(configuration)
-		this.saveToConfiguration(configuration)
-
-		curSimulatorConfiguration := kSimulatorConfiguration
-
-		kSimulatorConfiguration := configuration
-
-		SpeechSynthesizer.initializePostProcessing()
-
-		try {
-			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
-			language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-			voice := getMultiMapValue(configuration, "Voice Control", "Speaker")
-
-			synthesizer := SpeechSynthesizer(synthesizer, voice, language)
-
-			synthesizer.setVolume(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
-			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
-			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
-
-			synthesizer.speakTest()
-		}
-		finally {
-			kSimulatorConfiguration := curSimulatorConfiguration
-
-			SpeechSynthesizer.initializePostProcessing()
-		}
-	}
-
-	editInstructions(command := false, *) {
-		local x, y, w, h, instructionsGui
-
-		static result
-
-		if (command == kOk)
-			result := kOk
-		else if (command == kCancel)
-			result := kCancel
-		else {
-			result := false
-
-			instructionsGui := Window({Descriptor: "Voice Synthesizer Editor.Instructions", Resizeable: true, Options: "0x400000"}
-									, translate("Instructions"))
-
-			instructionsGui.SetFont("Norm", "Arial")
-
-			instructionsGui.Add("Edit", "x16 y16 w454 h200 W:Grow H:Grow Multi vinstructionEdit", this.Value["openAISpeakerInstructions"])
-
-			instructionsGui.Add("Button", "x160 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kOk))
-			instructionsGui.Add("Button", "x246 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", ObjBindMethod(this, "editInstructions", kCancel))
-
-			instructionsGui.Opt("+Owner" . this.Window.Hwnd)
-
-			this.Window.Block()
-
-			try {
-				instructionsGui.Show("AutoSize Center")
-
-				if getWindowPosition("Voice Synthesizer Editor.Instructions", &x, &y)
-					instructionsGui.Show("x" . x . " y" . y)
-				else
-					instructionsGui.Show("AutoSize Center")
-
-				if getWindowSize("Voice Synthesizer Editor.Instructions", &w, &h)
-					instructionsGui.Resize("Initialize", w, h)
-
-				while !result
-					Sleep(100)
-
-				try {
-					if (result == kCancel)
-						return false
-					else if (result == kOk)
-						return (this.Value["openAISpeakerInstructions"] := instructionsGui["instructionEdit"].Text)
-				}
-				finally {
-					instructionsGui.Destroy()
-				}
-			}
-			finally {
-				this.Window.Unblock()
-			}
+			window.Unblock()
 		}
 	}
 }

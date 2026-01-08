@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Tray Menu Functions             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,7 +55,7 @@ hasTrayMenu() {
 
 installTrayMenu(update := false) {
 	global gHasTrayMenu
-	local icon := kIconsDirectory . "Pause.ico"
+	local icon := kIconsDirectory . "Start.ico"
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel
 

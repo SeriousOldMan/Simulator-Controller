@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Reports Tool               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -771,7 +771,7 @@ class RaceReports extends ConfigurationItem {
 		local raceDirectory, simulators, window, prefix, simulator, car, track, msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected report?"), translate("Delete"), 262436)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected report?"), translate("Delete"), 262436)
 		OnMessage(0x44, translateYesNoButtons, 0)
 
 		if (msgResult = "Yes") {
@@ -952,7 +952,7 @@ startupRaceReports() {
 
 		if !reportsDirectory {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
+			msgResult := withBlockedWindows(MsgDlg, translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -1001,7 +1001,7 @@ startupRaceReports() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Reports"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Reports"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

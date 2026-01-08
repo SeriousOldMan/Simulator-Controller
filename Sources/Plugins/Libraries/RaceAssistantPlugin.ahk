@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Assistant Plugin           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,6 +53,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	iName := false
 	iLogo := false
 	iLanguage := false
+	iTranslator := false
 	iSynthesizer := false
 	iSpeaker := false
 	iSpeakerVocalics := false
@@ -169,6 +170,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		unmute(arguments*) {
 			this.callRemote("unmute", arguments*)
+		}
+
+		ask(arguments*) {
+			this.callRemote("ask", arguments*)
 		}
 
 		raiseEvent(arguments*) {
@@ -731,6 +736,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	Translator {
+		Get {
+			return this.iTranslator
+		}
+	}
+
 	Synthesizer {
 		Get {
 			return this.iSynthesizer
@@ -837,6 +848,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.iName := this.getArgumentValue("name", this.getArgumentValue("raceAssistantName", false))
 			this.iLogo := this.getArgumentValue("logo", this.getArgumentValue("raceAssistantLogo", false))
 			this.iLanguage := this.getArgumentValue("language", this.getArgumentValue("raceAssistantLanguage", false))
+			this.iTranslator := this.getArgumentValue("translator", this.getArgumentValue("raceAssistantTranslator", false))
 
 			raceAssistantToggle := this.getArgumentValue("raceAssistant", false)
 
@@ -1625,7 +1637,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		track := getMultiMapValue(data, "Session Data", "Track")
 
 		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
-			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined)
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*"
+												, "Session Settings", "Fuel.Amount", kUndefined)
 
 			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
@@ -1993,7 +2006,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					options := " -Remote " . pid
 
-					for ignore, parameter in ["Name", "Logo", "Language", "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
+					for ignore, parameter in ["Name", "Logo", "Language", "Translator"
+											, "Synthesizer", "Speaker", "SpeakerVocalics", "Recognizer", "Listener"
 											, "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"]
 						if this.%parameter%
 							options .= (" -" . parameter . " `"" . this.%parameter% . "`"")
@@ -2322,6 +2336,25 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	unmute() {
 		if this.RaceAssistant
 			this.RaceAssistant.unmute()
+	}
+
+	ask(question, command?) {
+		if this.RaceAssistant
+			if isSet(command) {
+				if (command = kTrue)
+					command := true
+				else if (command = kFalse)
+					command := false
+
+				this.RaceAssistant.ask("Text", question, command)
+			}
+			else
+				this.RaceAssistant.ask("Text", question)
+	}
+
+	command(grammar, command := "") {
+		if this.RaceAssistant
+			this.RaceAssistant.ask(grammar, command)
 	}
 
 	raiseEvent(event, arguments*) {
@@ -3294,6 +3327,36 @@ enableDataCollection(type) {
 
 disableDataCollection(type) {
 	RaceAssistantPlugin.CollectData[type] := false
+}
+
+ask(name, question) {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.ask(question)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+command(name, grammar, command := "") {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.command(grammar, command)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 raiseEvent(name, event, arguments*) {

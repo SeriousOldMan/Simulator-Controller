@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Action Callbacks                ;;;
 ;;;                                                                         ;;;
 ;;;   Author.     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License.    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License.    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -33,7 +33,11 @@ Controller.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callController, ?function
 Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
 Controller.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callController, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
 
-Assistant.Ask(?question) <= Call(askAssistant, ?question)
+Assistant.Ask(?question) <= Call(ask, ?question)
+Assistant.Ask(?question, ?command) <= Call(ask, ?question, ?commaand)
+
+Assistant.Command(?grammar) <= Call(command, ?grammar)
+Assistant.Command(?grammar, ?command) <= Call(command, ?grammar, ?command)
 
 Assistant.Speak(?message) <= Call(speakAssistant, ?message)
 Assistant.Speak(?message, ?force) <= Call(speakAssistant, ?message, ?force)

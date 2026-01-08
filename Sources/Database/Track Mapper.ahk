@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Track Mapper                    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -137,7 +137,8 @@ createTrackMap(simulator, track, fileName) {
 	writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 	loop Read, fileName {
-		coordinates.Push(string2Values(",", A_LoopReadLine))
+		if (Trim(A_LoopReadLine) != "")
+			coordinates.Push(string2Values(",", A_LoopReadLine))
 
 		Sleep(1)
 

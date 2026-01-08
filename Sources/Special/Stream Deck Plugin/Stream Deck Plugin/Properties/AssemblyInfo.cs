@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimulatorControllerPlugin")]
+[assembly: AssemblyTitle("Simulator Controller Plugin")]
 [assembly: AssemblyDescription("...")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SimulatorControllerPlugin")]
-[assembly: AssemblyCopyright("Copyright © Oliver Juwig (TheBigO) 2021")]
+[assembly: AssemblyProduct("Simulator Controller Plugin")]
+[assembly: AssemblyCopyright("Copyright © 2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

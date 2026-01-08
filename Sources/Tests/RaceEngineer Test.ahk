@@ -3,7 +3,7 @@
 ;;;                                         (Race Engineer Rules)           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -86,10 +86,10 @@ class UnknownProvider extends SimulatorProvider {
 }
 
 class TestRaceEngineer extends RaceEngineer {
-	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
+	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined, translator := kUndefined, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
-		super.__New(configuration, remoteHandler, name, language, synthesizer, speaker, vocalics, speakerBooster
+		super.__New(configuration, remoteHandler, name, language, translator, synthesizer, speaker, vocalics, speakerBooster
 				  , recognizer, listener, listenerBooster, conversationBooster, agentBooster
 				  , muted, voiceServer)
 
@@ -162,7 +162,7 @@ class TestRaceEngineer extends RaceEngineer {
 			vDamageStintLaps := stintLaps
 		}
 		else
-			MsgBox("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
+			MsgDlg("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
 	}
 }
 
@@ -287,7 +287,7 @@ class FuelReporting extends Assert {
 	FuelWarningTest() {
 		global vFuelWarnings
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false, false)
 
 		vFuelWarnings := CaseInsenseMap()
 
@@ -315,7 +315,7 @@ class FuelReporting extends Assert {
 	RemainingFuelTest() {
 		global vFuelWarnings
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false, false)
 
 		vFuelWarnings := CaseInsenseMap()
 
@@ -343,7 +343,7 @@ class DamageReporting extends Assert {
 	DamageReportingTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
@@ -382,7 +382,7 @@ class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		done := false
 
@@ -454,7 +454,7 @@ class DamageAnalysis extends Assert {
 	DamageRace3ReportingTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		done := false
 
@@ -549,7 +549,7 @@ class DamageAnalysis extends Assert {
 	DamageRace4ReportingTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		done := false
 
@@ -645,7 +645,7 @@ class PitstopHandling extends Assert {
 	PitstopPlanLap3Test() {
 		global vCompletedActions
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -695,7 +695,7 @@ class PitstopHandling extends Assert {
 	PitstopPlanLap4Test() {
 		global vCompletedActions
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -745,7 +745,7 @@ class PitstopHandling extends Assert {
 	PitstopPlanLap5Test() {
 		global vCompletedActions
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -800,7 +800,7 @@ class PitstopHandling extends Assert {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -867,7 +867,7 @@ class PitstopHandling extends Assert {
 		global vPitstopFuel, vPitstopTyreCompound, vPitstopTyreCompoundColor, vPitstopTyreSet, vPitstopTyrePressures
 		global vPitstopRepairSuspension, vPitstopRepairBodywork, vPitstopRepairEngine
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -934,7 +934,7 @@ class PitstopHandling extends Assert {
 		global vCompletedActions
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		vCompletedActions := CaseInsenseMap()
 
@@ -1010,7 +1010,7 @@ class PitstopHandling extends Assert {
 	PitstopMultipleTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
 		loop {
 			vSuspensionDamage := kNotInitialized
@@ -1099,7 +1099,7 @@ class PitstopHistory extends Assert {
 	LastPitstopTest() {
 		global vFuelWarnings
 
-		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false, false)
 
 		data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap 1.data")
 
@@ -1156,13 +1156,13 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	withBlockedWindows(MsgBox, "Full run took " . (A_TickCount - startTime) . " ms")
+	withBlockedWindows(MsgDlg, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Jona", "EN", true, true, false, true, true, true, true, true, true)
+							   , TestPitStopHandler(), "Jona", true, true, true, true, false, true, true, true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -1196,7 +1196,7 @@ else {
 					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
-					withBlockedWindows(MsgBox, "Lap " . A_Index . " loaded - Continue?")
+					withBlockedWindows(MsgDlg, "Lap " . A_Index . " loaded - Continue?")
 			}
 		}
 
@@ -1347,7 +1347,7 @@ else {
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1383,7 +1383,7 @@ else {
 						if engineer.Debug[kDebugKnowledgeBase]
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 					}
 
 					if isDebug()
@@ -1419,7 +1419,7 @@ else {
 
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						withBlockedWindows(MsgBox, "Pitstop")
+						withBlockedWindows(MsgDlg, "Pitstop")
 					}
 
 					if isDebug()
@@ -1455,13 +1455,13 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 24) {
 							engineer.performPitstop(23)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 					}
 					else if (raceNr = 11) {
@@ -1469,34 +1469,34 @@ else {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 11) {
 							engineer.performPitstop(11)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 
 						if (lap = 19)
-							withBlockedWindows(MsgBox, "Inspect")
+							withBlockedWindows(MsgDlg, "Inspect")
 					}
 					else if (raceNr = 12) {
 						if (lap = 21) {
 							engineer.planPitstop()
 							engineer.preparePitstop()
 
-							withBlockedWindows(MsgBox, "Pitstop Prepare")
+							withBlockedWindows(MsgDlg, "Pitstop Prepare")
 						}
 
 						if (lap = 22) {
 							engineer.performPitstop(22)
 
-							withBlockedWindows(MsgBox, "Pitstop Perform")
+							withBlockedWindows(MsgDlg, "Pitstop Perform")
 						}
 
 						if (lap = 24)
-							withBlockedWindows(MsgBox, "Inspect")
+							withBlockedWindows(MsgDlg, "Inspect")
 					}
 
 					if isDebug()
@@ -1604,7 +1604,7 @@ else {
 	}
 
 	if isDebug()
-		withBlockedWindows(MsgBox, "Done...")
+		withBlockedWindows(MsgDlg, "Done...")
 
 	ExitApp()
 }

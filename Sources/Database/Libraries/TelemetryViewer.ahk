@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Telemetry Viewer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -186,12 +186,15 @@ class TelemetryChart {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+						%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -206,12 +209,12 @@ class TelemetryChart {
 										 , {margin: margin})
 
 			before .= "`n function drawChart() {"
-
+			
 			loop chartFunctions.Length
 				before .= (" drawChart" . A_Index . "();")
 
 			before .= " }`n"
-
+			
 			before .= "`n function selectTelemetry(row) {"
 
 			loop chartFunctions.Length
@@ -466,9 +469,17 @@ class TelemetryChart {
 	}
 
 	selectRow(row) {
-		local data, x
+		local settings, data, x
 
-		static htmlViewer := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11")
+		static htmlViewer := false
+		
+		if !htmlViewer {
+			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+			
+			htmlViewer := getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+												   , getMultiMapValue(settings, "HTML", "Viewer.*"
+																			  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")))
+		}
 
 		if (false && (htmlViewer = "WebView2"))
 			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)
@@ -930,7 +941,7 @@ class TelemetryViewer {
 			if this.SelectedLap {
 				if isNumber(this.SelectedLap) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2490,7 +2501,7 @@ class TrackMap {
 					if section {
 						if (false && GetKeyState("Ctrl")) {
 							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
 							OnMessage(0x44, translateYesNoButtons, 0)
 
 							if (msgResult = "Yes")
@@ -3325,7 +3336,7 @@ class TrackMap {
 					section := section.Clone()
 
 					if ((result = "Corner") && (section.Type = "Corner")) {
-						result := withBlockedWindows(InputBox, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+						result := withBlockedWindows(InputDlg, translate("Please enter the name of the corner:"), translate("Corner"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
 						if (result.Result = "Ok")
 							section.Name := result.Value
@@ -3333,7 +3344,7 @@ class TrackMap {
 						result := "Corner"
 					}
 					else if ((result = "Straight") && (section.Type = "Straight")) {
-						result := withBlockedWindows(InputBox, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
+						result := withBlockedWindows(InputDlg, translate("Please enter the name of the straight:"), translate("Straight"), "w300 h100", section.HasProp("Name") ? section.Name : "")
 
 						if (result.Result = "Ok")
 							section.Name := result.Value
@@ -3592,7 +3603,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 			channelsListView.Modify(arguments[2], "Check")
 	}
 	else if (telemetryViewerOrCommand = "LayoutNew") {
-		inputResult := withBlockedWindows(InputBox, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
+		inputResult := withBlockedWindows(InputDlg, translate("Please enter the name of the new layout:"), translate("Telemetry Layouts"), "w300 h120")
 
 		if (inputResult.Result = "Ok") {
 			if layout

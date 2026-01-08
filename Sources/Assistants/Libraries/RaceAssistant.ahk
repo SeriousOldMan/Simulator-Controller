@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - AI Race Assistant               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -543,6 +543,12 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Assistant_Ask")
 						scriptPushValue(context, (c) {
+							command(this.RaceAssistant, scriptGetString(c))
+
+							return Integer(0)
+						})
+						scriptSetGlobal(context, "__Assistant_Command")
+						scriptPushValue(context, (c) {
 							speakAssistant(this.RaceAssistant, scriptGetString(c)
 										 , (scriptGetArgsCount(c) > 1) ? scriptGetBoolean(c, 2) : unset)
 
@@ -948,7 +954,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
+	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined, translator := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, speakerBooster := false
 		, recognizer := false, listener := false, listenerBooster := false, conversationBooster := false, agentBooster := false
 		, muted := false, voiceServer := false) {
@@ -978,7 +984,8 @@ class RaceAssistant extends ConfigurationItem {
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
 
-			options["Language"] := ((language != false) ? language : options["Language"])
+			options["Language"] := ((language == true) ? options["Language"] : language)
+			options["Translator"] := ((translator == true) ? options["Translator"] : translator)
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := speaker ; ((speaker == true) ? options["Speaker"] : speaker)
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
@@ -1044,6 +1051,12 @@ class RaceAssistant extends ConfigurationItem {
 		options := this.Options
 
 		options["Language"] := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+
+		if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false)
+			options["Translator"] := getMultiMapValue(configuration, "Voice Control", "Translator")
+		else
+			options["Translator"] := false
+
 		options["Synthesizer"] := getMultiMapValue(configuration, "Voice Control", "Synthesizer", getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
 		options["Speaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
 		options["Vocalics"] := Array(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
@@ -1749,6 +1762,26 @@ class RaceAssistant extends ConfigurationItem {
 				this.timeRecognized([])
 			default:
 				throw "Unknown information category `"" . category . "`" detected in RaceAssistant.requestInformation...."
+		}
+	}
+
+	ask(grammar, question, command?) {
+		local words, index, literal
+
+		if (grammar = "TEXT") {
+			if this.Listener
+				if (isSet(command) && command)
+					this.VoiceManager.recognize(question)
+				else
+					this.handleVoiceText("TEXT", question)
+		}
+		else if this.Listener {
+			words := string2Values(A_Space, question)
+
+			for index, literal in words
+				words[index] := RegExReplace(literal, "[:!?¿\-;。，！？：；]", "")
+
+			this.handleVoiceCommand(grammar, words)
 		}
 	}
 
@@ -4065,7 +4098,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 		number := this.getNumber(words)
 
-		if (number != kUndefined)
+		if (number = kUndefined)
+			number := false
+		else
 			for ignore, candidate in this.getCars()
 				if (knowledgeBase.getValue("Car." . candidate . ".Nr", "-") = number) {
 					car := candidate
@@ -4951,18 +4986,6 @@ callController(context, method, arguments*) {
 
 Controller_Call := callController
 
-askAssistant(context, question) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
-	local remoteHandler := assistant.RemoteHandler
-
-	if assistant.Listener
-		assistant.VoiceManager.recognize(question)
-
-	return true
-}
-
-Assistant_Ask := askAssistant
-
 speakAssistant(context, message, force := false) {
 	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
 	local speaker, ignore, part
@@ -4994,35 +5017,28 @@ speakAssistant(context, message, force := false) {
 Assistant_Speak := speakAssistant
 
 raiseEvent(context, event, arguments*) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
-	local pid
+	local assistant, pid
 
 	try {
-		if inList(kRaceAssistants, event) {
-			if (event = assistant.AssistantType) {
-				event := arguments.RemoveAt(1)
+		if inList(kRaceAssistants, context) {
+			assistant := context
+			pid := ProcessExist(assistant . ".exe")
 
-				return assistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+			if pid {
+				messageSend(kFileMessage, assistant
+										, "handleEvent:" . event . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+										, pid)
+
+				return true
 			}
-			else {
-				assistant := event
-				event := arguments.RemoveAt(1)
-
-				pid := ProcessExist(assistant . ".exe")
-
-				if pid {
-					messageSend(kFileMessage, assistant
-											, "handleEvent:" . event . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
-											, pid)
-
-					return true
-				}
-				else
-					return false
-			}
+			else
+				return false
 		}
-		else
+		else {
+			assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+
 			return assistant.handleEvent(normalizeArguments(Array(event, arguments*))*)
+		}
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -5034,35 +5050,28 @@ raiseEvent(context, event, arguments*) {
 Assistant_Raise := raiseEvent
 
 triggerAction(context, action, arguments*) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
-	local pid
+	local assistant, pid
 
 	try {
-		if inList(kRaceAssistants, action) {
-			if (action = assistant.AssistantType) {
-				action := arguments.RemoveAt(1)
+		if inList(kRaceAssistants, context) {
+			assistant := context
+			pid := ProcessExist(assistant . ".exe")
 
-				return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
+			if pid {
+				messageSend(kFileMessage, assistant
+										, "triggerAction:" . action . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
+										, pid)
+
+				return true
 			}
-			else {
-				assistant := action
-				action := arguments.RemoveAt(1)
-
-				pid := ProcessExist(assistant . ".exe")
-
-				if pid {
-					messageSend(kFileMessage, assistant
-											, "triggerAction:" . action . ((arguments.Length > 0) ? (";" . values2String(";", normalizeArguments(arguments, true)*)) : "")
-											, pid)
-
-					return true
-				}
-				else
-					return false
-			}
+			else
+				return false
 		}
-		else
+		else {
+			assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+
 			return assistant.triggerAction(normalizeArguments(Array(action, arguments*))*)
+		}
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -5072,6 +5081,70 @@ triggerAction(context, action, arguments*) {
 }
 
 Assistant_Trigger:= triggerAction
+
+ask(assistant, question, command?) {
+	local pid
+
+	try {
+		if inList(kRaceAssistants, assistant) {
+			pid := ProcessExist(assistant . ".exe")
+
+			if pid {
+				messageSend(kFileMessage, assistant, "ask:TEXT;" . question . (isSet(command) ? (";" . command) : ""), pid)
+
+				return true
+			}
+			else
+				return false
+		}
+		else {
+			assistant := (isInstance(assistant, RaceAssistant) ? assistant : assistant.KnowledgeBase.RaceAssistant)
+
+			assistant.ask("TEXT", question, command?)
+
+			return true
+		}
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Ask := ask
+
+command(assistant, grammar, command := false) {
+	local pid
+
+	try {
+		if inList(kRaceAssistants, assistant) {
+			pid := ProcessExist(assistant . ".exe")
+
+			if pid {
+				messageSend(kFileMessage, assistant, "ask:" . grammar . (command ? (";" . command) : ""), pid)
+
+				return true
+			}
+			else
+				return false
+		}
+		else {
+			assistant := (isInstance(assistant, RaceAssistant) ? assistant : assistant.KnowledgeBase.RaceAssistant)
+
+			assistant.ask(grammer, (command ? [command] : [])*)
+
+			return true
+		}
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Command := command
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -5312,6 +5385,12 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 					return Integer(0)
 				})
 				scriptSetGlobal(context, "__Assistant_Ask")
+				scriptPushValue(context, (c) {
+					command(assistant, scriptGetString(c))
+
+					return Integer(0)
+				})
+				scriptSetGlobal(context, "__Assistant_Command")
 				scriptPushValue(context, (c) {
 					speakAssistant(assistant, scriptGetString(c)
 								 , (scriptGetArgsCount(c) > 1) ? scriptGetBoolean(c, 2) : unset)

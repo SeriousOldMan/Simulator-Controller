@@ -6,7 +6,7 @@
 ;;;   more information and the download of the original WebView2.ahk.       ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,6 +24,7 @@
 global kExplorerVersions := CaseInsenseMap("Simulator Setup", 10)
 
 kExplorerVersions.Default := 11
+kHTMLViewer := "IE11"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -52,7 +53,7 @@ class ComVariable {
 		 * Construction VARIANT struct, `ptr` property points to the address, `__Item` property returns var's Value
 		 * @param vVal Values that need to be wrapped, supports String, Integer, Double, Array, ComValue, ComObjArray
 		 * ### example
-		 * `var1 := ComVariable('string'), withBlockedWindows(MsgBox, var1[])`
+		 * `var1 := ComVariable('string'), withBlockedWindows(MsgDlg, var1[])`
 		 *
 		 * `var2 := ComVariable([1,2,3,4], , true)`
 		 *
@@ -2154,6 +2155,58 @@ class IEViewer extends HTMLViewer {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Function Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getGoogleChartsScriptTag(offline?) {
+	; Returns the Google Charts loader script tag
+	;
+	; If offline is supplied
+	;	offline = true  -> Uses local files from Resources\Charts\
+	; 	offline = false -> Uses online CDN (default)
+	; else
+	;	us default from core settings
+
+	local ignore
+
+	static offlineDefault := kUndefined
+
+	if (kHTMLViewer = "WebView2") {
+		if (offlineDefault = kUndefined)
+			offlineDefault := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory
+																						   , kConfigDirectory))
+											 , "HTML", "Charts", "Online")
+
+		if !isSet(offline) {
+			if Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+				offline := (offlineDefault = "Offline")
+			else
+				offline := true
+		}
+		else if !offline
+			if !Dllcall("Sensapi.dll\IsNetworkAlive", "UintP", &ignore := 0)
+				offline := true
+
+		if offline
+			return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
+	}
+
+	return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
+}
+
+getGoogleChartsLoadStatement(drawFunction, packages*) {
+	; Returns the google.charts.load statement for the specified packages
+	; packages can be any number of package names like "corechart", "table", "bar"
+	;
+	; After that, the function specified by drawFunction is called
+
+	packages := values2String(", ", collect(packages, (p) => ("'" . p . "'"))*)
+
+	return ("google.charts.load('current', {packages:[" . packages . "]}).then(" . drawFunction . ");")
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -2167,6 +2220,7 @@ CoTaskMem_String(ptr) {
 
 fixIE(version := 0, exeName := "") {
 	local previousValue := ""
+	local ahkExe := false
 
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
 	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
@@ -2181,6 +2235,9 @@ fixIE(version := 0, exeName := "") {
 			SplitPath(A_AhkPath, &exeName)
 	}
 
+	if A_AhkPath
+		SplitPath(A_AhkPath, &ahkExe)
+
 	try {
 		previousValue := RegRead("HKCU\" . key, exeName, "")
 	}
@@ -2191,10 +2248,22 @@ fixIE(version := 0, exeName := "") {
 	if A_IsAdmin
 		try {
 			if (version = "") {
+				if ahkExe
+					try {
+						RegDelete("HKCU\" . key, ahkExe)
+						RegDelete("HKLM\" . key, ahkExe)
+					}
+
 				RegDelete("HKCU\" . key, exeName)
 				RegDelete("HKLM\" . key, exeName)
 			}
 			else {
+				if ahkExe
+					try {
+						RegWrite(version, "REG_DWORD", "HKCU\" . key, ahkExe)
+						RegWrite(version, "REG_DWORD", "HKLM\" . key, ahkExe)
+					}
+
 				RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
 				RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
 			}
@@ -2207,13 +2276,22 @@ fixIE(version := 0, exeName := "") {
 }
 
 initializeHTMLViewer() {
+	global kHTMLViewer
+
+	local settings
+
 	AddHTMLViewer(window, arguments*) {
 		return createWebView2Viewer(window, arguments*)
 	}
 
 	createWebView2Viewer(window, arguments*) {
-		local control := window.Add("Picture", arguments*)
-		local viewer := WebView2Viewer(control)
+		local control, viewer
+
+		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
+			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
+
+		control := window.Add("Picture", arguments*)
+		viewer := WebView2Viewer(control)
 
 		viewer.Navigate("about:blank")
 
@@ -2259,9 +2337,11 @@ initializeHTMLViewer() {
 	}
 
 	createIEViewer(window, options) {
-		local control := window.Add("ActiveX", options, "shell.explorer")
-		local viewer := IEViewer(control)
-		local explorer := viewer.Explorer
+		local control, viewer, explorer
+
+		control := window.Add("ActiveX", options, "shell.explorer")
+		viewer := IEViewer(control)
+		explorer := viewer.Explorer
 
 		explorer.navigate("about:blank")
 
@@ -2306,13 +2386,22 @@ initializeHTMLViewer() {
 	Window.DefineCustomControl("WebView2Viewer", createWebView2Viewer)
 	Window.DefineCustomControl("IE11Viewer", createIEViewer)
 
-	if ((getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory)), "HTML", "Viewer", "IE11") = "WebView2") ||
-		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+	if ((getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+								  , getMultiMapValue(settings, "HTML", "Viewer.*"
+															 , getMultiMapValue(settings, "HTML", "Viewer"
+																						, "IE11"))) = "WebView2")
+	 || (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
+
+		kHTMLViewer := "WebView2"
 	}
-	else
+	else {
 		Window.DefineCustomControl("HTMLViewer", createIEViewer)
+
+	}
 }
 
 

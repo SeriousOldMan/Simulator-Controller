@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -710,48 +710,51 @@ class SetupWorkbench extends ConfigurationItem {
 				if isChart {
 					before := "
 					(
-					<html>
-						<meta charset='utf-8'>
-						<head>
-							<style>
-								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							</style>
-							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-							<script type="text/javascript">
-								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
+						<html>
+							<meta charset='utf-8'>
+							<head>
+								<style>
+									.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+									.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+									.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+								</style>
+								%chartScript%
+								<script type="text/javascript">
+									%chartLoad%
 					)"
 
-					before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+					before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+														 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																								 , "corechart", "table", "bar")
+														 , fontColor: this.Window.Theme.TextColor
 														 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 					width := this.SettingsViewer.getWidth() - 4
 					height := (this.SettingsViewer.getHeight() - 110 - 4)
-
+					
 					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
-
+					
 					iWidth := width - 10
 					iHeight := 90
 
 					after := "
 					(
-							</script>
-						</head>
-						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-							<style> table, p, div { color: #%fontColor% } </style>
-							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-							<div style="width: %iWidth%px; height: %iHeight%px">
-								<p style="font-family: Arial; font-size: 16px; margin: 5px">
-									<br>
-									<br>
-									%info%
-								</p>
-							</div>
-						</body>
-					</html>
+								</script>
+							</head>
+							<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+								<style> table, p, div { color: #%fontColor% } </style>
+								<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+								<div style="width: %iWidth%px; height: %iHeight%px">
+									<p style="font-family: Arial; font-size: 16px; margin: 5px">
+										<br>
+										<br>
+										%info%
+									</p>
+								</div>
+							</body>
+						</html>
 					)"
 
 					after := substituteVariables(after, {fontColor: this.Window.Theme.TextColor
@@ -3955,7 +3958,7 @@ startupSetupWorkbench() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

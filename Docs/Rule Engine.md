@@ -568,7 +568,7 @@ Last but not lest, you can extend the reasoning process of a Race Assistant by c
 
 ## Execution of Scripts by the Rule Engine
 
-When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua]() scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
+When the rule engine is run as part of an Assistant, the *Execute* action and the *execute* predicate as documented above supports the execution of [Lua](https://www.lua.org) scripts in addition to executable files which can be run by Windows itself. A script must use the extensions ".script" or ".lua" to be identified.
 
 When this script is executed, the following global variables and functions are available:
 
@@ -580,13 +580,19 @@ When this script is executed, the following global variables and functions are a
    
      Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
 	 
-   - Assistant.Speak(phrase :: \<string\>, [force :: \<booelan\>])
+   - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
-   - Assistant.Ask(question :: \<string\>)
+   - Assistant.Ask(question :: \<string\> [, command :: \<boolean\>])
    
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. If the optional argument command is supplied and not false, full command processing is carried out, otherwise the question is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening.
+	 
+   - Assistant.Command(grammar :: \<string\> [, command :: \<string\>])
+   
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. This function will have no effect, if the Assistant is not configured for listening.
+	 
+	 If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
    - Controller.Call(method :: \<string\>, p1, p2, ...)
    

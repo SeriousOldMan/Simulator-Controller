@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Simulator Configuration Editor  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -94,7 +94,7 @@ class GeneralTab extends ConfiguratorPanel {
 		}
 
 		chooseNirCmdPath(*) {
-			local directory, translator
+			local directory
 
 			protectionOn()
 
@@ -515,7 +515,7 @@ initializeSimulatorConfiguration() {
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgBox, translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "Yes")
@@ -539,7 +539,7 @@ initializeSimulatorConfiguration() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
@@ -637,7 +637,7 @@ startupSimulatorConfiguration() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

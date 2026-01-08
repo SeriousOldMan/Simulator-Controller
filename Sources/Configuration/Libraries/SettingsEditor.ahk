@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Settings Editor                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -417,7 +417,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 		finally {

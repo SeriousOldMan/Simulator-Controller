@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Database                        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -598,25 +598,30 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	for group, groupedRows in values {
 		group := string2Values("|", group)
 
-		resultRow := Database.Row()
+		try {
+			resultRow := Database.Row()
 
-		for ignore, column in groupedByColumns
-			resultRow[column] := Database.decode(group[A_Index])
+			for ignore, column in groupedByColumns
+				resultRow[column] := Database.decode(group[A_Index])
 
-		for ignore, columnDescriptor in groupedColumns {
-			valueColumn := columnDescriptor[1]
-			function := columnDescriptor[2]
-			resultColumn := columnDescriptor[3]
+			for ignore, columnDescriptor in groupedColumns {
+				valueColumn := columnDescriptor[1]
+				function := columnDescriptor[2]
+				resultColumn := columnDescriptor[3]
 
-			columnValues := []
+				columnValues := []
 
-			for ignore, row in groupedRows
-				columnValues.Push(row[valueColumn])
+				for ignore, row in groupedRows
+					columnValues.Push(row[valueColumn])
 
-			resultRow[resultColumn] := function(columnValues)
+				resultRow[resultColumn] := function(columnValues)
+			}
+
+			result.Push(resultRow)
 		}
-
-		result.Push(resultRow)
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	return result

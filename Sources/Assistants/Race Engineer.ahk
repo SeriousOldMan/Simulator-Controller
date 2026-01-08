@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Engineer                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,7 +48,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	local info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local info := kVersion . " - 2026, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local title1 := translate("Modular Simulator Controller System")
 	local title2 := substituteVariables(translate("%name% - The AI Race Engineer"), {name: name})
@@ -88,6 +88,7 @@ startupRaceEngineer() {
 	local engineerName := "Jona"
 	local engineerLogo := false
 	local engineerLanguage := false
+	local engineerTranslator := false
 	local engineerSynthesizer := true
 	local engineerSpeaker := false
 	local engineerSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupRaceEngineer() {
 				index += 2
 			case "-Language":
 				engineerLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				engineerTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				engineerSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupRaceEngineer() {
 
 	engineer := RaceEngineer(kSimulatorConfiguration
 						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-						   , engineerName, engineerLanguage
+						   , engineerName, engineerLanguage, engineerTranslator
 						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics, engineerSpeakerBooster
 						   , engineerRecognizer, engineerListener, engineerListenerBooster, engineerConversationBooster, engineerAgentBooster
 						   , engineerMuted, voiceServer)

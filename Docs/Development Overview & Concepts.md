@@ -372,6 +372,22 @@ You may have noticed, that the grammar files support a kind of include mechanism
 
 	#Include Fragments.de
 
+#### Machine translation
+
+Beside manual translating the grammar files, an integrated translator can be used for additional languages. This translator supports translation services of Azure, Google, DeepL and any OpenAI compatible GPT service. The results of this *on-the-fly* translation are not perfect, of course, and some latency is added as well, but hey, it is better than no support of the given language.
+
+Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). A simple configuration dialog is also available on the "Basic" configuration page in "Simulator Setup" for the non-technical user. For all the above mentioned services an account on the website of the given service provider needs to be created and in all cases, a credit card must be registered. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
+
+The supported languages for the translator can be extended by placing a file named "Languages.csv" in the *Simulator Controller\Translations* folder, which is located in your *Documents* folder. The content must look like:
+
+	Armenian,hy,Հայերեն
+	Avestan,ae,Upastawakaēna
+	...
+	
+Note: Lines can be empty or can contain comments, if the first character is a ";".
+	
+A good source for the ISO 639 language codes can be found on [Wikipedia](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes).
+
 ### Instructions for the GPT-based Driving Coach
 
 The instructions are used to provide the LLM of the Driving Coach with information about the personality of the coach or to transfer context specific data to the LLM. All instructions are used as defaults in the configuration for the Driving Coach and can be altered by the user. The language specific default instructions can be found in *Resources\Instructions* in the programm installation folder. They are named 

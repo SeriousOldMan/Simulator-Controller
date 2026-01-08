@@ -18,6 +18,8 @@ If you don't want to use the launch window and want "Simulator Startup" to run t
 
 You can open the entry page of the documentation of Simulator Controller in a browser by clicking on the small button with the "Book" icon in the upper left corner of the window. If you hold down the Control key when clicking on this button, you will open a menu with all available news articles instead, incl. those, that already have been marked as read, in case you want to re-visit one of those articles.
 
+The next button with the small keyboard symbol opens the documentation of all available keyboard modifiers.
+
 Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
 
 ## Managing your *privacy*
@@ -122,6 +124,8 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
 
+Important: These menus are not working correctly, if scaling has been actived for the current monitor.
+
 ### Startup Profiles
 
 Managing the different functions, as well as some function specific configurations and settings can be quite time-consuming, when you participate in very different kind of sessions. The setup for a team race using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) is very different from running a local practice session or a race against the AI of a given simulator. Therefore, Simulator Controller provides the possibility to manage the most common settings as a profile and you can choose and activate a given profile while starting Simulator Controller by clicking on the green triangle. You can open the startup profiles editor by either exactly hitting the small cog wheel icon in the "Startup" button or by holding down the Control key while clicking on the "Startup" button. The following window appears:
@@ -168,7 +172,7 @@ The checkbox for each function has three states - selected, deselected and indet
 |------------------|---------------------------------------|-------------------|-------------|
 | Driving Coach    | Performance Analysis                  | Setting           | If enabled, the standings data, lap and sector times and so on are collected and are provided to the Driving Coach for further analysis. |
 |                  | Handling Anlaysis                     | Setting           | If enabled, information about over- and understeering are collected during driving and are provided to the Driving Coach for further analysis. |
-| On-track Coaching                     | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
+|                  | On-track Coaching                     | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
 |                  | Brake Coaching                        | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
 | Race Spotter     | Track Mapping                         | Controller Action | Enables or disables track mapping for the given session. This can be especially useful when mapping non-circuit tracks that require a roll-forward to the start line. |
 |                  | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
@@ -240,7 +244,19 @@ Now you can zip this folder and send it to your team mates. They have to unzip i
 
 ### Voice Commands
 
-The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants Jona and Cato, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.
+The Simulator Controller framework supports a sophisticated natural language interface. This capability is used by the Race Assistants, thereby allowing a fully voice enabled dialog between you and these Assistants, but the voice recognition can also be used to control parts of your controller hardware by voice commands.
+
+#### Supported languages and commands
+
+The Assistants of your virtual pit crew can interact with you, the driver, in several different languages. At the time of this writing, 8 languages are supported: English, German, Spanish, French, Italian, Japanese, Portuguese and Chinese. For each of these languages, the list of available commands can be found in the documentation of the different Assistants. Beside the builtin languages, an integrated translator can be used for many additional languages. This translator supports translation services of Azure, Google, DeepL and any OpenAI compatible GPT service. The results of this *on-the-fly* translation are not perfect, of course, and some latency is added as well, but hey, it is better than no support of the given language.
+
+Translators can be configured directly for the corresponding [plugins of the Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins). Of course, the translator configuration dialog is also available on the "Basic" configuration page in "Simulator Setup". For all the above mentioned services you need to create an account on the website of the given provider and in all cases, you must register a credit card. But some services provide a free contingent, for example 500.000 characters per month at DeepL, which is more than enough.
+
+The list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
+
+Important: Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
+
+#### Talking with your *crew*
 
 With the introduction of a new Race Assistant in Release 3.1 there are now several different *communication partners* and it is very important that the system understands, to whom you are talking. Therefore an activatiom command, very simular to other digital Assistants like Alexa or Cortana, has been introduced. For the Assistants Jona and Cato this is the call phrase "Hey %name%", where %name% is the configured name of the Assistant. For example, if you say "Hi Jona" or "Jona, can you hear me?" for example (as long as you sticked to the preconfigured name "Jona"), the AI Race Engineer will start to listen to the following commands. Jona will give you a short answer, so you know that the activation was successful. Beside this activation, the dedicated listen mode will also be activated, when any of the Assistants has asked you a question and is waiting for the answer. The listen mode of the Simulator Controller itself, which allows you to trigger [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) by voice, must be activated by an activation command as well, if you have more than one dialog partner active. This activation command can be configured in the [voice control tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). When this activation command is recognized, you will hear a short chime tone as confirmation and the system is ready to activate controller actions by voice. Please note, that you also hear a different short tone, when you have pressed the [*Push-To-Talk*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control in order to tell you, that you can issue your voice command.
 
@@ -269,7 +285,15 @@ This activates Jona, the Race Engineer, and immediately asks Jona to plan a pits
 1. This is not supported for voice recognition built into Windows ("Windows (Server)", "Windows (Desktop)").
 2. The combined phrase is only recognized, if the first word is the name of the Assistant. For example: "Hey Jona, can you plan a pitstop?" or "Can you plan a pitstop, Jona?" won't be recognized.
 
-#### Push-To-Talk backgroud
+#### *Activation* listener
+
+Now it gets a bit complicated, sorry. Every Assistant and all other dialog partners are using there own listener. This listener uses the configured language of the corresponding Assistant, even if this language is *translated*. Additionally there is a so called activation listener, which is used when you are pressing the *Push-To-Talk* button twice **or** at a fresh start, when no dialog partner has been yet activated. This activation listener uses the language selected from the general voice configuration and this language is also translatable. By the way, the recognizer method of the activation listener can be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). But this is only required in very rare cases.
+
+What does this mean: Let's assume, you are using translated Korean language for all your Assistants. The activation listenerhas now also be set to the Korean language using a translator. Otherwise the Korean activation command, for example "안녕하세요 차토" (annyeonghaseyo chato), will be registered in a speech recognizer with an English language, which will most probably not work. It gets even more complicated, if you are using Assistants which are configured with different languages (which I do sometimes for testing purposes). In this case, the activation listener will get phrases from different languages, which may work satisfactory, if those languages are similar to some extent, and will fail otherwise.
+
+Fortunately, all this is totally irrelevant and transparent, when everything is configured with one language, which is supported out of the box.
+
+#### Using the Push-To-Talk button
 
 Beside the behavior of the *Push-To-Talk* button described above, where you need to hold down the button as long as your are talking, there is an alternative method available. This method allows you to release the button while you are talking. Once you have finished your voice command, you press the *Push-To-Talk* button again, to indicate that you have finished talking and that the command should be executed. This alternative method can be enabled in the [voice control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 	
@@ -299,6 +323,8 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
+Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask my why...
+
 #### Non-standard voice configurations
 
 Normally you will use a standard configuration for voice control, which means, that voice output is enabled for the Assistants and voice input is enabled to issue commands to the Assistants. In this case, you can give your commands and answer questions of the Assistants with "Yes" or "No", dpending on the situation. But all other combinations are also possible, even using the Assistants fully silent will work, for example in a Team Race, where everything is controller by the "Team Center". Below you find a detailed description for all non-standard configurations.
@@ -322,8 +348,8 @@ Normally you will use a standard configuration for voice control, which means, t
 	 | Setting Value | Description |
 	 |---------------|-------------|
 	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
-	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
-	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
+	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT carried out. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
+	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not carried out by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
 
 #### Jona, the AI Race Engineer
 

@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Settings Editor            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -179,7 +179,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 				}
 				catch Any as exception {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 					OnMessage(0x44, translateOkButton, 0)
 
 					return false
@@ -1431,7 +1431,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 			catch Any as exception {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -1453,7 +1453,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 							, settingsGui["repairSuspensionThresholdEdit"].Text, settingsGui["repairBodyworkThresholdEdit"].Text, settingsGui["repairEngineThresholdEdit"].Text)
 		 || (!isInteger(settingsGui["trafficConsideredEdit"].Text) || (settingsGui["trafficConsideredEdit"].Text < 1) || (settingsGui["trafficConsideredEdit"].Text > 100))) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false

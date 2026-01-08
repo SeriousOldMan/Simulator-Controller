@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Pedal Calibtazion Step Wizard   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -166,7 +166,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		if super.savePage(page) {
 			if !this.SetupWizard.isSoftwareInstalled("SmartControl") {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")

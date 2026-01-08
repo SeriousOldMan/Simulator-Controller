@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Controller Step Wizard          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -329,7 +329,7 @@ class ControllerStepWizard extends StepWizard {
 		if super.savePage(page) {
 			if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				return false
@@ -349,7 +349,7 @@ class ControllerStepWizard extends StepWizard {
 			if this.iFunctionTriggers
 				if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "No")
@@ -631,7 +631,7 @@ class ControllerStepWizard extends StepWizard {
 						key2 := trigger[2]
 				}
 
-				result := withBlockedWindows(InputBox, translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
+				result := withBlockedWindows(InputDlg, translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
 								 , translate("Modular Simulator Controller System"), "w200 h150", key1)
 
 				if (result.Result = "Ok")
@@ -640,7 +640,7 @@ class ControllerStepWizard extends StepWizard {
 					return
 
 				if double {
-					result := withBlockedWindows(InputBox, translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
+					result := withBlockedWindows(InputDlg, translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
 
 					if (result.Result = "Ok")
 						key2 := result.Value
@@ -1115,7 +1115,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 			if !this.validateActions() {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")
@@ -1484,12 +1484,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			function := [function]
 		else {
 			if (actionDescriptor[2] == "Toggle")
-				translator := translateMsgBoxButtons.Bind(["On/Off", "Off", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["On/Off", "Off", "Cancel"])
 			else
-				translator := translateMsgBoxButtons.Bind(["Increase", "Decrease", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Increase", "Decrease", "Cancel"])
 
 			OnMessage(0x44, translator)
-			msgResult := withBlockedWindows(MsgBox, translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
+			msgResult := withBlockedWindows(MsgDlg, translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
 			OnMessage(0x44, translator, 0)
 
 			currentFunction := this.getActionFunction(mode, action)

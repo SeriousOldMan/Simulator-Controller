@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Strategy Representation         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -149,7 +149,7 @@ class StrategySimulation {
 			message := (isObject(exception) ? exception.Message : exception)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
+			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -190,7 +190,7 @@ class StrategySimulation {
 			message := (isObject(exception) ? exception.Message : exception)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
+			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -346,7 +346,7 @@ class StrategySimulation {
 
 					if !scriptExecute(scriptEngine, &message) {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
+						withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
 						return false
@@ -761,7 +761,7 @@ class StrategySimulation {
 			result += (this.scenarioCoefficient("TyreLapsMax", cTLaps - sTLaps, 10)
 					 + this.scenarioCoefficient("PitstopsPostLaps", sPLaps - cPLaps, 10))
 		; else
-		;	withBlockedWindows(MsgBox, "Inspect")
+		;	withBlockedWindows(MsgDlg, "Inspect")
 
 		if (this.SessionType = "Duration") {
 			sLaps := scenario1.getSessionLaps()

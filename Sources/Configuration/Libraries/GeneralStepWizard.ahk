@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - General Step Wizard             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -198,7 +198,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				label := this.iLaunchApplicationsListView.GetText(row, 2)
 				function := this.iLaunchApplicationsListView.GetText(row, 3)
 
-				result := withBlockedWindows(InputBox, translate("Please enter a label:"), translate("Modular Simulator Controller System"), "w200 h150", label)
+				result := withBlockedWindows(InputDlg, translate("Please enter a label:"), translate("Modular Simulator Controller System"), "w200 h150", label)
 
 				if (result.Result != "Ok")
 					return

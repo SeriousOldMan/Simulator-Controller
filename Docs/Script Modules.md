@@ -21,6 +21,8 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 The "Session" module for the integrated script engine defines three global objects (named topic in the following documentation), which can be used to access important information about the current session.
 
+Important: This module is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
+
 ### Topics
 
 In the following sections you will find an overview for all objects. Please note that not every property may be available for all simulators or that individual properties will have individual value ranges for a specific simulator.
@@ -70,13 +72,26 @@ This topic gives you access to the current standings including information about
 | Position        | Synonymous for *OverallPosition*. |
 | Standings       | Returns the full table of standings, sorted by the overall position. It contains objects for each car with the following properties::<br><br>1.*overallPosition* = the current overall position<br>2.*classPosition* = the current position with regards to the class-specific standings<br>3.*car* = the car in this position<br>4.*nr* = the race number of the car in this position<br>5.*driver* = the name of the driver in this position<br>6.*laps* = the number of laps the car in this position already has driven<br>7.*time* = the last lap time of the car in this position |
 
-## Module Assistants
+## Module *Assistants*
 
 The "Assistants" module which can be used in scripts started from the controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions) or started as action in the currently active [track automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation).
 
 ### Topics
 
-Only one topic is defined, which is named "Reasoning". It defines the following functions:
+Two topics are defined, which allow an interaction with a rnning Assistant.
+
+#### Interaction
+
+The topic "Interaction" allows a general interaction with an Assistant by simulating a voice command.
+
+| Function      | Arguments                                  | Description |
+|---------------|--------------------------------------------|-------------|
+| Ask           | assistant, question                        | This function will send the given *question* to the specified *assistant* as if it has been given by voice. If the optional argument *command* is supplied and *true*, full command processing is carried out, otherwise the *question* is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening. |
+| Command       | assistant, grammar, [Optional] command     | This function will trigger the command with the name *grammar* for the specified *assistant* as if it has been given by voice. This function will have no effect, if the Assistant is not configured for listening.<br><br>If the definition for the *grammar* requires variable parts in the command text, for example a number of liters for refueling, a full command text, that matches the defined grammar, must be supplied with *command*. Otherwise, it is optional. Example (for Race Engineer):<br><br>command("Race Engineer", "PitstopAdjustPressureUp", "Can we increase front left by 0.4?")<br><br>The names of the different command grammars can be found by looking into grammar files of the corresponding Assistant, which can be found in the *Resources\Grammars* folder which is located in the installation folder of Simulator Controller. |
+
+#### Reasoning
+
+The topic "Reasoning" serves as an interface to the *Reasoning* booster and defines the following functions:
 
 | Function      | Arguments                                  | Description |
 |---------------|--------------------------------------------|-------------|

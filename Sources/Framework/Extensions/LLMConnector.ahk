@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - LLM Connector                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -295,8 +295,12 @@ class LLMConnector {
 			}
 		}
 
-		CreateServiceURL(server) {
+		CreateServerURL(server) {
 			return server
+		}
+
+		CreateServiceURL(server) {
+			return this.CreateServerURL(server)
 		}
 
 		CreateHeaders(headers?) {
@@ -466,8 +470,22 @@ class LLMConnector {
 			}
 		}
 
+		CreateServerURL(server) {
+			if InStr(server, "/v1/chat/completions")
+				server := StrReplace(server, "/v1/chat/completions", "")
+
+			if (SubStr(server, StrLen(server)) = "/")
+				return SubStr(server, 1, StrLen(server) - 1)
+			else
+				return server
+		}
+
+		CreateServiceURL(server) {
+			return (this.CreateServerURL(server) . "/v1/chat/completions")
+		}
+
 		CreateModelsURL(server) {
-			return StrReplace(this.CreateServiceURL(server), "chat/completions", "models")
+			return (this.CreateServerURL(server) . "/v1/models")
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
@@ -475,7 +493,7 @@ class LLMConnector {
 			local ignore, instruction, conversation
 
 			if (!question || (question == true) || (Trim(question) = ""))
-				throw Error("Invalid question detected in APIConnector.CreatePrompt...")
+				throw Error("Invalid question detected in LLMConnector.APIConnector.CreatePrompt...")
 
 			addInstruction(instruction) {
 				if (instruction && (Trim(instruction) != ""))
@@ -632,7 +650,7 @@ class LLMConnector {
 		}
 
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://api.openai.com/v1/chat/completions"
+			serviceURL := "https://api.openai.com"
 			serviceKey := ""
 			model := "GPT 5 mini"
 		}
@@ -700,7 +718,7 @@ class LLMConnector {
 		}
 
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://api.mistral.ai/v1/chat/completions"
+			serviceURL := "https://api.mistral.ai"
 			serviceKey := ""
 			model := "Open Mixtral 8x22b"
 		}
@@ -720,9 +738,27 @@ class LLMConnector {
 		}
 
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+			serviceURL := "https://generativelanguage.googleapis.com"
 			serviceKey := ""
 			model := "gemini-2.0-flash-lite"
+		}
+
+		CreateServerURL(server) {
+			if InStr(server, "/v1beta/openai/chat/completions")
+				server := StrReplace(server, "/v1beta/openai/chat/completions", "")
+
+			if (SubStr(server, StrLen(server)) = "/")
+				return SubStr(server, 1, StrLen(server) - 1)
+			else
+				return server
+		}
+
+		CreateServiceURL(server) {
+			return (this.CreateServerURL(server) . "/v1beta/openai/chat/completions")
+		}
+
+		CreateModelsURL(server) {
+			return (this.CreateServerURL(server) . "/v1beta/openai/models")
 		}
 
 		ParseModels(response) {
@@ -739,7 +775,7 @@ class LLMConnector {
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "https://openrouter.ai/api/v1/chat/completions"
+			serviceURL := "https://openrouter.ai/api"
 			serviceKey := ""
 			model := ""
 		}
@@ -747,13 +783,13 @@ class LLMConnector {
 
 	class OllamaConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "http://localhost:11434/v1/chat/completions"
+			serviceURL := "http://localhost:11434"
 			serviceKey := "ollama"
 			model := ""
 		}
 
 		CreateModelsURL(server) {
-			return StrReplace(this.CreateServiceURL(server), "v1/chat/completions", "api/tags")
+			return (this.CreateServerURL(server) . "/api/tags")
 		}
 
 		ParseModels(response) {
@@ -768,7 +804,7 @@ class LLMConnector {
 
 	class GPT4AllConnector extends LLMConnector.APIConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
-			serviceURL := "http://localhost:4891/v1/chat/completions"
+			serviceURL := "http://localhost:4891"
 			serviceKey := "Any text will do the job"
 			model := ""
 		}

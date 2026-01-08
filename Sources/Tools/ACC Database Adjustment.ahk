@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - ACC Database Cleanup            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -100,13 +100,13 @@ cleanupTyrePressures() {
 	prompt := "Please input the adjustment factor for cold DRY pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
 
 	loop {
-		InputBox dryCorrection, Cold Pressure Correction, %prompt%, , 350, 200, , , , , %dryCorrection%
+		InputDlg dryCorrection, Cold Pressure Correction, %prompt%, , 350, 200, , , , , %dryCorrection%
 
 		if ErrorLevel {
 			ExitApp 0
 		}
 		else if dryCorrection is not number
-			MsgBox Please input a correct number...
+			MsgDlg Please input a correct number...
 		else
 			break
 	}
@@ -115,13 +115,13 @@ cleanupTyrePressures() {
 	prompt := "Please input the adjustment factor for cold WET pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
 
 	loop {
-		InputBox wetCorrection, Cold Pressure Adjustment, %prompt%, , 350, 200, , , , , %wetCorrection%
+		InputDlg wetCorrection, Cold Pressure Adjustment, %prompt%, , 350, 200, , , , , %wetCorrection%
 
 		if ErrorLevel {
 			ExitApp 0
 		}
 		else if wetCorrection is not number
-			MsgBox Please input a correct number...
+			MsgDlg Please input a correct number...
 		else
 			break
 	}
@@ -154,13 +154,13 @@ cleanupTelemetryData() {
 	prompt := "Please input the adjustment factor for laptimes in DRY conditions (use ""."" as decimal point).`n`nExample: 0.5 will increase all lap times in telemetry data by half a second."
 
 	loop {
-		InputBox laptimeCorrection, Laptime Correction, %prompt%, , 350, 200, , , , , %laptimeCorrection%
+		InputDlg laptimeCorrection, Laptime Correction, %prompt%, , 350, 200, , , , , %laptimeCorrection%
 
 		if ErrorLevel {
 			ExitApp 0
 		}
 		else if laptimeCorrection is not number
-			MsgBox Please input a correct number...
+			MsgDlg Please input a correct number...
 		else
 			break
 	}

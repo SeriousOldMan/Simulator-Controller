@@ -3,7 +3,7 @@
 ;;;                                         (by Kentaro Sato - see License) ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 /*
@@ -64,7 +64,7 @@ class AhkUnit {
 
 	static End(runner := false) {
 		if (AhkUnit.nesting == 0) {
-			withBlockedWindows(MsgBox, "AhkUnit.Begin() not called.")
+			withBlockedWindows(MsgDlg, "AhkUnit.Begin() not called.")
 			Exit()
 		}
 		AhkUnit.nesting--

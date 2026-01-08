@@ -8,7 +8,7 @@
 ;;;   for more information about the technical details.                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -26,6 +26,7 @@
 #Include "JSON.ahk"
 #Include "Task.ahk"
 #Include "CLR.ahk"
+#Include "Translator.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,6 +59,7 @@ class SpeechSynthesizer {
 	iVoices := []
 
 	iLanguage := ""
+	iTranslator := false
 	iLocale := ""
 	iVoice := ""
 
@@ -193,6 +195,12 @@ class SpeechSynthesizer {
 	Language {
 		Get {
 			return this.iLanguage
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
 		}
 	}
 
@@ -493,6 +501,10 @@ class SpeechSynthesizer {
 			SpeechSynthesizer.sFilterLowpass := 1800
 	}
 
+	setTranslator(translator) {
+		this.iTranslator := translator
+	}
+
 	getVoices() {
 		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
 
@@ -729,7 +741,7 @@ class SpeechSynthesizer {
 	speak(text, wait := true, cache := false, options := false) {
 		global kSox
 
-		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
+		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume, translator
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static sOverdriveGain, sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
@@ -776,6 +788,11 @@ class SpeechSynthesizer {
 		}
 		else
 			cacheFileName := false
+
+		translator := this.Translator
+
+		if translator
+			text := translator.translate(text)
 
 		if kSoX {
 			temp1Name := temporaryFileName("temp1", "wav")
@@ -926,11 +943,16 @@ class SpeechSynthesizer {
 			}
 		}
 		else if inList(["dotNet", "Azure", "Google"], this.Synthesizer) {
-			if ((this.Synthesizer = "Google") && (this.iGoogleMode = "RPC")) {
-				name := string2Values(" - ", this.Voice)
-				voice := string2Values("-", this.Voice)
+			try {
+				if ((this.Synthesizer = "Google") && (this.iGoogleMode = "RPC")) {
+					name := string2Values(" - ", this.Voice)
+					voice := string2Values("-", this.Voice)
 
-				this.iSpeechSynthesizer.SetVoice(name[1], name[2], voice[1] . "-" . voice[2])
+					this.iSpeechSynthesizer.SetVoice(name[1], name[2], voice[1] . "-" . voice[2])
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
 			}
 
 			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
@@ -1080,24 +1102,32 @@ class SpeechSynthesizer {
 		}
 	}
 
-	speakTest() {
-		switch this.Language, false {
-			case "DE":
-				this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
-			case "ES":
-				this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
-			case "FR":
-				this.speak("Portez ce vieux whisky au juge blond qui fume")
-			case "IT":
-				this.speak("Che tempi brevi zio, quando solfeggi")
-			case "PT":
-				this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
-			case "ZH":
-				this.speak("潮水冲淡了他们留在沙滩上的脚印")
-			case "JA":
-				this.speak("素早い茶色のキツネが怠け者の犬を飛び越える")
-			default:
-				this.speak("The quick brown fox jumps over the lazy dog")
+	speakTest(language := false) {
+		if !language
+			language := this.Language
+
+		try	{
+			switch language, false {
+				case "DE":
+					this.speak("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
+				case "ES":
+					this.speak("Extraño pan de col y kiwi se quemó bajo fugaz vaho")
+				case "FR":
+					this.speak("Portez ce vieux whisky au juge blond qui fume")
+				case "IT":
+					this.speak("Che tempi brevi zio, quando solfeggi")
+				case "PT":
+					this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
+				case "ZH":
+					this.speak("潮水冲淡了他们留在沙滩上的脚印")
+				case "JA":
+					this.speak("素早い茶色のキツネが怠け者の犬を飛び越える")
+				default:
+					this.speak("The quick brown fox jumps over the lazy dog")
+			}
+		}
+		catch Any as exception {
+			logError(exception, true)
 		}
 	}
 

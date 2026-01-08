@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Report Viewer              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -95,37 +95,40 @@ class RaceReportViewer extends RaceReportReader {
 			if (drawChartFunction && (drawChartFunction != "")) {
 				before := "
 				(
-				<html>
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 12px; font-weight: 500; color: #%fontColor%; background-color: #%headerBackColor%; border: none; border-spacing: 0; border-collapse: collapse; }
-							.cellStyle { border: none; border-spacing: 0; border-collapse: collapse; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							table {
-								border-collapse: collapse;
-								border-spacing: 0;
-							}
-						</style>
-						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-						<script type="text/javascript">
-							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
+					<html>
+						<meta charset='utf-8'>
+						<head>
+							<style>
+								.headerStyle { height: 25; font-size: 12px; font-weight: 500; color: #%fontColor%; background-color: #%headerBackColor%; border: none; border-spacing: 0; border-collapse: collapse; }
+								.cellStyle { border: none; border-spacing: 0; border-collapse: collapse; }
+								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+								table {
+									border-collapse: collapse;
+									border-spacing: 0;
+								}
+							</style>
+							%chartScript%
+							<script type="text/javascript">
+								%chartLoad%
 				)"
 
-				before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+				before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+													 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																							 , "corechart", "bar", "table")
+													 , fontColor: this.Window.Theme.TextColor
 													 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 													 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 													 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 				after := "
 				(
-						</script>
-					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-					</body>
-				</html>
+							</script>
+						</head>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+						</body>
+					</html>
 				)"
 
 				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2 - margin

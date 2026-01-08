@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Controller Editor               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -527,7 +527,7 @@ class ControlsList extends ConfigurationItemList {
 		if ((Trim(this.Control["controlNameEdit"].Text) = "") || !inList([1, 2, 3, 4], this.Control["controlTypeDropDown"].Value)
 		 || (Trim(this.Control["imageFilePathEdit"].Text) = "") || !isInteger(this.Control["imageWidthEdit"].Text) || !isInteger(this.Control["imageHeightEdit"].Text)) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -673,7 +673,7 @@ class LabelsList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["labelNameEdit"].Text) = "") || !isInteger(this.Control["labelWidthEdit"].Text) || !isInteger(this.Control["labelHeightEdit"].Text)) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1131,7 +1131,7 @@ class LayoutsList extends ConfigurationItemList {
 						  || !isInteger(this.Control["layoutSidesMarginEdit"].Text)
 						  || !isInteger(this.Control["layoutBottomMarginEdit"].Text)))) {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1151,7 +1151,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			if duplicate {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				return false
@@ -1380,7 +1380,7 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Text_Label__") {
 			oldLabel := (oldButton ? oldButton.Label : false)
 
-			result := withBlockedWindows(InputBox, translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
+			result := withBlockedWindows(InputDlg, translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
 
 			if (result.Result = "Ok")
 				oldButton.Label := result.Value
@@ -1420,7 +1420,7 @@ class LayoutsList extends ConfigurationItemList {
 				else
 					number := ""
 
-				result := withBlockedWindows(InputBox, translate("Please enter a controller function number:")
+				result := withBlockedWindows(InputDlg, translate("Please enter a controller function number:")
 								 , translate("Function Number"), "w200 h150", number)
 
 				if (result.Result = "Ok")

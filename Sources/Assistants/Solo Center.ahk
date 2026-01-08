@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Solo Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -263,10 +263,10 @@ class SoloCenter extends ConfigurationItem {
 						if this.SoloCenter.AutoExport
 							this.SoloCenter.exportSession(true)
 						else {
-							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+							translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
 
 							OnMessage(0x44, translator)
-							msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
 							OnMessage(0x44, translator, 0)
 
 							if (msgResult = "Yes")
@@ -1483,7 +1483,7 @@ class SoloCenter extends ConfigurationItem {
 				center.withExceptionhandler(ObjBindMethod(center, "importFromSimulation", center.Simulator))
 			else {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
+				withBlockedWindows(MsgDlg, translate("You must first select a simulation."), translate("Information"), 262192)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -1969,7 +1969,7 @@ class SoloCenter extends ConfigurationItem {
 		}
 		else if verbose {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("You are not connected to an active session."), translate("Information"), 262192)
+			withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -2028,7 +2028,7 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				else {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "No") {
@@ -2081,7 +2081,7 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				else {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "No") {
@@ -2125,7 +2125,7 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				else {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "No") {
@@ -2276,7 +2276,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if !prefix {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
+			withBlockedWindows(MsgDlg, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return
@@ -2507,7 +2507,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 		}
 		else {
-			this.Providers.supportsTyreManagement( , &tyreSets)
+			this.Provider.supportsTyreManagement( , &tyreSets)
 
 			if tyreSets {
 				window["tyreSetEdit"].Enabled := true
@@ -2704,7 +2704,7 @@ class SoloCenter extends ConfigurationItem {
 			case 8: ; Clear...
 				if this.SessionActive {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2719,7 +2719,7 @@ class SoloCenter extends ConfigurationItem {
 					this.saveSession(true)
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no session data to be saved."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no session data to be saved."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 13: ; Telemetry Viewer
@@ -2747,7 +2747,7 @@ class SoloCenter extends ConfigurationItem {
 			case 19: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
@@ -2755,7 +2755,7 @@ class SoloCenter extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -2829,7 +2829,7 @@ class SoloCenter extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
+						withBlockedWindows(MsgDlg, translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				case 5:
@@ -2853,7 +2853,7 @@ class SoloCenter extends ConfigurationItem {
 				logError(exception, true)
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 	}
@@ -5461,7 +5461,7 @@ class SoloCenter extends ConfigurationItem {
 
 					if (info.Count == 0) {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
+						withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 					else {
@@ -5570,16 +5570,19 @@ class SoloCenter extends ConfigurationItem {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+						%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 	 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+											 	 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-
+			
 			after := "
 			(
 					</script>
@@ -5839,22 +5842,25 @@ class SoloCenter extends ConfigurationItem {
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 						%tableCSS%
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
-
+						%chartLoad%
+						
 						function drawCharts() {
 			)"
 
-			script := substituteVariables(script, {tableCSS: getTableCSS()
+			script := substituteVariables(script, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawCharts"
+																						 , "corechart", "table", "scatter")
+												 , tableCSS: getTableCSS()
 												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-
+			
 			for ignore, chart in charts
 				script .= (A_Space . "drawChart" . chart[1] . "();")
-
+				
 			script .= "}`n"
 
 			for ignore, chart in charts {
@@ -8077,10 +8083,10 @@ class SoloCenter extends ConfigurationItem {
 					}
 					else {
 						if !this.SessionExported {
-							translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+							translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
 
 							OnMessage(0x44, translator)
-							msgResult := withBlockedWindows(MsgBox, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
+							msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
 							OnMessage(0x44, translator, 0)
 						}
 						else
@@ -8592,7 +8598,7 @@ startupSoloCenter() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Solo Center"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Solo Center"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

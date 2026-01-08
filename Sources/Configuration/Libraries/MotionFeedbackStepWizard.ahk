@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Motion Feedback Step Wizard     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -294,7 +294,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		if super.savePage(page) {
 			if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
+				msgResult := withBlockedWindows(MsgDlg, translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
 								  , translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
@@ -306,7 +306,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			if !function {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")
@@ -319,7 +319,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "No")
@@ -592,7 +592,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local actions := values2String(", ", this.getActions(mode)*)
 		local result
 
-		result := withBlockedWindows(InputBox, translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
+		result := withBlockedWindows(InputDlg, translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
 
 		if (result.Result = "Ok") {
 			this.saveActions()
@@ -741,7 +741,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			value := (mode ? "1.0" : "50")
 		}
 
-		result := withBlockedWindows(InputBox, translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:"), translate("Modular Simulator Controller System"), "w300 h150", value)
+		result := withBlockedWindows(InputDlg, translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:"), translate("Modular Simulator Controller System"), "w300 h150", value)
 
 		if (result.Result = "Ok") {
 			value := result.Value
@@ -762,7 +762,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate(message), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate(message), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				return

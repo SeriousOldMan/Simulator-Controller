@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - ACC UDP Test Program            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -209,9 +209,9 @@ readUDPData() {
 		Process Exist, ACC UDP Provider.exe
 
 		if ErrorLevel
-			MsgBox No data returned - UDP provider is frozen...
+			MsgDlg No data returned - UDP provider is frozen...
 		else
-			MsgBox No data returned - UDP provider has crashed...
+			MsgDlg No data returned - UDP provider has crashed...
 
 		return false
 	}

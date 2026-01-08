@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Utility Functions               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -486,10 +486,10 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 			}
 
 		if (hasFGProcesses && !silent) {
-			translator := translateMsgBoxButtons.Bind(["Continue", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Continue", "Cancel"])
 
 			OnMessage(0x44, translator)
-			msgResult := withBlockedWindows(MsgBox, translate(message), translate(title), 8500)
+			msgResult := withBlockedWindows(MsgDlg, translate(message), translate(title), 8500)
 			OnMessage(0x44, translator, 0)
 
 			if (msgResult = "Yes") {
@@ -544,7 +544,7 @@ triggerDetector(callback := false, options := ["Joy", "Key"]) {
 	}
 }
 
-testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
+testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 	local configuration := configurator.getSimulatorConfiguration()
 	local configurationFile := temporaryFileName("Simulator Configuration", "ini")
 	local thePlugin, ignore, assistant, options, parameter, value, found
@@ -564,8 +564,6 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 		Run(kBinariesDirectory . "Voice Server.exe -Debug true -Configuration `"" . configurationFile . "`"")
 
 		Sleep(2000)
-
-		language := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
 
 		for ignore, assistant in assistants {
 			thePlugin := Plugin(assistant, configuration)
@@ -597,8 +595,8 @@ testAssistants(configurator, assistants := kRaceAssistants, booster := false) {
 					}
 				}
 
-				if booster
-					for ignore, parameter in ["SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
+				if extended
+					for ignore, parameter in ["Translator", "SpeakerBooster", "ListenerBooster", "ConversationBooster", "AgentBooster"] {
 						found := false
 
 						if thePlugin.hasArgument(parameter) {

@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Strategy Workbench Tool         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -436,7 +436,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (dataTypeDropDown > 2) {
 				if ((dataTypeDropDown = 4) && (workbench.SelectedSimulator && workbench.SelectedCar && workbench.SelectedTrack)) {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
+					msgResult := withBlockedWindows(MsgDlg, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
 									  , translate("Delete"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
@@ -769,7 +769,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected fixed pitstop?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected fixed pitstop?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -826,10 +826,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			local msgResult, numRows, driver, translator
 
 			if row {
-				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Before", "After", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -873,7 +873,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -943,10 +943,10 @@ class StrategyWorkbench extends ConfigurationItem {
 				lastAirTemperature := workbench.WeatherListView.GetText(row, 3)
 				lastTrackTemperature := workbench.WeatherListView.GetText(row, 4)
 
-				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Before", "After", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
@@ -1016,7 +1016,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if row {
 				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you really want to delete the selected change of weather?"), translate("Delete"), 262436)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected change of weather?"), translate("Delete"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes") {
@@ -1711,32 +1711,35 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
 			(
-			<html>
-			    <meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						%chartScript%
+						<script type="text/javascript">
+							%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			after := "
 			(
-					</script>
-				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-				</body>
-			</html>
+						</script>
+					</head>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+					</body>
+				</html>
 			)"
 
 			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
@@ -2059,16 +2062,18 @@ class StrategyWorkbench extends ConfigurationItem {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+						%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart", "corechart", "table")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-
+												 
 			after := "
 			(
 					</script>
@@ -2871,13 +2876,13 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 					else {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
+						withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 					}
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 6: ; "Load from Settings..."
@@ -3003,7 +3008,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7, "Database":
@@ -3070,7 +3075,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 8: ; "Update from Telemetry..."
@@ -3093,7 +3098,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must first select a car and a track."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 9: ; "Import from Simulation..."
@@ -3102,7 +3107,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					if !prefix {
 						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgBox, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
+						withBlockedWindows(MsgDlg, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
 						return
@@ -3136,7 +3141,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("You must first select a simulation."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("You must first select a simulation."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 11:
@@ -3147,7 +3152,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgBox, translate("Do you really want to use fixed pitstops? Using fixed pitstops can result in invalid strategies."), translate("Warning"), 262436)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to use fixed pitstops? Using fixed pitstops can result in invalid strategies."), translate("Warning"), 262436)
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
@@ -3210,7 +3215,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.selectStrategy(strategy)
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no current scenario. Please run a simulation first..."), translate("Warning"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no current scenario. Please run a simulation first..."), translate("Error"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 		}
@@ -3250,7 +3255,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no active Race Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no active Race Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 4: ; "Load Strategy..."
@@ -3378,13 +3383,13 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 7: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
-				translator := translateMsgBoxButtons.Bind(["Compare", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Compare", "Cancel"])
 
 				OnMessage(0x44, translator)
 				files := withBlockedWindows(FileSelect, "M1", dirName, translate("Choose two or more Race Strategies for comparison..."), "Strategy (*.strategy)")
@@ -3409,7 +3414,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else {
 					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgBox, translate("There is no current Strategy."), translate("Information"), 262192)
+					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
 					OnMessage(0x44, translateOkButton, 0)
 				}
 			case 10: ; "Clear Strategy..."
@@ -3485,12 +3490,15 @@ class StrategyWorkbench extends ConfigurationItem {
 					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 				</style>
-				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+				%chartScript%
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+					%chartLoad%
 		)"
 
-		before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+		before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("drawCharts"
+																					 , "corechart", "table", "scatter")
+											 , fontColor: this.Window.Theme.TextColor
 											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -4051,10 +4059,10 @@ class ValidatorsEditor {
 			local translator
 
 			if this.Closeable {
-				translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
+				translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
 
 				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgBox, translate("Do you want to save your changes?"), translate("Close"), 262179)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?"), translate("Close"), 262179)
 				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Yes")
@@ -4353,10 +4361,10 @@ class ValidatorsEditor {
 				return
 			}
 
-		translator := translateMsgBoxButtons.Bind(["Rules", "Script", "Cancel"])
+		translator := translateMsgDlgButtons.Bind(["Rules", "Script", "Cancel"])
 
 		OnMessage(0x44, translator)
-		msgResult := withBlockedWindows(MsgBox, translate("Do you want to use rules or do you want to write a script?"), translate("Validator"), 262179)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you want to use rules or do you want to write a script?"), translate("Validator"), 262179)
 		OnMessage(0x44, translator, 0)
 
 		if (msgResult = "Cancel")
@@ -4493,7 +4501,7 @@ class ValidatorsEditor {
 				errorMessage := ("`n" . errorMessage)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -4672,7 +4680,7 @@ startupStrategyWorkbench() {
 		logError(exception, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)

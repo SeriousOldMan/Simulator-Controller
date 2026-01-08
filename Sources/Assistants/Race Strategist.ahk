@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Strategist                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,7 +48,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	local info := kVersion . " - 2025, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local info := kVersion . " - 2026, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local title1 := translate("Modular Simulator Controller System")
 	local title2 := substituteVariables(translate("%name% - The AI Race Strategist"), {name: name})
@@ -88,6 +88,7 @@ startupRaceStrategist() {
 	local strategistName := "Cato"
 	local strategistLogo := false
 	local strategistLanguage := false
+	local strategistTranslator := false
 	local strategistSynthesizer := true
 	local strategistSpeaker := false
 	local strategistSpeakerVocalics := false
@@ -123,6 +124,9 @@ startupRaceStrategist() {
 				index += 2
 			case "-Language":
 				strategistLanguage := A_Args[index + 1]
+				index += 2
+			case "-Translator":
+				strategistTranslator := A_Args[index + 1]
 				index += 2
 			case "-Synthesizer":
 				strategistSynthesizer := A_Args[index + 1]
@@ -180,7 +184,7 @@ startupRaceStrategist() {
 
 	strategist := RaceStrategist(kSimulatorConfiguration
 							   , remotePID ? RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
-							   , strategistName, strategistLanguage
+							   , strategistName, strategistLanguage, strategistTranslator
 							   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics, strategistSpeakerBooster
 							   , strategistRecognizer, strategistListener, strategistListenerBooster, strategistConversationBooster, strategistAgentBooster
 							   , strategistMuted, voiceServer)

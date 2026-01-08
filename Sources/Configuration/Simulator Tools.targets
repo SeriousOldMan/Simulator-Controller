@@ -16,6 +16,7 @@ Release 6.5.5=Release 6.5.4 -> updateConfigurationForV655
 Release 6.6.4=Release 6.5.5 -> updateConfigurationForV664
 Release 6.7.0=Release 6.6.4 -> updateStreamDeckIconPreset, updateActionLabels, updateActionIcons
 Release 6.7.5=Release 6.7.0 -> updatePluginsForV675
+Release 6.7.7=Release 6.7.5 -> updateConfigurationForV677
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%
@@ -126,6 +127,7 @@ Translations.1=%kTranslationsDirectory% <- %kSourcesDirectory%Configuration\Tran
 Translations.2=%kResourcesDirectory%Templates\Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en
 Translations.3=%kTranslationsDirectory% <- %kSourcesDirectory%Plugins\Translations\Controller Action Labels.*
 Translations.4=%kTranslationsDirectory% <- %kSourcesDirectory%Plugins\Translations\Controller Action Icons.*
+Translations.5=%kTranslationsDirectory% <- %kSourcesDirectory%Configuration\Translations\Translator Languages.csv
 Consent.1=%kTranslationsDirectory% <- %kSourcesDirectory%Database\Translations\Consent.*
 Strategy Engine.1=%kResourcesDirectory%Strategy\Rules\Strategy Validation.rules <- %kSourcesDirectory%Assistants\Rules\Strategy Validation.rules
 Strategy Engine.2=%kResourcesDirectory%Strategy\Scripts\Strategy Validation.script <- %kSourcesDirectory%Assistants\Scripts\Strategy Validation.script

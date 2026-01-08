@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Multi Map Functions             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -290,13 +290,13 @@ printMultiMap(multiMap, symbolic := true) {
 }
 
 getMultiMapValue(multiMap, section, key, default := false) {
-	local value
+	local values
 
 	if multiMap.Has(section) {
-		value := multiMap[section]
+		values := multiMap[section]
 
-		if value.Has(key)
-			return value[key]
+		if values.Has(StrLower(key))
+			return values[key]
 	}
 
 	return default

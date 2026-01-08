@@ -534,9 +534,15 @@ Additionally you can export and import actions here to build a library for you a
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
-   - Assistant.Ask(question)
+   - Assistant.Ask(question [, command])
    
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. If the optional argument command is supplied and not false, full command processing is carried out, otherwise the question is passed directly to the *Conversation* booster. This will have no effect, if the Assistant is not configured for listening.
+	 
+   - Assistant.Command(grammar [, command])
+   
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. This function will have no effect, if the Assistant is not configured for listening.
+	 
+	 If the grammar reacts to variable parts in the command text, this text can be passed as the optional second argument.
 	 
    - Controller.Call(method, p1, p2, ...)
    
@@ -570,9 +576,15 @@ Additionally you can export and import actions here to build a library for you a
    
 	 Outputs the given phrase using the voice of the given Race Assistant. *phrase* can be the label of a predefined phrase from the grammar definition of the Assistant. If *phrase* is not one of the predefined phrases it will be spoken as is. The *phrase* will not be spoken, if the Assistant is muted, unless you supply *true* for the optional parameter *force*.
 	 
-   - Assistant.Ask(question :: \<string\>)
+   - Assistant.Ask(question :: \<string\> [, command :: \<boolean\>])
    
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input.
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. If the optional argument command is supplied and not false, full command processing is carried out, otherwise the question is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening.
+	 
+   - Assistant.Command(grammar :: \<string\> [, command :: \<string\>])
+   
+     Triggers the specified grammar for the given Race Assistant as it has been given by voice input. This function will have no effect, if the Assistant is not configured for listening.
+	 
+	 If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
    - Controller.Call(method :: \<string\>, p1, p2, ...)
    

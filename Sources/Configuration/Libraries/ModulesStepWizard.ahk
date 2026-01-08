@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Mudules Step Wizard             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -616,7 +616,7 @@ class RuntimePreset extends NamedPreset {
 
 			if !found {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -793,7 +793,7 @@ class DownloadablePreset extends NamedPreset {
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -830,7 +830,7 @@ class DownloadablePreset extends NamedPreset {
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
@@ -852,7 +852,7 @@ class DownloadablePreset extends NamedPreset {
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -879,7 +879,7 @@ class DownloadablePreset extends NamedPreset {
 			logError(exception, true)
 
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			return false
@@ -1167,7 +1167,7 @@ class SplashMedia extends DownloadablePreset {
 			}
 			else {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}

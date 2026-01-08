@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Simulator Download              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,7 +56,7 @@ downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
 	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, ignore, url
+	local directory, currentDirectory, ignore, url, urls
 
 	exitOthers() {
 		loop 20
@@ -76,7 +76,7 @@ downloadSimulatorController() {
 	if !A_IsAdmin {
 		if RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)") {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 
 			ExitApp(0)
@@ -109,7 +109,7 @@ downloadSimulatorController() {
 		}
 		catch Any as exception {
 			OnMessage(0x44, translateOkButton)
-			withBlockedWindows(MsgBox, translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+			withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
 		}
 
@@ -119,11 +119,16 @@ downloadSimulatorController() {
 	devVersion := (cState || inList(A_Args, "-Development"))
 
 	deleteFile(kTempDirectory . "VERSION")
-	
-	for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
-					  , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
-					  , "http://" . MASTER . "/Releases/VERSION"
-					  , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+
+	if devVersion
+		urls := ["https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/VERSION"]
+	else
+		urls := ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OH13SGRl"
+			   , "https://www.dropbox.com/scl/fi/3m941rw7qz7voftjoqalq/VERSION?rlkey=b1r9ecrztj1t3cr0jmmbor6du&st=zhl9bzbm&dl=1"
+			   , "http://" . MASTER . "/Releases/VERSION"
+			   , "https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/VERSION"]
+
+	for ignore, url in urls
 		try {
 			error := false
 
@@ -141,7 +146,7 @@ downloadSimulatorController() {
 			logError(error, true)
 
 		OnMessage(0x44, translateOkButton)
-		withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+		withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(0)
@@ -158,7 +163,7 @@ downloadSimulatorController() {
 
 		if package {
 			package := substituteVariables(package, {master: MASTER})
-			
+
 			exitOthers()
 
 			for ignore, url in string2Values(";", package)
@@ -211,7 +216,7 @@ downloadSimulatorController() {
 							logError(exception, true)
 
 							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+							withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 							OnMessage(0x44, translateOkButton, 0)
 
 							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")
@@ -235,7 +240,7 @@ downloadSimulatorController() {
 				logError(error, true)
 
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
@@ -261,7 +266,7 @@ downloadSimulatorController() {
 			}
 			catch Any as exception {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgBox, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 
 				Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build")

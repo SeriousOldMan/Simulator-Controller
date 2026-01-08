@@ -3,7 +3,7 @@
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2025) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -146,7 +146,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 			window.Opt("+OwnDialogs")
 
-			translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
 
 			OnMessage(0x44, translator)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
@@ -359,14 +359,18 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	initializeInstructions(provider, model, setting, edit := false) {
 		local providerConfiguration := this.iProviderConfigurations[provider]
-		local language, value, instructions, configuration, thePlugin
+		local language, value, instructions, configuration, thePlugin, translated
 
 		value := (edit ? this.Value[setting] : providerConfiguration[setting])
 
 		if (value = "") {
 			try {
-				if isSet(SetupWizard)
-					language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+				if isSet(SetupWizard) {
+					if  SetupWizard.Instance.getModuleValue("Driving Coach", "Language.Translated", false)
+						language := "EN"
+					else
+						language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+				}
 				else if isSet(PluginsConfigurator) {
 					configuration := newMultiMap()
 
@@ -374,10 +378,19 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 					thePlugin := Plugin("Driving Coach", configuration)
 
-					language := thePlugin.getArgumentValue("language", thePlugin.getArgumentValue("raceAssistantLanguage"))
+					if thePlugin.getArgumentValue("translator", false)
+						language := "EN"
+					else
+						language := thePlugin.getArgumentValue("language", thePlugin.getArgumentValue("raceAssistantLanguage"))
 				}
-				else if isSet(VoiceControlConfigurator)
-					language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+				else if isSet(VoiceControlConfigurator) {
+					language := VoiceControlConfigurator.Instance.getCurrentLanguage(&translated)
+					
+					if translated
+						language := "EN"
+				}
+				else if getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language.Translated", false)
+					language := "EN"
 				else
 					language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 			}
@@ -396,10 +409,14 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 	normalizeConfiguration(configuration) {
 		local language, ignore, provider, setting, providerConfiguration, template, instruction
-		local theConfiguration, thePlugin
+		local theConfiguration, thePlugin, translated
 
-		if isSet(SetupWizard)
-			language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+		if isSet(SetupWizard) {
+			if SetupWizard.Instance.getModuleValue("Driving Coach", "Language.Translated", false)
+				language := "EN"
+			else
+				language := SetupWizard.Instance.getModuleValue("Driving Coach", "Language", getLanguage())
+		}
 		else if isSet(PluginsConfigurator) {
 			theConfiguration := newMultiMap()
 
@@ -407,10 +424,19 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 			thePlugin := Plugin("Driving Coach", theConfiguration)
 
-			language := thePlugin.getArgumentValue("language", thePlugin.getArgumentValue("raceAssistantLanguage"))
+			if thePlugin.getArgumentValue("translator", false)
+				language := "EN"
+			else
+				language := thePlugin.getArgumentValue("language", thePlugin.getArgumentValue("raceAssistantLanguage"))
 		}
-		else if isSet(VoiceControlConfigurator)
-			language := VoiceControlConfigurator.Instance.getCurrentLanguage()
+		else if isSet(VoiceControlConfigurator) {
+			language := VoiceControlConfigurator.Instance.getCurrentLanguage(&translated)
+			
+			if translated
+				language := "EN"
+		}
+		else if getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language.Translated", false)
+			language := "EN"
 		else
 			language := getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
 

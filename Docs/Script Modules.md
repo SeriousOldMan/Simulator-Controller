@@ -4,6 +4,19 @@ This documentation provides reference information for all modules which are avai
 
 After the module references, several examples are provided which demonstrate some of the provided functionality.
 
+## Module *Environment*
+
+This module provides global state for scripts that are running in the same process. This state is persistent as long as the current process is alive.
+
+### Topics
+
+Only one topic is defined, which is named "Enviroment". It defines the following functions:
+
+| Function | Arguments                      | Description |
+|----------|--------------------------------|-------------|
+| Get      | name, [Optional] default       | Returns the global value for the given *name*. If no value is defined, either the value *default* (if provided) or *nil* is returned. |
+| Set      | name, value                    | Sets the global value for the given *name*. *value* maybe of type string, number, boolean or simple arrays, that consists of values of these types. Please note, that the names are case-sensitive. |
+
 ## Module *Simulator*
 
 This module defines two functions, which allows you to read data from the simulation and also send some data to the simulator or activate commands for the simulator, if supported.

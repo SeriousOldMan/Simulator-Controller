@@ -19,6 +19,7 @@
   - Also many thanks to @rysimabd, who provided a full update of the Chinese translation files.
   - The strength of relative toe reduction / increase due to tyre temperatures has been reduced in "Setup Workbench".
   - New article for *News, tips and tricks* about the recently added automatic language translation.
+  - [Experts] A new [module "Environment"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-enviroment) has been defined for the *Lua* script engine, which supports global state handling.
   - [Experts] Two new controller action functions ["ask" and "command"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#Assistant-interface) let you generate synthetical voice input by any external trigger, for example a press of a button on your Stream Deck. This allows you to use the Assistants without voice control for even the most exotic cases.
     - The same functionality is available in the "Interaction" topic in the *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants).
     - Lastly, "Assistant.Command" has been added as predefined function/predicate in all rule sets and *Lua* enviromments that are executed in an Assistant process, for example in a *Reasoning* booster. (Note: "Assistant.Ask" was already available, but an additional optional parameter has been added.)

@@ -58,6 +58,13 @@ global LUA_REFNIL               := -1
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Private Variables Declaration Section                ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kLUAEnvironment := Map()
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Functions Declaration Section                ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -216,6 +223,16 @@ array2Table(context, array) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Functions Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+envSetGlobal(name, value) {
+	kLUAEnvironment[name] := value
+
+	return value
+}
+
+envGetGlobal(name, default := kUndefined) {
+	return (kLUAEnvironment.Has(name) ? kLUAEnvironment[name] : default)
+}
 
 scriptExternHandler(context) {
 	local value := %scriptGetString(context, 1)%

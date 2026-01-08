@@ -348,8 +348,8 @@ Normally you will use a standard configuration for voice control, which means, t
 	 | Setting Value | Description |
 	 |---------------|-------------|
 	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
-	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
-	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
+	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT carried out. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
+	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not carried out by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
 
 #### Jona, the AI Race Engineer
 

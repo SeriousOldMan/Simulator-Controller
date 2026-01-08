@@ -2079,7 +2079,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 ## 5.6.0.0-release 02/23/24
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
-  3. Fixed auto stint creation in "Practice Center", when a *normal* pitstop has been performed without a tyre change in any type of session.
+  3. Fixed auto stint creation in "Practice Center", when a *normal* pitstop has been carried out without a tyre change in any type of session.
   4. Fixed reporting of incidents and damage by the Engineer in the first lap, if the configured number of learning laps is equal to 1.
   5. New functions are available in the Startup Profiles and the corresponding documentation has been extended with an [overview](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) of all available functions.
   6. Race settings can now be exported and imported in the "Session Database". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) for more information.
@@ -2196,7 +2196,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   1. Minor bugfixes, as always
   2. Documentation updates here and there, as always
   3. Fixed a critical bug in Race Engineer for wet cold tyre pressure calculation.
-  4. Fixed a bug in Race Engineer, where a planned but not prepared pitstop was not cleared after a manual pitstop had been performed.
+  4. Fixed a bug in Race Engineer, where a planned but not prepared pitstop was not cleared after a manual pitstop had been carried out.
   5. Fixed many errors in the car meta data definitions for *Assetto Corsa* in "Setup Workbench".
   6. The Driving Coach will not inform you over and over again, when there is a problem with the configuration or the connection. This is especially helpful, when running an initial setup without a configured Push-To-Talk button.
   7. Several improvements for the "Setup Workbench", which now supports many more unconventional setup options and is fully prepared to handle hybrid cars with electrical power units and energy recovery systems:
@@ -3018,7 +3018,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. Multiple controller actions can be bound to a single custom voice command.
   4. Multiple action functions can be executed by a custom controller function.
   5. Increased performance of lap update in "Race Center" in low latency situations.
-  6. The Spotter informs you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
+  6. The Spotter informs you know whether you are ahead or behind your opponent regarding the number of carried out pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".
   8. Fixed potential race condition in session database which leads to "Session Database" freezing while editing settings.
   9. Added a mechanism that creates a *.bak file whenever a database file is updated.
@@ -3074,7 +3074,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   7. New icons in the Stream Deck icon set for all above new controller actions.
   8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
   9. List of driver-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
-  10. Unprepared pitstops that had been performed without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
+  10. Unprepared pitstops that had been carried out without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
   11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
   12. New plugin parameter *raceAssistantMuted* for all Race Assistants to start the correspnding assistant in muted state. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   13. The "Simulator Setup" presets *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, which completely disables voice input and output of a given Race Assistant, had been renamed to *Silent Engineer* and so on.
@@ -3123,9 +3123,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   6. Separated British from US-American Gallon in unit conversion framework.
   7. Fixed a couple of unit conversion bugs.
   8. Fixed the "RemainingSessionTime" information for *rFactor 2*, which prevented a preselected strategy to be accepted by the Race Strategist.
-  9. "Race Center" will now also show information for planned, but not yet performed pitstops.
+  9. "Race Center" will now also show information for planned, but not yet carried out pitstops.
   10. Optimized driver selection in "Race Center" for *Assetto Corsa Competizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
-  11. "Race Center" is now compatible with pitstops planned and performed by the Race Engineer alone. Very helpful, when you are double stinting and no team mate is around.
+  11. "Race Center" is now compatible with pitstops planned and carried out by the Race Engineer alone. Very helpful, when you are double stinting and no team mate is around.
   12. You can now save all driver specific tyre setups from the "Race Center" to an external file and you can upload from this file to another session. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#managing-driver-specific-tyre-pressures) for more information.
   13. "Simulator Setup" now allows you to locate a simulation or other software which is not installed in the standard location on your PC.
   14. New car models for "Setup Advisor":

@@ -297,6 +297,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printLine(&output, "MAP=n/a");
 		printLine(&output, "TC=n/a");
 		printLine(&output, "ABS=n/a");
+		printLine(&output, "BB=", 1 - round(localCopy->mBrakeBias * 100) / 100);
 
 		print(&output, "BodyworkDamage=", 0.0); print(&output, ",", 0.0); print(&output, ",", 0.0); print(&output, ",", 0.0); printLine(&output, ",", normalizeDamage(localCopy->mAeroDamage));
 

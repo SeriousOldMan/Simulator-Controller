@@ -227,6 +227,7 @@ int main(int argc, char* argv[]) {
 		printf("MAP=n/a\n");
 		printf("TC=n/a\n");
 		printf("ABS=n/a\n");
+		printf("BB=%f\n", 1 - round(localCopy->mBrakeBias * 100) / 100);
 
 		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
 		printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),

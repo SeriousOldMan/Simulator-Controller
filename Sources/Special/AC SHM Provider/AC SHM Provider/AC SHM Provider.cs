@@ -476,7 +476,8 @@ namespace ACSHMProvider
             Console.WriteLine("MAP=n/a");
             Console.WriteLine("TCRaw=" + physics.TC);
             Console.WriteLine("ABSRaw=" + physics.Abs);
-            
+            Console.WriteLine("BB=" + Math.Round(1 - physics.BrakeBias, 2));
+
             Console.Write("FuelRemaining="); Console.WriteLine(physics.Fuel);
 
             Console.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);

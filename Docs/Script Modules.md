@@ -1,8 +1,14 @@
-This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
+This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). They also can be called as a response to a button press, of course.
+
+Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
 
 	require("Session")
 
-After the module references, several examples are provided which demonstrate some of the provided functionality.
+Additionally, the execution environment includes the special function *extern* which can be used to reference any global function or object in the host process.
+
+	local MsgBox = extern("MsgBox")
+
+After the module references below, several examples are provided which demonstrate some of the provided functionality.
 
 ## Module *Environment*
 
@@ -15,7 +21,7 @@ Only one topic is defined, which is named "Enviroment". It defines the following
 | Function | Arguments                      | Description |
 |----------|--------------------------------|-------------|
 | Get      | name, [Optional] default       | Returns the global value for the given *name*. If no value is defined, either the value *default* (if provided) or *nil* is returned. |
-| Set      | name, value                    | Sets the global value for the given *name*. *value* maybe of type string, number, boolean or simple arrays, that consists of values of these types. Please note, that the names are case-sensitive. |
+| Set      | name, value                    | Sets the global value for the given *name*. *value* may be of type string, number or simple arrays, that consists of values of these types. Please note, that *name* is case-sensitive. |
 
 ## Module *Simulator*
 
@@ -227,3 +233,81 @@ This example demonstrates simulator specific coding of pitstop service requests.
 	else
 		Assistant.Speak("Are you kidding?")
 	end
+	
+***
+
+### Activating fixed presets for TC, ABS, Brake Balance and so on in *Le Mans Ultimate*
+
+And here comes an example how to use a *Lua* script as an action for a button on your steering wheel. This example shows how to use the data supplied by the game API and sending commands to the game. Define the action in "Simulator Configuration" or "Simulator Setup":
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Module%20Example%201.jpg)
+
+	-- Activation:  For example using a Custom conroller action:
+	--              1Joy9 -> execute('C:\Users\juwig\Documents\Simulator Controller\Scripts\BBPresets.script')
+	-- Description: 1. When called without argument, it cycles thrugh the predefined presets.
+	--              2. When called with a preset number as argument, this preset gets activated.
+	
+	require("Simulator")
+	require("Environment")
+
+	local Trigger = extern("trigger")
+
+	local HOTKEY_BB_UP     = ","
+	local HOTKEY_BB_DOWN   = "."
+
+	local BB_SETTING_THRESHOLD	= 0.25
+	local PRESETS 				= { 49.0, 50.0, 51.0 }
+
+	local PRESET
+
+	if #Arguments > 0 then
+		PRESET = Arguments[1]
+	else
+		PRESET = Environment.Get("Brake Balance", 1) + 1
+
+		if PRESET > #PRESETS then
+			PRESET = 1
+		end
+	end
+
+	PRESET = math.min(#PRESETS, math.max(0, PRESET))
+
+	local function currentBrakeBalance()
+		local ok, ini = pcall(Simulator.Read, "Le Mans Ultimate")
+	  
+		if not ok or type(ini) ~= "string" then
+			return nil
+		end
+
+		local w = string.match(ini, "BB%s*=%s*[%d%p]+")
+		
+		if not w then
+			return nil
+		end
+		
+		w = string.gsub(w, "BB", "")
+		w = string.gsub(w, "=", "")
+		w = string.match(w, "[%d%p]+")
+		
+		return tonumber(w) * 100.0
+	end
+
+	repeat
+		local currentBB = currentBrakeBalance()
+
+		if not currentBB then
+			return nil
+		end
+
+		if math.abs(currentBB - PRESETS[PRESET]) > BB_SETTING_THRESHOLD then
+			if (PRESETS[PRESET] - currentBB) > 0 then
+				Trigger(HOTKEY_BB_UP)
+			else
+				Trigger(HOTKEY_BB_DOWN)
+			end
+		else
+			break
+		end
+	until nil
+
+	Environment.Set("Brake Balance", PRESET)

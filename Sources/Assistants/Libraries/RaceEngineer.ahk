@@ -5076,37 +5076,41 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker := this.getSpeaker()
 
-				speaker.beginTalk()
+				if (remainingLaps <= 2) {
+					speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
+					try {
+						speaker.speakPhrase("VeryLowFuel", {laps: remainingLaps})
 
-					if this.supportsPitstop()
-						if this.hasPreparedPitstop()
-							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if planPitstop
-							if !this.hasPlannedPitstop() {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						if this.supportsPitstop()
+							if this.hasPreparedPitstop()
+								speaker.speakPhrase((remainingLaps <= 1) ? "LowComeIn" : "ComeIn")
+							else if planPitstop
+								if !this.hasPlannedPitstop() {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+										this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									}
+									else
+										this.proposePitstop("Now")
 								}
-								else
-									this.proposePitstop("Now")
-							}
-							else {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPrepare", false, true)
+								else {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									}
+									else
+										this.preparePitstop()
 								}
-								else
-									this.preparePitstop()
-							}
+					}
+					finally {
+						speaker.endTalk({Important: true})
+					}
 				}
-				finally {
-					speaker.endTalk({Important: true})
-				}
+				else
+					speaker.speakPhrase("LowFuel", {laps: remainingLaps})
 			}
 	}
 
@@ -5121,37 +5125,42 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker := this.getSpeaker()
 
-				speaker.beginTalk()
+				if (remainingLaps <= 2) {
+					speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowEnergy" : "LowEnergy", {laps: remainingLaps})
+					try {
+						speaker.speakPhrase("VeryLowEnergy", {laps: remainingLaps})
 
-					if this.supportsPitstop()
-						if this.hasPreparedPitstop()
-							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if planPitstop
-							if !this.hasPlannedPitstop() {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						if this.supportsPitstop()
+							if this.hasPreparedPitstop()
+								speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+							else if planPitstop
+								if !this.hasPlannedPitstop() {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+										this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									}
+									else
+										this.proposePitstop("Now")
 								}
-								else
-									this.proposePitstop("Now")
-							}
-							else {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPrepare", false, true)
+								else {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									}
+									else
+										this.preparePitstop()
 								}
-								else
-									this.preparePitstop()
-							}
+
+					}
+					finally {
+						speaker.endTalk({Important: true})
+					}
 				}
-				finally {
-					speaker.endTalk({Important: true})
-				}
+				else
+					speaker.speakPhrase("LowEnergy", {laps: remainingLaps})
 			}
 	}
 

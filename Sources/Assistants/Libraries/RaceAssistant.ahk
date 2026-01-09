@@ -5132,7 +5132,7 @@ command(assistant, grammar, command := false) {
 		else {
 			assistant := (isInstance(assistant, RaceAssistant) ? assistant : assistant.KnowledgeBase.RaceAssistant)
 
-			assistant.ask(grammer, (command ? [command] : [])*)
+			assistant.ask(grammar, (command ? [command] : [])*)
 
 			return true
 		}

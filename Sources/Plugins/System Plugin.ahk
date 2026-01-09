@@ -896,52 +896,55 @@ execute(command) {
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
-	if (thePlugin && thePlugin.activateWindow())
-		try {
-			command := parseCommand(substituteVariables(command))
+	if thePlugin
+		thePlugin.activateWindow()
 
-			if FileExist(command[1]) {
-				SplitPath(command[1], , , &extension)
+	try {
+		command := parseCommand(substituteVariables(command))
 
-				if ((extension = "script") || (extension = "lua")) {
-					try {
-						context := scriptOpenContext()
+		if FileExist(command[1]) {
+			SplitPath(command[1], , , &extension)
 
-						if !scriptLoadScript(context, command[1], &message)
-							throw message
+			if ((extension = "script") || (extension = "lua")) {
+				try {
+					context := scriptOpenContext()
 
-						arguments := command.Clone()
-						arguments.RemoveAt(1)
+					if !scriptLoadScript(context, command[1], &message)
+						throw message
 
-						scriptPushArray(context, arguments)
-						scriptSetGlobal(context, "Arguments")
+					arguments := command.Clone()
+					arguments.RemoveAt(1)
 
-						scriptPushValue(context, (c) {
-							return scriptExternHandler(c)
-						})
-						scriptSetGlobal(context, "extern")
+					scriptPushArray(context, arguments)
+					scriptSetGlobal(context, "Arguments")
 
-						if scriptExecute(context, &message)
-							result := scriptGetBoolean(context)
-						else
-							throw message
-					}
-					finally {
-						try
-							scriptCloseContext(context)
-					}
+					scriptPushValue(context, (c) {
+						return scriptExternHandler(c)
+					})
+					scriptSetGlobal(context, "extern")
 
-					return
+					if scriptExecute(context, &message)
+						result := scriptGetBoolean(context)
+					else
+						throw message
 				}
+				finally {
+					try
+						scriptCloseContext(context)
+				}
+
+				return
 			}
-
-			Run(values2String(A_Space, command*))
 		}
-		catch Any as exception {
-			logError(exception, true)
 
-			logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
-		}
+		Run(values2String(A_Space, command*))
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		try
+			logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command[1]}))
+	}
 }
 
 trigger(hotkeys, method := "Event") {

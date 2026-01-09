@@ -1,8 +1,14 @@
-This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
+This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). They also can be called as a response to a button press, of course.
+
+Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
 
 	require("Session")
 
-After the module references, several examples are provided which demonstrate some of the provided functionality.
+Additionally, the execution environment includes the special function *extern* which can be used to reference any global function or object in the host process.
+
+	local MsgBox = extern("MsgBox")
+
+After the module references below, several examples are provided which demonstrate some of the provided functionality.
 
 ## Module *Environment*
 
@@ -227,10 +233,14 @@ This example demonstrates simulator specific coding of pitstop service requests.
 	else
 		Assistant.Speak("Are you kidding?")
 	end
+	
+***
 
 ### Activating fixed presets for TC, ABS, Brake Balance and so on in *Le Mans Ultimate*
 
-Another example, which shows how to use the data supplied by the game API and sending commands to the game.
+And here comes an example how to use a *Lua* script as an action for a button on your steering wheel. This example shows how to use the data supplied by the game API and sending commands to the game. Define the action in "Simulator Configuration" or "Simulator Setup":
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Module%20Example%201.jpg)
 
 	-- Activation:  For example using a Custom conroller action:
 	--              1Joy9 -> execute('C:\Users\juwig\Documents\Simulator Controller\Scripts\BBPresets.script')

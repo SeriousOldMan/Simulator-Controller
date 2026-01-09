@@ -2421,7 +2421,8 @@ class ScriptHandler extends SettingHandler {
 			script := FileRead(this.Script)
 
 			script .= ("`n`n" . FileRead(getFileName("SettingHandlerExecutor.script"
-												   , kUserHomeDirectory . "Scripts\", kResourcesDirectory . "Scripts\")))
+												   , kUserHomeDirectory . "Garage\Scripts\"
+												   , kResourcesDirectory . "Garage\Scripts\")))
 
 			scriptFileName := temporaryFileName("Setting Handler", "script")
 

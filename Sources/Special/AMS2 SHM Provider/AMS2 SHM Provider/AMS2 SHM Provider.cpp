@@ -224,8 +224,14 @@ int main(int argc, char* argv[]) {
 
 		printf("[Car Data]\n");
 
-		printf("MAP=n/a\n");
-		printf("TC=n/a\n");
+		if (localCopy->mTractionControlSetting == -1)
+			printf("TC=n/a\n");
+		else
+			printf("TC=%d\n", localCopy->mTractionControlSetting);
+		if (localCopy->mAntiLockSetting == -1)
+			printf("ABS=n/a\n");
+		else
+			printf("ABS=%d\n", localCopy->mAntiLockSetting);
 		printf("ABS=n/a\n");
 
 		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));

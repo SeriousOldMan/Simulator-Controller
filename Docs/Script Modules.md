@@ -227,3 +227,77 @@ This example demonstrates simulator specific coding of pitstop service requests.
 	else
 		Assistant.Speak("Are you kidding?")
 	end
+
+### Activating fixed presets for TC, ABS, Brake Balance and so on in *Le Mans Ultimate*
+
+Another example, which shows how to use the data supplied by the game API and sending commands to the game.
+
+	-- Activation:  For example using a Custom conroller action:
+	--              1Joy9 -> execute('C:\Users\juwig\Documents\Simulator Controller\Scripts\BBPresets.script')
+	-- Description: 1. When called without argument, it cycles thrugh the predefined presets.
+	--              2. When called with a preset number as argument, this preset gets activated.
+	
+	require("Simulator")
+	require("Environment")
+
+	local Trigger = extern("trigger")
+
+	local HOTKEY_BB_UP     = ","
+	local HOTKEY_BB_DOWN   = "."
+
+	local BB_SETTING_THRESHOLD	= 0.25
+	local PRESETS 				= { 49.0, 50.0, 51.0 }
+
+	local PRESET
+
+	if #Arguments > 0 then
+		PRESET = Arguments[1]
+	else
+		PRESET = Environment.Get("Brake Balance", 1) + 1
+
+		if PRESET > #PRESETS then
+			PRESET = 1
+		end
+	end
+
+	PRESET = math.min(#PRESETS, math.max(0, PRESET))
+
+	local function currentBrakeBalance()
+		local ok, ini = pcall(Simulator.Read, "Le Mans Ultimate")
+	  
+		if not ok or type(ini) ~= "string" then
+			return nil
+		end
+
+		local w = string.match(ini, "BB%s*=%s*[%d%p]+")
+		
+		if not w then
+			return nil
+		end
+		
+		w = string.gsub(w, "BB", "")
+		w = string.gsub(w, "=", "")
+		w = string.match(w, "[%d%p]+")
+		
+		return tonumber(w) * 100.0
+	end
+
+	repeat
+		local currentBB = currentBrakeBalance()
+
+		if not currentBB then
+			return nil
+		end
+
+		if math.abs(currentBB - PRESETS[PRESET]) > BB_SETTING_THRESHOLD then
+			if (PRESETS[PRESET] - currentBB) > 0 then
+				Trigger(HOTKEY_BB_UP)
+			else
+				Trigger(HOTKEY_BB_DOWN)
+			end
+		else
+			break
+		end
+	until nil
+
+	Environment.Set("Brake Balance", PRESET)

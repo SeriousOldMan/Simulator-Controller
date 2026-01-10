@@ -1370,7 +1370,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				connector.Initialize(serverURL, serverToken)
 
 				connection := connector.Connect(serverToken, SessionDatabase.ID
-											  , gSimulator ? SessionDatabase.getDriverName(gSimulator, SessionDatabase.ID) : SessionDatabase.getUserName()
+											  , gSimulator ? SessionDatabase.getDriverName(gSimulator, SessionDatabase.ID) : SessionDatabase.getName("Driver")
 											  , "Driver")
 
 				if (connection && (connection != "")) {

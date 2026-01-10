@@ -644,7 +644,7 @@ class SessionDatabase extends ConfigurationItem {
 									, (defaultSurname != ""), (defaultNickname != ""))
 				else
 					return name
-			case "Data":
+			case "Data", "Driver":
 				name := this.getUserName()
 
 				if ((name = "John Doe (JD)") && defaultForname)

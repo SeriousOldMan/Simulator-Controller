@@ -2619,7 +2619,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 				try {
 					connector.Initialize(serverURL, serverToken)
 
-					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Driver")
+					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Driver")
 
 					if (connection && (connection != "")) {
 						settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")

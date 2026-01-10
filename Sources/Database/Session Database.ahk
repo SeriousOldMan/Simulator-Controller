@@ -6337,7 +6337,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							info := readMultiMap(info)
 
 							driver := this.SessionDatabase.getDriverID(this.SelectedSimulator
-																	 , getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName()))
+																	 , getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Data")))
 						}
 						else
 							driver := this.SessionDatabase.ID
@@ -6348,12 +6348,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 														  , driver)
 
 						if info {
-							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getUserName())
+							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Data"))
 							lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 							sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 						}
 						else {
-							driver := this.SessionDatabase.getUserName()
+							driver := this.SessionDatabase.getName("Data")
 							lapTime := false
 							sectorTimes := false
 						}
@@ -7950,7 +7950,7 @@ editSettings(editorOrCommand, arguments*) {
 		try {
 			connector.Initialize(serverURL, serverTokenEdit.Text)
 
-			connection := connector.Connect(serverTokenEdit.Text, sessionDB.ID, sessionDB.getUserName())
+			connection := connector.Connect(serverTokenEdit.Text, sessionDB.ID, sessionDB.getName("Profile"))
 
 			if (connection && (connection != "")) {
 				connector.ValidateDataToken()

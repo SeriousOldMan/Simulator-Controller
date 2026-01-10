@@ -960,7 +960,7 @@ class RaceAssistant extends ConfigurationItem {
 		, muted := false, voiceServer := false) {
 		global kUnknown
 
-		local userName := SessionDatabase.getUserName()
+		local userName := SessionDatabase.getName("Driver")
 		local options, forname, ignore, booster
 
 		if !kUnknown

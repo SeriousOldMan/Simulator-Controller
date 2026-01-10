@@ -575,7 +575,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 					this.iToken := token
 				}
 
-				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getUserName(), "Manager")
+				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Manager")
 
 				if this.iKeepAliveTask
 					this.iKeepAliveTask.stop()

@@ -2812,7 +2812,7 @@ class TeamCenter extends ConfigurationItem {
 				if !identifier
 					identifier := ""
 
-				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 
 				if connection {
 					this.iConnection := connection
@@ -2888,7 +2888,7 @@ class TeamCenter extends ConfigurationItem {
 				if !identifier
 					identifier := ""
 
-				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 			}
 		}
 	}
@@ -3058,7 +3058,7 @@ class TeamCenter extends ConfigurationItem {
 			this.iSessionName := names[chosen]
 			this.iSessionIdentifier := identifier
 
-			this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+			this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 		}
 		else {
 			this.iSessionName := ""
@@ -9983,7 +9983,7 @@ class TeamCenter extends ConfigurationItem {
 				info := newMultiMap()
 
 				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
 
 				setMultiMapValue(info, "Session", "Team", this.SelectedTeam)
 				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
@@ -10058,7 +10058,7 @@ class TeamCenter extends ConfigurationItem {
 
 							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
 							}
 
 							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {

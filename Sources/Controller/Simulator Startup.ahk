@@ -1700,8 +1700,9 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Add("Text", "x8 yp+25 w342 0x10")
 
-		profileGui.Add("Text", "x16 yp+10 w90 +0x200", translate("Driver"))
-		profileGui.Add("Text", "x110 yp w240", SessionDatabase.getUserName())
+		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("Driver"))
+		profileGui.Add("CheckBox", "x90 yp w19 h23 vprofileNameCheck")
+		profileGui.Add("Edit", "x110 yp w240 vprofileName", SessionDatabase.getProfileName())
 
 		profileGui.SetFont("Italic", "Arial")
 
@@ -1769,6 +1770,8 @@ editProfile(launchPadOrCommand := false, *) {
 				setMultiMapValue(settings, "Diagnostics", "Session", (sessionDataDropDown.Value = 1))
 
 				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
+
+				SessionDatabase.setProfileName(profileGui["profileName"].Text, profileGui["profileNameCheck"].Value)
 
 				return true
 			}

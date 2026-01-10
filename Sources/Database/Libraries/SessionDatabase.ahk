@@ -630,6 +630,79 @@ class SessionDatabase extends ConfigurationItem {
 		SessionDatabase.registerDriver(simulator, id, name)
 	}
 
+	static getName(type, defaultForName := false, defaultSurName := "", defaultNickName := "") {
+		local name, isDriver
+
+		switch type, false {
+			case "Conversation":
+				name := this.getProfileName(true, &isDriver)
+
+				if isDriver
+					return name
+				else if defaultForName
+					return driverName(defaultForName, defaultSurName, defaultNickName
+									, (defaultSurName != ""), (defaultNickName != ""))
+				else
+					return name
+			case "Data":
+				name := this.getUserName()
+
+				if ((name = "John Doe (JD)") && defaultForName)
+					return driverName(defaultForName, defaultSurName, defaultNickName
+									, (defaultSurName != ""), (defaultNickName != ""))
+				else
+					return name
+			case "Profile":
+				name := this.getProfileName()
+
+				if ((name = "John Doe (JD)") && defaultForName)
+					return driverName(defaultForName, defaultSurName, defaultNickName
+									, (defaultSurName != ""), (defaultNickName != ""))
+				else
+					return name
+		}
+	}
+
+	static getProfileName(forDriver := false, &isDriver?) {
+		local configuration
+
+		static name := false
+		static driver := false
+
+		if (!name || (forDriver = "Reload"))
+			if FileExist(kUserConfigDirectory . "PROFILE") {
+				configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+				name := getMultiMapValue(configuration, "User", "Name")
+				driver := getMultiMapValue(configuration, "User", "Driver", false)
+			}
+
+		isDriver := false
+
+		if (forDriver && name) {
+			isDriver := driver
+
+			return (isDriver ? name : this.getUserName())
+		}
+		else
+			return (name ? name : this.getUserName())
+	}
+
+	static setProfileName(name, driver) {
+		local configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+		setMultiMapValue(configuration, "User", "Name", name)
+		setMultiMapValue(configuration, "User", "Driver", driver)
+
+		writeMultiMap(kUserConfigDirectory . "PROFILE", configuration)
+
+		this.getProfileName("Reload")
+	}
+
+	getProfileName() {
+		return SessionDatabase.getProfileName()
+	}
+
 	static getUserName() {
 		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
 
@@ -3146,19 +3219,19 @@ parseDriverName(fullName, &forName, &surName, &nickName?) {
 	}
 }
 
-driverName(forName, surName, nickName := false) {
+driverName(forName, surName, nickName := false, withSurName := true, withNickName := true) {
 	local name := ""
 
 	if (forName != "")
 		name .= (forName . A_Space)
 
 	if (surName != "")
-		name .= (surName . A_Space)
+		name .= (withSurName ? (surName . A_Space) : "")
 
 	if !nickName
-		nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+		nickName := (withNickName ? (SubStr(forName, 1, 1) . SubStr(surName, 1, 1)) : "")
 
-	if (nickName != "")
+	if ((nickName != "") && withNickName)
 		name .= (translate("(") . nickName . translate(")"))
 
 	return Trim(name)

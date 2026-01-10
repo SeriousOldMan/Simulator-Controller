@@ -1261,27 +1261,63 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarCode(simulator, car)
 	}
 
-	getCarSteerLock(simulator, car, track) {
-		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car))
-		local steerLock
+	static getCarValue(simulator, car, track, type) {
+		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car) . "." . type)
+		local value
 
 		static settingsDB := false
-		static steerLocks := CaseInsenseMap()
+		static values := CaseInsenseMap()
 
-		if steerLocks.Has(key)
-			return steerLocks[key]
+		if values.Has(key)
+			return values[key]
 
 		if !settingsDB
 			settingsDB := SettingsDatabase()
 
-		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car.SteerLock", kUndefined)
+		value := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car." . type, kUndefined)
 
-		if (steerLock == kUndefined)
-			steerLock := getCarSteerLock(simulator, car)
+		if (value == kUndefined)
+			value := %"getCar" . type%(simulator, car)
 
-		steerLocks[key] := steerLock
+		if (value = kUndefined)
+			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+									, "Car Values", car . "." . type, kUndefined)
 
-		return steerLock
+		values[key] := value
+
+		return value
+	}
+
+	static getCarSteerLock(simulator, car, track) {
+		return this.getCarValue(simulator, car, track, "SteerLock")
+	}
+
+	getCarSteerLock(simulator, car, track) {
+		return SessionDatabase.getCarSteerLock(simulator, car, track)
+	}
+
+	static getCarSteerRatio(simulator, car, track) {
+		return this.getCarValue(simulator, car, track, "SteerRatio")
+	}
+
+	getCarSteerRatio(simulator, car, track) {
+		return SessionDatabase.getCarSteerRatio(simulator, car, track)
+	}
+
+	static getCarWheelbase(simulator, car, track) {
+		return this.getCarValue(simulator, car, track, "Wheelbase")
+	}
+
+	getCarWheelbase(simulator, car, track) {
+		return SessionDatabase.getCarWheelbase(simulator, car, track)
+	}
+
+	static getCarTrackWidth(simulator, car, track) {
+		return this.getCarValue(simulator, car, track, "TrackWidth")
+	}
+
+	getCarTrackWidth(simulator, car, track) {
+		return SessionDatabase.getCarTrackWidth(simulator, car, track)
 	}
 
 	static registerTrack(simulator, car, track, shortName, longName) {

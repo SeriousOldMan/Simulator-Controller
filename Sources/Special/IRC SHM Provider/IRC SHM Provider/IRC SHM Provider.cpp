@@ -1046,6 +1046,12 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("MAP="); printDataNAFloat(header, data, "dcEnginePower");
 			printf("TC="); printDataNAFloat(header, data, "dcTractionControl");
 			printf("ABS="); printDataNAFloat(header, data, "dcABS");
+			printf("BB=");
+			if (getDataValue(result, header, data, "dcBrakeBias"))
+				printf("%f", (float)(1 - round(atof(result) * 100) / 100));
+			else
+				printf("n/a");
+			printf("\n");
 
 			printf("BodyworkDamage=0,0,0,0,0\n");
 			printf("SuspensionDamage=0,0,0,0\n");

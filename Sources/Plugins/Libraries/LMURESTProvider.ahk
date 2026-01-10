@@ -1390,7 +1390,7 @@ class LMURESTProvider {
 				if (isSet(id) && this.TeamData.TeamSession)
 					return this.TeamData.Drivers[id]
 				else
-					return SessionDatabase.getUserName()
+					return SessionDatabase.getDriverName("Le Mans Ultimate", SessionDatabase.ID)
 			}
 		}
 

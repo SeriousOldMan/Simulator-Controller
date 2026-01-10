@@ -16,7 +16,7 @@
 ;;;                        Private Functions Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getCarValue(simulator, car, type) {
+getCarInformation(simulator, car, type) {
 	local fileName, value
 
 	simulator := SettingsDatabase.getSimulatorName(simulator)
@@ -43,17 +43,17 @@ getCarValue(simulator, car, type) {
 ;;;-------------------------------------------------------------------------;;;
 
 getCarSteerLock(simulator, car) {
-	return getCarValue(simulator, car, "SteerLock")
+	return getCarInformation(simulator, car, "SteerLock")
 }
 
 getCarSteerRatio(simulator, car) {
-	return getCarValue(simulator, car, "SteerRatio")
+	return getCarInformation(simulator, car, "SteerRatio")
 }
 
 getCarWheelbase(simulator, car) {
-	return getCarValue(simulator, car, "Wheelbase")
+	return getCarInformation(simulator, car, "Wheelbase")
 }
 
 getCarTrackWidth(simulator, car) {
-	return getCarValue(simulator, car, "TrackWidth")
+	return getCarInformation(simulator, car, "TrackWidth")
 }

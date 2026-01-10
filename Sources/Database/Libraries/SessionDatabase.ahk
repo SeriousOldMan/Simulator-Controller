@@ -1261,7 +1261,16 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarCode(simulator, car)
 	}
 
-	static getCarValue(simulator, car, track, type) {
+	static getCarClass(simulator, car) {
+		return getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+							  , "Car Classes", car, false)
+	}
+
+	getCarClass(simulator, car) {
+		return SessionDatabase.getCarClass(simulator, car)
+	}
+
+	static getCarInformation(simulator, car, track, type) {
 		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car) . "." . type)
 		local value
 
@@ -1281,7 +1290,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (value = kUndefined)
 			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Values", car . "." . type, kUndefined)
+									, "Car Information", car . "." . type, kUndefined)
 
 		values[key] := value
 
@@ -1289,7 +1298,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarSteerLock(simulator, car, track) {
-		return this.getCarValue(simulator, car, track, "SteerLock")
+		return this.getCarInformation(simulator, car, track, "SteerLock")
 	}
 
 	getCarSteerLock(simulator, car, track) {
@@ -1297,7 +1306,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarSteerRatio(simulator, car, track) {
-		return this.getCarValue(simulator, car, track, "SteerRatio")
+		return this.getCarInformation(simulator, car, track, "SteerRatio")
 	}
 
 	getCarSteerRatio(simulator, car, track) {
@@ -1305,7 +1314,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarWheelbase(simulator, car, track) {
-		return this.getCarValue(simulator, car, track, "Wheelbase")
+		return this.getCarInformation(simulator, car, track, "Wheelbase")
 	}
 
 	getCarWheelbase(simulator, car, track) {
@@ -1313,7 +1322,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarTrackWidth(simulator, car, track) {
-		return this.getCarValue(simulator, car, track, "TrackWidth")
+		return this.getCarInformation(simulator, car, track, "TrackWidth")
 	}
 
 	getCarTrackWidth(simulator, car, track) {

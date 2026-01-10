@@ -138,10 +138,10 @@ class Sector397Provider extends SimulatorProvider {
 		model := normalizeFileName(model)
 	}
 
-	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
 		category := false
 
-		return driverName(forName, surName, nickName)
+		return driverName(forname, surname, nickname)
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
@@ -157,7 +157,7 @@ class Sector397Provider extends SimulatorProvider {
 		local model := false
 		local team := false
 		local nr := false
-		local carRaw, carID, forName, surName, nickName, car, tyreCompound
+		local carRaw, carID, forname, surname, nickname, car, tyreCompound
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			carRaw := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
@@ -184,11 +184,11 @@ class Sector397Provider extends SimulatorProvider {
 															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
 															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
 													   , &driverCategory)
-								  , &forName, &surName, &nickName)
+								  , &forname, &surname, &nickname)
 
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surname)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickname)
 
 					if driverCategory
 						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Category", driverCategory)
@@ -250,7 +250,7 @@ class Sector397Provider extends SimulatorProvider {
 
 	acquireTelemetryData() {
 		local telemetryData := super.acquireTelemetryData()
-		local model, forName, surName, nickName
+		local model, forname, surname, nickname
 
 		static lastSimulator := false
 		static lastCar := false

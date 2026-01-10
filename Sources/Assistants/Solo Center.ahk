@@ -7934,7 +7934,7 @@ class SoloCenter extends ConfigurationItem {
 						delta := Round(result[1]["Delta"], 1)
 				}
 
-				driver := driverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				driver := driverName(driverFornames[index] , driverSurnames[index], driverNicknames[index])
 
 				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))

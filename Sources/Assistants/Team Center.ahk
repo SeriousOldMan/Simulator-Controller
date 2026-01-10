@@ -3770,7 +3770,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	importSetups(fileName, clear) {
-		local directory, ignore, entry, candidate, forName, surName, cForName, cSurName, found
+		local directory, ignore, entry, candidate, forname, surname, cForname, cSurname, found
 
 		if clear
 			this.SessionStore.clear("Setups.Data")
@@ -3790,14 +3790,14 @@ class TeamCenter extends ConfigurationItem {
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
 				entry := entry.Clone()
 
-				parseDriverName(entry["Driver"], &forName, &surName, &ignore := false)
+				parseDriverName(entry["Driver"], &forname, &surname, &ignore := false)
 
 				found := false
 
 				for ignore, candidate in getKeys(this.SessionDrivers) {
-					parseDriverName(candidate, &cForName, &cSurName, &ignore := false)
+					parseDriverName(candidate, &cForname, &cSurname, &ignore := false)
 
-					if ((forName = cForName) && (surName = cSurName)) {
+					if ((forname = cForname) && (surname = cSurname)) {
 						entry["Driver"] := candidate
 
 						found := true
@@ -3968,8 +3968,8 @@ class TeamCenter extends ConfigurationItem {
 
 	updatePlanFromStrategy() {
 		local pitstops, pitstop, numStints, time, currentTime, last, lastTime, msgResult, translator
-		local driver, forName, surName, nickName, found, ignore, candidate
-		local sForName, sSurName, sNickName
+		local driver, forname, surname, nickname, found, ignore, candidate
+		local sForname, sSurname, sNickname
 
 		if this.Strategy {
 			loop this.PlanListView.GetCount()
@@ -4063,22 +4063,22 @@ class TeamCenter extends ConfigurationItem {
 				else
 					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index - 1].DriverName)
 
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(driver, &forName, &surName, &nickName)
+				parseDriverName(driver, &forname, &surname, &nickname)
 
 				found := false
 
 				for ignore, candidate in getKeys(this.SessionDrivers) {
-					sForName := false
-					sSurName := false
-					sNickName := false
+					sForname := false
+					sSurname := false
+					sNickname := false
 
-					parseDriverName(candidate, &sForName, &sSurName, &sNickName)
+					parseDriverName(candidate, &sForname, &sSurname, &sNickname)
 
-					if ((sForName = forName) && (sSurName = surName)) {
+					if ((sForname = forname) && (sSurname = surname)) {
 						found := true
 						driver := candidate
 
@@ -4482,7 +4482,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	getDriver(stintNr) {
-		local stint, driver, ignore, candidate, forName, surName, nickName
+		local stint, driver, ignore, candidate, forname, surname, nickname
 
 		loop this.PlanListView.GetCount() {
 			stint := this.PlanListView.GetText(A_Index, 1)
@@ -4492,13 +4492,13 @@ class TeamCenter extends ConfigurationItem {
 
 				for ignore, candidate in getKeys(this.SessionDrivers)
 					if (driver = candidate) {
-						forName := ""
-						surName := ""
-						nickName := ""
+						forname := ""
+						surname := ""
+						nickname := ""
 
-						parseDriverName(candidate, &forName, &surName, &nickName)
+						parseDriverName(candidate, &forname, &surname, &nickname)
 
-						return this.createDriver({Forname: forName, Surname: surName, Nickname: nickName, Identifier: this.SessionDrivers[candidate]})
+						return this.createDriver({Forname: forname, Surname: surname, Nickname: nickname, Identifier: this.SessionDrivers[candidate]})
 					}
 			}
 		}
@@ -12951,7 +12951,7 @@ class TeamCenter extends ConfigurationItem {
 					delta := Round(result[1]["Delta"], 1)
 				}
 
-				driver := driverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				driver := driverName(driverFornames[index] , driverSurnames[index], driverNicknames[index])
 
 				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))
@@ -14893,7 +14893,7 @@ loadDrivers(connector, team) {
 			try {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[driverName(driver.ForName, driver.SurName, driver.NickName)] := driver.Identifier
+				drivers[driverName(driver.Forname, driver.Surname, driver.Nickname)] := driver.Identifier
 			}
 			catch Any as exception {
 				logError(exception, true)

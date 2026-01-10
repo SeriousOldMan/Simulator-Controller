@@ -60,9 +60,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	iCachedObjects := CaseInsenseMap()
 
-	iDriverForName := false
-	iDriverSurName := false
-	iDriverNickName := false
+	iDriverForname := false
+	iDriverSurname := false
+	iDriverNickname := false
 
 	iTeamServerEnabled := false
 
@@ -300,21 +300,21 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	DriverForName[force := false] {
+	DriverForname[force := false] {
 		Get {
-			return this.getDriverForName(force)
+			return this.getDriverForname(force)
 		}
 	}
 
-	DriverSurName[force := false] {
+	DriverSurname[force := false] {
 		Get {
-			return this.getDriverSurName(force)
+			return this.getDriverSurname(force)
 		}
 	}
 
-	DriverNickName[force := false] {
+	DriverNickname[force := false] {
 		Get {
-			return this.getDriverNickName(force)
+			return this.getDriverNickname(force)
 		}
 	}
 
@@ -507,7 +507,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							driver := this.iCachedObjects[driver]
 
 							lastStintInfo := [this.iCachedObjects[stint]["Nr"], this.iCachedObjects[lap]["Nr"]
-											, driverName(driver["ForName"], driver["SurName"], driver["NickName"])]
+											, driverName(driver["Forname"], driver["Surname"], driver["Nickname"])]
 
 							nextUpdate := (A_TickCount + 60000)
 						}
@@ -696,9 +696,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.iDriver := ((driver && (driver != "")) ? driver : false)
 		this.iSession := ((session && (session != "")) ? session : false)
 
-		this.iDriverForName := false
-		this.iDriverSurName := false
-		this.iDriverNickName := false
+		this.iDriverForname := false
+		this.iDriverSurname := false
+		this.iDriverNickname := false
 	}
 
 	tryConnect() {
@@ -799,7 +799,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				driver := this.iCachedObjects[driver]
 
-				return driverName(driver["ForName"], driver["SurName"], driver["NickName"])
+				return driverName(driver["Forname"], driver["Surname"], driver["Nickname"])
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
@@ -814,22 +814,22 @@ class TeamServerPlugin extends ControllerPlugin {
 		return false
 	}
 
-	getDriverForName(force := false) {
+	getDriverForname(force := false) {
 		local driver
 
-		if (!this.iDriverForName && (force || this.TeamServerActive)) {
+		if (!this.iDriverForname && (force || this.TeamServerActive)) {
 			try {
 				if ((this.Connected || force) && !this.iCachedObjects.Has(this.Driver))
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]
 
-				this.iDriverForName := driver["ForName"]
-				this.iDriverSurName := driver["SurName"]
-				this.iDriverNickName := driver["NickName"]
+				this.iDriverForname := driver["Forname"]
+				this.iDriverSurname := driver["Surname"]
+				this.iDriverNickname := driver["Nickname"]
 
 				if isLogLevel(kLogInfo)
-					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"] . A_Space . driver["SurName"] . translate(")"))
+					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["Forname"] . A_Space . driver["Surname"] . translate(")"))
 			}
 			catch Any as exception {
 				if !force {
@@ -845,19 +845,19 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 		}
 
-		return (this.iDriverForName ? this.iDriverForName : "")
+		return (this.iDriverForname ? this.iDriverForname : "")
 	}
 
-	getDriverSurName(force := false) {
-		this.getDriverForName(force)
+	getDriverSurname(force := false) {
+		this.getDriverForname(force)
 
-		return (this.iDriverSurName ? this.iDriverSurName : "")
+		return (this.iDriverSurname ? this.iDriverSurname : "")
 	}
 
-	getDriverNickName(force := false) {
-		this.getDriverForName(force)
+	getDriverNickname(force := false) {
+		this.getDriverForname(force)
 
-		return (this.iDriverNickName ? this.iDriverNickName : "")
+		return (this.iDriverNickname ? this.iDriverNickname : "")
 	}
 
 	startSession(simulator, car, track, duration, retries := 20, wait := 500) {
@@ -1561,19 +1561,19 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	addLap(lapNumber, telemetryData, standingsData, retries := 10, wait := 500) {
 		local waitUntil := (A_TickCount + (wait * retries))
-		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
+		local driverForname, driverSurname, driverNickname, stint, simulator, car, track, lap
 		local teamServerConfig, telemetryDirectory
 
 		if this.TeamServerActive {
 			try {
-				driverForName := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
-				driverSurName := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
-				driverNickName := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
+				driverForname := getMultiMapValue(telemetryData, "Stint Data", "DriverForname", "John")
+				driverSurname := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+				driverNickname := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JD")
 
 				if (isDebug() && isLogLevel(kLogDebug)) {
 					logMessage(kLogDebug, "Updating lap for team session: " . lapNumber)
 
-					if (isDevelopment() && ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName)))
+					if (isDevelopment() && ((this.DriverForname != driverForname) || (this.DriverSurname != driverSurname)))
 						throw "Driver inconsistency detected..."
 				}
 
@@ -1586,7 +1586,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							car := getMultiMapValue(telemetryData, "Session Data", "Car", "Unknown")
 							track := getMultiMapValue(telemetryData, "Session Data", "Track", "Unknown")
 
-							SessionDatabase.registerDriver(simulator, this.ID, driverName(driverForName, driverSurName, driverNickName))
+							SessionDatabase.registerDriver(simulator, this.ID, driverName(driverForname, driverSurname, driverNickname))
 
 							stint := this.joinSession(simulator, car, track, lapNumber)
 						}
@@ -1717,9 +1717,9 @@ class TeamServerPlugin extends ControllerPlugin {
 					if (this.Driver && this.Session)
 						connection := this.Connector.Connect(this.ServerToken
 														   , SessionDatabase().ID
-														   , driverName(this.DriverForName[true]
-																	  , this.DriverSurName[true]
-																	  , this.DriverNickName[true])
+														   , driverName(this.DriverForname[true]
+																	  , this.DriverSurname[true]
+																	  , this.DriverNickname[true])
 														   , "Driver", this.Session ? this.Session : "")
 
 					this.State["ServerURL"] := this.ServerURL
@@ -1745,7 +1745,7 @@ class TeamServerPlugin extends ControllerPlugin {
 								this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 							driverObject := this.iCachedObjects[this.Driver]
-							this.iDriverName := (driverObject["ForName"] . A_Space . driverObject["SurName"])
+							this.iDriverName := (driverObject["Forname"] . A_Space . driverObject["Surname"])
 
 							this.State["Driver"] := this.Driver[true]
 						}

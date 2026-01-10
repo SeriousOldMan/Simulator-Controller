@@ -1876,7 +1876,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			for ignore, identifier in identifiers {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
+				drivers[driverName(driver["Forname"], driver["Surname"], driver["Nickname"])] := driver["Identifier"]
 			}
 		}
 

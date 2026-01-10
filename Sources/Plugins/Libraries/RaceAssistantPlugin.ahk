@@ -1704,7 +1704,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.TeamSessionActive {
 			if RaceAssistantPlugin.Simulator
-				return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
+				return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForname, teamServer.DriverSurname)
 			else
 				return false
 		}

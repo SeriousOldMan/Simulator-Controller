@@ -276,7 +276,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.simulatorStartup(simulator)
 	}
 
-	driverActive(data, driverForName, driverSurName) {
+	driverActive(data, driverForname, driverSurname) {
 		return this.sessionActive(data)
 	}
 

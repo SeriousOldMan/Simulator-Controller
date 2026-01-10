@@ -91,7 +91,7 @@ runTeamSessionLogger() {
 								  , getMultiMapValue(data, "Stint Data", "InPit", "?")
 								  , getMultiMapValue(data, "Stint Data", "DriverForname", "?")
 								  , getMultiMapValue(data, "Stint Data", "DriverSurname", "?")
-								  , getMultiMapValue(data, "Stint Data", "DriverNickName", "?")
+								  , getMultiMapValue(data, "Stint Data", "DriverNickname", "?")
 								  , getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "?")
 								  , getMultiMapValue(data, "Stint Data", "StintTimeRemaining", "?")) . "`n"
 

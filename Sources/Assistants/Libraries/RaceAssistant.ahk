@@ -411,7 +411,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		User {
 			Get {
-				return this.RaceAssistant.DriverForName
+				return SessionDatabase.getName("Conversation", this.RaceAssistant.DriverForName)
 			}
 		}
 

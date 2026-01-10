@@ -1673,6 +1673,7 @@ loadStartupProfiles(target, fileName := false) {
 
 editProfile(launchPadOrCommand := false, *) {
 	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, sessionDataDropDown, x, y
+	local name, isDriver
 
 	static result := false
 
@@ -1700,9 +1701,11 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Add("Text", "x8 yp+25 w342 0x10")
 
+		name := SessionDatabase.getProfileName( , &isDriver)
+
 		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("Driver"))
-		profileGui.Add("CheckBox", "x90 yp w19 h23 vprofileNameCheck")
-		profileGui.Add("Edit", "x110 yp w240 vprofileName", SessionDatabase.getProfileName())
+		profileGui.Add("CheckBox", "x90 yp w19 h23 Checked" . (isDriver != false) . " vprofileNameCheck")
+		profileGui.Add("Edit", "x110 yp w240 vprofileName", name)
 
 		profileGui.SetFont("Italic", "Arial")
 

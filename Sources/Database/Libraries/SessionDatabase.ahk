@@ -677,13 +677,10 @@ class SessionDatabase extends ConfigurationItem {
 				driver := getMultiMapValue(configuration, "User", "Driver", false)
 			}
 
-		isDriver := false
+		isDriver := driver
 
-		if (forDriver && name) {
-			isDriver := driver
-
+		if (forDriver && name)
 			return (isDriver ? name : this.getUserName())
-		}
 		else
 			return (name ? name : this.getUserName())
 	}

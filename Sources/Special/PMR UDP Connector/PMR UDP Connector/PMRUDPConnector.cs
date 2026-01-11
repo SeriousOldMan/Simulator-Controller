@@ -225,7 +225,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("DriverSurname={0}\n", surname);
             sb.AppendFormat("DriverNickname={0}\n", nickname);
             sb.AppendFormat("Position={0}\n", playerState.RacePos);
-             sb.AppendFormat("LapValid={0}\n", playerState.LapValid ? "true" : "false");
+            sb.AppendFormat("LapValid={0}\n", playerState.LapValid ? "true" : "false");
             sb.AppendFormat("LapLastTime={0}\n", I(playerState.LastLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);

@@ -1033,7 +1033,7 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			print(output, "ABS="); printDataNAFloat(output, header, data, "dcABS"); printLine(output, "");
 			print(output, "BB=");
 			if (getDataValue(result, header, data, "dcBrakeBias"))
-				print(output, std::to_string(1 - round(atof(result) * 100) / 100));
+				print(output, std::to_string(round(atof(result) * 100) / 10000));
 			else
 				print(output, "n/a");
 			printLine(output, "");

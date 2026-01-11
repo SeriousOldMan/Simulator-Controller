@@ -1048,7 +1048,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("ABS="); printDataNAFloat(header, data, "dcABS");
 			printf("BB=");
 			if (getDataValue(result, header, data, "dcBrakeBias"))
-				printf("%f", (float)(1 - round(atof(result) * 100) / 100));
+				printf("%f", (float)round(atof(result) * 100) / 10000);
 			else
 				printf("n/a");
 			printf("\n");

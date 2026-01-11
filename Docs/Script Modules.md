@@ -289,7 +289,7 @@ And here comes an example how to use a *Lua* script as an action for a button on
 		w = string.gsub(w, "=", "")
 		w = string.match(w, "[%d%p]+")
 		
-		return tonumber(w) * 100.0
+		return tonumber(w)
 	end
 
 	repeat

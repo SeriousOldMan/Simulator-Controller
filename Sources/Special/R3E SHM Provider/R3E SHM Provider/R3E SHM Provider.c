@@ -311,7 +311,7 @@ int main(int argc, char* argv[])
 			if (map_buffer->brake_bias == -1)
 				wprintf_s(L"n/a\n");
 			else
-				wprintf_s(L"%f\n", 1 - round(map_buffer->brake_bias * 100) / 100);
+				wprintf_s(L"%f\n", (1 - round(map_buffer->brake_bias * 100) / 100) * 100);
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage / 4, suspDamage / 4, suspDamage / 4, suspDamage / 4);

@@ -23,7 +23,7 @@
 normalizeFileName(fileName) {
 	local ignore, character
 
-	static disallowedCharacters := ["/" , ":", "*", "?", "<", ">", "|"]
+	static disallowedCharacters := ["\", "/" , ":", "*", "?", "<", ">", "|"]
 
 	for ignore, character in disallowedCharacters
 		fileName := StrReplace(fileName, character, "")

@@ -4915,7 +4915,7 @@ class SoloCenter extends ConfigurationItem {
 
 					if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 						setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-						setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
+						setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 					}
 
 					setMultiMapValue(info, "Session", "Exported", true)
@@ -4978,7 +4978,7 @@ class SoloCenter extends ConfigurationItem {
 				info := newMultiMap()
 
 				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 
 				setMultiMapValue(info, "Session", "Session", this.Session)
 				setMultiMapValue(info, "Session", "Exported", this.SessionExported)

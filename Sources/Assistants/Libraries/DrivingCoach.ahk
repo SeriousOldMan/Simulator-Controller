@@ -1412,7 +1412,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 							info := newMultiMap()
 
-							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getName("Data")))
+							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getName("Creator")))
 							setMultiMapValue(info, "Info", "LapTime", bestLapTime)
 
 							sectorTimes := getMultiMapValue(bestInfo, "Lap", "SectorTimes", false)
@@ -1514,7 +1514,7 @@ class DrivingCoach extends GridRaceAssistant {
 		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
 			info := readMultiMap(A_LoopFileFullPath)
 
-			if (SessionDatabase.getName("Data") = getMultiMapValue(info, "Info", "Driver")) {
+			if (SessionDatabase.getName("Creator") = getMultiMapValue(info, "Info", "Driver")) {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 
 				if (lapTime && ((bestSessionLap == kUndefined) || (lapTime < bestSessionLapTime))) {
@@ -1602,7 +1602,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				info := readMultiMap(fileName . ".info")
 
-				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Data"))
+				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Creator"))
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 

@@ -196,7 +196,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 							driverName := getMultiMapValue(info, "Telemetry", "Driver")
 
 						if !driverName
-							driverName := SessionDatabase.getName("Data")
+							driverName := SessionDatabase.getName("Creator")
 
 						browserGui["telemetryListView"].Add("", name, driverName
 															  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
@@ -493,7 +493,7 @@ browseSoloSessions(ownerOrCommand := false, arguments*) {
 						driverName := getMultiMapValue(infos[index], "Creator", "Name")
 
 					if !driverName
-						driverName := SessionDatabase.getName("Data")
+						driverName := SessionDatabase.getName("Creator")
 
 					browserGui["sessionListView"].Add("", name, driverName
 														, FormatTime(getMultiMapValue(infos[index], "Session", "Date"), "ShortDate") . translate(" - ")

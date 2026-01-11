@@ -9983,7 +9983,7 @@ class TeamCenter extends ConfigurationItem {
 				info := newMultiMap()
 
 				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 
 				setMultiMapValue(info, "Session", "Team", this.SelectedTeam)
 				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
@@ -10058,7 +10058,7 @@ class TeamCenter extends ConfigurationItem {
 
 							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Data"))
+								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 							}
 
 							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {

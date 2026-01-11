@@ -631,73 +631,71 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getName(type, defaultForname := false, defaultSurname := "", defaultNickname := "") {
-		local name, isDriver
+		local name, scope
 
-		switch type, false {
-			case "Conversation":
-				name := this.getProfileName(true, &isDriver)
+		name := this.getProfileName(&scope)
 
-				if isDriver
-					return name
-				else if defaultForname
-					return driverName(defaultForname, defaultSurname, defaultNickname
+		if (type = "Profile")
+			return name
+		else if inList(scope, type)
+			return name
+		else if defaultForname
+			return driverName(defaultForname, defaultSurname, defaultNickname
 									, (defaultSurname != ""), (defaultNickname != ""))
-				else
-					return name
-			case "Data", "Driver":
-				name := this.getUserName()
-
-				if ((name = "John Doe (JD)") && defaultForname)
-					return driverName(defaultForname, defaultSurname, defaultNickname
-									, (defaultSurname != ""), (defaultNickname != ""))
-				else
-					return name
-			case "Profile":
-				name := this.getProfileName()
-
-				if ((name = "John Doe (JD)") && defaultForname)
-					return driverName(defaultForname, defaultSurname, defaultNickname
-									, (defaultSurname != ""), (defaultNickname != ""))
-				else
-					return name
-		}
+		else
+			return this.getUserName()
 	}
 
-	static getProfileName(forDriver := false, &isDriver?) {
+	static hasProfileName() {
+		return FileExist(kUserConfigDirectory . "PROFILE")
+	}
+
+	static getProfileName(&types?) {
 		local configuration
 
 		static name := false
-		static driver := false
+		static scope := ["Conversation", "Driver", "Creator"]
 
-		if (!name || (forDriver = "Reload"))
+		if !isSet(types)
+			types := false
+
+		if (!name || (types = "Reload"))
 			if FileExist(kUserConfigDirectory . "PROFILE") {
 				configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
 
 				name := getMultiMapValue(configuration, "User", "Name")
-				driver := getMultiMapValue(configuration, "User", "Driver", false)
+				scope := []
+
+				do(["Conversation", "Driver", "Creator"], (type) {
+					if getMultiMapValue(configuration, "User", type, false)
+						scope.Push(type)
+				})
+			}
+			else {
+				name := this.getUserName()
+				scope := ["Conversation", "Driver", "Creator"]
 			}
 
-		isDriver := driver
+		types := scope
 
-		if (forDriver && name)
-			return (isDriver ? name : this.getUserName())
-		else
-			return (name ? name : this.getUserName())
+		return name
 	}
 
-	static setProfileName(name, driver) {
+	static setProfileName(name, types) {
 		local configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
 
 		setMultiMapValue(configuration, "User", "Name", name)
-		setMultiMapValue(configuration, "User", "Driver", driver)
+
+		do(["Conversation", "Driver", "Creator"], (type) => removeMultiMapValue(configuration, "User", type))
+		do(types, (type) => setMultiMapValue(configuration, "User", type, true))
 
 		writeMultiMap(kUserConfigDirectory . "PROFILE", configuration)
 
-		this.getProfileName("Reload")
+		this.getProfileName(&type := "Reload")
 	}
 
-	getProfileName() {
-		return SessionDatabase.getProfileName()
+	getProfileName(&types?) {
+		return SessionDatabase.getProfileName(&types)
 	}
 
 	static getUserName() {

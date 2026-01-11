@@ -6337,7 +6337,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							info := readMultiMap(info)
 
 							driver := this.SessionDatabase.getDriverID(this.SelectedSimulator
-																	 , getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Data")))
+																	 , getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Creator")))
 						}
 						else
 							driver := this.SessionDatabase.ID
@@ -6348,12 +6348,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 														  , driver)
 
 						if info {
-							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Data"))
+							driver := getMultiMapValue(info, "Info", "Driver", this.SessionDatabase.getName("Creator"))
 							lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 							sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 						}
 						else {
-							driver := this.SessionDatabase.getName("Data")
+							driver := this.SessionDatabase.getName("Creator")
 							lapTime := false
 							sectorTimes := false
 						}

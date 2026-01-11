@@ -1673,9 +1673,36 @@ loadStartupProfiles(target, fileName := false) {
 
 editProfile(launchPadOrCommand := false, *) {
 	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, sessionDataDropDown, x, y
-	local name, isDriver
+	local name
 
 	static result := false
+	static scope
+
+	chooseScope(*) {
+		local scopeMenu := Menu()
+		local ignore, name
+
+		updateScope(name, *) {
+			local index := inList(scope, name)
+
+			if index
+				scope.RemoveAt(index)
+			else
+				scope.Push(name)
+		}
+
+		for ignore, name in ["Conversation", "Driver", "Creator"] {
+			scopeMenu.Add(translate(name), updateScope.Bind(name))
+
+			if inList(scope, name)
+				scopeMenu.Check(translate(name))
+		}
+
+		scopeMenu.Add()
+		scopeMenu.Add(translate("Cancel"), (*) => true)
+
+		scopeMenu.Show( , , true)
+	}
 
 	if (launchPadOrCommand == kOk)
 		result := kOk
@@ -1701,11 +1728,17 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Add("Text", "x8 yp+25 w342 0x10")
 
-		name := SessionDatabase.getProfileName( , &isDriver)
+		if SessionDatabase.hasProfileName()
+			name := SessionDatabase.getProfileName(&scope)
+		else {
+			name := SessionDatabase.getUserName()
 
-		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("Driver"))
-		profileGui.Add("CheckBox", "x90 yp w19 h23 Checked" . (isDriver != false) . " vprofileNameCheck")
-		profileGui.Add("Edit", "x110 yp w240 vprofileName", name)
+			scope := ["Conversation", "Driver", "Creator"]
+		}
+
+		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("User"))
+		profileGui.Add("Edit", "x110 yp w118 vprofileName", name)
+		profileGui.Add("Button", "x230 yp w115 h23 w120", translate("Use") . translate("...")).OnEvent("Click", chooseScope)
 
 		profileGui.SetFont("Italic", "Arial")
 
@@ -1774,7 +1807,7 @@ editProfile(launchPadOrCommand := false, *) {
 
 				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
 
-				SessionDatabase.setProfileName(profileGui["profileName"].Text, profileGui["profileNameCheck"].Value)
+				SessionDatabase.setProfileName(profileGui["profileName"].Text, scope)
 
 				return true
 			}

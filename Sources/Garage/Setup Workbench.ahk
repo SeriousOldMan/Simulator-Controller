@@ -1628,7 +1628,7 @@ class SetupWorkbench extends ConfigurationItem {
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
 		local lap
 
-		driver := SessionDatabase.getName("Data")
+		driver := SessionDatabase.getName("Creator")
 
 		lapTime := "-"
 		sectorTimes := ["-"]

@@ -35,6 +35,28 @@ Simulator Controller can provide diagnostics data to the development team to inc
 - If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
 - No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 
+## Setting your name
+
+In the same profile dialog you can change your name and define where this name will be used. Normally, the first name which is provided by the simulator API, when you run Simulator Controller for the first time, will be remembered and will be used whenever no other name can be derived, for example by calling the active simulator.
+
+But this default name can be changed and you can specify where this alternative name should be used. Currently, three different areas are supported:
+
+1. *Conversation*
+
+   The name will be used for the conversation with the Assistants, i.e. that will be the name, you will be called by them.
+
+2. *Driver*
+
+   Some simulators do not provide a name for the current driver in all situations. In this case, the alternative name can be used.
+
+3. *Data*
+
+   Whenever a data entry is created in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), this entry will be associated with a name as its creator. The alternative name can be used for this purpose as well.
+   
+As said, by default the first name that has been found will be used for all these purposes. If you want to change that, provide an alternative name in the *User* field of the profile dialog and click on the "Use..." button to select where this name should be used.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile%20Scope.JPG)
+
 ## Startup Process & Settings
 
 Before starting up, "Simulator Startup" checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically. You can trigger this anytime later by holding down the Control key when clicking on the Startup icon in "Simulator Startup". The following settings dialog will show up:

@@ -1691,7 +1691,7 @@ editProfile(launchPadOrCommand := false, *) {
 				scope.Push(name)
 		}
 
-		for ignore, name in ["Conversation", "Driver", "Creator"] {
+		for ignore, name in ["Conversation", "Driver", "Data"] {
 			scopeMenu.Add(translate(name), updateScope.Bind(name))
 
 			if inList(scope, name)
@@ -1728,12 +1728,15 @@ editProfile(launchPadOrCommand := false, *) {
 
 		profileGui.Add("Text", "x8 yp+25 w342 0x10")
 
-		if SessionDatabase.hasProfileName()
+		if SessionDatabase.hasProfileName() {
 			name := SessionDatabase.getProfileName(&scope)
+
+			scope := collect(scope, (s) => ((s = "Creator") ? "Data" : s))
+		}
 		else {
 			name := SessionDatabase.getUserName()
 
-			scope := ["Conversation", "Driver", "Creator"]
+			scope := ["Conversation", "Driver", "Data"]
 		}
 
 		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("User"))
@@ -1807,7 +1810,8 @@ editProfile(launchPadOrCommand := false, *) {
 
 				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
 
-				SessionDatabase.setProfileName(profileGui["profileName"].Text, scope)
+				SessionDatabase.setProfileName(profileGui["profileName"].Text
+											 , collect(scope, (s) => ((s = "Data") ? "Creator" : s)))
 
 				return true
 			}

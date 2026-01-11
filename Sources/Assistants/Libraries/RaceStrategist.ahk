@@ -2966,7 +2966,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local ignore, pitstop, theFact
 
 		for ignore, theFact in ["Name", "Version", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
-							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
+							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS", "BB"
 							  , "Pitstop.Next", "Pitstop.Lap", "Pitstop.Position"
 							  , "Pitstop.Lap.Warning", "Pitstop.Deviation"]
 			knowledgeBase.clearFact("Strategy." . theFact)

@@ -2813,6 +2813,7 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Map", getMultiMapValue(data, "Car Data", "Map", "n/a"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".TC", getMultiMapValue(data, "Car Data", "TC", "n/a"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".ABS", getMultiMapValue(data, "Car Data", "ABS", "n/a"))
+		knowledgeBase.addFact("Lap." . lapNumber . ".BB", getMultiMapValue(data, "Car Data", "BB", "n/a"))
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound", getMultiMapValue(data, "Car Data", "TyreCompound", "Dry"))
 		knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Compound.Color", getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black"))

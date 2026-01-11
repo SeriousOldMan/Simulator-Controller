@@ -96,7 +96,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right"
 														, "Data.Telemetry", "Data.Pressures", "Sectors.Time"
 														, "Engine.Temperature.Water", "Engine.Temperature.Oil"
-														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"]
+														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right", "BB"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
 										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"])
 
@@ -3657,6 +3657,7 @@ class SoloCenter extends ConfigurationItem {
 		lap.Map := getMultiMapValue(data, "Car Data", "Map", "n/a")
 		lap.TC := getMultiMapValue(data, "Car Data", "TC", "n/a")
 		lap.ABS := getMultiMapValue(data, "Car Data", "ABS", "n/a")
+		lap.BB := getMultiMapValue(data, "Car Data", "BB", "n/a")
 
 		lap.Weather := getMultiMapValue(data, "Weather Data", "Weather")
 		lap.Weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min")
@@ -4031,7 +4032,8 @@ class SoloCenter extends ConfigurationItem {
 								, "Unknown"
 								, getMultiMapValue(telemetry, "Car Data", "WaterTemperature", kNull)
 								, getMultiMapValue(telemetry, "Car Data", "OilTemperature", kNull)
-								, dataTyreLaps]
+								, dataTyreLaps
+								, getMultiMapValue(telemetry, "Car Data", "BB", "n/a")]
 
 				recentLap.State := "Unknown"
 				recentLap.TelemetryData := values2String("|||", telemetryData*)
@@ -5083,7 +5085,7 @@ class SoloCenter extends ConfigurationItem {
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
 			newLap := {Nr: lap["Nr"], Run: lap["Run"], LapTime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
 					 , Position: lap["Position"], Grip: lap["Grip"]
-					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"], State: lap["Lap.State"]
+					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"], BB: lap["BB"], State: lap["Lap.State"]
 					 , Weather: lap["Weather"], AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
@@ -5118,6 +5120,9 @@ class SoloCenter extends ConfigurationItem {
 
 			if isNull(newLap.ABS)
 				newLap.ABS := "n/a"
+
+			if isNull(newLap.BB)
+				newLap.BB := "n/a"
 
 			if isNull(newLap.EngineDamage)
 				newLap.EngineDamage := 0
@@ -6380,10 +6385,10 @@ class SoloCenter extends ConfigurationItem {
 			else if (report = "Custom") {
 				xChoices := ["Run", "Lap", "Lap.Time", "Lap.Valid"
 						   , "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
-						   , "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
+						   , "Map", "TC", "ABS", "BB", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Initial", "Fuel.Remaining", "Fuel.Consumption"
-							, "Lap.Time", "Lap.Valid", "Map", "TC", "ABS"
+							, "Lap.Time", "Lap.Valid", "Map", "TC", "ABS", "BB"
 							, "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
@@ -6632,7 +6637,7 @@ class SoloCenter extends ConfigurationItem {
 								  , "Fuel.Initial", null(lap.Run.FuelInitial), "Fuel.Consumption", null(lap.FuelConsumption)
 								  , "Fuel.Remaining", null(lap.FuelRemaining), "Lap.State", lap.State, "Lap.Valid", (lap.State != "Invalid")
 								  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
-								  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
+								  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS), "BB", null(lap.BB)
 								  , "Tyre.Compound", values2String(",", tyreCompound*)
 								  , "Tyre.Compound.Color", values2String(",", tyreCompoundColor*)
 								  , "Tyre.Set", lap.TyreSet

@@ -34,7 +34,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	static kLapDataSchemas := CaseInsenseMap("Telemetry", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
 														 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
 														 , "Compound", "Compound.Color", "Tyre.Laps", "Pressures", "Temperatures", "Wear", "State"
-														 , "Engine.Temperature.Water", "Engine.Temperature.Oil"])
+														 , "Engine.Temperature.Water", "Engine.Temperature.Oil", "BB"])
 
 	iRaceStrategist := false
 

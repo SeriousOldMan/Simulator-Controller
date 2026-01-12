@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None at the moment...
+[6.7.9.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Fm96aNiX/Releases/Simulator%20Controller%206.7.9.0-dev.zip) (Early build for 6.7.9. Changes: New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6790) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-679) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -126,7 +128,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
-35. [Scripting Assistant behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+35. [Scripting Assistant behavior](https://youtu.be/zu3WJwKBhj0) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
 

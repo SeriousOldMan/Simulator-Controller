@@ -111,7 +111,7 @@ class ACProvider extends SimulatorProvider {
 		local track := getMultiMapValue(data, "Session Data", "Track", "")
 		local layout := getMultiMapValue(data, "Session Data", "Layout", "")
 		local extension := ""
-		local forName, surName, nickName, name
+		local forname, surname, nickname, name
 
 		if ((getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
 		 && (getMultiMapValue(data, "Session Data", "SessionFormat", "Laps") = "Time")) {
@@ -134,12 +134,12 @@ class ACProvider extends SimulatorProvider {
 		setMultiMapValue(data, "Car Data", "TC", Round((getMultiMapValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
 		setMultiMapValue(data, "Car Data", "ABS", Round((getMultiMapValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 
-		forName := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
-		surName := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
-		nickName := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
+		forname := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
+		surname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+		nickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
 
-		if ((forName = surName) && (surName = nickName)) {
-			name := string2Values(A_Space, forName, 2)
+		if ((forname = surname) && (surname = nickname)) {
+			name := string2Values(A_Space, forname, 2)
 
 			if (isObject(name) && (name.Length > 0)) {
 				setMultiMapValue(data, "Stint Data", "DriverForname", name[1])

@@ -442,7 +442,8 @@ namespace SHMConnector
             strWriter.WriteLine("MAP=n/a");
             strWriter.WriteLine("TCRaw=" + physics.TC);
             strWriter.WriteLine("ABSRaw=" + physics.Abs);
-            
+            strWriter.WriteLine("BB=" + Math.Round(physics.BrakeBias * 100, 2));
+
             strWriter.Write("FuelRemaining="); strWriter.WriteLine(physics.Fuel);
 
             strWriter.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);

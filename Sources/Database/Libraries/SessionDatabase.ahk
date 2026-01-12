@@ -595,7 +595,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static registerDriver(simulator, id, name) {
-		local sessionDB, forName, surName, nickName, key
+		local sessionDB, forname, surname, nickname, key
 
 		static knownDrivers := CaseInsenseMap()
 
@@ -607,15 +607,15 @@ class SessionDatabase extends ConfigurationItem {
 			if !knownDrivers.Has(key) {
 				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(name, &forName, &surName, &nickName)
+				parseDriverName(name, &forname, &surname, &nickname)
 
 				try {
-					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
-						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
+					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forname, Surname: surname}}).Length = 0)
+						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forname, "Surname", surname, "Nickname", nickname), true)
 
 					knownDrivers[key] := true
 				}
@@ -630,6 +630,74 @@ class SessionDatabase extends ConfigurationItem {
 		SessionDatabase.registerDriver(simulator, id, name)
 	}
 
+	static getName(type, defaultForname := false, defaultSurname := "", defaultNickname := "") {
+		local name, scope
+
+		name := this.getProfileName(&scope)
+
+		if (type = "Profile")
+			return name
+		else if inList(scope, type)
+			return name
+		else if defaultForname
+			return driverName(defaultForname, defaultSurname, defaultNickname
+									, (defaultSurname != ""), (defaultNickname != ""))
+		else
+			return this.getUserName()
+	}
+
+	static hasProfileName() {
+		return FileExist(kUserConfigDirectory . "PROFILE")
+	}
+
+	static getProfileName(&types?) {
+		local configuration
+
+		static name := false
+		static scope := ["Conversation", "Driver", "Creator"]
+
+		if !isSet(types)
+			types := false
+
+		if (!name || (types = "Reload"))
+			if FileExist(kUserConfigDirectory . "PROFILE") {
+				configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+				name := getMultiMapValue(configuration, "User", "Name")
+				scope := []
+
+				do(["Conversation", "Driver", "Creator"], (type) {
+					if getMultiMapValue(configuration, "User", type, false)
+						scope.Push(type)
+				})
+			}
+			else {
+				name := this.getUserName()
+				scope := ["Conversation", "Driver", "Creator"]
+			}
+
+		types := scope
+
+		return name
+	}
+
+	static setProfileName(name, types) {
+		local configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+		setMultiMapValue(configuration, "User", "Name", name)
+
+		do(["Conversation", "Driver", "Creator"], (type) => removeMultiMapValue(configuration, "User", type))
+		do(types, (type) => setMultiMapValue(configuration, "User", type, true))
+
+		writeMultiMap(kUserConfigDirectory . "PROFILE", configuration)
+
+		this.getProfileName(&type := "Reload")
+	}
+
+	getProfileName(&types?) {
+		return SessionDatabase.getProfileName(&types)
+	}
+
 	static getUserName() {
 		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
 
@@ -641,22 +709,22 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getDriverIDs(simulator, name, sessionDB := false) {
-		local forName, surName, nickName, ids, ignore, entry
+		local forname, surname, nickname, ids, ignore, entry
 
 		try {
 			if (simulator && name) {
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(name, &forName, &surName, &nickName)
+				parseDriverName(name, &forname, &surname, &nickname)
 
 				if !sessionDB
 					sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				ids := []
 
-				for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
+				for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forname, Surname: surname}})
 					ids.Push(entry["ID"])
 
 				return ids
@@ -1191,27 +1259,72 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarCode(simulator, car)
 	}
 
-	getCarSteerLock(simulator, car, track) {
-		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car))
-		local steerLock
+	static getCarClass(simulator, car) {
+		return getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+							  , "Car Classes", car, false)
+	}
+
+	getCarClass(simulator, car) {
+		return SessionDatabase.getCarClass(simulator, car)
+	}
+
+	static getCarInformation(simulator, car, track, type) {
+		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car) . "." . type)
+		local value
 
 		static settingsDB := false
-		static steerLocks := CaseInsenseMap()
+		static values := CaseInsenseMap()
 
-		if steerLocks.Has(key)
-			return steerLocks[key]
+		if values.Has(key)
+			return values[key]
 
 		if !settingsDB
 			settingsDB := SettingsDatabase()
 
-		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car.SteerLock", kUndefined)
+		value := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car." . type, kUndefined)
 
-		if (steerLock == kUndefined)
-			steerLock := getCarSteerLock(simulator, car)
+		if (value == kUndefined)
+			value := %"getCar" . type%(simulator, car)
 
-		steerLocks[key] := steerLock
+		if (value = kUndefined)
+			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+									, "Car Information", car . "." . type, kUndefined)
 
-		return steerLock
+		values[key] := value
+
+		return value
+	}
+
+	static getCarSteerLock(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "SteerLock")
+	}
+
+	getCarSteerLock(simulator, car, track) {
+		return SessionDatabase.getCarSteerLock(simulator, car, track)
+	}
+
+	static getCarSteerRatio(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "SteerRatio")
+	}
+
+	getCarSteerRatio(simulator, car, track) {
+		return SessionDatabase.getCarSteerRatio(simulator, car, track)
+	}
+
+	static getCarWheelbase(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "Wheelbase")
+	}
+
+	getCarWheelbase(simulator, car, track) {
+		return SessionDatabase.getCarWheelbase(simulator, car, track)
+	}
+
+	static getCarTrackWidth(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "TrackWidth")
+	}
+
+	getCarTrackWidth(simulator, car, track) {
+		return SessionDatabase.getCarTrackWidth(simulator, car, track)
 	}
 
 	static registerTrack(simulator, car, track, shortName, longName) {
@@ -3124,42 +3237,42 @@ combineCompounds(&compounds, &compoundColors := false) {
 	}
 }
 
-parseDriverName(fullName, &forName, &surName, &nickName?) {
+parseDriverName(fullName, &forname, &surname, &nickname?) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)
 
-		nickName := Trim(StrReplace(fullName[2], ")", ""))
+		nickname := Trim(StrReplace(fullName[2], ")", ""))
 		fullName := fullName[1]
 	}
 	else
-		nickName := ""
+		nickname := ""
 
 	fullName := StrSplit(fullName, A_Space, " `t", 2)
 
 	if (fullName.Length > 0) {
-		forName := fullName[1]
-		surName := ((fullName.Length > 1) ? fullName[2] : "")
+		forname := fullName[1]
+		surname := ((fullName.Length > 1) ? fullName[2] : "")
 	}
 	else {
-		forName := ""
-		surName := ""
+		forname := ""
+		surname := ""
 	}
 }
 
-driverName(forName, surName, nickName := false) {
+driverName(forname, surname, nickname := false, withSurname := true, withNickname := true) {
 	local name := ""
 
-	if (forName != "")
-		name .= (forName . A_Space)
+	if (forname != "")
+		name .= (forname . A_Space)
 
-	if (surName != "")
-		name .= (surName . A_Space)
+	if (surname != "")
+		name .= (withSurname ? (surname . A_Space) : "")
 
-	if !nickName
-		nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+	if !nickname
+		nickname := (withNickname ? (SubStr(forname, 1, 1) . SubStr(surname, 1, 1)) : "")
 
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
+	if ((nickname != "") && withNickname)
+		name .= (translate("(") . nickname . translate(")"))
 
 	return Trim(name)
 }

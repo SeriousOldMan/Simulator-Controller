@@ -1594,15 +1594,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", 1)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("TC"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", 1)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("ABS"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", 2)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", translate("n/a"))
+		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
+
+		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("BB"))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VstrategyStartBBEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
 
 		x := 186
@@ -3445,6 +3449,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyStartMapEdit"].Text := strategy.Map
 		this.Control["strategyStartTCEdit"].Text := strategy.TC
 		this.Control["strategyStartABSEdit"].Text := strategy.ABS
+		this.Control["strategyStartBBEdit"].Text := strategy.BB
 
 		this.Control["strategyCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(strategy.TyreCompound, strategy.TyreCompoundColor)))
 

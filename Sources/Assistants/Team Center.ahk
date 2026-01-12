@@ -97,7 +97,7 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 														, "Penalty", "Time.Stint.Remaining", "Time.Driver.Remaining"
 														, "Lap.State", "Lap.Valid", "Sectors.Time"
 														, "Engine.Temperature.Water", "Engine.Temperature.Oil"
-														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"]
+														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right", "BB"]
 										   , "Pitstop.Data", ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 															, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 															, "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -2812,7 +2812,7 @@ class TeamCenter extends ConfigurationItem {
 				if !identifier
 					identifier := ""
 
-				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+				connection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 
 				if connection {
 					this.iConnection := connection
@@ -2888,7 +2888,7 @@ class TeamCenter extends ConfigurationItem {
 				if !identifier
 					identifier := ""
 
-				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+				this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 			}
 		}
 	}
@@ -3058,7 +3058,7 @@ class TeamCenter extends ConfigurationItem {
 			this.iSessionName := names[chosen]
 			this.iSessionIdentifier := identifier
 
-			this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Internal", identifier)
+			this.iConnection := this.Connector.Connect(this.ServerToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Internal", identifier)
 		}
 		else {
 			this.iSessionName := ""
@@ -3770,7 +3770,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	importSetups(fileName, clear) {
-		local directory, ignore, entry, candidate, forName, surName, cForName, cSurName, found
+		local directory, ignore, entry, candidate, forname, surname, cForname, cSurname, found
 
 		if clear
 			this.SessionStore.clear("Setups.Data")
@@ -3790,14 +3790,14 @@ class TeamCenter extends ConfigurationItem {
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
 				entry := entry.Clone()
 
-				parseDriverName(entry["Driver"], &forName, &surName, &ignore := false)
+				parseDriverName(entry["Driver"], &forname, &surname, &ignore := false)
 
 				found := false
 
 				for ignore, candidate in getKeys(this.SessionDrivers) {
-					parseDriverName(candidate, &cForName, &cSurName, &ignore := false)
+					parseDriverName(candidate, &cForname, &cSurname, &ignore := false)
 
-					if ((forName = cForName) && (surName = cSurName)) {
+					if ((forname = cForname) && (surname = cSurname)) {
 						entry["Driver"] := candidate
 
 						found := true
@@ -3968,8 +3968,8 @@ class TeamCenter extends ConfigurationItem {
 
 	updatePlanFromStrategy() {
 		local pitstops, pitstop, numStints, time, currentTime, last, lastTime, msgResult, translator
-		local driver, forName, surName, nickName, found, ignore, candidate
-		local sForName, sSurName, sNickName
+		local driver, forname, surname, nickname, found, ignore, candidate
+		local sForname, sSurname, sNickname
 
 		if this.Strategy {
 			loop this.PlanListView.GetCount()
@@ -4063,22 +4063,22 @@ class TeamCenter extends ConfigurationItem {
 				else
 					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index - 1].DriverName)
 
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(driver, &forName, &surName, &nickName)
+				parseDriverName(driver, &forname, &surname, &nickname)
 
 				found := false
 
 				for ignore, candidate in getKeys(this.SessionDrivers) {
-					sForName := false
-					sSurName := false
-					sNickName := false
+					sForname := false
+					sSurname := false
+					sNickname := false
 
-					parseDriverName(candidate, &sForName, &sSurName, &sNickName)
+					parseDriverName(candidate, &sForname, &sSurname, &sNickname)
 
-					if ((sForName = forName) && (sSurName = surName)) {
+					if ((sForname = forname) && (sSurname = surname)) {
 						found := true
 						driver := candidate
 
@@ -4482,7 +4482,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	getDriver(stintNr) {
-		local stint, driver, ignore, candidate, forName, surName, nickName
+		local stint, driver, ignore, candidate, forname, surname, nickname
 
 		loop this.PlanListView.GetCount() {
 			stint := this.PlanListView.GetText(A_Index, 1)
@@ -4492,13 +4492,13 @@ class TeamCenter extends ConfigurationItem {
 
 				for ignore, candidate in getKeys(this.SessionDrivers)
 					if (driver = candidate) {
-						forName := ""
-						surName := ""
-						nickName := ""
+						forname := ""
+						surname := ""
+						nickname := ""
 
-						parseDriverName(candidate, &forName, &surName, &nickName)
+						parseDriverName(candidate, &forname, &surname, &nickname)
 
-						return this.createDriver({Forname: forName, Surname: surName, Nickname: nickName, Identifier: this.SessionDrivers[candidate]})
+						return this.createDriver({Forname: forname, Surname: surname, Nickname: nickname, Identifier: this.SessionDrivers[candidate]})
 					}
 			}
 		}
@@ -7226,9 +7226,10 @@ class TeamCenter extends ConfigurationItem {
 				else
 					lap.RemainingStintTime := Round(lap.RemainingStintTime / 1000)
 
-			lap.Map := getMultiMapValue(data, "Car Data", "Map")
-			lap.TC := getMultiMapValue(data, "Car Data", "TC")
-			lap.ABS := getMultiMapValue(data, "Car Data", "ABS")
+			lap.Map := getMultiMapValue(data, "Car Data", "Map", "n/a")
+			lap.TC := getMultiMapValue(data, "Car Data", "TC", "n/a")
+			lap.ABS := getMultiMapValue(data, "Car Data", "ABS", "n/a")
+			lap.BB := getMultiMapValue(data, "Car Data", "BB", "n/a")
 
 			lap.Weather := getMultiMapValue(data, "Weather Data", "Weather")
 			lap.Weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min")
@@ -7897,7 +7898,7 @@ class TeamCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local tyreChange := true
 		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
-		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
+		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row, bb
 		local tyreCompound, tyreCompoundColor, mixedCompounds, index, tyre, axle, compounds, tyreLaps
 
 		wasPitstop(lap, &tyreChange := false) {
@@ -8052,7 +8053,8 @@ class TeamCenter extends ConfigurationItem {
 														  , false, false
 														  , "Unknown"
 														  , getMultiMapValue(telemetry, "Car Data", "WaterTemperature", kNull)
-														  , getMultiMapValue(telemetry, "Car Data", "OilTemperature", kNull))
+														  , getMultiMapValue(telemetry, "Car Data", "OilTemperature", kNull)
+														  , getMultiMapValue(telemetry, "Car Data", "BB", "n/a"))
 					}
 					else
 						telemetryData := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-", wasPitstop(lap), "n/a", "n/a", "n/a", "-", "-", ",,,", ",,,", "null,null,null,null", false, false, "Unknown")
@@ -8083,7 +8085,7 @@ class TeamCenter extends ConfigurationItem {
 				runningLap += 1
 
 				if (telemetryData.Length >= 24)
-					tyreLaps := tyreLaps := telemetryData[24]
+					tyreLaps := telemetryData[24]
 				else
 					tyreLaps := values2String(",", runningLap, runningLap, runningLap, runningLap)
 
@@ -8095,9 +8097,12 @@ class TeamCenter extends ConfigurationItem {
 				else
 					wear := [kNull, kNull, kNull, kNull]
 
+				bb := ((telemetryData.Length > 23) ? telemetryData[24] : kNull)
+
 				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 										, telemetryData[14], telemetryData[15]
-										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+										, telemetryData[11], telemetryData[12], telemetryData[13], bb
+										, telemetryData[7], telemetryData[8], telemetryData[9]
 										, driverID)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
@@ -8119,6 +8124,9 @@ class TeamCenter extends ConfigurationItem {
 					theLap.WaterTemperature := telemetryData[22]
 					theLap.OilTemperature := telemetryData[23]
 				}
+
+				if (telemetryData.Length > 23)
+					theLap.BB := telemetryData[24]
 
 				row := theLap.Row
 
@@ -9983,7 +9991,7 @@ class TeamCenter extends ConfigurationItem {
 				info := newMultiMap()
 
 				setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+				setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 
 				setMultiMapValue(info, "Session", "Team", this.SelectedTeam)
 				setMultiMapValue(info, "Session", "Session", this.SelectedSession)
@@ -10058,7 +10066,7 @@ class TeamCenter extends ConfigurationItem {
 
 							if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 								setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
-								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getUserName())
+								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 							}
 
 							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {
@@ -10134,7 +10142,7 @@ class TeamCenter extends ConfigurationItem {
 			newLap := {Nr: lap["Nr"], Row: false, Stint: lap["Stint"], Laptime: lap["Lap.Time"], SectorsTime: lap["Sectors.Time"]
 					 , State: lap["Lap.State"], Valid: lap["Lap.Valid"]
 					 , Position: lap["Position"], Grip: lap["Grip"]
-					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"]
+					 , Map: lap["Map"], TC: lap["TC"], ABS: lap["ABS"], BB: lap["BB"]
 					 , Weather: lap["Weather"], AirTemperature: lap["Temperature.Air"], TrackTemperature: lap["Temperature.Track"]
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
@@ -10166,6 +10174,9 @@ class TeamCenter extends ConfigurationItem {
 
 			if isNull(newLap.ABS)
 				newLap.ABS := "n/a"
+
+			if isNull(newLap.BB)
+				newLap.BB := "n/a"
 
 			if isNull(newLap.EngineDamage)
 				newLap.EngineDamage := 0
@@ -11702,11 +11713,11 @@ class TeamCenter extends ConfigurationItem {
 			else if (report = "Custom") {
 				xChoices := ["Stint", "Lap", "Lap.Time"
 						   , "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
-						   , "Map", "TC", "ABS", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
+						   , "Map", "TC", "ABS", "BB", "Temperature.Air", "Temperature.Track", "Tyre.Wear.Average", "Brake.Wear.Average"]
 
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Fuel.Consumption", "Lap.Time"
 						    , "Tyre.Laps.Front.Left", "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right"
-							, "Map", "TC", "ABS"
+							, "Map", "TC", "ABS", "BB"
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
@@ -11949,7 +11960,7 @@ class TeamCenter extends ConfigurationItem {
 										  , "Damage", lap.Damage, "EngineDamage", lap.EngineDamage, "Accident", lap.Accident, "Penalty", lap.Penalty
 										  , "Fuel.Consumption", null(lap.FuelConsumption), "Fuel.Remaining", null(lap.FuelRemaining)
 										  , "Weather", lap.Weather, "Temperature.Air", null(lap.AirTemperature), "Temperature.Track", null(lap.TrackTemperature)
-										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS)
+										  , "Grip", lap.Grip, "Map", null(lap.Map), "TC", null(lap.TC), "ABS", null(lap.ABS), "BB", null(lap.BB)
 										  , "Tyre.Compound", values2String(",", collect(lap.Compounds, compound)*)
 										  , "Tyre.Compound.Color", values2String(",", collect(lap.Compounds, compoundColor)*)
 										  , "Time.Stint.Remaining", lap.RemainingStintTime, "Time.Driver.Remaining", lap.RemainingDriverTime
@@ -12951,7 +12962,7 @@ class TeamCenter extends ConfigurationItem {
 					delta := Round(result[1]["Delta"], 1)
 				}
 
-				driver := driverName(driverFornames[index] , driverSurnames[index], driverNickNames[index])
+				driver := driverName(driverFornames[index] , driverSurnames[index], driverNicknames[index])
 
 				if (driverCategories && (driverCategories[index] != "Unknown"))
 					driver .= (translate(" [") . translate(driverCategories[index]) . translate("]"))
@@ -14893,7 +14904,7 @@ loadDrivers(connector, team) {
 			try {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[driverName(driver.ForName, driver.SurName, driver.NickName)] := driver.Identifier
+				drivers[driverName(driver.Forname, driver.Surname, driver.Nickname)] := driver.Identifier
 			}
 			catch Any as exception {
 				logError(exception, true)

@@ -22,11 +22,37 @@ The next button with the small keyboard symbol opens the documentation of all av
 
 Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
 
-## Managing your *privacy*
+## User profile
 
-Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.
+In this dialog, which can be accessed by clicking on the small button with the small person icon in the upper right corner of "Simulator Startup", you can specify personal information and manage various data consents which will, if given, support the further development of Simulator Controller. Lastly, you can share data with the community for which you will receive valuable data in return.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile.JPG)
+
+## Changing your name
+
+In the upper section of the profile dialog you can change your name and define where this name will be used. Normally, the driver name which is provided by the simulator API, when you run Simulator Controller for the first time, will be remembered and will be used whenever no other name can be derived, for example, by calling the active simulator.
+
+But this default name can be changed and you can specify where this alternative name should be used. Currently, three different areas are supported:
+
+1. *Conversation*
+
+   The name will be used for the conversation with the Assistants, i.e. that will be the name, you will be called by them.
+
+2. *Driver*
+
+   Some simulators do not provide a name for the current driver in all situations. In this case, the alternative name can be used.
+
+3. *Data*
+
+   Whenever a data entry is created in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), this entry will be associated with a name as its creator. The alternative name can be used for this purpose as well.
+   
+As said, by default the first name that has been found will be used for all these purposes. If you want to change that, provide an alternative name in the *User* field of the profile dialog and click on the "Use..." button to select where this name should be used.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile%20Scope.JPG)
+
+## Data *privacy* settings
+
+Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can manage all this in the lower section of the profile dialog.
 
 - **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
 

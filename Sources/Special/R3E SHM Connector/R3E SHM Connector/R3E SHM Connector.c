@@ -360,6 +360,12 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			writeString(result, "MAP=", &pos); writeNAValue(result, map_buffer->engine_map_setting, &pos); writeLine(result, &pos);
 			writeString(result, "TC=", &pos); writeNAValue(result, map_buffer->aid_settings.tc, &pos); writeLine(result, &pos);
 			writeString(result, "ABS=", &pos); writeNAValue(result, map_buffer->aid_settings.abs, &pos); writeLine(result, &pos);
+			writeString(result, "BB=", &pos); 
+			if (map_buffer->brake_bias == -1)
+				writeString(result, "n/a", &pos);
+			else
+				writeFloat(result, (1 - round(map_buffer->brake_bias * 10000) / 10000) * 100, &pos);
+			writeLine(result, &pos);
 
 			writeString(result, "BodyworkDamage=", &pos);
 			writeFloat(result, 0.0, &pos); writeString(result, ", ", &pos);

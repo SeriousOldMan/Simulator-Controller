@@ -674,20 +674,20 @@ class LMURESTProvider {
 
 		setDriver(name) {
 			local driver := this.lookup("DRIVER:")
-			local index, candidate, forName, surName, cForName, cSurName, ignore, length, cLength
+			local index, candidate, forname, surname, cForname, cSurname, ignore, length, cLength
 
 			if driver {
-				parseDriverName(name, &forName, &surName, &ignore)
+				parseDriverName(name, &forname, &surname, &ignore)
 
-				length := StrLen(forName)
+				length := StrLen(forname)
 
 				for index, candidate in driver["settings"] {
-					parseDriverName(candidate["text"], &cForName, &cSurName, &ignore)
+					parseDriverName(candidate["text"], &cForname, &cSurname, &ignore)
 
-					cLength := StrLen(cForName)
+					cLength := StrLen(cForname)
 
-					if ((surName = cSurName) && ((length > cLength) ? (SubStr(forName, 1, cLength) = cForName)
-																	: (forName = SubStr(cForName, 1, length)))) {
+					if ((surname = cSurname) && ((length > cLength) ? (SubStr(forname, 1, cLength) = cForname)
+																	: (forname = SubStr(cForname, 1, length)))) {
 						driver["currentSetting"] := (index - 1)
 
 						break
@@ -1390,7 +1390,7 @@ class LMURESTProvider {
 				if (isSet(id) && this.TeamData.TeamSession)
 					return this.TeamData.Drivers[id]
 				else
-					return SessionDatabase.getUserName()
+					return SessionDatabase.getDriverName("Le Mans Ultimate", SessionDatabase.ID)
 			}
 		}
 

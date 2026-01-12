@@ -162,7 +162,7 @@ class RaceReportReader {
 		local tCategories := driverCategories
 		local tTimes := true
 		local classes := CaseInsenseMap()
-		local driver, category, forName, surName, nickName, position, carClass
+		local driver, category, forname, surname, nickname, position, carClass
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -237,20 +237,20 @@ class RaceReportReader {
 						if carNames
 							carNames.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-						forName := false
-						surName := false
-						nickName := false
+						forname := false
+						surname := false
+						nickname := false
 
-						parseDriverName(drivers[1][A_Index], &forName, &surName, &nickName)
+						parseDriverName(drivers[1][A_Index], &forname, &surname, &nickname)
 
 						if driverFornames
-							driverFornames.Push(forName)
+							driverFornames.Push(forname)
 
 						if driverSurnames
-							driverSurnames.Push(surName)
+							driverSurnames.Push(surname)
 
 						if driverNicknames
-							driverNicknames.Push(nickName)
+							driverNicknames.Push(nickname)
 
 						if driverCategories
 							driverCategories.Push(tCategories[1][A_Index])

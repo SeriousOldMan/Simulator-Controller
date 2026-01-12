@@ -89,6 +89,7 @@ class StrategyViewer {
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("ABS:") . "</b></td><td>" . strategy.ABS . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("BB:") . "</b></td><td>" . strategy.BB . "</td></tr>")
 		html .= "</table>"
 
 		return html

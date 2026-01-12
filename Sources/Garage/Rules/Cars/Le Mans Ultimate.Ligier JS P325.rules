@@ -12,6 +12,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: addSettings("Le Mans Ultimate", "Ligier JS P325",
-									 [Bumpstop.Range.Front.Heave, Bumpstop.Range.Rear.Heave,
+									 [Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
+									  Bumpstop.Range.Front.Heave, Bumpstop.Range.Rear.Heave,
 									  Differential.Coast, Differential.Power])),
-				 (Prove: removeSettings("Le Mans Ultimate", "Ligier JS P325", [Aero.Splitter.Front]))
+				 (Prove: removeSettings("Le Mans Ultimate", "Ligier JS P325", [Electronics.Map, Aero.Splitter.Front]))

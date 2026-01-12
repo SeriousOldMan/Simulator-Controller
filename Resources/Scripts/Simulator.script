@@ -30,11 +30,11 @@ Simulator = {}
 Simulator.Read = function (simulator, ...)
 	local arguments = table.pack(...)
 	
-	return __read_simulator(simulator, tables.unpack(arguments))
+	return __read_simulator(simulator, table.unpack(arguments))
 end
 
 Simulator.Call = function (simulator, ...)
 	local arguments = table.pack(...)
 	
-	return __call_simulator(simulator, tables.unpack(arguments))
+	return __call_simulator(simulator, table.unpack(arguments))
 end

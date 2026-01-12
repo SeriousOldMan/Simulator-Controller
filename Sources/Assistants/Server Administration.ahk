@@ -317,7 +317,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				token := false
 
 			if token {
-				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getUserName(), "Admin")
+				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Admin")
 
 				administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 

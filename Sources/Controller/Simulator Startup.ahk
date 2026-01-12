@@ -1673,8 +1673,36 @@ loadStartupProfiles(target, fileName := false) {
 
 editProfile(launchPadOrCommand := false, *) {
 	local profileGui, settings, errorLogsDropDown, usageStatsDropDown, sessionDataDropDown, x, y
+	local name
 
 	static result := false
+	static scope
+
+	chooseScope(*) {
+		local scopeMenu := Menu()
+		local ignore, name
+
+		updateScope(name, *) {
+			local index := inList(scope, name)
+
+			if index
+				scope.RemoveAt(index)
+			else
+				scope.Push(name)
+		}
+
+		for ignore, name in ["Conversation", "Driver", "Data"] {
+			scopeMenu.Add(translate(name), updateScope.Bind(name))
+
+			if inList(scope, name)
+				scopeMenu.Check(translate(name))
+		}
+
+		scopeMenu.Add()
+		scopeMenu.Add(translate("Cancel"), (*) => true)
+
+		scopeMenu.Show( , , true)
+	}
 
 	if (launchPadOrCommand == kOk)
 		result := kOk
@@ -1694,14 +1722,26 @@ editProfile(launchPadOrCommand := false, *) {
 		profileGui.SetFont("Norm", "Arial")
 
 		profileGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Profile")
-					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile")
 
 		profileGui.SetFont("Norm", "Arial")
 
 		profileGui.Add("Text", "x8 yp+25 w342 0x10")
 
-		profileGui.Add("Text", "x16 yp+10 w90 +0x200", translate("Driver"))
-		profileGui.Add("Text", "x110 yp w240", SessionDatabase.getUserName())
+		if SessionDatabase.hasProfileName() {
+			name := SessionDatabase.getProfileName(&scope)
+
+			scope := collect(scope, (s) => ((s = "Creator") ? "Data" : s))
+		}
+		else {
+			name := SessionDatabase.getUserName()
+
+			scope := ["Conversation", "Driver", "Data"]
+		}
+
+		profileGui.Add("Text", "x16 yp+10 w73 h23 +0x200", translate("User"))
+		profileGui.Add("Edit", "x110 yp w118 vprofileName", name)
+		profileGui.Add("Button", "x230 yp w115 h23 w120", translate("Use") . translate("...")).OnEvent("Click", chooseScope)
 
 		profileGui.SetFont("Italic", "Arial")
 
@@ -1769,6 +1809,9 @@ editProfile(launchPadOrCommand := false, *) {
 				setMultiMapValue(settings, "Diagnostics", "Session", (sessionDataDropDown.Value = 1))
 
 				writeMultiMap(kUserConfigDirectory . "Core Settings.ini", settings)
+
+				SessionDatabase.setProfileName(profileGui["profileName"].Text
+											 , collect(scope, (s) => ((s = "Data") ? "Creator" : s)))
 
 				return true
 			}
@@ -1873,7 +1916,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			for ignore, identifier in identifiers {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
+				drivers[driverName(driver["Forname"], driver["Surname"], driver["Nickname"])] := driver["Identifier"]
 			}
 		}
 
@@ -2613,7 +2656,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 				try {
 					connector.Initialize(serverURL, serverToken)
 
-					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getUserName(), "Driver")
+					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Driver")
 
 					if (connection && (connection != "")) {
 						settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")

@@ -1549,6 +1549,7 @@ class Strategy extends ConfigurationItem {
 	iMap := "n/a"
 	iTC := "n/a"
 	iABS := "n/a"
+	iBB := "n/a"
 
 	iStartStint := 1
 	iStartLap := 0
@@ -1611,7 +1612,7 @@ class Strategy extends ConfigurationItem {
 	iLastStintWeight := 0
 
 	iDriver := false
-	iDriverName := SessionDatabase.getUserName()
+	iDriverName := SessionDatabase.getName("Driver")
 
 	iPitstops := []
 
@@ -1621,7 +1622,7 @@ class Strategy extends ConfigurationItem {
 		iLap := 0
 
 		iDriver := false
-		iDriverName := SessionDatabase.getUserName()
+		iDriverName := SessionDatabase.getName("Driver")
 
 		iTime := 0
 		iDuration := 0
@@ -2076,7 +2077,7 @@ class Strategy extends ConfigurationItem {
 			super.loadFromConfiguration(configuration)
 
 			this.iDriver := getMultiMapValue(configuration, "Pitstop", "Driver." . lap, false)
-			this.iDriverName := getMultiMapValue(configuration, "Pitstop", "DriverName." . lap, SessionDatabase.getUserName())
+			this.iDriverName := getMultiMapValue(configuration, "Pitstop", "DriverName." . lap, SessionDatabase.getName("Driver"))
 
 			this.iTime := getMultiMapValue(configuration, "Pitstop", "Time." . lap, 0)
 			this.iDuration := getMultiMapValue(configuration, "Pitstop", "Duration." . lap, 0)
@@ -2311,6 +2312,12 @@ class Strategy extends ConfigurationItem {
 	ABS {
 		Get {
 			return this.iABS
+		}
+	}
+
+	BB {
+		Get {
+			return this.iBB
 		}
 	}
 
@@ -3189,6 +3196,7 @@ class Strategy extends ConfigurationItem {
 		this.iMap := getMultiMapValue(configuration, "Setup", "Map", "n/a")
 		this.iTC := getMultiMapValue(configuration, "Setup", "TC", "n/a")
 		this.iABS := getMultiMapValue(configuration, "Setup", "ABS", "n/a")
+		this.iBB := getMultiMapValue(configuration, "Setup", "BB", "n/a")
 
 		this.iStartStint := getMultiMapValue(configuration, "Session", "StartStint", 1)
 		this.iStartLap := getMultiMapValue(configuration, "Session", "StartLap", 0)
@@ -3219,7 +3227,7 @@ class Strategy extends ConfigurationItem {
 		this.iFuelConsumption := getMultiMapValue(configuration, "Strategy", "FuelConsumption", 0)
 
 		this.iDriver := getMultiMapValue(configuration, "Strategy", "Driver", false)
-		this.iDriverName := getMultiMapValue(configuration, "Strategy", "DriverName", SessionDatabase.getUserName())
+		this.iDriverName := getMultiMapValue(configuration, "Strategy", "DriverName", SessionDatabase.getName("Driver"))
 
 		for ignore, lap in string2Values(",", getMultiMapValue(configuration, "Strategy", "Pitstops", ""))
 			this.Pitstops.Push(this.createPitstop(this.StartStint + A_Index - 1, lap, this.Driver
@@ -3337,6 +3345,7 @@ class Strategy extends ConfigurationItem {
 		setMultiMapValue(configuration, "Setup", "Map", this.Map)
 		setMultiMapValue(configuration, "Setup", "TC", this.TC)
 		setMultiMapValue(configuration, "Setup", "ABS", this.ABS)
+		setMultiMapValue(configuration, "Setup", "BB", this.BB)
 
 		setMultiMapValue(configuration, "Session", "StartStint", this.StartStint)
 		setMultiMapValue(configuration, "Session", "StartLap", this.StartLap)

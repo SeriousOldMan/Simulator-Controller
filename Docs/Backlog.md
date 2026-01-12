@@ -1,11 +1,10 @@
 #### General
   1. Support for unit conversions per simulator
   2. Make the location of the local data folder configurable during installation process
-  3. Make the driver name editable in the profile dialog
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Full support for hybrid and fully electric cars
+  2. Full support for fully electric cars
   3. Support for new and also historic simulators
   4. Work around the jumping lap counter in *rFactor 2* and *Le Mans Ultimate* after an RTG in practice
   5. Support for Time *or* Laps session format
@@ -27,8 +26,7 @@
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
   3. Engineer's Diary with change history, lap times after change, notes and so on
-  4. Support for crucial meta data like steer lock, wheelbase, etc. for all sims
-
+  
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation

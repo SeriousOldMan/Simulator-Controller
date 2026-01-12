@@ -1,8 +1,14 @@
-This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
+This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). They also can be called as a response to a button press, of course.
+
+Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
 
 	require("Session")
 
-After the module references, several examples are provided which demonstrate some of the provided functionality.
+Additionally, the execution environment includes the special function *extern* which can be used to reference any global function or object in the host process.
+
+	local MsgBox = extern("MsgBox")
+
+After the module references below, several examples are provided which demonstrate some of the provided functionality.
 
 ## Module *Environment*
 
@@ -283,7 +289,7 @@ And here comes an example how to use a *Lua* script as an action for a button on
 		w = string.gsub(w, "=", "")
 		w = string.match(w, "[%d%p]+")
 		
-		return tonumber(w) * 100.0
+		return tonumber(w)
 	end
 
 	repeat

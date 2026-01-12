@@ -35,6 +35,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you probably want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 6.7.9
+
+Nothing to do.
+
+***
+
 ## Release 6.7.8
 
 1. [Optional] If you are using the dark Windows 11 them and have added some of the Simulator Controller to your Windows task bar, you can use the Windows "Disk Cleanup" application to clear the "Tumbnails", so that the Explorer reloads the icons from all applications. On WIndows 11, you can achieve the same on the System > Storage page of the Windows settings.

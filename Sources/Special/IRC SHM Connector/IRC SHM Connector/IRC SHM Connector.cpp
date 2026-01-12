@@ -742,7 +742,7 @@ void writePositions(std::ostringstream* output, const irsdk_header *header, cons
 					if (((float*)trackPositions)[carIndex] >= 0)
 						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=" + std::to_string(((float*)trackPositions)[carIndex]));
 					else
-						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=^0");
+						printLine(output, "Car." + std::string(carIdx1) + ".Lap.Running=0");
 
 				if (trackLocations) {
 					irsdk_TrkLoc location = ((irsdk_TrkLoc*)trackLocations)[carIndex];
@@ -1031,6 +1031,12 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			print(output, "MAP="); printDataNAFloat(output, header, data, "dcEnginePower"); printLine(output, "");
 			print(output, "TC="); printDataNAFloat(output, header, data, "dcTractionControl"); printLine(output, "");
 			print(output, "ABS="); printDataNAFloat(output, header, data, "dcABS"); printLine(output, "");
+			print(output, "BB=");
+			if (getDataValue(result, header, data, "dcBrakeBias"))
+				print(output, std::to_string(round(atof(result) * 10000) / 10000));
+			else
+				print(output, "n/a");
+			printLine(output, "");
 
 			printLine(output, "BodyworkDamage=0,0,0,0,0");
 			printLine(output, "SuspensionDamage=0,0,0,0");

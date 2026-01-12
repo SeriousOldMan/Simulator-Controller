@@ -281,7 +281,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			for ignore, identifier in identifiers {
 				driver := parseObject(connector.GetDriver(identifier))
 
-				drivers[driverName(driver["ForName"], driver["SurName"], driver["NickName"])] := driver["Identifier"]
+				drivers[driverName(driver["Forname"], driver["Surname"], driver["Nickname"])] := driver["Identifier"]
 			}
 		}
 
@@ -1370,7 +1370,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				connector.Initialize(serverURL, serverToken)
 
 				connection := connector.Connect(serverToken, SessionDatabase.ID
-											  , gSimulator ? SessionDatabase.getDriverName(gSimulator, SessionDatabase.ID) : SessionDatabase.getUserName()
+											  , gSimulator ? SessionDatabase.getDriverName(gSimulator, SessionDatabase.ID) : SessionDatabase.getName("Driver")
 											  , "Driver")
 
 				if (connection && (connection != "")) {

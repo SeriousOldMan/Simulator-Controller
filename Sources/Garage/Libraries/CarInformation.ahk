@@ -13,11 +13,11 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Public Functions Section                        ;;;
+;;;                        Private Functions Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getCarSteerLock(simulator, car) {
-	local fileName
+getCarInformation(simulator, car, type) {
+	local fileName, value
 
 	simulator := SettingsDatabase.getSimulatorName(simulator)
 	car := SettingsDatabase.getCarName(simulator, car)
@@ -27,12 +27,33 @@ getCarSteerLock(simulator, car) {
 	if FileExist(fileName) {
 		configuration := readMultiMap(fileName)
 
-		steerLock := getMultiMapValue(configuration, "Setup.General", "SteerLock", kUndefined)
+		value := getMultiMapValue(configuration, "Setup.General", type, kUndefined)
 
-		if (steerLock != kUndefined)
-			return steerLock
+		if (value != kUndefined)
+			return value
 	}
 
 	return getMultiMapValue(readMultiMap(kUserConfigDirectory . "Issue Collector.ini"), "Settings"
-						  , (simulator . "." . car . ".*.") . "SteerLock", false)
+						  , (simulator . "." . car . ".*.") . type, false)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Public Functions Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+getCarSteerLock(simulator, car) {
+	return getCarInformation(simulator, car, "SteerLock")
+}
+
+getCarSteerRatio(simulator, car) {
+	return getCarInformation(simulator, car, "SteerRatio")
+}
+
+getCarWheelbase(simulator, car) {
+	return getCarInformation(simulator, car, "Wheelbase")
+}
+
+getCarTrackWidth(simulator, car) {
+	return getCarInformation(simulator, car, "TrackWidth")
 }

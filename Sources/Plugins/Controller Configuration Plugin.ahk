@@ -417,7 +417,7 @@ class FunctionsList extends ConfigurationItemList {
 
 	computeHotkeysAndActionText(hotkeys, action) {
 		if (hotKeys && (hotkeys != ""))
-			return (hotkeys . ((action == "") ? "" : (" => " . action)))
+			return (hotkeys . ((action == "") ? "" : (" -> " . action)))
 		else if (action != "")
 			return action
 		else

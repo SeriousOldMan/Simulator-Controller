@@ -7393,7 +7393,8 @@ editLaps(editorOrCommand, arguments*) {
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
 			  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
-			  , (entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"]]
+			  , (entry["ABS"] = kNull) ? translate("n/a") : entry["ABS"]
+			  , (entry["BB"] = kNull) ? translate("n/a") : entry["BB"]]
 	}
 
 	loadTyres(entry) {
@@ -7684,7 +7685,7 @@ editLaps(editorOrCommand, arguments*) {
 
 		electronicsListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
 													 , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
-															  , "Consumption", "Lap Time", "Map", "TC", "ABS"], translate))
+															  , "Consumption", "Lap Time", "Map", "TC", "ABS", "BB"], translate))
 		electronicsListView.OnEvent("Click", noSelect)
 		electronicsListView.OnEvent("DoubleClick", noSelect)
 		electronicsListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))

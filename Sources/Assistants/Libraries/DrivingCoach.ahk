@@ -400,7 +400,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if (getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, kUndefined) != kUndefined)
 				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
 			else
-				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[options["Language"]], "Instructions", instruction)
+				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[this.VoiceManager.Language["Original"]], "Instructions", instruction)
 
 		laps := InStr(options["Driving Coach.Instructions.Stint"], "%laps:")
 
@@ -533,7 +533,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Stint":
 				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
-					language := this.Options["Language"]
+					language := this.VoiceManager.Language["Original"]
 					position := this.getPosition(false, "Class")
 
 					if ((position != 0) && (this.Laps.Count > 0)) {

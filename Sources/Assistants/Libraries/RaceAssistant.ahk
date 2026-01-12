@@ -984,7 +984,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (language != kUndefined) {
 			listener := ((speaker != false) ? listener : false)
 
-			options["Language"] := ((language == true) ? options["Language"] : language)
+			options["Language"] := ((language == false) ? "EN" : ((language == true) ? options["Language"] : language))
 			options["Translator"] := ((translator == true) ? options["Translator"] : translator)
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
 			options["Speaker"] := speaker ; ((speaker == true) ? options["Speaker"] : speaker)

@@ -60,9 +60,6 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Automobilista 2 (by @inthebagbud UK; no setup editor support)
 	  - to be defined...
 
-New car models for "Setup Workbench"
-
-
 # Release history
 
 ## 6.7.7.1

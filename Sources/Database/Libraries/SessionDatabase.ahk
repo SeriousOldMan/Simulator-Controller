@@ -1290,7 +1290,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (!value || (value = kUndefined))
 			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
-									, "Car Information", carCode . "." . type, kUndefined)
+									, "Car Information", carCode . "." . type, false)
 
 		values[key] := value
 

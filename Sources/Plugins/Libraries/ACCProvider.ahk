@@ -153,16 +153,17 @@ class ACCProvider extends SimulatorProvider {
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local standingsData, session
-		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
+		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate
+		local carID, carClass, carModel
 
 		static carIDs := false
-		static carCategories := false
+		; static carCategories := false
 
 		if !carIDs {
 			ACCProvider.requireCarDatabase()
 
 			carIDs := getMultiMapValues(ACCProvider.sCarData, "Car IDs")
-			carCategories := getMultiMapValues(ACCProvider.sCarData, "Car Categories")
+			; carCategories := getMultiMapValues(ACCProvider.sCarData, "Car Categories")
 		}
 
 		try {
@@ -200,15 +201,21 @@ class ACCProvider extends SimulatorProvider {
 				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID != kUndefined) {
+					; setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+					;			     , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
+					
+					carClass := SessionDatabase.getCarClass(this.Simulator, carID)
+					
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
-								   , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
+								   , carClass ? carClass : ACCProvider.kUnknown)
+						
 
-					car := (carIDs.Has(carID) ? carIDs[carID] : ACCProvider.kUnknown)
+					carModel := (carIDs.Has(carID) ? carIDs[carID] : ACCProvider.kUnknown)
 
-					if ((car = ACCProvider.kUnknown) && isDebug())
+					if ((carModel = ACCProvider.kUnknown) && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", car)
+					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", carModel)
 
 					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 						driverCar := A_Index

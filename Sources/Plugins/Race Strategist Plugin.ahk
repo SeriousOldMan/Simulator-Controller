@@ -336,7 +336,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	}
 
 	saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 			  , compound, compoundColor, tyreLaps, pressures, temperatures, wear, lapState
 			  , waterTemperature, oilTemperature) {
 		local teamServer := this.TeamServer
@@ -351,7 +351,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 												    , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												    , compound, compoundColor
 													, pressures, temperatures, wear, createGUID(), createGUID(), lapState
-													, waterTemperature, oilTemperature, tyreLaps))
+													, waterTemperature, oilTemperature, tyreLaps, bb))
 		else {
 			pid := ProcessExist("Solo Center.exe")
 
@@ -359,7 +359,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 				messageSend(kFileMessage, "Solo Center", "updateTelemetry:" . values2String(";", lapNumber, simulator, car, track, weather
 																							   , airTemperature, trackTemperature
 																							   , fuelConsumption, fuelRemaining, lapTime, pitstop
-																							   , map, tc, abs
+																							   , map, tc, abs, bb
 																							   , compound, compoundColor, tyreLaps
 																							   , pressures, temperatures
 																							   , wear, lapState, waterTemperature, oilTemperature)
@@ -368,7 +368,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			this.LapDatabase.add("Telemetry", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
-														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
+														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs, "BB", bb
 														 , "Compound", compound, "Compound.Color", compoundColor, "Tyre.Laps", tyreLaps
 														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear, "State", lapState
 														 , "Engine.Temperature.Water", "Engine.Temperature.Oil"))
@@ -436,11 +436,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 							pressures := string2Values(",", telemetryData[16])
 							temperatures := string2Values(",", telemetryData[17])
 							wear := string2Values(",", telemetryData[18])
-
+							bb := ((telemetryData.Length > 23) ? telemetryData[24] : kNull)
+							
 							try {
 								lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 														, telemetryData[14], telemetryData[15]
-														, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
+														, telemetryData[11], telemetryData[12], telemetryData[13], bb
+														, telemetryData[7], telemetryData[8]
 														, telemetryData[9], driverID, telemetryData.Has(19) ? telemetryData[19] : false)
 
 								lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]
@@ -473,7 +475,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 					try {
 						lapsDB.addElectronicEntry(telemetryData["Weather"], telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
 												, telemetryData["Compound"], telemetryData["Compound.Color"]
-												, telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"]
+												, telemetryData["Map"], telemetryData["TC"], telemetryData["ABS"], telemetryData["BB"]
 												, telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 
 						pressures := string2Values(",", telemetryData["Pressures"])

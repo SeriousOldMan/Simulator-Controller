@@ -364,7 +364,7 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 			if (map_buffer->brake_bias == -1)
 				writeString(result, "n/a", &pos);
 			else
-				writeFloat(result, (1 - round(map_buffer->brake_bias * 100) / 100) * 100), &pos);
+				writeFloat(result, (1 - round(map_buffer->brake_bias * 10000) / 10000) * 100, &pos);
 			writeLine(result, &pos);
 
 			writeString(result, "BodyworkDamage=", &pos);

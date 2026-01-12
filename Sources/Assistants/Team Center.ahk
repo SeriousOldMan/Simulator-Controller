@@ -7898,7 +7898,7 @@ class TeamCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local tyreChange := true
 		local newData, message, session, lapsDB, tyresTable, lap, theLap, runningLap, driverID, telemetry
-		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row
+		local telemetryData, pressures, temperatures, wear, lapPressures, pressure, driver, row, bb
 		local tyreCompound, tyreCompoundColor, mixedCompounds, index, tyre, axle, compounds, tyreLaps
 
 		wasPitstop(lap, &tyreChange := false) {
@@ -8097,9 +8097,12 @@ class TeamCenter extends ConfigurationItem {
 				else
 					wear := [kNull, kNull, kNull, kNull]
 
+				bb := ((telemetryData.Length > 23) ? telemetryData[24] : kNull)
+
 				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 										, telemetryData[14], telemetryData[15]
-										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+										, telemetryData[11], telemetryData[12], telemetryData[13], bb
+										, telemetryData[7], telemetryData[8], telemetryData[9]
 										, driverID)
 
 				lapsDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6]

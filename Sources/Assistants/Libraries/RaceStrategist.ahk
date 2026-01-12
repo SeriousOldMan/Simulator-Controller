@@ -1873,6 +1873,7 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.Map"] := strategy.Map
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
+		facts["Strategy.BB"] := strategy.BB
 
 		pitstopDeviation := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 0)
 
@@ -5157,6 +5158,7 @@ class RaceStrategist extends GridRaceAssistant {
 			setMultiMapValue(data, "Lap", prefix . ".Map", knowledgeBase.getValue(prefix . ".Map", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".TC", knowledgeBase.getValue(prefix . ".TC", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))
+			setMultiMapValue(data, "Lap", prefix . ".BB", knowledgeBase.getValue(prefix . ".BB", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Pitstop", pitstop)
 			setMultiMapValue(data, "Lap", prefix . ".State", lapState)

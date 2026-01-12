@@ -3082,6 +3082,7 @@ getSimulatorOptions(plugin := false) {
 			options .= " -Map " . getMultiMapValue(data, "Car Data", "MAP", "n/a")
 			options .= " -TC " . getMultiMapValue(data, "Car Data", "TC", "n/a")
 			options .= " -ABS " . getMultiMapValue(data, "Car Data", "ABS", "n/a")
+			options .= " -BB " . getMultiMapValue(data, "Car Data", "BB", "n/a")
 		}
 	}
 

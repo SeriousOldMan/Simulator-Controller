@@ -209,15 +209,15 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	Definition[original := false] {
+	Definition {
 		Get {
-			return (original ? this.iOriginalDefinition : this.iDefinition)
+			return this.iDefinition
 		}
 	}
 
-	SimulatorDefinition[original := false] {
+	SimulatorDefinition {
 		Get {
-			return (original ? this.iOriginalSimulatorDefinition : this.iSimulatorDefinition)
+			return this.iSimulatorDefinition
 		}
 	}
 
@@ -733,9 +733,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 					width := this.SettingsViewer.getWidth() - 4
 					height := (this.SettingsViewer.getHeight() - 110 - 4)
-					
+
 					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
-					
+
 					iWidth := width - 10
 					iHeight := 90
 

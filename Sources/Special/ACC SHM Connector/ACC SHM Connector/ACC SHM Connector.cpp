@@ -343,6 +343,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printNAData(&output, "MAP", gf->EngineMap + 1);
 		printNAData(&output, "TC", gf->TC);
 		printNAData(&output, "ABS", gf->ABS);
+		printData(&output, "ABS", "n/a");
 		printNAData(&output, "BBRaw", pf->brakeBias);
 
 		printData(&output, "Ignition", pf->ignitionOn ? "true" : "false");

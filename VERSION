@@ -2,8 +2,8 @@
 Version=6.7.9.0-dev
 Target=6.7.9.0-release
 Date=01/12/2026
-Download=
-Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation 
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Fm96aNiX/Releases/Simulator Controller 6.7.9.0-dev.zip
+Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
 [Release]
 Version=6.7.8.0-release

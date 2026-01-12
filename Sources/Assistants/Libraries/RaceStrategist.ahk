@@ -3765,8 +3765,16 @@ class RaceStrategist extends GridRaceAssistant {
 			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
 
 			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
-			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
-							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
+
+			try {
+				lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
+								+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				lastRunnings.Push(0)
+			}
 		}
 
 		laps := CaseInsenseWeakMap()

@@ -1269,7 +1269,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarInformation(simulator, car, track, type) {
-		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car) . "." . type)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local carCode := this.getCarCode(simulator, car)
+		local key := (simulatorCode . "." carCode . "." . type)
 		local value
 
 		static settingsDB := false
@@ -1286,9 +1288,9 @@ class SessionDatabase extends ConfigurationItem {
 		if (value == kUndefined)
 			value := %"getCar" . type%(simulator, car)
 
-		if (value = kUndefined)
-			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Information", car . "." . type, kUndefined)
+		if (!value || (value = kUndefined))
+			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+									, "Car Information", carCode . "." . type, kUndefined)
 
 		values[key] := value
 

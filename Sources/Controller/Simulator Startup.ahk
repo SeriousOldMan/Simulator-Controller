@@ -1722,7 +1722,7 @@ editProfile(launchPadOrCommand := false, *) {
 		profileGui.SetFont("Norm", "Arial")
 
 		profileGui.Add("Documentation", "x108 YP+20 w130 Center", translate("Profile")
-					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile")
 
 		profileGui.SetFont("Norm", "Arial")
 

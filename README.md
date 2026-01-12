@@ -134,6 +134,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
 
+38. [Using automatic language translation for the Assistants](https://youtu.be/FSkf-SxQ3M8) - The new functionality that supports automatic translation for speech interaction is demonstrated in this video. You will learn how to configure the Assistants to use nay language you want.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

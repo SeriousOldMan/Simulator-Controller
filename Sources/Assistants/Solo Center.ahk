@@ -3935,7 +3935,7 @@ class SoloCenter extends ConfigurationItem {
 	addTelemetry(lap, simulator, car, track, weather, airTemperature, trackTemperature
 			   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 			   , compound, compoundColor, pressures, temperatures, wear, state
-			   , waterTemperature := kNull, oilTemperature := kNull, tyreLaps := kNull) {
+			   , waterTemperature := kNull, oilTemperature := kNull, tyreLaps := kNull, bb := kNull) {
 		local lapsDB := this.LapsDatabase
 		local tyresTable := this.LapsDatabase.Database.Tables["Tyres"]
 		local driver := lap.Run.Driver
@@ -4040,7 +4040,7 @@ class SoloCenter extends ConfigurationItem {
 
 				lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 										, telemetryData[14], telemetryData[15]
-										, telemetryData[11], telemetryData[12], telemetryData[13]
+										, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[23]
 										, kNull, telemetryData[8], telemetryData[9], driverID)
 
 				pressuresData := collect(string2Values(",", telemetryData[16]), null)
@@ -4071,10 +4071,10 @@ class SoloCenter extends ConfigurationItem {
 		lap.TelemetryData := values2String("|||", simulator, car, track, weather, airTemperature, trackTemperature
 												, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 												, compound, compoundColor, pressures, temperatures, wear, state
-												, waterTemperature, oilTemperature, dataTyreLaps)
+												, waterTemperature, oilTemperature, dataTyreLaps, bb)
 
 		lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-								, map, tc, abs, fuelConsumption, fuelRemaining, lapTime, driverID)
+								, map, tc, abs, bb, fuelConsumption, fuelRemaining, lapTime, driverID)
 
 		pressures := collect(string2Values(",", pressures), null)
 		temperatures := collect(string2Values(",", temperatures), null)
@@ -4347,7 +4347,7 @@ class SoloCenter extends ConfigurationItem {
 			local locked := false
 			local count := 0
 			local oldCritical := Task.Critical
-			local progressWindow, lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info
+			local progressWindow, lap, driver, telemetryData, pressures, temperatures, wear, pressuresData, info, bb
 
 			while (row := this.LapsListView.GetNext(row, "C"))
 				count += 1
@@ -4378,9 +4378,12 @@ class SoloCenter extends ConfigurationItem {
 							else
 								telemetryData := string2Values("---", lap.TelemetryData)
 
+							bb := ((telemetryData.Length > 22) ? telemetryData[23] : kNull)
+							
 							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 													, telemetryData[14], telemetryData[15]
-													, telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8], telemetryData[9]
+													, telemetryData[11], telemetryData[12], telemetryData[13], bb
+													, telemetryData[7], telemetryData[8], telemetryData[9]
 													, driver)
 
 							pressures := string2Values(",", telemetryData[16])
@@ -8296,7 +8299,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	updateTelemetry(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+				  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 				  , compound, compoundColor, tyreLaps, pressures, temperatures, wear, state
 				  , waterTemperature, oilTemperature) {
 		udateTelemetryAsync() {
@@ -8304,7 +8307,7 @@ class SoloCenter extends ConfigurationItem {
 				this.addTelemetry(this.LastLap, simulator, car, track, weather, airTemperature, trackTemperature
 								, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
 								, compound, compoundColor, pressures, temperatures, wear, state
-								, waterTemperature, oilTemperature, tyreLaps)
+								, waterTemperature, oilTemperature, tyreLaps, bb)
 
 				this.analyzeTelemetry()
 			}

@@ -1873,6 +1873,7 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.Map"] := strategy.Map
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
+		facts["Strategy.BB"] := strategy.BB
 
 		pitstopDeviation := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 0)
 
@@ -2468,7 +2469,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature
 		local mixedCompounds, compound, compoundColor
-		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
+		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, bb, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, driverID, lastTime, waterTemperature, oilTemperature
 
 		static lastLap := 0
@@ -2633,6 +2634,7 @@ class RaceStrategist extends GridRaceAssistant {
 			map := knowledgeBase.getValue(prefix . ".Map")
 			tc := knowledgeBase.getValue(prefix . ".TC")
 			antiBS := knowledgeBase.getValue(prefix . ".ABS")
+			bb := knowledgeBase.getValue(prefix . ".BB")
 
 			pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
 						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
@@ -2656,7 +2658,7 @@ class RaceStrategist extends GridRaceAssistant {
 			oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
 
 			this.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
+						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS, bb
 						   , values2String(",", compound*), values2String(",", compoundColor*)
 						   , pressures, temperatures, wear, lapState
 						   , waterTemperature, oilTemperature)
@@ -5157,6 +5159,7 @@ class RaceStrategist extends GridRaceAssistant {
 			setMultiMapValue(data, "Lap", prefix . ".Map", knowledgeBase.getValue(prefix . ".Map", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".TC", knowledgeBase.getValue(prefix . ".TC", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))
+			setMultiMapValue(data, "Lap", prefix . ".BB", knowledgeBase.getValue(prefix . ".BB", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Pitstop", pitstop)
 			setMultiMapValue(data, "Lap", prefix . ".State", lapState)
@@ -5281,7 +5284,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 			  , compound, compoundColor, pressures, temperatures, wear, lapState
 			  , waterTemperature, oilTemperature) {
 		local knowledgeBase := this.KnowledgeBase
@@ -5311,7 +5314,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ((lapState = "Valid") && !pitstop) {
 			lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-											 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+											 , map, tc, abs, bb, fuelConsumption, fuelRemaining, lapTime
 											 , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 
 			if (stintLaps > 1)
@@ -5329,7 +5332,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateDynamicValues({HasLapsData: true})
 
 			this.RemoteHandler.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 										  , compound, compoundColor, tyreLaps, values2String(",", pressures*), values2String(",", temperatures*)
 										  , wear ? values2String(",", wear*) : false
 										  , lapState, waterTemperature, oilTemperature)

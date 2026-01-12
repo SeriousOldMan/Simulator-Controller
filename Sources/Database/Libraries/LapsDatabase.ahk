@@ -27,7 +27,7 @@
 
 global kLapsSchemas := CaseInsenseMap("Electronics", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 													, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"
-													, "Identifier", "Synchronized"]
+													, "Identifier", "Synchronized", "BB"]
 									, "Tyres", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 											  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
 											  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
@@ -424,7 +424,7 @@ class LapsDatabase extends SessionDatabase {
 	}
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+					 , map, tc, abs, bb, fuelConsumption, fuelRemaining, lapTime
 					 , driver := false, identifier := false, retry := 100) {
 		local db := this.Database
 
@@ -441,7 +441,7 @@ class LapsDatabase extends SessionDatabase {
 											     , "Fuel.Remaining", valueOrNull(fuelRemaining)
 											     , "Fuel.Consumption", valueOrNull(fuelConsumption)
 											     , "Lap.Time", valueOrNull(lapTime)
-											     , "Map", map, "TC", tc, "ABS", abs
+											     , "Map", map, "TC", tc, "ABS", abs, "BB", bb
 											     , "Identifier", identifier ? identifier : kNull)
 									, true, retry)
 			}

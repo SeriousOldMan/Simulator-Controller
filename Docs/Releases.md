@@ -30,7 +30,36 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.7.9.0
+
+#### Date: 01/16/26 (planned)
+
+#### Fixes
+
+  - A bug has been fixed for *iRacing* when cars are towed to the pit or are otherwise absent. This bug caused the Monte Carlo strategy simulation to crash.
+  - Fixed handling of language specific instructions for the Driving Coach and the Assistant boosters, when a machine translated language is used.
+  - Fixed a misbehaviour of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
+  - [Experts] Fixed a bug in the "Simualators" script module, which accessed a non-existent global function.
+  - [Experts] Fixed parameter extraction in the "execute" controller action function, when a path to the executable is provided, which contains a space character.
+
+#### Changes
+
+  - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
+  - Information about the currently chosen TC and ABS settings is now available for *Automobilista 2*, if provided by the simulator (and available for the current car, of course).
+  - The urgency of low fuel and low energy warnings of the Race Engineer has been reduced, if more than one lap can still be run on the remaining fuel/energy.
+  - Information about the current setting of the current brake balance setting is now available for most simulators.
+    - The current setting will be available as "BB" series in many reports in all applications of Simulator Controller.
+    - [Experts] This information is provided to the rule engine and is also available in *Lua* scripts, for example to automate changes of the brake balance.
+  - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+      - Ginetta G61-LT-P325 Evo
+	  - Ligier JS P325 (fixed brake balance and some other settings)
+	- Automobilista 2 (by @inthebagbud UK; no setup editor support)
+	  - to be defined...
+
+New car models for "Setup Workbench"
+
 
 # Release history
 
@@ -786,7 +815,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - The "Laps" data entries in the session database can now handle wheel specific information about the number of driven laps on the mounted tyre. You will find now four different tyre laps properties in the data reports in the "Strategy Workbench", "Solo Center" and "Team Center" applications, one for each wheel. Data points are still uniform for all four wheels with this release, but this will change with the next release.
-  - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) to share anonymous data from your sessions that will be used to train models for the Assistants AI. The default for this setting is "No", so make sure, that you change it, if you want to contribute.
+  - Consent can now be given in the [personal profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#data-privacy-settings) to share anonymous data from your sessions that will be used to train models for the Assistants AI. The default for this setting is "No", so make sure, that you change it, if you want to contribute.
   - [Experts] When [defining the meta data for a new car](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car) in the "Setup Workbench", [Lua](https://lua.org/) scripts can now be used to create handlers for complex settings in the setup, which cannot be defined correctly by using one of the predefined handlers.
 
 ## 6.3.4.0
@@ -946,7 +975,7 @@ As mentioned above, this version contains an all new simulator data interface. I
   - News & Updates are now shown one at a time on a daily basis and many more articles are available now.
   - All applications of Simulator Controller now collect critical errors and also some statistical information. This data can be transferred to the developer team based on your consent and will be used to enhance the stability and functionality of Simulator Controller.
 	- If you want to know what data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
-    - You can specify which type of data will be transferred using a [new profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy) in "Simulator Startup".
+    - You can specify which type of data will be transferred using a [new profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#data-privacy-settings) in "Simulator Startup".
 	- Of course it is possible to fully disable the transfer of diagnostic data.
 	- No personal data will ever be transferred. With one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
 	- **Important:** Transfer of information about critical errors and also statistical usage information is **enabled** by default.

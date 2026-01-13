@@ -53,12 +53,26 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - The current setting will be available as "BB" series in many reports in all applications of Simulator Controller.
     - [Experts] This information is provided to the rule engine and is also available in *Lua* scripts, for example to automate changes of the brake balance.
   - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
+  - [Internal] Extended usage statistics with information about used speech technologies.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
       - Ginetta G61-LT-P325 Evo
 	  - Ligier JS P325 (fixed brake balance and some other settings)
 	- Automobilista 2 (by @inthebagbud UK; no setup editor support)
-	  - to be defined...
+	  - ARC Camaro, BMW M1 Procar, Caterham 620R
+	  - Caterham Academy, Caterham Superlight, Caterham Supersport
+	  - Chevrolet Opala Old Stock Race, Chevrolet Opala Stock Cars 1979, Chevrolet Opala Stock Cars 1986
+	  - Copa Uno, Formula Classic Gen1 Model1, Formula Classic Gen1 Model2
+	  - Formula Classic Gen2 Model1, Formula Classic Gen2 Model2, Formula Classic Gen2 Model3
+	  - Formula Classic Gen3 Model1, Formula Classic Gen3 Model2, Formula Classic Gen3 Model3
+	  - Formula Classic Gen3 Model4, Ginetta G40 Cup, Ginetta G40
+	  - Ginetta G55 GT3, Ginetta G55 GT4 Supercup, Ginetta G55 GT4
+	  - Ginetta G58 Gen2, Lamborghini Diablo SV-R, Ligier JS P217
+	  - Ligier JS P320, Ligier JS P4, Ligier JS2 R
+	  - Lotus Renault 98T, McLaren Honda MP44, McLaren Honda MP45B
+	  - MCR S2000, MetalMoro AJR Gen2 Chevrolet, MetalMoro AJR Gen2 Honda
+	  - MetalMoro AJR Gen2 Nissan, Mitsubishi Lancer R, Oreca 07
+	  - Porsche 911 GT3 Cup 3.8, Porsche 911 GT3 Cup 4.0, Sigma P1 G5
 
 # Release history
 

@@ -171,6 +171,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 std::string normalizeName(const char* name) {
 	std::string result = name;
 
+	replace(result, "\\", "");
 	replace(result, "/", "");
 	replace(result, ":", "");
 	replace(result, "*", "");

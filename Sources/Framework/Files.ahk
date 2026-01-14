@@ -21,14 +21,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 normalizeFileName(fileName) {
-	local ignore, character
-
-	static disallowedCharacters := ["\", "/" , ":", "*", "?", "<", ">", "|"]
-
-	for ignore, character in disallowedCharacters
-		fileName := StrReplace(fileName, character, "")
-
-	return fileName
+	return RegExReplace(fileName, "[/\\:\*?<>|]", "")
 }
 
 getFileName(fileName, directories*) {

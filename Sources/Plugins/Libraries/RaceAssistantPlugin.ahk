@@ -49,6 +49,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static sCollectData := CaseInsenseMap()
 
+	static sLanguageStats := false
+
 	iEnabled := false
 	iName := false
 	iLogo := false
@@ -816,7 +818,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openSoloCenter, openTeamCenter, openStrategyWorkbench, importSetup
-		local assistantSpeaker, assistantListener, first, index
+		local assistantSpeaker, assistantListener, first, index, stats
 
 		super.__New(controller, name, configuration, false)
 
@@ -1011,6 +1013,61 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 20000, kHighPriority)
 
 			RaceAssistantPlugin.CollectorTask.start()
+		}
+
+		if !RaceAssistantPlugin.sLanguageStats {
+			RaceAssistantPlugin.sLanguageStats := CaseInsenseMap()
+
+			Task.startTask(() {
+				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				local language, stats, ignore, value
+
+				for language, stats in RaceAssistantPlugin.sLanguageStats {
+					setMultiMapValue(usage, "Languages", "Translators." . language
+										  , getMultiMapValue(usage, "Languages", "Translators." . language, 0) + stats.Translators)
+
+					for ignore, value in stats.Synthesizers
+						setMultiMapValue(usage, "Languages", "Synthesizers." . value . "." . language
+											  , getMultiMapValue(usage, "Languages", "Synthesizers." . value . "." . language, 0) + 1)
+
+					for ignore, value in stats.Recognizers
+						setMultiMapValue(usage, "Languages", "Recognizers." . value . "." . language
+											  , getMultiMapValue(usage, "Languages", "Recognizers." . value . "." . language, 0) + 1)
+				}
+
+				writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+
+				RaceAssistantPlugin.sLanguageStats := false
+			}, 10000, kLowPriority)
+		}
+
+		if this.Language {
+			if RaceAssistantPlugin.sLanguageStats.Has(this.Language)
+				stats := RaceAssistantPlugin.sLanguageStats[this.Language]
+			else {
+				stats := {Language: this.Language, Translators: 0, Synthesizers: [], Recognizers: []}
+
+				RaceAssistantPlugin.sLanguageStats[this.Language] := stats
+			}
+
+			if translator
+				stats.Translators += 1
+
+			synthesizer := this.Synthesizer
+
+			if (!synthesizer && this.Speaker)
+				synthesizer := getMultiMapValue(this.Configuration, "Voice Control", "Synthesizer")
+
+			if synthesizer
+				stats.Synthesizers.Push(string2Values("|", synthesizer)[1])
+
+			recognizer := this.Recognizer
+
+			if (!recognizer && this.Listener)
+				recognizer := getMultiMapValue(this.Configuration, "Voice Control", "Recognizer")
+
+			if recognizer
+				stats.Recognizers.Push(string2Values("|", recognizer)[1])
 		}
 	}
 
@@ -3082,6 +3139,7 @@ getSimulatorOptions(plugin := false) {
 			options .= " -Map " . getMultiMapValue(data, "Car Data", "MAP", "n/a")
 			options .= " -TC " . getMultiMapValue(data, "Car Data", "TC", "n/a")
 			options .= " -ABS " . getMultiMapValue(data, "Car Data", "ABS", "n/a")
+			options .= " -BB " . getMultiMapValue(data, "Car Data", "BB", "n/a")
 		}
 	}
 

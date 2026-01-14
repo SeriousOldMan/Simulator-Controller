@@ -1,0 +1,16 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Automobilista 2                 ;;;
+;;;                                         Oreca 07                        ;;;
+;;;                                         Setup Rules                     ;;;
+;;;There are 2 cars with same name but different classes - this is for both ;;;
+;;;   Author:     Oliver Juwig (TheBigO) / inthebagbud UK                   ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Automobilista 2", "Oreca 07",
+										[Electronics.ABS, Electronics.Turbo,	
+										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode]))

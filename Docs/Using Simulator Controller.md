@@ -28,7 +28,7 @@ In this dialog, which can be accessed by clicking on the small button with the s
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile.JPG)
 
-## Changing your name
+### Changing your name
 
 In the upper section of the profile dialog you can change your name and define where this name will be used. Normally, the driver name which is provided by the simulator API, when you run Simulator Controller for the first time, will be remembered and will be used whenever no other name can be derived, for example, by calling the active simulator.
 
@@ -50,13 +50,13 @@ As said, by default the first name that has been found will be used for all thes
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile%20Scope.JPG)
 
-## Data *privacy* settings
+### Data *privacy* settings
 
 Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can manage all this in the lower section of the profile dialog.
 
 - **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
 
-### Notes
+#### Notes
 
 - If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
 - No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.

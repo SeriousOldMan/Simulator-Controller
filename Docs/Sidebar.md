@@ -134,7 +134,7 @@
   - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups)
   - [Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures)
   - [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration)
-  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration)
+  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings)
   
 [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 ------

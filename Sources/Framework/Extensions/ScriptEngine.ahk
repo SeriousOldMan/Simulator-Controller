@@ -61,6 +61,7 @@ global LUA_REFNIL               := -1
 ;;;                    Private Variables Declaration Section                ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kLUALibrary := "lua54.dll"
 global kLUAEnvironment := Map()
 
 
@@ -68,74 +69,74 @@ global kLUAEnvironment := Map()
 ;;;                    Private Functions Declaration Section                ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-luaL_loadfilex(L, filename, mode) => DllCall("lua54.dll\luaL_loadfilex", "ptr", L, "astr", String(filename)
-																	   , (mode == LUA_NULL) ? "int" : "str", mode == LUA_NULL ? 0 : String(mode))
-luaL_newstate() => DllCall("lua54.dll\luaL_newstate", "ptr")
-luaL_openlibs(L) => DllCall("lua54.dll\luaL_openlibs", "ptr", L)
-luaL_checktype(L, arg, t) => DllCall("lua54.dll\luaL_checktype", "ptr", L, "int", Integer(arg), "int", Integer(t))
+luaL_loadfilex(L, filename, mode) => DllCall(kLUALibrary . "\luaL_loadfilex", "ptr", L, "astr", String(filename)
+																			, (mode == LUA_NULL) ? "int" : "str", mode == LUA_NULL ? 0 : String(mode))
+luaL_newstate() => DllCall(kLUALibrary . "\luaL_newstate", "ptr")
+luaL_openlibs(L) => DllCall(kLUALibrary . "\luaL_openlibs", "ptr", L)
+luaL_checktype(L, arg, t) => DllCall(kLUALibrary . "\luaL_checktype", "ptr", L, "int", Integer(arg), "int", Integer(t))
 
-luaL_ref(L, t) => DllCall("lua54.dll\luaL_ref", "ptr", L, "int", t)
-luaL_unref(L, t) => DllCall("lua54.dll\luaL_unref", "ptr", L, "int", t)
+luaL_ref(L, t) => DllCall(kLUALibrary . "\luaL_ref", "ptr", L, "int", t)
+luaL_unref(L, t) => DllCall(kLUALibrary . "\luaL_unref", "ptr", L, "int", t)
 
-lua_absindex(L, idx) => DllCall("lua54.dll\lua_absindex", "ptr", L, "int", idx)
-lua_close(L) => DllCall("lua54.dll\lua_close", "ptr", L)
-lua_copy(L, fromidx, toidx) => DllCall("lua54.dll\lua_copy", "ptr", L, "int", Integer(fromidx), , "int", Integer(toidx))
-lua_createtable(L, narr, nrec) => DllCall("lua54.dll\lua_createtable", "ptr", L, "int", Integer(narr), "int", Integer(nrec))
-lua_error(L) => DllCall("lua54.dll\lua_error", "ptr", L)
-lua_getglobal(L, name) => DllCall("lua54.dll\lua_getglobal", "ptr", L, "astr", name)
-lua_getupvalue(L, funcindex, n) => DllCall("lua54.dll\lua_getupvalue", "ptr", L, "int", funcindex, "int", n)
-lua_gettable(L, index) => DllCall("lua54.dll\lua_gettable", "ptr", L, "int", Integer(index))
-lua_gettop(L) => DllCall("lua54.dll\lua_gettop", "ptr", L)
-lua_iscfunction(L, index) => DllCall("lua54.dll\lua_iscfunction", "ptr", L, "int", Integer(index))
-lua_pcallk(L, nargs, nresults, msgh, ctx, k) => DllCall("lua54.dll\lua_pcallk", "ptr", L, "int", Integer(nargs), "int", Integer(nresults)
-																			  , "int", Integer(msgh)
-																			  , "int", ctx, (k == LUA_NULL) ? "int" : "ptr", k || 0)
-lua_pushcclosure(L, f, n) => DllCall("lua54.dll\lua_pushcclosure", "ptr", L, "ptr", f, "int", Integer(n))
-lua_pushnumber(L, n) => DllCall("lua54.dll\lua_pushnumber", "ptr", L, "double", Float(n))
-lua_pushinteger(L, n) => DllCall("lua54.dll\lua_pushinteger", "ptr", L, "int", Integer(n))
-lua_pushliteral(L, s) => DllCall("lua54.dll\lua_pushliteral", "ptr", L, "astr", String(s))
-lua_pushnil(L) => DllCall("lua54.dll\lua_pushnil", "ptr", L)
-lua_pushstring(L, s) => DllCall("lua54.dll\lua_pushstring", "ptr", L, "astr", String(s))
-lua_rawget(L, index) => DllCall("lua54.dll\lua_rawget", "ptr", L, "int", Integer(index))
-lua_rawgeti(L, index, n) => DllCall("lua54.dll\lua_rawgeti", "ptr", L, "int", Integer(index), "int", Integer(n))
-lua_rawlen(L, index) => DllCall("lua54.dll\lua_rawlen", "ptr", L, "int", index)
-lua_rawset(L, index) => DllCall("lua54.dll\lua_rawset", "ptr", L, "int", Integer(index))
-lua_rawseti(L, index, i) => DllCall("lua54.dll\lua_rawseti", "ptr", L, "int", Integer(index), "int", Integer(i))
-lua_requiref(L, modname, openf, glb) => DllCall("lua54.dll\lua_rawseti", "ptr", L, "str", String(modname), "ptr", openf, "int", Integer(glb))
-lua_rotate(L, idx, n) => DllCall("lua54.dll\lua_rotate", "ptr", L, "int", Integer(idx), "int", Integer(n))
-lua_setfield(L, index, k) => DllCall("lua54.dll\lua_setfield", "ptr", L, "int", Integer(index), "astr", String(k))
-lua_setglobal(L, name) => DllCall("lua54.dll\lua_setglobal", "ptr", L, "astr", name)
-lua_setupvalue(L, funcindex, n) => DllCall("lua54.dll\lua_setupvalue", "ptr", L, "int", funcindex, "int", n)
-lua_settable(L, index) => DllCall("lua54.dll\lua_settable", "ptr", L, "int", Integer(index))
-lua_settop(L, index) => DllCall("lua54.dll\lua_settop", "ptr", L, "int", Integer(index))
-lua_toboolean(L, index) => DllCall("lua54.dll\lua_toboolean", "ptr", L, "int", Integer(index))
-lua_tointeger(L, index) => DllCall("lua54.dll\lua_tointegerx", "ptr", L, "int", Integer(index), "int", 0)
+lua_absindex(L, idx) => DllCall(kLUALibrary . "\lua_absindex", "ptr", L, "int", idx)
+lua_close(L) => DllCall(kLUALibrary . "\lua_close", "ptr", L)
+lua_copy(L, fromidx, toidx) => DllCall(kLUALibrary . "\lua_copy", "ptr", L, "int", Integer(fromidx), , "int", Integer(toidx))
+lua_createtable(L, narr, nrec) => DllCall(kLUALibrary . "\lua_createtable", "ptr", L, "int", Integer(narr), "int", Integer(nrec))
+lua_error(L) => DllCall(kLUALibrary . "\lua_error", "ptr", L)
+lua_getglobal(L, name) => DllCall(kLUALibrary . "\lua_getglobal", "ptr", L, "astr", name)
+lua_getupvalue(L, funcindex, n) => DllCall(kLUALibrary . "\lua_getupvalue", "ptr", L, "int", funcindex, "int", n)
+lua_gettable(L, index) => DllCall(kLUALibrary . "\lua_gettable", "ptr", L, "int", Integer(index))
+lua_gettop(L) => DllCall(kLUALibrary . "\lua_gettop", "ptr", L)
+lua_iscfunction(L, index) => DllCall(kLUALibrary . "\lua_iscfunction", "ptr", L, "int", Integer(index))
+lua_pcallk(L, nargs, nresults, msgh, ctx, k) => DllCall(kLUALibrary . "\lua_pcallk", "ptr", L, "int", Integer(nargs), "int", Integer(nresults)
+																				   , "int", Integer(msgh)
+																				   , "int", ctx, (k == LUA_NULL) ? "int" : "ptr", k || 0)
+lua_pushcclosure(L, f, n) => DllCall(kLUALibrary . "\lua_pushcclosure", "ptr", L, "ptr", f, "int", Integer(n))
+lua_pushnumber(L, n) => DllCall(kLUALibrary . "\lua_pushnumber", "ptr", L, "double", Float(n))
+lua_pushinteger(L, n) => DllCall(kLUALibrary . "\lua_pushinteger", "ptr", L, "int", Integer(n))
+lua_pushliteral(L, s) => DllCall(kLUALibrary . "\lua_pushliteral", "ptr", L, "astr", String(s))
+lua_pushnil(L) => DllCall(kLUALibrary . "\lua_pushnil", "ptr", L)
+lua_pushstring(L, s) => DllCall(kLUALibrary . "\lua_pushstring", "ptr", L, "astr", String(s))
+lua_rawget(L, index) => DllCall(kLUALibrary . "\lua_rawget", "ptr", L, "int", Integer(index))
+lua_rawgeti(L, index, n) => DllCall(kLUALibrary . "\lua_rawgeti", "ptr", L, "int", Integer(index), "int", Integer(n))
+lua_rawlen(L, index) => DllCall(kLUALibrary . "\lua_rawlen", "ptr", L, "int", index)
+lua_rawset(L, index) => DllCall(kLUALibrary . "\lua_rawset", "ptr", L, "int", Integer(index))
+lua_rawseti(L, index, i) => DllCall(kLUALibrary . "\lua_rawseti", "ptr", L, "int", Integer(index), "int", Integer(i))
+lua_requiref(L, modname, openf, glb) => DllCall(kLUALibrary . "\lua_rawseti", "ptr", L, "str", String(modname), "ptr", openf, "int", Integer(glb))
+lua_rotate(L, idx, n) => DllCall(kLUALibrary . "\lua_rotate", "ptr", L, "int", Integer(idx), "int", Integer(n))
+lua_setfield(L, index, k) => DllCall(kLUALibrary . "\lua_setfield", "ptr", L, "int", Integer(index), "astr", String(k))
+lua_setglobal(L, name) => DllCall(kLUALibrary . "\lua_setglobal", "ptr", L, "astr", name)
+lua_setupvalue(L, funcindex, n) => DllCall(kLUALibrary . "\lua_setupvalue", "ptr", L, "int", funcindex, "int", n)
+lua_settable(L, index) => DllCall(kLUALibrary . "\lua_settable", "ptr", L, "int", Integer(index))
+lua_settop(L, index) => DllCall(kLUALibrary . "\lua_settop", "ptr", L, "int", Integer(index))
+lua_toboolean(L, index) => DllCall(kLUALibrary . "\lua_toboolean", "ptr", L, "int", Integer(index))
+lua_tointeger(L, index) => DllCall(kLUALibrary . "\lua_tointegerx", "ptr", L, "int", Integer(index), "int", 0)
 
 lua_tolstring(L, index, len) {
-	result := DllCall("lua54.dll\lua_tolstring", "ptr", L, "int", Integer(index)
-											   , (len == LUA_NULL) ? "int" : "int*", (len == LUA_NULL) ? 0 : Integer(len))
+	result := DllCall(kLUALibrary . "\lua_tolstring", "ptr", L, "int", Integer(index)
+													, (len == LUA_NULL) ? "int" : "int*", (len == LUA_NULL) ? 0 : Integer(len))
 
 	return ((result == 0) ? "" : StrGet(result, "UTF-8"))
 }
 
-lua_tonumberx(L, index, &isnum?) => DllCall("lua54.dll\lua_tonumberx", "ptr", L, "int", Integer(index)
-																	 , !IsSet(isnum) ? "int" : "int*"
-																	 , !IsSet(isnum) ? 0 : &isnum, "double")
-lua_topointer(L, index) => Format("<pointer: {:#x}>", DllCall("lua54.dll\lua_topointer", "ptr", L, "int", Integer(index)))
-lua_type(L, index) => DllCall("lua54.dll\lua_type", "ptr", L, "int", Integer(index))
-lua_typename(L, tp) => StrGet(DllCall("lua54.dll\lua_typename", "ptr", L, "int", Integer(tp)), "UTF-8")
-lua_callk(L, nargs, nresults, ctx, k) => DllCall("lua54.dll\lua_typename", "ptr", L, "int", Integer(nargs), "int", Integer(nresults)
-																		 , "int", ctx, (k == LUA_NULL) ? "int" : "ptr", k || 0)
-luaopen_base(L) => DllCall("lua54.dll\luaopen_base", "ptr", L)
-luaopen_package(L) => DllCall("lua54.dll\luaopen_package", "ptr", L)
-luaopen_coroutine(L) => DllCall("lua54.dll\luaopen_coroutine", "ptr", L)
-luaopen_table(L) => DllCall("lua54.dll\luaopen_table", "ptr", L)
-luaopen_io(L) => DllCall("lua54.dll\luaopen_io", "ptr", L)
-luaopen_os(L) => DllCall("lua54.dll\luaopen_os", "ptr", L)
-luaopen_string(L) => DllCall("lua54.dll\luaopen_string", "ptr", L)
-luaopen_math(L) => DllCall("lua54.dll\luaopen_math", "ptr", L)
-luaopen_utf8(L) => DllCall("lua54.dll\luaopen_utf8", "ptr", L)
-luaopen_debug(L) => DllCall("lua54.dll\luaopen_debug", "ptr", L)
+lua_tonumberx(L, index, &isnum?) => DllCall(kLUALibrary . "\lua_tonumberx", "ptr", L, "int", Integer(index)
+																		  , !IsSet(isnum) ? "int" : "int*"
+																		  , !IsSet(isnum) ? 0 : &isnum, "double")
+lua_topointer(L, index) => Format("<pointer: {:#x}>", DllCall(kLUALibrary . "\lua_topointer", "ptr", L, "int", Integer(index)))
+lua_type(L, index) => DllCall(kLUALibrary . "\lua_type", "ptr", L, "int", Integer(index))
+lua_typename(L, tp) => StrGet(DllCall(kLUALibrary . "\lua_typename", "ptr", L, "int", Integer(tp)), "UTF-8")
+lua_callk(L, nargs, nresults, ctx, k) => DllCall(kLUALibrary . "\lua_typename", "ptr", L, "int", Integer(nargs), "int", Integer(nresults)
+																			  , "int", ctx, (k == LUA_NULL) ? "int" : "ptr", k || 0)
+luaopen_base(L) => DllCall(kLUALibrary . "\luaopen_base", "ptr", L)
+luaopen_package(L) => DllCall(kLUALibrary . "\luaopen_package", "ptr", L)
+luaopen_coroutine(L) => DllCall(kLUALibrary . "\luaopen_coroutine", "ptr", L)
+luaopen_table(L) => DllCall(kLUALibrary . "\luaopen_table", "ptr", L)
+luaopen_io(L) => DllCall(kLUALibrary . "\luaopen_io", "ptr", L)
+luaopen_os(L) => DllCall(kLUALibrary . "\luaopen_os", "ptr", L)
+luaopen_string(L) => DllCall(kLUALibrary . "\luaopen_string", "ptr", L)
+luaopen_math(L) => DllCall(kLUALibrary . "\luaopen_math", "ptr", L)
+luaopen_utf8(L) => DllCall(kLUALibrary . "\luaopen_utf8", "ptr", L)
+luaopen_debug(L) => DllCall(kLUALibrary . "\luaopen_debug", "ptr", L)
 
 luaL_loadfile(L, filename) => luaL_loadfilex(L, filename, LUA_NULL)
 luaL_dofile(L, filename) => (luaL_loadfile(L, filename) || lua_pcallk(L, 0, LUA_MULTRET, 0, 0, LUA_NULL))
@@ -165,7 +166,7 @@ lua_replace(L, idx) => (lua_copy(L, -1, idx), lua_pop(L, 1))
 lua_upvalueindex(i) => (LUA_REGISTRYINDEX - (i))
 
 initializeScriptEngine() {
-	if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\lua54.dll", "Ptr") {
+	if !DllCall("LoadLibrary", "Str", kBinariesDirectory . "Code Runtime\" . kLUALibrary, "Ptr") {
 		logMessage(kLogCritical, translate("Error while initializing script engine - please rebuild the applications"))
 
 		if (!kSilentMode)
@@ -263,7 +264,7 @@ scriptExternHandler(context) {
 }
 
 scriptEngineAvailable() {
-	return (DllCall("GetModuleHandle", "str", "lua54.dll") != 0)
+	return (DllCall("GetModuleHandle", "str", kLUALibrary) != 0)
 }
 
 scriptOpenContext() {

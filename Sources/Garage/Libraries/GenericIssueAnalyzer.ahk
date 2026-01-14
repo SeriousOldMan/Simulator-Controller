@@ -382,10 +382,10 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			if FileExist(fileName) {
 				configuration := readMultiMap(fileName)
 
-				this.iSteerLock := SessionDatabase.getCarSteerLock(simulator, selectedCar, selectedTrack)
-				this.iSteerRatio := SessionDatabase.getCarSteerRatio(simulator, selectedCar, selectedTrack)
-				this.iWheelbase := SessionDatabase.getCarWheelbase(simulator, selectedCar, selectedTrack)
-				this.iTrackWidth := SessionDatabase.getCarTrackWidth(simulator, selectedCar, selectedTrack)
+				this.iSteerLock := (SessionDatabase.getCarSteerLock(simulator, selectedCar, selectedTrack) || this.SteerLock)
+				this.iSteerRatio := (SessionDatabase.getCarSteerRatio(simulator, selectedCar, selectedTrack) || this.SteerRatio)
+				this.iWheelbase := (SessionDatabase.getCarWheelbase(simulator, selectedCar, selectedTrack) || this.Wheelbase)
+				this.iTrackWidth := (SessionDatabase.getCarTrackWidth(simulator, selectedCar, selectedTrack) || this.TrackWidth)
 
 				this.iSteerRatio := getMultiMapValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
 				this.iWheelbase := getMultiMapValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)

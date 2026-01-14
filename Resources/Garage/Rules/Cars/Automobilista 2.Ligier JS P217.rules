@@ -1,0 +1,19 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Automobilista 2                 ;;;
+;;;                                         Ligier JS P217                  ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   There are 2 cars with same name but different classes, this setup     ;;;
+;;;   file can be used for both.                                            ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO) / inthebagbud UK                   ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Automobilista 2", "Ligier JS P217",
+										[Electronics.ABS, Electronics.Turbo,	
+										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode]))

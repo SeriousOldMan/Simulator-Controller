@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.7.9.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Fm96aNiX/Releases/Simulator%20Controller%206.7.9.0-dev.zip) (Early build for 6.7.9. Changes: New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars.)
+[6.7.9.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/rmSOS_jQ/Releases/Simulator%20Controller%206.7.9.0-beta.zip) (Test build for 6.7.9. Changes: New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6790) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-679) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -133,6 +133,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
 
 37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
+
+38. [Using automatic language translation for the Assistants](https://youtu.be/FSkf-SxQ3M8) - The new functionality that supports automatic translation for speech interaction is demonstrated in this video. You will learn how to configure the Assistants to use nay language you want.
 
 This list will be extended from time to time to cover new functionalities.
 

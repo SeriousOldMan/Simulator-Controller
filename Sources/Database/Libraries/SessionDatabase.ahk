@@ -1143,23 +1143,60 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getSimulators(force)
 	}
 
-	getCars(simulator) {
+	getCars(simulator, all := false) {
 		local code := this.getSimulatorCode(simulator)
+		local carData, codes
 
-		if code
-			return this.getEntries(code . "\*.*")
+		if code {
+			if all {
+				carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+				codes := getMultiMapValues(carData, "Car Names")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in this.getEntries(code . "\*.*")
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\*.*")
+			}
+			else
+				return this.getEntries(code . "\*.*")
+		}
 		else
 			return []
 	}
 
-	getTracks(simulator, car) {
+	getTracks(simulator, car, all := false) {
 		local code := this.getSimulatorCode(simulator)
-		local tracks
+		local tracks, trackData, codes
 
 		if code {
 			tracks := this.getEntries(code . "\" . car . "\*.*")
+			tracks := ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 
-			return ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
+			if all {
+				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+				codes := getMultiMapValues(trackData, "Track Names Long")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in tracks
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*")
+			}
+			else
+				return tracks
 		}
 		else
 			return []
@@ -1197,24 +1234,27 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerCar(simulator, car, name) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
-		local carCode := SessionDatabase.getCarCode(simulator, car)
-		local carData, fileName
+		local carData, carCode, fileName, found
+
+		carCode := SessionDatabase.getCarCode(simulator, car, &found)
 
 		if (simulator && simulatorCode && (simulatorCode != "0")  && car && carCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode)
 
-			carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+			if !found {
+				carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
 
-			if ((simulatorCode != "ACC") && (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined)) {
-				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
-				carData := readMultiMap(fileName)
+				if ((simulatorCode != "ACC") && (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined)) {
+					fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
+					carData := readMultiMap(fileName)
 
-				setMultiMapValue(carData, "Car Names", car, name)
-				setMultiMapValue(carData, "Car Codes", name, car)
+					setMultiMapValue(carData, "Car Names", car, name)
+					setMultiMapValue(carData, "Car Codes", name, car)
 
-				writeMultiMap(fileName, carData)
+					writeMultiMap(fileName, carData)
 
-				SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+					SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+				}
 			}
 		}
 	}
@@ -1224,15 +1264,16 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarName(simulator, car) {
-		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Names", car, kUndefined)
+		local carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getMultiMapValue(carData, "Car Names", car, kUndefined)
 
 		if (name == kUndefined)
-			name := normalizeFileName(car)
+			name := getMultiMapValue(carData, "Car Names", normalizeFileName(car), kUndefined)
+
+		if (name == kUndefined)
+			name := car
 		else if (!name || (name = ""))
-			name := normalizeFileName(car)
-		else
-			name := normalizeFileName(name)
+			name := car
 
 		return name
 	}
@@ -1241,22 +1282,30 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarName(simulator, car)
 	}
 
-	static getCarCode(simulator, car) {
-		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Codes", car, kUndefined)
+	static getCarCode(simulator, car, &found?) {
+		local carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local code := getMultiMapValue(carData, "Car Codes", car, kUndefined)
 
-		if (code == kUndefined)
-			code := normalizeFileName(car)
+		found := false
+
+		if (code == kUndefined) {
+			code := getMultiMapValue(carData, "Car Codes", normalizeFileName(car), kUndefined)
+
+			if (code == kUndefined)
+				code := car
+			else
+				found := true
+		}
 		else if (!code || (code = ""))
-			code := normalizeFileName(car)
+			code := car
 		else
-			code := normalizeFileName(code)
+			found := true
 
-		return code
+		return normalizeFileName(code)
 	}
 
-	getCarCode(simulator, car) {
-		return SessionDatabase.getCarCode(simulator, car)
+	getCarCode(simulator, car, &found?) {
+		return SessionDatabase.getCarCode(simulator, car, &found)
 	}
 
 	static getCarClass(simulator, car) {
@@ -1269,7 +1318,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarInformation(simulator, car, track, type) {
-		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car) . "." . type)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local carCode := this.getCarCode(simulator, car)
+		local key := (simulatorCode . "." carCode . "." . type)
 		local value
 
 		static settingsDB := false
@@ -1286,9 +1337,9 @@ class SessionDatabase extends ConfigurationItem {
 		if (value == kUndefined)
 			value := %"getCar" . type%(simulator, car)
 
-		if (value = kUndefined)
-			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Information", car . "." . type, kUndefined)
+		if (!value || (value = kUndefined))
+			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+									, "Car Information", carCode . "." . type, false)
 
 		values[key] := value
 
@@ -1330,26 +1381,29 @@ class SessionDatabase extends ConfigurationItem {
 	static registerTrack(simulator, car, track, shortName, longName) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local carCode := SessionDatabase.getCarCode(simulator, car)
-		local trackCode := SessionDatabase.getTrackCode(simulator, track)
-		local trackData, fileName
+		local trackData, trackCode, fileName, found
+
+		trackCode := SessionDatabase.getTrackCode(simulator, track, &found)
 
 		if (simulator && simulatorCode && (simulatorCode != "0") && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
-			trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
+			if !found {
+				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
 
-			if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
-				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
-				trackData := readMultiMap(fileName)
+				if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
+					fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
+					trackData := readMultiMap(fileName)
 
-				setMultiMapValue(trackData, "Track Names Long", track, longName)
-				setMultiMapValue(trackData, "Track Names Short", track, shortName)
-				setMultiMapValue(trackData, "Track Codes", longName, track)
-				setMultiMapValue(trackData, "Track Codes", shortName, track)
+					setMultiMapValue(trackData, "Track Names Long", track, longName)
+					setMultiMapValue(trackData, "Track Names Short", track, shortName)
+					setMultiMapValue(trackData, "Track Codes", longName, track)
+					setMultiMapValue(trackData, "Track Codes", shortName, track)
 
-				writeMultiMap(fileName, trackData)
+					writeMultiMap(fileName, trackData)
 
-				SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+					SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+				}
 			}
 		}
 	}
@@ -1359,43 +1413,58 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getTrackName(simulator, track, long := true) {
-		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , long ? "Track Names Long" : "Track Names Short", track, kUndefined)
+		local trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short", track, kUndefined)
 
 		if ((name != kUndefined) && (StrLen(name) < 5))
-			name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Names Long", track, name)
+			name := getMultiMapValue(trackData, "Track Names Long", track, name)
 
-		if (name == kUndefined)
-			name := normalizeFileName(track)
+		if (name == kUndefined) {
+			name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short"
+											  , normalizeFileName(track), kUndefined)
+
+			if ((name != kUndefined) && (StrLen(name) < 5))
+				name := getMultiMapValue(trackData, "Track Names Long", normalizeFileName(track), name)
+
+			if (name == kUndefined)
+				name := track
+		}
 		else if (!name || (name = ""))
-			name := normalizeFileName(track)
+			name := track
 		else
-			name := normalizeFileName(name)
+			found := true
 
-		return StrTitle(name)
+		return StrTitle(normalizeFileName(name))
 	}
 
 	getTrackName(simulator, track, long := true) {
 		return SessionDatabase.getTrackName(simulator, track, long)
 	}
 
-	static getTrackCode(simulator, track) {
-		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Codes", track, kUndefined)
+	static getTrackCode(simulator, track, &found?) {
+		local trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local code := getMultiMapValue(trackData, "Track Codes", track, kUndefined)
 
-		if (code == kUndefined)
-			code := normalizeFileName(track)
+		found := false
+
+		if (code == kUndefined) {
+			code := getMultiMapValue(trackData, "Track Codes", normalizeFileName(track), kUndefined)
+
+			if (code == kUndefined)
+				code := track
+			else
+				found := true
+		}
 		else if (!code || (code = ""))
-			code := normalizeFileName(track)
+			code := track
 		else
-			code := normalizeFileName(code)
+			found := true
 
-		return code
+		return normalizeFileName(code)
 	}
 
-	getTrackCode(simulator, track) {
-		return SessionDatabase.getTrackCode(simulator, track)
+	getTrackCode(simulator, track, &found?) {
+		return SessionDatabase.getTrackCode(simulator, track, &found)
 	}
 
 	static getTyreCompounds(simulator, car, track, codes := false) {

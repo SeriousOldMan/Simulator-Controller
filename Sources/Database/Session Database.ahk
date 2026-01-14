@@ -99,6 +99,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iAllTracks := []
 
+	iShowAllCars := false
+	iShowAllTracks := false
+
 	iAirTemperature := 23
 	iTrackTemperature := 27
 	iTyreCompound := false
@@ -422,6 +425,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	__New(simulator := false, car := false, track := false
 		, weather := false, airTemperature := false, trackTemperature := false
 		, compound := false, compoundColor := false, requestorPID := false) {
+		local configuration
+
 		if simulator {
 			this.iSelectedSimulator := this.SessionDatabase.getSimulatorName(simulator)
 			this.iSelectedCar := car
@@ -436,6 +441,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iRequestorPID := requestorPID
 		this.iTrackEditorMode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 												, "Session Database", "Track Editor", this.TrackEditorMode)
+
+		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+		this.iShowAllCars := (getMultiMapValue(configuration, "Scope", "Cars", "Used") = "All")
+		this.iShowAllTracks := (getMultiMapValue(configuration, "Scope", "Tracks", "Used") = "All")
 
 		super.__New(kSimulatorConfiguration)
 
@@ -453,10 +463,42 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		showSettings(*) {
+			local simulator := this.SelectedSimulator
+			local car := this.SelectedCar
+			local track := this.SelectedTrack
+			local mode := this.SelectedMode
+			local weather := this.SelectedWeather
+			local module := this.SelectedModule
+			local configuration
+
 			editorGui.Block()
 
 			try {
-				editSettings(editor, editorGui)
+				if editSettings(editor, editorGui) {
+					configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+					this.iShowAllCars := (getMultiMapValue(configuration, "Scope", "Cars", "Used") = "All")
+					this.iShowAllTracks := (getMultiMapValue(configuration, "Scope", "Tracks", "Used") = "All")
+
+					DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 0, "Ptr", 0)
+
+					try {
+						this.selectModule("Settings", true)
+
+						this.loadSimulator(simulator, true)
+						this.loadCar(car, true)
+						this.loadTrack(track, true)
+						this.loadMode(mode, true)
+						this.loadWeather(weather, true)
+
+						this.selectModule(module, true)
+					}
+					finally {
+						DllCall("user32.dll\SendMessage", "Ptr", this.Window.Hwnd, "UInt", 0xB, "Ptr", 1, "Ptr", 0)
+
+						WinRedraw(this.Window)
+					}
+				}
 			}
 			finally {
 				editorGui.Unblock()
@@ -2340,10 +2382,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getCars(simulator) {
-		return this.SessionDatabase.getCars(simulator)
+		return this.SessionDatabase.getCars(simulator, this.iShowAllCars)
 	}
 
-	getTracks(simulator, car := false) {
+	getTracks(simulator, car := false, recurse := false) {
 		local tracks, ignore, track
 
 		if !car
@@ -2355,7 +2397,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				tracks := []
 
 				for ignore, car in this.getCars(simulator)
-					for ignore, track in this.getTracks(simulator, car)
+					for ignore, track in this.getTracks(simulator, car, true)
 						if !inList(tracks, track)
 							tracks.Push(track)
 
@@ -2364,8 +2406,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				return tracks
 			}
 		}
+		else if !recurse {
+			if (this.iShowAllTracks && (this.iAllTracks.Length = 0))
+				this.getTracks(simulator, true)
+
+			if (this.iShowAllTracks && (this.iAllTracks.Length > 0))
+				return this.iAllTracks
+			else
+				return this.SessionDatabase.getTracks(simulator, car, this.iShowAllTracks)
+		}
 		else
-			return this.SessionDatabase.getTracks(simulator, car)
+			return this.SessionDatabase.getTracks(simulator, car, this.iShowAllTracks)
 	}
 
 	getCarName(simulator, car) {
@@ -8136,7 +8187,7 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
 
 		settingsEditorGui.Add("Documentation", "x103 YP+20 w204 Center", translate("Database Settings")
-							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")
 
@@ -8248,6 +8299,22 @@ editSettings(editorOrCommand, arguments*) {
 		shareTelemetriesCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21 Checked" . shareTelemetriesCheck, translate("Telemetries"))
 		shareTelemetriesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 
+		settingsEditorGui.SetFont("Italic", "Arial")
+
+		settingsEditorGui.Add("GroupBox", "x16 yp+40 w388 h70 Section", translate("Display"))
+
+		settingsEditorGui.SetFont("Norm", "Arial")
+
+		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+		settingsEditorGui.Add("Text", "x24 yp+16 w117 h23 +0x200", translate("Cars"))
+		settingsEditorGui.Add("DropDownList", "x146 yp w120 vsettingsShowCarsDropDown", collect(["All", "Used"], translate))
+		settingsEditorGui["settingsShowCarsDropDown"].Choose(1 + (getMultiMapValue(configuration, "Scope", "Cars", "Used") = "Used"))
+
+		settingsEditorGui.Add("Text", "x24 yp+24 w117 h23 +0x200", translate("Tracks"))
+		settingsEditorGui.Add("DropDownList", "x146 yp w120 vsettingsShowTracksDropDown", collect(["All", "Used"], translate))
+		settingsEditorGui["settingsShowTracksDropDown"].Choose(1 + (getMultiMapValue(configuration, "Scope", "Tracks", "Used") = "Used"))
+
 		settingsEditorGui.Add("Button", "x16 ys+78 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
 			settingsEditorGui.Block()
 
@@ -8271,164 +8338,172 @@ editSettings(editorOrCommand, arguments*) {
 		else
 			settingsEditorGui.Show("AutoSize Center")
 
-		done := false
+		try {
+			done := false
 
-		while !done {
-			result := false
+			while !done {
+				result := false
 
-			while !result
-				Sleep(100)
+				while !result
+					Sleep(100)
 
-			if (result == kCancel)
-				done := true
-			else if (result == kOk) {
-				changed := false
-				restart := false
+				if (result == kCancel)
+					done := true
+				else if (result == kOk) {
+					changed := false
+					restart := false
 
-				if (databaseLocationEdit.Text = "") {
-					OnMessage(0x44, translateOkButton)
-					withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
+					if (databaseLocationEdit.Text = "") {
+						OnMessage(0x44, translateOkButton)
+						withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
+						OnMessage(0x44, translateOkButton, 0)
 
-					continue
-				}
-				else if (normalizeDirectoryPath(databaseLocationEdit.Text) != normalizeDirectoryPath(kDatabaseDirectory)) {
-					if !FileExist(databaseLocationEdit.Text)
-						try {
-							DirCreate(databaseLocationEdit.Text)
-						}
-						catch Any as exception {
-							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
-
-							continue
-						}
-
-					translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
-
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgDlg, translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
-									  , translate("Session Database"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Cancel")
 						continue
-
-					if (msgResult = "Yes") {
-						empty := true
-
-						loop Files, databaseLocationEdit.Text . "\*.*", "FD" {
-							empty := false
-
-							break
-						}
-
-						if !empty {
-							OnMessage(0x44, translateOkButton)
-							withBlockedWindows(MsgDlg, translate("The new database folder must be empty."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
-
-							continue
-						}
-
-						original := normalizeDirectoryPath(kDatabaseDirectory)
-
-						showProgress({color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
-
-						copyFiles(original, databaseLocationEdit.Text)
-
-						showProgress({progress: 100, message: translate("Finished...")})
-
-						Sleep(200)
-
-						hideProgress()
 					}
+					else if (normalizeDirectoryPath(databaseLocationEdit.Text) != normalizeDirectoryPath(kDatabaseDirectory)) {
+						if !FileExist(databaseLocationEdit.Text)
+							try {
+								DirCreate(databaseLocationEdit.Text)
+							}
+							catch Any as exception {
+								OnMessage(0x44, translateOkButton)
+								withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
+								OnMessage(0x44, translateOkButton, 0)
 
-					SessionDatabase.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
+								continue
+							}
 
-					changed := true
-					restart := true
-				}
+						translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
 
-				if !changed {
-					oldConnections := []
+						OnMessage(0x44, translator)
+						msgResult := withBlockedWindows(MsgDlg, translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+										  , translate("Session Database"), 262179)
+						OnMessage(0x44, translator, 0)
 
-					for identifier, serverURL in sessionDB.ServerURLs
-						oldConnections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
+						if (msgResult = "Cancel")
+							continue
 
-					if (oldConnections.Length != connections.Length) {
+						if (msgResult = "Yes") {
+							empty := true
+
+							loop Files, databaseLocationEdit.Text . "\*.*", "FD" {
+								empty := false
+
+								break
+							}
+
+							if !empty {
+								OnMessage(0x44, translateOkButton)
+								withBlockedWindows(MsgDlg, translate("The new database folder must be empty."), translate("Error"), 262160)
+								OnMessage(0x44, translateOkButton, 0)
+
+								continue
+							}
+
+							original := normalizeDirectoryPath(kDatabaseDirectory)
+
+							showProgress({color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
+
+							copyFiles(original, databaseLocationEdit.Text)
+
+							showProgress({progress: 100, message: translate("Finished...")})
+
+							Sleep(200)
+
+							hideProgress()
+						}
+
+						SessionDatabase.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
+
 						changed := true
 						restart := true
 					}
-					else
-						loop connections.Length {
 
-							currentConnection := A_Index
+					if !changed {
+						oldConnections := []
 
-							loop 3
-								if (oldConnections[currentConnection][A_Index] != connections[currentConnection][A_Index]) {
-									changed := true
+						for identifier, serverURL in sessionDB.ServerURLs
+							oldConnections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
 
-									if (A_Index > 1)
-										restart := true
-								}
-
-							if (!changed && (values2String(",", oldConnections[currentConnection][4]*) != values2String(",", connections[currentConnection][4]*))) {
-								changed := true
-								restart := true
-							}
+						if (oldConnections.Length != connections.Length) {
+							changed := true
+							restart := true
 						}
-				}
+						else
+							loop connections.Length {
 
-				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+								currentConnection := A_Index
 
-				setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit.Text)
+								loop 3
+									if (oldConnections[currentConnection][A_Index] != connections[currentConnection][A_Index]) {
+										changed := true
 
-				setMultiMapValue(configuration, "Share", "Race Strategies", shareStrategiesCheck.Value)
-				setMultiMapValue(configuration, "Share", "Car Setups", shareSetupsCheck.Value)
-				setMultiMapValue(configuration, "Share", "Lap Telemetries", shareTelemetriesCheck.Value)
+										if (A_Index > 1)
+											restart := true
+									}
 
-				if changed {
-					setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", CaseInsenseMap()))
-
-					setMultiMapValue(configuration, "Database", "Path", normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
-
-					serverURLs := CaseInsenseMap()
-					serverTokens := CaseInsenseMap()
-					groups := CaseInsenseMap()
-
-					for ignore, connection in connections {
-						serverURLs[connection[1]] := connection[2]
-						serverTokens[connection[1]] := connection[3]
-						groups[connection[1]] := values2String(",", connection[4]*)
+								if (!changed && (values2String(",", oldConnections[currentConnection][4]*) != values2String(",", connections[currentConnection][4]*))) {
+									changed := true
+									restart := true
+								}
+							}
 					}
 
-					setMultiMapValue(configuration, "Team Server", "Groups", mapToString("|", "->", groups))
-					setMultiMapValue(configuration, "Team Server", "Server.URL", mapToString("|", "->", serverURLs))
-					setMultiMapValue(configuration, "Team Server", "Server.Token", mapToString("|", "->", serverTokens))
+					configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-					writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
+					setMultiMapValue(configuration, "Scope", "Cars", ["All", "Used"][settingsEditorGui["settingsShowCarsDropDown"].Value])
+					setMultiMapValue(configuration, "Scope", "Tracks", ["All", "Used"][settingsEditorGui["settingsShowTracksDropDown"].Value])
 
-					if restart {
-						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgDlg, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
-							 , translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
+					setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit.Text)
 
-						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitProcess")
+					setMultiMapValue(configuration, "Share", "Race Strategies", shareStrategiesCheck.Value)
+					setMultiMapValue(configuration, "Share", "Car Setups", shareSetupsCheck.Value)
+					setMultiMapValue(configuration, "Share", "Lap Telemetries", shareTelemetriesCheck.Value)
+
+					if changed {
+						setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", CaseInsenseMap()))
+
+						setMultiMapValue(configuration, "Database", "Path", normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
+
+						serverURLs := CaseInsenseMap()
+						serverTokens := CaseInsenseMap()
+						groups := CaseInsenseMap()
+
+						for ignore, connection in connections {
+							serverURLs[connection[1]] := connection[2]
+							serverTokens[connection[1]] := connection[3]
+							groups[connection[1]] := values2String(",", connection[4]*)
+						}
+
+						setMultiMapValue(configuration, "Team Server", "Groups", mapToString("|", "->", groups))
+						setMultiMapValue(configuration, "Team Server", "Server.URL", mapToString("|", "->", serverURLs))
+						setMultiMapValue(configuration, "Team Server", "Server.Token", mapToString("|", "->", serverTokens))
+
+						writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
+
+						if restart {
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgDlg, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+								 , translate("Information"), 262192)
+							OnMessage(0x44, translateOkButton, 0)
+
+							broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitProcess")
+						}
 					}
+					else
+						writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
+
+					SessionDatabase.reloadConfiguration()
+
+					done := true
 				}
-				else
-					writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
-
-				SessionDatabase.reloadConfiguration()
-
-				done := true
 			}
-		}
 
-		settingsEditorGui.Destroy()
+			return (result = kOk)
+		}
+		finally {
+			settingsEditorGui.Destroy()
+		}
 	}
 }
 

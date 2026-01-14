@@ -1143,23 +1143,60 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getSimulators(force)
 	}
 
-	getCars(simulator) {
+	getCars(simulator, all := false) {
 		local code := this.getSimulatorCode(simulator)
+		local carData, codes
 
-		if code
-			return this.getEntries(code . "\*.*")
+		if code {
+			if all {
+				carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+				codes := getMultiMapValues(carData, "Car Names")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in this.getEntries(code . "\*.*")
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\*.*")
+			}
+			else
+				return this.getEntries(code . "\*.*")
+		}
 		else
 			return []
 	}
 
-	getTracks(simulator, car) {
+	getTracks(simulator, car, all := false) {
 		local code := this.getSimulatorCode(simulator)
-		local tracks
+		local tracks, trackData, codes
 
 		if code {
 			tracks := this.getEntries(code . "\" . car . "\*.*")
+			tracks := ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 
-			return ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
+			if all {
+				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+				codes := getMultiMapValues(trackData, "Track Names Long")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in tracks
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*")
+			}
+			else
+				return tracks
 		}
 		else
 			return []

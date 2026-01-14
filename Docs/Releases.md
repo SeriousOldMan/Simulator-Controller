@@ -49,9 +49,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
   - Information about the currently chosen TC and ABS settings is now available for *Automobilista 2*, if provided by the simulator (and available for the current car, of course).
   - The urgency of low fuel and low energy warnings of the Race Engineer has been reduced, if more than one lap can still be run on the remaining fuel/energy.
-  - Information about the current setting of the current brake balance setting is now available for most simulators.
+  - Information about the current setting of the brake balance is now available for most simulators.
     - The current setting will be available as "BB" series in many reports in all applications of Simulator Controller.
     - [Experts] This information is provided to the rule engine and is also available in *Lua* scripts, for example to automate changes of the brake balance.
+  - It is now possible to display all known cars and all known tracks in the "Session Database" and not only the ones, that had been used so far. Use the extended [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) to choose your preference.
   - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
   - [Internal] Extended usage statistics with information about used speech technologies.
   - New car models for "Setup Workbench":

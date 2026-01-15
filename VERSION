@@ -1,28 +1,28 @@
 [Development]
-Version=6.7.9.0-beta
+Version=6.7.9.0-release
 Target=6.7.9.0-release
-Date=01/14/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/rmSOS_jQ/Releases/Simulator Controller 6.7.9.0-beta.zip
+Date=01/16/2026
+Download=https://cutt.ly/otkMqRoU;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-HAVhdaz/Releases/Simulator%20Controller%206.7.9.0-release.zip;https://www.dropbox.com/scl/fi/dip329ihfiptznt2ca1lb/Simulator-Controller-6.7.9.0-release.zip?rlkey=dq9w0pfklt141vb14kq7757jl&st=18egixm5&dl=1;http://%master%/Releases/Simulator Controller 6.7.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.9.0-release.zip
 Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database"
-Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
+Components=Media->5.6.1,Configuration->6.7.9,Utilities->6.7.9
 [Release]
-Version=6.7.8.0-release
-Date=01/09/2026
-Download=https://cutt.ly/8thMnbim;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/rOSPKF5Q/Releases/Simulator Controller 6.7.8.0-release.zip;https://www.dropbox.com/scl/fi/5czcx1vpuf7mmafrgl0zq/Simulator-Controller-6.7.8.0-release.zip?rlkey=bws9o3vi39rhmw56rszx4m3lf&st=thp6ayro&dl=1;http://%master%/Releases/Simulator Controller 6.7.8.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.8.0-release.zip
-Changes=Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation, Application discrimininator for HTML->Viewer core setting, New functions "Ask" and "Command" in Lua Assistants module, New predicates/functions "Assistant.Ask" and "Assitant.Command" for booster rules and scripts, New predicates "Assistant.Ask" and "Assitant.Command" in the rule engine of an Assistant, New "Environment" script module
-Components=Media->5.6.1,Configuration->6.7.6,Utilities->6.6.4
+Version=6.7.9.0-release
+Date=01/16/2026
+Download=https://cutt.ly/otkMqRoU;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-HAVhdaz/Releases/Simulator%20Controller%206.7.9.0-release.zip;https://www.dropbox.com/scl/fi/dip329ihfiptznt2ca1lb/Simulator-Controller-6.7.9.0-release.zip?rlkey=dq9w0pfklt141vb14kq7757jl&st=18egixm5&dl=1;http://%master%/Releases/Simulator Controller 6.7.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.9.0-release.zip
+Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database"
+Components=Media->5.6.1,Configuration->6.7.9,Utilities->6.7.9
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.7.6.Path=Resources
-Configuration.6.7.6.Content=Setup
-Configuration.6.7.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0epZ_XD8/Components/Configuration 6.7.6.zip;https://www.dropbox.com/scl/fi/c9ps6odw4jsfbqh9awwbp/Configuration-6.7.6.zip?rlkey=e5dg8b1wppik6um3kiuuw4iok&st=sowlpk4o&dl=1;http://%master%/Components/Configuration 6.7.6.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.7.6.zip
-Utilities.6.6.4.Path=.
-Utilities.6.6.4.Content=Utilities
-Utilities.6.6.4.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yPis6D34/Components/Utilities 6.6.4.zip;https://www.dropbox.com/scl/fi/1q7bysrlq1tb2x3gcl9x3/Utilities-6.6.4.zip?rlkey=grdq0topcoiwrw7aywbwsrw5x&st=0y2spbnz&dl=1;http://%master%/Components/Utilities 6.6.4.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.6.4.zip
+Configuration.6.7.9.Path=Resources
+Configuration.6.7.9.Content=Setup
+Configuration.6.7.9.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/25EH0qBQ/Components/Configuration%206.7.9.zip;https://www.dropbox.com/scl/fi/e21zroy7qgdruk3sr9d21/Configuration-6.7.9.zip?rlkey=ptnxkldjznvwwgtv193ogbyz9&st=4ag70ave&dl=1;http://%master%/Components/Configuration 6.7.9.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.7.9.zip
+Utilities.6.7.9.Path=.
+Utilities.6.7.9.Content=Utilities
+Utilities.6.7.9.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JQWiIlKY/Components/Utilities%206.7.9.zip;https://www.dropbox.com/scl/fi/d24qjndtbnwvipimosl12/Utilities-6.7.9.zip?rlkey=3avbt8vn40u85hko471xoo1st&st=7um32aub&dl=1;http://%master%/Components/Utilities 6.7.9.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.7.9.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.7.9.0-beta
-Release=6.7.8.0-release
+Development=6.7.9.0-release
+Release=6.7.9.0-release

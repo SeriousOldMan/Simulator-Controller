@@ -129,7 +129,7 @@ class ScriptKnowledgeBase extends KnowledgeBase {
 					scriptFileName := executable
 
 					try {
-						if !scriptLoadScript(context, scriptFileName, &message)
+						if !scriptLoad(context, scriptFileName, &message)
 							throw message
 					}
 					finally {

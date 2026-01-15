@@ -61,7 +61,8 @@ global LUA_REFNIL               := -1
 ;;;                    Private Variables Declaration Section                ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLUALibrary := "lua54.dll"
+global kLUALibrary := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									 , "Script Engine", "Engine", "lua54.dll")
 global kLUAEnvironment := Map()
 
 
@@ -316,7 +317,52 @@ scriptCloseContext(context) {
 	lua_close(context)
 }
 
-scriptLoadScript(context, fileName, &errorMessage?) {
+scriptCheck(scriptFileName, &errors) {
+	local context, message, ignore
+
+	if (kLUALibrary = "lua54.dll") {
+		context := scriptOpenContext()
+
+		try {
+			errors := []
+
+			if scriptLoad(context, scriptFileName, &message)
+				return true
+			else {
+				for ignore, message in string2Values("`n", message)
+					if (Trim(message) != "")
+						errors.Push(message)
+
+				return false
+			}
+		}
+		finally {
+			scriptCloseContext(context)
+		}
+	}
+	else {
+		deleteFile(kTempDirectory . "ScriptCompiler.out")
+
+		result := RunWait(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Code Runtime\luac55.exe" . "`" -p `"" . scriptFileName . "`" 2> `""
+												. kTempDirectory . "ScriptCompiler.out`"`"", , "Hide")
+
+		if FileExist(kTempDirectory . "ScriptCompiler.out") {
+			errors := Trim(FileRead(kTempDirectory . "ScriptCompiler.out"))
+
+			if (errors != "") {
+				errors := choose(string2Values("`n", errors), (e) => (Trim(e) != ""))
+
+				return false
+			}
+		}
+
+		errors := []
+
+		return true
+	}
+}
+
+scriptLoad(context, fileName, &errorMessage?) {
 	if (luaL_loadfile(context, fileName) != LUA_OK) {
 		errorMessage := lua_tostring(context, -1)
 

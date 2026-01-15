@@ -55,6 +55,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - It is now possible to display all known cars and all known tracks in the "Session Database" and not only the ones, that had been used so far. Use the extended [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings-1) to choose your preference.
   - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
   - [Internal] Extended usage statistics with information about used speech technologies.
+  - [Internal] Integrated latest *Lua* version 5.5, but not fully tested yet. You can activate it with a switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#script-settings) at your own risk.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
       - Ginetta G61-LT-P325 Evo

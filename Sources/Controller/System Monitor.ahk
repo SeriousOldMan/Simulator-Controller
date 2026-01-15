@@ -886,6 +886,7 @@ systemMonitor(command := false, arguments*) {
 					if fuelService
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Refuel"))) . "</td></tr>")
 
+					/*
 					if (tyreService = "Wheel") {
 						for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 							if ((index = 1) || (index = 3))
@@ -926,7 +927,9 @@ systemMonitor(command := false, arguments*) {
 							html .= "</tr>"
 						}
 					}
-					else if tyreService {
+					else
+					*/
+					if tyreService {
 						tyreCompound := getMultiMapValue(sessionState, "Strategy", "Pitstop.Next.Tyre.Compound")
 
 						if (tyreCompound && (tyreCompound != "-"))

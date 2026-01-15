@@ -135,7 +135,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format", kNull))
 		state["SessionTimeLeft"] := remainingSessionTime
 		state["StintTimeLeft"] := remainingStintTime
-		state["StintTimeLeft"] := remainingDriverTime
+		state["DriverTimeLeft"] := remainingDriverTime
 		state["SessionLapsLeft"] := sessionLaps
 		state["StintLapsLeft"] := stintLaps
 
@@ -340,6 +340,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap", kNull)
 			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0)) : kNull)
 
+			/*
 			if (tyreService = "Wheel") {
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre)
@@ -364,6 +365,7 @@ class IntegrationPlugin extends ControllerPlugin {
 					state["TyreCompound" . axle] := tyreCompound
 				}
 			}
+			*/
 
 			if tyreService {
 				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")

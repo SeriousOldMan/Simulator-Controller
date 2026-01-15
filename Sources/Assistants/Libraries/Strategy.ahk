@@ -173,7 +173,7 @@ class StrategySimulation {
 			try {
 				FileAppend(script, scriptFileName)
 
-				if !scriptLoadScript(context, scriptFileName, &message) {
+				if !scriptLoad(context, scriptFileName, &message) {
 					scriptCloseContext(context)
 
 					throw message

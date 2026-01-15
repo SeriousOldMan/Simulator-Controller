@@ -2429,7 +2429,7 @@ class ScriptHandler extends SettingHandler {
 			try {
 				FileAppend(script, scriptFileName)
 
-				if !scriptLoadScript(context, scriptFileName, &message)
+				if !scriptLoad(context, scriptFileName, &message)
 					throw message
 			}
 			finally {

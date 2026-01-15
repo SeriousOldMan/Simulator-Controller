@@ -2077,7 +2077,7 @@ class StrategyWorkbench extends ConfigurationItem {
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-												 
+
 			after := "
 			(
 					</script>
@@ -4446,7 +4446,7 @@ class ValidatorsEditor {
 		local valid := true
 		local name := this.Control["validatorNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context, message
+		local ignore, other, type, fileName, messages
 
 		if (Trim(name) = "") {
 			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
@@ -4475,14 +4475,13 @@ class ValidatorsEditor {
 			fileName := temporaryFilename("Script", "script")
 
 			try {
-				context := scriptOpenContext()
-
 				FileAppend(this.ScriptEditor.Content[true], fileName)
 
-				if !scriptLoadScript(context, fileName, &message)
-					throw message
+				if !scriptCheck(fileName, &messages){
+					errorMessage .= ("`n" . values2String("`n", collect(messages, (m) => (translate("Error: ") . m))*))
 
-				scriptCloseContext(context)
+					valid := false
+				}
 			}
 			catch Any as exception {
 				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))

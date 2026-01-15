@@ -81,9 +81,10 @@ The following group let's you control a couple of aspects of the voice recogniti
 
 The Script Engine used by the Assistants is based on the well-known *Lua* scripting language. *Lua* can use libraries or modules, which can be loaded on demand using the *require* statement. These libraries will be searched in those directories defined in a correspnding *Path* setting. If you have defined your own libraries, put them in a folder and point the settings below to this folder. However, if you are using the *Lua* package manager *luarocks* and use only libraries from there, this is not necessary, as long as the packages are located in "%appdata%\luarocks\share\lua\5.4" and "%appdata%\luarocks\lib\lua\5.4", which are the defaults for *luarocks*.
 
-| Category      | Setting        | Default | Description |
-|---------------|----------------|---------|-------------|
-| Script Engine | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\\?.script;%homePath%\Documents\Simulator Controller\Scripts\\?.lua;%APPDATA%\luarocks\share\lua\5.4\\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. When placing scripts in the %homePath%\Documents\Simulator Controller\Scripts direectory, they can have also the extension ".script". The default value contains the local script folder and also the default location for *luarocks* modules. |
+| Category      | Setting        | Default   | Description |
+|---------------|----------------|-----------|-------------|
+| Script Engine | Engine         | lua54.dll | The *Lua* engine to be used. Available *Lua* versions are 5.4 and 5.5, but 5.5 is not fully tested yet. |
+|               | Modules Path   | %homePath%\Documents\Simulator Controller\Scripts\\?.script;%homePath%\Documents\Simulator Controller\Scripts\\?.lua;%APPDATA%\luarocks\share\lua\5.4\\?.lua | The path to search for *Lua* modules. Please note the "?.lua" at the end which matches *Lua* source files. When placing scripts in the %homePath%\Documents\Simulator Controller\Scripts direectory, they can have also the extension ".script". The default value contains the local script folder and also the default location for *luarocks* modules. |
 |               | Libraries Path | %APPDATA%\luarocks\lib\lua\5.4\\?.lua | The path to search for libraries written in other languages which can be used by *Lua*. Please note the "?.dll". The default value points to the default location of *luarocks* libraries. |
 
 ### HTML Engine Settings

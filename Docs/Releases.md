@@ -1,5 +1,57 @@
 # Latest stable release
 
+## 6.7.9.0
+
+#### Date: 01/16/26
+
+#### Fixes
+
+  - A bug has been fixed for *iRacing* when cars are towed to the pit or are otherwise absent. This bug caused the Monte Carlo strategy simulation to crash.
+  - Fixed handling of language specific instructions for the Driving Coach and the Assistant boosters, when a machine translated language is used.
+  - Fixed a misbehaviour of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
+  - Fixed a rare bug introduced with one of the recent releases, which caused the "Telemetry" and the "Analyzer" item to be unavailable in the "Issues" selector menu of "Setup Workbench".
+  - Fixed a bug in "Simulator Setup" which prevented pre-listening a voice in a translated language.
+  - [Experts] Fixed a bug in the "Simualators" script module, which accessed a non-existent global function.
+  - [Experts] Fixed parameter extraction in the "execute" controller action function, when a path to the executable is provided, which contains a space character.
+
+#### Changes
+
+  - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
+  - Information about the currently chosen TC and ABS settings is now available for *Automobilista 2*, if provided by the simulator (and available for the current car, of course).
+  - The urgency of low fuel and low energy warnings of the Race Engineer has been reduced, if more than one lap can still be run on the remaining fuel/energy.
+  - Information about the current setting of the brake balance is now available for most simulators.
+    - The current setting will be available as "BB" series in many reports in all applications of Simulator Controller.
+    - [Experts] This information is provided to the rule engine and is also available in *Lua* scripts, for example to automate changes of the brake balance.
+  - It is now possible to display all known cars and all known tracks in the "Session Database" and not only the ones, that had been used so far. Use the extended [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings-1) to choose your preference.
+  - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
+  - [Internal] Extended usage statistics with information about used speech technologies.
+  - [Internal] Integrated latest *Lua* version 5.5, but not fully tested yet. You can activate it with a switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#script-settings) at your own risk.
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+      - Ginetta G61-LT-P325 Evo
+	  - Ligier JS P325 (fixed brake balance and some other settings)
+	- Automobilista 2 (by @inthebagbud UK; no setup editor support)
+	  - ARC Camaro, BMW M1 Procar, Caterham 620R
+	  - Caterham Academy, Caterham Superlight, Caterham Supersport
+	  - Chevrolet Opala Old Stock Race, Chevrolet Opala Stock Cars 1979, Chevrolet Opala Stock Cars 1986
+	  - Copa Uno, Formula Classic Gen1 Model1, Formula Classic Gen1 Model2
+	  - Formula Classic Gen2 Model1, Formula Classic Gen2 Model2, Formula Classic Gen2 Model3
+	  - Formula Classic Gen3 Model1, Formula Classic Gen3 Model2, Formula Classic Gen3 Model3
+	  - Formula Classic Gen3 Model4, Ginetta G40 Cup, Ginetta G40
+	  - Ginetta G55 GT3, Ginetta G55 GT4 Supercup, Ginetta G55 GT4
+	  - Ginetta G58 Gen2, Lamborghini Diablo SV-R, Ligier JS P217
+	  - Ligier JS P320, Ligier JS P4, Ligier JS2 R
+	  - Lotus Renault 98T, McLaren Honda MP44, McLaren Honda MP45B
+	  - MCR S2000, MetalMoro AJR Gen2 Chevrolet, MetalMoro AJR Gen2 Honda
+	  - MetalMoro AJR Gen2 Nissan, Mitsubishi Lancer R, Oreca 07
+	  - Porsche 911 GT3 Cup 3.8, Porsche 911 GT3 Cup 4.0, Sigma P1 G5
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.7.8.0
 
 #### Date: 01/09/26
@@ -27,55 +79,6 @@
   - [Internal] Extensive preparation for running the charts engine offline without a network connection to Google. See the new [core setting "HTML" -> "Charts"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#html-engine-settings) for more information.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-678), for information how to delete the Windows task bar icon cache and also how to activate the new track names for *Automobilista 2*. 
-
-# Upcoming release
-
-## 6.7.9.0
-
-#### Date: 01/16/26 (planned)
-
-#### Fixes
-
-  - A bug has been fixed for *iRacing* when cars are towed to the pit or are otherwise absent. This bug caused the Monte Carlo strategy simulation to crash.
-  - Fixed handling of language specific instructions for the Driving Coach and the Assistant boosters, when a machine translated language is used.
-  - Fixed a misbehaviour of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
-  - Fixed a rare bug introduced with one of the recent releases, which caused the "Telemetry" and the "Analyzer" item to be unavailable in the "Issues" selector menu of "Setup Workbench".
-  - Fixed a bug in "Simulator Setup" which prevented pre-listening a voice in a translated language.
-  - [Experts] Fixed a bug in the "Simualators" script module, which accessed a non-existent global function.
-  - [Experts] Fixed parameter extraction in the "execute" controller action function, when a path to the executable is provided, which contains a space character.
-
-#### Changes
-
-  - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
-  - Information about the currently chosen TC and ABS settings is now available for *Automobilista 2*, if provided by the simulator (and available for the current car, of course).
-  - The urgency of low fuel and low energy warnings of the Race Engineer has been reduced, if more than one lap can still be run on the remaining fuel/energy.
-  - Information about the current setting of the brake balance is now available for most simulators.
-    - The current setting will be available as "BB" series in many reports in all applications of Simulator Controller.
-    - [Experts] This information is provided to the rule engine and is also available in *Lua* scripts, for example to automate changes of the brake balance.
-  - It is now possible to display all known cars and all known tracks in the "Session Database" and not only the ones, that had been used so far. Use the extended [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) to choose your preference.
-  - [Experts] Additional meta data can now be supplied for cars in the [configuration files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-a-new-car). This meta data includes the *Steer Lock*, *Steer Ratio*, *Wheelbase* and *TrackWidth* of a given car and will be used in the "Setup Workbench" issue analyzer as default values. Alternatively, this information can also be provided in the [car definition file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for the "Setup Workbench".
-  - [Internal] Extended usage statistics with information about used speech technologies.
-  - New car models for "Setup Workbench":
-    - Le Mans Ultimate
-      - Ginetta G61-LT-P325 Evo
-	  - Ligier JS P325 (fixed brake balance and some other settings)
-	- Automobilista 2 (by @inthebagbud UK; no setup editor support)
-	  - ARC Camaro, BMW M1 Procar, Caterham 620R
-	  - Caterham Academy, Caterham Superlight, Caterham Supersport
-	  - Chevrolet Opala Old Stock Race, Chevrolet Opala Stock Cars 1979, Chevrolet Opala Stock Cars 1986
-	  - Copa Uno, Formula Classic Gen1 Model1, Formula Classic Gen1 Model2
-	  - Formula Classic Gen2 Model1, Formula Classic Gen2 Model2, Formula Classic Gen2 Model3
-	  - Formula Classic Gen3 Model1, Formula Classic Gen3 Model2, Formula Classic Gen3 Model3
-	  - Formula Classic Gen3 Model4, Ginetta G40 Cup, Ginetta G40
-	  - Ginetta G55 GT3, Ginetta G55 GT4 Supercup, Ginetta G55 GT4
-	  - Ginetta G58 Gen2, Lamborghini Diablo SV-R, Ligier JS P217
-	  - Ligier JS P320, Ligier JS P4, Ligier JS2 R
-	  - Lotus Renault 98T, McLaren Honda MP44, McLaren Honda MP45B
-	  - MCR S2000, MetalMoro AJR Gen2 Chevrolet, MetalMoro AJR Gen2 Honda
-	  - MetalMoro AJR Gen2 Nissan, Mitsubishi Lancer R, Oreca 07
-	  - Porsche 911 GT3 Cup 3.8, Porsche 911 GT3 Cup 4.0, Sigma P1 G5
-
-# Release history
 
 ## 6.7.7.1
 

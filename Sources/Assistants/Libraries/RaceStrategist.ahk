@@ -2347,6 +2347,7 @@ class RaceStrategist extends GridRaceAssistant {
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", tyreCompound)
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", tyreCompoundColor)
 
+				/*
 				if (tyreService = "Wheel") {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre, tyreCompound)
@@ -2358,6 +2359,7 @@ class RaceStrategist extends GridRaceAssistant {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . axle, tyreCompound)
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle, tyreCompoundColor)
 					}
+				*/
 			}
 
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count"

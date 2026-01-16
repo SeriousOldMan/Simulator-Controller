@@ -99,6 +99,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iAllTracks := []
 
+	iCarNames := []
+	iTrackNames := []
+
 	iShowAllCars := false
 	iShowAllTracks := false
 
@@ -309,6 +312,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				return translate("All")
 			else
 				return this.iSelectedWeather
+		}
+	}
+
+	CarNames {
+		Get {
+			return this.iCarNames
+		}
+	}
+
+	TrackNames {
+		Get {
+			return this.iTrackNames
 		}
 	}
 
@@ -2904,6 +2919,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			for index, car in choices
 				choices[index] := this.getCarName(simulator, car)
 
+			bubbleSort(&choices)
+
+			this.iCarNames := choices.Clone()
+
 			choices.InsertAt(1, translate("All"))
 
 			window["carDropDown"].Delete()
@@ -2930,10 +2949,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (car == true)
 				window["carDropDown"].Choose(1)
 			else
-				window["carDropDown"].Choose(inList(this.getCars(this.SelectedSimulator), car) + 1)
+				window["carDropDown"].Choose(inList(this.CarNames, SessionDatabase.getCarName(this.SelectedSimulator, car)) + 1)
 
 			tracks := this.getTracks(this.SelectedSimulator, car).Clone()
 			trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+
+			bubbleSort(&trackNames)
+
+			this.iTrackNames := trackNames.Clone()
 
 			tracks.InsertAt(1, true)
 			trackNames.InsertAt(1, translate("All"))
@@ -2965,7 +2988,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				window["trackDropDown"].Choose(1)
 			}
 			else
-				window["trackDropDown"].Choose(inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
+				window["trackDropDown"].Choose(inList(this.TrackNames, SessionDatabase.getTrackName(this.SelectedSimulator, track)) + 1)
 
 			this.updateModules()
 		}
@@ -8187,7 +8210,7 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.SetFont("s9 Norm", "Arial")
 
 		settingsEditorGui.Add("Documentation", "x103 YP+20 w204 Center", translate("Database Settings")
-							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings")
+							, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings-1")
 
 		settingsEditorGui.SetFont("s8 Norm", "Arial")
 
@@ -8315,7 +8338,7 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.Add("DropDownList", "x146 yp w120 vsettingsShowTracksDropDown", collect(["All", "Used"], translate))
 		settingsEditorGui["settingsShowTracksDropDown"].Choose(1 + (getMultiMapValue(configuration, "Scope", "Tracks", "Used") = "Used"))
 
-		settingsEditorGui.Add("Button", "x16 ys+78 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
+		settingsEditorGui.Add("Button", "x16 ys+82 w120 h23", translate("Consent...")).OnEvent("Click", (*) {
 			settingsEditorGui.Block()
 
 			try {

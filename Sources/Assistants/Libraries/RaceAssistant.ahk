@@ -496,7 +496,7 @@ class RaceAssistant extends ConfigurationItem {
 						try {
 							FileAppend(script, scriptFileName)
 
-							if !scriptLoadScript(context, scriptFileName, &message)
+							if !scriptLoad(context, scriptFileName, &message)
 								throw message
 						}
 						finally {
@@ -5328,7 +5328,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				try {
 					FileAppend(script, scriptFileName)
 
-					if !scriptLoadScript(context, scriptFileName, &message)
+					if !scriptLoad(context, scriptFileName, &message)
 						throw message
 				}
 				finally {

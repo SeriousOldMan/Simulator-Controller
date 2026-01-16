@@ -909,7 +909,7 @@ execute(command) {
 				try {
 					context := scriptOpenContext()
 
-					if !scriptLoadScript(context, command[1], &message)
+					if !scriptLoad(context, command[1], &message)
 						throw message
 
 					arguments := command.Clone()

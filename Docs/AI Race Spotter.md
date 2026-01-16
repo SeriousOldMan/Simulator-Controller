@@ -337,12 +337,18 @@ And a final warning: This kind of automation might be considered illegal accordi
 
 ### Enabling and disabling Track Automations
 
-For Track Automations to be active, you must enable them, when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) available.
+For Track Automations to be active, you must enable them when you are on the track. Once Track Automation is enabled, the default automation (see above) is loaded and activated at the beginning of the next lap. Of course, there are many different ways to enable the automation:
+
+1. The ["Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) provides an action, which you can bind to your controller to enable or disable Track Automations.
+2. The are also controller action functions ["enableTrackAutomation" and "disableTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) available. Using them, you can define custom voice commands, for example.
+3. Automations can also be enabled in the Windows tray menu of the "Simulator Controller" process.
+4. And a corresponding function is available for [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
+
+There are other methods, but the ones mentioned above are the most common ones.
 
 ### Choosing between different Track Automations
 
-As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling
-) action function. To use this, you must create an entry in your configuration like:
+As you have seen above, you can select one of the available Track Automations as the default, which will be loaded and activated, when you enable Track Automations. But there might be occasions, for example, when the weather changes, where you want a different set of track actions to be active. In this situation you can load a different Track Automation by name using the ["seleectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#track-automation-handling) action function. To use this, you must create an entry in your configuration like:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Track%20Automation%201.JPG)
 
@@ -352,7 +358,9 @@ If you are using "Simulator Setup" for your configuration tasks, you can achieve
 	Custom.42.Call=<^<!W
 	Custom.42.Call Action=selectTrackAutomation(Wet)
 
-In this example, the "<^<!W" stands for the [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) *W* pressed together with left *Control* and the left *Alt* key. But you can also use a button on your steering wheel, for example: "3Joy15". However. when the trigger is detected, the action function "selectTrackAutomation" Track Automation is called and loads the Track Automation named "Wet" for the current simulator / car / track combination.
+In this example, the "<^<!W" stands for the [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) *W* pressed together with left *Control* and the left *Alt* key. But you can also use a button on your steering wheel, for example: "3Joy15", or even a voice command like "?Wet Track". In any case, when the trigger is detected, the action function "selectTrackAutomation" Track Automation is called and loads the Track Automation named "Wet" for the current simulator / car / track combination.
+
+A much more advanced method may be to write an action script for a [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events), to select an automation depending on track wetness and grip.
 
 ### Ex- and importing Track Automations
 

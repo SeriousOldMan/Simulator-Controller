@@ -2222,7 +2222,7 @@ class CallbacksEditor {
 		local valid := true
 		local name := this.Control["callbackNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context, message, script
+		local ignore, other, type, fileName, message, script
 
 		if this.SelectedParameter
 			if !this.saveParameter(this.SelectedParameter)
@@ -2272,8 +2272,6 @@ class CallbacksEditor {
 			fileName := temporaryFilename("Script", "script")
 
 			try {
-				context := scriptOpenContext()
-
 				script := this.ScriptEditor.Content[true]
 
 				for ignore, parameter in callback.Parameters
@@ -2281,10 +2279,11 @@ class CallbacksEditor {
 
 				FileAppend(script, fileName)
 
-				if !scriptLoadScript(context, fileName, &message)
-					throw message
+				if !scriptCheck(fileName, &messages){
+					errorMessage .= ("`n" . values2String("`n", collect(messages, (m) => (translate("Error: ") . m))*))
 
-				scriptCloseContext(context)
+					valid := false
+				}
 			}
 			catch Any as exception {
 				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
@@ -2451,7 +2450,7 @@ class CallbacksEditor {
 		local extension := (InStr(this.Type, "Events") ? ".events" : ".actions")
 		local configuration := readMultiMap(kResourcesDirectory . "Actions\" . this.Assistant . extension)
 		local callbacks := []
-		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, context, fileName, message, category
+		local active, disabled, ignore, type, callback, descriptor, parameters, theCallback, fileName, message, category
 
 		this.iDeletedCallbacks := CaseInsenseMap()
 
@@ -2511,14 +2510,10 @@ class CallbacksEditor {
 							fileName := temporaryFilename("Script", "script")
 
 							try {
-								context := scriptOpenContext()
-
 								FileAppend(theCallback.Script, fileName)
 
-								if !scriptLoadScript(context, fileName, &message)
-									throw message
-
-								scriptCloseContext(context)
+								if !scriptCheck(fileName, &messages)
+									throw values2String("`n", messages*)
 							}
 							finally {
 								deleteFile(fileName)

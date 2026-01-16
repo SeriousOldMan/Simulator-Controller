@@ -2377,22 +2377,19 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		if lastPitstop
+		if (this.PitstopHistory && (this.PitstopHistory.Length > 0)) {
+			pitstop := this.PitstopHistory[this.PitstopHistory.Length]
+
+			stintLaps := (lapNumber - pitstop.Lap)
+
+			if (pitstop.Nr >= lastPitstop)
+				tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
+											 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+		}
+		else if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 		else
 			stintLaps := lapNumber
-
-		if this.PitstopHistory {
-			tyreLaps := false
-
-			for ignore, pitstop in this.PitstopHistory
-				if (pitstop.Nr = lastPitstop) {
-					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
-												 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
-
-					break
-				}
-		}
 
 		if !tyreLaps
 			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
@@ -5303,21 +5300,20 @@ class RaceStrategist extends GridRaceAssistant {
 		local tyreLaps := false
 		local stintLaps, ignore, thePitstop
 
-		if lastPitstop
+		if (this.PitstopHistory && (this.PitstopHistory.Length > 0)) {
+			thePitstop := this.PitstopHistory[this.PitstopHistory.Length]
+
+			stintLaps := (lapNumber - thePitstop.Lap)
+
+			tyreLaps := values2String(",", thePitstop.TyreLapsFrontLeft + stintLaps
+										 , thePitstop.TyreLapsFrontRight + stintLaps
+										 , thePitstop.TyreLapsRearLeft + stintLaps
+										 , thePitstop.TyreLapsRearRight + stintLaps)
+		}
+		else if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 		else
 			stintLaps := lapNumber
-
-		if this.PitstopHistory
-			for ignore, thePitstop in this.PitstopHistory
-				if (thePitstop.Nr = lastPitstop) {
-					tyreLaps := values2String(",", thePitstop.TyreLapsFrontLeft + stintLaps
-												 , thePitstop.TyreLapsFrontRight + stintLaps
-												 , thePitstop.TyreLapsRearLeft + stintLaps
-												 , thePitstop.TyreLapsRearRight + stintLaps)
-
-					break
-				}
 
 		if !tyreLaps
 			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)

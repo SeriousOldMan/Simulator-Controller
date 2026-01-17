@@ -92,43 +92,56 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createSessionState(sessionInfo) {
-		local state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator", kNull)
-						 , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
-						 , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
-						 , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+		local state
 
-		if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
-			state["Profile"] := kNull
-		else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
-			state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
+		if getMultiMapValue(sessionInfo, "Session", "Simulator", false) {
+			state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator")
+					   , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
+					   , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
+					   , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+
+			if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
+				state["Profile"] := kNull
+			else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
+				state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
+			else
+				state["Profile"] := translate("Standard")
+
+			return state
+		}
 		else
-			state["Profile"] := translate("Standard")
-
-		return state
+			return kNull
 	}
 
 	createDurationState(sessionInfo) {
-		local sessionTime := getMultiMapValue(sessionInfo, "Session", "Time.Remaining", kUndefined)
-		local stintTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", kUndefined)
-		local driverTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", kUndefined)
-		local state := Map()
+		local sessionTime, stintTime, driverTime, state
 
-		if getMultiMapValue(sessionInfo, "Session", "Format", false)
-			state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"))
+		if getMultiMapValue(sessionInfo, "Session", "Simulator", false) {
+			state := Map()
 
-		state["SessionLapsLeft"] := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
-		state["StintLapsLeft"] := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
+			sessionTime := getMultiMapValue(sessionInfo, "Session", "Time.Remaining", kUndefined)
+			stintTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", kUndefined)
+			driverTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", kUndefined)
 
-		if isNumber(sessionTime)
-			state["SessionTimeLeft"] := displayValue("Time", sessionTime)
+			if getMultiMapValue(sessionInfo, "Session", "Format", false)
+				state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"))
 
-		if isNumber(stintTime)
-			state["StintTimeLeft"] := displayValue("Time", stintTime)
+			state["SessionLapsLeft"] := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
+			state["StintLapsLeft"] := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
 
-		if isNumber(driverTime)
-			state["DriverTimeLeft"] := displayValue("Time", driverTime)
+			if isNumber(sessionTime)
+				state["SessionTimeLeft"] := displayValue("Time", sessionTime)
 
-		return state
+			if isNumber(stintTime)
+				state["StintTimeLeft"] := displayValue("Time", stintTime)
+
+			if isNumber(driverTime)
+				state["DriverTimeLeft"] := displayValue("Time", driverTime)
+
+			return state
+		}
+		else
+			return kNull
 	}
 
 	createConditionsState(sessionInfo) {
@@ -143,7 +156,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		if grip
 			state["Grip"] := translate(grip)
 
-		if wetherNow
+		if weatherNow
 			state["Weather"] := translate(weatherNow)
 
 		if weather10Min
@@ -151,6 +164,12 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		if weather30Min
 			state["Weather30Min"] := translate(weather30Min)
+
+		if ((state.Count > 2) || getMultiMapValue(sessionInfo, "Weather", "Temperature", false)
+							  || getMultiMapValue(sessionInfo, "Track", "Temperature", false))
+			return state
+		else
+			return kNull
 	}
 
 	createStintState(sessionInfo) {
@@ -161,14 +180,17 @@ class IntegrationPlugin extends ControllerPlugin {
 		local lastSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Last", false)
 		local bestSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Best", false)
 
-		return Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
-				 , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")
-				 , "Lap", (lastLap + 1)
-				 , "Position", getMultiMapValue(sessionInfo, "Stint", "Position")
-				 , "BestTime", ((bestTime < 3600) ? displayValue("Time", bestTime) : kNull)
-				 , "LastTime", ((lastTime < 3600) ? displayValue("Time", lastTime) : kNull)
-				 , "BestSpeed", (bestSpeed ? convertUnit("Speed", bestSpeed) : kNull)
-				 , "LastSpeed", (bestSpeed ? convertUnit("Speed", lastSpeed) : kNull))
+		if (getMultiMapValue(sessionInfo, "Session", "Simulator", false) && getMultiMapValue(sessionInfo, "Stint", "Position", false))
+			return Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
+					 , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")
+					 , "Lap", (lastLap + 1)
+					 , "Position", getMultiMapValue(sessionInfo, "Stint", "Position")
+					 , "BestTime", ((bestTime < 3600) ? displayValue("Time", bestTime) : kNull)
+					 , "LastTime", ((lastTime < 3600) ? displayValue("Time", lastTime) : kNull)
+					 , "BestSpeed", (bestSpeed ? convertUnit("Speed", bestSpeed) : kNull)
+					 , "LastSpeed", (bestSpeed ? convertUnit("Speed", lastSpeed) : kNull))
+		else
+			return kNull
 	}
 
 	createFuelState(sessionInfo) {
@@ -183,13 +205,16 @@ class IntegrationPlugin extends ControllerPlugin {
 		state["RemainingFuelLaps"] := state["RemainingLaps"]
 
 		if (getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", kUndefined) != kUndefined) {
-			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 1)
-			state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 1)
-			state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 1)
+			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 0)
+			state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
+			state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
 			state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
 		}
 
-		return state
+		if exist(getValues(state), (v) => (v > 0))
+			return state
+		else
+			return kNull
 	}
 
 	createTyresState(sessionInfo) {
@@ -256,7 +281,10 @@ class IntegrationPlugin extends ControllerPlugin {
 				state["TyreSet"] := tyreSet
 		}
 
-		return state
+		if exist(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) => (state["TyreCompound" . tyre] = "-"))
+			return kNull
+		else
+			return state
 	}
 
 	createBrakesState(sessionInfo) {
@@ -304,64 +332,60 @@ class IntegrationPlugin extends ControllerPlugin {
 		local tyreService := false
 		local nextPitstop, tyreCompound, tyreCompoundColor, pitstop, position, index, tyre, axle
 
-		if this.Provider
-			this.Provider.supportsPitstop(&fuelService, &tyreService)
+		if (pitstopsCount == kUndefined)
+			return kNull
+		else {
+			if this.Provider
+				this.Provider.supportsPitstop(&fuelService, &tyreService)
 
-		if (pitstopsCount == kUndefined) {
-			pitstopsCount := 0
+			if (nextPitstop && (pitstopsCount != 0))
+				remainingPitstops := (pitstopsCount - nextPitstop + 1)
 
-			state["State"] := "Unavailable"
-		}
-		else
-			state["State"] := "Active"
+			state["PlannedPitstops"] := pitstopsCount
+			state["RemainingPitstops"] := remainingPitstops
 
-		if (nextPitstop && (pitstopsCount != 0))
-			remainingPitstops := (pitstopsCount - nextPitstop + 1)
+			if nextPitstop {
+				nextPitstop := Map()
 
-		state["PlannedPitstops"] := pitstopsCount
-		state["RemainingPitstops"] := remainingPitstops
+				state["NextPitstop"] := nextPitstop
 
-		if nextPitstop {
-			nextPitstop := Map()
+				nextPitstop["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap")
 
-			state["NextPitstop"] := nextPitstop
+				if fuelService
+					nextPitstop["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0))
 
-			nextPitstop["Lap"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Lap")
+				if tyreService {
+					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
 
-			if fuelService
-				nextPitstop["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Refuel", 0))
+					if tyreCompound
+						nextPitstop["TyreCompound"] := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
+				}
 
-			if tyreService {
-				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
+				position := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", false)
 
-				if tyreCompound
-					nextPitstop["TyreCompound"] := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
+				if position
+					nextPitstop["Position"] := position
 			}
 
-			position := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", false)
+			loop pitstopsCount {
+				pitstop := Map("Nr", A_Index
+							 , "Lap", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Lap"))
 
-			if position
-				nextPitstop["Position"] := position
-		}
+				if fuelService
+					pitstop["Fuel"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Fuel.Amount")
 
-		loop pitstopsCount {
-			pitstop := Map("Nr", A_Index
-						 , "Lap", getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Lap"))
+				if (tyreService && getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Change")) {
+					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound")
+					tyreCompoundColor := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound.Color")
 
-			if fuelService
-				pitstop["Fuel"] := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Fuel.Amount")
+					pitstop["TyreCompound"] := translate(compound(tyreCompound, tyreCompoundColor))
+				}
 
-			if (tyreService && getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Change")) {
-				tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound")
-				tyreCompoundColor := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound.Color")
-
-				pitstop["TyreCompound"] := translate(compound(tyreCompound, tyreCompoundColor))
+				pitstops.Push(pitstop)
 			}
 
-			pitstops.Push(pitstop)
+			state["Pitstops"] := pitstops
 		}
-
-		state["Pitstops"] := pitstops
 
 		return state
 	}
@@ -399,13 +423,10 @@ class IntegrationPlugin extends ControllerPlugin {
 			this.Provider.supportsTyreManagement( , &tyreSet)
 		}
 
-		if (pitstopNr == kUndefined) {
-			pitstopNr := false
+		if (pitstopNr == kUndefined)
+			return kNull
 
-			state["State"] := "Unavailable"
-		}
-		else
-			state["State"] := "Planned"
+		state["State"] := "Planned"
 
 		if pitstopNr {
 			state["Number"] := pitstopNr
@@ -816,8 +837,13 @@ class IntegrationPlugin extends ControllerPlugin {
 							  , "Standings", this.createStandingsState(sessionInfo))
 
 			do(getKeys(sessionState), (k) {
-				if ((sessionState[k] == kNull) || (sessionState[k].Count = 0))
-					sesseionState.Delete(k)
+				try {
+					if ((sessionState[k] == kNull) || (sessionState[k].Count = 0))
+						sessionState.Delete(k)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 			})
 
 			if (this.DrivingCoach && this.DrivingCoach.TrackCoachingActive) {

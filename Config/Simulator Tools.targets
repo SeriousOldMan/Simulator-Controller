@@ -122,6 +122,7 @@ Setup Configuration.19=%kResourcesDirectory%Setup\Presets\R3EFullHDTripleNoHDREN
 Setup Configuration.20=%kResourcesDirectory%Setup\Presets\Startup.settings <- %kResourcesDirectory%\Templates\Startup.settings
 Setup Configuration.21=%kResourcesDirectory%Setup\Plugins <- %kHomeDirectory%Utilities\Plugins
 Setup Configuration.22=%kResourcesDirectory%Setup\Windows Runtimes <- %kHomeDirectory%Utilities\3rd Party\Windows Runtimes
+Setup Configuration.23=%kResourcesDirectory%Setup\Plugins\SimHub\SimulatorController.SimHub.Plugin.dll <- %kHomeDirectory%Binaries\SimHub\net48\SimulatorController.SimHub.Plugin.dll
 Build Targets.1=%kConfigDirectory%Simulator Tools.targets <- %kSourcesDirectory%Configuration\Simulator Tools.targets
 Translations.1=%kTranslationsDirectory% <- %kSourcesDirectory%Configuration\Translations\Translations.*
 Translations.2=%kResourcesDirectory%Templates\Translations.en <- %kSourcesDirectory%Configuration\Translations\Translations.en

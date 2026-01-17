@@ -1162,7 +1162,7 @@ else {
 	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Jona", "EN", false, true, true, false, true, true, true, true, true, true)
+							   , TestPitStopHandler(), "Jona", true, true, true, true, false, true, true, true, true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 

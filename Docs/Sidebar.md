@@ -41,7 +41,9 @@
 
 [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller)
 ------
-  - [Data privacy settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#managing-your-privacy)
+  - [User profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#user-profile)
+    - [Change your name](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Changing-your-name)
+    - [Data privacy settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#data-privacy-settings)
   - [Startup Process & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings)
     - [Customizing Startup Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration)
 	- [Customizing Controller Notifications](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications)
@@ -132,7 +134,7 @@
   - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups)
   - [Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures)
   - [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration)
-  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration)
+  - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings-1)
   
 [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 ------

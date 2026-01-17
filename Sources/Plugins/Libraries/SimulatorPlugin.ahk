@@ -1104,10 +1104,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false))
 	}
 
-	driverActive(data, driverForName, driverSurName) {
+	driverActive(data, driverForname, driverSurname) {
 		return (this.sessionActive(data)
-			 && (getMultiMapValue(data, "Stint Data", "DriverForname") = driverForName)
-			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
+			 && (getMultiMapValue(data, "Stint Data", "DriverForname") = driverForname)
+			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurname))
 	}
 
 	prepareSimulation() {

@@ -313,6 +313,7 @@ int main(int argc, char* argv[])
 		printNAData("MAP", gf->EngineMap + 1);
 		printNAData("TC", gf->TC);
 		printNAData("ABS", gf->ABS);
+		printNAData("BBRaw", pf->brakeBias);
 
 		printData("Ignition", pf->ignitionOn ? "true" : "false");
 		printData("HeadLights", (gf->lightsStage == 0) ? "Off" : (gf->lightsStage == 1) ? "Low" : "High");

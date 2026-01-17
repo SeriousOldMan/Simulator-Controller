@@ -9,12 +9,25 @@
 ---                           Public Modules Section                        ---
 -------------------------------------------------------------------------------
 
+Interaction = {}
 Reasoning = {}
 
 
 -------------------------------------------------------------------------------
 ---                          Public Functions Section                       ---
 -------------------------------------------------------------------------------
+
+function Interaction.Ask(raceAssistant, question, ...)
+	local arguments = table.pack(...)
+	
+	return extern("ask")(raceAssistant, question, table.unpack(arguments))
+end
+
+function Interaction.Command(raceAssistant, grammar, ...)
+	local arguments = table.pack(...)
+	
+	return extern("command")(raceAssistant, grammar, table.unpack(arguments))
+end
 
 function Reasoning.RaiseEvent(raceAssistant, event, ...)
 	local arguments = table.pack(...)

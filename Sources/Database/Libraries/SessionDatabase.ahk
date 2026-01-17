@@ -595,7 +595,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static registerDriver(simulator, id, name) {
-		local sessionDB, forName, surName, nickName, key
+		local sessionDB, forname, surname, nickname, key
 
 		static knownDrivers := CaseInsenseMap()
 
@@ -607,15 +607,15 @@ class SessionDatabase extends ConfigurationItem {
 			if !knownDrivers.Has(key) {
 				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(name, &forName, &surName, &nickName)
+				parseDriverName(name, &forname, &surname, &nickname)
 
 				try {
-					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
-						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
+					if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forname, Surname: surname}}).Length = 0)
+						sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forname, "Surname", surname, "Nickname", nickname), true)
 
 					knownDrivers[key] := true
 				}
@@ -630,6 +630,74 @@ class SessionDatabase extends ConfigurationItem {
 		SessionDatabase.registerDriver(simulator, id, name)
 	}
 
+	static getName(type, defaultForname := false, defaultSurname := "", defaultNickname := "") {
+		local name, scope
+
+		name := this.getProfileName(&scope)
+
+		if (type = "Profile")
+			return name
+		else if inList(scope, type)
+			return name
+		else if defaultForname
+			return driverName(defaultForname, defaultSurname, defaultNickname
+									, (defaultSurname != ""), (defaultNickname != ""))
+		else
+			return this.getUserName()
+	}
+
+	static hasProfileName() {
+		return FileExist(kUserConfigDirectory . "PROFILE")
+	}
+
+	static getProfileName(&types?) {
+		local configuration
+
+		static name := false
+		static scope := ["Conversation", "Driver", "Creator"]
+
+		if !isSet(types)
+			types := false
+
+		if (!name || (types = "Reload"))
+			if FileExist(kUserConfigDirectory . "PROFILE") {
+				configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+				name := getMultiMapValue(configuration, "User", "Name")
+				scope := []
+
+				do(["Conversation", "Driver", "Creator"], (type) {
+					if getMultiMapValue(configuration, "User", type, false)
+						scope.Push(type)
+				})
+			}
+			else {
+				name := this.getUserName()
+				scope := ["Conversation", "Driver", "Creator"]
+			}
+
+		types := scope
+
+		return name
+	}
+
+	static setProfileName(name, types) {
+		local configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
+
+		setMultiMapValue(configuration, "User", "Name", name)
+
+		do(["Conversation", "Driver", "Creator"], (type) => removeMultiMapValue(configuration, "User", type))
+		do(types, (type) => setMultiMapValue(configuration, "User", type, true))
+
+		writeMultiMap(kUserConfigDirectory . "PROFILE", configuration)
+
+		this.getProfileName(&type := "Reload")
+	}
+
+	getProfileName(&types?) {
+		return SessionDatabase.getProfileName(&types)
+	}
+
 	static getUserName() {
 		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
 
@@ -641,22 +709,22 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getDriverIDs(simulator, name, sessionDB := false) {
-		local forName, surName, nickName, ids, ignore, entry
+		local forname, surname, nickname, ids, ignore, entry
 
 		try {
 			if (simulator && name) {
-				forName := false
-				surName := false
-				nickName := false
+				forname := false
+				surname := false
+				nickname := false
 
-				parseDriverName(name, &forName, &surName, &nickName)
+				parseDriverName(name, &forname, &surname, &nickname)
 
 				if !sessionDB
 					sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				ids := []
 
-				for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forName, Surname: surName}})
+				for ignore, entry in sessionDB.query("Drivers", {Where: {Forname: forname, Surname: surname}})
 					ids.Push(entry["ID"])
 
 				return ids
@@ -1075,23 +1143,60 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getSimulators(force)
 	}
 
-	getCars(simulator) {
+	getCars(simulator, all := false) {
 		local code := this.getSimulatorCode(simulator)
+		local carData, codes
 
-		if code
-			return this.getEntries(code . "\*.*")
+		if code {
+			if all {
+				carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+				codes := getMultiMapValues(carData, "Car Names")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in this.getEntries(code . "\*.*")
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\*.*")
+			}
+			else
+				return this.getEntries(code . "\*.*")
+		}
 		else
 			return []
 	}
 
-	getTracks(simulator, car) {
+	getTracks(simulator, car, all := false) {
 		local code := this.getSimulatorCode(simulator)
-		local tracks
+		local tracks, trackData, codes
 
 		if code {
 			tracks := this.getEntries(code . "\" . car . "\*.*")
+			tracks := ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 
-			return ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
+			if all {
+				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+				codes := getMultiMapValues(trackData, "Track Names Long")
+
+				if (codes.Count > 0) {
+					codes := getKeys(codes)
+
+					for ignore, code in tracks
+						if !inList(codes, code)
+							codes.Push(code)
+
+					return codes
+				}
+				else
+					return this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*")
+			}
+			else
+				return tracks
 		}
 		else
 			return []
@@ -1129,24 +1234,27 @@ class SessionDatabase extends ConfigurationItem {
 
 	static registerCar(simulator, car, name) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
-		local carCode := SessionDatabase.getCarCode(simulator, car)
-		local carData, fileName
+		local carData, carCode, fileName, found
+
+		carCode := SessionDatabase.getCarCode(simulator, car, &found)
 
 		if (simulator && simulatorCode && (simulatorCode != "0")  && car && carCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode)
 
-			carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+			if !found {
+				carData := SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
 
-			if ((simulatorCode != "ACC") && (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined)) {
-				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
-				carData := readMultiMap(fileName)
+				if ((simulatorCode != "ACC") && (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined)) {
+					fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
+					carData := readMultiMap(fileName)
 
-				setMultiMapValue(carData, "Car Names", car, name)
-				setMultiMapValue(carData, "Car Codes", name, car)
+					setMultiMapValue(carData, "Car Names", car, name)
+					setMultiMapValue(carData, "Car Codes", name, car)
 
-				writeMultiMap(fileName, carData)
+					writeMultiMap(fileName, carData)
 
-				SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+					SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
+				}
 			}
 		}
 	}
@@ -1156,15 +1264,16 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarName(simulator, car) {
-		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Names", car, kUndefined)
+		local carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getMultiMapValue(carData, "Car Names", car, kUndefined)
 
 		if (name == kUndefined)
-			name := normalizeFileName(car)
+			name := getMultiMapValue(carData, "Car Names", normalizeFileName(car), kUndefined)
+
+		if (name == kUndefined)
+			name := car
 		else if (!name || (name = ""))
-			name := normalizeFileName(car)
-		else
-			name := normalizeFileName(name)
+			name := car
 
 		return name
 	}
@@ -1173,70 +1282,128 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarName(simulator, car)
 	}
 
-	static getCarCode(simulator, car) {
-		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									 , "Car Codes", car, kUndefined)
+	static getCarCode(simulator, car, &found?) {
+		local carData := SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local code := getMultiMapValue(carData, "Car Codes", car, kUndefined)
 
-		if (code == kUndefined)
-			code := normalizeFileName(car)
+		found := false
+
+		if (code == kUndefined) {
+			code := getMultiMapValue(carData, "Car Codes", normalizeFileName(car), kUndefined)
+
+			if (code == kUndefined)
+				code := car
+			else
+				found := true
+		}
 		else if (!code || (code = ""))
-			code := normalizeFileName(car)
+			code := car
 		else
-			code := normalizeFileName(code)
+			found := true
 
-		return code
+		return normalizeFileName(code)
 	}
 
-	getCarCode(simulator, car) {
-		return SessionDatabase.getCarCode(simulator, car)
+	getCarCode(simulator, car, &found?) {
+		return SessionDatabase.getCarCode(simulator, car, &found)
 	}
 
-	getCarSteerLock(simulator, car, track) {
-		local key := (this.getSimulatorCode(simulator) . "." this.getCarCode(simulator, car))
-		local steerLock
+	static getCarClass(simulator, car) {
+		return getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+							  , "Car Classes", car, false)
+	}
+
+	getCarClass(simulator, car) {
+		return SessionDatabase.getCarClass(simulator, car)
+	}
+
+	static getCarInformation(simulator, car, track, type) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local carCode := this.getCarCode(simulator, car)
+		local key := (simulatorCode . "." carCode . "." . type)
+		local value
 
 		static settingsDB := false
-		static steerLocks := CaseInsenseMap()
+		static values := CaseInsenseMap()
 
-		if steerLocks.Has(key)
-			return steerLocks[key]
+		if values.Has(key)
+			return values[key]
 
 		if !settingsDB
 			settingsDB := SettingsDatabase()
 
-		steerLock := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car.SteerLock", kUndefined)
+		value := settingsDB.readSettingValue(simulator, car, track, "*", "*", "Session Settings", "Car." . type, kUndefined)
 
-		if (steerLock == kUndefined)
-			steerLock := getCarSteerLock(simulator, car)
+		if (value == kUndefined)
+			value := %"getCar" . type%(simulator, car)
 
-		steerLocks[key] := steerLock
+		if (!value || (value = kUndefined))
+			value := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, simulatorCode, "Car Data.ini")
+									, "Car Information", carCode . "." . type, false)
 
-		return steerLock
+		values[key] := value
+
+		return value
+	}
+
+	static getCarSteerLock(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "SteerLock")
+	}
+
+	getCarSteerLock(simulator, car, track) {
+		return SessionDatabase.getCarSteerLock(simulator, car, track)
+	}
+
+	static getCarSteerRatio(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "SteerRatio")
+	}
+
+	getCarSteerRatio(simulator, car, track) {
+		return SessionDatabase.getCarSteerRatio(simulator, car, track)
+	}
+
+	static getCarWheelbase(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "Wheelbase")
+	}
+
+	getCarWheelbase(simulator, car, track) {
+		return SessionDatabase.getCarWheelbase(simulator, car, track)
+	}
+
+	static getCarTrackWidth(simulator, car, track) {
+		return this.getCarInformation(simulator, car, track, "TrackWidth")
+	}
+
+	getCarTrackWidth(simulator, car, track) {
+		return SessionDatabase.getCarTrackWidth(simulator, car, track)
 	}
 
 	static registerTrack(simulator, car, track, shortName, longName) {
 		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local carCode := SessionDatabase.getCarCode(simulator, car)
-		local trackCode := SessionDatabase.getTrackCode(simulator, track)
-		local trackData, fileName
+		local trackData, trackCode, fileName, found
+
+		trackCode := SessionDatabase.getTrackCode(simulator, track, &found)
 
 		if (simulator && simulatorCode && (simulatorCode != "0") && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
-			trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
+			if !found {
+				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
 
-			if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
-				fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
-				trackData := readMultiMap(fileName)
+				if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
+					fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
+					trackData := readMultiMap(fileName)
 
-				setMultiMapValue(trackData, "Track Names Long", track, longName)
-				setMultiMapValue(trackData, "Track Names Short", track, shortName)
-				setMultiMapValue(trackData, "Track Codes", longName, track)
-				setMultiMapValue(trackData, "Track Codes", shortName, track)
+					setMultiMapValue(trackData, "Track Names Long", track, longName)
+					setMultiMapValue(trackData, "Track Names Short", track, shortName)
+					setMultiMapValue(trackData, "Track Codes", longName, track)
+					setMultiMapValue(trackData, "Track Codes", shortName, track)
 
-				writeMultiMap(fileName, trackData)
+					writeMultiMap(fileName, trackData)
 
-				SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+					SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
+				}
 			}
 		}
 	}
@@ -1246,43 +1413,58 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getTrackName(simulator, track, long := true) {
-		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , long ? "Track Names Long" : "Track Names Short", track, kUndefined)
+		local trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short", track, kUndefined)
 
 		if ((name != kUndefined) && (StrLen(name) < 5))
-			name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Names Long", track, name)
+			name := getMultiMapValue(trackData, "Track Names Long", track, name)
 
-		if (name == kUndefined)
-			name := normalizeFileName(track)
+		if (name == kUndefined) {
+			name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short"
+											  , normalizeFileName(track), kUndefined)
+
+			if ((name != kUndefined) && (StrLen(name) < 5))
+				name := getMultiMapValue(trackData, "Track Names Long", normalizeFileName(track), name)
+
+			if (name == kUndefined)
+				name := track
+		}
 		else if (!name || (name = ""))
-			name := normalizeFileName(track)
+			name := track
 		else
-			name := normalizeFileName(name)
+			found := true
 
-		return StrTitle(name)
+		return StrTitle(normalizeFileName(name))
 	}
 
 	getTrackName(simulator, track, long := true) {
 		return SessionDatabase.getTrackName(simulator, track, long)
 	}
 
-	static getTrackCode(simulator, track) {
-		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									 , "Track Codes", track, kUndefined)
+	static getTrackCode(simulator, track, &found?) {
+		local trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local code := getMultiMapValue(trackData, "Track Codes", track, kUndefined)
 
-		if (code == kUndefined)
-			code := normalizeFileName(track)
+		found := false
+
+		if (code == kUndefined) {
+			code := getMultiMapValue(trackData, "Track Codes", normalizeFileName(track), kUndefined)
+
+			if (code == kUndefined)
+				code := track
+			else
+				found := true
+		}
 		else if (!code || (code = ""))
-			code := normalizeFileName(track)
+			code := track
 		else
-			code := normalizeFileName(code)
+			found := true
 
-		return code
+		return normalizeFileName(code)
 	}
 
-	getTrackCode(simulator, track) {
-		return SessionDatabase.getTrackCode(simulator, track)
+	getTrackCode(simulator, track, &found?) {
+		return SessionDatabase.getTrackCode(simulator, track, &found)
 	}
 
 	static getTyreCompounds(simulator, car, track, codes := false) {
@@ -3124,42 +3306,42 @@ combineCompounds(&compounds, &compoundColors := false) {
 	}
 }
 
-parseDriverName(fullName, &forName, &surName, &nickName?) {
+parseDriverName(fullName, &forname, &surname, &nickname?) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)
 
-		nickName := Trim(StrReplace(fullName[2], ")", ""))
+		nickname := Trim(StrReplace(fullName[2], ")", ""))
 		fullName := fullName[1]
 	}
 	else
-		nickName := ""
+		nickname := ""
 
 	fullName := StrSplit(fullName, A_Space, " `t", 2)
 
 	if (fullName.Length > 0) {
-		forName := fullName[1]
-		surName := ((fullName.Length > 1) ? fullName[2] : "")
+		forname := fullName[1]
+		surname := ((fullName.Length > 1) ? fullName[2] : "")
 	}
 	else {
-		forName := ""
-		surName := ""
+		forname := ""
+		surname := ""
 	}
 }
 
-driverName(forName, surName, nickName := false) {
+driverName(forname, surname, nickname := false, withSurname := true, withNickname := true) {
 	local name := ""
 
-	if (forName != "")
-		name .= (forName . A_Space)
+	if (forname != "")
+		name .= (forname . A_Space)
 
-	if (surName != "")
-		name .= (surName . A_Space)
+	if (surname != "")
+		name .= (withSurname ? (surname . A_Space) : "")
 
-	if !nickName
-		nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+	if !nickname
+		nickname := (withNickname ? (SubStr(forname, 1, 1) . SubStr(surname, 1, 1)) : "")
 
-	if (nickName != "")
-		name .= (translate("(") . nickName . translate(")"))
+	if ((nickname != "") && withNickname)
+		name .= (translate("(") . nickname . translate(")"))
 
 	return Trim(name)
 }

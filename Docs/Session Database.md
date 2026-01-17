@@ -340,13 +340,21 @@ Here is what you have to do:
 
 Then start the "Session Database", select the target simulator and run the import as described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration).
 
-#### Database Configuration
+### Settings
 
-Normally, your local database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. You can move the database to another location on your PC, and you also can synchronize most data objects with those of other drivers in your team, as long as all of you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). To change the database configuration, click on the small button with the cog wheel in the upper right corner. The following window appears:
+To change the settings and configuration of the session database, click on the small button with the cog wheel in the upper right corner. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2014.jpg)
 
-In the first field, you can define the location of the database on your local PC. Doing this, you can move your own database folder to another location, or you can switch temporarily to another database, for example to look at the data of a friend or team mate. If you change this location and leave the dialog with "Ok", you will be asked, if you want to transfer all your current data to the new location, or if you want to use the new database folder as it is. Please note, that as long as you configured your database to a location of a copy of a *foreign* users database, no data will be collected in order to prevent disorder.
+#### Cars and tracks
+
+Let's start with the simple settings. In the lowest section of the settings dialog you can specify which cars and tracks will be available in the drop down menus of the main window. By default, only the cars and tracks, you already have used so far for the selected simulator will be available for selection, because only for those any data can exist. This will be different, if you change the database scope to "User & Community", of course. However, using the supplied settings in the lower section of the settings dialog, you can also display any cars and tracks, which may be known to Simulator Controller, even if you haven't used them so far. Please not, that it depends on the selected simulator and the available meta data, whether this any effect.
+
+#### Database Configuration
+
+Normally, your local database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. You can move the database to another location on your PC, and you also can synchronize most data objects with those of other drivers in your team, as long as all of you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). 
+
+In the first field of the settings dialog, you can define the location of the database on your local PC. Doing this, you can move your own database folder to another location, or you can switch temporarily to another database, for example to look at the data of a friend or team mate. If you change this location and leave the dialog with "Ok", you will be asked, if you want to transfer all your current data to the new location, or if you want to use the new database folder as it is. Please note, that as long as you configured your database to a location of a copy of a *foreign* users database, no data will be collected in order to prevent disorder.
 
 In the lower area of the window, you can configure one or more connections to Team Servers, which allow you to synchronize all kinds of *your* data to a central database and also replicate the same kind of data of all your team mates from the central database to your local database. Very helpful for data analysis, strategy development and stint planning in endurance races.
 

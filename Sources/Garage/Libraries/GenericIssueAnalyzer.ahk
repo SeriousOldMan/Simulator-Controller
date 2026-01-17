@@ -60,7 +60,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iOilTemperature := [80, 90, 100]
 
 	iAcousticFeedback := true
-	
+
 	iIssueCollector := false
 	iLastHandling := false
 	iLastTemperatures := false
@@ -379,10 +379,14 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		if selectedCar {
 			fileName := getFileName("Garage\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
+			this.iSteerLock := (SessionDatabase.getCarSteerLock(simulator, selectedCar, selectedTrack) || this.SteerLock)
+			this.iSteerRatio := (SessionDatabase.getCarSteerRatio(simulator, selectedCar, selectedTrack) || this.SteerRatio)
+			this.iWheelbase := (SessionDatabase.getCarWheelbase(simulator, selectedCar, selectedTrack) || this.Wheelbase)
+			this.iTrackWidth := (SessionDatabase.getCarTrackWidth(simulator, selectedCar, selectedTrack) || this.TrackWidth)
+
 			if FileExist(fileName) {
 				configuration := readMultiMap(fileName)
 
-				this.iSteerLock := getMultiMapValue(configuration, "Setup.General", "SteerLock", this.SteerLock)
 				this.iSteerRatio := getMultiMapValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
 				this.iWheelbase := getMultiMapValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)
 				this.iTrackWidth := getMultiMapValue(configuration, "Setup.General", "TrackWidth", this.TrackWidth)
@@ -666,7 +670,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 
 		this.iIssueCollector := false
-		
+
 		return false
 	}
 

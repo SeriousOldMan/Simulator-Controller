@@ -14,6 +14,7 @@
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\Framework\Extensions\Translator.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -806,7 +807,7 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 
 speak(message) {
-	local configuration
+	local configuration, arguments
 
 	static speaker := kUndefined
 
@@ -817,6 +818,14 @@ speak(message) {
 			speaker := SpeechSynthesizer(getMultiMapValue(configuration, "Voice Control", "Synthesizer")
 									   , getMultiMapValue(configuration, "Voice Control", "Speaker")
 									   , getMultiMapValue(configuration, "Voice Control", "Language"))
+
+			if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false) {
+				arguments := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Translator"))
+
+				speaker.setTranslator(Translator(arguments[1], arguments[2], arguments[3]
+											   , arguments[4]
+											   , string2Values(",", arguments[5])*))
+			}
 		}
 		catch Any as exception {
 			logError(exception, true)
@@ -887,52 +896,55 @@ execute(command) {
 
 	SimulatorController.Instance.runningSimulator(&thePlugin)
 
-	if (thePlugin && thePlugin.activateWindow())
-		try {
-			command := parseCommand(substituteVariables(command))
+	if thePlugin
+		thePlugin.activateWindow()
 
-			if FileExist(command[1]) {
-				SplitPath(command[1], , , &extension)
+	try {
+		command := parseCommand(substituteVariables(command))
 
-				if ((extension = "script") || (extension = "lua")) {
-					try {
-						context := scriptOpenContext()
+		if FileExist(command[1]) {
+			SplitPath(command[1], , , &extension)
 
-						if !scriptLoadScript(context, command[1], &message)
-							throw message
+			if ((extension = "script") || (extension = "lua")) {
+				try {
+					context := scriptOpenContext()
 
-						arguments := command.Clone()
-						arguments.RemoveAt(1)
+					if !scriptLoad(context, command[1], &message)
+						throw message
 
-						scriptPushArray(context, arguments)
-						scriptSetGlobal(context, "Arguments")
+					arguments := command.Clone()
+					arguments.RemoveAt(1)
 
-						scriptPushValue(context, (c) {
-							return scriptExternHandler(c)
-						})
-						scriptSetGlobal(context, "extern")
+					scriptPushArray(context, arguments)
+					scriptSetGlobal(context, "Arguments")
 
-						if scriptExecute(context, &message)
-							result := scriptGetBoolean(context)
-						else
-							throw message
-					}
-					finally {
-						try
-							scriptCloseContext(context)
-					}
+					scriptPushValue(context, (c) {
+						return scriptExternHandler(c)
+					})
+					scriptSetGlobal(context, "extern")
 
-					return
+					if scriptExecute(context, &message)
+						result := scriptGetBoolean(context)
+					else
+						throw message
 				}
+				finally {
+					try
+						scriptCloseContext(context)
+				}
+
+				return
 			}
-
-			Run(values2String(A_Space, command*))
 		}
-		catch Any as exception {
-			logError(exception, true)
 
-			logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
-		}
+		Run(values2String(A_Space, command*))
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		try
+			logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command[1]}))
+	}
 }
 
 trigger(hotkeys, method := "Event") {

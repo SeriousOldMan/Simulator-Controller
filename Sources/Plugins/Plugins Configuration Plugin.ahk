@@ -289,30 +289,6 @@ class PluginsConfigurator extends ConfigurationItemList {
 		return this.Editor.getSimulatorConfiguration()
 	}
 
-	getLanguage() {
-		local thePlugin := this.buildItemFromEditor()
-		local arguments, language
-
-		getCurrentLanguage() {
-			if isSet(VoiceControlConfigurator)
-				return VoiceControlConfigurator.Instance.getCurrentLanguage()
-			else
-				return getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Language", getLanguage())
-		}
-
-		if thePlugin {
-			arguments := string2Values("|", thePlugin.getArgumentValue("translator", ""))
-
-			if (arguments.Length = 5)
-				return {Service: arguments[1], Language: arguments[3]
-					  , Code: first(Translator.Languages, (l) => ((l.Identifier = arguments[3])
-															   || (l.Code = arguments[3]))).Code
-					  , APIKey: arguments[4], Arguments: string2Values(",", arguments[5])}
-			else
-				return thePlugin.getArgumentValue("language", getCurrentLanguage())
-		}
-	}
-
 	editAssistant() {
 		local assistantMenu := Menu()
 
@@ -355,9 +331,14 @@ class PluginsConfigurator extends ConfigurationItemList {
 				voice := thePlugin.getArgumentValue("speaker", true)
 				vocalics := string2Values(",", thePlugin.getArgumentValue("speakerVocalics", "100,0,0"))
 
-				if (arguments.Length = 5)
+				if (arguments.Length = 5) {
 					language := first(Translator.Languages, (l) => ((l.Identifier = arguments[3])
 																 || (l.Code = arguments[3]))).Code
+																 
+					setMultiMapValue(configuration, "Voice Control", "Language.Translated", true)
+					setMultiMapValue(configuration, "Voice Control", "Translator"
+												  , thePlugin.getArgumentValue("translator"))
+				}
 				else
 					language := thePlugin.getArgumentValue("language", getCurrentLanguage())
 
@@ -467,7 +448,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 				if configuration {
 					language := getMultiMapValue(configuration, assistant . ".Translator", "Language")
-					
+
 					thePlugin.setArgumentValue("language"
 											 , first(Translator.Languages, (l) => ((l.Identifier = language)
 																				|| (l.Code = language))).Code)

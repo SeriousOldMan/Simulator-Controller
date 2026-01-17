@@ -1873,6 +1873,7 @@ class RaceStrategist extends GridRaceAssistant {
 		facts["Strategy.Map"] := strategy.Map
 		facts["Strategy.TC"] := strategy.TC
 		facts["Strategy.ABS"] := strategy.ABS
+		facts["Strategy.BB"] := strategy.BB
 
 		pitstopDeviation := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Pitstop", 0)
 
@@ -2346,6 +2347,7 @@ class RaceStrategist extends GridRaceAssistant {
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound", tyreCompound)
 				setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color", tyreCompoundColor)
 
+				/*
 				if (tyreService = "Wheel") {
 					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . tyre, tyreCompound)
@@ -2357,6 +2359,7 @@ class RaceStrategist extends GridRaceAssistant {
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound." . axle, tyreCompound)
 						setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color." . axle, tyreCompoundColor)
 					}
+				*/
 			}
 
 			setMultiMapValue(sessionInfo, "Strategy", "Pitstop.Count"
@@ -2374,22 +2377,19 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		if lastPitstop
+		if (this.PitstopHistory && (this.PitstopHistory.Length > 0)) {
+			pitstop := this.PitstopHistory[this.PitstopHistory.Length]
+
+			stintLaps := (lapNumber - pitstop.Lap)
+
+			if (pitstop.Nr >= lastPitstop)
+				tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
+											 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
+		}
+		else if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 		else
 			stintLaps := lapNumber
-
-		if this.PitstopHistory {
-			tyreLaps := false
-
-			for ignore, pitstop in this.PitstopHistory
-				if (pitstop.Nr = lastPitstop) {
-					tyreLaps := values2String(",", pitstop.TyreLapsFrontLeft + stintLaps, pitstop.TyreLapsFrontRight + stintLaps
-												 , pitstop.TyreLapsRearLeft + stintLaps, pitstop.TyreLapsRearRight + stintLaps)
-
-					break
-				}
-		}
 
 		if !tyreLaps
 			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
@@ -2468,7 +2468,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase, result, lap, simulator, car, track, frequency, curContinuation
 		local pitstop, prefix, validLap, lapState, weather, airTemperature, trackTemperature
 		local mixedCompounds, compound, compoundColor
-		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
+		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, bb, pressures, temperatures, wear, multiClass
 		local sessionInfo, driverCar, driverID, lastTime, waterTemperature, oilTemperature
 
 		static lastLap := 0
@@ -2633,6 +2633,7 @@ class RaceStrategist extends GridRaceAssistant {
 			map := knowledgeBase.getValue(prefix . ".Map")
 			tc := knowledgeBase.getValue(prefix . ".TC")
 			antiBS := knowledgeBase.getValue(prefix . ".ABS")
+			bb := knowledgeBase.getValue(prefix . ".BB")
 
 			pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
 						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
@@ -2656,7 +2657,7 @@ class RaceStrategist extends GridRaceAssistant {
 			oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
 
 			this.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
+						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS, bb
 						   , values2String(",", compound*), values2String(",", compoundColor*)
 						   , pressures, temperatures, wear, lapState
 						   , waterTemperature, oilTemperature)
@@ -2966,7 +2967,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local ignore, pitstop, theFact
 
 		for ignore, theFact in ["Name", "Version", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
-							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
+							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS", "BB"
 							  , "Pitstop.Next", "Pitstop.Lap", "Pitstop.Position"
 							  , "Pitstop.Lap.Warning", "Pitstop.Deviation"]
 			knowledgeBase.clearFact("Strategy." . theFact)
@@ -3763,8 +3764,16 @@ class RaceStrategist extends GridRaceAssistant {
 			carStatistics[A_Index] := [lapTime, potential, raceCraft, speed, consistency, carControl]
 
 			lastPositions.Push(knowledgeBase.getValue("Car." . A_Index . ".Position", 0))
-			lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
-							+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
+
+			try {
+				lastRunnings.Push(knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
+								+ knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0))
+			}
+			catch Any as exception {
+				logError(exception)
+
+				lastRunnings.Push(0)
+			}
 		}
 
 		laps := CaseInsenseWeakMap()
@@ -5157,6 +5166,7 @@ class RaceStrategist extends GridRaceAssistant {
 			setMultiMapValue(data, "Lap", prefix . ".Map", knowledgeBase.getValue(prefix . ".Map", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".TC", knowledgeBase.getValue(prefix . ".TC", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".ABS", knowledgeBase.getValue(prefix . ".ABS", "n/a"))
+			setMultiMapValue(data, "Lap", prefix . ".BB", knowledgeBase.getValue(prefix . ".BB", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Consumption", knowledgeBase.getValue(prefix . ".Fuel.Consumption", "n/a"))
 			setMultiMapValue(data, "Lap", prefix . ".Pitstop", pitstop)
 			setMultiMapValue(data, "Lap", prefix . ".State", lapState)
@@ -5281,7 +5291,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+			  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 			  , compound, compoundColor, pressures, temperatures, wear, lapState
 			  , waterTemperature, oilTemperature) {
 		local knowledgeBase := this.KnowledgeBase
@@ -5290,28 +5300,27 @@ class RaceStrategist extends GridRaceAssistant {
 		local tyreLaps := false
 		local stintLaps, ignore, thePitstop
 
-		if lastPitstop
+		if (this.PitstopHistory && (this.PitstopHistory.Length > 0)) {
+			thePitstop := this.PitstopHistory[this.PitstopHistory.Length]
+
+			stintLaps := (lapNumber - thePitstop.Lap)
+
+			tyreLaps := values2String(",", thePitstop.TyreLapsFrontLeft + stintLaps
+										 , thePitstop.TyreLapsFrontRight + stintLaps
+										 , thePitstop.TyreLapsRearLeft + stintLaps
+										 , thePitstop.TyreLapsRearRight + stintLaps)
+		}
+		else if lastPitstop
 			stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 		else
 			stintLaps := lapNumber
-
-		if this.PitstopHistory
-			for ignore, thePitstop in this.PitstopHistory
-				if (thePitstop.Nr = lastPitstop) {
-					tyreLaps := values2String(",", thePitstop.TyreLapsFrontLeft + stintLaps
-												 , thePitstop.TyreLapsFrontRight + stintLaps
-												 , thePitstop.TyreLapsRearLeft + stintLaps
-												 , thePitstop.TyreLapsRearRight + stintLaps)
-
-					break
-				}
 
 		if !tyreLaps
 			tyreLaps := values2String(",", lapNumber, lapNumber, lapNumber, lapNumber)
 
 		if ((lapState = "Valid") && !pitstop) {
 			lapsDB.addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-											 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+											 , map, tc, abs, bb, fuelConsumption, fuelRemaining, lapTime
 											 , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 
 			if (stintLaps > 1)
@@ -5329,7 +5338,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.updateDynamicValues({HasLapsData: true})
 
 			this.RemoteHandler.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+										  , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs, bb
 										  , compound, compoundColor, tyreLaps, values2String(",", pressures*), values2String(",", temperatures*)
 										  , wear ? values2String(",", wear*) : false
 										  , lapState, waterTemperature, oilTemperature)

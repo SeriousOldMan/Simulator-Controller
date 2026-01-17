@@ -170,6 +170,7 @@ namespace PMRUDPConnector
             sb.Append("MAP=n/a\n");
             sb.AppendFormat("TC={0}\n", (playerTelem.Setup.TCSLevel >= 0) ? I(playerTelem.Setup.TCSLevel) : "n/a");
             sb.AppendFormat("ABS={0}\n", (playerTelem.Setup.ABSLevel >= 0) ? I(playerTelem.Setup.ABSLevel) : "n/a");
+            sb.AppendFormat("BB={0}\n", (playerTelem.Setup.BrakeBias >= 0) ? F((float)Math.Round(playerTelem.Setup.BrakeBias * 100, 2)) : "n/a");
             sb.Append("BodyworkDamage=0,0,0,0,0\n");
             sb.Append("SuspensionDamage=0,0,0,0\n");
             sb.AppendFormat("EngineDamage={0}\n", F(playerState.EngineDamage * 100));

@@ -22,15 +22,41 @@ The next button with the small keyboard symbol opens the documentation of all av
 
 Another way to get more specific documentation is by clicking on any *blue* label in one of the windows of the Simulator Controller applications. This will open the documentation right on the page where the content and functionality of this specific application or item is discussed.
 
-## Managing your *privacy*
+## User profile
 
-Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can use the profile dialog in "Simulator Setup" to make your choices.
+In this dialog, which can be accessed by clicking on the small button with the small person icon in the upper right corner of "Simulator Startup", you can specify personal information and manage various data consents which will, if given, support the further development of Simulator Controller. Lastly, you can share data with the community for which you will receive valuable data in return.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile.JPG)
 
+### Changing your name
+
+In the upper section of the profile dialog you can change your name and define where this name will be used. Normally, the driver name which is provided by the simulator API, when you run Simulator Controller for the first time, will be remembered and will be used whenever no other name can be derived, for example, by calling the active simulator.
+
+But this default name can be changed and you can specify where this alternative name should be used. Currently, three different areas are supported:
+
+1. *Conversation*
+
+   The name will be used for the conversation with the Assistants, i.e. that will be the name, you will be called by them.
+
+2. *Driver*
+
+   Some simulators do not provide a name for the current driver in all situations. In this case, the alternative name can be used.
+
+3. *Data*
+
+   Whenever a data entry is created in the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), this entry will be associated with a name as its creator. The alternative name can be used for this purpose as well.
+   
+As said, by default the first name that has been found will be used for all these purposes. If you want to change that, provide an alternative name in the *User* field of the profile dialog and click on the "Use..." button to select where this name should be used.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Profile%20Scope.JPG)
+
+### Data *privacy* settings
+
+Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can manage all this in the lower section of the profile dialog.
+
 - **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
 
-### Notes
+#### Notes
 
 - If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
 - No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
@@ -172,7 +198,7 @@ The checkbox for each function has three states - selected, deselected and indet
 |------------------|---------------------------------------|-------------------|-------------|
 | Driving Coach    | Performance Analysis                  | Setting           | If enabled, the standings data, lap and sector times and so on are collected and are provided to the Driving Coach for further analysis. |
 |                  | Handling Anlaysis                     | Setting           | If enabled, information about over- and understeering are collected during driving and are provided to the Driving Coach for further analysis. |
-| On-track Coaching                     | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
+|                  | On-track Coaching                     | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
 |                  | Brake Coaching                        | Controller Action | If enabled, telemetry coaching by the Driving Coach will be automatically enabled. This also includes automatic enabling of corner by corner coaching, once telemetry data is available. If you want to have more control over the process, use the voice commands or take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode). |
 | Race Spotter     | Track Mapping                         | Controller Action | Enables or disables track mapping for the given session. This can be especially useful when mapping non-circuit tracks that require a roll-forward to the start line. |
 |                  | Track Automation                      | Controller Action | Enables or disables the Track Automation for the given session. |
@@ -287,9 +313,9 @@ This activates Jona, the Race Engineer, and immediately asks Jona to plan a pits
 
 #### *Activation* listener
 
-Now it gets a bit complicated, sorry. Every Assistant and all other dialog partners are using there own listener. This listener uses the configured language of the corresponding Assistant, even if this language is *translated*. Additionally there is a so called activation listener, which is used when you are pressing the *Push-To-Talk* button twice **or** at a fresh start, when no dialog partner has been yet activated. This activation listener uses the language selected from the general voice configuration and this language is not (yet) translatable. By the way, the recognizer method of the activation listener can be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). But this is only required in very rare cases.
+Now it gets a bit complicated, sorry. Every Assistant and all other dialog partners are using there own listener. This listener uses the configured language of the corresponding Assistant, even if this language is *translated*. Additionally there is a so called activation listener, which is used when you are pressing the *Push-To-Talk* button twice **or** at a fresh start, when no dialog partner has been yet activated. This activation listener uses the language selected from the general voice configuration and this language is also translatable. By the way, the recognizer method of the activation listener can be configured in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). But this is only required in very rare cases.
 
-What does this mean: Let's assume, you are using translated Korean language for all your Assistants. Since this language is not available for the activation listener, you need to select English here and you need to call your Engineer with "Hello Jona" (or any other name) for the first time. Once an Assistant is active, his listener will be used to process activation commands. Therefore, if you want to talk to your Strategist then, you need to call: "안녕하세요 차토" (annyeonghaseyo chato). Similar rules apply, if your Assistants are configured with different languages (which I do sometimes for testing purposes).
+What does this mean: Let's assume, you are using translated Korean language for all your Assistants. The activation listenerhas now also be set to the Korean language using a translator. Otherwise the Korean activation command, for example "안녕하세요 차토" (annyeonghaseyo chato), will be registered in a speech recognizer with an English language, which will most probably not work. It gets even more complicated, if you are using Assistants which are configured with different languages (which I do sometimes for testing purposes). In this case, the activation listener will get phrases from different languages, which may work satisfactory, if those languages are similar to some extent, and will fail otherwise.
 
 Fortunately, all this is totally irrelevant and transparent, when everything is configured with one language, which is supported out of the box.
 
@@ -348,8 +374,8 @@ Normally you will use a standard configuration for voice control, which means, t
 	 | Setting Value | Description |
 	 |---------------|-------------|
 	 | Never         | The Assistant will not ask you for confirmation, but will directly perform the task, as if you have answered with "Yes". This choice is very helpful, if you have fully disabled voice control and want the Assistants to be as autonomous as possible. |
-	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT performed. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
-	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not performed by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
+	 | Listening     | This choice will let the Assistant ask for confirmation if, and only if voice input is enabled. If this is not the case, the corresponding task is NOT carried out. This is a good setting, if you want to use the Assistants only for information purposes or if the car is fully remote controlled by the "Team Center". |
+	 | Always        | This is the default for all confirmation settings. "Always" means, that the Assistant will ask for confirmation, even if voice input is disabled. In this case, you can either ignore the question (the task is not carried out by the Assistant), or you can answer using the "Accept" or "Reject" actions on your Button Box or Stream Deck. |
 
 #### Jona, the AI Race Engineer
 

@@ -155,7 +155,7 @@ class LMUProvider extends Sector397Provider {
 			super.parseCarName(carID, carName, , &nr, &category)
 	}
 
-	parseDriverName(carID, carName, forName, surName, nickName, &category?) {
+	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
 		local drivers, standingsData
 
 		getCategory(drivers, driver) {
@@ -179,25 +179,25 @@ class LMUProvider extends Sector397Provider {
 				category := false
 			}
 
-		return super.parseDriverName(carID, carName, forName, surName, nickName)
+		return super.parseDriverName(carID, carName, forname, surname, nickname)
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
-		local standingsData, forName, surName, nickName, id, teamID
+		local standingsData, forname, surname, nickname, id, teamID
 
 		this.iStandingsData := LMURESTProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-			forName := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname")
-			surName := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname")
+			forname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname")
+			surname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname")
 
 			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
 
 			if teamSession {
-				teamID := this.TeamData.TeamID[forName . A_Space . surName]
+				teamID := this.TeamData.TeamID[forname . A_Space . surname]
 
 				if teamID {
 					nr := this.TeamData.Nr[teamID]
@@ -212,18 +212,18 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
-			parseDriverName(this.StandingsData.Driver[id], &forName, &surName, &nickName)
+			parseDriverName(this.StandingsData.Driver[id], &forname, &surname, &nickname)
 
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forName)
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surName)
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickName)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surname)
+			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickname)
 		}
 
 		return standingsData
 	}
 
 	acquireSessionData(&telemetryData, &standingsData, finished := false) {
-		local driver, forName, surName, nickName
+		local driver, forname, surname, nickname
 
 		super.acquireSessionData(&telemetryData, &standingsData, finished)
 
@@ -235,17 +235,17 @@ class LMUProvider extends Sector397Provider {
 		if driver {
 			this.iLastDriver := driver
 
-			forName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Forname")
-			surName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Surname")
-			nickName := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Nickname")
+			forname := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Forname")
+			surname := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Surname")
+			nickname := getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Driver.Nickname")
 
-			if ((forName != getMultiMapValue(telemetryData, "Stint Data", "DriverForname"))
-			 || (surName != getMultiMapValue(telemetryData, "Stint Data", "DriverSurname")))
+			if ((forname != getMultiMapValue(telemetryData, "Stint Data", "DriverForname"))
+			 || (surname != getMultiMapValue(telemetryData, "Stint Data", "DriverSurname")))
 				setMultiMapValue(telemetryData, "Session Data", "Paused", true)
 
-			setMultiMapValue(telemetryData, "Stint Data", "DriverForname", forName)
-			setMultiMapValue(telemetryData, "Stint Data", "DriverSurname", surName)
-			setMultiMapValue(telemetryData, "Stint Data", "DriverNickname", nickName)
+			setMultiMapValue(telemetryData, "Stint Data", "DriverForname", forname)
+			setMultiMapValue(telemetryData, "Stint Data", "DriverSurname", surname)
+			setMultiMapValue(telemetryData, "Stint Data", "DriverNickname", nickname)
 		}
 	}
 

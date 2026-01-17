@@ -39,6 +39,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 std::string normalizeName(const char* name) {
 	std::string result = name;
 
+	replace(result, "\\", "");
 	replace(result, "/", "");
 	replace(result, ":", "");
 	replace(result, "*", "");
@@ -225,8 +226,18 @@ int main(int argc, char* argv[]) {
 		printf("[Car Data]\n");
 
 		printf("MAP=n/a\n");
-		printf("TC=n/a\n");
-		printf("ABS=n/a\n");
+		if (localCopy->mTractionControlSetting == -1)
+			printf("TC=n/a\n");
+		else
+			printf("TC=%d\n", localCopy->mTractionControlSetting);
+		if (localCopy->mAntiLockSetting == -1)
+			printf("ABS=n/a\n");
+		else
+			printf("ABS=%d\n", localCopy->mAntiLockSetting);
+		if (localCopy->mBrakeBias == -1)
+			printf("BB=n/a\n");
+		else
+			printf("BB=%f\n", (1 - round(localCopy->mBrakeBias * 10000) / 10000) * 100);
 
 		printf("BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(localCopy->mAeroDamage));
 		printf("SuspensionDamage=%f, %f, %f, %f\n", normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_LEFT]),

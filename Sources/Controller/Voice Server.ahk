@@ -69,7 +69,11 @@ class VoiceServer extends ConfigurationItem {
 
 	iActivationGrammars := []
 
-	iLanguage := "en"
+	iOriginalLanguage := "en"
+	iTranslatedLanguage := "en"
+
+	iTranslator := false
+		
 	iSynthesizer := "dotNET"
 	iSpeaker := true
 	iSpeakerVolume := 100
@@ -81,6 +85,7 @@ class VoiceServer extends ConfigurationItem {
 	iPushToTalkMode := false
 
 	iSpeechRecognizer := false
+	iActivationTranslator := false
 
 	iSpeaking := false
 	iListening := false
@@ -873,9 +878,15 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	Language {
+	Language[mode] {
 		Get {
-			return this.iLanguage
+			return ((mode = "Original") ? this.iOriginalLanguage : this.iTranslatedLanguage)
+		}
+	}
+
+	Translator {
+		Get {
+			return this.iTranslator
 		}
 	}
 
@@ -990,7 +1001,7 @@ class VoiceServer extends ConfigurationItem {
 
 						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(engine
 																					   , getMultiMapValue(kSimulatorConfiguration, "Voice Control", "Listener", true)
-																					   , this.Language, true)
+																					   , this.Language["Translated"], true)
 
 						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
@@ -998,21 +1009,38 @@ class VoiceServer extends ConfigurationItem {
 					catch Any as exception {
 						logError(exception, true)
 
-						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language["Translated"], true)
 
 						if ((this.iSpeechRecognizer.Recognizers.Length = 0) && !this.iSpeechRecognizer.Model)
 							throw "Activation Recognizer engine not installed..."
 					}
 				}
 				catch Any as exception {
-					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language["Translated"])
 				}
+																					   
+				this.iSpeechRecognizer.setTranslator(this.ActivationTranslator)
 
 				if !this.hasPushToTalk()
 					this.startListening()
 			}
 
 			return this.iSpeechRecognizer
+		}
+	}
+
+	ActivationTranslator {
+		Get {
+			local arguments
+
+			if (!this.iActivationTranslator && this.Translator) {
+				arguments := string2Values("|", this.Translator)
+
+				this.iActivationTranslator := Translator(arguments[1], arguments[3], arguments[2]
+													   , arguments[4], string2Values(",", arguments[5])*)
+			}
+
+			return this.iActivationTranslator
 		}
 	}
 
@@ -1035,7 +1063,16 @@ class VoiceServer extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		this.iLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iTranslatedLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		
+		if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false) {
+			this.iOriginalLanguage := "en"
+			
+			this.iTranslator := getMultiMapValue(configuration, "Voice Control", "Translator")
+		}
+		else
+			this.iOriginalLanguage := this.iTranslatedLanguage
+			
 		this.iSynthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer"
 											, getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
 		this.iSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
@@ -1531,10 +1568,10 @@ class VoiceServer extends ConfigurationItem {
 			listener := this.Listener
 
 		if (originalLanguage == false)
-			originalLanguage := this.Language
+			originalLanguage := this.Language["Original"]
 
 		if (translatedLanguage == false)
-			translatedLanguage := this.Language
+			translatedLanguage := this.Language["Translated"]
 
 		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 

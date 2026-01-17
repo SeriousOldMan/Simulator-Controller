@@ -2224,28 +2224,28 @@ class RaceEngineer extends RaceAssistant {
 	updateDriver(name, verbose := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverRequest := knowledgeBase.getValue("Pitstop.Planned.Driver.Request", false)
-		local driver, index, candidate, forName, surName
+		local driver, index, candidate, forname, surname
 
 		if driverRequest {
 			driverRequest := string2Values("|", driverRequest)
 
-			parseDriverName(name, &forName, &surName)
+			parseDriverName(name, &forname, &surname)
 
-			forName := SubStr(forName, 1, 1)
+			forname := SubStr(forname, 1, 1)
 
-			name := driverName(forName, surName, "")
+			name := driverName(forname, surname, "")
 
-			parseDriverName(string2Values(":", driverRequest[2])[1], &forName, &surName)
+			parseDriverName(string2Values(":", driverRequest[2])[1], &forname, &surname)
 
-			forName := SubStr(forName, 1, 1)
+			forname := SubStr(forname, 1, 1)
 
-			if (name != driverName(forName, surName, ""))
+			if (name != driverName(forname, surname, ""))
 				for index, driver in string2Values(",", driverRequest[3]) {
-					parseDriverName(driver, &forName, &surName)
+					parseDriverName(driver, &forname, &surname)
 
-					forName := SubStr(forName, 1, 1)
+					forname := SubStr(forname, 1, 1)
 
-					if (driverName(forName, surName, "") = name) {
+					if (driverName(forname, surname, "") = name) {
 						this.pitstopOptionChanged("Driver Request", verbose
 												, values2String("|", driverRequest[1], values2String(":", driver, index), driverRequest[3]))
 
@@ -3218,10 +3218,14 @@ class RaceEngineer extends RaceAssistant {
 			if (repairService.Length > 0)
 				setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
 
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Planned", true)
+
 			planned := this.hasPlannedPitstop()
 			prepared := this.hasPreparedPitstop()
 
 			if (planned || prepared) {
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned", true)
+
 				lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
 
 				if lap
@@ -4861,15 +4865,10 @@ class RaceEngineer extends RaceAssistant {
 		local numPitstops := 0
 		local numTyreSets := 1
 		local lastLap := 0
-		local tyreLapsFL := 0
-		local tyreLapsFR := 0
-		local tyreLapsRL := 0
-		local tyreLapsRR := 0
+		local tyreLaps := [0, 0, 0, 0]
 		local pitstopLap, pitstopLaps, tyreCompound, tyreCompoundColor, tyreSet
 		local tyreService, brakeService, tyreSets, pitstop, tyreChange, index, axle, tyre
 		local tc, tcc, first
-
-		static postfixes := ["FL", "FR", "RL", "RR"]
 
 		if knowledgeBase {
 			this.Provider.supportsPitstop( , &tyreService, &brakeService)
@@ -4887,8 +4886,9 @@ class RaceEngineer extends RaceAssistant {
 			loop knowledgeBase.getValue("Pitstop.Last") {
 				numPitstops += 1
 
-				if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined) {
-					pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
+				pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined)
+
+				if (pitstopLap != kUndefined) {
 					pitstopLaps := (pitstopLap - lastLap)
 
 					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
@@ -4948,22 +4948,22 @@ class RaceEngineer extends RaceAssistant {
 								tyreChange := true
 
 								if (axle = "Front") {
-									tyreLapsFL := 0
-									tyreLapsFR := 0
+									tyreLaps[1] := 0
+									tyreLaps[2] := 0
 								}
 								else {
-									tyreLapsRL := 0
-									tyreLapsRR := 0
+									tyreLaps[3] := 0
+									tyreLaps[4] := 0
 								}
 							}
-							else  {
+							else {
 								if (axle = "Front") {
-									tyreLapsFL += pitstopLaps
-									tyreLapsFR += pitstopLaps
+									tyreLaps[1] += pitstopLaps
+									tyreLaps[2] += pitstopLaps
 								}
 								else {
-									tyreLapsRL += pitstopLaps
-									tyreLapsRR += pitstopLaps
+									tyreLaps[3] += pitstopLaps
+									tyreLaps[4] += pitstopLaps
 								}
 							}
 						}
@@ -4993,13 +4993,13 @@ class RaceEngineer extends RaceAssistant {
 
 								tyreChange := true
 
-								%"tyreLaps" . postfixes[index]% := 0
+								tyreLaps[index] := 0
 							}
 							else  {
 								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound" . tyre, false)
 								setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor" . tyre, false)
 
-								%"tyreLaps" . postfixes[index]% += pitstopLaps
+								tyreLaps[index] += pitstopLaps
 							}
 						}
 
@@ -5009,24 +5009,19 @@ class RaceEngineer extends RaceAssistant {
 						}
 					}
 					else if tyreCompound {
-						tyreLapsFL := 0
-						tyreLapsFR := 0
-						tyreLapsRL := 0
-						tyreLapsRR := 0
+						loop 4
+							tyreLaps[A_Index] := 0
 
 						tyreChange := true
 					}
-					else {
-						tyreLapsFL += pitstopLaps
-						tyreLapsFR += pitstopLaps
-						tyreLapsRL += pitstopLaps
-						tyreLapsRR += pitstopLaps
-					}
+					else
+						loop 4
+							tyreLaps[A_Index] += pitstopLaps
 
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", tyreLapsFL)
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", tyreLapsFR)
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", tyreLapsRL)
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", tyreLapsRR)
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", tyreLaps[1])
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", tyreLaps[2])
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", tyreLaps[3])
+					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", tyreLaps[4])
 
 					if tyreChange
 						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
@@ -5076,37 +5071,41 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker := this.getSpeaker()
 
-				speaker.beginTalk()
+				if (remainingLaps <= 2) {
+					speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
+					try {
+						speaker.speakPhrase("VeryLowFuel", {laps: remainingLaps})
 
-					if this.supportsPitstop()
-						if this.hasPreparedPitstop()
-							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if planPitstop
-							if !this.hasPlannedPitstop() {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						if this.supportsPitstop()
+							if this.hasPreparedPitstop()
+								speaker.speakPhrase((remainingLaps <= 1) ? "LowComeIn" : "ComeIn")
+							else if planPitstop
+								if !this.hasPlannedPitstop() {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+										this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									}
+									else
+										this.proposePitstop("Now")
 								}
-								else
-									this.proposePitstop("Now")
-							}
-							else {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPrepare", false, true)
+								else {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									}
+									else
+										this.preparePitstop()
 								}
-								else
-									this.preparePitstop()
-							}
+					}
+					finally {
+						speaker.endTalk({Important: true})
+					}
 				}
-				finally {
-					speaker.endTalk({Important: true})
-				}
+				else
+					speaker.speakPhrase("LowFuel", {laps: remainingLaps})
 			}
 	}
 
@@ -5121,37 +5120,42 @@ class RaceEngineer extends RaceAssistant {
 
 				speaker := this.getSpeaker()
 
-				speaker.beginTalk()
+				if (remainingLaps <= 2) {
+					speaker.beginTalk()
 
-				try {
-					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowEnergy" : "LowEnergy", {laps: remainingLaps})
+					try {
+						speaker.speakPhrase("VeryLowEnergy", {laps: remainingLaps})
 
-					if this.supportsPitstop()
-						if this.hasPreparedPitstop()
-							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-						else if planPitstop
-							if !this.hasPlannedPitstop() {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+						if this.supportsPitstop()
+							if this.hasPreparedPitstop()
+								speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+							else if planPitstop
+								if !this.hasPlannedPitstop() {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-									this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+										this.setContinuation(ObjBindMethod(this, "proposePitstop", "Now"))
+									}
+									else
+										this.proposePitstop("Now")
 								}
-								else
-									this.proposePitstop("Now")
-							}
-							else {
-								if this.confirmAction("Pitstop.Fuel") {
-									speaker.speakPhrase("ConfirmPrepare", false, true)
+								else {
+									if this.confirmAction("Pitstop.Fuel") {
+										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									}
+									else
+										this.preparePitstop()
 								}
-								else
-									this.preparePitstop()
-							}
+
+					}
+					finally {
+						speaker.endTalk({Important: true})
+					}
 				}
-				finally {
-					speaker.endTalk({Important: true})
-				}
+				else
+					speaker.speakPhrase("LowEnergy", {laps: remainingLaps})
 			}
 	}
 

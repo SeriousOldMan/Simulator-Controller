@@ -202,7 +202,7 @@ recentLapWeathers(?lap, ?offset, [?weather | ?weathers]) <=
 
 clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 				  clearLap(?lap, [Driver.Forname, Driver.Surname, Driver.Nickname, Driver.Category,
-								  Map, TC, ABS, Tyre.Compound, Tyre.Compound.Color, Tyre.Set,
+								  Map, TC, ABS, BB, Tyre.Compound, Tyre.Compound.Color, Tyre.Set,
 								  Tyre.Compound.Front, Tyre.Compound.Color.Front,
 								  Tyre.Compound.Rear, Tyre.Compound.Color.Rear,
 								  Tyre.Compound.Front.Left, Tyre.Compound.Color.Front.Left,

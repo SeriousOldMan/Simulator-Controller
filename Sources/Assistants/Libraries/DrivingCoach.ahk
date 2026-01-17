@@ -400,7 +400,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if (getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, kUndefined) != kUndefined)
 				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
 			else
-				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[options["Language"]], "Instructions", instruction)
+				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[this.VoiceManager.Language["Original"]], "Instructions", instruction)
 
 		laps := InStr(options["Driving Coach.Instructions.Stint"], "%laps:")
 
@@ -516,7 +516,7 @@ class DrivingCoach extends GridRaceAssistant {
 					if (simulator && car && track)
 						return substituteVariables(this.Instructions["Simulation"]
 												 , {name: this.VoiceManager.Name
-												  , driver: this.DriverForName
+												  , driver: this.VoiceManager.User
 												  , simulator: settingsDB.getSimulatorName(simulator)
 												  , car: settingsDB.getCarName(simulator, car)
 												  , track: settingsDB.getTrackName(simulator, track)})
@@ -533,7 +533,7 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 			case "Stint":
 				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
-					language := this.Options["Language"]
+					language := this.VoiceManager.Language["Original"]
 					position := this.getPosition(false, "Class")
 
 					if ((position != 0) && (this.Laps.Count > 0)) {
@@ -1412,7 +1412,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 							info := newMultiMap()
 
-							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getUserName()))
+							setMultiMapValue(info, "Info", "Driver", getMultiMapValue(bestInfo, "Lap", "Driver", SessionDatabase.getName("Creator")))
 							setMultiMapValue(info, "Info", "LapTime", bestLapTime)
 
 							sectorTimes := getMultiMapValue(bestInfo, "Lap", "SectorTimes", false)
@@ -1509,12 +1509,12 @@ class DrivingCoach extends GridRaceAssistant {
 		local bestDBLapTime := 999999
 		local bestDBLap := kUndefined
 		local sessionDB, info, telemetries, ignore, candidate, lapTime
-		local file, size, telemetry, driver, fileName, nickName
+		local file, size, telemetry, driver, fileName, nickname
 
 		loop Files, kTempDirectory . "Driving Coach\Telemetry\*.info", "F" {
 			info := readMultiMap(A_LoopFileFullPath)
 
-			if (SessionDatabase.getUserName() = getMultiMapValue(info, "Info", "Driver")) {
+			if (SessionDatabase.getName("Creator") = getMultiMapValue(info, "Info", "Driver")) {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 
 				if (lapTime && ((bestSessionLap == kUndefined) || (lapTime < bestSessionLapTime))) {
@@ -1542,13 +1542,13 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
-				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickName := true)
+				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickname := true)
 
 				SplitPath(bestSessionLap, , &directory, , &fileName)
 
 				file := FileOpen(directory . "\" . fileName, "r-wd")
 
-				fileName := (nickName . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
+				fileName := (nickname . A_Space . Round(getMultiMapValue(bestInfo, "Info", "AirTemperature", 23))
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "TrackTemperature", 27))
 									  . A_Space . getMultiMapValue(bestInfo, "Info", "Weather", "Dry")
 									  . A_Space . Round(getMultiMapValue(bestInfo, "Info", "Fuel", 0)) . "L"
@@ -1602,7 +1602,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 				info := readMultiMap(fileName . ".info")
 
-				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getUserName())
+				driver := getMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Creator"))
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
@@ -1786,15 +1786,15 @@ class DrivingCoach extends GridRaceAssistant {
 				loop Files, kTempDirectory . "Driving Coach\Telemetry\*.telemetry" {
 					lap := StrReplace(StrReplace(A_LoopFileName, "Lap ", ""), ".telemetry", "")
 
-					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.ForName")) {
+					if (!loadedLaps.Has(lap) && knowledgeBase.hasFact("Lap." . lap . ".Driver.Forname")) {
 						if isDebug()
 							logMessage(kLogDebug, "Telemetry for lap " . lap . " available...")
 
 						car := knowledgeBase.getValue("Driver.Car", kUndefined)
 
-						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.ForName")
-										   , knowledgeBase.getValue("Lap." . lap . ".Driver.SurName")
-										   , knowledgeBase.getValue("Lap." . lap . ".Driver.NickName"))
+						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.Forname")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Surname")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Nickname"))
 						lapTime := (this.getLapTime(car) / 1000)
 						sectorTimes := this.getSectorTimes(car)
 

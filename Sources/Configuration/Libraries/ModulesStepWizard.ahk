@@ -1003,6 +1003,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 		local carName := getMultiMapValue(this.Definition, car, "Name")
 		local carCode := getMultiMapValue(this.Definition, car, "Code")
 		local carClass := getMultiMapValue(this.Definition, car, "Class", false)
+		local carInformation := getMultiMapValue(this.Definition, car, "Information", false)
 		local carData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
 		local tyreData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini")
 		local setting
@@ -1012,6 +1013,13 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 		if carClass
 			setMultiMapValue(carData, "Car Classes", carCode, carClass)
+
+		if carInformation
+			for ignore, information in string2Values("|", carInformation) {
+				information := string2Values("=", information)
+
+				setMultiMapValue(carData, "Car Information", information[1], information[2])
+			}
 
 		loop {
 			setting := getMultiMapValue(this.Definition, car, "Pitstop Settings." . A_Index, kUndefined)
@@ -1044,12 +1052,18 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	uninstallObject(car) {
 		local carName := getMultiMapValue(this.Definition, car, "Name")
 		local carCode := getMultiMapValue(this.Definition, car, "Code")
+		local carInformation := getMultiMapValue(this.Definition, car, "Information", false)
 		local carData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini")
 		local tyreData := readMultiMap(kUserHomeDirectory . "Simulator Data\AC\Tyre Data.ini")
 		local setting
 
 		removeMultiMapValue(carData, "Car Codes", carName)
 		removeMultiMapValue(carData, "Car Names", carCode)
+		removeMultiMapValue(carData, "Car Classes", carCode)
+
+		if carInformation
+			do(string2Values("|", carInformation)
+			 , (info) => removeMultiMapValue(carData, "Car Information", string2Values("=", info)[1]))
 
 		writeMultiMap(kUserHomeDirectory . "Simulator Data\AC\Car Data.ini", carData)
 

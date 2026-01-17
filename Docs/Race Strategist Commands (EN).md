@@ -79,9 +79,9 @@ Announcements=weather warnings
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
 
-	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
-
 	[What about the weather, Is rain ahead, {Any, Are} weather changes in sight, (CanYou) check the {weather, weather please}]
+
+	[(TellMe) the remaining laps, How many laps are remaining, How many laps are left, How many laps to go, How long to go]
 
 	[Simulate the {race, standings} in (Number) laps, (CanYou) simulate the {race, standings} in (Number) laps, What will my position be in (Number) laps, What is my position in (Number) laps]
 

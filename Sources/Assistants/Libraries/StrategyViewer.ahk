@@ -89,6 +89,7 @@ class StrategyViewer {
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("TC:") . "</b></td><td>" . strategy.TC . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("ABS:") . "</b></td><td>" . strategy.ABS . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("BB:") . "</b></td><td>" . strategy.BB . "</td></tr>")
 		html .= "</table>"
 
 		return html
@@ -308,17 +309,20 @@ class StrategyViewer {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
+						%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart%chartID%"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
 												 , chartID: chartID})
-
+			
 			after := "
 			(
 					</script>

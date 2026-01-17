@@ -1594,15 +1594,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", 1)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("TC"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", 1)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("ABS"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", 2)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", translate("n/a"))
+		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
+
+		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("BB"))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VstrategyStartBBEdit Disabled", translate("n/a"))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
 
 		x := 186
@@ -1711,32 +1715,35 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
 			(
-			<html>
-			    <meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						%chartScript%
+						<script type="text/javascript">
+							%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																						 , "corechart", "table", "scatter")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
 			after := "
 			(
-					</script>
-				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-				</body>
-			</html>
+						</script>
+					</head>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+					</body>
+				</html>
 			)"
 
 			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
@@ -2059,12 +2066,14 @@ class StrategyWorkbench extends ConfigurationItem {
 						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 					</style>
-					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					%chartScript%
 					<script type="text/javascript">
-						google.charts.load('current', {'packages':['corechart', 'table']}).then(drawChart);
+						%chartLoad%
 			)"
 
-			before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+			before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+												 , chartLoad: getGoogleChartsLoadStatement("drawChart", "corechart", "table")
+												 , fontColor: this.Window.Theme.TextColor
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -3440,6 +3449,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyStartMapEdit"].Text := strategy.Map
 		this.Control["strategyStartTCEdit"].Text := strategy.TC
 		this.Control["strategyStartABSEdit"].Text := strategy.ABS
+		this.Control["strategyStartBBEdit"].Text := strategy.BB
 
 		this.Control["strategyCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(strategy.TyreCompound, strategy.TyreCompoundColor)))
 
@@ -3485,12 +3495,15 @@ class StrategyWorkbench extends ConfigurationItem {
 					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
 					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
 				</style>
-				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+				%chartScript%
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawCharts);
+					%chartLoad%
 		)"
 
-		before := substituteVariables(before, {fontColor: this.Window.Theme.TextColor
+		before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("drawCharts"
+																					 , "corechart", "table", "scatter")
+											 , fontColor: this.Window.Theme.TextColor
 											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
@@ -4433,7 +4446,7 @@ class ValidatorsEditor {
 		local valid := true
 		local name := this.Control["validatorNameEdit"].Text
 		local errorMessage := ""
-		local ignore, other, type, fileName, context, message
+		local ignore, other, type, fileName, messages
 
 		if (Trim(name) = "") {
 			errorMessage .= ("`n" . translate("Error: ") . "Name cannot be empty...")
@@ -4462,14 +4475,13 @@ class ValidatorsEditor {
 			fileName := temporaryFilename("Script", "script")
 
 			try {
-				context := scriptOpenContext()
-
 				FileAppend(this.ScriptEditor.Content[true], fileName)
 
-				if !scriptLoadScript(context, fileName, &message)
-					throw message
+				if !scriptCheck(fileName, &messages){
+					errorMessage .= ("`n" . values2String("`n", collect(messages, (m) => (translate("Error: ") . m))*))
 
-				scriptCloseContext(context)
+					valid := false
+				}
 			}
 			catch Any as exception {
 				errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))

@@ -49,6 +49,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static sCollectData := CaseInsenseMap()
 
+	static sLanguageStats := false
+
 	iEnabled := false
 	iName := false
 	iLogo := false
@@ -170,6 +172,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		unmute(arguments*) {
 			this.callRemote("unmute", arguments*)
+		}
+
+		ask(arguments*) {
+			this.callRemote("ask", arguments*)
 		}
 
 		raiseEvent(arguments*) {
@@ -812,7 +818,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction, assistant
 		local openRaceSettings, openRaceReports, openSessionDatabase, openSetupWorkbench
 		local openSoloCenter, openTeamCenter, openStrategyWorkbench, importSetup
-		local assistantSpeaker, assistantListener, first, index
+		local assistantSpeaker, assistantListener, first, index, stats
 
 		super.__New(controller, name, configuration, false)
 
@@ -1007,6 +1013,61 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 20000, kHighPriority)
 
 			RaceAssistantPlugin.CollectorTask.start()
+		}
+
+		if !RaceAssistantPlugin.sLanguageStats {
+			RaceAssistantPlugin.sLanguageStats := CaseInsenseMap()
+
+			Task.startTask(() {
+				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				local language, stats, ignore, value
+
+				for language, stats in RaceAssistantPlugin.sLanguageStats {
+					setMultiMapValue(usage, "Languages", "Translators." . language
+										  , getMultiMapValue(usage, "Languages", "Translators." . language, 0) + stats.Translators)
+
+					for ignore, value in stats.Synthesizers
+						setMultiMapValue(usage, "Languages", "Synthesizers." . value . "." . language
+											  , getMultiMapValue(usage, "Languages", "Synthesizers." . value . "." . language, 0) + 1)
+
+					for ignore, value in stats.Recognizers
+						setMultiMapValue(usage, "Languages", "Recognizers." . value . "." . language
+											  , getMultiMapValue(usage, "Languages", "Recognizers." . value . "." . language, 0) + 1)
+				}
+
+				writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+
+				RaceAssistantPlugin.sLanguageStats := false
+			}, 10000, kLowPriority)
+		}
+
+		if this.Language {
+			if RaceAssistantPlugin.sLanguageStats.Has(this.Language)
+				stats := RaceAssistantPlugin.sLanguageStats[this.Language]
+			else {
+				stats := {Language: this.Language, Translators: 0, Synthesizers: [], Recognizers: []}
+
+				RaceAssistantPlugin.sLanguageStats[this.Language] := stats
+			}
+
+			if translator
+				stats.Translators += 1
+
+			synthesizer := this.Synthesizer
+
+			if (!synthesizer && this.Speaker)
+				synthesizer := getMultiMapValue(this.Configuration, "Voice Control", "Synthesizer")
+
+			if synthesizer
+				stats.Synthesizers.Push(string2Values("|", synthesizer)[1])
+
+			recognizer := this.Recognizer
+
+			if (!recognizer && this.Listener)
+				recognizer := getMultiMapValue(this.Configuration, "Voice Control", "Recognizer")
+
+			if recognizer
+				stats.Recognizers.Push(string2Values("|", recognizer)[1])
 		}
 	}
 
@@ -1633,7 +1694,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		track := getMultiMapValue(data, "Session Data", "Track")
 
 		if !getMultiMapValue(data, "Session Data", "FuelAmount", false) {
-			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined)
+			maxFuel := settingsDB.getSettingValue(simulator, car, track, "*", "*"
+												, "Session Settings", "Fuel.Amount", kUndefined)
 
 			if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 				setMultiMapValue(data, "Session Data", "FuelAmount", maxFuel)
@@ -1699,7 +1761,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.TeamSessionActive {
 			if RaceAssistantPlugin.Simulator
-				return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
+				return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForname, teamServer.DriverSurname)
 			else
 				return false
 		}
@@ -2331,6 +2393,25 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	unmute() {
 		if this.RaceAssistant
 			this.RaceAssistant.unmute()
+	}
+
+	ask(question, command?) {
+		if this.RaceAssistant
+			if isSet(command) {
+				if (command = kTrue)
+					command := true
+				else if (command = kFalse)
+					command := false
+
+				this.RaceAssistant.ask("Text", question, command)
+			}
+			else
+				this.RaceAssistant.ask("Text", question)
+	}
+
+	command(grammar, command := "") {
+		if this.RaceAssistant
+			this.RaceAssistant.ask(grammar, command)
 	}
 
 	raiseEvent(event, arguments*) {
@@ -3058,6 +3139,7 @@ getSimulatorOptions(plugin := false) {
 			options .= " -Map " . getMultiMapValue(data, "Car Data", "MAP", "n/a")
 			options .= " -TC " . getMultiMapValue(data, "Car Data", "TC", "n/a")
 			options .= " -ABS " . getMultiMapValue(data, "Car Data", "ABS", "n/a")
+			options .= " -BB " . getMultiMapValue(data, "Car Data", "BB", "n/a")
 		}
 	}
 
@@ -3303,6 +3385,36 @@ enableDataCollection(type) {
 
 disableDataCollection(type) {
 	RaceAssistantPlugin.CollectData[type] := false
+}
+
+ask(name, question) {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.ask(question)
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+command(name, grammar, command := "") {
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(name)
+
+	protectionOn()
+
+	try {
+		if (plugin && controller.isActive(plugin))
+			plugin.command(grammar, command)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 raiseEvent(name, event, arguments*) {

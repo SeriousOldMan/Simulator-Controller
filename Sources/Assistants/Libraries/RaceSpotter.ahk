@@ -1822,7 +1822,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local position := false
 		local number := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore, delta, driver, forName, surName
+		local minute, rnd, phrase, bestLapTime, lastTopSpeed, ignore, delta, driver, forname, surname
 
 		if isDebug()
 			logMessage(kLogDebug, "SessionInformation: " . lastLap . ", " . regular . " Positions: " . (positions != false) . " Remaining: " . remainingSessionLaps . ", " . remainingStintLaps)
@@ -2098,13 +2098,13 @@ class RaceSpotter extends GridRaceAssistant {
 					minute := Floor(lapTime / 60)
 					delta := (lapTime - this.DriverCar.BestLapTime)
 
-					parseDriverName(driver, &forName, &surName, &ignore)
+					parseDriverName(driver, &forname, &surname, &ignore)
 
-					if (Trim(forName) = "")
-						forName := "John"
+					if (Trim(forname) = "")
+						forname := "John"
 
-					if (Trim(surName) = "")
-						surName := "Doe"
+					if (Trim(surname) = "")
+						surname := "Doe"
 
 					speaker.beginTalk()
 
@@ -2113,7 +2113,7 @@ class RaceSpotter extends GridRaceAssistant {
 							speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
 													   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)
 													   , indicator: this.getCarIndicatorFragment(speaker, number, position)
-													   , forName: forName, surName: surName})
+													   , forname: forname, surname: surname})
 
 							if ((Round(Abs(delta), 1) != 0) && (Abs(delta) < 5))
 								speaker.speakPhrase("DeltaLapTime", {delta: speaker.number2Speech(Round(Abs(delta), 1))
@@ -2663,8 +2663,8 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.beginTalk()
 
 						speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)
-																  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-																  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+																  , forname: knowledgeBase.getValue("Car." . car . ".Driver.Forname", "John")
+																  , surname: knowledgeBase.getValue("Car." . car . ".Driver.Surname", "Doe")})
 
 						talking := true
 
@@ -2708,8 +2708,8 @@ class RaceSpotter extends GridRaceAssistant {
 						speaker.beginTalk()
 
 						speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)
-																   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-																   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+																   , forname: knowledgeBase.getValue("Car." . car . ".Driver.Forname", "John")
+																   , surname: knowledgeBase.getValue("Car." . car . ".Driver.Surname", "Doe")})
 
 						talking := true
 
@@ -2765,8 +2765,8 @@ class RaceSpotter extends GridRaceAssistant {
 							speaker.speakPhrase((delta < 0) ? "FocusGapToBehind" : "FocusGapToAhead"
 											  , {indicator: this.getCarIndicatorFragment(speaker, number, this.FocusedCar[true].Car.Position["Class"])
 											   , delta: speaker.number2Speech(Abs(delta), 1)
-											   , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-											   , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+											   , forname: knowledgeBase.getValue("Car." . car . ".Driver.Forname", "John")
+											   , surname: knowledgeBase.getValue("Car." . car . ".Driver.Surname", "Doe")})
 
 							talking := true
 
@@ -3614,8 +3614,8 @@ class RaceSpotter extends GridRaceAssistant {
 									this.pushAlert("Accident" . type . "Driver"
 												 , {distance: Round(convertUnit("Length", distance))
 												  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-												  , forName: knowledgeBase.getValue("Car." . car . ".Driver.ForName", "John")
-												  , surName: knowledgeBase.getValue("Car." . car . ".Driver.SurName", "Doe")})
+												  , forname: knowledgeBase.getValue("Car." . car . ".Driver.Forname", "John")
+												  , surname: knowledgeBase.getValue("Car." . car . ".Driver.Surname", "Doe")})
 
 									return
 								}
@@ -3627,8 +3627,8 @@ class RaceSpotter extends GridRaceAssistant {
 											this.pushAlert("Accident" . type . "Driver"
 														 , {distance: Round(convertUnit("Length", distance))
 														  , unit: this.getSpeaker(true).Fragments[getUnit("Length")]
-														  , forName: knowledgeBase.getValue("Car." . A_Index . ".Driver.ForName", "John")
-														  , surName: knowledgeBase.getValue("Car." . A_Index . ".Driver.SurName", "Doe")})
+														  , forname: knowledgeBase.getValue("Car." . A_Index . ".Driver.Forname", "John")
+														  , surname: knowledgeBase.getValue("Car." . A_Index . ".Driver.Surname", "Doe")})
 
 											return
 										}
@@ -4438,7 +4438,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if hasDriver {
-				bubbleSort(&carPositions, (a, b) => a[3] < b[3])
+				bubbleSort(&carPositions
+						 , (a, b) => (isNumber(a[3]) && isNumber(b[3])) ? (a[3] < b[3])
+																		: !strGreater(a[3], b[3]))
 
 				positions["Driver"] := driver
 				positions["Count"] := count
@@ -4610,24 +4612,24 @@ class RaceSpotter extends GridRaceAssistant {
 ;;;-------------------------------------------------------------------------;;;
 
 getDriverVariables(driver, variables := false) {
-	local forName, surName, nickName
+	local forname, surname, nickname
 
-	parseDriverName(driver, &forName, &surName, &nickName)
+	parseDriverName(driver, &forname, &surname, &nickname)
 
-	if (Trim(forName) = "")
-		forName := "John"
+	if (Trim(forname) = "")
+		forname := "John"
 
-	if (Trim(surName) = "")
-		surName := "Doe"
+	if (Trim(surname) = "")
+		surname := "Doe"
 
 	if variables {
-		variables.forName := forName
-		variables.surName := surName
+		variables.forname := forname
+		variables.surname := surname
 
 		return variables
 	}
 	else
-		return {forName: forName, surName: surName}
+		return {forname: forname, surname: surname}
 }
 
 

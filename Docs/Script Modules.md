@@ -1,8 +1,27 @@
-This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
+This documentation provides reference information for all modules which are available to include in *Lua* scripts. These modules can be used to interface with the simulator and provide information about the current session. The modules can be loaded into any script which is used to implement an action for an [Assistant booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions). They also can be called as a response to a button press, of course.
+
+Use the "require" function to load a given module, which then defines some global objects which provide the specific properties and functions. which in turn keeps the namespace clean. Example:
 
 	require("Session")
 
-After the module references, several examples are provided which demonstrate some of the provided functionality.
+Additionally, the execution environment includes the special function *extern* which can be used to reference any global function or object in the host process.
+
+	local MsgBox = extern("MsgBox")
+
+After the module references below, several examples are provided which demonstrate some of the provided functionality.
+
+## Module *Environment*
+
+This module provides global state for scripts that are running in the same process. This state is persistent as long as the current process is alive.
+
+### Topics
+
+Only one topic is defined, which is named "Enviroment". It defines the following functions:
+
+| Function | Arguments                      | Description |
+|----------|--------------------------------|-------------|
+| Get      | name, [Optional] default       | Returns the global value for the given *name*. If no value is defined, either the value *default* (if provided) or *nil* is returned. |
+| Set      | name, value                    | Sets the global value for the given *name*. *value* may be of type string, number or simple arrays, that consists of values of these types. Please note, that *name* is case-sensitive. |
 
 ## Module *Simulator*
 
@@ -14,12 +33,14 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 | Function | Arguments                      | Description |
 |----------|--------------------------------|-------------|
-| Read     | simulator, car, track          | Returns the full set of data provided by the *simulator* for the given *car* and *track* combination. The data is returned as string coded in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). |
-| Call     | simulator, command             | Sends the given command to the simulator. See the examples below to see some of the available commands. |
+| Read     | simulator, [Optional] car, [Optional] track | Returns the full set of data provided by the *simulator* for the given *car* and *track* combination incl. all post processing for tyre compound names, track names, etc. If *car* and *track* are not provided, the result will be the same, but processing will be slower, because two passes are required. The data is returned as string coded in "INI" format as [described in the Assistants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration). |
+| Call     | simulator, [Optional] command  | Sends the given command to the simulator and returns the result (if any). See the examples below to see some of the available commands. |
 
 ## Module *Session*
 
 The "Session" module for the integrated script engine defines three global objects (named topic in the following documentation), which can be used to access important information about the current session.
+
+Important: This module is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
 
 ### Topics
 
@@ -70,13 +91,26 @@ This topic gives you access to the current standings including information about
 | Position        | Synonymous for *OverallPosition*. |
 | Standings       | Returns the full table of standings, sorted by the overall position. It contains objects for each car with the following properties::<br><br>1.*overallPosition* = the current overall position<br>2.*classPosition* = the current position with regards to the class-specific standings<br>3.*car* = the car in this position<br>4.*nr* = the race number of the car in this position<br>5.*driver* = the name of the driver in this position<br>6.*laps* = the number of laps the car in this position already has driven<br>7.*time* = the last lap time of the car in this position |
 
-## Module Assistants
+## Module *Assistants*
 
 The "Assistants" module which can be used in scripts started from the controller action function [*execute*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions) or started as action in the currently active [track automation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#track-automation).
 
 ### Topics
 
-Only one topic is defined, which is named "Reasoning". It defines the following functions:
+Two topics are defined, which allow an interaction with a rnning Assistant.
+
+#### Interaction
+
+The topic "Interaction" allows a general interaction with an Assistant by simulating a voice command.
+
+| Function      | Arguments                                  | Description |
+|---------------|--------------------------------------------|-------------|
+| Ask           | assistant, question, [Optional] command    | This function will send the given *question* to the specified *assistant* as if it has been given by voice. If the optional argument *command* is supplied and *true*, full command processing is carried out, otherwise the *question* is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening. |
+| Command       | assistant, grammar, [Optional] command     | This function will trigger the command with the name *grammar* for the specified *assistant* as if it has been given by voice. This function will have no effect, if the Assistant is not configured for listening.<br><br>If the definition for the *grammar* requires variable parts in the command text, for example a number of liters for refueling, a full command text, that matches the defined grammar, must be supplied with *command*. Otherwise, it is optional. Example (for Race Engineer):<br><br>command("Race Engineer", "PitstopAdjustPressureUp", "Can we increase front left by 0.4?")<br><br>The names of the different command grammars can be found by looking into grammar files of the corresponding Assistant, which can be found in the *Resources\Grammars* folder which is located in the installation folder of Simulator Controller. |
+
+#### Reasoning
+
+The topic "Reasoning" serves as an interface to the *Reasoning* booster and defines the following functions:
 
 | Function      | Arguments                                  | Description |
 |---------------|--------------------------------------------|-------------|
@@ -199,3 +233,81 @@ This example demonstrates simulator specific coding of pitstop service requests.
 	else
 		Assistant.Speak("Are you kidding?")
 	end
+	
+***
+
+### Activating fixed presets for TC, ABS, Brake Balance and so on in *Le Mans Ultimate*
+
+And here comes an example how to use a *Lua* script as an action for a button on your steering wheel. This example shows how to use the data supplied by the game API and sending commands to the game. Define the action in "Simulator Configuration" or "Simulator Setup":
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Simulator%20Module%20Example%201.jpg)
+
+	-- Activation:  For example using a Custom conroller action:
+	--              1Joy9 -> execute('C:\Users\juwig\Documents\Simulator Controller\Scripts\BBPresets.script')
+	-- Description: 1. When called without argument, it cycles thrugh the predefined presets.
+	--              2. When called with a preset number as argument, this preset gets activated.
+	
+	require("Simulator")
+	require("Environment")
+
+	local Trigger = extern("trigger")
+
+	local HOTKEY_BB_UP     = ","
+	local HOTKEY_BB_DOWN   = "."
+
+	local BB_SETTING_THRESHOLD	= 0.25
+	local PRESETS 				= { 49.0, 50.0, 51.0 }
+
+	local PRESET
+
+	if #Arguments > 0 then
+		PRESET = Arguments[1]
+	else
+		PRESET = Environment.Get("Brake Balance", 1) + 1
+
+		if PRESET > #PRESETS then
+			PRESET = 1
+		end
+	end
+
+	PRESET = math.min(#PRESETS, math.max(0, PRESET))
+
+	local function currentBrakeBalance()
+		local ok, ini = pcall(Simulator.Read, "Le Mans Ultimate")
+	  
+		if not ok or type(ini) ~= "string" then
+			return nil
+		end
+
+		local w = string.match(ini, "BB%s*=%s*[%d%p]+")
+		
+		if not w then
+			return nil
+		end
+		
+		w = string.gsub(w, "BB", "")
+		w = string.gsub(w, "=", "")
+		w = string.match(w, "[%d%p]+")
+		
+		return tonumber(w)
+	end
+
+	repeat
+		local currentBB = currentBrakeBalance()
+
+		if not currentBB then
+			return nil
+		end
+
+		if math.abs(currentBB - PRESETS[PRESET]) > BB_SETTING_THRESHOLD then
+			if (PRESETS[PRESET] - currentBB) > 0 then
+				Trigger(HOTKEY_BB_UP)
+			else
+				Trigger(HOTKEY_BB_DOWN)
+			end
+		else
+			break
+		end
+	until nil
+
+	Environment.Set("Brake Balance", PRESET)

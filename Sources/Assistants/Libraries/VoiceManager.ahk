@@ -1659,15 +1659,9 @@ class VoiceManager extends ConfigurationItem {
 		if bestMatch {
 			words := string2Values(A_Space, text)
 
-			for index, literal in words {
-				literal := StrReplace(literal, ".", "")
-				literal := StrReplace(literal, ",", "")
-				literal := StrReplace(literal, ";", "")
-				literal := StrReplace(literal, "?", "")
-				literal := StrReplace(literal, "-", "")
 
-				words[index] := literal
-			}
+			for index, literal in words
+				words[index] := RegExReplace(literal, "[:!?¿\-;。，！？：；]", "")
 
 			return bestMatch
 		}
@@ -1677,7 +1671,7 @@ class VoiceManager extends ConfigurationItem {
 
 	recognize(text) {
 		if this.VoiceServer
-			messageSend(kFileMessage, "Voice", "recognize:" . values2String(";", this.VoiceManager.Name, text), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "recognize:" . values2String(";", this.Name, text), this.VoiceServer)
 		else
 			this.iSpeechRecognizer.recognize(text)
 	}

@@ -295,7 +295,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		}
 
 		newDriver(*) {
-			local result := withBlockedWindows(InputDlg, translate("Please enter the name of the new driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200")
+			local result := withBlockedWindows(InputDlg, translate("Please enter the name of the new driver (Format: FirstName LastName (Nickname)):"), translate("Team Server"), "w300 h200")
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "addDriver"), Trim(result.Value))
@@ -313,7 +313,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		}
 
 		renameDriver(*) {
-			local result := withBlockedWindows(InputDlg, translate("Please enter the new name for the selected driver (Format: FirstName LastName (NickName)):"), translate("Team Server"), "w300 h200", this.SelectedDriver)
+			local result := withBlockedWindows(InputDlg, translate("Please enter the new name for the selected driver (Format: FirstName LastName (Nickname)):"), translate("Team Server"), "w300 h200", this.SelectedDriver)
 
 			if ((result.Result = "Ok") && (StrLen(Trim(result.Value)) > 0))
 				this.withExceptionHandler(ObjBindMethod(this, "renameDriver"), this.SelectedDriver, Trim(result.Value))
@@ -575,7 +575,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 					this.iToken := token
 				}
 
-				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getUserName(), "Manager")
+				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Manager")
 
 				if this.iKeepAliveTask
 					this.iKeepAliveTask.stop()
@@ -794,7 +794,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 				try {
 					driver := this.parseObject(connector.GetDriver(identifier))
 
-					name := driverName(driver.ForName, driver.SurName, driver.NickName)
+					name := driverName(driver.Forname, driver.Surname, driver.Nickname)
 
 					if (StrLen(Trim(name)) = 0)
 						connector.DeleteDriver(identifier)
@@ -957,37 +957,37 @@ class TeamManagementPanel extends ConfiguratorPanel {
 	}
 
 	normalizeDriverName(name) {
-		local forName := ""
-		local surName := ""
-		local nickName := ""
-		local initialForName, initialSurName
+		local forname := ""
+		local surname := ""
+		local nickname := ""
+		local initialForname, initialSurname
 
-		parseDriverName(name, &forName, &surName, &nickName)
+		parseDriverName(name, &forname, &surname, &nickname)
 
-		if (Trim(nickName) = "") {
-			initialForName := StrUpper(SubStr(forName, 1, 1))
-			initialSurName := StrUpper(SubStr(surName, 1, 1))
+		if (Trim(nickname) = "") {
+			initialForname := StrUpper(SubStr(forname, 1, 1))
+			initialSurname := StrUpper(SubStr(surname, 1, 1))
 
-			nickName := (initialForName . initialSurName)
+			nickname := (initialForname . initialSurname)
 		}
 
-		nickName := SubStr(nickName, 1, 3)
+		nickname := SubStr(nickname, 1, 3)
 
-		return driverName(forName, surName, nickName)
+		return driverName(forname, surname, nickname)
 	}
 
 	addDriver(name) {
 		local drivers := this.Drivers
-		local forName := ""
-		local surName := ""
-		local nickName := ""
+		local forname := ""
+		local surname := ""
+		local nickname := ""
 		local identifier
 
 		name := this.normalizeDriverName(name)
 
-		parseDriverName(name, &forName, &surName, &nickName)
+		parseDriverName(name, &forname, &surname, &nickname)
 
-		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], forName, surName, nickName)
+		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], forname, surname, nickname)
 
 		drivers[name] := identifier
 
@@ -1004,9 +1004,9 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		parts := string2Values(A_Space, newName)
 
 		if (parts.Length > 2)
-			this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=" . parts[2] . "`n" . "NickName=" . StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
+			this.Connector.UpdateDriver(this.Drivers[oldName], "Forname=" . parts[1] . "`n" . "Surname=" . parts[2] . "`n" . "Nickname=" . StrReplace(StrReplace(parts[3], "(", ""), ")", ""))
 		else
-			this.Connector.UpdateDriver(this.Drivers[oldName], "ForName=" . parts[1] . "`n" . "SurName=`n" . "NickName=" . StrReplace(StrReplace(parts[2], "(", ""), ")", ""))
+			this.Connector.UpdateDriver(this.Drivers[oldName], "Forname=" . parts[1] . "`n" . "Surname=`n" . "Nickname=" . StrReplace(StrReplace(parts[2], "(", ""), ")", ""))
 
 		this.loadDrivers()
 		this.selectDriver(newName)

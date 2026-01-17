@@ -119,7 +119,7 @@ class TranslatorEditor extends ConfiguratorPanel {
 		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorServiceDropDown", translatorServices)
 		editorGui["translatorServiceDropDown"].OnEvent("Change", updateTranslatorFields)
 
-		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorLanguageLabel", translate("Target Language"))
+		editorGui.Add("Text", "x8 yp+30 w100 h23 +0x200 VtranslatorLanguageLabel", translate("Language"))
 		editorGui.Add("DropDownList", "x120 yp w280 Choose1 VtranslatorLanguageDropDown", collect(Translator.Languages, (l) => l.Name))
 		editorGui["translatorLanguageDropDown"].OnEvent("Change", (*) => this.updateTranslation())
 

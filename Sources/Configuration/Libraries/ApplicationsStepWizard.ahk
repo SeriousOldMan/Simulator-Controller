@@ -284,7 +284,7 @@ class ApplicationsStepWizard extends StepWizard {
 					wizard.locateApplication(application, check ? "CHECK" : false, false)
 
 					if steamIDs.Has(application)
-						wizard.setApplicationValue(application, "SteamID", steamIDs[application])
+						wizard.setApplicationValue(application, "SteamID", steamIDs[application], false)
 
 					if (initialize && wizard.isApplicationInstalled(application))
 						wizard.selectApplication(application, true, false)

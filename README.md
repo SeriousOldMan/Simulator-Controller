@@ -34,15 +34,15 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.7.7.0-release](https://cutt.ly/WtgnyBe2) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
+[6.7.9.0-release](https://cutt.ly/otkMqRoU) (Changes: New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6770) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-677) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6790) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-679) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.7.5.1-release](https://cutt.ly/ttsVJKiP) (Changes: Support for Project Motor Racing, New detailed API protocol support, Prevent the Spotter to raise errors when muted or silent, Fixed a couple of grammar errors, Removed orphane temporary files when importing into the "Session Database", Better logging for GPT HTTP error codes, Prevent the low level Spotter process from crashing when cars join a session after session start, Retry for rate limited GPT provider APIs, Force rounded window corners on Windows 11, Added generic handling issues for AC Evo.)
+[6.7.8.0-release](https://cutt.ly/8thMnbim) (Changes: Improved dark mode with new icons, Application icon on progress bar, Translator for activation listener, Translator for non-Assistant speeches, Fixed cars leaving and entering a session in iRacing, New controller action function "ask", New controller action function "command", Fixed pitstop settings preview in "Team Center" for LMU, New track data file for AMS2, Full update of Chinese translation, Application discrimininator for HTML->Viewer core setting, New functions "Ask" and "Command" in Lua Assistats module, New predicates/functions "Assistant.Ask" and "Assitant.Command" for booster rules and scripts, New predicates "Assistant.Ask" and "Assitant.Command" in the rule engine of an Assistant, New "Environment" script module.)
 
-[6.7.1.0-release](https://cutt.ly/dtoZbIfr) (Changes: Support for enabling/disabling of track sections, Refactoring of action function documentation.)
+[6.7.7.1-release](https://cutt.ly/EthyIeFt) (Changes: Support for language translation for Race Assistants, Ctrl key now runs a simple Assistant test mode, Updated copyright to 2026, Support for new editors on Plugins tab in "Simulator Configuration", Support for extended dark theming, New button for keyboard shortcuts in "Simulator Startup".)
 
 #### Latest development build
 
@@ -126,11 +126,13 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 34. [Telemetry System Revisited](https://youtu.be/pPPSqs5Bdrk) - This video provides you with updated information about the telemetry system of Simulator Controller, since many functions have been added recently.
 
-35. [Scripting Assistant behavior](https://youtu.be/Kvs_YePeMRI) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
+35. [Scripting Assistant behavior](https://youtu.be/zu3WJwKBhj0) - This video introduces Lua scripting for the Race Assistants. Lua is an easy to learn, simple language which now can be used to define new voice commands, interact with the simulator and so on.
 
 36. [Brake coaching by an AI](https://youtu.be/ADI3DvOu_bw) - Demonstration of the new brake coaching mode of the Driving Coach as released for the 5th anniversary of Simulator Controller.
 
 37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
+
+38. [Using automatic language translation for the Assistants](https://youtu.be/FSkf-SxQ3M8) - The new functionality that supports automatic translation for speech interaction is demonstrated in this video. You will learn how to configure the Assistants to use nay language you want.
 
 This list will be extended from time to time to cover new functionalities.
 

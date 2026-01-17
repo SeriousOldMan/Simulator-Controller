@@ -157,14 +157,12 @@ class BasicStepWizard extends StepWizard {
 			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
 				if this.editTranslator(assistant)
 					this.loadVoices(assistant)
-				else {
-					this.SetupWizard.setModuleValue(assistant, "Language.Translated", false, false)
 
+				if !this.SetupWizard.getModuleValue(assistant, "Language.Translated", false)
 					if dropDown.HasProp("LastValue")
 						dropDown.Choose(dropDown.LastValue)
 					else
 						dropDown.Choose(1)
-				}
 			}
 			else if InStr(selectedText, translate("---------------------------------------------")) {
 				if dropDown.HasProp("LastValue")
@@ -1126,13 +1124,19 @@ class BasicStepWizard extends StepWizard {
 
 			configuration := newMultiMap()
 
+			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+
 			setup := this.assistantSetup(assistant)
 			language := setup.Language
 
-			if isObject(language)
-				language := language.Code
+			if isObject(language) {
+				setMultiMapValue(configuration, "Voice Control", "Language.Translated", true)
+				setMultiMapValue(configuration, "Voice Control", "Translator"
+											  , values2String("|", language.Service, "English", language.Language
+																 , language.APIKey, values2String(",", language.Arguments*)))
 
-			setMultiMapValues(configuration, "Voice Control", getMultiMapValues(kSimulatorConfiguration, "Voice Control"), false)
+				language := language.Code
+			}
 
 			setMultiMapValue(configuration, "Voice Control", "Language", language)
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", setup.Synthesizer)

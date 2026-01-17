@@ -9,8 +9,8 @@
 ---                         Private Functions Section                       ---
 -------------------------------------------------------------------------------
 
-__call_simulator = extern("callSimulator")
-__read_simulator = extern("readSimulator")
+__call_simulator = extern("_callSimulator")
+__read_simulator = extern("_readSimulator")
 
 
 -------------------------------------------------------------------------------
@@ -27,10 +27,14 @@ Simulator = {}
 ---                             Functions                                   ---
 -------------------------------------------------------------------------------
 
-Simulator.Read = function (simulator, car, track)
-	return __read_simulator(simulator, car, track, "Text")
+Simulator.Read = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __read_simulator(simulator, table.unpack(arguments))
 end
 
-Simulator.Call = function (simulator, command)
-	return __call_simulator(simulator, command)
+Simulator.Call = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __call_simulator(simulator, table.unpack(arguments))
 end

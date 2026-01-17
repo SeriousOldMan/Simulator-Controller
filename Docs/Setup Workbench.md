@@ -232,7 +232,38 @@ Although it is possible to introduce support for a completely new simulator, muc
 
 ### Introducing a new car
 
-General car meta data is managed in the files "Car Data.ini" and "Tyre Data.ini" which can be found in *Resources\Simulator Data\\[Simulator]* in the program folder (with [Simulator] substituted with "AC" or "ACC" and so on). If your specific car is not already available, you can create an entry for your own car by placing corresponding files in the *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder. Use one of the already available cars as a template for your own entries.
+General car meta data is managed in the files "Car Data.ini" and "Tyre Data.ini" which can be found in *Resources\Simulator Data\\[Simulator]* in the program folder (with [Simulator] substituted with "AC" or "ACC" and so on). If your specific car is not already available, you can create an entry for your own car by placing corresponding files in the *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder. Use one of the already available cars as a template for your own entries. The following sections are supported:
+
+1. [Car Names]
+
+   Mapping from internal car name to *official* car name. Example:
+   
+		ks_alfa_33_stradale=Alfa Romeo 33 Stradale
+   
+2. [Car Codes]
+
+   Mapping from *official* car name to internal car name. Example:
+   
+		Alfa Romeo 33 Stradale=ks_alfa_33_stradale
+   
+3. [Car Classes]
+
+   Mapping from internal car name to corresponding car class. Example:
+   
+		ks_alfa_33_stradale=Road
+ 
+4. [Car Information]
+
+   Geometry and other data for a given car. Example:
+   
+		mclaren_720s_gt3.SteerLock=480
+		mclaren_720s_gt3.SteerRatio=12
+		mclaren_720s_gt3.WheelBase=270
+		mclaren_720s_gt3.TrackWidth=150
+
+Depending on the simulator, some or all of this information is not required, because it is provided by the corresponding API. Additionally, the values from the "[Car Information]" section can also be supplied in the setup definition files for a given car in the "[General]" section (see below).
+
+Please note, that the "Car Data.ini" file for *Assetto Corsa Competizione* has a different format, but because no cars can be added for this simulator by the community, it does not matter.
 
 Once the car is generally known to Simulator Controller, proceed to the next section.
 
@@ -282,6 +313,8 @@ with [Simulator] and [Car] substituted by the specific names.
 
 Here is an extract from the definition file for the "McLaren 720s GT3":
 
+	[General]
+	SteerLock=480
 	[Setup.Settings.Handler]
 	Brake.Balance=FloatHandler(47.0, 0.2, 1, 47.0, 68.0)
 	Brake.Duct.Front=ClicksHandler(0, 6)
@@ -312,6 +345,8 @@ Here is an extract from the definition file for the "McLaren 720s GT3":
 	Geometry.Toe.Rear.Left=Degrees
 	Geometry.Toe.Rear.Right=Degrees
 	...
+
+In the "[General]" section, values for *SteerLock*, *SteerRatio*, *Wheelbase* and *TrackWidth* can be supplied. They are used to initialize the settings in the issue analyzer and are also used for the telemetry analayzer.
 
 The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers are available:
 

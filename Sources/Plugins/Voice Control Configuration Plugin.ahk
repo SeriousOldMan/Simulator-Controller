@@ -12,6 +12,8 @@
 
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
+#Include "..\Framework\Extensions\Translator.ahk"
+#Include "..\Configuration\Libraries\TranslatorEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -72,11 +74,51 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local choices := []
 		local chosen := 0
 		local enIndex := 0
-		local languageCode := "en"
 		local languages := availableLanguages()
 		local code, language, ignore, grammarFile, x0, x1, x2, w1, w2, x3, w3, x4, w4, voices, recognizers, halfWidth
 
 		updateLanguage(*) {
+			local dropDown := window["voiceLanguageDropDown"]
+			local selectedText := dropDown.Text
+			local language
+
+			if (InStr(selectedText, translate("Translator")) || InStr(selectedText, translate(" (translated)..."))) {
+				if this.editTranslator() {
+					if this.Value["voiceTranslator"] {
+						language := this.Value["voiceTranslator"].TargetLanguage
+
+						this.Value["voiceLanguage"] := first(Translator.Languages, (l) => ((l.Identifier = language)
+																						|| (l.Code = language))).Code
+						this.Value["voiceLanguageTranslated"] := true
+					}
+					else {
+						this.Value["voiceLanguage"] := getLanguage()
+
+						this.Value["voiceLanguageTranslated"] := false
+					}
+				}
+				else if dropDown.HasProp("LastValue") {
+					dropDown.Choose(dropDown.LastValue)
+
+					return
+				}
+			}
+			else if InStr(selectedText, translate("---------------------------------------------")) {
+				if dropDown.HasProp("LastValue") {
+					dropDown.Choose(dropDown.LastValue)
+
+					return
+				}
+			}
+			else {
+				this.Value["voiceLanguage"] := this.getCurrentLanguage()
+
+				this.Value["voiceLanguageTranslated"] := false
+			}
+
+			dropDown.LastValue := dropDown.Value
+
+			this.loadLanguages()
 			this.updateLanguage()
 		}
 
@@ -362,7 +404,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					else
 						choices.Push(code)
 
-					if (code == this.Value["voiceLanguage"])
+					if (code = this.Value["voiceLanguage"])
 						chosen := A_Index
 
 					if (code = "en")
@@ -371,6 +413,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 
 		this.iLanguages := choices
+
+		if (chosen = 0)
+			chosen := enIndex
 
 		x0 := x + 8
 		x1 := x + 118
@@ -614,18 +659,34 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	loadFromConfiguration(configuration, load := false) {
-		local languageCode, languages, synthesizer, recognizer
+		local languageCode, languages, synthesizer, recognizer, translator, translated
 
 		super.loadFromConfiguration(configuration)
 
 		if load {
+			translator := getMultiMapValue(configuration, "Voice Control", "Translator", false)
 			languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
 			languages := availableLanguages()
 
-			if languages.Has(languageCode)
-				this.Value["voiceLanguage"] := languages[languageCode]
-			else
+			this.Value["voiceLanguageTranslated"] := getMultiMapValue(configuration, "Voice Control", "Language.Translated", false)
+
+			if translator {
+				arguments := string2Values("|", translator)
+
+				this.Value["voiceTranslator"] := {Service: arguments[1]
+												, SourceLanguage: arguments[2], TargetLanguage: arguments[3]
+												, APIKey: arguments[4], Arguments: arguments[5]}
+
 				this.Value["voiceLanguage"] := languageCode
+			}
+			else {
+				this.Value["voiceTranslator"] := false
+
+				if languages.Has(languageCode)
+					this.Value["voiceLanguage"] := languages[languageCode]
+				else
+					this.Value["voiceLanguage"] := languageCode
+			}
 
 			synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 
@@ -747,10 +808,23 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleSpeaker := this.Control["googleSpeakerDropDown"].Text
 		local elevenLabsSpeaker := this.Control["elevenLabsSpeakerDropDown"].Text
 		local listener := this.Control["listenerDropDown"].Text
+		local translator := this.Value["voiceTranslator"]
+		local translated := false
 
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
+		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage(&translated))
+		setMultiMapValue(configuration, "Voice Control", "Language.Translated", translated)
+
+		if translator {
+			translator := values2String("|", translator.Service
+										   , translator.SourceLanguage, translator.TargetLanguage
+										   , translator.APIKey, translator.Arguments)
+
+			setMultiMapValue(configuration, "Voice Control", "Translator", translator)
+		}
+		else
+			setMultiMapValue(configuration, "Voice Control", "Translator", false)
 
 		if (windowsSpeaker = translate("Random"))
 			windowsSpeaker := true
@@ -887,34 +961,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	loadConfigurator(configuration) {
-		local choices := []
 		local chosen := 0
-		local enIndex := 0
-		local languageCode := "en"
-		local languages := availableLanguages()
-		local code, language, ignore, grammarFile, voices, recognizers, listener
+		local recognizers, listener
 
 		this.loadFromConfiguration(configuration, true)
 
-		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
-			SplitPath(grammarFile, , , &code)
-
-			if !choices.Has(languages.Has(code) ? languages[code] : code)
-				if languages.Has(code)
-					choices.Push(languages[code])
-				else
-					choices.Push(code)
-
-				if ((languages.Has(code) ? languages[code] : code) == this.Value["voiceLanguage"]) {
-					chosen := choices.Length
-					languageCode := code
-				}
-
-			if (code = "en")
-				enIndex := choices.Length
-		}
-
-		this.Control["voiceLanguageDropDown"].Choose(chosen)
+		this.loadLanguages()
 
 		this.Control["voiceSynthesizerDropDown"].Choose(this.Value["voiceSynthesizer"])
 		this.Control["voiceRecognizerDropDown"].Choose(this.Value["voiceRecognizer"])
@@ -1018,6 +1070,58 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["pushToTalkEdit"].Text := this.Value["pushToTalk"]
 		this.Control["pushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"], this.Value["pushToTalkMode"]))
 		this.Control["activationCommandEdit"].Text := this.Value["activationCommand"]
+	}
+
+	loadLanguages() {
+		local choices := []
+		local chosen := 0
+		local enIndex := 0
+		local languages := availableLanguages()
+		local theTranslator := this.Value["voiceTranslator"]
+		local code, ignore, grammarFile
+
+		for ignore, grammarFile in getFileNames("Race Engineer.grammars.*", kUserGrammarsDirectory, kGrammarsDirectory) {
+			SplitPath(grammarFile, , , &code)
+
+			if !choices.Has(languages.Has(code) ? languages[code] : code)
+				if languages.Has(code)
+					choices.Push(languages[code])
+				else
+					choices.Push(code)
+
+			if (code = this.Value["voiceLanguage"])
+				chosen := choices.Length
+			else if (languages.Has(code) && (languages[code] = this.Value["voiceLanguage"]))
+				chosen := choices.Length
+
+			if (code = "en")
+				enIndex := choices.Length
+		}
+
+		if theTranslator {
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   . translate("---------------------------------------------")
+										   . translate("---------------------------------------------")
+										   , first(Translator.Languages, (l) => ((l.Identifier = theTranslator.TargetLanguage)
+																			  || (l.Code = theTranslator.TargetLanguage))).Name . translate(" (translated)...")])
+
+			if this.Value["voiceLanguageTranslated"]
+				chosen := choices.Length
+		}
+		else
+			choices := concatenate(choices, [translate("---------------------------------------------")
+										   . translate("---------------------------------------------")
+										   . translate("---------------------------------------------")
+										   , translate("Translator") . translate("...")])
+
+		if !chosen
+			chosen := enIndex
+
+		this.Control["voiceLanguageDropDown"].Delete()
+		this.Control["voiceLanguageDropDown"].Add(choices)
+		this.Control["voiceLanguageDropDown"].Choose(chosen)
+
+		this.Control["voiceLanguageDropDown"].LastValue := chosen
 	}
 
 	show() {
@@ -1904,18 +2008,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iRecognizerMode := false
 	}
 
-	getCurrentLanguage() {
+	getCurrentLanguage(&translated?) {
 		local languageCode := "en"
 		local languages := availableLanguages()
 		local found := false
 		local voiceLanguage, code, language, ignore, grammarFile, grammarLanguageCode
 
-		try {
-			voiceLanguage := this.Control["voiceLanguageDropDown"].Text
+		voiceLanguage := this.Control["voiceLanguageDropDown"].Text
+
+		if (InStr(voiceLanguage, translate("Translator")) || InStr(voiceLanguage, translate(" (translated)..."))) {
+			translated := true
+
+			return first(Translator.Languages, (l) => ((l.Identifier = this.Value["voiceTranslator"].TargetLanguage)
+													|| (l.Code = this.Value["voiceTranslator"].TargetLanguage))).Code
 		}
-		catch Any as exception {
-			voiceLanguage := getMultiMapValue(this.Configuration, "Voice Control", "Language", getLanguage())
-		}
+		else
+			translated := false
 
 		for code, language in languages
 			if (language = voiceLanguage) {
@@ -1941,6 +2049,40 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 
 		return languageCode
+	}
+
+	editTranslator() {
+		local window := this.Window
+		local configuration
+
+		window.Block()
+
+		try {
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini")
+
+			configuration := TranslatorEditor("*", configuration).editTranslator(window)
+
+			if configuration {
+				writeMultiMap(kUserHomeDirectory . "Setup\Translator Configuration.ini", configuration)
+
+				if getMultiMapValue(configuration, "*.Translator", "Service", false)
+					this.Value["voiceTranslator"]
+						:= {Service: getMultiMapValue(configuration, "*.Translator", "Service")
+						  , SourceLanguage: "EN"
+						  , TargetLanguage: getMultiMapValue(configuration, "*.Translator", "Language")
+						  , APIKey: getMultiMapValue(configuration, "*.Translator", "API Key")
+						  , Arguments: getMultiMapValue(configuration, "*.Translator", "Arguments", "")}
+				else
+					this.Value["voiceTranslator"] := false
+
+				return true
+			}
+			else
+				return false
+		}
+		finally {
+			window.Unblock()
+		}
 	}
 
 	updateLanguage(recognizer := true) {
@@ -2306,6 +2448,13 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			synthesizer.setVolume(getMultiMapValue(configuration, "Voice Control", "SpeakerVolume"))
 			synthesizer.setPitch(getMultiMapValue(configuration, "Voice Control", "SpeakerPitch"))
 			synthesizer.setRate(getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed"))
+
+			if getMultiMapValue(configuration, "Voice Control", "Language.Translated", false) {
+				arguments := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Translator", ""))
+
+				synthesizer.setTranslator(Translator(arguments[1], arguments[2], arguments[3]
+												   , arguments[4], string2Values(",", arguments[5])*))
+			}
 
 			synthesizer.speakTest()
 		}

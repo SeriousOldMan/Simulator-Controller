@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("SimHub plugin that integrates Simulator Controller telemetry data")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba047442aa8cdaed082f0d06a3fc687a3f38cbc4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e4fdccff47476c46d13347628362ee380c98577")]
 [assembly: System.Reflection.AssemblyProductAttribute("Simulator Controller SimHub Integration")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SimulatorController.SimHub.Plugin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

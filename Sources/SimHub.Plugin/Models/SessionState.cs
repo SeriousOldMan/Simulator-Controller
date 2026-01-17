@@ -3,10 +3,6 @@ using Newtonsoft.Json;
 
 namespace SimulatorController.SimHub.Plugin
 {
-    /// <summary>
-    /// Root model for Simulator Controller session state.
-    /// CRITICAL: All properties are nullable to handle missing data gracefully.
-    /// </summary>
     public class SessionState
     {
         [JsonProperty("Assistants")]
@@ -85,6 +81,9 @@ namespace SimulatorController.SimHub.Plugin
     {
         [JsonProperty("Muted")]
         public bool? Muted { get; set; }
+
+        [JsonProperty("Silent")]
+        public bool? Silent { get; set; }
 
         [JsonProperty("State")]
         public string State { get; set; }
@@ -249,11 +248,23 @@ namespace SimulatorController.SimHub.Plugin
 
     public class FuelData
     {
+        [JsonProperty("AvgConsumption")]
+        public double? AvgConsumption { get; set; }
+
         [JsonProperty("AvgFuelConsumption")]
         public double? AvgFuelConsumption { get; set; }
 
+        [JsonProperty("AvgEnergyConsumption")]
+        public double? AvgEnergyConsumption { get; set; }
+
+        [JsonProperty("LastConsumption")]
+        public double? LastConsumption { get; set; }
+
         [JsonProperty("LastFuelConsumption")]
         public double? LastFuelConsumption { get; set; }
+
+        [JsonProperty("LastEnergyConsumption")]
+        public double? LastEnergyConsumption { get; set; }
 
         [JsonProperty("RemainingFuel")]
         public double? RemainingFuel { get; set; }
@@ -261,17 +272,14 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("RemainingFuelLaps")]
         public int? RemainingFuelLaps { get; set; }
 
-        [JsonProperty("AvgEnergyConsumption")]
-        public double? AvgEnergyConsumption { get; set; }
-
-        [JsonProperty("LastEnergyConsumption")]
-        public double? LastEnergyConsumption { get; set; }
-
         [JsonProperty("RemainingEnergy")]
         public double? RemainingEnergy { get; set; }
 
         [JsonProperty("RemainingEnergyLaps")]
         public int? RemainingEnergyLaps { get; set; }
+
+        [JsonProperty("RemainingLaps")]
+        public int? RemainingLaps { get; set; }
     }
 
     #endregion
@@ -331,20 +339,20 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("Brakes")]
         public bool? Brakes { get; set; }
 
-        [JsonProperty("RepairBodywork")]
-        public bool? RepairBodywork { get; set; }
+        [JsonProperty("Repairs")]
+        public RepairsData Repairs { get; set; }
+    }
 
-        [JsonProperty("RepairSuspension")]
-        public bool? RepairSuspension { get; set; }
+    public class RepairsData
+    {
+        [JsonProperty("Bodywork")]
+        public bool? Bodywork { get; set; }
 
-        [JsonProperty("RepairEngine")]
-        public bool? RepairEngine { get; set; }
+        [JsonProperty("Suspension")]
+        public bool? Suspension { get; set; }
 
-        [JsonProperty("RepairFrontAero")]
-        public bool? RepairFrontAero { get; set; }
-
-        [JsonProperty("RepairRearAero")]
-        public bool? RepairRearAero { get; set; }
+        [JsonProperty("Engine")]
+        public bool? Engine { get; set; }
     }
 
     #endregion
@@ -395,6 +403,9 @@ namespace SimulatorController.SimHub.Plugin
 
         [JsonProperty("OverallPosition")]
         public int? OverallPosition { get; set; }
+
+        [JsonProperty("Position")]
+        public int? Position { get; set; }
     }
 
     public class DriverStanding
@@ -452,38 +463,32 @@ namespace SimulatorController.SimHub.Plugin
 
     public class StrategyData
     {
-        [JsonProperty("State")]
-        public string State { get; set; }
-
-        [JsonProperty("Fuel")]
-        public double? Fuel { get; set; }
-
-        [JsonProperty("Lap")]
-        public int? Lap { get; set; }
-
-        [JsonProperty("Position")]
-        public int? Position { get; set; }
-
         [JsonProperty("PlannedPitstops")]
         public int? PlannedPitstops { get; set; }
 
         [JsonProperty("RemainingPitstops")]
         public int? RemainingPitstops { get; set; }
 
-        [JsonProperty("TyreCompoundFrontLeft")]
-        public string TyreCompoundFrontLeft { get; set; }
-
-        [JsonProperty("TyreCompoundFrontRight")]
-        public string TyreCompoundFrontRight { get; set; }
-
-        [JsonProperty("TyreCompoundRearLeft")]
-        public string TyreCompoundRearLeft { get; set; }
-
-        [JsonProperty("TyreCompoundRearRight")]
-        public string TyreCompoundRearRight { get; set; }
+        [JsonProperty("NextPitstop")]
+        public NextPitstopData NextPitstop { get; set; }
 
         [JsonProperty("Pitstops")]
         public PlannedPitstop[] Pitstops { get; set; }
+    }
+
+    public class NextPitstopData
+    {
+        [JsonProperty("Lap")]
+        public int? Lap { get; set; }
+
+        [JsonProperty("Fuel")]
+        public double? Fuel { get; set; }
+
+        [JsonProperty("TyreCompound")]
+        public string TyreCompound { get; set; }
+
+        [JsonProperty("Position")]
+        public int? Position { get; set; }
     }
 
     public class PlannedPitstop
@@ -491,20 +496,14 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("Nr")]
         public int? Nr { get; set; }
 
+        [JsonProperty("Lap")]
+        public int? Lap { get; set; }
+
         [JsonProperty("Fuel")]
         public double? Fuel { get; set; }
 
-        [JsonProperty("TyreCompoundFrontLeft")]
-        public string TyreCompoundFrontLeft { get; set; }
-
-        [JsonProperty("TyreCompoundFrontRight")]
-        public string TyreCompoundFrontRight { get; set; }
-
-        [JsonProperty("TyreCompoundRearLeft")]
-        public string TyreCompoundRearLeft { get; set; }
-
-        [JsonProperty("TyreCompoundRearRight")]
-        public string TyreCompoundRearRight { get; set; }
+        [JsonProperty("TyreCompound")]
+        public string TyreCompound { get; set; }
     }
 
     #endregion

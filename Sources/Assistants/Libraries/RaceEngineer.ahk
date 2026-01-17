@@ -3218,10 +3218,14 @@ class RaceEngineer extends RaceAssistant {
 			if (repairService.Length > 0)
 				setMultiMapValue(sessionInfo, "Pitstop", "Target.Time.Repairs", Round(knowledgeBase.getValue("Target.Time.Repairs", 0) / 1000))
 
+			setMultiMapValue(sessionInfo, "Pitstop", "Target.Planned", true)
+
 			planned := this.hasPlannedPitstop()
 			prepared := this.hasPreparedPitstop()
 
 			if (planned || prepared) {
+				setMultiMapValue(sessionInfo, "Pitstop", "Planned", true)
+
 				lap := knowledgeBase.getValue("Pitstop.Planned.Lap", false)
 
 				if lap

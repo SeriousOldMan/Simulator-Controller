@@ -391,8 +391,6 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createPitstopState(sessionInfo) {
-		local pitstopNr := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", kUndefined)
-		local pitstopLap := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", false)
 		local state := Map()
 		local fuelService := false
 		local tyreService := false
@@ -423,16 +421,16 @@ class IntegrationPlugin extends ControllerPlugin {
 			this.Provider.supportsTyreManagement( , &tyreSet)
 		}
 
-		if (pitstopNr == kUndefined)
+		if (getMultiMapValue(sessionInfo, "Pitstop", "Planned", false) && !getMultiMapValue(sessionInfo, "Pitstop", "Target.Planned", false))
 			return kNull
 
 		state["State"] := "Planned"
 
-		if pitstopNr {
-			state["Number"] := pitstopNr
+		if getMultiMapValue(sessionInfo, "Pitstop", "Planned", false) {
+			state["Number"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr")
 
-			if pitstopLap
-				state["Lap"] := pitstopLap
+			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", false)
+				state["Lap"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap")
 
 			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", false)
 				state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service")
@@ -496,7 +494,7 @@ class IntegrationPlugin extends ControllerPlugin {
 					state["TyreCompound" . tyre] := tyreCompound
 			}
 
-			if tyreService {
+			if (tyreService && exist(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) => (state["TyreCompound" . tyre] != kNull))) {
 				if tyreSet {
 					tyreSet := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Set")
 
@@ -532,9 +530,9 @@ class IntegrationPlugin extends ControllerPlugin {
 												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension")
 												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine"))
 
-			state["Prepared"] := getMultiMapValue(sessionInfo, "Pitstop", "Prepared", false)
+			state["Prepared"] := (getMultiMapValue(sessionInfo, "Pitstop", "Prepared", false) ? kTrue : kFalse)
 		}
-		else if (getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", kUndefined) != kUndefined) {
+		else if getMultiMapValue(sessionInfo, "Pitstop", "Target.Planned", false) {
 			state["State"] := "Forecast"
 
 			if fuelService

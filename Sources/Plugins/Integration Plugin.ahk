@@ -392,7 +392,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 	createPitstopState(sessionInfo) {
 		local pitstopNr := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr", kUndefined)
-		local pitstopLap := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", 0)
+		local pitstopLap := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", false)
 		local state := Map()
 		local fuelService := false
 		local tyreService := false
@@ -430,11 +430,18 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		if pitstopNr {
 			state["Number"] := pitstopNr
-			state["Lap"] := ((pitstopLap != 0) ? pitstopLap : kNull)
-			state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", 0)
-			state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", 0)
-			state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel")) : kNull)
-			state["Driver"] := kNull
+
+			if pitstopLap
+				state["Lap"] := pitstopLap
+
+			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service", false)
+				state["ServiceTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Service")
+
+			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", false)
+				state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane")
+
+			if fuelService
+				state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel"))
 
 			driverRequest := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Driver.Request", false)
 
@@ -445,12 +452,12 @@ class IntegrationPlugin extends ControllerPlugin {
 
 				if (driver != string2Values(":", driverRequest[1])[1])
 					state["Driver"] := driver
+				else
+					state["Driver"] := string2Values(":", driverRequest[1])[1]
 			}
 
-			if (repairService.Length > 0)
-				state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", 0)
-			else
-				state["RepairTime"] := kNull
+			if ((repairService.Length > 0) && getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs", false))
+				state["RepairTime"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Repairs")
 
 			if (tyreService = "Wheel") {
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
@@ -525,13 +532,13 @@ class IntegrationPlugin extends ControllerPlugin {
 												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Suspension")
 												 , getMultiMapValue(sessionInfo, "Pitstop", "Planned.Repair.Engine"))
 
-			state["Prepared"] := getMultiMapValue(sessionInfo, "Pitstop", "Prepared")
+			state["Prepared"] := getMultiMapValue(sessionInfo, "Pitstop", "Prepared", false)
 		}
 		else if (getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount", kUndefined) != kUndefined) {
 			state["State"] := "Forecast"
 
 			if fuelService
-				state["Fuel"] := (fuelService ? convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount")) : kNull)
+				state["Fuel"] := convertUnit("Volume", getMultiMapValue(sessionInfo, "Pitstop", "Target.Fuel.Amount"))
 
 			if (tyreService = "Wheel") {
 				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {

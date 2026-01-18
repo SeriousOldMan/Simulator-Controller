@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = SimulatorController.SimHub.Plugin
+build_property.ProjectDir = C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

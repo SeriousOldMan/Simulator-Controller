@@ -1,0 +1,11 @@
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.csproj.AssemblyReference.cache
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.AssemblyInfoInputs.cache
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.AssemblyInfo.cs
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.csproj.CoreCompileInputs.cache
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.sourcelink.json
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Binaries\SimHub\net48\SimulatorController.SimHub.Plugin.dll
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Binaries\SimHub\net48\SimulatorController.SimHub.Plugin.pdb
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\Simulato.E054FC84.Up2Date
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.dll
+C:\Users\sudhi\Documents\GitHub\Simulator-Controller\Sources\SimHub.Plugin\obj\Release\net48\SimulatorController.SimHub.Plugin.pdb

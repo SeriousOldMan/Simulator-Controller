@@ -693,7 +693,12 @@ class IntegrationPlugin extends ControllerPlugin {
 			for ignore, hint in coachingHints {
 				message := getMultiMapValue(coachingState, "Instructions", hint, false)
 
-				hints.Push(Map("Hint", hint, "Message", message ? message : kNull))
+				hint := Map("Hint", hint)
+
+				if message
+					hint["Message"] := message
+
+				hints.Push(hint)
 			}
 
 			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)

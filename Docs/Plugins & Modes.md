@@ -1567,15 +1567,15 @@ Only one plugin argument is provided, with which you can define the output file 
 
 	stateFile: *path*;
 	language: DE | EN | ...;
-	timeFormat: [H:]M:S.## | [H:]M:S,## | S.## | S,##;
+	formats: Time [H:]M:S.## | [H:]M:S,## | S.## | S,##;
 	units: Pressure PSI | KPa | BAR, Temperature Celsius | Fahrenheit,
-		   Speed kmh | mph, Volume Liter | Gallon (US) | Gallon (UK);
+		   Speed km/h | mph, Volume Liter | Gallon (US) | Gallon (UK);
 
 If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
 
 With *language*, which defaults to "EN", you can choose the language for all textual properties. Only languagesm for which a translation is available in Simulator Controller are supported.
 
-*timeFormat* allows you to specify, how time spans are specified. Suppoted values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds.
+*formats* allows you to specify, how time spans are specified. Suppoted values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds.
 
 Lastly you can specify with *units*, which units are used for the different numerical values. Defaults are:
 
@@ -1583,7 +1583,7 @@ Lastly you can specify with *units*, which units are used for the different nume
 |-------------|---------|
 | Pressure    | PSI     |
 | Temperature | Celsius |
-| Speed       | kmh     |
+| Speed       | km/h    |
 | Volume      | Liter   |
 
 The content of the JSON file looks like this, one big object containing several embedded objects, which will be available depending on the current state of the simulator, the current session and the available and configured functions of Simulator Controller.
@@ -1826,7 +1826,7 @@ Now let's have a look at each oject:
 12. *Pitstop*
 
 		"Pitstop": {
-			"State": "Planned",
+			"State": "Plan",
 			"Fuel": 67.0,
 			"Lap": 12,
 			"Driver": "Oliver Juwig",

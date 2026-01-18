@@ -1565,11 +1565,28 @@ where *D:\SimRacing\Session State.json* is an example. Substitute your own path 
 
 Only one plugin argument is provided, with which you can define the output file for the state representation.
 
-	stateFile: *path*
+	stateFile: *path*;
+	language: DE | EN | ...;
+	formats: Time [H:]M:S.## | [H:]M:S,## | S.## | S,##;
+	units: Pressure PSI | KPa | BAR, Temperature Celsius | Fahrenheit,
+		   Speed km/h | mph, Volume Liter | Gallon (US) | Gallon (UK);
 
 If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
 
-The content of the JSON file looks like this (depending on the current situation, of course):
+With *language*, which defaults to "EN", you can choose the language for all textual properties. Only languagesm for which a translation is available in Simulator Controller are supported.
+
+*formats* allows you to specify, how time spans are specified. Suppoted values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds.
+
+Lastly you can specify with *units*, which units are used for the different numerical values. Defaults are:
+
+| Unit        | Default |
+|-------------|---------|
+| Pressure    | PSI     |
+| Temperature | Celsius |
+| Speed       | km/h    |
+| Volume      | Liter   |
+
+The content of the JSON file looks like this, one big object containing several embedded objects, which will be available depending on the current state of the simulator, the current session and the available and configured functions of Simulator Controller.
 
 	{
 		"Assistants": {
@@ -1596,23 +1613,78 @@ The content of the JSON file looks like this (depending on the current situation
 			"State": "Active"
 		},
 		"Brakes": {
-			"Temperatures": [
-				199.6,
-				197.6,
-				339.9,
-				337.0
-			],
-			"Wear": [
-				2,
-				2,
-				3,
-				3
-			]
+			...
 		},
 		"Engine": {
-			"WaterTemperature": 92.7,
-			"OilTemperature": 85.2
+			...
 		},
+		...
+	}
+
+Before we take a look at each individual object and its properties, it is important to understand, that the structure and properties can vary depending on the situation, the currently available functions and of course of the simulator in use. Each object can be absent, if not applicable, and this is true for all the properties as well. For example, if no strategy has been set, the *Strategy* object will not be available. Or, if the given simulator does not supply tyre wear information, this property will be absent. And so on...
+
+Additionally, the following applies:
+
+1. Most text-based values contain strings, that may optionally be tranlasted according to the plugin arguments. Example: "Race" -> "Rennen" - if the configured language is *German*.
+
+2. All time values and numbers will be formatted accordng to the chosen time format supplied during plugin initialization.
+
+3. For some unit-based values like fuel amount, the corresponding unit (Liter, Gallon (US), PSI, KPa, Celsius, Fahrenheit, ...) can be configured,
+
+Now let's have a look at each oject:
+
+1. *Assistants*
+
+		"Assistants": {
+			"Mode": "Team",
+			"Race Engineer": {
+				"Muted": true,
+				"State": "Waiting"
+			},
+			"Race Spotter": {
+				"State": "Active"
+			},
+			"Race Strategist": {
+				"Silent": true,
+				"State": "Active"
+			},
+			"Session": "Race"
+		}
+		
+   Beside information about the current type of session ("Practice", "Qualifying", "Race", ...), as well as the current mode ("Solo", "Team"), this object contains the current state of each Assistant. Available properties are: "Silent", "Muted" and "State" (with values "Active", "Waiting", "Disabled" and "Finished").
+   
+2. *Session*
+
+   This object provides information about the currently active session, if any.
+   
+		"Session": {
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"Track": "Circuit de Spa-Franchorchamps",
+			"Profile": "Standard"
+		}
+
+   The property "Session" can have the values "Practice", "Qualifying", "Race", "Time Trial" and "Other" and "Profile" specifies the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) in use.
+
+3. *Duration*
+
+   Information about session length and other timing stuff can be found here.
+
+		"Duration": {
+			"Format": "Time",
+			"SessionLapsLeft": 24,
+			"SessionTimeLeft": "54:53.0",
+			"StintLapsLeft": 9,
+			"StintTimeLeft": "54:53.0"
+		}
+		
+   "Format" may be one of "Time", "Time + 1", "Laps" and "Laps + 1". Additionally, if the current simulator and session is configured for a maximum driver time in a team race, the property "DriverTimeLeft" may be present.
+
+4. *Conditions*
+
+   This object supplies information about the current weather and track conditions as well as an outlook, if provided by the simulator.
+   
 		"Conditions": {
 			"AirTemperature": 24.9,
 			"Grip": "Optimum",
@@ -1620,7 +1692,87 @@ The content of the JSON file looks like this (depending on the current situation
 			"Weather": "Dry",
 			"Weather10Min": "Dry",
 			"Weather30Min": "Dry"
-		},
+		}
+
+	"Grip" may be one of "Optimum", "Fast", "Green", "Greasy", "Damp", "Wet" and "Flooded". The *weather* properties may contain "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm".
+
+5. *Stint*
+
+   Contains timing and performance information for the current stint.
+
+		"Stint": {
+			"Driver": "Oliver Juwig (OJU)",
+			"Lap": 3,
+			"Laps": 2,
+			"LastTime": "2:21.3",
+			"BestTime": "2:20.7",
+			"LastSpeed": 270.8,
+			"BestSpeed": 272.1,
+			"Position": 1
+		}
+		
+   "Lap" is the current lap number and "Laps" contains the number of laps driven in this stint so far. "Position" contains the overall position, for the class-specific position see the *Standings* object.
+   
+6. *Fuel*
+
+   Everything about the fuel and energy management can be found in this object.
+
+		"Fuel": {
+			"AvgFuelConsumption": 4.1,
+			"LastFuelConsumption": 4.1,
+			"RemainingFuel": 36.9,
+			"RemainingFuelLaps": 9
+		}
+
+   If the current car has an electric motor and a battery, additional proprties may be present:
+
+			"RemainingEnergy": 26.7,
+			"RemainingEnergyLaps": 8,
+			"AvgEnergyConsumption": 3.2,
+			"LastEnergyConsumption": 3.0
+
+7. *Tyres*
+
+   This object, which can become quite large, provides everything about the current state of the tyres.
+
+		"Tyres": {
+			"HotPressures":		[26.4, 26.4, 26.7, 26.5],
+			"ColdPressures":	[25.3, 24.9, 25.1, 24.5],
+			"PressureLosses":	[0.0, -0.1, 0.0, -0.2],
+			"Temperatures":		[80.6, 80.6, 91.7, 91.1],
+			"Wear":				[4, 3, 3, 2],
+			"Laps":				[2, 2, 2, 2],
+			"TyreCompoundFrontLeft": "Dry (Black)",
+			"TyreCompoundFrontRight": "Dry (Black)",
+			"TyreCompoundRearLeft": "Dry (Black)",
+			"TyreCompoundRearRight": "Dry (Black)",
+			"TyreSet": 3
+		}
+
+   The property "Wear" is not supported by all simulators, of course.
+
+8. *Brakes*
+
+   The current state of the brakes is provided in this object.
+
+		"Brakes": {
+			"Temperatures":		[199.6, 197.6, 339.9, 337.0],
+			"Wear":				[2, 2, 3, 3]
+		}
+
+9. *Engine*
+
+   Fluid temperatures of the engine is available here.
+
+		"Engine": {
+			"WaterTemperature": 92.7,
+			"OilTemperature": 85.2
+		}
+
+10. *Damage*
+
+    If the car had an accident, information about the damage, if any, is provided in this object.
+
 		"Damage": {
 			"Bodywork": {
 				"Front": 0.0,
@@ -1638,35 +1790,55 @@ The content of the JSON file looks like this (depending on the current situation
 			"Engine": 0.0,
 			"LapDelta": 0.3,
 			"RepairTime": 2.7
-		},
-		"Duration": {
-			"Format": "Time",
-			"SessionLapsLeft": 24,
-			"SessionTimeLeft": "54:53.0",
-			"StintLapsLeft": 9,
-			"StintTimeLeft": "54:53.0"
-		},
-		"Fuel": {
-			"AvgFuelConsumption": 4.1,
-			"LastFuelConsumption": 4.1,
-			"RemainingFuel": 36.9,
-			"RemainingFuelLaps": 9,
-			"AvgEnergyConsumption": 3.2,
-			"LastEnergyConsumption": 3.0,
-			"RemainingEnergy": 26.7,
-			"RemainingEnergyLaps": 8
-		},
+		}
+
+	The properties "Bodywork", "Suspension" and "Engine" contain values that indicate the amount of damage for each category. The absolute amount of these values are specific for each simulator. In many simulators, the values represent a distribution of the damage by percentage. "RepairTime" may be an indication, but is not to be considered an exact value in most simulators.
+
+11. *Strategy*
+
+	If the current session is run under strategy control, this object is available.
+	
+		"Strategy": {
+			"PlannedPitstops": 2,
+			"RemainingPitstops": 2,
+			"NextPitstop": {
+				"Fuel": 67.0,
+				"Lap": 12,
+				"Position": 7,
+				"TyreCompound": "Dry (Black)"
+			},
+			"Pitstops": [
+				{
+					"Nr": 1,
+					"Fuel": 67.0,
+					"TyreCompound": "Dry (Black)"
+				},
+				{
+					"Nr": 2,
+					"Fuel": 20.0,
+					"TyreCompound": null
+				}
+			]
+		}
+
+	Unless all required pitstops have been performed (in case "RemainingPitstops" is **0**), the object "NextPitstop" specifies the planned lap and service for the upcoming pitstop. Please not, that strategies are always planned with a tyre change, if any, on all four wheels with the same tyre compound.
+
+12. *Pitstop*
+
 		"Pitstop": {
-			"State": "Planned",
-			"Fuel": 68.0,
-			"Lap": null,
+			"State": "Plan",
+			"Fuel": 67.0,
+			"Lap": 12,
 			"Driver": "Oliver Juwig",
 			"ServiceTime": 30,
 			"RepairTime": 7,
 			"PitlaneDelta": 23,
 			"Number": 1,
-			"Prepared": 0,
-			"TyreCompound": "Dry (Black)",
+			"Prepared": false,
+			"TyreCompoundFrontLeft": "Dry (Black)",
+			"TyreCompoundFrontRight": "Dry (Black)",
+			"TyreCompoundRearLeft": "Dry (Black)",
+			"TyreCompoundRearRight": "Dry (Black)",
 			"TyrePressures": [
 				25.2,
 				25.2,
@@ -1676,119 +1848,60 @@ The content of the JSON file looks like this (depending on the current situation
 			"TyrePressureIncrements": [0.2, 0.1, -0.3, -0.2],
 			"TyreSet": 2,
 			"Brakes": false,
-			"Repairs": "-"
-		},
-		"Session": {
-			"Car": "McLaren 720S GT3",
-			"Session": "Race",
-			"Simulator": "Assetto Corsa Competizione",
-			"Track": "Circuit de Spa-Franchorchamps",
-			"Profile": "Standard"
-		},
+			"Repairs": {
+				"Bodywork": true,
+				"Suspension": false
+			}
+		}
+		
+13. *Standings*
+
 		"Standings": {
 			"Ahead": null,
 			"Behind": {
-				"Delta": "-0:02,1",
+				"Delta": "-0:02.1",
 				"InPit": false,
-				"LapTime": "2:21,3",
+				"LapTime": "2:21.3",
 				"Laps": 2,
 				"Nr": 109
 			},
 			"ClassPosition": 1,
 			"Focus": {
-				"Delta": "-0:15,9",
+				"Delta": "-0:15.9",
 				"InPit": false,
-				"LapTime": "2:24,3",
+				"LapTime": "2:24.3",
 				"Laps": 2,
 				"Nr": 15
 			},
 			"Leader": null,
 			"OverallPosition": 1,
 			"ClassPosition": 1
-		},
-		"Stint": {
-			"BestTime": null,
-			"Driver": "Oliver Juwig (OJU)",
-			"Lap": 3,
-			"Laps": 2,
-			"LastTime": "2:21,3",
-			"BestTime": "2:20,7",
-			"LastSpeed": 270.8,
-			"BestSpeed": 272.1,
-			"Position": 1
-		},
-		"Strategy": {
-			"State": "Active",
-			"Fuel": 12.0,
-			"Lap": 10,
-			"Position": 7,
-			"PlannedPitstops": 2,
-			"RemainingPitstops": 2,
-			"TyreCompound": "Dry (Black)",
-			"Pitstops": [
-				{
-					"Nr": 1,
-					"Fuel": 12.0,
-					"TyreCompound": "Dry (Black)"
-				},
-				{
-					"Nr": 2,
-					"Fuel": 0.0,
-					"TyreCompound": null
-				}
-			]
-		},
+		}
+
+14. *Automation*
+
+		"Automation": {
+			"Automation": "Dry",
+			"Car": "McLaren 720S GT3",
+			"Session": "Race",
+			"Simulator": "Assetto Corsa Competizione",
+			"State": "Active"
+		}
+
+15. *TeamServer*
+
 		"TeamServer": {
 			"Driver": "Oliver Juwig",
 			"Server": "https:\/\/vgr-teamserver.azurewebsites.net",
 			"Session": "24H Spa",
 			"Team": "VGR (EOS)",
 			"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
-		},
-		"Tyres": {
-			"HotPressures": [
-				26.4,
-				26.4,
-				26.7,
-				26.5
-			],
-			"ColdPressures": [
-				25.3,
-				24.9,
-				25.1,
-				24.5
-			],
-			"PressureLosses": [
-				0.0,
-				-0.1,
-				0.0,
-				-0.2
-			],
-			"Temperatures": [
-				80.6,
-				80.6,
-				91.7,
-				91.1
-			],
-			"Wear": [
-				null,
-				null,
-				null,
-				null
-			],
-			"Laps": [
-				2,
-				2,
-				2,
-				2
-			],
-			"TyreCompound": "Dry (M)",
-			"TyreCompoundFrontLeft": "Dry (M)",
-			"TyreCompoundFrontRight": "Dry (S)",
-			"TyreCompoundRearLeft": "Dry (M)",
-			"TyreCompoundRearRight": "Dry (M)",
-			"TyreSet": 3
-		},
+		}
+
+16. *Instructions*
+
+	A special case here is of course the "Instructions" object. This object is present if [corner by corner coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-on-the-track) by the Driving Coach is currently active.
+	
 		"Instructions": {
 			"Corner": 3,
 			"Hints": [
@@ -1806,6 +1919,7 @@ The content of the JSON file looks like this (depending on the current situation
 				}
 			]
 		}
-	}
 	
-A special case here is of course the "Instructions" object. This object is present if [corner by corner coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-on-the-track) by the Driving Coach is currently active. The "Message"* field will have the instruction translated to the language configured for the Driving Coach. If no voice configuration for the Driving Coach is available, "Message" will be *null*.
+	Please note, that the "Message" properties are not available, if no voice support for the Driving Coach has been configured.
+
+As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example SimHub with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.

@@ -34,6 +34,13 @@ class IntegrationPlugin extends ControllerPlugin {
 	iStateFile := (kTempDirectory . "Session State.json")
 	iAssistantsStateTask := false
 
+	iLanguage := "EN"
+	iUnits := CaseInsenseMap("Pressure", "PSI"
+						   , "Temperature", "Celsius"
+						   , "Volume", "Liter"
+						   , "Speed", "km/h")
+	iFormats := CaseInsenseMap("Time", "[H:]M:S.##")
+
 	DrivingCoach {
 		Get {
 			return this.iDrivingCoach
@@ -49,6 +56,24 @@ class IntegrationPlugin extends ControllerPlugin {
 	StateFile {
 		Get {
 			return this.iStateFile
+		}
+	}
+
+	Language {
+		Get {
+			return this.iLanguage
+		}
+	}
+
+	Formats[key] {
+		Get {
+			return this.iFormats[key]
+		}
+	}
+
+	Units[key] {
+		Get {
+			return this.iUnits[key]
 		}
 	}
 
@@ -98,14 +123,14 @@ class IntegrationPlugin extends ControllerPlugin {
 			state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator")
 					   , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
 					   , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
-					   , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull)))
+					   , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull), this.Language))
 
 			if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
 				state["Profile"] := kNull
 			else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
 				state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
 			else
-				state["Profile"] := translate("Standard")
+				state["Profile"] := translate("Standard", this.Language)
 
 			return state
 		}
@@ -124,7 +149,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			driverTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", kUndefined)
 
 			if getMultiMapValue(sessionInfo, "Session", "Format", false)
-				state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"))
+				state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"), this.Language)
 
 			state["SessionLapsLeft"] := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
 			state["StintLapsLeft"] := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
@@ -154,16 +179,16 @@ class IntegrationPlugin extends ControllerPlugin {
 						 , "TrackTemperature", convertUnit("Temperature", getMultiMapValue(sessionInfo, "Track", "Temperature", 27)))
 
 		if grip
-			state["Grip"] := translate(grip)
+			state["Grip"] := translate(grip, this.Language)
 
 		if weatherNow
-			state["Weather"] := translate(weatherNow)
+			state["Weather"] := translate(weatherNow, this.Language)
 
 		if weather10Min
-			state["Weather10Min"] := translate(weather10Min)
+			state["Weather10Min"] := translate(weather10Min, this.Language)
 
 		if weather30Min
-			state["Weather30Min"] := translate(weather30Min)
+			state["Weather30Min"] := translate(weather30Min, this.Language)
 
 		if ((state.Count > 2) || getMultiMapValue(sessionInfo, "Weather", "Temperature", false)
 							  || getMultiMapValue(sessionInfo, "Track", "Temperature", false))
@@ -262,17 +287,20 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		if (mixedCompounds = "Wheel") {
 			for ignore, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-"))
+				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-")
+														, this.Language)
 		}
 		else if (mixedCompounds = "Axle") {
 			for ignore, tyre in ["Front", "Rear"] {
-				state["TyreCompound" . tyre . "Left"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-"))
-				state["TyreCompound" . tyre . "Right"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-"))
+				state["TyreCompound" . tyre . "Left"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-")
+																 , this.Language)
+				state["TyreCompound" . tyre . "Right"] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound" . tyre, "-")
+																  , this.Language)
 			}
 		}
 		else
 			for ignore, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"]
-				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound", "-"))
+				state["TyreCompound" . tyre] := translate(getMultiMapValue(sessionInfo, "Tyres", "Compound", "-"), this.Language)
 
 		if tyreSet {
 			tyreSet := getMultiMapValue(sessionInfo, "Tyres", "Set", false)
@@ -358,7 +386,8 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound")
 
 					if tyreCompound
-						nextPitstop["TyreCompound"] := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color")))
+						nextPitstop["TyreCompound"] := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Tyre.Compound.Color"))
+															   , this.Language)
 				}
 
 				position := getMultiMapValue(sessionInfo, "Strategy", "Pitstop.Next.Position", false)
@@ -378,7 +407,7 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound")
 					tyreCompoundColor := getMultiMapValue(sessionInfo, "Strategy", "Pitstop." . A_Index . ".Tyre.Compound.Color")
 
-					pitstop["TyreCompound"] := translate(compound(tyreCompound, tyreCompoundColor))
+					pitstop["TyreCompound"] := translate(compound(tyreCompound, tyreCompoundColor), this.Language)
 				}
 
 				pitstops.Push(pitstop)
@@ -424,9 +453,9 @@ class IntegrationPlugin extends ControllerPlugin {
 		if (getMultiMapValue(sessionInfo, "Pitstop", "Planned", false) && !getMultiMapValue(sessionInfo, "Pitstop", "Target.Planned", false))
 			return kNull
 
-		state["State"] := "Planned"
-
 		if getMultiMapValue(sessionInfo, "Pitstop", "Planned", false) {
+			state["State"] := "Plan"
+
 			state["Number"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Nr")
 
 			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Lap", false)
@@ -462,7 +491,8 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound." . tyre)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . tyre)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . tyre))
+												, this.Language)
 					else
 						tyreCompound := kNull
 
@@ -474,7 +504,8 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound." . axle)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . axle)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color." . axle))
+												, this.Language)
 					else
 						tyreCompound := kNull
 
@@ -486,7 +517,8 @@ class IntegrationPlugin extends ControllerPlugin {
 				tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound")
 
 				if (tyreCompound && (tyreCompound != "-"))
-					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color")))
+					tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Tyre.Compound.Color"))
+											, this.Language)
 				else
 					tyreCompound := kNull
 
@@ -543,7 +575,8 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . tyre)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound.Color." . tyre)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound.Color." . tyre))
+												, this.Language)
 					else
 						tyreCompound := kNull
 
@@ -555,7 +588,8 @@ class IntegrationPlugin extends ControllerPlugin {
 					tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . axle)
 
 					if (tyreCompound && (tyreCompound != "-"))
-						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . axle)))
+						tyreCompound := translate(compound(tyreCompound, getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound." . axle))
+												, this.Language)
 					else
 						tyreCompound := kNull
 
@@ -567,7 +601,7 @@ class IntegrationPlugin extends ControllerPlugin {
 				tyreCompound := getMultiMapValue(sessionInfo, "Pitstop", "Target.Tyre.Compound")
 
 				if (tyreCompound && (tyreCompound != "-"))
-					tyreCompound := translate(normalizeCompound(tyreCompound))
+					tyreCompound := translate(normalizeCompound(tyreCompound), this.Language)
 				else
 					tyreCompound := kNull
 
@@ -693,7 +727,12 @@ class IntegrationPlugin extends ControllerPlugin {
 			for ignore, hint in coachingHints {
 				message := getMultiMapValue(coachingState, "Instructions", hint, false)
 
-				hints.Push(Map("Hint", hint, "Message", message ? message : kNull))
+				hint := Map("Hint", hint)
+
+				if message
+					hint["Message"] := message
+
+				hints.Push(hint)
 			}
 
 			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)
@@ -710,7 +749,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
 			if ((key = "Mode") || (key = "Session"))
-				assistantsState[key] := translate(state)
+				assistantsState[key] := translate(state, this.Language)
 			else {
 				if !assistantsState.Has(key)
 					assistantsState[key] := Map()

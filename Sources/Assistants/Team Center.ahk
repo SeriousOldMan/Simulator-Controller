@@ -8084,7 +8084,7 @@ class TeamCenter extends ConfigurationItem {
 
 				runningLap += 1
 
-				if (telemetryData.Length >= 24)
+				if ((telemetryData.Length >= 24) && (telemetryData[24] != kNull))
 					tyreLaps := telemetryData[24]
 				else
 					tyreLaps := values2String(",", runningLap, runningLap, runningLap, runningLap)

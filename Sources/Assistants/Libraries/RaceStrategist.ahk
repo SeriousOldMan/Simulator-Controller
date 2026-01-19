@@ -5334,6 +5334,9 @@ class RaceStrategist extends GridRaceAssistant {
 										   , isDebug() ? SessionDatabase.getDriverID(this.Simulator, this.DriverFullName) : false)
 		}
 
+		if pitstop
+			tyreLaps := kNull
+
 		if (this.RemoteHandler && this.CollectLaps) {
 			this.updateDynamicValues({HasLapsData: true})
 

@@ -3178,7 +3178,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 
-				date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+				date := getMultiMapValue(info, "General", "Date", kUndefined)
 
 				if (date != kUndefined)
 					date := FormatTime(date, "ShortDate")
@@ -3240,7 +3240,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 
-				date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+				date := getMultiMapValue(info, "General", "Date", kUndefined)
 
 				if (date != kUndefined)
 					date := FormatTime(date, "ShortDate")
@@ -3309,7 +3309,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 
-					date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+					date := getMultiMapValue(info, "General", "Date", kUndefined)
 
 					if (date != kUndefined)
 						date := FormatTime(date, "ShortDate")

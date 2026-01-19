@@ -2006,7 +2006,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		local carID, carClass, carModel
 
 		static carIDs := false
-		; static carCategories := false
 
 		static lastDriverCar := false
 		static sessionID := 0
@@ -2016,7 +2015,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			ACCPlugin.requireCarDatabase()
 
 			carIDs := getMultiMapValues(ACCPlugin.sCarData, "Car IDs")
-			; carCategories := getMultiMapValues(ACCPlugin.sCarData, "Car Categories")
 		}
 
 		lap := getMultiMapValue(telemetryData, "Stint Data", "Laps", 0)
@@ -2069,20 +2067,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID != kUndefined) {
-					; setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
-					;			     , carCategories.Has(carID) ? carCategories[carID] : ACCProvider.kUnknown)
-
-					carClass := SessionDatabase.getCarClass(this.Simulator, carID)
-					
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
-								   , carClass ? carClass : ACCProvider.kUnknown)
-								   
 					carModel := (carIDs.Has(carID) ? carIDs[carID] : ACCPlugin.kUnknown)
 
-					if ((carModel = ACCPlugin.kUnknown) && isDebug())
-						showMessage("Unknown car with ID " . carID . " detected...")
+					if (carModel = ACCPlugin.kUnknown) {
+						if isDebug()
+							showMessage("Unknown car with ID " . carID . " detected...")
 
-					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", carModel)
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", ACCPlugin.kUnknown)
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class", ACCPlugin.kUnknown)
+					}
+					else {
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", carModel)
+
+						carClass := SessionDatabase.getCarClass(this.Simulator[true], carModel)
+
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+									   , carClass ? carClass : ACCProvider.kUnknown)
+					}
 
 					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 						driverCar := A_Index

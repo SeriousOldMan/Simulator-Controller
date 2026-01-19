@@ -2298,6 +2298,9 @@ class SessionDatabase extends ConfigurationItem {
 			if (driver != kUndefined)
 				setMultiMapValue(info, "Origin", "Driver", driver)
 
+			if (getMultiMapValue(info, "Origin", "Date", kUndefined) == kUndefined)
+				setMultiMapValue(info, "Origin", "Date", A_Now)
+
 			if (identifier != kUndefined)
 				setMultiMapValue(info, "Telemetry", "Identifier", identifier)
 
@@ -2772,6 +2775,9 @@ class SessionDatabase extends ConfigurationItem {
 			if (driver != kUndefined)
 				setMultiMapValue(info, "Origin", "Driver", driver)
 
+			if (getMultiMapValue(info, "Origin", "Date", kUndefined) == kUndefined)
+				setMultiMapValue(info, "Origin", "Date", A_Now)
+
 			if (identifier != kUndefined)
 				setMultiMapValue(info, "Setup", "Identifier", identifier)
 
@@ -2971,6 +2977,9 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (driver != kUndefined)
 			setMultiMapValue(info, "Origin", "Driver", driver)
+
+		if (getMultiMapValue(info, "Origin", "Date", kUndefined) == kUndefined)
+			setMultiMapValue(info, "Origin", "Date", A_Now)
 
 		if (identifier != kUndefined)
 			setMultiMapValue(info, "Strategy", "Identifier", identifier)

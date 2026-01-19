@@ -988,6 +988,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
+		updateTelemetryNotes(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, name
+
+			selected := editor.TelemetryListView.GetNext(0)
+
+			if selected {
+				name := editor.TelemetryListView.GetText(selected, 2)
+
+				info := sessionDB.readTelemetryInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
+
+				setMultiMapValue(info, "General", "Notes", encode(editor.Control["telemetryNotesEdit"].Text))
+
+				sessionDB.writeTelemetryInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
+			}
+		}
+
 		uploadTelemetry(*) {
 			editor.uploadTelemetry()
 		}
@@ -1048,6 +1065,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
+		updateStrategyNotes(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, name
+
+			selected := editor.StrategyListView.GetNext(0)
+
+			if selected {
+				name := editor.StrategyListView.GetText(selected, 2)
+
+				info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
+
+				setMultiMapValue(info, "General", "Notes", encode(editor.Control["strategyNotesEdit"].Text))
+
+				sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
+			}
+		}
+
 		uploadStrategy(*) {
 			editor.uploadStrategy()
 		}
@@ -1096,6 +1130,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				setMultiMapValue(info, "Setup", "Synchronized", false)
 				setMultiMapValue(info, "Access", "Share", editor.Control["shareSetupWithCommunityCheck"].Value)
 				setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareSetupWithTeamServerCheck"].Value)
+
+				sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
+			}
+		}
+
+		updateSetupNotes(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, type, name
+
+			type := kSetupTypes[editor.Control["setupTypeDropDown"].Value]
+
+			selected := editor.SetupListView.GetNext(0)
+
+			if selected {
+				name := editor.SetupListView.GetText(selected, 2)
+
+				info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
+
+				setMultiMapValue(info, "General", "Notes", encode(editor.Control["setupNotesEdit"].Text))
 
 				sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
 			}
@@ -1986,12 +2039,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(3)
 
-		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h363 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name", "Date"], translate))
 		this.iTelemetryListView.OnEvent("Click", chooseTelemetry)
 		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
 
-		editorGui.Add("Button", "xp+235 yp+440 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
+		editorGui.Add("Button", "xp+235 yp+370 w23 h23 X:Move Y:Move vuploadTelemetryButton").OnEvent("Click", uploadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadTelemetryButton").OnEvent("Click", downloadTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameTelemetryButton").OnEvent("Click", renameTelemetry)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteTelemetryButton").OnEvent("Click", deleteTelemetry)
@@ -2006,14 +2059,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareTelemetryWithCommunityCheck", translate("with Community")).OnEvent("Click", updateTelemetryAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareTelemetryWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateTelemetryAccess)
 
+		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
+
+		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vtelemetryNotesEdit").OnEvent("Change", updateTelemetryNotes)
+
 		editorGui["settingsTab"].UseTab(4)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h363 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name", "Date"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 		this.iStrategyListView.OnEvent("DoubleClick", openStrategy)
 		this.iStrategyListView.OnEvent("ItemSelect", navStrategy)
 
-		editorGui.Add("Button", "xp+260 yp+440 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
+		editorGui.Add("Button", "xp+260 yp+370 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameStrategyButton").OnEvent("Click", renameStrategy)
 		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
@@ -2026,20 +2083,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
+		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
+
+		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vstrategyNotesEdit").OnEvent("Change", updateStrategyNotes)
+
 		editorGui["settingsTab"].UseTab(5)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200 X:Move(0.2)", translate("Purpose"))
 		editorGui.Add("DropDownList", "xp+90 yp w270 X:Move(0.2) W:Grow(0.8) Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h409 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h339 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name", "Date"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 		this.iSetupListView.OnEvent("DoubleClick", chooseSetup)
 		this.iSetupListView.OnEvent("ItemSelect", navSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
 
-		editorGui.Add("Button", "xp+260 yp+416 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+260 yp+346 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdownloadSetupButton").OnEvent("Click", downloadSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vrenameSetupButton").OnEvent("Click", renameSetup)
 		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteSetupButton").OnEvent("Click", deleteSetup)
@@ -2051,6 +2112,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x296 yp w80 h23 X:Move(0.2) Y:Move +0x200", translate("Share"))
 		editorGui.Add("CheckBox", "xp+90 yp+4 w140 X:Move(0.2) Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
 		editorGui.Add("CheckBox", "x386 yp+24 w140 X:Move(0.2) Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
+
+		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
+
+		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vsetupNotesEdit").OnEvent("Change", updateSetupNotes)
 
 		editorGui["settingsTab"].UseTab(6)
 
@@ -2658,6 +2723,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				info := this.SessionDatabase.readTelemetryInfo(simulator, car, track, name)
 
 				window["deleteTelemetryButton"].Enabled := true
+				window["telemetryNotesEdit"].Enabled := true
 
 				if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
 					window["renameTelemetryButton"].Enabled := true
@@ -2681,6 +2747,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window["shareTelemetryWithCommunityCheck"].Value := 0
 				window["shareTelemetryWithTeamServerCheck"].Value := 0
+
+				window["telemetryNotesEdit"].Enabled := false
 			}
 		}
 		else {
@@ -2693,6 +2761,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window["shareTelemetryWithCommunityCheck"].Value := 0
 			window["shareTelemetryWithTeamServerCheck"].Value := 0
+
+			window["telemetryNotesEdit"].Enabled := false
 		}
 
 		selected := this.StrategyListView.GetNext(0)
@@ -2712,6 +2782,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					window["renameStrategyButton"].Enabled := true
 					window["shareStrategyWithCommunityCheck"].Enabled := true
 					window["shareStrategyWithTeamServerCheck"].Enabled := true
+
+					window["strategyNotesEdit"].Enabled := true
 				}
 				else {
 					window["renameStrategyButton"].Enabled := false
@@ -2720,6 +2792,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					window["shareStrategyWithCommunityCheck"].Value := 0
 					window["shareStrategyWithTeamServerCheck"].Value := 0
+
+					window["strategyNotesEdit"].Enabled := false
 				}
 			}
 			else {
@@ -2730,6 +2804,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window["shareStrategyWithCommunityCheck"].Value := 0
 				window["shareStrategyWithTeamServerCheck"].Value := 0
+
+				window["strategyNotesEdit"].Enabled := false
 			}
 		}
 		else {
@@ -2741,6 +2817,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window["shareStrategyWithCommunityCheck"].Value := 0
 			window["shareStrategyWithTeamServerCheck"].Value := 0
+
+			window["strategyNotesEdit"].Enabled := false
 		}
 
 		selected := this.SetupListView.GetNext(0)
@@ -2760,6 +2838,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					window["renameSetupButton"].Enabled := true
 					window["shareSetupWithCommunityCheck"].Enabled := true
 					window["shareSetupWithTeamServerCheck"].Enabled := true
+
+					window["setupNotesEdit"].Enabled := true
 				}
 				else {
 					window["renameSetupButton"].Enabled := false
@@ -2768,6 +2848,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					window["shareSetupWithCommunityCheck"].Value := 0
 					window["shareSetupWithTeamServerCheck"].Value := 0
+
+					window["setupNotesEdit"].Enabled := false
 				}
 			}
 			else {
@@ -2778,6 +2860,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window["shareSetupWithCommunityCheck"].Value := 0
 				window["shareSetupWithTeamServerCheck"].Value := 0
+
+				window["setupNotesEdit"].Enabled := false
 			}
 		}
 		else {
@@ -2789,6 +2873,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window["shareSetupWithCommunityCheck"].Value := 0
 			window["shareSetupWithTeamServerCheck"].Value := 0
+
+			window["setupNotesEdit"].Enabled := false
 		}
 
 		selected := this.SettingsListView.GetNext(0)
@@ -2949,7 +3035,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (car == true)
 				window["carDropDown"].Choose(1)
 			else
-				window["carDropDown"].Choose(inList(this.CarNames, SessionDatabase.getCarName(this.SelectedSimulator, car)) + 1)
+				window["carDropDown"].Choose(inList(this.CarNames, this.getCarName(this.SelectedSimulator, car)) + 1)
 
 			tracks := this.getTracks(this.SelectedSimulator, car).Clone()
 			trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
@@ -2988,7 +3074,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				window["trackDropDown"].Choose(1)
 			}
 			else
-				window["trackDropDown"].Choose(inList(this.TrackNames, SessionDatabase.getTrackName(this.SelectedSimulator, track)) + 1)
+				window["trackDropDown"].Choose(inList(this.TrackNames, this.getTrackName(this.SelectedSimulator, track)) + 1)
 
 			this.updateModules()
 		}
@@ -3070,7 +3156,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadTelemetries(select := false) {
 		local window := this.Window
-		local userTelemetries, communityTelemetries, ignore, name, info, origin
+		local userTelemetries, communityTelemetries, ignore, name, info, origin, date
 
 		this.TelemetryListView.Delete()
 
@@ -3082,34 +3168,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, name in userTelemetries {
 			info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
 
-			if !info
+			if !info {
 				origin := translate("User")
+
+				date := translate("-")
+			}
 			else {
 				origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
 				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+
+				date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+
+				if (date != kUndefined)
+					date := FormatTime(date, "ShortDate")
+				else
+					date := translate("-")
 			}
 
 			if (select = name) {
-				this.TelemetryListView.Add("Select Vis", origin, name)
+				this.TelemetryListView.Add("Select Vis", origin, name, date)
 
 				select := this.TelemetryListView.GetCount()
 			}
 			else
-				this.TelemetryListView.Add("", origin, name)
+				this.TelemetryListView.Add("", origin, name, date)
 		}
 
 		if communityTelemetries
 			for ignore, name in communityTelemetries
 				if !inList(userTelemetries, name)
-					this.TelemetryListView.Add("", translate("Community"), name)
+					this.TelemetryListView.Add("", translate("Community"), name, translate("-"))
 
 		this.TelemetryListView.ModifyCol()
 
-		loop 2
+		loop 3
 			this.TelemetryListView.ModifyCol(A_Index, 10)
 
-		loop 2
+		loop 3
 			this.TelemetryListView.ModifyCol(A_Index, "AutoHdr")
 
 		WinRedraw(window)
@@ -3122,7 +3218,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadStrategies(select := false) {
 		local window := this.Window
-		local userStrategies, communityStrategies, ignore, name, info, origin
+		local userStrategies, communityStrategies, ignore, name, info, origin, date
 
 		this.StrategyListView.Delete()
 
@@ -3134,34 +3230,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		for ignore, name in userStrategies {
 			info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
 
-			if !info
+			if !info {
 				origin := translate("User")
+
+				date := translate("-")
+			}
 			else {
 				origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
 				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+
+				date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+
+				if (date != kUndefined)
+					date := FormatTime(date, "ShortDate")
+				else
+					date := translate("-")
 			}
 
 			if (select = name) {
-				this.StrategyListView.Add("Select Vis", origin, name)
+				this.StrategyListView.Add("Select Vis", origin, name, date)
 
 				select := this.StrategyListView.GetCount()
 			}
 			else
-				this.StrategyListView.Add("", origin, name)
+				this.StrategyListView.Add("", origin, name, date)
 		}
 
 		if communityStrategies
 			for ignore, name in communityStrategies
 				if !inList(userStrategies, name)
-					this.StrategyListView.Add("", translate("Community"), name)
+					this.StrategyListView.Add("", translate("Community"), name, translate("-"))
 
 		this.StrategyListView.ModifyCol()
 
-		loop 2
+		loop 3
 			this.StrategyListView.ModifyCol(A_Index, 10)
 
-		loop 2
+		loop 3
 			this.StrategyListView.ModifyCol(A_Index, "AutoHdr")
 
 		WinRedraw(window)
@@ -3174,7 +3280,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadSetups(setupType, force := false, select := false) {
 		local window := this.Window
-		local userSetups, communitySetups, ignore, name, info, origin
+		local userSetups, communitySetups, ignore, name, info, origin, date
 
 		if (force || (setupType != this.SelectedSetupType)) {
 			this.SetupListView.Delete()
@@ -3193,34 +3299,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			for ignore, name in userSetups {
 				info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, name)
 
-				if !info
+				if !info {
 					origin := translate("User")
+
+					date := translate("-")
+				}
 				else {
 					origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
 					origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+
+					date := getMultiMapValue(info, "Origin", "Date", kUndefined)
+
+					if (date != kUndefined)
+						date := FormatTime(date, "ShortDate")
+					else
+						date := translate("-")
 				}
 
 				if (select = name) {
-					this.SetupListView.Add("Select Vis", origin, name)
+					this.SetupListView.Add("Select Vis", origin, name, date)
 
 					select := this.SetupListView.GetCount()
 				}
 				else
-					this.SetupListView.Add("", origin, name)
+					this.SetupListView.Add("", origin, name, date)
 			}
 
 			if communitySetups
 				for ignore, name in communitySetups[setupType]
 					if !inList(userSetups, name)
-						this.SetupListView.Add("", translate("Community"), name)
+						this.SetupListView.Add("", translate("Community"), name, translate("-"))
 
 			this.SetupListView.ModifyCol()
 
-			loop 2
+			loop 3
 				this.SetupListView.ModifyCol(A_Index, 10)
 
-			loop 2
+			loop 3
 				this.SetupListView.ModifyCol(A_Index, "AutoHdr")
 
 			WinRedraw(window)
@@ -6209,6 +6325,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["shareTelemetryWithTeamServerCheck"].Value := 0
 		}
 
+		window["telemetryNotesEdit"].Text := (info ? decode(getMultiMapValue(info, "General", "Notes", "")) : "")
+
 		this.updateState()
 
 		if open {
@@ -6276,6 +6394,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["shareStrategyWithTeamServerCheck"].Value := 0
 		}
 
+		window["strategyNotesEdit"].Text := (info ? decode(getMultiMapValue(info, "General", "Notes", "")) : "")
+
 		this.updateState()
 
 		if open {
@@ -6308,6 +6428,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["shareSetupWithCommunityCheck"].Value := 0
 			window["shareSetupWithTeamServerCheck"].Value := 0
 		}
+
+		window["setupNotesEdit"].Text := (info ? decode(getMultiMapValue(info, "General", "Notes", "")) : "")
 
 		this.updateState()
 	}

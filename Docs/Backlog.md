@@ -21,6 +21,8 @@
   
 #### Session Database
   1. Active validation of value ranges in settings definitions
+  2. Creation Date in the list of telemetries, strategies and setups
+  3. Notes field for telemetries, strategies and setups
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

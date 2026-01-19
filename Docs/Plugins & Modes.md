@@ -1742,10 +1742,7 @@ Now let's have a look at each oject:
 			"Temperatures":		[80.6, 80.6, 91.7, 91.1],
 			"Wear":				[4, 3, 3, 2],
 			"Laps":				[2, 2, 2, 2],
-			"TyreCompoundFrontLeft": "Dry (Black)",
-			"TyreCompoundFrontRight": "Dry (Black)",
-			"TyreCompoundRearLeft": "Dry (Black)",
-			"TyreCompoundRearRight": "Dry (Black)",
+			"TyreCompounds": 	["Dry (Black)", "Dry (Black)", "Dry (Black)", "Dry (Black)"],
 			"TyreSet": 3
 		}
 
@@ -1819,8 +1816,7 @@ Now let's have a look at each oject:
 				},
 				{
 					"Nr": 2,
-					"Fuel": 20.0,
-					"TyreCompound": null
+					"Fuel": 20.0
 				}
 			]
 		}
@@ -1841,10 +1837,12 @@ Now let's have a look at each oject:
 			"PitlaneDelta": 23,
 			"Number": 1,
 			"Prepared": false,
-			"TyreCompoundFrontLeft": "Dry (Black)",
-			"TyreCompoundFrontRight": "Dry (Black)",
-			"TyreCompoundRearLeft": "Dry (Black)",
-			"TyreCompoundRearRight": "Dry (Black)",
+			"TyreCompounds": [
+				"Dry (Black)",
+				"Dry (Black)",
+				"Dry (Black)",
+				"Dry (Black)"
+			],
 			"TyrePressures": [
 				25.2,
 				25.2,

@@ -1,9 +1,9 @@
 [Development]
-Version=6.7.9.0-release
-Target=6.7.9.0-release
-Date=01/16/2026
-Download=https://cutt.ly/otkMqRoU;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-HAVhdaz/Releases/Simulator%20Controller%206.7.9.0-release.zip;https://www.dropbox.com/scl/fi/dip329ihfiptznt2ca1lb/Simulator-Controller-6.7.9.0-release.zip?rlkey=dq9w0pfklt141vb14kq7757jl&st=18egixm5&dl=1;http://%master%/Releases/Simulator Controller 6.7.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.9.0-release.zip
-Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database"
+Version=6.8.0.0-dev
+Target=6.8.0.0-release
+Date=01/19/2026
+Download=
+Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always
 Components=Media->5.6.1,Configuration->6.7.9,Utilities->6.7.9
 [Release]
 Version=6.7.9.0-release
@@ -22,7 +22,7 @@ Utilities.6.7.9.Path=.
 Utilities.6.7.9.Content=Utilities
 Utilities.6.7.9.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JQWiIlKY/Components/Utilities%206.7.9.zip;https://www.dropbox.com/scl/fi/d24qjndtbnwvipimosl12/Utilities-6.7.9.zip?rlkey=3avbt8vn40u85hko471xoo1st&st=7um32aub&dl=1;http://%master%/Components/Utilities 6.7.9.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.7.9.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.7.9.0-release
+Development=6.8.0.0-dev
 Release=6.7.9.0-release

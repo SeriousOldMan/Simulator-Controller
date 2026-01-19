@@ -77,47 +77,33 @@ readLanguage(targetLanguageCode) {
 		logError("Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage...")
 }
 
-getTemperatureUnit(trans := false) {
-	global gTemperatureUnit
-
-	return (trans ? translate(gTemperatureUnit) : gTemperatureUnit)
+getTemperatureUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-getPressureUnit(trans := false) {
-	global gPressureUnit
-
-	return (trans ? translate(gPressureUnit) : gPressureUnit)
+getPressureUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-getSpeedUnit(trans := false) {
-	global gSpeedUnit
-
-	return (trans ? translate(gSpeedUnit) : gSpeedUnit)
+getSpeedUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-getLengthUnit(trans := false) {
-	global gLengthUnit
-
-	return (trans ? translate(gLengthUnit) : gLengthUnit)
+getLengthUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-getMassUnit(trans := false) {
-	global gMassUnit
-
-	return (trans ? translate(gMassUnit) : gMassUnit)
+getMassUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-getVolumeUnit(trans := false) {
-	global gVolumeUnit
-
-	return (trans ? translate(gVolumeUnit) : gVolumeUnit)
+getVolumeUnit(unit, trans := false) {
+	return (trans ? translate(unit) : unit)
 }
 
-displayTemperatureValue(celsius, rnd) {
-	global gTemperatureUnit
-
+displayTemperatureValue(unit, celsius, rnd) {
 	if isNumber(celsius) {
-		switch gTemperatureUnit, false {
+		switch unit, false {
 			case "Celsius":
 				return (rnd ? Round(celsius, 1) : celsius)
 			case "Fahrenheit":
@@ -130,11 +116,9 @@ displayTemperatureValue(celsius, rnd) {
 		return celsius
 }
 
-displayPressureValue(psi, rnd) {
-	global gPressureUnit
-
+displayPressureValue(unit, psi, rnd) {
 	if isNumber(psi) {
-		switch gPressureUnit, false {
+		switch unit, false {
 			case "PSI":
 				return (rnd ? Round(psi, 1) : psi)
 			case "Bar":
@@ -149,11 +133,9 @@ displayPressureValue(psi, rnd) {
 		return psi
 }
 
-displayLengthValue(meter, rnd) {
-	global gLengthUnit
-
+displayLengthValue(unit, meter, rnd) {
 	if isNumber(meter) {
-		switch gLengthUnit, false {
+		switch unit, false {
 			case "Meter":
 				return (rnd ? Round(meter, 1) : meter)
 			case "Yard":
@@ -166,11 +148,9 @@ displayLengthValue(meter, rnd) {
 		return meter
 }
 
-displaySpeedValue(kmh, rnd) {
-	global gSpeedUnit
-
+displaySpeedValue(unit, kmh, rnd) {
 	if isNumber(kmh) {
-		switch gSpeedUnit, false {
+		switch unit, false {
 			case "km/h":
 				return (rnd ? Round(kmh, 1) : kmh)
 			case "mph":
@@ -183,11 +163,9 @@ displaySpeedValue(kmh, rnd) {
 		return kmh
 }
 
-displayMassValue(kilogram, rnd) {
-	global gMassUnit
-
+displayMassValue(unit, kilogram, rnd) {
 	if isNumber(kilogram) {
-		switch gMassUnit, false {
+		switch unit, false {
 			case "Kilogram":
 				return (rnd ? Round(kilogram, 1) : kilogram)
 			case "Pound":
@@ -200,11 +178,9 @@ displayMassValue(kilogram, rnd) {
 		return kilogram
 }
 
-displayVolumeValue(liter, rnd) {
-	global gVolumeUnit
-
+displayVolumeValue(unit, liter, rnd) {
 	if isNumber(liter) {
-		switch gVolumeUnit, false {
+		switch unit, false {
 			case "Liter":
 				return (rnd ? Round(liter, 1) : liter)
 			case "Gallon (US)":
@@ -219,28 +195,26 @@ displayVolumeValue(liter, rnd) {
 		return liter
 }
 
-displayFloatValue(float, precision := kUndefined) {
+displayFloatValue(format, float, precision := kUndefined) {
 	if isNumber(float) {
 		if (precision = kUndefined)
-			return StrReplace(float, ".", getFloatSeparator())
+			return StrReplace(float, ".", getFloatSeparator(format))
 		else if (precision = 0)
 			return Round(float)
 		else
-			return StrReplace(Round(float, precision), ".", getFloatSeparator())
+			return StrReplace(Round(float, precision), ".", getFloatSeparator(format))
 	}
 	else
 		return float
 }
 
-displayTimeValue(time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
-	global gTimeFormat
-
+displayTimeValue(format, time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
 	local sign := (signum(time) < 0)
 	local hours, seconds, fraction, minutes
 
 	if isNumber(time) {
-		if ((gTimeFormat = "S.##") || (gTimeFormat = "S,##"))
-			return StrReplace(time, ".", (gTimeFormat = "S.##") ? "." : ",")
+		if ((format = "S.##") || (format = "S,##"))
+			return StrReplace(time, ".", (format = "S.##") ? "." : ",")
 		else {
 			time := Abs(time)
 
@@ -276,12 +250,7 @@ displayTimeValue(time, fillHours := false, withSeconds := true, withFractions :=
 		return time
 }
 
-internalPressureValue(value, rnd, unit := false) {
-	global gPressureUnit
-
-	if !unit
-		unit := gPressureUnit
-
+internalPressureValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "PSI":
@@ -298,12 +267,7 @@ internalPressureValue(value, rnd, unit := false) {
 		return value
 }
 
-internalTemperatureValue(value, rnd, unit := false) {
-	global gTemperatureUnit
-
-	if !unit
-		unit := gTemperatureUnit
-
+internalTemperatureValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "Celsius":
@@ -318,12 +282,7 @@ internalTemperatureValue(value, rnd, unit := false) {
 		return value
 }
 
-internalLengthValue(value, rnd, unit := false) {
-	global gLengthUnit
-
-	if !unit
-		unit := gLengthUnit
-
+internalLengthValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "Meter":
@@ -338,12 +297,7 @@ internalLengthValue(value, rnd, unit := false) {
 		return value
 }
 
-internalSpeedValue(value, rnd, unit := false) {
-	global gSpeedUnit
-
-	if !unit
-		unit := gSpeedUnit
-
+internalSpeedValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "km/h":
@@ -358,12 +312,7 @@ internalSpeedValue(value, rnd, unit := false) {
 		return value
 }
 
-internalMassValue(value, rnd, unit := false) {
-	global gMassUnit
-
-	if !unit
-		unit := gMassUnit
-
+internalMassValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "Kilogram":
@@ -378,12 +327,7 @@ internalMassValue(value, rnd, unit := false) {
 		return value
 }
 
-internalVolumeValue(value, rnd, unit := false) {
-	global gVolumeUnit
-
-	if !unit
-		unit := gVolumeUnit
-
+internalVolumeValue(unit, value, rnd) {
 	if isNumber(value) {
 		switch unit, false {
 			case "Liter":
@@ -400,26 +344,24 @@ internalVolumeValue(value, rnd, unit := false) {
 		return value
 }
 
-internalFloatValue(value, precision := kUndefined) {
+internalFloatValue(format, value, precision := kUndefined) {
 	if (precision = kUndefined)
-		return StrReplace(value, getFloatSeparator(), ".")
+		return StrReplace(value, getFloatSeparator(format), ".")
 	else if isNumber(value)
-		return Round(StrReplace(value, getFloatSeparator(), "."), precision)
+		return Round(StrReplace(value, getFloatSeparator(format), "."), precision)
 	else
 		return value
 }
 
-internalTimeValue(time, arguments*) {
-	global gTimeFormat
-
+internalTimeValue(format, time, arguments*) {
 	local seconds, fraction
 
-	if (gTimeFormat = "S,##")
+	if (format = "S,##")
 		return StrReplace(time, ",", ".")
-	else if (gTimeFormat = "S.##")
+	else if (format = "S.##")
 		return time
 	else {
-		seconds := StrSplit(time, (gTimeFormat = "S,##") ? "," : ".")
+		seconds := StrSplit(time, (format = "S,##") ? "," : ".")
 
 		if (seconds.Length = 1) {
 			seconds := seconds[1]
@@ -653,8 +595,6 @@ writeTranslations(languageCode, languageName, translations) {
 }
 
 translate(string, targetLanguageCode := false) {
-	global gTargetLanguageCode
-
 	local theTranslations, translation
 
 	static currentLanguageCode := "en"
@@ -702,7 +642,7 @@ translate(string, targetLanguageCode := false) {
 }
 
 setLanguage(languageCode) {
-	global gLocalizationCallbacks, gTargetLanguageCode
+	global gTargetLanguageCode
 
 	local igore, callback
 
@@ -734,57 +674,51 @@ getSystemLanguage() {
 }
 
 getLanguage() {
-	global gTargetLanguageCode
-
 	return gTargetLanguageCode
 }
 
 registerLocalizationCallback(callback) {
-	global gLocalizationCallbacks
-
 	gLocalizationCallbacks.Push(callback)
 }
 
 getUnit(type, translate := false) {
-	switch type, false {
+	switch isObject(type) ? type.Type : type, false {
 		case "Pressure":
-			return getPressureUnit(translate)
+			return getPressureUnit(isObject(type) ? type.Unit : gPressureUnit, translate)
 		case "Temperature":
-			return getTemperatureUnit(translate)
+			return getTemperatureUnit(isObject(type) ? type.Unit : gTemperatureUnit, translate)
 		case "Length":
-			return getLengthUnit(translate)
+			return getLengthUnit(isObject(type) ? type.Unit : gLengthUnit, translate)
 		case "Speed":
-			return getSpeedUnit(translate)
+			return getSpeedUnit(isObject(type) ? type.Unit : gSpeedUnit, translate)
 		case "Mass":
-			return getMassUnit(translate)
+			return getMassUnit(isObject(type) ? type.Unit : gMassUnit, translate)
 		case "Volume":
-			return getVolumeUnit(translate)
+			return getVolumeUnit(isObject(type) ? type.Unit : gVolumeUnit, translate)
 		default:
 			throw "Unknown unit type detected in getUnit..."
 	}
 }
 
-getFloatSeparator() {
-	global gNumberFormat
-
-	return (gNumberFormat == "#.##" ? "." : ",")
+getFloatSeparator(format := gNumberFormat) {
+	return (format == "#.##" ? "." : ",")
 }
 
 convertUnit(type, value, display := true, rnd := true) {
 	if (display == true) {
-		switch type, false {
+		switch isObject(type) ? type.Type : type, false {
 			case "Pressure":
-				return displayPressureValue(value, rnd)
+				return displayPressureValue(isObject(type) ? type.Unit : gPressureUnit, value, rnd)
 			case "Temperature":
-				return displayTemperatureValue(value, rnd)
+				return displayTemperatureValue(isObject(type) ? type.Unit : gTemperatureUnit, value, rnd)
 			case "Length":
-				return displayLengthValue(value, rnd)
+				return displayLengthValue(isObject(type) ? type.Unit : gLengthUnit, value, rnd)
 			case "Speed":
-				return displaySpeedValue(value, rnd)
+				return displaySpeedValue(isObject(type) ? type.Unit : gSpeedUnit, value, rnd)
 			case "Mass":
-				return displayMassValue(value, rnd)
+				return displayMassValue(isObject(type) ? type.Unit : gMassUnit, value, rnd)
 			case "Volume":
-				return displayVolumeValue(value, rnd)
+				return displayVolumeValue(isObject(type) ? type.Unit : gVolumeUnit, value, rnd)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}
@@ -792,17 +726,17 @@ convertUnit(type, value, display := true, rnd := true) {
 	else if display {
 		switch type, false {
 			case "Pressure":
-				return internalPressureValue(value, rnd, display)
+				return internalPressureValue(isObject(type) ? type.Unit : display, value, rnd)
 			case "Temperature":
-				return internalTemperatureValue(value, rnd, display)
+				return internalTemperatureValue(isObject(type) ? type.Unit : display, value, rnd)
 			case "Length":
-				return internalLengthValue(value, rnd, display)
+				return internalLengthValue(isObject(type) ? type.Unit : display, value, rnd)
 			case "Speed":
-				return internalSpeedValue(value, rnd, display)
+				return internalSpeedValue(isObject(type) ? type.Unit : display, value, rnd)
 			case "Mass":
-				return internalMassValue(value, rnd, display)
+				return internalMassValue(isObject(type) ? type.Unit : display, value, rnd)
 			case "Volume":
-				return internalVolumeValue(value, rnd, display)
+				return internalVolumeValue(isObject(type) ? type.Unit : display, value, rnd)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}
@@ -810,39 +744,39 @@ convertUnit(type, value, display := true, rnd := true) {
 	else
 		switch type, false {
 			case "Pressure":
-				return internalPressureValue(value, rnd)
+				return internalPressureValue(isObject(type) ? type.Unit : gPressureUnit, value, rnd)
 			case "Temperature":
-				return internalTemperatureValue(value, rnd)
+				return internalTemperatureValue(isObject(type) ? type.Unit : gTemperatureUnit, value, rnd)
 			case "Length":
-				return internalLengthValue(value, rnd)
+				return internalLengthValue(isObject(type) ? type.Unit : gLengthUnit, value, rnd)
 			case "Speed":
-				return internalSpeedValue(value, rnd)
+				return internalSpeedValue(isObject(type) ? type.Unit : gSpeedUnit, value, rnd)
 			case "Mass":
-				return internalMassValue(value, rnd)
+				return internalMassValue(isObject(type) ? type.Unit : gMassUnit, value, rnd)
 			case "Volume":
-				return internalVolumeValue(value, rnd)
+				return internalVolumeValue(isObject(type) ? type.Unit : gVolumeUnit, value, rnd)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}
 }
 
 displayValue(type, value, arguments*) {
-	switch type, false {
+	switch isObject(type) ? type.Type : type, false {
 		case "Float":
-			return displayFloatValue(value, arguments*)
+			return displayFloatValue(isObject(type) ? type.Format : gNumberFormat, value, arguments*)
 		case "Time":
-			return displayTimeValue(value, arguments*)
+			return displayTimeValue(isObject(type) ? type.Format : gTimeFormat, value, arguments*)
 		default:
 			throw "Unknown format type detected in displayValue..."
 	}
 }
 
 internalValue(type, value, arguments*) {
-	switch type, false {
+	switch isObject(type) ? type.Type : type, false {
 		case "Float":
-			return internalFloatValue(value, arguments*)
+			return internalFloatValue(isObject(type) ? type.Format : gNumberFormat, value, arguments*)
 		case "Time":
-			return internalTimeValue(value, arguments*)
+			return internalTimeValue(isObject(type) ? type.Format : gTimeFormat, value, arguments*)
 		default:
 			throw "Unknown format type detected in internalValue..."
 	}

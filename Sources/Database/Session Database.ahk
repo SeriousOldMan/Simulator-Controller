@@ -7460,10 +7460,10 @@ editLaps(editorOrCommand, arguments*) {
 			tyreCompound := translate(compound(tyreCompound, tyreCompoundColor))
 
 		return [translate(entry["Weather"])
-			  , convertUnit("Temperature", entry["Temperature.Air"])
-			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Air"]))
+			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Track"]))
 			  , tyreCompound
-			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Consumption"]))
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
 			  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
@@ -7528,10 +7528,10 @@ editLaps(editorOrCommand, arguments*) {
 		}
 
 		return [translate(entry["Weather"])
-			  , convertUnit("Temperature", entry["Temperature.Air"])
-			  , convertUnit("Temperature", entry["Temperature.Track"])
+			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Air"]))
+			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Track"]))
 			  , tyreCompound
-			  , convertUnit("Volume", entry["Fuel.Consumption"])
+			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Consumption"]))
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (isInteger(entry["Tyre.Laps"]) || InStr(entry["Tyre.Laps"], ",")) ? entry["Tyre.Laps"] : translate("n/a")
 			  , pressures ? values2String(seperator, pressures*) : translate("n/a")

@@ -1575,7 +1575,7 @@ If no argument for *stateFile* is provided, the state info will be put in a file
 
 With *language*, which defaults to "EN", you can choose the language for all textual properties. Only languagesm for which a translation is available in Simulator Controller are supported.
 
-*formats* allows you to specify, how time spans are specified. Suppoted values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds.
+*formats* allows you to specify, how time spans are specified. Suppoted values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds. Default is "[H:]M:S.##"
 
 Lastly you can specify with *units*, which units are used for the different numerical values. Defaults are:
 
@@ -1651,7 +1651,7 @@ Now let's have a look at each oject:
 			"Session": "Race"
 		}
 		
-   Beside information about the current type of session ("Practice", "Qualifying", "Race", ...), as well as the current mode ("Solo", "Team"), this object contains the current state of each Assistant. Available properties are: "Silent", "Muted" and "State" (with values "Active", "Waiting", "Disabled" and "Finished").
+   Beside information about the current type of session ("Practice", "Qualifying", "Race", ...), as well as the current mode ("Solo", "Team"), this object contains the current state of each Assistant. Available properties are: "Silent", "Muted" and "State" (with values "Active", "Waiting", "Disabled" and "Finished"). Please noite, that "Muted" and "Silent" will only be present, if applicable.
    
 2. *Session*
 
@@ -1694,7 +1694,7 @@ Now let's have a look at each oject:
 			"Weather30Min": "Dry"
 		}
 
-	"Grip" may be one of "Optimum", "Fast", "Green", "Greasy", "Damp", "Wet" and "Flooded". The *weather* properties may contain "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm".
+	"Grip" will be one of "Optimum", "Fast", "Green", "Greasy", "Damp", "Wet" and "Flooded". The *weather* properties will contain "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm".
 
 5. *Stint*
 
@@ -1759,6 +1759,8 @@ Now let's have a look at each oject:
 			"Temperatures":		[199.6, 197.6, 339.9, 337.0],
 			"Wear":				[2, 2, 3, 3]
 		}
+		
+   Availability of this information depends on the simulator in use.
 
 9. *Engine*
 
@@ -1768,6 +1770,8 @@ Now let's have a look at each oject:
 			"WaterTemperature": 92.7,
 			"OilTemperature": 85.2
 		}
+		
+   Availability of this information depends on the simulator in use.
 
 10. *Damage*
 
@@ -1821,9 +1825,11 @@ Now let's have a look at each oject:
 			]
 		}
 
-	Unless all required pitstops have been performed (in case "RemainingPitstops" is **0**), the object "NextPitstop" specifies the planned lap and service for the upcoming pitstop. Please not, that strategies are always planned with a tyre change, if any, on all four wheels with the same tyre compound.
+	Unless all required pitstops have been performed (in case "RemainingPitstops" is **0**), the object "NextPitstop" specifies the planned lap and service for the upcoming pitstop. Please not, that strategies are always planned with a tyre change, if any, on all four wheels with the same tyre compound. The property "NextPitstop.Position" contains the simulated position after the pitstop and is only available, if strategy simulation has been activated.
 
 12. *Pitstop*
+
+    This object contains information about the next pitstop, if any is required.
 
 		"Pitstop": {
 			"State": "Plan",
@@ -1853,11 +1859,16 @@ Now let's have a look at each oject:
 				"Suspension": false
 			}
 		}
+
+	The property "State" may be either "Plan" (the pitstop has been planned by the Engineer as reaction to a voice command or an active strategy, and so on) or "Forecast" to indicate the decision the Engineer will take, if a pitstop plan is requested. "Prepared", which is available only for planned pitstops, will be true, if the settings have transferred to the simulator.
 		
 13. *Standings*
 
+	Information about the most important opponents are given in the object.
+
 		"Standings": {
-			"Ahead": null,
+			"OverallPosition": 1,
+			"ClassPosition": 1,
 			"Behind": {
 				"Delta": "-0:02.1",
 				"InPit": false,
@@ -1865,20 +1876,20 @@ Now let's have a look at each oject:
 				"Laps": 2,
 				"Nr": 109
 			},
-			"ClassPosition": 1,
 			"Focus": {
 				"Delta": "-0:15.9",
 				"InPit": false,
 				"LapTime": "2:24.3",
 				"Laps": 2,
 				"Nr": 15
-			},
-			"Leader": null,
-			"OverallPosition": 1,
-			"ClassPosition": 1
+			}
 		}
+	
+	Available opponent *objects* are "Leader", "Ahead", "Behind" and "Focus", depending on the own position and whether a specific car has been *focused* by the driver.
 
 14. *Automation*
+
+	Contains information about the track automation choosen by the driver.
 
 		"Automation": {
 			"Automation": "Dry",
@@ -1887,8 +1898,12 @@ Now let's have a look at each oject:
 			"Simulator": "Assetto Corsa Competizione",
 			"State": "Active"
 		}
+		
+	"State" may be "Active", in this case the "Automation" property contains the name of the active automation. It may be "Waiting", if the automation is starting currently, or it may be "Unavailable", if an automation has been requested but none match the criteria. The "Automation" object will be absent, if no automation has been requested by the driver.
 
 15. *TeamServer*
+
+	If the driver is connected to a Team Server, this object gives information about the active connection.
 
 		"TeamServer": {
 			"Driver": "Oliver Juwig",

@@ -70,8 +70,6 @@ class SpeechSynthesizer {
 	iCache := CaseInsenseMap()
 	iCacheDirectory := false
 
-	static sAudioRoutingInitialized := false
-
 	static sElevenLabsSampleFrequency := false
 	static sOpenAISampleFrequency := false
 
@@ -449,14 +447,6 @@ class SpeechSynthesizer {
 																		   , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
 			SpeechSynthesizer.sOpenAISampleFrequency := getMultiMapValue(settings, "Voice", "OpenAI.Sample Frequency"
 																	   , getMultiMapValue(settings, "Voice", "Sample Frequency", 24000))
-		}
-
-		if kSox {
-			if !SpeechSynthesizer.sAudioRoutingInitialized {
-				SpeechSynthesizer.sAudioRoutingInitialized := true
-
-				configuration := readMultiMap(kUserConfigDirectory . "Audio Settings.ini")
-			}
 		}
 
 		this.setVolume(100)

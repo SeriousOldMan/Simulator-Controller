@@ -448,6 +448,7 @@ Supported output routes are:
 | Reasoning       | The short sounds that indicate that a given behavior is triggered by the LLM of a *Reasoning* booster.               |
 | Controller      | The short acknowledge sound, when the Controller itself received a voice command or was activated for voice control. |
 | Analyzer        | The feedback sound of the Issue Analyzer for over- or understeer handling events.                                    |
+| Scripts         | Covers the controller action functions ["speak" and "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions), which can be used from scripts or in track automations and so on. |
 
 *Headset* is only an example for any configured audio device which is named "Headset" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device. If nothing is configured here, the currently in the Windows settings selected default audio device will be used.
 

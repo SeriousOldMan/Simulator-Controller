@@ -2061,7 +2061,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
 
-		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vtelemetryNotesEdit").OnEvent("Change", updateTelemetryNotes)
+		editorGui.Add("Edit", "x386 yp w270 h100 X:Move(0.2) Y:Move W:Grow(0.8) vtelemetryNotesEdit").OnEvent("Change", updateTelemetryNotes)
 
 		editorGui["settingsTab"].UseTab(4)
 
@@ -2085,7 +2085,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
 
-		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vstrategyNotesEdit").OnEvent("Change", updateStrategyNotes)
+		editorGui.Add("Edit", "x386 yp w270 h100 X:Move(0.2) Y:Move W:Grow(0.8) vstrategyNotesEdit").OnEvent("Change", updateStrategyNotes)
 
 		editorGui["settingsTab"].UseTab(5)
 
@@ -2115,7 +2115,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp+30 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Notes"))
 
-		editorGui.Add("Edit", "x386 yp w270 h94 X:Move(0.2) Y:Move W:Grow(0.8) vsetupNotesEdit").OnEvent("Change", updateSetupNotes)
+		editorGui.Add("Edit", "x386 yp w270 h100 X:Move(0.2) Y:Move W:Grow(0.8) vsetupNotesEdit").OnEvent("Change", updateSetupNotes)
 
 		editorGui["settingsTab"].UseTab(6)
 

@@ -3197,8 +3197,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if communityTelemetries
 			for ignore, name in communityTelemetries
-				if !inList(userTelemetries, name)
-					this.TelemetryListView.Add("", translate("Community"), name, translate("-"))
+				if !inList(userTelemetries, name) {
+					info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, "Community")
+
+					if info {
+						date := getMultiMapValue(info, "General", "Date", kUndefined)
+
+						if (date != kUndefined)
+							date := FormatTime(date, "ShortDate")
+						else
+							date := translate("-")
+					}
+					else
+						date := translate("-")
+
+					this.TelemetryListView.Add("", translate("Community"), name, date)
+				}
 
 		this.TelemetryListView.ModifyCol()
 
@@ -3259,8 +3273,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if communityStrategies
 			for ignore, name in communityStrategies
-				if !inList(userStrategies, name)
-					this.StrategyListView.Add("", translate("Community"), name, translate("-"))
+				if !inList(userStrategies, name) {
+					info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, "Community")
+
+					if info {
+						date := getMultiMapValue(info, "General", "Date", kUndefined)
+
+						if (date != kUndefined)
+							date := FormatTime(date, "ShortDate")
+						else
+							date := translate("-")
+					}
+					else
+						date := translate("-")
+
+					this.StrategyListView.Add("", translate("Community"), name, date)
+				}
 
 		this.StrategyListView.ModifyCol()
 
@@ -3328,8 +3356,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if communitySetups
 				for ignore, name in communitySetups[setupType]
-					if !inList(userSetups, name)
-						this.SetupListView.Add("", translate("Community"), name, translate("-"))
+					if !inList(userSetups, name) {
+						info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+																 , setupType, name, "Community")
+
+						if info {
+							date := getMultiMapValue(info, "General", "Date", kUndefined)
+
+							if (date != kUndefined)
+								date := FormatTime(date, "ShortDate")
+							else
+								date := translate("-")
+						}
+						else
+							date := translate("-")
+
+						this.SetupListView.Add("", translate("Community"), name, date)
+					}
 
 			this.SetupListView.ModifyCol()
 
@@ -6312,8 +6355,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectTelemetry(row, open := false) {
 		local window := this.Window
+		local origin := this.TelemetryListView.GetText(row, 1)
 		local name := this.TelemetryListView.GetText(row, 2)
-		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		local info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+														   , name, (origin = translate("Community")) ? "Community" : "User")
 		local viewer, telemetryData, size, telemetryInfo, sectorTimes
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
@@ -6381,8 +6426,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectStrategy(row, open := false) {
 		local window := this.Window
+		local origin := this.StrategyListView.GetText(row, 1)
 		local name := this.StrategyListView.GetText(row, 2)
-		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+														  , name, (origin = translate("Community")) ? "Community" : "User")
 		local fileName
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
@@ -6412,13 +6459,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	selectSetup(row) {
+		local origin := this.SetupListView.GetText(row, 1)
+		local name := this.SetupListView.GetText(row, 2)
 		local window := this.Window
-		local name, info
-
-		name := this.SetupListView.GetText(row, 2)
-
-		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
-												 , kSetupTypes[window["setupTypeDropDown"].Value], name)
+		local info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+													   , kSetupTypes[window["setupTypeDropDown"].Value]
+													   , name, (origin = translate("Community")) ? "Community" : "User")
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareSetupWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)

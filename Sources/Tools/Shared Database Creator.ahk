@@ -222,6 +222,12 @@ class DatabaseCreator {
 					info := readMultiMap(telemetryFile . ".info")
 					newInfo := newMultiMap()
 
+					if getMultiMapValue(info, "General", "Date", false)
+						setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+					if (getMultiMapValue(info, "General", "Notes", "") != "")
+						setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
 					setMultiMapValue(newInfo, "Info", "Driver", "John Doe")
 
 					if getMultiMapValue(info, "Lap", "LapTime", false)
@@ -248,7 +254,25 @@ class DatabaseCreator {
 
 			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies")
 
-			FileCopy(strategyFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies", 1)
+			if FileExist(strategyFile) {
+				FileCopy(strategyFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies", 1)
+
+				if FileExist(strategyFile . ".info") {
+					info := readMultiMap(strategyFile . ".info")
+					newInfo := newMultiMap()
+
+					if getMultiMapValue(info, "General", "Date", false)
+						setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+					if (getMultiMapValue(info, "General", "Notes", "") != "")
+						setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
+					SplitPath(strategyFile, &strategyFile)
+
+					writeMultiMap(directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies\" . strategyFile . ".info"
+								, newInfo)
+				}
+			}
 		}
 	}
 
@@ -260,7 +284,25 @@ class DatabaseCreator {
 
 			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type)
 
-			FileCopy(setupFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type, 1)
+			if FileExist(setupFile) {
+				FileCopy(setupFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type, 1)
+
+				if FileExist(setupFile . ".info") {
+					info := readMultiMap(setupFile . ".info")
+					newInfo := newMultiMap()
+
+					if getMultiMapValue(info, "General", "Date", false)
+						setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+					if (getMultiMapValue(info, "General", "Notes", "") != "")
+						setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
+					SplitPath(setupFile, &setupFile)
+
+					writeMultiMap(directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\" . setupFile . ".info"
+								, newInfo)
+				}
+			}
 		}
 	}
 }

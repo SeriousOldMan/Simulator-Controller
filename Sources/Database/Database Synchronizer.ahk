@@ -64,7 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files
+	local name, extension, files, info, newInfo
 
 	updateState() {
 		if (++step > 20) {
@@ -164,24 +164,35 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 											files := []
 
 											for ignore, type in kSetupTypes
-												loop Files, directory . type . "\*.*", "F" {
+												loop Files, directory . type . "\*.info", "F" {
+													updateState()
+
 													SplitPath(A_LoopFileName, , , &extension, &name)
 
-													if (extension = "info") {
-														updateState()
+													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
 
-														info := sessionDB.readSetupInfo(simulator, car, track, type, name)
+													if (!info
+													 || (getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+													 || !getMultiMapValue(info, "Access", "Share", false)) {
+														deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
 
-														if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
-														 || !getMultiMapValue(info, "Access", "Share", false))
-															deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
-														else
-															files.Push([type, getMultiMapValue(info, "Setup", "Name")])
-
-														deleteFile(A_LoopFilePath)
-
-														Sleep(1)
+														deleteFile(A_LoopFileFullPath)
 													}
+													else {
+														files.Push([type, getMultiMapValue(info, "Setup", "Name")])
+
+														newInfo := newMultiMap()
+
+														if getMultiMapValue(info, "General", "Date", false)
+															setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+														if (getMultiMapValue(info, "General", "Notes", "") != "")
+															setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
+														writeMultiMap(A_LoopFileFullPath, newInfo)
+													}
+
+													Sleep(1)
 												}
 
 											for ignore, type in kSetupTypes
@@ -189,7 +200,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 													SplitPath(A_LoopFileName, , , , &name)
 
 													if (choose(files, (c) => ((c[1] = type) && c[2] = name)).Length = 0)
-														deleteFile(A_LoopFilePath)
+														deleteFile(A_LoopFileFullPath)
 
 													Sleep(1)
 												}
@@ -216,23 +227,36 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												info := sessionDB.readStrategyInfo(simulator, car, track, name)
 
-												if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
-												 || !getMultiMapValue(info, "Access", "Share", false))
+												if (!info
+												 || (getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getMultiMapValue(info, "Access", "Share", false)) {
 													deleteFile(directory . getMultiMapValue(info, "Strategy", "Name"))
 
-												deleteFile(A_LoopFilePath)
+													deleteFile(A_LoopFileFullPath)
+												}
+												else {
+													newInfo := newMultiMap()
+
+													if getMultiMapValue(info, "General", "Date", false)
+														setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+													if (getMultiMapValue(info, "General", "Notes", "") != "")
+														setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
+													writeMultiMap(A_LoopFileFullPath, newInfo)
+												}
 
 												Sleep(1)
 											}
 
 											loop Files, directory . "*.*", "FD" {
-												if InStr(FileExist(A_LoopFileName), "D")
-													deleteDirectory(A_LoopFileName)
+												if InStr(FileExist(A_LoopFileFullPath), "D")
+													deleteDirectory(A_LoopFileFullPath)
 												else {
 													SplitPath(A_LoopFileName, , , &extension)
 
 													if ((extension != "info") && (extension != "strategy"))
-														deleteFile(A_LoopFileName)
+														deleteFile(A_LoopFileFullPath)
 												}
 
 												Sleep(1)
@@ -246,7 +270,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 								if uploadTelemetries {
 									try {
-										directory := sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries"
+										directory := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
 
 										if FileExist(directory) {
 											DirCopy(directory, kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Lap Telemetries")
@@ -260,23 +284,43 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 												info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
-												if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
-												 || !getMultiMapValue(info, "Access", "Share", false))
+												if (!info
+												 || (getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getMultiMapValue(info, "Access", "Share", false)) {
 													deleteFile(directory . getMultiMapValue(info, "Telemetry", "Name"))
 
-												deleteFile(A_LoopFilePath)
+													deleteFile(A_LoopFileFullPath)
+												}
+												else {
+													newInfo := newMultiMap()
+
+													if getMultiMapValue(info, "General", "Date", false)
+														setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+
+													if (getMultiMapValue(info, "General", "Notes", "") != "")
+														setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
+
+													if getMultiMapValue(info, "Lap", "LapTime", false)
+														setMultiMapValue(newInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
+
+													if getMultiMapValue(info, "Lap", "SectorTimes", false)
+														if first(string2Values(",", getMultiMapValue(info, "Lap", "SectorTimes")), (s) => (isNumber(s) && (s != 0)))
+															setMultiMapValue(newInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
+
+													writeMultiMap(A_LoopFileFullPath, newInfo)
+												}
 
 												Sleep(1)
 											}
 
 											loop Files, directory . "*.*", "FD" {
-												if InStr(FileExist(A_LoopFileName), "D")
-													deleteDirectory(A_LoopFileName)
+												if InStr(FileExist(A_LoopFileFullPath), "D")
+													deleteDirectory(A_LoopFileFullPath)
 												else {
 													SplitPath(A_LoopFileName, , , &extension)
 
 													if ((extension != "info") && (extension != "telemetry"))
-														deleteFile(A_LoopFileName)
+														deleteFile(A_LoopFileFullPath)
 												}
 
 												Sleep(1)
@@ -426,7 +470,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
 	global gSynchronizing
-	
+
 	local oldCritical := Task.Critical
 
 	if gSynchronizing
@@ -457,7 +501,7 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 synchronizeSessionDatabase(minutes) {
 	global gSynchronizing
-	
+
 	local oldCritical := Task.Critical
 
 	if gSynchronizing

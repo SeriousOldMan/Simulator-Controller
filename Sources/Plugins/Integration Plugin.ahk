@@ -768,7 +768,13 @@ class IntegrationPlugin extends ControllerPlugin {
 		local ignore, property, key, value, state, configuration
 
 		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
-			if ((key = "Mode") || (key = "Session"))
+			if ((key = "Session") && InStr(state, ";")) {
+				state := string2Values(";", state)
+
+				assistantsState["Mode"] := translate(state[1], this.Language)
+				assistantsState["Session"] := translate(state[2], this.Language)
+			}
+			else if ((key = "Mode") || (key = "Session"))
 				assistantsState[key] := translate(state, this.Language)
 			else {
 				if !assistantsState.Has(key)

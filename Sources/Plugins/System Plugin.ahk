@@ -38,10 +38,10 @@ class SystemPlugin extends ControllerPlugin {
 	iRunnableApplications := []
 	iModeSelectors := []
 
-	class ScriptsSpeechSynthesizer extends SpeechSynthesizer {
+	class ActionsSpeechSynthesizer extends SpeechSynthesizer {
 		Routing {
 			Get {
-				return "Scripts"
+				return "Actions"
 			}
 		}
 	}
@@ -823,7 +823,7 @@ speak(message) {
 		try {
 			configuration := SimulatorController.Instance.Configuration
 
-			speaker := SystemPlugin.ScriptsSpeechSynthesizer(getMultiMapValue(configuration, "Voice Control", "Synthesizer")
+			speaker := SystemPlugin.ActionsSpeechSynthesizer(getMultiMapValue(configuration, "Voice Control", "Synthesizer")
 														   , getMultiMapValue(configuration, "Voice Control", "Speaker")
 														   , getMultiMapValue(configuration, "Voice Control", "Language"))
 
@@ -847,7 +847,7 @@ speak(message) {
 
 play(soundFileName) {
 	try {
-		playSound("AUTSoundPlayer.exe", soundFileName, getAudioSettings("Scripts"))
+		playSound("AUTSoundPlayer.exe", soundFileName, getAudioSettings("Actions"))
 	}
 	catch Any as exception {
 		logError(exception, true)

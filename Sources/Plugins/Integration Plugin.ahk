@@ -853,18 +853,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		static lastUpdate := A_Now
 
-		static raceAssistants := false
-
-		if !raceAssistants {
-			raceAssistants := ["Driving Coach", "Race Spotter", "Race Strategist", "Race Engineer"]
-
-			do(kRaceAssistants, (a) {
-				if !inList(raceAssistants, a)
-					raceAssistants.InsertAt(1, a)
-			})
-		}
-
-		for ignore, assistant in raceAssistants {
+		for ignore, assistant in kRaceAssistants {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
 			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
@@ -874,16 +863,18 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 		}
 
-		fileName := (kTempDirectory . "Simulator Controller.state")
+		if !needsUpdate {
+			fileName := (kTempDirectory . "Simulator Controller.state")
 
-		if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
-			needsUpdate := true
+			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
+				needsUpdate := true
+		}
 
 		if needsUpdate {
 			lastUpdate := A_Now
 			sessionInfo := newMultiMap()
 
-			for ignore, assistant in raceAssistants
+			for ignore, assistant in kRaceAssistants
 				addMultiMapValues(sessionInfo, readMultiMap(kTempDirectory . assistant . " Session.state"))
 
 			try {

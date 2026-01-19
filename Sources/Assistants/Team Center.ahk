@@ -3576,7 +3576,7 @@ class TeamCenter extends ConfigurationItem {
 			}
 		}
 
-		if (this.SessionActive && this.LastLap && InStr(this.LastLap.Telemetry, "[Setup Data]"))
+		if (this.SessionActive && this.LastLap) ; && InStr(this.LastLap.Telemetry, "[Setup Data]"))
 			window["pitstopSettingsButton"].Enabled := true
 		else
 			window["pitstopSettingsButton"].Enabled := false
@@ -11000,7 +11000,7 @@ class TeamCenter extends ConfigurationItem {
 					%chartScript%
 					<script type="text/javascript">
 						%chartLoad%
-						
+
 						function drawCharts() {
 			)"
 

@@ -232,6 +232,16 @@ exist(list, predicate) {
 	return false
 }
 
+all(list, predicate) {
+	local ignore, value
+
+	for ignore, value in list
+		if !predicate.Call(value)
+			return false
+
+	return true
+}
+
 do(list, function) {
 	local ignore, value
 

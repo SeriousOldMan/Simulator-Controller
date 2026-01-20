@@ -236,16 +236,26 @@ class IntegrationPlugin extends ControllerPlugin {
 		local lastSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Last", false)
 		local bestSpeed := getMultiMapValue(sessionInfo, "Stint", "Speed.Best", false)
 		local unit := {Type: "Speed", Unit: this.Unit["Speed"]}
+		local state
 
-		if (getMultiMapValue(sessionInfo, "Session", "Simulator", false) && getMultiMapValue(sessionInfo, "Stint", "Position", false))
-			return Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
-					 , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")
-					 , "Lap", (getMultiMapValue(sessionInfo, "Session", "Laps", 0) + 1)
-					 , "Position", getMultiMapValue(sessionInfo, "Stint", "Position")
-					 , "BestTime", ((bestTime < 3600) ? displayValue(format, bestTime) : kNull)
-					 , "LastTime", ((lastTime < 3600) ? displayValue(format, lastTime) : kNull)
-					 , "BestSpeed", (bestSpeed ? convertUnit(unit, bestSpeed) : kNull)
-					 , "LastSpeed", (bestSpeed ? convertUnit(unit, lastSpeed) : kNull))
+		if (getMultiMapValue(sessionInfo, "Session", "Simulator", false) && getMultiMapValue(sessionInfo, "Stint", "Position", false)) {
+			state := Map("Driver", getMultiMapValue(sessionInfo, "Stint", "Driver")
+					   , "Laps", getMultiMapValue(sessionInfo, "Stint", "Laps")
+					   , "Lap", (getMultiMapValue(sessionInfo, "Session", "Laps", 0) + 1)
+					   , "Position", getMultiMapValue(sessionInfo, "Stint", "Position"))
+
+			if (bestTime < 3600)
+				state["BestTime"] := displayValue(format, bestTime)
+
+			if (lastTime < 3600)
+				state["LastTime"] := displayValue(format, lastTime)
+
+			if bestSpeed
+				state["BestSpeed"] := convertUnit(unit, bestSpeed)
+
+			if lastSpeed
+				state["LastSpeed"] := convertUnit(unit, lastSpeed)
+		}
 		else
 			return kNull
 	}
@@ -283,41 +293,45 @@ class IntegrationPlugin extends ControllerPlugin {
 		local tyreSet := false
 		local pressures, temperatures, wear, tyreSet, laps, tyreCompound
 
+		nonZero(value) {
+			return (!isNull(value) && (value != 0) && (value != "-"))
+		}
+
 		if this.Provider
 			this.Provider.supportsTyreManagement(&mixedCompounds, &tyreSet)
 
 		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Hot", ""))
 
-		if (pressures.Length = 4)
+		if ((pressures.Length = 4) && all(pressures, nonZero))
 			state["HotPressures"] := [convertUnit(pressureUnit, pressures[1]), convertUnit(pressureUnit, pressures[2])
 								    , convertUnit(pressureUnit, pressures[3]), convertUnit(pressureUnit, pressures[4])]
 
 		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Cold", ""))
 
-		if ((pressures.Length = 4) && (pressures[1] != 0))
+		if ((pressures.Length = 4) && all(pressures, nonZero))
 			state["ColdPressures"] := [convertUnit(pressureUnit, pressures[1]), convertUnit(pressureUnit, pressures[2])
 									 , convertUnit(pressureUnit, pressures[3]), convertUnit(pressureUnit, pressures[4])]
 
 		pressures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Pressures.Loss", ""))
 
-		if ((pressures.Length = 4) && exist(pressures, (p) => (p != 0)))
+		if ((pressures.Length = 4) && all(pressures, (p) => isNumber(p)))
 			state["PressureLosses"] := [convertUnit(pressureUnit, pressures[1]), convertUnit(pressureUnit, pressures[2])
 									  , convertUnit(pressureUnit, pressures[3]), convertUnit(pressureUnit, pressures[4])]
 
 		temperatures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Temperatures", ""))
 
-		if (temperatures.Length = 4)
+		if ((temperatures.Length = 4) && all(temperatures, nonZero))
 			state["Temperatures"] := [convertUnit(temperatureUnit, temperatures[1]), convertUnit(temperatureUnit, temperatures[2])
 									, convertUnit(temperatureUnit, temperatures[3]), convertUnit(temperatureUnit, temperatures[4])]
 
 		wear := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Wear", ""))
 
-		if (wear.Length = 4)
+		if ((wear.Length = 4) && all(wear, (w) => isNumber(w)))
 			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
 
 		laps := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Laps", ""))
 
-		if (laps.Length = 4)
+		if ((laps.Length = 4) && all(laps, (l) => isNumber(l)))
 			state["Laps"] := [Round(laps[1]), Round(laps[2]), Round(laps[3]), Round(laps[4])]
 
 		tyreCompound := []

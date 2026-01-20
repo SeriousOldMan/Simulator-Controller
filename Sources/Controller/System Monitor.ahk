@@ -417,7 +417,7 @@ systemMonitor(command := false, arguments*) {
 	static raceAssistants := false
 
 	nonZero(value) {
-		return ((value != 0) && (value != "-"))
+		return (!isNull(value) && (value != 0) && (value != "-"))
 	}
 
 	modifySettings(systemMonitorGui, *) {
@@ -686,7 +686,7 @@ systemMonitor(command := false, arguments*) {
 
 			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Hot", ""))
 
-			if (pressures.Length = 4) {
+			if ((pressures.Length = 4) && all(pressures, nonZero)) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (hot)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
@@ -705,7 +705,7 @@ systemMonitor(command := false, arguments*) {
 
 			pressures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Pressures.Cold", ""))
 
-			if ((pressures.Length = 4) && (pressures[1] != 0)) {
+			if ((pressures.Length = 4) && all(pressures, nonZero)) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Pressures (cold)") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Pressure", pressures[2])) . "</td></tr>")
@@ -727,7 +727,7 @@ systemMonitor(command := false, arguments*) {
 
 			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
 
-			if (temperatures.Length = 4) {
+			if ((temperatures.Length = 4) && all(temperatures, nonZero)) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")

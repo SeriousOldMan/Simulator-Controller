@@ -315,6 +315,7 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("Prepared")]
         public int? Prepared { get; set; }
 
+        /*
         [JsonProperty("TyreCompoundFrontLeft")]
         public string TyreCompoundFrontLeft { get; set; }
 
@@ -326,6 +327,10 @@ namespace SimulatorController.SimHub.Plugin
 
         [JsonProperty("TyreCompoundRearRight")]
         public string TyreCompoundRearRight { get; set; }
+        */
+
+        [JsonProperty("TyreCompounds")]
+        public string?[] TyreCompounds { get; set; }
 
         [JsonProperty("TyrePressures")]
         public double?[] TyrePressures { get; set; }
@@ -552,6 +557,7 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("Laps")]
         public int?[] Laps { get; set; }
 
+        /*
         [JsonProperty("TyreCompoundFrontLeft")]
         public string TyreCompoundFrontLeft { get; set; }
 
@@ -563,6 +569,10 @@ namespace SimulatorController.SimHub.Plugin
 
         [JsonProperty("TyreCompoundRearRight")]
         public string TyreCompoundRearRight { get; set; }
+        */
+
+        [JsonProperty("TyreCompounds")]
+        public string?[] TyreCompounds { get; set; }
 
         [JsonProperty("TyreSet")]
         public int? TyreSet { get; set; }

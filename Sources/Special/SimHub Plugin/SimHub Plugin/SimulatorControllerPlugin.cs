@@ -407,7 +407,7 @@ namespace SimulatorController.SimHub.Plugin
             {
                 try
                 {
-                    pluginManager.AddProperty($"{PropertyPrefix}.{name}", this.GetType(), value ?? string.Empty);
+                    pluginManager.AddProperty($"{name}", this.GetType(), value ?? string.Empty);
                 }
                 catch (Exception ex)
                 {

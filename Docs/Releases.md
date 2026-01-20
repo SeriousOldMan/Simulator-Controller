@@ -63,12 +63,14 @@
   - A new [audio route "Actions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the controller action functions ["speak" and "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions), which can be used from scripts or in track automations and so on, has been introduced.
   - The creation/upload date for telemetries, strategies and setups is now displayed in the "Session Database".
   - You now can attach notes to your telemetries, strategies and setups in the "Session Database".
-  - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well.
+  - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
   - The SimHub plugin which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by @Awesome-XV and is now an official part of Simulator Controller.
   - [Expert] The support for *Lua* 5.5 has been extended, but still not fully functional.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
 	  - to be completed...
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
 
 # Release history
 

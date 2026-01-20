@@ -37,7 +37,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.8.0
 
-Nothing to do.
+The session state JSON object supplied by the "Intagration" plugin has changed. The changes introduce some long awaited extension, but also some incompatible changes. Therefore, if you have build an app based on that data, this app must be updated as well. The SimHub plugin which was created by Jordan Moss some time ago has been updated by @Awesome-XV and will be part of this release.
 
 ***
 

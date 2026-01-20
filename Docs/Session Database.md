@@ -133,6 +133,8 @@ Telemetry data for individual laps can be stored in the session database, for ex
 
 You can use the buttons below the list to upload, download, rename or delete lap telemetry data, but in most cases you will use the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), the ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center),the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench) or the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach) itself to record the telemetry data and store it in the database. Once you have selected telemetry data in the list above, you can decide whether you want to share it potentially with the community (if you have given consent to share telemetry data - see the information about community data at the end of this chapter) and/or whether you want to synchronize the lap telemetry with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below). Additionally, you can use the copy button to copy the name of the telemetry data to the clipbaord. This is useful, if you want to register the given lap as reference lap for the Driving Coach in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 
+When sharing lap telemetries with the community, but also for yourself, use the *Notes* field to mention everything worth to know about the game version, weather conditions, setups and so on.
+
 ##### Naming conventions
 
 Although technically not strictly necessary, it would be benificial that everybody who contributes to the lap telemetry collection will follow the same naming conventions. Therefore, I dare to propose a naming scheme here:
@@ -230,6 +232,8 @@ This tab shows you a list of race stratagies, which are stored in the database. 
 
 You can use the buttons below the list to upload, download, rename or delete a strategy, but in most cases you will use the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench) to create a strategy and store it in the database. Once you have selected a strategy in the list above, you can decide whether you want to share this strategy potentially with the community (if you have given consent to share strategies - see the information about community data at the end of this chapter) and/or whether you want to synchronize the strategy with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
 
+When sharing strategies with the community, but also for yourself, use the *Notes* field to mention everything worth to know about the strategies.
+
 Good to know: Strategies can be opened in the "Strategy Workbench" by double-clicking them.
 
 ##### Naming conventions
@@ -247,6 +251,8 @@ This tab allows you to store your preferred car setup files for different condit
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
 Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file. Once you have selected a setup in the list above, you can decide whether you want to share this setup potentially with the community (if you have given consent to share setups - see the information about community data at the end of this chapter) and/or whether you want to synchronize the setup with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below).
+
+When sharing setups with the community, but also for yourself, use the *Notes* field to mention everything worth to know about the game version, competition type (sprint or endurance) and so on.
 
 ##### Naming conventions
 

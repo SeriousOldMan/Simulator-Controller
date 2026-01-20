@@ -19,3 +19,4 @@ Sources/*/*.exe
 Binaries
 Releases
 .vscode
+Sources/SimHub-Plugin/obj/Release/

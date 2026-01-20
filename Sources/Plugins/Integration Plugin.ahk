@@ -84,11 +84,41 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
+		local format, ignore, unit
+
 		super.__New(controller, name, configuration)
 
 		this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
 
 		deleteFile(this.StateFile)
+
+		this.iLanguage := this.getArgumentValue("stateFile", "EN")
+
+		if !inList(availableLanguages(), this.iLanguage)
+			this.iLanguage := "EN"
+
+		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
+
+		if ((format.Length = 2) && (format[1] = "Time") && inList(kTimeFormats, format[2]))
+			this.iFormats["Time"] := format[2]
+
+		for ignore, unit in string2Values(",", this.getArgumentValue("units", ""))
+			for ignore, unit in string2Values(A_Space, unit)
+				if (unit.Length = 2)
+					switch unit[1], false {
+						case "Volume":
+							if inList(kVolumeUnits, unit[2])
+								this.iUnits[unit[1]] := unit[2]
+						case "Pressure":
+							if inList(kPressureUnits, unit[2])
+								this.iUnits[unit[1]] := unit[2]
+						case "Temperature":
+							if inList(kTemperatureUnits, unit[2])
+								this.iUnits[unit[1]] := unit[2]
+						case "Speed":
+							if inList(kSpeedUnits, unit[2])
+								this.iUnits[unit[1]] := unit[2]
+					}
 
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iAssistantsStateTask := PeriodicTask(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)

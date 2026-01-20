@@ -1554,16 +1554,16 @@ To activate this plugin, add it to the list of active plugins in "Simulator Conf
 	[Plugins]
 	Integration=true||
 
-If you want to use the *stateFile* parameter here (see below), it looks like:
+If you want to use any additional parameters here (see below), it looks like:
 
 	[Plugins]
-	Integration=true||stateFile: D:\SimRacing\Session State.json
+	Integration=true||stateFile: D:\SimRacing\Session State.json; language: DE; formats: Time S.##
 	
 where *D:\SimRacing\Session State.json* is an example. Substitute your own path here.
 
 ### Configuration
 
-Only one plugin argument is provided, with which you can define the output file for the state representation.
+Several plugin arguments are provided, with which you can define the output file for the state representation and choose language and unit settings.
 
 	stateFile: *path*;
 	language: DE | EN | ...;

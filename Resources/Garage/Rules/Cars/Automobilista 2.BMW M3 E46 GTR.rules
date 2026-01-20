@@ -1,0 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Automobilista 2                 ;;;
+;;;                                         BMW M3 E46 GTR                  ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO) / inthebagbud UK                   ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Automobilista 2", "BMW M3 E46 GTR",
+										[Electronics.TC, Electronics.ABS, Electronics.Turbo,
+										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
+										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
+										 Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+										 Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave
+										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))

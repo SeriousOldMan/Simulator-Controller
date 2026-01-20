@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimHub Plugin", "SimHub Plugin\SimHub Plugin.csproj", "{31FD83EB-201E-F016-A7B6-96E0069D938C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31FD83EB-201E-F016-A7B6-96E0069D938C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31FD83EB-201E-F016-A7B6-96E0069D938C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31FD83EB-201E-F016-A7B6-96E0069D938C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31FD83EB-201E-F016-A7B6-96E0069D938C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {038DE186-200D-4D4A-9CC1-88AB1CD4A432}
+	EndGlobalSection
+EndGlobal

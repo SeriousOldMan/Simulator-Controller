@@ -89,6 +89,7 @@ Speech Interface.18=%kBinariesDirectory%Audio Capture <- %kSourcesDirectory%Spec
 Speech Interface.19=%kBinariesDirectory%Audio Capture\ffmpeg.exe <- %kHomeDirectory%Utilities\3rd Party\Sound Processing\ffmpeg.exe
 Stream Deck Interface.1=%kBinariesDirectory%Connectors\SimulatorControllerPluginConnector.dll <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\SimulatorControllerPluginConnector.dll
 Stream Deck Interface.2=%kHomeDirectory%Utilities\Plugins\de.thebigo.simulatorcontroller.sdPlugin <- %kSourcesDirectory%Special\Stream Deck Plugin\Release\de.thebigo.simulatorcontroller.sdPlugin
+SimHub Plugin.1=%kHomeDirectory%Utilities\Plugins\ <- %kSourcesDirectory%Special\SimHub Plugin\SimHub Plugin\obj\Release\\net48\SimulatorController.SimHub.Plugin.dll
 Code Editor.1=%kBinariesDirectory%Code Editor\ <- %kHomeDirectory%Utilities\3rd Party\Code Editor\*.dll
 Code Runtime.1=%kBinariesDirectory%Code Runtime\ <- %kHomeDirectory%Utilities\3rd Party\Code Runtime\lua54.dll
 Code Runtime.2=%kBinariesDirectory%Code Runtime\ <- %kHomeDirectory%Utilities\3rd Party\Code Runtime\lua55.dll

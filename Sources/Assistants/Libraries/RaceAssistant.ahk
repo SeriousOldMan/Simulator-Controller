@@ -411,7 +411,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		User {
 			Get {
-				return SessionDatabase.getName("Conversation", this.RaceAssistant.DriverForname)
+				local name
+				
+				parseDriverName(this.DrivingCoach.TrackCoachingActive, &name)
+				
+				return name
 			}
 		}
 
@@ -961,12 +965,12 @@ class RaceAssistant extends ConfigurationItem {
 		global kUnknown
 
 		local userName := SessionDatabase.getName("Driver")
-		local options, forname, ignore, booster
+		local options, forname, booster
 
 		if !kUnknown
 			kUnknown := translate("Unknown")
 
-		parseDriverName(userName, &forname, &ignore := false, &ignore := false)
+		parseDriverName(userName, &forname)
 
 		this.iDriverForname := forname
 		this.iDriverFullName := userName
@@ -4276,10 +4280,10 @@ class GridRaceAssistant extends RaceAssistant {
 	driverNameAheadRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined)
-		local forname, surname, ignore
+		local forname, surname
 
 		if (car != kUndefined) {
-			parseDriverName(this.getDriver(car), &forname, &surname, &ignore := false)
+			parseDriverName(this.getDriver(car), &forname, &surname)
 
 			this.getSpeaker().speakPhrase("DriverNameAhead", {forname: forname, surname: surname})
 		}
@@ -4290,10 +4294,10 @@ class GridRaceAssistant extends RaceAssistant {
 	driverNameBehindRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
 		local car := knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined)
-		local forname, surname, ignore
+		local forname, surname
 
 		if (car != kUndefined) {
-			parseDriverName(this.getDriver(car), &forname, &surname, &ignore := false)
+			parseDriverName(this.getDriver(car), &forname, &surname)
 
 			this.getSpeaker().speakPhrase("DriverNameBehind", {forname: forname, surname: surname})
 		}

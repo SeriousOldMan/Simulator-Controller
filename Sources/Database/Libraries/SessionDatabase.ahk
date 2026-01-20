@@ -3356,7 +3356,7 @@ combineCompounds(&compounds, &compoundColors := false) {
 	}
 }
 
-parseDriverName(fullName, &forname, &surname, &nickname?) {
+parseDriverName(fullName, &forname?, &surname?, &nickname?) {
 	if InStr(fullName, "(") {
 		fullname := StrSplit(fullName, "(", " `t", 2)
 

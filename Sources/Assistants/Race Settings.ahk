@@ -1952,11 +1952,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x16 y82 w88 h23 +0x200 Section", translate("Avg. Lap Time"))
 		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value)
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
-		settingsGui.Add("Text", "x164 yp+4 w45 h20", translate("Sec."))
+		settingsGui.Add("Text", "x158 yp+4 w51 h20", translate("Sec."))
 
 		settingsGui.Add("Text", "x16 yp+22 w88 h20 +0x200", translate("Fuel Consumption"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnEvent("Change", validateNumber.Bind("fuelConsumptionEdit"))
-		settingsGui.Add("Text", "x164 yp+4 w45 h20", getUnit("Volume", true))
+		settingsGui.Add("Text", "x158 yp+4 w51 h20", StrReplace(StrReplace(getUnit("Volume", true), "Gallone", "Gall."), "Gallon", "Gall."))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 

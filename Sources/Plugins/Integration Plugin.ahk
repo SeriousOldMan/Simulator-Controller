@@ -939,7 +939,7 @@ class IntegrationPlugin extends ControllerPlugin {
 				}
 			})
 
-			if (this.DrivingCoach && this.DrivingCoach.TrackCoachingActive) {
+			if (this.DrivingCoach && (this.DrivingCoach.TrackCoachingActive || this.DrivingCoach.BrakeCoachingActive)) {
 				sessionState["Instructions"] := this.createCornerInstructions(sessionInfo)
 
 				if Task.CurrentTask {

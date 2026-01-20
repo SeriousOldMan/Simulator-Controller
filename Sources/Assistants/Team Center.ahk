@@ -3790,12 +3790,12 @@ class TeamCenter extends ConfigurationItem {
 			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
 				entry := entry.Clone()
 
-				parseDriverName(entry["Driver"], &forname, &surname, &ignore := false)
+				parseDriverName(entry["Driver"], &forname, &surname)
 
 				found := false
 
 				for ignore, candidate in getKeys(this.SessionDrivers) {
-					parseDriverName(candidate, &cForname, &cSurname, &ignore := false)
+					parseDriverName(candidate, &cForname, &cSurname)
 
 					if ((forname = cForname) && (surname = cSurname)) {
 						entry["Driver"] := candidate

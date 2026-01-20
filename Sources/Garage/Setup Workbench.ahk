@@ -926,26 +926,19 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getCars(simulator) {
 		local cars := []
-		local ignore, car, descriptor
+		local ignore, directory, filter, car, descriptor
 
 		if ((simulator != true) && (simulator != "*")) {
-			loop Files, kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".*.ini", "F" {
-				SplitPath(A_LoopFileName, , , , &descriptor)
+			for ignore, directory in [kResourcesDirectory, kUserHomeDirectory]
+				for ignore, filter in ["Garage\Definitions\Cars\" . simulator . ".*.ini", "Garage\Rules\Cars\" . simulator . ".*.rules"]
+					loop Files, kResourcesDirectory . filter, "F" {
+						SplitPath(A_LoopFileName, , , , &descriptor)
 
-				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
+						car := StrReplace(StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", ""), ".rules", "")
 
-				if ((car != "Generic") && !inList(cars, car))
-					cars.Push(SessionDatabase.getCarName(simulator, car))
-			}
-
-			loop Files, kUserHomeDirectory . "Garage\Definitions\Cars\" . simulator . ".*.ini", "F" {
-				SplitPath(A_LoopFileName, , , , &descriptor)
-
-				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
-
-				if ((car != "Generic") && !inList(cars, car))
-					cars.Push(SessionDatabase.getCarName(simulator, car))
-			}
+						if ((car != "Generic") && !inList(cars, car))
+							cars.Push(SessionDatabase.getCarName(simulator, car))
+					}
 
 			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
 				for ignore, car in SessionDatabase().getCars(simulator) {
@@ -956,6 +949,8 @@ class SetupWorkbench extends ConfigurationItem {
 				}
 			}
 		}
+
+		bubbleSort(&cars)
 
 		cars.InsertAt(1, "*")
 

@@ -1542,7 +1542,7 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			if ((bestDBLap == kUndefined) || (bestSessionLapTime < bestDBLapTime)) {
-				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), &ignore := false, &ignore := false, &nickname := true)
+				parseDriverName(getMultiMapValue(bestInfo, "Info", "Driver"), , , &nickname)
 
 				SplitPath(bestSessionLap, , &directory, , &fileName)
 

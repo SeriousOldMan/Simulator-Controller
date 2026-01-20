@@ -104,11 +104,11 @@ The "Tactile Feedback" plugin will allow you to enable or disable pedal vibratio
 
 To get the most out of this plugin in the sample configuration presented below, you will need three 2-way toggle switches, two rotary dials and eight push buttons on your controller hardware, although the dials and push buttons may be shared with other modes. But, since all this is fully configurable, you can find a compromise, if your controller provides less control elements. To help you with the configuration of *SimHub*, two shaker profiles are provided in the *Profiles* folder in the Simulator Controller distribution. Please load these profiles, named "...CV..." for chassis vibration and "...PV..." for pedal vibration, and adopt them to the specific configuration of your simulation rig. Using the plugin parameters described below, you can then customize the "Tactile Feedback" plugin to support your concrete hardware configuration as best as possible. These profiles already have been preconfigured with external triggers (for example: "togglePedalVibration" or "increaseRPMSVibration", just to name two), which will be used by the "Tactile Feedback" plugin to interact with *SimHub*.
 
-If you want to create your SimHub profiles from scratch, you can create the external trigger in SimHub using the command shell. Start SimHub and open the controls window for the specific element. The following window will appear:
+If you want to create your SimHub profiles from scratch, you can create the external trigger in *SimHub* using the command shell. Start *SimHub* and open the controls window for the specific element. The following window will appear:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/SimHub%20Control.JPG)
 
-Click the desired input, then open a command shell, go to the SimHub programm directory and execute the following command:
+Click the desired input, then open a command shell, go to the *SimHub* programm directory and execute the following command:
 
 	SimHubWPF.exe -triggerinput [command][CATEGORY][EFFECT]Vibration
 
@@ -1935,4 +1935,8 @@ Now let's have a look at each oject:
 	
 	Please note, that the "Message" properties are not available, if no voice support for the Driving Coach has been configured.
 
-As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example SimHub with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
+As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example *SimHub* with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
+
+### SimHub Plugin
+
+A special plugin for *SimHub* is bundled with Simulator Controller, that exposes all the data supplied by the "Integration" plugin (as documented above) to *SimHub*. This plugin will be installed automatically in the root directory of *SimHub* by "Simulator Setup", if *SimHub* is detected, but it must be enabled in *SimHub* and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.

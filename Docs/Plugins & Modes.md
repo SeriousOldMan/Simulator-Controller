@@ -1940,3 +1940,9 @@ As mentioned above the "Session State.json" file will be periodically updated wi
 ### SimHub Plugin
 
 A special plugin for *SimHub* is bundled with Simulator Controller, that exposes all the data supplied by the "Integration" plugin (as documented above) to *SimHub*. This plugin will be installed automatically in the root directory of *SimHub* by "Simulator Setup", if *SimHub* is detected, but it must be enabled in *SimHub* and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
+
+Once the plugin is enabled in *SimHub*, you can configure it:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/SimHub%20Plugin%201.jpg)
+
+The location of the "Session State.json" file must only be changed, when the "Integration" plugin of Simulator Controller had been for a different location as well. The "Polling Interval" of 1 second will also be fine, unless you also want to use the driving instructions by the Driving Coach, because these may be updated at a higher rate like 500ms.

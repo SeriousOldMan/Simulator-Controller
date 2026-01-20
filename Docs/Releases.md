@@ -68,7 +68,25 @@
   - [Expert] The support for *Lua* 5.5 has been extended, but still not fully functional.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
-	  - to be completed...
+      - Alpine A424, Aston Martin Valkyrie Hypercar, Aston Martin Valkyrie
+      - Audi R8 LMP1, BMW 2002 Turbo, BMW M Hybrid V8
+      - BMW M3 E46 GTR, Brabham BT62, Cadillac DPi-VR
+      - Cadillac V-Series.R, Chevrolet Chevette, Chevrolet Corvette C3
+      - Copa Fusca, Copa Montana, Courage C60 Hybrid
+      - Dallara F301, Dallara F309, Dallara SP1
+      - Fusca 1 Hot Cars, Fusca 2 Hot Cars, Fusca Classic FL
+      - Gol Classic B, Gol Classic FL, Gol Hot Cars
+      - Iveco Stralis, Kart 2-Stroke 125cc Direct, Kart 2-Stroke 125cc Shifter
+      - Kart 4-Stroke Race, Kart 4-Stroke Rental, Kart Cross
+      - Lamborghini Miura SV, Lamborghini Revuelto, Lamborghini SC63
+      - Lamborghini Veneno Roadster, Lotus 23, MAN TGX
+      - McLaren Senna, Mercedes-Benz Actros, MINI Cooper S 1965 B
+      - MINI Cooper S 1965, Mitsubishi Lancer RS, Passat Classic B
+      - Passat Classic FL, Passat Hot Cars, Porsche 963
+      - Puma GTB, Puma GTE, Ultima GTR Race
+      - Uno Classic B, Volkswagen Constellation, Volkswagen Polo GTS
+      - Volkswagen Polo, Volkswagen Virtus GTS, Volkswagen Virtus
+      - Vulkan Truck
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
 

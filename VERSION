@@ -1,7 +1,7 @@
 [Development]
 Version=6.8.0.0-dev
 Target=6.8.0.0-release
-Date=01/19/2026
+Date=01/20/2026
 Download=
 Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC
 Components=Media->5.6.1,Configuration->6.7.9,Utilities->6.7.9

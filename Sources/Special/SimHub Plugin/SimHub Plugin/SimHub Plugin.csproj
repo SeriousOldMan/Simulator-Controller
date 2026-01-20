@@ -7,7 +7,6 @@
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <OutputPath>..\..\Binaries\SimHub\</OutputPath>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
 
@@ -17,6 +16,11 @@
     <Company>Simulator Controller</Company>
     <Product>Simulator Controller SimHub Integration</Product>
     <Description>SimHub plugin that integrates Simulator Controller telemetry data</Description>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>

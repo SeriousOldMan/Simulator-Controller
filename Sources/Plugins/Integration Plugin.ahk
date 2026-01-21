@@ -84,7 +84,7 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
-		local format, ignore, unit
+		local formats, ignore, unit
 
 		super.__New(controller, name, configuration)
 
@@ -99,8 +99,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
 
-		if ((format.Length = 2) && (format[1] = "Time") && inList(kTimeFormats, format[2]))
-			this.iFormats["Time"] := format[2]
+		if ((formats.Length = 2) && (formats[1] = "Time") && inList(kTimeFormats, formats[2]))
+			this.iFormats["Time"] := formats[2]
 
 		for ignore, unit in string2Values(",", this.getArgumentValue("units", ""))
 			for ignore, unit in string2Values(A_Space, unit)

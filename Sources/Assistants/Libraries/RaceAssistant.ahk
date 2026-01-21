@@ -412,9 +412,9 @@ class RaceAssistant extends ConfigurationItem {
 		User {
 			Get {
 				local name
-				
-				parseDriverName(this.DrivingCoach.TrackCoachingActive, &name)
-				
+
+				parseDriverName(SessionDatabase.getName("Conversation", this.RaceAssistant.DriverForname), &name)
+
 				return name
 			}
 		}

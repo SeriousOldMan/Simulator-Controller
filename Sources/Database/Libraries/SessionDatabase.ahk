@@ -710,10 +710,6 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.setProfileName(name, types)
 	}
 
-	getProfileName(&types?) {
-		return SessionDatabase.getProfileName(&types)
-	}
-
 	static getUserName() {
 		static userName := SessionDatabase.getDriverNames(false, this.ID)[1]
 

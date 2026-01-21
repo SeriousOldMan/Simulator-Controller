@@ -1811,11 +1811,13 @@ Now let's have a look at each oject:
 			"Pitstops": [
 				{
 					"Nr": 1,
+					"Lap": 12,
 					"Fuel": 67.0,
 					"TyreCompound": "Dry (Black)"
 				},
 				{
 					"Nr": 2,
+					"Lap": 37,
 					"Fuel": 20.0
 				}
 			]
@@ -1891,10 +1893,10 @@ Now let's have a look at each oject:
 
 		"Automation": {
 			"Automation": "Dry",
-			"Car": "McLaren 720S GT3",
-			"Session": "Race",
-			"Simulator": "Assetto Corsa Competizione",
 			"State": "Active"
+			"Car": "BMW M4 GT3 EVO",
+			"Simulator": "iRacing",
+			"Track": "Miami International Autodrome"
 		}
 		
 	"State" may be "Active", in this case the "Automation" property contains the name of the active automation. It may be "Waiting", if the automation is starting currently, or it may be "Unavailable", if an automation has been requested but none match the criteria. The "Automation" object will be absent, if no automation has been requested by the driver.
@@ -1936,6 +1938,8 @@ Now let's have a look at each oject:
 	Please note, that the "Message" properties are not available, if no voice support for the Driving Coach has been configured.
 
 As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example *SimHub* with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
+
+Good to know: You can find a complete example "Session State.json" file in the *Resources\Templates* folder which is located in the program installation folder.
 
 ### SimHub Plugin
 

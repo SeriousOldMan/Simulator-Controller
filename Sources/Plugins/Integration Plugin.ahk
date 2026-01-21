@@ -255,6 +255,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			if lastSpeed
 				state["LastSpeed"] := convertUnit(unit, lastSpeed)
+
+			return state
 		}
 		else
 			return kNull

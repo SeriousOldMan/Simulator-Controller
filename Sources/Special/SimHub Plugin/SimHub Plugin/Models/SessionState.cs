@@ -313,7 +313,7 @@ namespace SimulatorController.SimHub.Plugin
         public int? Number { get; set; }
 
         [JsonProperty("Prepared")]
-        public int? Prepared { get; set; }
+        public bool? Prepared { get; set; }
 
         /*
         [JsonProperty("TyreCompoundFrontLeft")]

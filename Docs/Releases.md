@@ -1,5 +1,55 @@
 # Latest stable release
 
+#### Date: 01/23/26
+
+#### Fixes
+
+  - Fixed several missing unit and value format conversions.
+  - Fixed a bug in "Session Database" introduced with the last release, that prevented the track drop down menu showing the selected track name.
+  - Fixed a critical bug for *Assetto Corsa Competizione* which prevented to Assistants and all other components of Simulator Controller to start up correctly.
+  - Several bugs have been fixed for the tyre laps calculation in sessions where tyres are used for more than two stints.
+  - Fixed a bug in "Team Center" that prevented the pitstop settings preview window to be opened for *Le Mans Ultimate* sessions, when the pitstop update check had been set to a very long time.
+
+#### Changes
+
+  - A new [audio route "Actions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the controller action functions ["speak" and "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions), which can be used from scripts or in track automations and so on, has been introduced.
+  - The creation/upload date for telemetries, strategies and setups is now displayed in the "Session Database".
+  - You now can attach notes to your telemetries, strategies and setups in the "Session Database".
+  - All known cars will now be shown in "Setup Workbench", also those without setup editor support and even if they had not been driven yet.
+  - The [SimHub plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin) which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by our team member @Awesome-XV and is now an official part of Simulator Controller. It will be installed automatically by "Simulator Setup", but it must be enabled in SimHub and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
+  - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
+  - [Internal] The support for *Lua* 5.5 has been extended, but still not fully functional.
+  - [Internal] Fixed usage statistics for translators.
+  - New car models for "Setup Workbench":
+    - Automobilista 2 (by @inthebagbud UK; no setup editor support)
+      - Alpine A424, Aston Martin Valkyrie Hypercar, Aston Martin Valkyrie
+      - Audi R8 LMP1, BMW 2002 Turbo, BMW M Hybrid V8
+      - BMW M3 E46 GTR, Brabham BT62, Cadillac DPi-VR
+      - Cadillac V-Series.R, Chevrolet Chevette, Chevrolet Corvette C3
+      - Copa Fusca, Copa Montana, Courage C60 Hybrid
+      - Dallara F301, Dallara F309, Dallara SP1
+      - Fusca 1 Hot Cars, Fusca 2 Hot Cars, Fusca Classic FL
+      - Gol Classic B, Gol Classic FL, Gol Hot Cars
+      - Iveco Stralis, Kart 2-Stroke 125cc Direct, Kart 2-Stroke 125cc Shifter
+      - Kart 4-Stroke Race, Kart 4-Stroke Rental, Kart Cross
+      - Lamborghini Miura SV, Lamborghini Revuelto, Lamborghini SC63
+      - Lamborghini Veneno Roadster, Lotus 23, MAN TGX
+      - McLaren Senna, Mercedes-Benz Actros, MINI Cooper S 1965 B
+      - MINI Cooper S 1965, Mitsubishi Lancer RS, Passat Classic B
+      - Passat Classic FL, Passat Hot Cars, Porsche 963
+      - Puma GTB, Puma GTE, Ultima GTR Race
+      - Uno Classic B, Volkswagen Constellation, Volkswagen Polo GTS
+      - Volkswagen Polo, Volkswagen Virtus GTS, Volkswagen Virtus
+      - Vulkan Truck
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.7.9.0
 
 #### Date: 01/16/26
@@ -45,54 +95,6 @@
 	  - MCR S2000, MetalMoro AJR Gen2 Chevrolet, MetalMoro AJR Gen2 Honda
 	  - MetalMoro AJR Gen2 Nissan, Mitsubishi Lancer R, Oreca 07
 	  - Porsche 911 GT3 Cup 3.8, Porsche 911 GT3 Cup 4.0, Sigma P1 G5
-
-# Upcoming release
-
-#### Date: 01/23/26 (planned)
-
-#### Fixes
-
-  - Fixed several missing unit and value format conversions.
-  - Fixed a bug in "Session Database" introduced with the last release, that prevented the track drop down menu showing the selected track name.
-  - Fixed a critical bug for *Assetto Corsa Competizione* which prevented to Assistants and all other components of Simulator Controller to start up correctly.
-  - Several bugs have been fixed for the tyre laps calculation in sessions where tyres are used for more than two stints.
-  - Fixed a bug in "Team Center" that prevented the pitstop settings preview window to be opened for *Le Mans Ultimate* sessions, when the pitstop update check had been set to a very long time.
-
-#### Changes
-
-  - A new [audio route "Actions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the controller action functions ["speak" and "play"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions), which can be used from scripts or in track automations and so on, has been introduced.
-  - The creation/upload date for telemetries, strategies and setups is now displayed in the "Session Database".
-  - You now can attach notes to your telemetries, strategies and setups in the "Session Database".
-  - All known cars will now be shown in "Setup Workbench", also those without setup editor support and even if they had not been driven yet.
-  - The [SimHub plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin) which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by our team member @Awesome-XV and is now an official part of Simulator Controller. It will be installed automatically by "Simulator Setup", but it must be enabled in SimHub and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
-  - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
-  - [Internal] The support for *Lua* 5.5 has been extended, but still not fully functional.
-  - [Internal] Fixed usage statistics for translators.
-  - New car models for "Setup Workbench":
-    - Automobilista 2 (by @inthebagbud UK; no setup editor support)
-      - Alpine A424, Aston Martin Valkyrie Hypercar, Aston Martin Valkyrie
-      - Audi R8 LMP1, BMW 2002 Turbo, BMW M Hybrid V8
-      - BMW M3 E46 GTR, Brabham BT62, Cadillac DPi-VR
-      - Cadillac V-Series.R, Chevrolet Chevette, Chevrolet Corvette C3
-      - Copa Fusca, Copa Montana, Courage C60 Hybrid
-      - Dallara F301, Dallara F309, Dallara SP1
-      - Fusca 1 Hot Cars, Fusca 2 Hot Cars, Fusca Classic FL
-      - Gol Classic B, Gol Classic FL, Gol Hot Cars
-      - Iveco Stralis, Kart 2-Stroke 125cc Direct, Kart 2-Stroke 125cc Shifter
-      - Kart 4-Stroke Race, Kart 4-Stroke Rental, Kart Cross
-      - Lamborghini Miura SV, Lamborghini Revuelto, Lamborghini SC63
-      - Lamborghini Veneno Roadster, Lotus 23, MAN TGX
-      - McLaren Senna, Mercedes-Benz Actros, MINI Cooper S 1965 B
-      - MINI Cooper S 1965, Mitsubishi Lancer RS, Passat Classic B
-      - Passat Classic FL, Passat Hot Cars, Porsche 963
-      - Puma GTB, Puma GTE, Ultima GTR Race
-      - Uno Classic B, Volkswagen Constellation, Volkswagen Polo GTS
-      - Volkswagen Polo, Volkswagen Virtus GTS, Volkswagen Virtus
-      - Vulkan Truck
-	  
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
-
-# Release history
 
 ## 6.7.8.0
 

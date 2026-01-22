@@ -1,34 +1,28 @@
 [Development]
-Version=6.8.0.0-beta
+Version=6.8.0.0-release
 Target=6.8.0.0-release
-Date=01/22/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Zxhj2wRo/Releases/Simulator%20Controller%206.8.0.0-beta.zip
+Date=01/23/2026
+Download=https://cutt.ly/ktzTpbdV;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/LIN_n6Xx/Releases/Simulator Controller 6.8.0.0-release.zip;https://www.dropbox.com/scl/fi/f0sd8g2c7ocv47z7f9kdh/Simulator-Controller-6.8.0.0-release.zip?rlkey=nbs88eisnerqumapm8rznz2s1&st=0v7nm5ru&dl=1;http://%master%/Releases/Simulator Controller 6.8.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.0.0-release.zip
 Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.8.0,Utilities->6.8.0
 [Release]
-Version=6.7.9.0-release
-Date=01/16/2026
-Download=https://cutt.ly/otkMqRoU;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-HAVhdaz/Releases/Simulator%20Controller%206.7.9.0-release.zip;https://www.dropbox.com/scl/fi/dip329ihfiptznt2ca1lb/Simulator-Controller-6.7.9.0-release.zip?rlkey=dq9w0pfklt141vb14kq7757jl&st=18egixm5&dl=1;http://%master%/Releases/Simulator Controller 6.7.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.7.9.0-release.zip
-Changes=New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database"
-Components=Media->5.6.1,Configuration->6.7.9,Utilities->6.7.9
+Version=6.8.0.0-release
+Date=01/23/2026
+Download=https://cutt.ly/ktzTpbdV;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/LIN_n6Xx/Releases/Simulator Controller 6.8.0.0-release.zip;https://www.dropbox.com/scl/fi/f0sd8g2c7ocv47z7f9kdh/Simulator-Controller-6.8.0.0-release.zip?rlkey=nbs88eisnerqumapm8rznz2s1&st=0v7nm5ru&dl=1;http://%master%/Releases/Simulator Controller 6.8.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.0.0-release.zip
+Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench"
+Components=Media->5.6.1,Configuration->6.8.0,Utilities->6.8.0
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
 Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/DfSnfhLR;https://www.dropbox.com/scl/fi/3c56fjdvdd4od5t7rsuc9/Media-5.6.1.zip?rlkey=x0icl05jy05nn886due4dsblv&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+5.6.1.zip
-Configuration.6.7.9.Path=Resources
-Configuration.6.7.9.Content=Setup
-Configuration.6.7.9.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/25EH0qBQ/Components/Configuration%206.7.9.zip;https://www.dropbox.com/scl/fi/e21zroy7qgdruk3sr9d21/Configuration-6.7.9.zip?rlkey=ptnxkldjznvwwgtv193ogbyz9&st=4ag70ave&dl=1;http://%master%/Components/Configuration 6.7.9.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.7.9.zip
 Configuration.6.8.0.Path=Resources
 Configuration.6.8.0.Content=Setup
 Configuration.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1DdpJXti/Components/Configuration%206.8.0.zip;https://www.dropbox.com/scl/fi/viuj1tn9l14yzz9hi0qog/Configuration-6.8.0.zip?rlkey=lonv34bh5mxjjitkbu3p9jabx&st=37qrgpi5&dl=1http://%master%/Components/Configuration 6.8.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.0.zip
-Utilities.6.7.9.Path=.
-Utilities.6.7.9.Content=Utilities
-Utilities.6.7.9.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JQWiIlKY/Components/Utilities%206.7.9.zip;https://www.dropbox.com/scl/fi/d24qjndtbnwvipimosl12/Utilities-6.7.9.zip?rlkey=3avbt8vn40u85hko471xoo1st&st=7um32aub&dl=1;http://%master%/Components/Utilities 6.7.9.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.7.9.zip
 Utilities.6.8.0.Path=.
 Utilities.6.8.0.Content=Utilities
 Utilities.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IKuiL_L_/Components/Utilities%206.8.0.zip;https://www.dropbox.com/scl/fi/20ulkc1lu2z6ax94yt0lf/Utilities-6.8.0.zip?rlkey=hwqmq5tihnjnoapx1qq4s4kis&st=q16sul4m&dl=1;http://%master%/Components/Utilities 6.8.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.0.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.8.0.0-beta
-Release=6.7.9.0-release
+Development=6.8.0.0-release
+Release=6.8.0.0-release

@@ -1,0 +1,259 @@
+{
+  "Assistants": {
+    "Driving Coach": {
+      "Muted": false,
+      "Silent": false,
+      "State": "Active"
+    },
+    "Mode": "Solo",
+    "Race Engineer": {
+      "Muted": false,
+      "Silent": false,
+      "State": "Active"
+    },
+    "Race Spotter": {
+      "Muted": false,
+      "Silent": false,
+      "State": "Active"
+    },
+    "Race Strategist": {
+      "Muted": false,
+      "Silent": false,
+      "State": "Active"
+    },
+    "Session": "Race"
+  },
+  "Automation": {
+	"Automation": "Dry",
+	"State": "Active",
+	"Car": "BMW M4 GT3 EVO",
+    "Simulator": "iRacing",
+    "Track": "Miami International Autodrome"
+  },
+  "Brakes": {
+	"Temperatures": [199.6, 197.6, 339.9, 337.0],
+	"Wear": [2, 2, 3, 3]
+  },
+  "Conditions": {
+    "AirTemperature": 26.6,
+    "Grip": "Fast",
+    "TrackTemperature": 42.8,
+    "Weather": "Dry",
+    "Weather10Min": "Dry",
+    "Weather30Min": "Dry"
+  },
+  "Damage": {
+	"Bodywork": {
+		"Front": 0.0,
+		"Left": 0.34,
+		"Right": 0.0,
+		"Rear": 2.72,
+		"All": 3.06
+	},
+	"Suspension": {
+		"FrontLeft": 0.0,
+		"FrontRight": 0.0,
+		"RearLeft": 0.0,
+		"RearRight": 0.0
+	},
+	"Engine": 0.0,
+	"LapDelta": 0.3,
+	"RepairTime": 2.7
+  },
+  "Duration": {
+    "DriverTimeLeft": "56:46.0",
+    "Format": "Time",
+    "SessionLapsLeft": 7,
+    "SessionTimeLeft": "56:46.0",
+    "StintLapsLeft": 6,
+    "StintTimeLeft": "56:46.0"
+  },
+  "Engine": {
+    "OilTemperature": 89.0,
+    "WaterTemperature": 93.0
+  },
+  "Fuel": {
+    "AvgConsumption": 3.2,
+    "AvgFuelConsumption": 3.2,
+    "LastConsumption": 3.2,
+    "LastFuelConsumption": 3.2,
+    "RemainingFuel": 36.4,
+    "RemainingFuelLaps": 11,
+    "RemainingLaps": 11,
+	"RemainingEnergy": 26.7,
+	"RemainingEnergyLaps": 8,
+	"AvgEnergyConsumption": 3.2,
+	"LastEnergyConsumption": 3.0
+  },
+  "Pitstop": {
+	"State": "Plan",
+	"Fuel": 58.0,
+	"Lap": 12,
+	"Driver": "Oliver Juwig",
+	"ServiceTime": 30,
+	"RepairTime": 7,
+	"PitlaneDelta": 23,
+	"Number": 1,
+	"Prepared": false,
+	"TyreCompounds": [
+		"Dry (Black)",
+		"Dry (Black)",
+		"Dry (Black)",
+		"Dry (Black)"
+	],
+	"TyrePressures": [
+		25.2,
+		25.2,
+		24.4,
+		24.3
+	],
+	"TyrePressureIncrements": [0.2, 0.1, -0.3, -0.2],
+	"TyreSet": 2,
+	"Brakes": false,
+	"Repairs": {
+		"Bodywork": true,
+		"Suspension": false
+	}
+  },
+  "Session": {
+    "Car": "BMW M4 GT3 EVO",
+    "Profile": "Standard",
+    "Session": "Race",
+    "Simulator": "iRacing",
+    "Track": "Miami International Autodrome"
+  },
+  "Standings": {
+    "Ahead": {
+      "Delta": "0:00.8",
+      "InPit": false,
+      "LapTime": "1:57.7",
+      "Laps": 3,
+      "Nr": 15
+    },
+    "Behind": {
+      "Delta": "-0:00.2",
+      "InPit": false,
+      "LapTime": "1:57.9",
+      "Laps": 3,
+      "Nr": 10
+    },
+    "ClassPosition": 13,
+    "Leader": {
+      "Delta": "0:23.2",
+      "InPit": false,
+      "LapTime": "1:56.3",
+      "Laps": 3,
+      "Nr": 2
+    },
+	"Focus": {
+		"Delta": "-0:15.9",
+		"InPit": false,
+		"LapTime": "2:24.3",
+		"Laps": 2,
+		"Nr": 15
+	},
+    "OverallPosition": 13,
+    "Position": 13
+  },
+  "Stint": {
+	"Driver": "Oliver Juwig (OJU)",
+	"Lap": 3,
+	"Laps": 2,
+	"LastTime": "2:21.3",
+	"BestTime": "2:20.7",
+	"LastSpeed": 270.8,
+	"BestSpeed": 272.1,
+	"Position": 1
+  },
+  "Strategy": {
+	"PlannedPitstops": 2,
+	"RemainingPitstops": 2,
+	"NextPitstop": {
+		"Fuel": 67.0,
+		"Lap": 12,
+		"Position": 7,
+		"TyreCompound": "Dry (Black)"
+	},
+	"Pitstops": [
+		{
+			"Nr": 1,
+			"Lap": 12,
+			"Fuel": 58.0,
+			"TyreCompound": "Dry (Black)"
+		},
+		{
+			"Nr": 2,
+			"Lap": 37,
+			"Fuel": 20.0
+		}
+	]
+  },
+  "Tyres": {
+    "HotPressures": [
+      26.7,
+      26.7,
+      26.7,
+      26.7
+    ],
+    "ColdPressures": [
+      26.7,
+      26.7,
+      26.7,
+      26.7
+    ],
+    "Laps": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "PressureLosses": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Temperatures": [
+      77.2,
+      82.2,
+      77.1,
+      79.9
+    ],
+    "TyreCompounds": [
+      "Dry (Black)",
+      "Dry (Black)",
+      "Dry (Black)",
+      "Dry (Black)"
+    ],
+    "Wear": [
+      3.0,
+      4.0,
+      2.0,
+      3.0
+    ]
+  },
+  "TeamServer": {
+	"Driver": "Oliver Juwig",
+	"Server": "https:\/\/vgr-teamserver.azurewebsites.net",
+	"Session": "24H Spa",
+	"Team": "VGR (EOS)",
+	"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
+  },
+  "Instructions": {
+	"Corner": 3,
+	"Hints": [
+		{
+			"Hint": "BrakeEarlier",
+			"Message": "Brake a bit earlier"
+		},
+		{
+			"Hint": "BrakeHarder",
+			"Message": "Put more pressure on the brakes"
+		},
+		{
+			"Hint": "AccelerateLater",
+			"Message": "Later on the throttle"
+		}
+	]
+  }
+}

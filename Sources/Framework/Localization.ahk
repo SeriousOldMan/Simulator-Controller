@@ -208,13 +208,13 @@ displayFloatValue(format, float, precision := kUndefined) {
 		return float
 }
 
-displayTimeValue(format, time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
+displayTimeValue(timeFormat, time, fillHours := false, withSeconds := true, withFractions := true, arguments*) {
 	local sign := (signum(time) < 0)
 	local hours, seconds, fraction, minutes
 
 	if isNumber(time) {
-		if ((format = "S.##") || (format = "S,##"))
-			return StrReplace(time, ".", (format = "S.##") ? "." : ",")
+		if ((timeFormat = "S.##") || (timeFormat = "S,##"))
+			return StrReplace(time, ".", (timeFormat = "S.##") ? "." : ",")
 		else {
 			time := Abs(time)
 
@@ -243,7 +243,7 @@ displayTimeValue(format, time, fillHours := false, withSeconds := true, withFrac
 			else
 				hours := ""
 
-			return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((gTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
+			return ((sign ? "-" : "") . (hours . minutes . (withSeconds ? (":" . seconds . (withFractions ? (((timeFormat = "[H:]M:S.##") ? "." : ",") . fraction) : "")) : "")))
 		}
 	}
 	else
@@ -353,15 +353,15 @@ internalFloatValue(format, value, precision := kUndefined) {
 		return value
 }
 
-internalTimeValue(format, time, arguments*) {
+internalTimeValue(timeFormat, time, arguments*) {
 	local seconds, fraction
 
-	if (format = "S,##")
+	if (timeFormat = "S,##")
 		return StrReplace(time, ",", ".")
-	else if (format = "S.##")
+	else if (timeFormat = "S.##")
 		return time
 	else {
-		seconds := StrSplit(time, (format = "S,##") ? "," : ".")
+		seconds := StrSplit(time, (timeFormat = "S,##") ? "," : ".")
 
 		if (seconds.Length = 1) {
 			seconds := seconds[1]

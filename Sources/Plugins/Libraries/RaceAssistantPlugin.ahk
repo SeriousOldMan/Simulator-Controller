@@ -1050,7 +1050,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.sLanguageStats[this.Language] := stats
 			}
 
-			if translator
+			if this.Translator
 				stats.Translators += 1
 
 			synthesizer := this.Synthesizer

@@ -1,8 +1,8 @@
 [Development]
-Version=6.8.0.0-dev
+Version=6.8.0.0-beta
 Target=6.8.0.0-release
-Date=01/20/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/41jcTpBh/Releases/Simulator%20Controller%206.8.0.0-dev.zip
+Date=01/22/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Zxhj2wRo/Releases/Simulator%20Controller%206.8.0.0-beta.zip
 Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.8.0,Utilities->6.8.0
 [Release]
@@ -30,5 +30,5 @@ Utilities.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.8.0.0-dev
+Development=6.8.0.0-beta
 Release=6.7.9.0-release

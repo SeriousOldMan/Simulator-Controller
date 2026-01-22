@@ -64,9 +64,10 @@
   - The creation/upload date for telemetries, strategies and setups is now displayed in the "Session Database".
   - You now can attach notes to your telemetries, strategies and setups in the "Session Database".
   - All known cars will now be shown in "Setup Workbench", also those without setup editor support and even if they had not been driven yet.
-  - The [SimHub plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin) which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by @Awesome-XV and is now an official part of Simulator Controller. It will be installed automatically by "Simulator Setup", but it must be enabled in SimHub and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
+  - The [SimHub plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin) which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by our team member @Awesome-XV and is now an official part of Simulator Controller. It will be installed automatically by "Simulator Setup", but it must be enabled in SimHub and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
   - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
-  - [Expert] The support for *Lua* 5.5 has been extended, but still not fully functional.
+  - [Internal] The support for *Lua* 5.5 has been extended, but still not fully functional.
+  - [Internal] Fixed usage statistics for translators.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
       - Alpine A424, Aston Martin Valkyrie Hypercar, Aston Martin Valkyrie

@@ -59,7 +59,7 @@ namespace SimulatorController.SimHub.Plugin
     public class AssistantsData
     {
         [JsonProperty("Mode")]
-        public string Mode { get; set; }
+        public string? Mode { get; set; }
 
         [JsonProperty("Race Engineer")]
         public AssistantState RaceEngineer { get; set; }
@@ -74,7 +74,7 @@ namespace SimulatorController.SimHub.Plugin
         public AssistantState DrivingCoach { get; set; }
 
         [JsonProperty("Session")]
-        public string Session { get; set; }
+        public string? Session { get; set; }
     }
 
     public class AssistantState
@@ -86,7 +86,7 @@ namespace SimulatorController.SimHub.Plugin
         public bool? Silent { get; set; }
 
         [JsonProperty("State")]
-        public string State { get; set; }
+        public string? State { get; set; }
     }
 
     #endregion
@@ -96,22 +96,22 @@ namespace SimulatorController.SimHub.Plugin
     public class AutomationData
     {
         [JsonProperty("Automation")]
-        public string Automation { get; set; }
+        public string? Automation { get; set; }
 
         [JsonProperty("Car")]
-        public string Car { get; set; }
+        public string? Car { get; set; }
 
         [JsonProperty("Session")]
-        public string Session { get; set; }
+        public string? Session { get; set; }
 
         [JsonProperty("Simulator")]
-        public string Simulator { get; set; }
+        public string? Simulator { get; set; }
 
         [JsonProperty("Track")]
-        public string Track { get; set; }
+        public string? Track { get; set; }
 
         [JsonProperty("State")]
-        public string State { get; set; }
+        public string? State { get; set; }
     }
 
     #endregion
@@ -150,19 +150,19 @@ namespace SimulatorController.SimHub.Plugin
         public double? AirTemperature { get; set; }
 
         [JsonProperty("Grip")]
-        public string Grip { get; set; }
+        public string? Grip { get; set; }
 
         [JsonProperty("TrackTemperature")]
         public double? TrackTemperature { get; set; }
 
         [JsonProperty("Weather")]
-        public string Weather { get; set; }
+        public string? Weather { get; set; }
 
         [JsonProperty("Weather10Min")]
-        public string Weather10Min { get; set; }
+        public string? Weather10Min { get; set; }
 
         [JsonProperty("Weather30Min")]
-        public string Weather30Min { get; set; }
+        public string? Weather30Min { get; set; }
     }
 
     #endregion
@@ -227,19 +227,19 @@ namespace SimulatorController.SimHub.Plugin
     public class DurationData
     {
         [JsonProperty("Format")]
-        public string Format { get; set; }
+        public string? Format { get; set; }
 
         [JsonProperty("SessionLapsLeft")]
         public int? SessionLapsLeft { get; set; }
 
         [JsonProperty("SessionTimeLeft")]
-        public string SessionTimeLeft { get; set; }
+        public string? SessionTimeLeft { get; set; }
 
         [JsonProperty("StintLapsLeft")]
         public int? StintLapsLeft { get; set; }
 
         [JsonProperty("StintTimeLeft")]
-        public string StintTimeLeft { get; set; }
+        public string? StintTimeLeft { get; set; }
     }
 
     #endregion
@@ -289,7 +289,7 @@ namespace SimulatorController.SimHub.Plugin
     public class PitstopData
     {
         [JsonProperty("State")]
-        public string State { get; set; }
+        public string? State { get; set; }
 
         [JsonProperty("Fuel")]
         public double? Fuel { get; set; }
@@ -298,7 +298,7 @@ namespace SimulatorController.SimHub.Plugin
         public int? Lap { get; set; }
 
         [JsonProperty("Driver")]
-        public string Driver { get; set; }
+        public string? Driver { get; set; }
 
         [JsonProperty("ServiceTime")]
         public int? ServiceTime { get; set; }
@@ -313,20 +313,20 @@ namespace SimulatorController.SimHub.Plugin
         public int? Number { get; set; }
 
         [JsonProperty("Prepared")]
-        public int? Prepared { get; set; }
+        public bool? Prepared { get; set; }
 
         /*
         [JsonProperty("TyreCompoundFrontLeft")]
-        public string TyreCompoundFrontLeft { get; set; }
+        public string? TyreCompoundFrontLeft { get; set; }
 
         [JsonProperty("TyreCompoundFrontRight")]
-        public string TyreCompoundFrontRight { get; set; }
+        public string? TyreCompoundFrontRight { get; set; }
 
         [JsonProperty("TyreCompoundRearLeft")]
-        public string TyreCompoundRearLeft { get; set; }
+        public string? TyreCompoundRearLeft { get; set; }
 
         [JsonProperty("TyreCompoundRearRight")]
-        public string TyreCompoundRearRight { get; set; }
+        public string? TyreCompoundRearRight { get; set; }
         */
 
         [JsonProperty("TyreCompounds")]
@@ -367,22 +367,22 @@ namespace SimulatorController.SimHub.Plugin
     public class SessionData
     {
         [JsonProperty("Car")]
-        public string Car { get; set; }
+        public string? Car { get; set; }
 
         [JsonProperty("Session")]
-        public string Session { get; set; }
+        public string? Session { get; set; }
 
         [JsonProperty("Simulator")]
-        public string Simulator { get; set; }
+        public string? Simulator { get; set; }
 
         [JsonProperty("Track")]
-        public string Track { get; set; }
+        public string? Track { get; set; }
 
         [JsonProperty("Profile")]
-        public string Profile { get; set; }
+        public string? Profile { get; set; }
 
         [JsonProperty("DriverTimeLeft")]
-        public string DriverTimeLeft { get; set; }
+        public string? DriverTimeLeft { get; set; }
     }
 
     #endregion
@@ -416,13 +416,13 @@ namespace SimulatorController.SimHub.Plugin
     public class DriverStanding
     {
         [JsonProperty("Delta")]
-        public string Delta { get; set; }
+        public string? Delta { get; set; }
 
         [JsonProperty("InPit")]
         public bool? InPit { get; set; }
 
         [JsonProperty("LapTime")]
-        public string LapTime { get; set; }
+        public string? LapTime { get; set; }
 
         [JsonProperty("Laps")]
         public int? Laps { get; set; }
@@ -438,10 +438,10 @@ namespace SimulatorController.SimHub.Plugin
     public class StintData
     {
         [JsonProperty("BestTime")]
-        public string BestTime { get; set; }
+        public string? BestTime { get; set; }
 
         [JsonProperty("Driver")]
-        public string Driver { get; set; }
+        public string? Driver { get; set; }
 
         [JsonProperty("Lap")]
         public int? Lap { get; set; }
@@ -450,7 +450,7 @@ namespace SimulatorController.SimHub.Plugin
         public int? Laps { get; set; }
 
         [JsonProperty("LastTime")]
-        public string LastTime { get; set; }
+        public string? LastTime { get; set; }
 
         [JsonProperty("BestSpeed")]
         public double? BestSpeed { get; set; }
@@ -490,7 +490,7 @@ namespace SimulatorController.SimHub.Plugin
         public double? Fuel { get; set; }
 
         [JsonProperty("TyreCompound")]
-        public string TyreCompound { get; set; }
+        public string? TyreCompound { get; set; }
 
         [JsonProperty("Position")]
         public int? Position { get; set; }
@@ -508,7 +508,7 @@ namespace SimulatorController.SimHub.Plugin
         public double? Fuel { get; set; }
 
         [JsonProperty("TyreCompound")]
-        public string TyreCompound { get; set; }
+        public string? TyreCompound { get; set; }
     }
 
     #endregion
@@ -518,19 +518,19 @@ namespace SimulatorController.SimHub.Plugin
     public class TeamServerData
     {
         [JsonProperty("Driver")]
-        public string Driver { get; set; }
+        public string? Driver { get; set; }
 
         [JsonProperty("Server")]
-        public string Server { get; set; }
+        public string? Server { get; set; }
 
         [JsonProperty("Session")]
-        public string Session { get; set; }
+        public string? Session { get; set; }
 
         [JsonProperty("Team")]
-        public string Team { get; set; }
+        public string? Team { get; set; }
 
         [JsonProperty("Token")]
-        public string Token { get; set; }
+        public string? Token { get; set; }
     }
 
     #endregion
@@ -559,16 +559,16 @@ namespace SimulatorController.SimHub.Plugin
 
         /*
         [JsonProperty("TyreCompoundFrontLeft")]
-        public string TyreCompoundFrontLeft { get; set; }
+        public string? TyreCompoundFrontLeft { get; set; }
 
         [JsonProperty("TyreCompoundFrontRight")]
-        public string TyreCompoundFrontRight { get; set; }
+        public string? TyreCompoundFrontRight { get; set; }
 
         [JsonProperty("TyreCompoundRearLeft")]
-        public string TyreCompoundRearLeft { get; set; }
+        public string? TyreCompoundRearLeft { get; set; }
 
         [JsonProperty("TyreCompoundRearRight")]
-        public string TyreCompoundRearRight { get; set; }
+        public string? TyreCompoundRearRight { get; set; }
         */
 
         [JsonProperty("TyreCompounds")]
@@ -594,10 +594,10 @@ namespace SimulatorController.SimHub.Plugin
     public class HintData
     {
         [JsonProperty("Hint")]
-        public string Hint { get; set; }
+        public string? Hint { get; set; }
 
         [JsonProperty("Message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
     }
 
     #endregion

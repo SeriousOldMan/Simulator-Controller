@@ -646,8 +646,16 @@ class SessionDatabase extends ConfigurationItem {
 			return this.getUserName()
 	}
 
+	getName(type, defaultForname := false, defaultSurname := "", defaultNickname := "") {
+		return SessionDatabase.getName(type, defaultForname, defaultSurname, defaultNickname)
+	}
+
 	static hasProfileName() {
 		return FileExist(kUserConfigDirectory . "PROFILE")
+	}
+
+	hasProfileName() {
+		return SessionDatabase.hasProfileName()
 	}
 
 	static getProfileName(&types?) {
@@ -681,6 +689,10 @@ class SessionDatabase extends ConfigurationItem {
 		return name
 	}
 
+	getProfileName(&types?) {
+		return SessionDatabase.getProfileName(&types)
+	}
+
 	static setProfileName(name, types) {
 		local configuration := readMultiMap(kUserConfigDirectory . "PROFILE")
 
@@ -694,8 +706,8 @@ class SessionDatabase extends ConfigurationItem {
 		this.getProfileName(&type := "Reload")
 	}
 
-	getProfileName(&types?) {
-		return SessionDatabase.getProfileName(&types)
+	setProfileName(name, types) {
+		return SessionDatabase.setProfileName(name, types)
 	}
 
 	static getUserName() {

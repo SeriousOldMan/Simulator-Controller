@@ -84,7 +84,7 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false) {
-		local format, ignore, unit
+		local formats, ignore, unit
 
 		super.__New(controller, name, configuration)
 
@@ -99,8 +99,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
 
-		if ((format.Length = 2) && (format[1] = "Time") && inList(kTimeFormats, format[2]))
-			this.iFormats["Time"] := format[2]
+		if ((formats.Length = 2) && (formats[1] = "Time") && inList(kTimeFormats, formats[2]))
+			this.iFormats["Time"] := formats[2]
 
 		for ignore, unit in string2Values(",", this.getArgumentValue("units", ""))
 			for ignore, unit in string2Values(A_Space, unit)
@@ -153,7 +153,12 @@ class IntegrationPlugin extends ControllerPlugin {
 			state := Map("Simulator", getMultiMapValue(sessionInfo, "Session", "Simulator")
 					   , "Car", getMultiMapValue(sessionInfo, "Session", "Car", kNull)
 					   , "Track", getMultiMapValue(sessionInfo, "Session", "Track", kNull)
-					   , "Session", translate(getMultiMapValue(sessionInfo, "Session", "Type", kNull), this.Language))
+					   , "Session", getMultiMapValue(sessionInfo, "Session", "Type", kNull))
+
+			if (state["Session"] = "Qualification")
+				state["Session"] := "Qualifying"
+
+			state["Session"] := translate(state["Session"], this.Language)
 
 			if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
 				state["Profile"] := kNull
@@ -255,6 +260,8 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			if lastSpeed
 				state["LastSpeed"] := convertUnit(unit, lastSpeed)
+
+			return state
 		}
 		else
 			return kNull
@@ -815,11 +822,18 @@ class IntegrationPlugin extends ControllerPlugin {
 			if ((key = "Session") && InStr(state, ";")) {
 				state := string2Values(";", state)
 
+				if (state[2] = "Qualification")
+					state[2] := "Qualifying"
+
 				assistantsState["Mode"] := translate(state[1], this.Language)
 				assistantsState["Session"] := translate(state[2], this.Language)
 			}
-			else if ((key = "Mode") || (key = "Session"))
+			else if ((key = "Mode") || (key = "Session")) {
+				if (state = "Qualification")
+					state := "Qualifying"
+
 				assistantsState[key] := translate(state, this.Language)
+			}
 			else {
 				if !assistantsState.Has(key)
 					assistantsState[key] := Map()
@@ -865,6 +879,11 @@ class IntegrationPlugin extends ControllerPlugin {
 			teamServerState["Team"] := state["Team"]
 			teamServerState["Driver"] := state["Driver"]
 			teamServerState["Session"] := state["Session"]
+
+			if (teamServerState["Session"] = "Qualification")
+				teamServerState["Session"] := "Qualifying"
+
+			teamServerState["Session"] := translate(teamServerState["Session"], this.Language)
 
 			sessionState["TeamServer"] := teamServerState
 		}

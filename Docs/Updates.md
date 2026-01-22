@@ -37,7 +37,9 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.8.0
 
-The session state JSON object supplied by the "Intagration" plugin has changed. The changes introduce some long awaited extension, but also some incompatible changes. Therefore, if you have build an app based on that data, this app must be updated as well. The SimHub plugin which was created by Jordan Moss some time ago has been updated by @Awesome-XV and will be part of this release.
+The session state JSON object supplied by the "Intagration" plugin has changed. The changes introduce some long awaited extension, but also some incompatible changes. Therefore, if you have build an app based on that data, this app must be updated as well.
+
+The SimHub plugin which was created by Jordan Moss some time ago has been updated by @Awesome-XV and will be part of this release. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller. And you have to enable the new plugin in SimHub, of course. After you have done that, enable the "Integration" plugin in "Simulator Configuration" and run a few laps with all the features enabled (for example, strategy handling), you want to use in your SimHub dashboards and overlays. The new SimHub plugin will learn the data structures before you can use the properties in the layout designer.
 
 ***
 

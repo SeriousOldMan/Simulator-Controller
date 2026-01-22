@@ -1811,11 +1811,13 @@ Now let's have a look at each oject:
 			"Pitstops": [
 				{
 					"Nr": 1,
+					"Lap": 12,
 					"Fuel": 67.0,
 					"TyreCompound": "Dry (Black)"
 				},
 				{
 					"Nr": 2,
+					"Lap": 37,
 					"Fuel": 20.0
 				}
 			]
@@ -1891,10 +1893,10 @@ Now let's have a look at each oject:
 
 		"Automation": {
 			"Automation": "Dry",
-			"Car": "McLaren 720S GT3",
-			"Session": "Race",
-			"Simulator": "Assetto Corsa Competizione",
 			"State": "Active"
+			"Car": "BMW M4 GT3 EVO",
+			"Simulator": "iRacing",
+			"Track": "Miami International Autodrome"
 		}
 		
 	"State" may be "Active", in this case the "Automation" property contains the name of the active automation. It may be "Waiting", if the automation is starting currently, or it may be "Unavailable", if an automation has been requested but none match the criteria. The "Automation" object will be absent, if no automation has been requested by the driver.
@@ -1937,12 +1939,22 @@ Now let's have a look at each oject:
 
 As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example *SimHub* with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
 
+Good to know: You can find a complete example "Session State.json" file in the *Resources\Templates* folder which is located in the program installation folder.
+
 ### SimHub Plugin
 
 A special plugin for *SimHub* is bundled with Simulator Controller, that exposes all the data supplied by the "Integration" plugin (as documented above) to *SimHub*. This plugin will be installed automatically in the root directory of *SimHub* by "Simulator Setup", if *SimHub* is detected, but it must be enabled in *SimHub* and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
+
+If you want to install the plugin manually, or if you need to update it, if a new version is released in the future, copy it from the *Utilities\Plugins* folder, which is located in your user *Documents* folder, to the root directory of the *SimHub* program folder.
 
 Once the plugin is enabled in *SimHub*, you can configure it:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/SimHub%20Plugin%201.jpg)
 
 The location of the "Session State.json" file must only be changed, when the "Integration" plugin of Simulator Controller had been for a different location as well. The "Polling Interval" of 1 second will also be fine, unless you also want to use the driving instructions by the Driving Coach, because these may be updated at a higher rate like 500ms.
+
+Once *SimHub* and the plugin is running, you will see the available properties in *SimHub* and can use them in your dashboards and overlays.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/SimHub%20Plugin%202.jpg)
+
+If the properties do not show up immediately, it may be necessary to point the plugin to the *Resources\Templates\Session State.json* file in the program directory of Simulator Controller (mentioned above), while you are designing your dashboards and overlays. Many properties do only show up, if they have been seen in the data for the first time, while you are on the track. Alternativly you can run a few laps with all the features enabled (for example, strategy handling), you want to use in your *SimHub* dashboards and overlays. The *SimHub* plugin will learn the data structures before you can use the properties in the layout designer.

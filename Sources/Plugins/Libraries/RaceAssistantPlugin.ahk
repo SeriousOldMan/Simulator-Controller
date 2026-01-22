@@ -1023,8 +1023,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				local language, stats, ignore, value
 
 				for language, stats in RaceAssistantPlugin.sLanguageStats {
-					setMultiMapValue(usage, "Languages", "Translators." . language
-										  , getMultiMapValue(usage, "Languages", "Translators." . language, 0) + stats.Translators)
+					if (stats.Translators > 0)
+						setMultiMapValue(usage, "Languages", "Translators." . language
+											  , getMultiMapValue(usage, "Languages", "Translators." . language, 0) + stats.Translators)
 
 					for ignore, value in stats.Synthesizers
 						setMultiMapValue(usage, "Languages", "Synthesizers." . value . "." . language

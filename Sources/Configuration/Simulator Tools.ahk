@@ -1776,6 +1776,14 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV680() {
+	local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+
+	do(availableLanguages(), (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
+
+	writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+}
+
 updateConfigurationForV677() {
 	local configuration, subtitle
 

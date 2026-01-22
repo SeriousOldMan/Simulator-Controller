@@ -926,15 +926,16 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getCars(simulator) {
 		local cars := []
-		local ignore, directory, filter, car, descriptor
+		local ignore, directory, files, car, descriptor, extension
 
 		if ((simulator != true) && (simulator != "*")) {
 			for ignore, directory in [kResourcesDirectory, kUserHomeDirectory]
-				for ignore, filter in ["Garage\Definitions\Cars\" . simulator . ".*.ini", "Garage\Rules\Cars\" . simulator . ".*.rules"]
-					loop Files, kResourcesDirectory . filter, "F" {
-						SplitPath(A_LoopFileName, , , , &descriptor)
+				for ignore, files in ["Garage\Definitions\Cars\" . simulator . ".*.ini"
+									, "Garage\Rules\Cars\" . simulator . ".*.rules"]
+					loop Files, kResourcesDirectory . files, "F" {
+						SplitPath(A_LoopFileName, , , &extension, &descriptor)
 
-						car := StrReplace(StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", ""), ".rules", "")
+						car := StrReplace(StrReplace(descriptor, simulator . ".", ""), "." . extension, "")
 
 						if ((car != "Generic") && !inList(cars, car))
 							cars.Push(SessionDatabase.getCarName(simulator, car))

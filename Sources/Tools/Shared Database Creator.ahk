@@ -223,19 +223,19 @@ class DatabaseCreator {
 					newInfo := newMultiMap()
 
 					if getMultiMapValue(info, "General", "Date", false)
-						setMultiMapValue(newInfo, "General", "Data", getMultiMapValue(info, "General", "Date"))
+						setMultiMapValue(newInfo, "General", "Date", getMultiMapValue(info, "General", "Date"))
 
 					if (getMultiMapValue(info, "General", "Notes", "") != "")
 						setMultiMapValue(newInfo, "General", "Notes", getMultiMapValue(info, "General", "Notes"))
 
-					setMultiMapValue(newInfo, "Info", "Driver", "John Doe")
+					setMultiMapValue(newInfo, "Lap", "Driver", "John Doe")
 
 					if getMultiMapValue(info, "Lap", "LapTime", false)
-						setMultiMapValue(newInfo, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
+						setMultiMapValue(newInfo, "Lap", "LapTime", getMultiMapValue(info, "Lap", "LapTime"))
 
 					if getMultiMapValue(info, "Lap", "SectorTimes", false)
-						if first(string2Values(",", getMultiMapValue(info, "Lap", "SectorTimes")), (s) => (isNumber(s) && (s != 0)))
-							setMultiMapValue(newInfo, "Info", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
+						if exist(string2Values(",", getMultiMapValue(info, "Lap", "SectorTimes")), (s) => (isNumber(s) && (s != 0)))
+							setMultiMapValue(newInfo, "Lap", "SectorTimes", getMultiMapValue(info, "Lap", "SectorTimes"))
 
 					SplitPath(telemetryFile, &telemetryFile)
 

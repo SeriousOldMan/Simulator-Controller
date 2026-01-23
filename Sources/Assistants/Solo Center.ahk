@@ -2019,8 +2019,8 @@ class SoloCenter extends ConfigurationItem {
 		return SessionDatabase().getTracks(simulator, car)
 	}
 
-	loadSimulator(simulator, force := false) {
-		local drivers, ignore, id, index, car, carNames, cars, settings, msgResult
+	loadSimulator(simulator, force := false, reload := true) {
+		local cars, settings, msgResult
 
 		if (force || (simulator != this.Simulator)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2054,17 +2054,12 @@ class SoloCenter extends ConfigurationItem {
 			else
 				cars := []
 
-			carNames := cars.Clone()
-
-			for index, car in cars
-				carNames[index] := SessionDatabase.getCarName(simulator, car)
-
 			this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), simulator))
 
 			this.Control["carDropDown"].Delete()
-			this.Control["carDropDown"].Add(carNames)
+			this.Control["carDropDown"].Add(collect(cars, (c) => SessionDatabase.getCarName(simulator, c)))
 
-			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
+			this.loadCar((cars.Length > 0) ? cars[1] : false, true, reload)
 
 			return true
 		}
@@ -2072,8 +2067,8 @@ class SoloCenter extends ConfigurationItem {
 		return false
 	}
 
-	loadCar(car, force := false) {
-		local tracks, settings
+	loadCar(car, force := false, reload := true) {
+		local tracks, settings, index
 
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2094,29 +2089,38 @@ class SoloCenter extends ConfigurationItem {
 				}
 			}
 
-			this.iCar := car
+			index := inList(this.getAvailableCars(this.Simulator), car)
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			if (!index && reload) {
+				this.loadSimulator(this.Simulator, true, false)
 
-			setMultiMapValue(settings, "Solo Center", "Car", car)
+				return this.loadCar(car, true, false)
+			}
+			else {
+				this.iCar := car
 
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			tracks := this.getAvailableTracks(this.Simulator, car)
+				setMultiMapValue(settings, "Solo Center", "Car", car)
 
-			this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), car))
-			this.Control["trackDropDown"].Delete()
-			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+				tracks := this.getAvailableTracks(this.Simulator, car)
 
-			return true
+				this.Control["carDropDown"].Choose(index)
+				this.Control["trackDropDown"].Delete()
+				this.Control["trackDropDown"].Add(collect(tracks, (t) => SessionDatabase.getTrackName(this.Simulator, t)))
+
+				this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true, reload)
+
+				return true
+			}
 		}
 
 		return false
 	}
 
-	loadTrack(track, force := false) {
+	loadTrack(track, force := false, reload := true) {
 		local simulator, car, settings
 
 		if (force || (track != this.Track)) {
@@ -2141,20 +2145,30 @@ class SoloCenter extends ConfigurationItem {
 			simulator := this.Simulator
 			car := this.Car
 
-			this.iTrack := track
+			index := inList(this.getAvailableTracks(simulator, car), track)
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+			if (!index && reload) {
+				this.loadSimulator(simulator, true, false)
+				this.loadCar(car, true, false)
 
-			setMultiMapValue(settings, "Solo Center", "Track", track)
+				return this.loadTrack(track, true, false)
+			}
+			else {
+				this.iTrack := track
 
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
+				setMultiMapValue(settings, "Solo Center", "Track", track)
 
-			if track
-				this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			return true
+				this.Control["trackDropDown"].Choose(index)
+
+				if track
+					this.loadTyreCompounds(simulator, car, track)
+
+				return true
+			}
 		}
 
 		return false
@@ -2162,7 +2176,7 @@ class SoloCenter extends ConfigurationItem {
 
 	loadTyreCompounds(simulator, car, track) {
 		local compounds := SessionDatabase.getTyreCompounds(simulator, car, track)
-		local translatedCompounds, choices, index, ignore, compound
+		local translatedCompounds, ignore, compound
 
 		this.iAvailableTyreCompounds := compounds
 		this.iTyreCompounds := compounds
@@ -4379,7 +4393,7 @@ class SoloCenter extends ConfigurationItem {
 								telemetryData := string2Values("---", lap.TelemetryData)
 
 							bb := ((telemetryData.Length > 22) ? telemetryData[23] : kNull)
-							
+
 							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 													, telemetryData[14], telemetryData[15]
 													, telemetryData[11], telemetryData[12], telemetryData[13], bb
@@ -5590,7 +5604,7 @@ class SoloCenter extends ConfigurationItem {
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-			
+
 			after := "
 			(
 					</script>
@@ -5853,7 +5867,7 @@ class SoloCenter extends ConfigurationItem {
 					%chartScript%
 					<script type="text/javascript">
 						%chartLoad%
-						
+
 						function drawCharts() {
 			)"
 
@@ -5865,10 +5879,10 @@ class SoloCenter extends ConfigurationItem {
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-			
+
 			for ignore, chart in charts
 				script .= (A_Space . "drawChart" . chart[1] . "();")
-				
+
 			script .= "}`n"
 
 			for ignore, chart in charts {

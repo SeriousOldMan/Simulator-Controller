@@ -10,9 +10,6 @@
   5. Support for Time *or* Laps session format
   6. Sector time approximation for *Assetto Corsa*
 
-#### Plugins
-  1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
-
 #### Assistants
   1. Better answers by the Strategist, when a pitstop cannot be recommended
   2. Shift beeps by the Coach

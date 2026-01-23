@@ -4500,6 +4500,9 @@ class GridRaceAssistant extends RaceAssistant {
 		if data {
 			if inList(categories, "Class") {
 				carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		
+				carClass := (SessionDatabase.getCarClass(this.Simulator, getMultiMapValue(data, "Position Data"
+																							  , "Car." . car . ".Car", false)) || carClass)
 
 				if inList(categories, "Cup")
 					carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)
@@ -4510,6 +4513,8 @@ class GridRaceAssistant extends RaceAssistant {
 		else {
 			if inList(categories, "Class") {
 				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Class", kUnknown) : kUnknown)
+		
+				carClass := (SessionDatabase.getCarClass(this.Simulator, knowledgeBase.getValue("Car." . car . ".Car", false)) || carClass)
 
 				if inList(categories, "Cup")
 					carCategory := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Category", kUndefined) : kUndefined)

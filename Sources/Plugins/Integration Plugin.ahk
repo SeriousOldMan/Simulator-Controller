@@ -767,7 +767,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		for ignore, position in ["FL", "FR", "RL", "RR"]
 			if getMultiMapValue(sessionInfo, "Damage", "Suspension." . position, false)
-			subState[projection[position]] := getMultiMapValue(sessionInfo, "Damage", "Suspension." . position)
+				subState[projection[position]] := getMultiMapValue(sessionInfo, "Damage", "Suspension." . position)
 
 		if (subState.Count > 0)
 			state["Suspension"] := subState

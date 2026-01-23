@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 using GameReaderCommon;
 using SimHub.Plugins;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SimulatorController.SimHub.Plugin
 {
@@ -21,23 +23,18 @@ namespace SimulatorController.SimHub.Plugin
     {
         private const string PropertyPrefix = "SC";
         private const int DefaultPollingInterval = 1000;
-        private const int MaxArrayElements = 4;
-        private const int MaxPropertyDepth = 3;
+        private const int MaxPropertyDepth = 10;
         private static readonly string[] WheelPositions = { "FrontLeft", "FrontRight", "RearLeft", "RearRight" };
         
         private PluginSettings _settings = null!;
         private FileSystemWatcher? _fileWatcher;
         private Timer? _pollingTimer;
         private DateTime _lastFileWriteTime;
-        private SessionState _currentState = new SessionState();
+        private JObject? _currentState;
         private readonly object _stateLock = new object();
         private bool _isInitialized = false;
         private readonly object _initLock = new object();
         private Timer? _initTimer;
-        
-        // Cache reflection results for performance (avoid repeated reflection at 60Hz)
-        private static readonly Dictionary<Type, System.Reflection.PropertyInfo[]> _propertyCache = new Dictionary<Type, System.Reflection.PropertyInfo[]>();
-        private static readonly object _cacheLock = new object();
         
         public PluginManager PluginManager { get; set; }
         
@@ -51,22 +48,26 @@ namespace SimulatorController.SimHub.Plugin
 
         /// <summary>
         /// Called when SimHub initializes the plugin
-        /// CRITICAL: Does NOTHING to prevent any blocking. Initialization happens on a timer.
         /// </summary>
         public void Init(PluginManager pluginManager)
         {
-            // Store plugin manager only - do absolutely nothing else
             this.PluginManager = pluginManager;
-            global::SimHub.Logging.Current.Info("Simulator Controller Plugin: Init called (deferred initialization)");
+            global::SimHub.Logging.Current.Info("Simulator Controller Plugin: Init called");
             
-            // Start initialization after 500ms delay (ensures SimHub is fully loaded)
-            _initTimer = new Timer(InitializePlugin, null, 500, Timeout.Infinite);
+            // Load settings immediately (required for UI binding)
+            // Do NOT modify settings here - let them persist exactly as saved
+            _settings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
+            
+            global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Settings loaded - Path: {_settings?.JsonFilePath ?? "null"}");
+            
+            // Start monitoring on a background thread to avoid blocking SimHub startup
+            _initTimer = new Timer(StartMonitoringDelayed, null, 500, Timeout.Infinite);
         }
         
         /// <summary>
-        /// Performs actual initialization on background thread
+        /// Start monitoring on background thread (non-blocking)
         /// </summary>
-        private void InitializePlugin(object? state)
+        private void StartMonitoringDelayed(object? state)
         {
             lock (_initLock)
             {
@@ -75,26 +76,13 @@ namespace SimulatorController.SimHub.Plugin
                     
                 try
                 {
-                    // Load settings
-                    _settings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
-                    
-                    // Initialize default file path if not set
-                    if (string.IsNullOrWhiteSpace(_settings.JsonFilePath))
-                    {
-                        string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                        _settings.JsonFilePath = Path.Combine(documentsPath, "Simulator Controller", "Temp", "Session State.json");
-                        this.SaveCommonSettings("GeneralSettings", _settings);
-                    }
-                    
-                    // Start monitoring
                     StartMonitoring();
-                    
                     _isInitialized = true;
-                    global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Initialized and monitoring: {_settings.JsonFilePath}");
+                    global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Monitoring started for: {_settings?.JsonFilePath ?? "unknown"}");
                 }
                 catch (Exception ex)
                 {
-                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Initialization failed: {ex.Message}");
+                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Failed to start monitoring: {ex.Message}");
                 }
                 finally
                 {
@@ -122,8 +110,34 @@ namespace SimulatorController.SimHub.Plugin
         /// </summary>
         public void End(PluginManager pluginManager)
         {
-            global::SimHub.Logging.Current.Info("Simulator Controller Plugin: Shutting down...");
-            StopMonitoring();
+            try
+            {
+                global::SimHub.Logging.Current.Info("Simulator Controller Plugin: Shutting down...");
+                
+                // CRITICAL: Save settings when SimHub closes completely
+                if (_settings != null)
+                {
+                    global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Saving settings on shutdown - Path: '{_settings.JsonFilePath}', Interval: {_settings.PollingInterval}ms");
+                    this.SaveCommonSettings("GeneralSettings", _settings);
+                    
+                    // Verify the save worked
+                    var verifySettings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
+                    if (verifySettings != null && !string.IsNullOrEmpty(verifySettings.JsonFilePath))
+                    {
+                        global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Settings verified saved on shutdown - Path: '{verifySettings.JsonFilePath}'");
+                    }
+                    else
+                    {
+                        global::SimHub.Logging.Current.Error("Simulator Controller Plugin: Settings verification failed on shutdown!");
+                    }
+                }
+                
+                StopMonitoring();
+            }
+            catch (Exception ex)
+            {
+                global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Error during shutdown: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -315,21 +329,22 @@ namespace SimulatorController.SimHub.Plugin
                     return; // Silently skip empty files
                 }
                 
-                // Parse JSON with null handling
-                SessionState? newState = JsonConvert.DeserializeObject<SessionState>(jsonContent, new JsonSerializerSettings
+                // Parse JSON dynamically with JObject to handle ANY structure
+                JObject? newState = null;
+                try
                 {
-                    NullValueHandling = NullValueHandling.Include,
-                    MissingMemberHandling = MissingMemberHandling.Ignore,
-                    Error = (sender, args) =>
-                    {
-                        args.ErrorContext.Handled = true; // Ignore parsing errors silently
-                    }
-                });
+                    newState = JObject.Parse(jsonContent);
+                }
+                catch (JsonException)
+                {
+                    // If JSON is invalid, just skip silently
+                    return;
+                }
                 
                 // Update state (properties are exposed in DataUpdate)
                 lock (_stateLock)
                 {
-                    _currentState = newState ?? new SessionState();
+                    _currentState = newState;
                 }
                 
                 global::SimHub.Logging.Current.Info("Simulator Controller Plugin: State updated successfully");
@@ -342,24 +357,29 @@ namespace SimulatorController.SimHub.Plugin
             }
         }
 
-
-
-        /// <summary>
-        /// Safely get value from array with null handling
-        /// </summary>
-        private T GetArrayValue<T>(T[]? array, int index, T defaultValue)
-        {
-            return array != null && (uint)index < (uint)array.Length && array[index] != null
-                ? array[index]
-                : defaultValue;
-        }
-
         #region Settings UI
 
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
             try
             {
+                // Ensure settings are loaded (in case Init hasn't run yet)
+                if (_settings == null)
+                {
+                    _settings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
+                }
+                
+                // Initialize default path ONLY if truly empty (first time use)
+                if (string.IsNullOrWhiteSpace(_settings.JsonFilePath))
+                {
+                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    _settings.JsonFilePath = Path.Combine(documentsPath, "Simulator Controller", "Temp", "Session State.json");
+                    
+                    // Save the default immediately
+                    this.SaveCommonSettings("GeneralSettings", _settings);
+                    global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Default path initialized and saved: {_settings.JsonFilePath}");
+                }
+                
                 return new SettingsControl(this);
             }
             catch (Exception ex)
@@ -375,16 +395,50 @@ namespace SimulatorController.SimHub.Plugin
 
         public void OnShowSettings()
         {
-            // Called when settings UI is shown
+            // Reload settings when UI is shown to get latest values
+            if (_settings != null)
+            {
+                try
+                {
+                    var freshSettings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
+                    if (freshSettings != null)
+                    {
+                        // Update properties to trigger PropertyChanged events
+                        _settings.JsonFilePath = freshSettings.JsonFilePath ?? _settings.JsonFilePath;
+                        _settings.PollingInterval = freshSettings.PollingInterval;
+                        _settings.EnableDebugLogging = freshSettings.EnableDebugLogging;
+                        
+                        global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Settings reloaded - Path: {_settings.JsonFilePath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Error reloading settings: {ex.Message}");
+                }
+            }
         }
 
         public void OnSettingsClosed()
         {
             try
             {
-                // Save settings and restart monitoring
-                this.SaveCommonSettings("GeneralSettings", _settings);
-                StartMonitoring();
+                // Save settings when UI is closed
+                if (_settings != null)
+                {
+                    global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Saving settings - Path: '{_settings.JsonFilePath}', Interval: {_settings.PollingInterval}ms, Debug: {_settings.EnableDebugLogging}");
+                    
+                    this.SaveCommonSettings("GeneralSettings", _settings);
+                    
+                    // Force verify the save worked by reading it back
+                    var verifySettings = this.ReadCommonSettings("GeneralSettings", () => new PluginSettings());
+                    if (verifySettings != null)
+                    {
+                        global::SimHub.Logging.Current.Info($"Simulator Controller Plugin: Settings verified saved - Path: '{verifySettings.JsonFilePath}'");
+                    }
+                    
+                    // Restart monitoring with new settings
+                    StartMonitoring();
+                }
             }
             catch (Exception ex)
             {
@@ -396,121 +450,136 @@ namespace SimulatorController.SimHub.Plugin
 
         /// <summary>
         /// Update SimHub properties during DataUpdate tick using AddProperty API
-        /// This dynamically exposes ALL properties from the current state
+        /// This dynamically exposes ALL properties from any JSON structure
         /// </summary>
         private void UpdateSimHubPropertiesOnDataUpdate(PluginManager pluginManager, ref GameData data)
         {
             if (_currentState == null)
                 return;
 
-            void AddProp(string name, object? value)
+            try
             {
-                try
-                {
-                    pluginManager.AddProperty($"{name}", this.GetType(), value ?? string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    if (_settings?.EnableDebugLogging == true)
-                        global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Failed to add property {name}: {ex.Message}");
-                }
+                // Recursively expose all properties from the JObject
+                ExposeJObjectProperties(pluginManager, string.Empty, _currentState, 0);
             }
-
-            var stateType = _currentState.GetType();
-            foreach (var prop in stateType.GetProperties())
+            catch (Exception ex)
             {
-                try
-                {
-                    var value = prop.GetValue(_currentState);
-                    if (value == null)
-                        continue;
-
-                    var propType = value.GetType();
-                    
-                    if (propType.IsPrimitive || propType == typeof(string) || propType == typeof(decimal) || propType == typeof(double) || propType == typeof(float))
-                    {
-                        AddProp(prop.Name, value);
-                    }
-                    else
-                    {
-                        ExposeNestedProperties(pluginManager, prop.Name, value, AddProp, 1);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (_settings?.EnableDebugLogging == true)
-                        global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Failed to expose property {prop.Name}: {ex.Message}");
-                }
+                if (_settings?.EnableDebugLogging == true)
+                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Error updating properties: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// Recursively expose nested object properties (with reflection caching and depth limiting)
+        /// Recursively expose JObject/JArray properties to SimHub (works with ANY JSON structure)
         /// </summary>
-        private void ExposeNestedProperties(PluginManager pluginManager, string parentPath, object obj, Action<string, object?> addProp, int depth)
+        private void ExposeJObjectProperties(PluginManager pluginManager, string parentPath, JToken token, int depth)
         {
-            if (obj == null || depth > MaxPropertyDepth)
+            // Prevent infinite recursion
+            if (depth > MaxPropertyDepth)
                 return;
 
-            var objType = obj.GetType();
-            
-            if (objType.IsArray)
+            try
             {
-                var array = (Array)obj;
-                int arrayLength = Math.Min(array.Length, MaxArrayElements);
-                for (int i = 0; i < arrayLength; i++)
+                switch (token.Type)
                 {
-                    var element = array.GetValue(i);
-                    addProp($"{parentPath}.{WheelPositions[i]}", element);
-                }
-                return;
-            }
-
-            System.Reflection.PropertyInfo[] properties;
-            lock (_cacheLock)
-            {
-                if (!_propertyCache.TryGetValue(objType, out properties))
-                {
-                    properties = objType.GetProperties();
-                    _propertyCache[objType] = properties;
-                }
-            }
-
-            foreach (var prop in properties)
-            {
-                try
-                {
-                    var value = prop.GetValue(obj);
-                    if (value == null)
-                        continue;
-
-                    var propType = value.GetType();
-                    string fullPath = $"{parentPath}.{prop.Name}";
-
-                    if (propType.IsPrimitive || propType == typeof(string) || propType == typeof(decimal) || propType == typeof(double) || propType == typeof(float) || propType == typeof(bool))
-                    {
-                        addProp(fullPath, value);
-                    }
-                    else if (propType.IsArray)
-                    {
-                        var array = (Array)value;
-                        int arrayLength = Math.Min(array.Length, MaxArrayElements);
-                        for (int i = 0; i < arrayLength; i++)
+                    case JTokenType.Object:
+                        var obj = (JObject)token;
+                        foreach (var property in obj.Properties())
                         {
-                            var element = array.GetValue(i);
-                            addProp($"{fullPath}.{WheelPositions[i]}", element);
+                            string fullPath = string.IsNullOrEmpty(parentPath) 
+                                ? property.Name 
+                                : $"{parentPath}.{property.Name}";
+                            
+                            ExposeJObjectProperties(pluginManager, fullPath, property.Value, depth + 1);
                         }
-                    }
-                    else
-                    {
-                        ExposeNestedProperties(pluginManager, fullPath, value, addProp, depth + 1);
-                    }
+                        break;
+
+                    case JTokenType.Array:
+                        var array = (JArray)token;
+                        
+                        // Detect if this is a 4-element array with only primitive values (wheel array)
+                        // Non-primitive arrays (objects) should always use numeric indices
+                        bool isWheelArray = array.Count == 4 && 
+                                          array.All(t => t.Type != JTokenType.Object && t.Type != JTokenType.Array);
+                        
+                        for (int i = 0; i < array.Count; i++)
+                        {
+                            string indexer = isWheelArray ? WheelPositions[i] : i.ToString();
+                            string fullPath = $"{parentPath}.{indexer}";
+                            
+                            var element = array[i];
+                            if (element.Type == JTokenType.Object || element.Type == JTokenType.Array)
+                            {
+                                // Recursively expose nested objects/arrays
+                                ExposeJObjectProperties(pluginManager, fullPath, element, depth + 1);
+                            }
+                            else
+                            {
+                                // Expose primitive value
+                                AddProperty(pluginManager, fullPath, element);
+                            }
+                        }
+                        break;
+
+                    case JTokenType.Integer:
+                    case JTokenType.Float:
+                    case JTokenType.String:
+                    case JTokenType.Boolean:
+                    case JTokenType.Date:
+                    case JTokenType.TimeSpan:
+                        // Expose primitive value
+                        AddProperty(pluginManager, parentPath, token);
+                        break;
+
+                    case JTokenType.Null:
+                    case JTokenType.Undefined:
+                        // Expose missing/null values as space
+                        AddProperty(pluginManager, parentPath, " ");
+                        break;
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                if (_settings?.EnableDebugLogging == true)
+                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Error exposing property {parentPath}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Safely add a property to SimHub
+        /// </summary>
+        private void AddProperty(PluginManager pluginManager, string name, object value)
+        {
+            try
+            {
+                // Convert JToken to actual value if needed
+                object actualValue;
+                if (value is JToken token)
                 {
-                    if (_settings?.EnableDebugLogging == true)
-                        global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Failed to expose nested property {prop.Name}: {ex.Message}");
+                    actualValue = token.Type switch
+                    {
+                        JTokenType.Integer => token.Value<long>(),
+                        JTokenType.Float => token.Value<double>(),
+                        JTokenType.String => token.Value<string>() ?? " ",
+                        JTokenType.Boolean => token.Value<bool>(),
+                        JTokenType.Date => token.Value<DateTime>(),
+                        JTokenType.TimeSpan => token.Value<TimeSpan>(),
+                        JTokenType.Null => " ",
+                        JTokenType.Undefined => " ",
+                        _ => token.ToString()
+                    };
                 }
+                else
+                {
+                    actualValue = value ?? " ";
+                }
+
+                pluginManager.AddProperty(name, this.GetType(), actualValue);
+            }
+            catch (Exception ex)
+            {
+                if (_settings?.EnableDebugLogging == true)
+                    global::SimHub.Logging.Current.Error($"Simulator Controller Plugin: Failed to add property {name}: {ex.Message}");
             }
         }
 

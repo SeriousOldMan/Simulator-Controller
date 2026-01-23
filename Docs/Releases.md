@@ -1,5 +1,7 @@
 # Latest stable release
 
+## 6.8.0.0
+
 #### Date: 01/23/26
 
 #### Fixes
@@ -47,7 +49,20 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.8.1.0
+
+#### Date: 01/30/26 (planned)
+
+#### Fixes
+
+  - None this time. 
+
+#### Changes
+
+  - The "Solo Center" now reloads all cars and tracks, if used for a session where a car or a track is used for the very first time.
+  - The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
 
 # Release history
 

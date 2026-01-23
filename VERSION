@@ -1,9 +1,9 @@
 [Development]
-Version=6.8.0.0-release
-Target=6.8.0.0-release
+Version=6.8.1.0-dev
+Target=6.8.1.0-release
 Date=01/23/2026
-Download=https://cutt.ly/ktzTpbdV;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/LIN_n6Xx/Releases/Simulator Controller 6.8.0.0-release.zip;https://www.dropbox.com/scl/fi/f0sd8g2c7ocv47z7f9kdh/Simulator-Controller-6.8.0.0-release.zip?rlkey=nbs88eisnerqumapm8rznz2s1&st=0v7nm5ru&dl=1;http://%master%/Releases/Simulator Controller 6.8.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.0.0-release.zip
-Changes=Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench"
+Download=
+Changes=Auto reload of all cars and track in "Solo Center", Updated SimHub plugin
 Components=Media->5.6.1,Configuration->6.8.0,Utilities->6.8.0
 [Release]
 Version=6.8.0.0-release
@@ -22,7 +22,7 @@ Utilities.6.8.0.Path=.
 Utilities.6.8.0.Content=Utilities
 Utilities.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IKuiL_L_/Components/Utilities%206.8.0.zip;https://www.dropbox.com/scl/fi/20ulkc1lu2z6ax94yt0lf/Utilities-6.8.0.zip?rlkey=hwqmq5tihnjnoapx1qq4s4kis&st=q16sul4m&dl=1;http://%master%/Components/Utilities 6.8.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.0.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.8.0.0-release
+Development=6.8.1.0-dev
 Release=6.8.0.0-release

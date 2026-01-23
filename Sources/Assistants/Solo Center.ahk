@@ -2072,8 +2072,8 @@ class SoloCenter extends ConfigurationItem {
 		return false
 	}
 
-	loadCar(car, force := false) {
-		local tracks, settings
+	loadCar(car, force := false, reload := true) {
+		local tracks, settings, index
 
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2104,19 +2104,28 @@ class SoloCenter extends ConfigurationItem {
 
 			tracks := this.getAvailableTracks(this.Simulator, car)
 
-			this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), car))
-			this.Control["trackDropDown"].Delete()
-			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
+			index := inList(this.getAvailableCars(this.Simulator), car)
 
-			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+			if (!index && reload) {
+				this.loadSimulator(this.Simulator, true)
 
-			return true
+				return this.loadCar(car, true, false)
+			}
+			else {
+				this.Control["carDropDown"].Choose(index)
+				this.Control["trackDropDown"].Delete()
+				this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
+
+				this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+
+				return true
+			}
 		}
 
 		return false
 	}
 
-	loadTrack(track, force := false) {
+	loadTrack(track, force := false, reload := true) {
 		local simulator, car, settings
 
 		if (force || (track != this.Track)) {
@@ -2149,12 +2158,24 @@ class SoloCenter extends ConfigurationItem {
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-			this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
+			index := inList(this.getAvailableTracks(simulator, car), track)
 
-			if track
-				this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+			if (!index && reload) {
+				car := this.Car
 
-			return true
+				this.loadSimulator(this.Simulator, true)
+				this.loadCar(car, true)
+
+				index := this.loadTrack(track, true, false)
+			}
+			else {
+				this.Control["trackDropDown"].Choose(index)
+
+				if track
+					this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+
+				return true
+			}
 		}
 
 		return false
@@ -4379,7 +4400,7 @@ class SoloCenter extends ConfigurationItem {
 								telemetryData := string2Values("---", lap.TelemetryData)
 
 							bb := ((telemetryData.Length > 22) ? telemetryData[23] : kNull)
-							
+
 							lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 													, telemetryData[14], telemetryData[15]
 													, telemetryData[11], telemetryData[12], telemetryData[13], bb
@@ -5590,7 +5611,7 @@ class SoloCenter extends ConfigurationItem {
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-			
+
 			after := "
 			(
 					</script>
@@ -5853,7 +5874,7 @@ class SoloCenter extends ConfigurationItem {
 					%chartScript%
 					<script type="text/javascript">
 						%chartLoad%
-						
+
 						function drawCharts() {
 			)"
 
@@ -5865,10 +5886,10 @@ class SoloCenter extends ConfigurationItem {
 												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
-			
+
 			for ignore, chart in charts
 				script .= (A_Space . "drawChart" . chart[1] . "();")
-				
+
 			script .= "}`n"
 
 			for ignore, chart in charts {

@@ -61,6 +61,9 @@ class RaceReportReader {
 
 		if inList(categories, "Class") {
 			carClass := getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)
+		
+			carClass := (SessionDatabase.getCarClass(getMultiMapValue(raceData, "Session", "Simulator", false)
+												   , getMultiMapValue(raceData, "Cars", "Car." . car . ".Car", false)) || carClass)
 
 			if inList(categories, "Cup") {
 				carCategory := getMultiMapValue(raceData, "Cars", "Car." . car . ".Category", kUndefined)

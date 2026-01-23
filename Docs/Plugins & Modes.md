@@ -1549,7 +1549,11 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.
 
-To activate this plugin, add it to the list of active plugins in "Simulator Configuration", or, of you are using only the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
+To activate this plugin, add it to the list of active plugins in "Simulator Configuration".
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Integration%20Plugin%201.png)
+
+As an alternative, if you are using only the "Simulator Setup" wizard for your configuration work, add the following line to the ["Configuration Patch.ini"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) file:
 
 	[Plugins]
 	Integration=true||
@@ -1559,7 +1563,7 @@ If you want to use any additional parameters here (see below), it looks like:
 	[Plugins]
 	Integration=true||stateFile: D:\SimRacing\Session State.json; language: DE; formats: Time S.##
 	
-where *D:\SimRacing\Session State.json* is an example. Substitute your own path here.
+where *D:\SimRacing\Session State.json* is an example. Substitute your own path here. But easier will be to do this in "Simulator Configuration" and this information will be preserved, even if you generate the next configuration using "Simulator Setup".
 
 ### Configuration
 

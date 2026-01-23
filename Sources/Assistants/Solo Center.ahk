@@ -2019,8 +2019,8 @@ class SoloCenter extends ConfigurationItem {
 		return SessionDatabase().getTracks(simulator, car)
 	}
 
-	loadSimulator(simulator, force := false) {
-		local drivers, ignore, id, index, car, carNames, cars, settings, msgResult
+	loadSimulator(simulator, force := false, reload := true) {
+		local cars, settings, msgResult
 
 		if (force || (simulator != this.Simulator)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2054,17 +2054,12 @@ class SoloCenter extends ConfigurationItem {
 			else
 				cars := []
 
-			carNames := cars.Clone()
-
-			for index, car in cars
-				carNames[index] := SessionDatabase.getCarName(simulator, car)
-
 			this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), simulator))
 
 			this.Control["carDropDown"].Delete()
-			this.Control["carDropDown"].Add(carNames)
+			this.Control["carDropDown"].Add(collect(cars, (c) => SessionDatabase.getCarName(simulator, c)))
 
-			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
+			this.loadCar((cars.Length > 0) ? cars[1] : false, true, reload)
 
 			return true
 		}
@@ -2094,29 +2089,29 @@ class SoloCenter extends ConfigurationItem {
 				}
 			}
 
-			this.iCar := car
-
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", "Car", car)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-
-			tracks := this.getAvailableTracks(this.Simulator, car)
-
 			index := inList(this.getAvailableCars(this.Simulator), car)
 
 			if (!index && reload) {
-				this.loadSimulator(this.Simulator, true)
+				this.loadSimulator(this.Simulator, true, false)
 
 				return this.loadCar(car, true, false)
 			}
 			else {
+				this.iCar := car
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Solo Center", "Car", car)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+				tracks := this.getAvailableTracks(this.Simulator, car)
+
 				this.Control["carDropDown"].Choose(index)
 				this.Control["trackDropDown"].Delete()
-				this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(SessionDatabase, "getTrackName", this.Simulator)))
+				this.Control["trackDropDown"].Add(collect(tracks, (t) => SessionDatabase.getTrackName(this.Simulator, t)))
 
-				this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
+				this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true, reload)
 
 				return true
 			}
@@ -2150,29 +2145,27 @@ class SoloCenter extends ConfigurationItem {
 			simulator := this.Simulator
 			car := this.Car
 
-			this.iTrack := track
-
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", "Track", track)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-
 			index := inList(this.getAvailableTracks(simulator, car), track)
 
 			if (!index && reload) {
-				car := this.Car
+				this.loadSimulator(simulator, true, false)
+				this.loadCar(car, true, false)
 
-				this.loadSimulator(this.Simulator, true)
-				this.loadCar(car, true)
-
-				index := this.loadTrack(track, true, false)
+				return this.loadTrack(track, true, false)
 			}
 			else {
+				this.iTrack := track
+
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Solo Center", "Track", track)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
 				this.Control["trackDropDown"].Choose(index)
 
 				if track
-					this.loadTyreCompounds(this.Simulator, this.Car, this.Track)
+					this.loadTyreCompounds(simulator, car, track)
 
 				return true
 			}
@@ -2183,7 +2176,7 @@ class SoloCenter extends ConfigurationItem {
 
 	loadTyreCompounds(simulator, car, track) {
 		local compounds := SessionDatabase.getTyreCompounds(simulator, car, track)
-		local translatedCompounds, choices, index, ignore, compound
+		local translatedCompounds, ignore, compound
 
 		this.iAvailableTyreCompounds := compounds
 		this.iTyreCompounds := compounds

@@ -2362,6 +2362,9 @@ class SoloCenter extends ConfigurationItem {
 
 		if inList(categories, "Class") {
 			carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		
+			carClass := (SessionDatabase.getCarClass(this.Simulator, getMultiMapValue(data, "Position Data"
+																						  , "Car." . car . ".Car", false)) || carClass)
 
 			if inList(categories, "Cup") {
 				carCategory := getMultiMapValue(data, "Position Data", "Car." . car . ".Category", kUndefined)

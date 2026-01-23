@@ -9,6 +9,7 @@
   - Fixed a critical bug for *Assetto Corsa Competizione* which prevented to Assistants and all other components of Simulator Controller to start up correctly.
   - Several bugs have been fixed for the tyre laps calculation in sessions where tyres are used for more than two stints.
   - Fixed a bug in "Team Center" that prevented the pitstop settings preview window to be opened for *Le Mans Ultimate* sessions, when the pitstop update check had been set to a very long time.
+  - Fixed display of the car class in various reports in cases where the official car class name if not supplied by the simulator. 
 
 #### Changes
 

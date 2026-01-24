@@ -180,6 +180,9 @@ class SoloCenter extends ConfigurationItem {
 	iAirTemperature := 23
 	iTrackTemperature := 27
 
+	iCarNames := []
+	iTrackNames := []
+
 	iProvider := false
 
 	iRunning := Map()
@@ -893,6 +896,18 @@ class SoloCenter extends ConfigurationItem {
 	Track {
 		Get {
 			return this.iTrack
+		}
+	}
+
+	CarNames {
+		Get {
+			return this.iCarNames
+		}
+	}
+
+	TrackNames {
+		Get {
+			return this.iTrackNames
 		}
 	}
 
@@ -2056,8 +2071,10 @@ class SoloCenter extends ConfigurationItem {
 
 			this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), simulator))
 
+			this.iCarNames := collect(cars, (c) => SessionDatabase.getCarName(simulator, c))
+
 			this.Control["carDropDown"].Delete()
-			this.Control["carDropDown"].Add(collect(cars, (c) => SessionDatabase.getCarName(simulator, c)))
+			this.Control["carDropDown"].Add(this.CarNames)
 
 			this.loadCar((cars.Length > 0) ? cars[1] : false, true, reload)
 
@@ -2068,7 +2085,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false, reload := true) {
-		local tracks, settings, index
+		local tracks, settings
 
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2089,9 +2106,7 @@ class SoloCenter extends ConfigurationItem {
 				}
 			}
 
-			index := inList(this.getAvailableCars(this.Simulator), car)
-
-			if (!index && reload) {
+			if (reload && car && !inList(this.CarNames, SessionDatabase.getCarName(this.Simulator, car))) {
 				this.loadSimulator(this.Simulator, true, false)
 
 				return this.loadCar(car, true, false)
@@ -2107,9 +2122,11 @@ class SoloCenter extends ConfigurationItem {
 
 				tracks := this.getAvailableTracks(this.Simulator, car)
 
-				this.Control["carDropDown"].Choose(index)
+				this.iTrackNames := collect(tracks, (t) => SessionDatabase.getTrackName(this.Simulator, t))
+
+				this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), car))
 				this.Control["trackDropDown"].Delete()
-				this.Control["trackDropDown"].Add(collect(tracks, (t) => SessionDatabase.getTrackName(this.Simulator, t)))
+				this.Control["trackDropDown"].Add(this.TrackNames)
 
 				this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true, reload)
 
@@ -2145,9 +2162,7 @@ class SoloCenter extends ConfigurationItem {
 			simulator := this.Simulator
 			car := this.Car
 
-			index := inList(this.getAvailableTracks(simulator, car), track)
-
-			if (!index && reload) {
+			if (reload && track && !inList(this.TrackNames, SessionDatabase.getTrackName(simulator, track))) {
 				this.loadSimulator(simulator, true, false)
 				this.loadCar(car, true, false)
 
@@ -2162,7 +2177,7 @@ class SoloCenter extends ConfigurationItem {
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-				this.Control["trackDropDown"].Choose(index)
+				this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
 
 				if track
 					this.loadTyreCompounds(simulator, car, track)

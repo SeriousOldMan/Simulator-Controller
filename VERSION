@@ -1,10 +1,10 @@
 [Development]
 Version=6.8.1.0-dev
 Target=6.8.1.0-release
-Date=01/23/2026
+Date=01/24/2026
 Download=
-Changes=Auto reload of all cars and track in "Solo Center", Updated SimHub plugin
-Components=Media->5.6.1,Configuration->6.8.0,Utilities->6.8.0
+Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin
+Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
 Version=6.8.0.0-release
 Date=01/23/2026
@@ -18,9 +18,15 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.8.0.Path=Resources
 Configuration.6.8.0.Content=Setup
 Configuration.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1DdpJXti/Components/Configuration%206.8.0.zip;https://www.dropbox.com/scl/fi/viuj1tn9l14yzz9hi0qog/Configuration-6.8.0.zip?rlkey=lonv34bh5mxjjitkbu3p9jabx&st=37qrgpi5&dl=1http://%master%/Components/Configuration 6.8.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.0.zip
+Configuration.6.8.1.Path=Resources
+Configuration.6.8.1.Content=Setup
+Configuration.6.8.1.Download=
 Utilities.6.8.0.Path=.
 Utilities.6.8.0.Content=Utilities
 Utilities.6.8.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/IKuiL_L_/Components/Utilities%206.8.0.zip;https://www.dropbox.com/scl/fi/20ulkc1lu2z6ax94yt0lf/Utilities-6.8.0.zip?rlkey=hwqmq5tihnjnoapx1qq4s4kis&st=q16sul4m&dl=1;http://%master%/Components/Utilities 6.8.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.0.zip
+Utilities.6.8.1.Path=.
+Utilities.6.8.1.Content=Utilities
+Utilities.6.8.1.Download=
 [Current]
 Type=Development
 [Version]

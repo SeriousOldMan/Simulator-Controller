@@ -504,7 +504,7 @@ namespace SimulatorController.SimHub.Plugin
                         
                         for (int i = 0; i < array.Count; i++)
                         {
-                            string indexer = isWheelArray ? WheelPositions[i] : i.ToString();
+                            string indexer = isWheelArray ? WheelPositions[i] : (i + 1).ToString();
                             string fullPath = $"{parentPath}.{indexer}";
                             
                             var element = array[i];

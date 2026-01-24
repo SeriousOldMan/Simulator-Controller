@@ -23,7 +23,7 @@
 										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right, Damper.Rebound.Slow.Front.Heave,
 										 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right, Damper.Rebound.Slow.Rear.Heave,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right, Damper.Rebound.Fast.Front.Heave,
-										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right, Spring.Rate.Front.Heave,
 										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right, Spring.Rate.Rear.Heave,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right, Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,

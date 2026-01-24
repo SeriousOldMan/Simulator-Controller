@@ -19,6 +19,6 @@
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right, Damper.Compression.Fast.Rear.Heave,
 										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right, Damper.Rebound.Slow.Rear.Heave,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right, Damper.Rebound.Fast.Front.Heave,
-										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave,
 										 Spring.Rate.Rear.Heave,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right]))

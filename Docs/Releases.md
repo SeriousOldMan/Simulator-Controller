@@ -65,7 +65,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - When "All" tracks had been selected in the settings of the "Session Database", all tracks that already had been driven (independent of car) will be available in the "Tracks" drop down menu. This information is collected while driving, so will only be updated starting from now.
   - Data for all cars with the *old* composite names incl. team name, car number and so on from *Le Mans Ultimate* has been removed from the session database. All removed data has been moved the folder *Simulator Controller\Database\Archive\LMU* which is located in your user *Documents* folder.
   - Car names of all cars and tracks have been added for *Le Mans Ultimate*, so that they show up in the "Session Database", even if they have not been driven yet.
-  - The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
+  - [Important] The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
       - Alpine A110 GT4 Evo, Aston Martin Vantage GT4 Evo, Aston Martin Vantage GTE

@@ -1790,10 +1790,9 @@ updateConfigurationForV681() {
 }
 
 updateConfigurationForV680() {
-	local languages := getKeys(availableLanguages())
 	local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 
-	do(languages, (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
+	do(getKeys(availableLanguages()), (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
 
 	writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 }

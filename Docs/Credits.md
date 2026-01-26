@@ -22,7 +22,7 @@ Simulator Controller today supports multiple different languages for the user in
 
 Also very important are several contributions to the code base of Simulator Controller by @alejandrocq, @Awesome-XV and @EightOhFour. And I want to thank Jordan Moss (@Mossi) for the initial version of his great plugin, which provides most of the Simulator Controller data and state information to SimHub to support building dashboards and overlays.
 
-Then we have the contributors to the car meta data, especially Chris Matthews, Mirko Lesko, @neophyte, @inthebagbud UK and @alejandrocq, who provided many car definitions for *Assetto Corsa*, *Automobilista 2* and *RaceRoom Racing Experience*, and I also want to thank @mOellemeister for the *Le Mans Ultimate* data.
+Then we have the contributors to the car meta data, especially Chris Matthews, Mirko Lesko, @neophyte, @inthebagbud UK, @rysimabd and @alejandrocq, who provided many car definitions for *Assetto Corsa*, *Automobilista 2*, *Le Mans Ultimate* and *RaceRoom Racing Experience*, and I also want to thank @mOellemeister for the *Le Mans Ultimate* data.
 
 And I don't want to forget Matus Celko (@winzarten), who was so kind to provide a special export format and also a REST API for telemetry data in his "Second Monitor" app.
 

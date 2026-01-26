@@ -94,7 +94,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		this.iLanguage := this.getArgumentValue("stateFile", "EN")
 
-		if !inList(availableLanguages(), this.iLanguage)
+		if !inList(getKeys(availableLanguages()), this.iLanguage)
 			this.iLanguage := "EN"
 
 		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))

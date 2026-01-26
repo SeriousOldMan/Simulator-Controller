@@ -135,17 +135,27 @@ class DatabaseCreator {
 	}
 
 	loadDatabase(databaseDirectory) {
+		local cars
+
 		loop Files, databaseDirectory . "*.*", "D" {
 			simulator := A_LoopFileName
 
 			if ((simulator = "1") || (simulator = "0") || (simulator = "Unknown"))
 				deleteDirectory(databaseDirectory . simulator)
-			else
+			else {
+				if (simulator = "LMU") {
+					cars := getKeys(getMultiMapValues(readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Tyre Data.ini"), "Cars"))
+
+					cars := collect(cars, (c) => string2Values(";", c)[1])
+				}
+
 				loop Files, databaseDirectory . simulator . "\*.*", "D" {
 					car := A_LoopFileName
 
 					if ((car = "1") || (car = "0") || (car = "Unknown"))
 						deleteDirectory(databaseDirectory . simulator . "\" . car)
+					else if ((simulator = "LMU") && !inList(cars, car))
+						continue
 					else
 						loop Files, databaseDirectory . simulator . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
@@ -180,6 +190,7 @@ class DatabaseCreator {
 							}
 						}
 				}
+			}
 		}
 	}
 

@@ -1,9 +1,9 @@
 [Development]
 Version=6.8.1.0-dev
 Target=6.8.1.0-release
-Date=01/24/2026
-Download=
-Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin
+Date=01/26/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VlvJqrxN/Releases/Simulator%20Controller%206.8.1.0-dev.zip
+Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non_English languages in "Integration" plugin
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
 Version=6.8.0.0-release

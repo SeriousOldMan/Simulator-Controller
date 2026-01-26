@@ -13,5 +13,4 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Porsche 963",
 										[Electronics.ABS,
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 										 Aero.Splitter.Front, Aero.Wing.Front]))

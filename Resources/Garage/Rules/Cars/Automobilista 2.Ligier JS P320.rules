@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Ligier JS P320",
 										[Electronics.Turbo,	
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,			
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
 										 Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,

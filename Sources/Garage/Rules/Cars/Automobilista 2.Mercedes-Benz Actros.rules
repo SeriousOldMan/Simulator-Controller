@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Mercedes-Benz Actros",
 										[Electronics.TC, Electronics.ABS, Electronics.Engine.Brake,
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 										 Aero.Splitter.Front, Aero.Wing.Front, Aero.Wing.Rear,
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right, Damper.Compression.Fast.Front.Heave,

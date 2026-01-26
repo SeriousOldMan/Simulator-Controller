@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Copa Montana",
 										[Electronics.TC, Electronics.ABS, Electronics.Engine.Brake, Electronics.Turbo,
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 										 Damper.Compression.Slow.Front.Left, Damper.Compression.Slow.Front.Right, Damper.Compression.Slow.Front.Heave,
 										 Damper.Compression.Slow.Rear.Left, Damper.Compression.Slow.Rear.Right, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,

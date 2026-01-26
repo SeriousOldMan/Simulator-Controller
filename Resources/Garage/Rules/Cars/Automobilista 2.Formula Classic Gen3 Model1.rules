@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Formula Classic Gen3 Model1",
 										[Electronics.TC, Electronics.ABS, Electronics.Turbo,	
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,			
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right, Damper.Compression.Fast.Front.Heave,
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right, Damper.Compression.Fast.Rear.Heave,

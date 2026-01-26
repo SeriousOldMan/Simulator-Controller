@@ -18,6 +18,7 @@ Release 6.7.0=Release 6.6.4 -> updateStreamDeckIconPreset, updateActionLabels, u
 Release 6.7.5=Release 6.7.0 -> updatePluginsForV675
 Release 6.7.7=Release 6.7.5 -> updateConfigurationForV677
 Release 6.8.0=Release 6.7.7 -> updateConfigurationForV680
+Release 6.8.1=Release 6.8.0 -> updateConfigurationForV681
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

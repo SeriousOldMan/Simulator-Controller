@@ -94,7 +94,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		this.iLanguage := this.getArgumentValue("stateFile", "EN")
 
-		if !inList(availableLanguages(), this.iLanguage)
+		if !inList(getKeys(availableLanguages()), this.iLanguage)
 			this.iLanguage := "EN"
 
 		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
@@ -767,7 +767,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		for ignore, position in ["FL", "FR", "RL", "RR"]
 			if getMultiMapValue(sessionInfo, "Damage", "Suspension." . position, false)
-			subState[projection[position]] := getMultiMapValue(sessionInfo, "Damage", "Suspension." . position)
+				subState[projection[position]] := getMultiMapValue(sessionInfo, "Damage", "Suspension." . position)
 
 		if (subState.Count > 0)
 			state["Suspension"] := subState

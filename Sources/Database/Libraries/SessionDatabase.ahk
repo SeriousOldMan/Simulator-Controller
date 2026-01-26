@@ -1400,7 +1400,7 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulator && simulatorCode && (simulatorCode != "0") && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
-			if !found {
+			; if !found {
 				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
 
 				if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
@@ -1416,7 +1416,7 @@ class SessionDatabase extends ConfigurationItem {
 
 					SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
 				}
-			}
+			; }
 		}
 	}
 

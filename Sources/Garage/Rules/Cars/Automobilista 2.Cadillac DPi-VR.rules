@@ -12,5 +12,4 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Cadillac DPi-VR",
-										[Electronics.ABS, Electronics.Turbo,
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode]))
+										[Electronics.ABS, Electronics.Turbo]))

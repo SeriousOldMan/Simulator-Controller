@@ -10,17 +10,11 @@
   5. Support for Time *or* Laps session format
   6. Sector time approximation for *Assetto Corsa*
 
-#### Plugins
-  1. Cleanup of "Session State.json" file, i.e. not using *null* anymore for unavailable data
-
 #### Assistants
   1. Better answers by the Strategist, when a pitstop cannot be recommended
   2. Shift beeps by the Coach
   3. Configurable priority for voice output between Spotter and other Assistants
   4. Include lap time meadian value in the lap time information given by the Strategist and others
-  
-#### Session Database
-  1. Active validation of value ranges in settings definitions
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

@@ -5386,9 +5386,11 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
+		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight"
+										  , "FrontLeft", "FrontLeft", "FrontRRight", "FrontRight"
+										  , "RearLeft", "RearLeft", "RearRightR", "RearRight")
 
-		if !inList(["FL", "FR", "RL", "RR"], tyre)
+		if !tyreLookup.Has(tyre)
 			throw "Unknown tyre descriptor (" . tyre . ") detected in RaceEngineer.pressureLossWarning..."
 
 		if (this.hasEnoughData(false) && (this.Session == kSessionRace))

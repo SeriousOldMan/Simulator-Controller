@@ -1,0 +1,30 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Automobilista 2                 ;;;
+;;; 	                                    McLaren F1 LM                   ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO) / inthebagbud UK                   ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Automobilista 2", "McLaren F1 LM",
+										[Electronics.Map, Electronics.TC, Electronics.ABS, Electronics.Engine.Brake, Electronics.Turbo,	
+										 Brake.Duct.Front, Brake.Duct.Rear,		
+										 Aero.Splitter.Front, Aero.Wing.Front, Aero.Wing.Rear, Aero.Height.Front, Aero.Height.Rear,	
+										 Damper.Compression.Slow.Front.Left, Damper.Compression.Slow.Front.Right, Damper.Compression.Slow.Front.Heave,
+										 Damper.Compression.Slow.Rear.Left, Damper.Compression.Slow.Rear.Right, Damper.Compression.Slow.Rear.Heave,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right, Damper.Compression.Fast.Front.Heave,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right, Damper.Compression.Fast.Rear.Heave,
+										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right, Damper.Rebound.Slow.Front.Heave,
+										 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right, Damper.Rebound.Slow.Rear.Heave,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right, Damper.Rebound.Fast.Front.Heave,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave,
+										 Spring.Rate.Front.Left, Spring.Rate.Front.Right, Spring.Rate.Front.Heave,
+										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right, Spring.Rate.Rear.Heave,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right, Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,		
+										 Radiator.Blanket.Water,	
+										 Differential.Coast, Differential.Power]))

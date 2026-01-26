@@ -15,5 +15,4 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Ligier JS P217",
-										[Electronics.ABS, Electronics.Turbo,	
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode]))
+										[Electronics.ABS, Electronics.Turbo]))

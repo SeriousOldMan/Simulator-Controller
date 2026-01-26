@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "Porsche 911 GT3 Cup 4.0",
 										[Electronics.Map, Electronics.TC, Electronics.Turbo,	
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,				
 										 Aero.Splitter.Front, Aero.Wing.Front,	
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,

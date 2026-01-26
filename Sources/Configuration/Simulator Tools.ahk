@@ -1496,8 +1496,6 @@ editTargets(command := "", *) {
 
 updatePhraseGrammars() {
 	/* Obsolete since 4.0.4...
-	languages := availableLanguages()
-
 	for ignore, filePrefix in ["Race Engineer.grammars.", "Race Strategist.grammars.", "Race Spotter.grammars."]
 		for ignore, grammarFileName in getFileNames(filePrefix . "*", kUserGrammarsDirectory, kUserConfigDirectory) {
 			SplitPath grammarFileName, , , languageCode
@@ -1776,10 +1774,25 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV681() {
+	local cars := getKeys(getMultiMapValues(readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Tyre Data.ini"), "Cars"))
+
+	cars := collect(cars, (c) => string2Values(";", c)[1])
+
+	DirCreate(kDatabaseDirectory . "Archive\LMU")
+
+	loop Files, kDatabaseDirectory . "User\LMU\*.*", "D"
+		if !inList(cars, A_LoopFileName)
+			try
+				DirMove(A_LoopFileFullPath, kDatabaseDirectory . "Archive\LMU", 1)
+
+	updateConfigurationForV680()
+}
+
 updateConfigurationForV680() {
 	local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 
-	do(availableLanguages(), (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
+	do(getKeys(availableLanguages()), (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
 
 	writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 }

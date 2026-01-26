@@ -798,8 +798,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		changeSetting(*) {
 			changeSettingAsync() {
-				local selected, settings, section, key, ignore, setting
-				local type, value, oldValue, settingDropDown, settingValue
+				local selected, settings, section, key, ignore, setting, range
+				local type, value, oldValue, newValue, settingDropDown, settingValue
 
 				if (editor.SelectedModule = "Settings") {
 					selected := editor.SettingsListView.GetNext(0)
@@ -857,6 +857,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						settingValue := editorGui["settingValueEdit"].Text
 
+						range := this.getSettingRange()
+
 						if (type = "Integer") {
 							if !isInteger(settingValue) {
 								settingValue := oldValue
@@ -866,8 +868,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								loop 10
 									SendEvent("{Right}")
 							}
+							else if range {
+								newValue := Min(range[2], Max(range[1], settingValue))
 
-							value := settingValue
+								if (newValue != settingValue) {
+									settingValue := newValue
+
+									editorGui["settingValueEdit"].Text := newValue
+
+									loop 10
+										SendEvent("{Right}")
+								}
+							}
 						}
 						else if (type = "Float") {
 							value := internalValue("Float", editorGui["settingValueEdit"].Text)
@@ -880,7 +892,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								loop 10
 									SendEvent("{Right}")
 							}
+							else if range {
+								newValue := Min(range[2], Max(range[1], settingValue))
+
+								if (newValue != settingValue) {
+									settingValue := newValue
+
+									editorGui["settingValueEdit"].Text := newValue
+
+									loop 10
+										SendEvent("{Right}")
+								}
+							}
 						}
+
+						value := settingValue
 					}
 
 					editor.updateSetting(section, key, value)
@@ -5854,6 +5880,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if InStr(type, "Choices:")
 				type := string2Values(",", string2Values(":", type)[2])
+			else if InStr(type, ":")
+				type := string2Values(":", type)[1]
 
 			if (default = kTrue)
 				default := true
@@ -5870,6 +5898,43 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		return type
+	}
+
+	getSettingRange(section := false, key := false) {
+		local selected, range
+
+		if !section {
+			selected := this.SettingsListView.GetNext(0)
+
+			if selected {
+				section := this.iSettings[selected][1]
+				key := this.iSettings[selected][2]
+			}
+			else
+				return false
+		}
+
+		range := getMultiMapValue(this.SettingDescriptors, section . ".Types", key, false)
+
+		if range {
+			if InStr(range, ";")
+				range := string2Values(";", range)[1]
+
+			if InStr(range, "Choices:")
+				return string2Values(",", string2Values(":", range)[2])
+			else if InStr(range, ":") {
+				range := string2Values(":", range)[2]
+
+				range := string2Values("-", StrReplace(range, "\-", "###HY###"))
+
+				range[1] := StrReplace(range[1], "###HY###", "-")
+				range[2] := StrReplace(range[2], "###HY###", "-")
+
+				return range
+			}
+		}
+		else
+			return false
 	}
 
 	getAvailableSettings(selection := false) {

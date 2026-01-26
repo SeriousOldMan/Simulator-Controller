@@ -13,7 +13,6 @@
 
 [?Initialize] => (Prove: removeSettings("Automobilista 2", "ARC Camaro",
 										[Electronics.Map, Electronics.TC, Electronics.ABS, Electronics.Engine.Brake, Electronics.Turbo,	
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,			
 										 Brake.Duct.Front, Brake.Duct.Rear,		
 										 Aero.Splitter.Front, Aero.Wing.Front,
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,

@@ -1563,7 +1563,7 @@ If you want to use any additional parameters here (see below), it looks like:
 	[Plugins]
 	Integration=true||stateFile: D:\SimRacing\Session State.json; language: DE; formats: Time S.##
 	
-where *D:\SimRacing\Session State.json* is an example. Substitute your own path here. But easier will be to do this in "Simulator Configuration" and this information will be preserved, even if you generate the next configuration using "Simulator Setup".
+where *D:\SimRacing\Session State.json* is an example. Substitute your own path here. But it will be easier to do this in "Simulator Configuration". The information will be preserved, even if you generate the next configuration using "Simulator Setup".
 
 ### Configuration
 

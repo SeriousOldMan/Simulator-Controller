@@ -1400,7 +1400,7 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulator && simulatorCode && (simulatorCode != "0") && car && carCode && track && trackCode) {
 			DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . carCode . "\" . trackCode)
 
-			if !found {
+			; if !found {
 				trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, simulatorCode, "Track Data.ini")
 
 				if ((simulatorCode != "ACC") && (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined)) {
@@ -1416,7 +1416,7 @@ class SessionDatabase extends ConfigurationItem {
 
 					SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
 				}
-			}
+			; }
 		}
 	}
 
@@ -1428,12 +1428,19 @@ class SessionDatabase extends ConfigurationItem {
 		local trackData := SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 		local name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short", track, kUndefined)
 
+		if (name == kUndefined)
+			name := getMultiMapValue(trackData, long ? "Track Names Short" : "Track Names Long", track, kUndefined)
+
 		if ((name != kUndefined) && (StrLen(name) < 5))
 			name := getMultiMapValue(trackData, "Track Names Long", track, name)
 
 		if (name == kUndefined) {
 			name := getMultiMapValue(trackData, long ? "Track Names Long" : "Track Names Short"
 											  , normalizeFileName(track), kUndefined)
+
+			if (name == kUndefined)
+				name := getMultiMapValue(trackData, long ? "Track Names Short" : "Track Names Long"
+												  , normalizeFileName(track), kUndefined)
 
 			if ((name != kUndefined) && (StrLen(name) < 5))
 				name := getMultiMapValue(trackData, "Track Names Long", normalizeFileName(track), name)

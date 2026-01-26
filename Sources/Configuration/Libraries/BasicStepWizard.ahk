@@ -93,7 +93,6 @@ class BasicStepWizard extends StepWizard {
 		local col2Width := (width - col1Width - 20)
 		local button1X := x + (Round(width / 3) - 32)
 		local button2X := x + (Round(width / 3 * 2) - 32)
-		local languages := availableLanguages()
 		local code, language, w, h, choices
 
 		noSelect(listView, *) {
@@ -301,7 +300,7 @@ class BasicStepWizard extends StepWizard {
 
 		choices := []
 
-		for code, language in languages
+		for code, language in availableLanguages()
 			choices.Push(language)
 
 		widget5 := window.Add("Text", "x" . x . " yp+10 w100 h23 +0x200 Hidden", translate("Localization"))

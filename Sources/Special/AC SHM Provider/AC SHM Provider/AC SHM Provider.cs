@@ -21,8 +21,20 @@ namespace ACSHMProvider
         Cars cars;
         StaticInfo staticInfo;
 
+        private const int MAX_CARS = 64;
+        private const double SECTOR_APPROXIMATION = 0.33;
+        
+        private int[] previousSector = new int[MAX_CARS];
+        private int[] sector1Times = new int[MAX_CARS];
+        private int[] sector2Times = new int[MAX_CARS];
+        private int[] sector3Times = new int[MAX_CARS];
+        private int[] sectorStartTimes = new int[MAX_CARS];
+
         public SHMProvider()
         {
+            for (int i = 0; i < MAX_CARS; i++)
+                previousSector[i] = -1;
+            
             connected = ConnectToSharedMemory();
         }
 
@@ -93,7 +105,6 @@ namespace ACSHMProvider
             {
                 memoryStatus = AC_MEMORY_STATUS.CONNECTING;
 
-                // Connect to shared memory
                 physicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_physics");
                 graphicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_graphics");
                 staticInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_static");
@@ -274,6 +285,11 @@ namespace ACSHMProvider
 
             if (connected)
             {
+                graphics = ReadGraphics();
+                cars = ReadCars();
+                
+                UpdateSectorTimes(0, graphics.CurrentSectorIndex, graphics.iCurrentTime, graphics.iLastTime);
+                
                 Console.Write("Car.Count="); Console.WriteLine(cars.numVehicles);
 
 				int idx = 1;
@@ -294,12 +310,28 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
                     int lapTime = car.lastLapTimeMS;
-                    int sector1Time = 0;
-                    int sector2Time = 0;
-                    int sector3Time = 0;
-
-                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
-                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+                    
+                    int carIndex = i - 1;
+                    int sector1Time = sector1Times[carIndex];
+                    int sector2Time = sector2Times[carIndex];
+                    int sector3Time = sector3Times[carIndex];
+                    
+                    if (lapTime > 0)
+                    {
+                        if (sector1Time == 0 || sector2Time == 0 || sector3Time == 0)
+                        {
+                            sector1Time = (int)(lapTime * SECTOR_APPROXIMATION);
+                            sector2Time = (int)(lapTime * SECTOR_APPROXIMATION);
+                            sector3Time = lapTime - sector1Time - sector2Time;
+                        }
+                        
+                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
+                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+                    }
+                    else
+                    {
+                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
+                    }
 
                     string carModel = GetStringFromBytes(car.carModel);
 
@@ -329,23 +361,59 @@ namespace ACSHMProvider
 
         public void ReadSetup()
         {
-            /*
-            Console.WriteLine("[Setup Data]");
-            if (connected)
-            {
-            }
-            */
         }
 
-        // Determine if the race is timed or lap based bceause AC doesn't provide this info correctly
         public bool IsTimedRace()
         {
             bool isTimedBasedOnRemainingTime = graphics.SessionTimeLeft >= 0;
-
-            // Race may still be time based as at the end of a timed race the session time left goes negative
             bool isTimedBasedOnTrackLength = GetRemainingLaps((long)graphics.SessionTimeLeft) <= -1;
 
             return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;
+        }
+
+        private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lastLapTime)
+        {
+            if (carIndex < 0 || carIndex >= MAX_CARS)
+                return;
+
+            int prevSector = previousSector[carIndex];
+            
+            if (prevSector == -1)
+            {
+                previousSector[carIndex] = currentSector;
+                sectorStartTimes[carIndex] = currentTime;
+                return;
+            }
+
+            if (prevSector != currentSector)
+            {
+                if (prevSector == 2 && currentSector == 0)
+                {
+                    if (lastLapTime > 0)
+                    {
+                        sector3Times[carIndex] = lastLapTime - sector1Times[carIndex] - sector2Times[carIndex];
+                        if (sector3Times[carIndex] < 0)
+                            sector3Times[carIndex] = 0;
+                    }
+                    
+                    sectorStartTimes[carIndex] = currentTime;
+                }
+                else if (prevSector == 0 && currentSector == 1)
+                {
+                    sector1Times[carIndex] = currentTime - sectorStartTimes[carIndex];
+                    if (sector1Times[carIndex] < 0)
+                        sector1Times[carIndex] = 0;
+                }
+                else if (prevSector == 1 && currentSector == 2)
+                {
+                    int cumulativeTime = currentTime - sectorStartTimes[carIndex];
+                    sector2Times[carIndex] = cumulativeTime - sector1Times[carIndex];
+                    if (sector2Times[carIndex] < 0)
+                        sector2Times[carIndex] = 0;
+                }
+
+                previousSector[carIndex] = currentSector;
+            }
         }
 
         public void ReadData() {
@@ -364,15 +432,6 @@ namespace ACSHMProvider
 
                 session = GetSession(graphics.Session);
 
-				/*
-                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0) {
-                    if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
-						session = "Finished";
-                }
-                else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
-                    session = "Finished";
-				*/
-
                 Console.Write("Session="); Console.WriteLine(session);
 
                 Console.Write("Car="); Console.WriteLine(normalizeName(staticInfo.CarModel));
@@ -381,27 +440,15 @@ namespace ACSHMProvider
                 Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 
-                /*
-                if (session == "Practice")
-                {
-                    Console.WriteLine("SessionTimeRemaining=3600000");
-                    Console.WriteLine("SessionLapsRemaining=30");
-                }
-                else
-                {
-                */
-                    timeLeft = (long)graphics.SessionTimeLeft;
+                timeLeft = (long)graphics.SessionTimeLeft;
 
                     if (timeLeft < 0)
                     {
                         timeLeft = 24 * 3600 * 1000;
                     }
 
-                    Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
-                    Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
-                /*
-                }
-                */
+                Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
+                Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
             }
             else
                 return;
@@ -419,8 +466,10 @@ namespace ACSHMProvider
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
-            Console.WriteLine("Sector=" + graphics.CurrentSectorIndex + 1);
+            Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
             Console.WriteLine("Laps=" + graphics.CompletedLaps);
+            
+            UpdateSectorTimes(0, graphics.CurrentSectorIndex, graphics.iCurrentTime, graphics.iLastTime);
 
             Console.WriteLine("LapValid=true");
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);
@@ -429,22 +478,10 @@ namespace ACSHMProvider
             if (graphics.Flag == AC_FLAG_TYPE.AC_PENALTY_FLAG)
                 Console.WriteLine("Penalty=true");
 
-            /*
-            if (session == "Practice")
-            {
-                Console.WriteLine("StintTimeRemaining=3600000");
-                Console.WriteLine("DriverTimeRemaining=3600000");
-            }
-            else
-            {
-            */
-                long time = GetRemainingTime(timeLeft);
+            long time = GetRemainingTime(timeLeft);
 
-                Console.WriteLine("StintTimeRemaining=" + time);
-                Console.WriteLine("DriverTimeRemaining=" + time);
-            /*
-            }
-            */
+            Console.WriteLine("StintTimeRemaining=" + time);
+            Console.WriteLine("DriverTimeRemaining=" + time);
             Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
             Console.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
@@ -485,10 +522,6 @@ namespace ACSHMProvider
                                                  + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
             Console.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
                                               + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
-            /*
-            Console.WriteLine("TyreWear=" + Math.Round(physics.TyreWear[0]) + "," + Math.Round(physics.TyreWear[1]) + ","
-                                          + Math.Round(physics.TyreWear[2]) + "," + Math.Round(physics.TyreWear[3]));
-            */
             Console.WriteLine("BrakeTemperature=" + physics.BrakeTemp[0] + "," + physics.BrakeTemp[1] + ","
                                                  + physics.BrakeTemp[2] + "," + physics.BrakeTemp[3]);
 

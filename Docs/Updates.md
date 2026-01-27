@@ -35,7 +35,9 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.8.1
 
-The SimHub plugin has been updated. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller.
+1. The SimHub plugin has been updated. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller.
+
+2. The data of all cars from *Le Mans Ultimate* with the old naming scheme (no car model, but a combination of team name and race number) has been moved from the session database to an archive. This archive is located in the *Simulator Controller\Database\Archive\LMU* folder which is located in your user *Documents* folder. If you want to merge the data with data collected for cars with the normal naming scheme, open the files with a unicode capable text editor and copy the data to the corresponding files in *Simulator Controller\Database\User\LMU*.
 
 ## Release 6.8.0
 

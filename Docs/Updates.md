@@ -2,8 +2,6 @@ Before we start, an important information for *First Time Users*: If you install
 
 Special steps, that might be necessary for using voice control and pitstop automation for the *RaceRoom Racing Experience* Pitstop MFD, are described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1). There might be additional requirements for other simulators as well. Up to date information can always be found in chapter about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
-***
-
 ## Automated update procedure
 
 Beginning with Version 2.0 an automatic update procedure is available to bring a local configuaration database up to the new specs.
@@ -39,34 +37,24 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 The SimHub plugin has been updated. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller.
 
-***
-
 ## Release 6.8.0
 
 The session state JSON object supplied by the "Intagration" plugin has changed. The changes introduce some long awaited extension, but also some incompatible changes. Therefore, if you have build an app based on that data, this app must be updated as well.
 
 The SimHub plugin which was created by Jordan Moss some time ago has been updated by @Awesome-XV and will be part of this release. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller. And you have to enable the new plugin in SimHub, of course. After you have done that, enable the "Integration" plugin in "Simulator Configuration" and run a few laps with all the features enabled (for example, strategy handling), you want to use in your SimHub dashboards and overlays. The new SimHub plugin will learn the data structures before you can use the properties in the layout designer.
 
-***
-
 ## Release 6.7.9
 
 Nothing to do.
-
-***
 
 ## Release 6.7.8
 
 1. [Optional] If you are using the dark Windows 11 them and have added some of the Simulator Controller to your Windows task bar, you can use the Windows "Disk Cleanup" application to clear the "Tumbnails", so that the Explorer reloads the icons from all applications. On WIndows 11, you can achieve the same on the System > Storage page of the Windows settings.
 2. A file with all official track names has been added for *Automobilista 2*. Because Simulator Controller has already collected names for all tracks, you already have used, you may want to delete the file "Track Data.ini" which is located in the [Documents]\Simulator Controller\Simulator Data\AMS2*.
 
-***
-
 ## Release 6.7.7
 
 Nothing to do.
-
-***
 
 ## Release 6.7.6
 
@@ -74,152 +62,102 @@ Everyhing handled automatically, but you may want to re-generate your configurat
 
 You may also want to review the AMS2 tyre compound mapping, if you have created your own ones in the past. Most probably, these are now obsolete and are covered by the default mappings provided by Simulator Controller. You may have created personal mappings as settings in the !Session Database" or you may have edit the file [Documents]\Simulator Controller\Simulator Data\AMS2\Tyre Data.ini, which can be edited using a text editor. More information about tyre compound mappings can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#creating-own-compound-rules).
 
-***
-
 ## Release 6.7.5
 
 Nothing to do.
-
-***
 
 ## Release 6.7.1
 
 Nothing to do.
 
-***
-
 ## Release 6.7.0
 
 Everything handled automatically, but you may want to include the "BrakeCoaching" action into your controller configuration.
-
-***
 
 ## Release 6.6.7
 
 Nothing to do.
 
-***
-
 ## Release 6.6.7
 
 Everything handled automatically.
-
-***
 
 ## Release 6.6.6
 
 Nothing to do.
 
-***
-
 ## Release 6.6.5
 
 New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "grip_low" event and the "report_low_grip" action, if necessary.
-
-***
 
 ## Release 6.6.4
 
 Nothing to do.
 
-***
-
 ## Release 6.6.3
 
 Everything handled automatically.
-
-***
 
 ## Release 6.6.2
 
 Nothing to do.
 
-***
-
 ## Release 6.6.1
 
 If you are using some of the additional car meta data supplied in the DLC for *Assetto Corsa* you have to update it for included information about car classes. Open "Simulator Setup", go to the presets page and remove the DLC for the car meta data. Then include the cars you are interested in again.
-
-***
 
 ## Release 6.6.0
 
 If you already have driven the Oreca 07 car in the ELMS series, wrong data may have been stored in the database. You can use the Administration -> Laps editor (double click) in the "Session Database" to remove entries with too fast lap times, you have recorded already.
 
-***
-
 ## Release 6.5.6
 
 Nothing to do.
-
-***
 
 ## Release 6.5.5
 
 To get rid of all unnecessary language specific LLM instructions in the main configuration, which may slow things down a bit, open the configuration, 1. open the Assistant Booster editor for each Assistant and close it using "Ok" and 2. go to the Driving Coach configuration page, but do nothing there. Finally save the configuration.
 
-***
-
 ## Release 6.5.4
 
 The handling of names of tracks and track layouts in *Assetto Corsa* has changed. The file "Track Data.ini" n the *Simulator Controller\Simulator Data\AC* which is located in your user *Documents* folder has been renamed as a backup, in case you have edited or extended it. The format of an internal track name is *track***-***layout* and there can be a short and a long name for each track configuration. See the original "Track Data.ini" file located in *Simulator Data\AC* folder in the installation folder of Simulator Controller for information about the structure of the file.
 
-***
-
 ## Release 6.5.3
 
 Nothing to do.
-
-***
 
 ## Release 6.5.2
 
 1. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 2. Due to a change in the *Le Mans Ultimate* API, data which had been collected for one of the shorter track layouts may have been stored for the base layout. You can fix this in the "Administration" tab of the "Session Database". Double click on the "Laps" and/or "Pressures" entry and delete the faulty lines, which can be identified by the lap time.
 
-***
-
 ## Release 6.5.1
 
 If you are using the "Whisper Server" to run the Whisper voice recognition on a second PC, copy the files "Whisper Server.exe" and "Whisper Server.dll" from the *Binaries\Whisper Server* directory in the installation directory of Simulator Controller over to your "Whisper Server" installation directory.
-
-***
 
 ## Release 6.5.0
 
 Nothing to do.
 
-***
-
 ## Release 6.4.3
 
 Everything handled automatically.
-
-***
 
 ## Release 6.4.2
 
 Nothing to do.
 
-***
-
 ## Release 6.4.1
 
 Nothing to do.
-
-***
 
 ## Release 6.4.0
 
 See [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-639) for last release.
 
-***
-
 ## Release 6.3.9
 
 If you have been running a custom livery in *Le Mans Ultimate*, data from the session may have been stored under the wrong name in the session database. You can identify those entries by looking at the *Simulator Controller\Database\User\LMU* folder in the user *Documents* folder. The wrong entries do not have a car model as name, but look more like a team name. You can either simply delete them (recommended) or you can use a text editor to consilidate the data into the correct car model entry, if you know what your doing.
-
-***
 
 ## Release 6.3.8
 
@@ -227,49 +165,33 @@ New events and new actions have been defined for the *Reasoning* Booster of the 
 
 Additionaly, the LLM "GPT 4o mini" will get deprecated by OpenAI soon. If you are using it, you may consider switching to "GPT 4.1 mini".
 
-***
-
 ## Release 6.3.7
 
 Nothing to do.
-
-***
 
 ## Release 6.3.6
 
 New events and new actions have been defined for the *Reasoning* Booster of the Race Engineer. You may want to update your Events and Actions configuration and include the "tyre_wear" and "brake_wear" events and the "report_tyre_wear" and "report_brake_wear" actions, if necessary.
 
-***
-
 ## Release 6.3.5
 
 Nothing to do.
-
-***
 
 ## Release 6.3.4
 
 Everything handled automatically.
 
-***
-
 ## Release 6.3.3
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
-
-***
 
 ## Release 6.3.2
 
 Nothing to do.
 
-***
-
 ## Release 6.3.1
 
 Nothing to do.
-
-***
 
 ## Release 6.3.0
 
@@ -277,19 +199,13 @@ To install the added VC++ 2013 runtime library, open "Simulator Setup" and go to
 
 And you may want to give the new Google GPT integration a try.
 
-***
-
 ## Release 6.2.9
 
 Everything handled automatically.
 
-***
-
 ## Release 6.2.8
 
 Nothing to do.
-
-***
 
 ## Release 6.2.7
 
@@ -304,67 +220,45 @@ If you already have collected data for cars or tracks, which have a character fr
 
 If the original name contained a "/", things are even more complex, since Windows may have created a subfolder for the second part of the name after the "/". You must move the contents of this folder one level up so that they can be accessed again. If in doubt, or if you need support, contact me in our Discord.
 
-***
-
 ## Release 6.2.6
 
 Nothing to do.
-
-***
 
 ## Release 6.2.5
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
-***
-
 ## Release 6.2.4
 
 Everything handled automatically.
-
-***
 
 ## Release 6.2.3
 
 The file extension for issues saved by the "Setup Workbench" has been renamed from ".setup" to ".issues". If you have such save issue files, you have to change the extension accordingly to make them readable again.
 
-***
-
 ## Release 6.2.2
 
 The *Rephrasing* booster instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again.
-
-***
 
 ## Release 6.2.1
 
 This release comes with a new version of the Team Server with some minor changes. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
-***
-
 ## Release 6.2.0
 
 Nothing to do.
-
-***
 
 ## Release 6.1.6
 
 The Driving Coach instructions have changed with this release. If you have modified the default instructions, you will have to revert them back to original and integrate your modifications back again. Take a look especially at the "Coaching" instruction, which has changed for corner name handling.
 
-***
-
 ## Release 6.1.5
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
-***
-
 ## Release 6.1.4
 
 Nothing to do.
-
-***
 
 ## Release 6.1.3
 
@@ -372,19 +266,13 @@ Nothing to do.
 
 2. The Engineer does no longer automatically request the pitstop after all settings has been prepared in *Automobilista 2*, since this can lead to unwanted effects when pitstops are planned and prepared multiple times. But there is as [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to make it automatic again.
 
-***
-
 ## Release 6.1.2
 
 The format of action calls in the *Conversation* booster has changed. All builtin actions are still working as expected, but if you have defined your own action, which use *Assistant Method*, *Controller Method* or *Controller Function* as action type, you may want to check your definition according to the new documentation.
 
-***
-
 ## Release 6.1.1
 
 Nothing to do.
-
-***
 
 ## Release 6.1.0
 
@@ -394,31 +282,21 @@ This time you have to care for two things:
 
 2. The definition of the controller action "RepairRequest" for *iRacing* has changed. If you are using this controller action, start "Simulator Setup", goto the configuration page of the simulators, remove the binding for the "RepairRequest" action and recreate it.
 
-***
-
 ## Release 6.0.2
 
 Nothing to do.
-
-***
 
 ## Release 6.0.1
 
 Everything handled automatically.
 
-***
-
 ## Release 6.0.0
 
 Nothing to do.
 
-***
-
 ## Release 5.9.9
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
-
-***
 
 ## Release 5.9.8
 
@@ -428,31 +306,21 @@ This release introduces new builtin voice recognition engines by Microsoft for I
 
 After that, open "Simulator Setup" and go to the *Basic* configuration page. The new versions of the voice recognition engines will then be installed automatically.
 
-***
-
 ## Release 5.9.7
 
 Everything handled automatically.
-
-***
 
 ## Release 5.9.6
 
 Nothing to do.
 
-***
-
 ## Release 5.9.5
 
 This release introduces track sections in preparation for the upcoming telemetry-based live coaching. To ensure, that corner numbers are correct, the track maps must be rebuild. You can do this with the "Session Database". Select "All" cars and "All" tracks, then open the "Administration" tab. There select all tracks and delete them. They will get rebuild automatically.
 
-***
-
 ## Release 5.9.4
 
 Everything handled automatically.
-
-***
 
 ## Release 5.9.3
 
@@ -460,31 +328,21 @@ A bug has been fixed in "Simulator Setup", that created inconsistent configurati
 
 And be sure to check your changes to the definition files in *[Documents]\Simulator Controller\Garage\Definitions* as mentioned in the Release Notes, if you have made custom additions to the "Setup Workbench".
 
-***
-
 ## Release 5.9.2
 
 Nothing to do.
-
-***
 
 ## Release 5.9.1
 
 Everything handled automatically.
 
-***
-
 ## Release 5.9.0
 
 Nothing to do this time.
 
-***
-
 ## Release 5.8.7
 
 No actions required.
-
-***
 
 ## Release 5.8.6
 
@@ -492,13 +350,9 @@ No actions required.
 2. The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 3. If you have used the controller action functions "openRaceCenter" or "openPracticeCenter" in your custom configuration, you have to change them to "openTeamCenter" and "openSoloCenter" respectively.
 
-***
-
 ## Release 5.8.5
 
 New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
-
-***
 
 ## Release 5.8.4
 
@@ -506,20 +360,14 @@ New builtin LLM Events has been defined for the Race Spotter. As always, you may
 2. New builtin LLM Actions have been defined for the Race Spotter. As always, you may want to revisit your *Conversation* booster configuration.
 3. The local LLM Runtime now also supports a Vulkan driver for non-Nvidia GPUs. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it. This is not necessary, if you are already running a CUDA setup. But: If you have a Nvidia GPU and perform the update, you may encounter conflicts with the CUDA driver as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime). If this is the case, remove the "vulkan" folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder and continue using CUDA.
 
-***
-
 ## Release 5.8.3.2
 
 No actions required.
-
-***
 
 ## Release 5.8.3
 
 1. New builtin LLM Events has been defined for the Race Spotter. As always, you may want to revisit your *Reasoning* booster configuration.
 2. This release introduces a new version of the optional local LLM Runtime. If you are using the LLM Runtime, open "Simulator Setup", go to the presets page and remove the preset for the runtime. Then add it again to trigger a new download.
-
-***
 
 ## Release 5.8.2
 
@@ -529,37 +377,25 @@ The event "damage_collected" has been renamed to "damage_detected". Additionally
 
 Record practice and team race sessions can now be shared between team members via the Team Server. If you want to use this, run the "Session Database" and include "Sessions" in the replication settings.
 
-***
-
 ## Release 5.8.1
 
 No actions required.
-
-***
 
 ## Release 5.8.0
 
 No manual changes necessary.
 
-***
-
 ## Release 5.7.9
 
 Nothing to do for this release.
-
-***
 
 ## Release 5.7.8
 
 No actions required.
 
-***
-
 ## Release 5.7.7
 
 No actions required.
-
-***
 
 ## Release 5.7.6
 
@@ -569,19 +405,13 @@ Two things for you to look at with this release:
 
 2. The "Conversation" booster now as an option to allow the LLM to activate some predefined actions. The default is "Off", since you may want to test it before using it in a race. Go to the Conversation Booster configuration for each Assistant, if you want to enable it.
 
-***
-
 ## Release 5.7.5
 
 The "Telemetry" instruction for both the Driving Coach and the Conversation Booster has been substitued by the "Knowledge" instruction. If you have changed the "Telemetry" instruction, you may want to integrate your additions into the "Knowledge" instruction.
 
-***
-
 ## Release 5.7.4
 
 No changes necessary.
-
-***
 
 ## Release 5.7.3
 
@@ -591,13 +421,9 @@ The "Character" instruction for the Driving Coach has been updated and all instr
 
 Nothing to do for this release.
 
-***
-
 ## Release 5.7.1
 
 No manual activities required.
-
-***
 
 ## Release 5.7.0
 
@@ -605,67 +431,45 @@ The former referenced OpenAI model "GPT 3.5 turbo 1106" has been deprecated by O
 
 You can check always the latest models and their pricing on [the pricing page](https://openai.com/api/pricing) of the OpenAI website.
 
-***
-
 ## Release 5.6.8
 
 No manual activities required.
-
-***
 
 ## Release 5.6.7
 
 This release comes with a new version of the Team Server with a minor change. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
-***
-
 ## Release 5.6.6
 
 Everything handled automatically.
-
-***
 
 ## Release 5.6.5
 
 It looks like the Windows 11 system shutdown timing changed a little bit, which caused occasional crashes of the Simulator Controller applications as well as the Stream Deck plugin. If you are using the Stream Deck integration, you may want to update the integration plugin, but it is only a cosmetical kind of fix.
 
-***
-
 ## Release 5.6.4
 
 Nothing to do for the update, but if you are using *iRacing* you may want to integrate the new "TyreCompound" action in your controller configuration. The best way to do this is to use the "Simulator Setup" simulator configuration page.
-
-***
 
 ## Release 5.6.3
 
 Everything handled automatically.
 
-***
-
 ## Release 5.6.2
 
 Nothing to do this time.
-
-***
 
 ## Release 5.6.1
 
 This release introduces the integration for *Le Mans Ultimate*. This title is still under development as you know. Currently there is no way to enable new plugins in the user interface of *Le Mans Ultimate*. Therefore, please follow the [special instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for more information on how to install and configure the data integration plugin (*rFactor2SharedMemoryMapPlugin64.dll*) in the *Le Mans Ultimate* installation directory. Once the data integration has been activated, you can configure the actions of ["LMU" plugin]((https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-lmu) to control *Le Mans Ultimate* from you hardware controller, if you like. All actions are also available in "Simulator Setup" for configuration.
 
-***
-
 ## Release 5.6.0
 
 Only relevant, if you have used strategy scenario validation rules: The capabilities of the rule engine for strategy scenario validation has been extended in the "Strategy Workbench". Tyre set information is now available for the first stint and also for each pitstop with a tyre change. To keep thiings tidy and clean, some rules have been renamed. You must adopt your own validation rules to reflect the new naming scheme. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#scenario-validation) for more information.
 
-***
-
 ## Release 5.5.8
 
 Everything handled automatically.
-
-***
 
 ## Release 5.5.7
 
@@ -673,31 +477,21 @@ The splash screen media has been made a downloadable component. You may want to 
 
 This release also comes with a new version of the Team Server with some minor fixes. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
-***
-
 ## Release 5.5.6
 
 No manual activities required.
-
-***
 
 ## Release 5.5.5
 
 Nothing to do.
 
-***
-
 ## Release 5.5.4
 
 No changes necessary.
 
-***
-
 ## Release 5.5.3
 
 Nothing to do.
-
-***
 
 ## Release 5.5.2
 
@@ -705,55 +499,37 @@ Updates are handled automatically, but a couple of presets has been deprecated i
 
 Additionally, this release brings a new version of the Team Server with some internal optimizations. Although it will be compatible with the current release, I recommend updating your installation, if you are running your own Team Server. Database files are compatible.
 
-***
-
 ## Release 5.5.1
 
 Nothing to do.
-
-***
 
 ## Release 5.5.0
 
 The handling of the *Automobilista 2* ICM has changed. You must now [set the ICM to the Pitstop page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-requirements-when-using-the-pitstop-automation-1) and select the line at the bottom before using any of the automation auf Simulator Controller.
 
-***
-
 ## Release 5.4.8
 
 The "Tactile Feedback" plugin has been updated to work with the latest version of *SimHub*. This requires, that the triggers for the effect settings in *SimHub* must be recreated. You can either load the standard profiles from the *Profiles* directory, or you follow the instructions found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback).
-
-***
 
 ## Release 5.4.7
 
 Nothing to do.
 
-***
-
 ## Release 5.4.6
 
 The configuration for the "Driving Coach" has changed. You may want to review your settings and you may want to try the all new full local LLM runtime, which does not require an OpenAI account or additional software installation anymore. You only have to download your model of choice in GGUF format and you are good to go.
-
-***
 
 ## Release 5.4.5
 
 Everything handled automatically.
 
-***
-
 ## Release 5.4.4
 
 Nothing to do.
 
-***
-
 ## Release 5.4.3
 
 No manual updates necessary.
-
-***
 
 ## Release 5.4.2
 
@@ -763,33 +539,23 @@ You can, however, use your old threshold values, if you set the conversion facto
 
 Another change regards the time need for refueling. The default value is now 1.8 seconds per 10 liter rather than 1.5 seconds. Since this value is persistents, once you have used "Race Settings" (and you don't have set your own default value in "Session Database", you might want to change it to make the pitstop duration calculation more precise.
 
-***
-
 ## Release 5.4.1
 
 The instructions for the LLM of the Driving Coach have been extended. You can update to the new instructions using the [reload button in the configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach). Also, new instructions for extended data integration have been added, which you can also load into the configuration.
 
 Another change regards the storage of the Telemetry Analyzer settings of "Setup Workbench". These are now also used by the Driving Coach and therefore it was necessary to change their internal structure. The structural change will be handled by the update procedure, but in some rare cases, old settings will be lost and must be recreated before running the analyzer again.
 
-***
-
 ## Release 5.4.0
 
 Since this release introduces a new Assistant, a new plugin "Driving Coach" will be automatically added to your configuration, but it will be deactivated by default. You should run "Simulator Setup" and use the basic configuration step to include it in your setup. Then visit the configuration step for Race Assistants and create a configuration for the Driving Coach. You will need to have a subscription on [OpenAI](https://openai.com) (it is very cheap, by the way), or you will have to install the free AI runtime environment [GPT4All](https://gpt4all.io/index.html). But the LLMs (language models) of GPT4All are way behind from what OpenAI offers, and you will need a very powerful PC to run these models (and it will use your GPU, therefore it is impossible to use it alongside a running simulator).
-
-***
 
 ## Release 5.3.2
 
 Tyre set handling has changed with this release. This is a specific feature for *Assetto Corsa Competizione*. You now have the choice to explicitly define the first tyre set to use for an upcoming pitstop, or you can set the tyre sets in "Race Settings" to "Auto", which will let ACC decide on its own, which tyre set to use (please be aware, that there is a bug in the automatic selection in ACC, when switching from wet to dry tyres, though). The automatic update procedure of this release will set the tyre sets to "Auto" in "Race Settings", which will be perfect for most users. If you also specified tyre sets in the settings in the "Session Database", you can remove the settings there.
 
-***
-
 ## Release 5.3.1
 
 No manual updates necessary.
-
-***
 
 ## Release 5.3.0
 
@@ -807,37 +573,25 @@ You may want to check your preset choices in "Simulator Setup" and use the new "
 
 Beside that, a new version of the Team Server is part of the release. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
 
-***
-
 ## Release 5.2.3
 
 [Developers only]: The property "Pressures" of the "Tyres" object in the "Session State.json" file has been renamed to "HotPressures".
-
-***
 
 ## Release 5.2.2
 
 A new information request action "LapTime" is available, incl. a specialized icon for Stream Deck. If you are a Stream Deck user, you might want to integrate the new action into your profile.
 
-***
-
 ## Release 5.2.1
 
 The Stream Deck plugin has been updated. You may want to install the new version, if you have encountered stability issues in the past.
-
-***
 
 ## Release 5.2.0
 
 No manual updates necessary.
 
-***
-
 ## Release 5.1.2
 
 The controller action function "call" has been renamed to "invoke". You must change your configuration manually here.
-
-***
 
 ## Release 5.1.1
 
@@ -854,49 +608,33 @@ you might want to use the new syntax
 
 using the **dot** between the trigger and "Action". It is not strictly necessary, since the old syntax is still supported during reading of configurations.
 
-***
-
 ## Release 5.1.0
 
 No manual updates necessary.
-
-***
 
 ## Release 5.0.9
 
 A bug has been fixed in the Team Server for handling strategies und setups. The Team Server instances on Azure will be updated automatically, but if you are running a local Team Server for testing purposes, or if you are hosting a Team Server by yourself for your team(s), you might want to update your instance. Don't forget to backup your database file and copy it back after the update.
 
-***
-
 ## Release 5.0.8
 
 A duplicate setting named "Strategy: Pitstop Window" has been removed from the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) and joined with "Strategy: Pitstop Variation Window (+/- Lap)". Please check your settings in the "Session Database", when you have used these settings. You may have to remove remaining artefacts (a setting named "0") from your settings in the "Session Database".
-
-***
 
 ## Release 5.0.7
 
 No manual updates necessary.
 
-***
-
 ## Release 5.0.6
 
 Everything handled automatically.
-
-***
 
 ## Release 5.0.5
 
 Nothing to do for this release.
 
-***
-
 ## Release 5.0.3
 
 Nothing to do this time.
-
-***
 
 ## Release 5.0.2
 
@@ -905,8 +643,6 @@ You might want to take a look at:
 1. Due to an error by the stupid developer, the Team Server found in the *Binaries* folder of the distribution package was still a build for .NET Core 3.1, which has been taken out of service by Microsoft quite a while ago. I have updated the Team Server on all Azure instances already, but I forgot to update the build rule for the local Team Server. This has been fixed with this release. So, if you are running a local Team Server for testing purposes, or if you are hosting a Team Server anyhwere not on Azure, you might want to update your instance. You need the .NET Core 6.0 runtime environment incl. hosting bundle to do this. As always, you can keep your database file, so no data will be lost.
 
 2. The handling of tyre swaps in pitstops managed by the Race Engineer has been disabled by default for *iRacing*, since, due to the lack of correct tyre pressure data, the pressures after the swap might be totally wrong. If you want to enable it again, please open the "Session Database", select *iRacing* as the simulator and add the setting named "Pitstop: Tyre Service" and change the value to *True* (checked).
-
-***
 
 ## Release 5.0.1
 
@@ -920,8 +656,6 @@ Very similar it is possible to select one of the predefined UI themes (one of "S
 	[General]
 	UI Theme=System
 
-***
-
 ## Release 5.0.0
 
 A couple of things to consider for this release:
@@ -934,27 +668,19 @@ A couple of things to consider for this release:
 
 Users of *Assetto Corsa Competizione* will have to change the target hot pressures for the GT3 cars in "Race Settings" and probably in the default settings in the "Session Database" as well. And, unfortunately, you might want to consider deleting all collected cold pressures as well, which can be easily done in the "Session Database".
 
-***
-
 ## Release 4.6.3
 
 A new controller action ["ActiveCars"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) has been introduced for the Race Strategist and the Race Spotter. If you want to use this new command and are using a Stream Deck as well, you might have to reload the Stream Deck icon preset using "Simulator Setup" in case the automatic update fails, so that the icon ("CALL_Cars.png") for the new action is available.
 
 If you are already using the audio routing capabilities to support your streaming setup, you may want to take a look at the new input [audio routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) capabilities.
 
-***
-
 ## Release 4.6.2
 
 Everything handled automatically.
 
-***
-
 ## Release 4.6.1
 
 No manual update needed.
-
-***
 
 ## Release 4.6.0
 
@@ -962,13 +688,9 @@ New controller actions ["DriverSwapPlan" and "NoRefuel"](https://github.com/Seri
 
 You may also take the opportunity to take a look at the controller actions ["TyrePressuresCold" and "TyrePressuresSetup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) introduced in the last release.
 
-***
-
 ## Release 4.5.9
 
 Everything handled automatically.
-
-***
 
 ## Release 4.5.8
 
@@ -977,55 +699,37 @@ Updates are handled automatically. Beside that:
 1. If you are hosting your own Team Server, you **should** update your instance. Although both the old and the new client are compatible, I strongly recommend to deploy the new Team Server, since the .NET Core 3.1 framework used in the old version of the Team Server is out of supprt now. You can continue to use your current database file, schema updates will be handled automatically. You can download the latest version of the .NET Core 6.0 runtime environment from a [dedicated Microsoft website](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 2. If you are using a managed instance of the Team Server because of your Patreon membership, you have nothing to do.
 
-***
-
 ## Release 4.5.7
 
 Everything handled automatically.
-
-***
 
 ## Release 4.5.6
 
 No manual updates necessary.
 
-***
-
 ## Release 4.5.5
 
 Everything handled automatically.
-
-***
 
 ## Release 4.5.4
 
 Everything handled automatically.
 
-***
-
 ## Release 4.5.3
 
 Nothing to do this time.
-
-***
 
 ## Release 4.5.2
 
 Since the oversteer detection has been revised for the telemetry analyzer of the "Setup Advisor", you have to adjust the detection thresholds to higher values. Maybe you want to use the new calibration support.
 
-***
-
 ## Release 4.5.1
 
 Nothing to do manually, but the reorganization of the race reports database might run quite a long time depending of the number of reports you already have. Please make a backup copy, before running the update.
 
-***
-
 ## Release 4.5.0
 
 New controller actions ["Mute" and "Unmute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) have been introduced for all Race Assistants. If you want to use this new commands and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icons for the new actions are available. There are also special icons "Mute_ASSISTANTS.png" and "Unmute_ASSISTANTS.png" available, if you want to create a Stream Deck action, which mutes/unmutes all Assistants with one button press.
-
-***
 
 ## Release 4.4.8
 
@@ -1035,25 +739,17 @@ Updates are handled automatically. Beside that:
 2. If you are using a managed instance of Team Server because of your Patreon membership, please make sure, that you don't connect with a version prior to 4.4.8 to this instance, since it has been ugraded to the new release.
 3. When you have already configured a data replication with the Team Server for the session database, you might want to visit the settings in "Session Database", since there are new replication options available for strategies and car setups.
 
-***
-
 ## Release 4.4.7
 
 No manual updates necessary.
-
-***
 
 ## Release 4.4.6
 
 Nothing to do for you this time.
 
-***
-
 ## Release 4.4.5
 
 Everything handled automatically.
-
-***
 
 ## Release 4.4.0
 
@@ -1067,31 +763,21 @@ Updates are handled automatically. Beside that:
 
 Everything handled automatically this time as well.
 
-***
-
 ## Release 4.3.4
 
 Everything handled automatically.
-
-***
 
 ## Release 4.3.3
 
 Nothing to see here, move on.
 
-***
-
 ## Release 4.3.2
 
 Nothing to do for this release.
 
-***
-
 ## Release 4.3.1
 
 Nothing to do this time.
-
-***
 
 ## Release 4.3.0
 
@@ -1100,8 +786,6 @@ Updates are handled automatically. Beside that:
 1. You may want to review the [configuration of the "Race Spotter" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter), since some options have been removed and a new configuration setting has been added.
 
 2. A new controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin to trigger the recalculation of the current race strategy. If you want to use this new command and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icon for this new action is available.
-
-***
 
 ## Release 4.2.6
 
@@ -1115,8 +799,6 @@ A couple of things to do for you for this update:
 
 4. The actions "BrakeTemperatures" and "BreakeWear" have been added to the "Race Engineer" plugin. You can add it to your configuration, if you want to get these informations by the press of a button on your controller (but they are available as voice commands as well). If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the added icons for the new "BrakeTemperatures" and "BreakeWear" actions will be available to you.
 
-***
-
 ## Release 4.2.5
 
 Updates are automatic. Please note, that all recorded track images will be deleted, since the mapping information has changed for the new automation feature. They will be automatically recreated, after you have driven a few laps on each track.
@@ -1128,8 +810,6 @@ IMPORTANT for *iRacing* users: The identification of the *iRacing* simulator mai
 1. If you are still using "Simulator Setup" for all your configuration tasks, simply recreate a configuration. Done.
 2. If you use "Simulator Configuration", go to the "Applications" tab, select the "iRacing" application and set the Window title to "ahk_exe iRacingSim64DX11.exe". Save and Done.
 
-***
-
 ## Release 4.2.4
 
 Configuration updates are automatic, including a complete and possibly time-cosuming reconfiguration of all data for *rFactor 2*.
@@ -1140,13 +820,9 @@ The other major change in this release that requires your attention is the intro
 
 A "TyreCompound" action has beend added to the *RaceRoom Racing Experience* plugin. You may want to add it to your configuration. If you are using a Stream Deck and you have used the icons preset in "Simulator Setup", remove and reassign it, so that the icons for the new "TyreCompound" action will be available to you.
 
-***
-
 ## Release 4.2.3
 
 Configuration updates are automatic, but the information request action "GapToFront" was renamed to "GapToAhead". For compatibility reasons, the old spelling is still supported by the different apps, but if you regenerate your configuration using "Simulator Setup", you must fix your controller bindings. If you have used the icon set preset for Stream Deck, remove it from the preset list and reassign it, so that the modified request action names come into effect.
-
-***
 
 ## Release 4.2.2
 
@@ -1158,13 +834,9 @@ Nothing to do regarding the configuration update, but:
 
   3. The action "TyreChange" is no longer available for the "AMS2" plugin. It has been replaced by "TyreCompound". Two more actions ("Strategy" and "DriverSwap") are available now. You may want to update your configuration and your controller bindings.
 
-***
-
 ## Release 4.2.1
 
 Database and configuration update is again handled automatically, but there is a major change in this version, how the Pitstop MFD in ACC is handled. Before this release, you had to create small search images, so that the available options and the current state of the ACC Pitstop MFD could be detected using image recognition. The new method introduced with this release uses a different approach, a kind of fuzzy option walk, to achieve the same result. But you can still use the image recognition method, if you feel disturbed by the fast moving cursor of the Pitstop MFD or - even more important - if there is a malfunction with the new method. To do this, open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator.
-
-***
 
 ## Release 4.2.0
 
@@ -1172,61 +844,41 @@ Database and configuration update is handled automatically, but you may want to 
 
 New labels and Stream Deck icons where added for *Assetto Corsa*. You may want to take a look in the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons). Engine repair icons has been added to the Stream Deck icon collection and also to the corresponding preset for "Simulator Setup". If you want to benefit of them, open "Simulator Setup", remove the preset and re-add it again. But be careful, if you have modified the icon assignments on your own with the [Action Labels & Icons editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons), since your changes will be lost, if you do it this way.
 
-***
-
 ## Release 4.1.9
 
 Everything handled automatically.
-
-***
 
 ## Release 4.1.8
 
 Once again, nothing to do for you.
 
-***
-
 ## Release 4.1.7
 
 Everything is handled automatically.
-
-***
 
 ## Release 4.1.6
 
 Configuration and database updates ae handled automatically, but the file structure of the Race Spotter grammars changed. If you have modified or extended the grammars, you have to check and potentially merge your changes.
 
-***
-
 ## Release 4.1.4
 
 A new information request action "FuelRemaining" has been added to the "Race Engineer" plugin and all simulator plugins. You might want to configure this to a button on your hardware controller. All other changes will be handled automatically.
-
-***
 
 ## Release 4.1.2
 
 Once again, nothing to do for you.
 
-***
-
 ## Release 4.1.0
 
 Everything is handled automatically.
-
-***
 
 ## Release 4.0.8
 
 Nothing to do this time.
 
-***
-
 ## Release 4.0.6
 
 Nothing to see here, move on.
-
-***
 
 ## Release 4.0.4
 
@@ -1240,15 +892,11 @@ Please note, that from now on, only the changed items in translatable configurat
   4. Controller Action Icons (handled by the [Action Labels & Icons](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons))
   5. Settings Definition Files for "Session Database" (handled as plain text file)
 
-***
-
 ## Release 4.0.2
 
 Update is handled automatically, but you may want to check the possibilities of the new cloud based voice recognition. Details can be found in the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
 
 The Assistant grammars has been modified with this release for the new voice recognition functionalities. Therefore, if you have modified or extended the grammar files of the Race Assistants, please check the original files and incorporate those changes into your own versions. A new placeholder variable "(Digit)" has been introduced for single-digit numbers. Use it whereever possible, it will increase recognition performance. The usage of "(Number)" for values between 0 and 100 is discouraged where not necessary.
-
-***
 
 ## Release 4.0.0
 
@@ -1258,8 +906,6 @@ Beside that, this version introduces new voice commands for the Race Assistants 
 
 Other changes will be handled automatically. You will notice that the plugin parameter "raceAssistantService" has been renamed to "raceAssistantSynthesizer" and a new paramater "raceAssistantRecognizer" has been introduced.
 
-***
-
 ## Release 3.9.8
 
 The local database has been revised heavily but all configuration updates will be handled automatically:
@@ -1268,37 +914,25 @@ The local database has been revised heavily but all configuration updates will b
   2. The action function *openSetupDatabase* has been renamed to *openSessionDatabase*.
   3. Similar, the plugin parameter *openSetupDatabase* for the plugins "Race Engineer" and "Race Strategist" has been renamed to *openSessionDatabase*.
 
-***
-
 ## Release 3.9.6
 
 Everything is handled automatically.
-
-***
 
 ## Release 3.9.4
 
 Adjustments to the configuration are carried out automatically. Please check whether the new plugin parameter ["openSetupAdvisor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) should be included in the configuration of the "Race Engineer" plugin. Also, a new action label and action icon slot has been introduced for the "SetupAdvisorOpen" action. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
 
-***
-
 ## Release 3.9.2
 
 Configuration update is handled automatically. A bug has been fixed for handling of ICO files in the Stream Deck plugin. If you are using the Stream Deck integration for Simulator Controller, you must update the *de.thebigo.simulatorcontroller.sdplugin* plugin (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) for more information).
-
-***
 
 ## Release 3.9.0
 
 Everything is handled automatically.
 
-***
-
 ## Release 3.8.8
 
 Everything is handled automatically, but you might want to have a look at new plugin information request action "TIME", which is available for the Race Assistant plugins (and also as a voice command). 
-
-***
 
 ## Release 3.8.6
 
@@ -1306,19 +940,13 @@ This release introduces the new AI Race Spotter. A new [plugin "Race Spotter"](h
 
 A new action label and action icon slot has been introduced for the Spotter. See the [configuration documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons) for more information.
 
-***
-
 ## Release 3.8.4
 
 Everything is handled automatically.
 
-***
-
 ## Release 3.8.2
 
 A new parameter *pitstopMFDMode* has been introduced for all simulator plugins. With this paramater, you can specify the method with which Simulator Controller communicates with the simulation game. Trying different communication modes might help in situations where the communication for the handling of the Pitstop MFD fails.
-
-***
 
 ## Release 3.8.0
 
@@ -1326,13 +954,9 @@ Nothing special, only some new plugin labels and icon slots have been added to t
 
 The Team Server backend has been extended. If you are hosting an own installation, you have to redeploy the server. You can keep your data file, it will be updated to the new format.
 
-***
-
 ## Release 3.7.8
 
 The file storage format for Strategies has been heavily extended. Although old strategy files should load without error, I strongly recommend to recreate any strategy that will be used in conjunction with the new dynamic, situation aware strategy adjustment feature of the "Team Center" tool.
-
-***
 
 ## Release 3.7.6
 
@@ -1340,19 +964,13 @@ Many changes in the Team Server internals. If you are hosting an own installatio
 
 Attention: The automatic update handling for versions older than 3.0 has been removed. If you haven't updated Simulator Controller for such a long time, you have to remove your *Simulator Controller* folder in your user *Documents* folder (make a backup copy) and start with a fresh installation. You can restore your changes, if any, later on.
 
-***
-
 ## Release 3.7.4
 
 Nothing to do for this release.
 
-***
-
 ## Release 3.7.2
 
 The storage format of the Setup Database has been modified for this release. The migration is handled automatically by the update procedure (be patient, might take a few moments), but you should make a backup copy before running the update in order to be on the safe side. The "Team Server" has changed dramatically. You have to use the new version of the "Team Server" for this release and also older versions of Simulator Controller will not be compatible with the current release of "Team Server".
-
-***
 
 ## Release 3.7.0
 
@@ -1362,37 +980,25 @@ Some new plugin labels and icon slots have been added to the "ACC" plugin and al
 
 Please note, that with the latest update of ACC V 1.8 by Kunos, the tyre model changed significantly, which leads to different cold tyre pressures and reduced laptimes on most tracks. This renders the data in the Setup- and Telemetry Database almost useless, but you will find a small tool in the #tools-and-fixes channel in our Discord Server, which you can use to correct the data, at least on average.
 
-***
-
 ## Release 3.6.8
 
 Nothing to do for this release, but you may take a look at the new conifguration tools for the Stream Deck integration, if you own one of these little gems.
-
-***
 
 ## Release 3.6.6
 
 To support the new Stream Deck integration, all labels for plugin actions has been reworked. Therefore it is necessary to update the "Controller Plugin Labels.XX" files, which are located in the *Simulator Controller\Tranlations* folder, which is located in your user documents folder, if you have modified the labels in the past. The update procedure will move your local files to *.bak files to preserve your changes, but you have to use the "Simulator Configuration" tool to reenter your changes in the updated version of those files.
 
-***
-
 ## Release 3.6.4
 
 Nothing to do for this release.
-
-***
 
 ## Release 3.6.2
 
 Nothing to do for this release.
 
-***
-
 ## Release 3.6.0
 
 Nothing to do for this release.
-
-***
 
 ## Release 3.5.8
 
@@ -1402,8 +1008,6 @@ A new controller action function "openStrategyWorkbench" has been defined, which
 
 The local folder for the *Setup Database* has been renamed from "Setup Database" to "Database" in order to better reflect the future usage, since the telemetry data for the strategy development will be saved there also. Side note for all, who have given consent to share their tyre and/or setup data: Telemetry data will never be shared with the community, so no new consent is necessary.
 
-***
-
 ## Release 3.5.6
 
 All configuration changes are handled automatically for this release. New plugin parameters "Call" have been defined for the "Race Engineer" and the "Race Strategist" plugins. You may want to check the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) to check, if these parameters might be useful for you. Please note, that this version introduces [new report types](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) for the "Race Reports" application. Older reports may show missing data for the new report types.
@@ -1412,13 +1016,9 @@ IMPORTANT for RaceRoom Racing Experience users:
 
 If you have used "Simulator Setup" already, there was an error in the defaults for the Pitstop menu navigation buttons. This will definitely lead to a non-functional Pitstop menu handling. Please correct the "Next Option" value to "S" and the "Previous Option" value to "W" and recreate your configuration. If you are already using "Simulator Configuration" for your configuration tasks, the plugin parameters are *nextOption:* and *previousOption:* correspondingly.
 
-***
-
 ## Release 3.5.4
 
 All configuration changes are handled automatically for this release. You might want to check the extended options of the [Race Strategist configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist), if you want to use the new "Race Reports" tool.
-
-***
 
 ## Release 3.5.2
 
@@ -1426,8 +1026,6 @@ This release introduces a fully automatic program installation and update proces
 
   1. Use the new automated installer to download and install tha latest version of Simulator Controller (3.5.2 in this case). See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for more details. Use this method for the official release of Version 3.5.2 on Friday, 08/27/21 and all later release versions.
   2. Download the latest version (3.5.2 or later) from the [release section on GitHub](https://github.com/SeriousOldMan/Simulator-Controller#latest-release-build), extract the contents of the archive and run the application "Simulator Tools" in the *Binaries* folder. This will guide you through the installation process. The files of the installation archive will be deleted afterwards, unless you have chosen a portable installation and the target installation folder is the same as the folder of the installation archive files.
-
-***
 
 ## Release 3.5.0
 
@@ -1437,16 +1035,12 @@ The biggest change in this release is the introduction of the all-new [Setup Wiz
 
 Therefore: If you have edited your local files in the *Simulator Controller\Translations* folder in your *Documents* folder and introduced your own label identifiers, be sure to re-integrate your changes after running the update. You may have to manually copy the original files from the *Resources\Translations* folder to the *Simulator Controller\Translations* folder in your user *Documents* folder before re-integrating your changes, if you do **not** start the editor from inside the "Simulator Configuration* application.
 
-***
-
 ## Release 3.3.0
 
 This release is all about speech synthesis - and it took a great step forward.
 
   1. Support for *Azure Cognitive Services* for speech synthesis is now available. Please see the revised documentation for [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information. If you are using Jona and/or Cato, you can choose between different synthesization methods and voices using the new plugin parameter *raceAssistantService*. See the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), it is really worth it.
   2. Audio post processing for a really immersive in-car team radio sound is also available now. You have to install a small sound processing utility] [SoX](http://sox.sourceforge.net/) on your computer (for your convenience, you will find the current SoX installer in the *Utilities\3rd Party\Sound Processing* folder) and you have to configure it in the [Voice Control configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) as well. It will take only a few minutes, and the immersion effect is great, so you don't want to miss this.
-
-***
 
 ## Release 3.2.2
 
@@ -1455,23 +1049,17 @@ This release is all about speech synthesis - and it took a great step forward.
   - Furthermore, the "Accept" and "Reject" commands of the "Race Engineer" and "Race Strategist" and of the "Pitstop" modes of all simulation game plugins will now trigger the answer for the currently focused Race Assistant. Nothing to do here, but you should be aware of this new behavior.
   - New images for the repair options in the *RaceRoom Racing Experience* Pitstop MFD have been introduced. If you created your own images for your local screen resolution and language choice, you need to images for the new options as well ("Bodywork Damage", "Bodywork Damage Selected", "Rear Damage" and "Rear Damage Selected").
 
-***
-
 ## Release 3.2.0
 
 Release 3.2.0 integrates the telemetry and data provider for *Automobilista 2*. Nothing to do here with regards to installation, but you must enable the shared memory interface of *Automobilista 2* in the settings of the game. Please choose the mode "PCars 2".
 
 Furthermore, a "Pitstop" controller mode is available for *Automobilista 2* as well. Please take a look at the configuration documentation for the ["AMS2" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8), if you want to use the new mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) as well, so that the pitstop mode is automatically selected during a race or practice session.
 
-***
-
 ## Release 3.1.6
 
 This release introduces the first version of the plugin for Automobilista 2. If you are a fan of Automobilista 2, you will see growing support for this simulation, including an integration with Jona and Cato, in the upcoming releases of Simulator Controller.
 
 The automated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "Automobilista 2". Please set "startAMS2" as the *Startup Function Hook*. And last but not least, you may want to add "Automobilista 2" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
-
-***
 
 ## Release 3.1.4
 
@@ -1481,8 +1069,6 @@ Please take note of the following:
   - The "Race Engineer.settings" file has been renamed to "Race.settings". The automated update procedure will take care of the renaming in all locations, even in the local setup database. But an additional tab with settings for the strategy simulation model has been added. You may want to take a look at the new settings using the *Race Settings* tool.
   - The controller actions "openRaceEngineerSettings" and "openRaceEngineerSetups" have been renamed to "openRaceAssistantSettings" and "openSessionDatabase" respectively. If you have used them in your configuration, you must rename them manually using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
-***
-
 ## Release 3.1.2
 
 This release takes the next step for Cato, the AI Race Strategist and introduces integrations for iRacing, rFactor 2 and RaceRoom Racing Experience. Nothing to do here on your side. Small adaptions may be necessary for:
@@ -1491,8 +1077,6 @@ This release takes the next step for Cato, the AI Race Strategist and introduces
   - [For Developers]: The class *RaceEngineerSimulatorPlugin* has been renamed to *RaceAssistantSimulatorPlugin* the methods *getAction* and *fireAction* of the class *SimulatorController* have been renamed to *getActions* and *fireActions* and now support multiple actions for one controller function.
   
 Note: Beginning with this release, the source code is no longer part of the distribution to save some space. But you can always load the sources from GitHub, if required.
-
-***
 
 ## Release 3.1.0
 
@@ -1509,39 +1093,27 @@ Release 3.1 introduces a new Assistant, Cato, the AI Race Strategist. The new As
   | Grammars | Config | [SC]\Resources\Grammars | Simulator Controller\Grammars |
   | Rules | Config | [SC]\Resources\Rules | Simulator Controller\Rules |
 
-***
-
 ## Release 3.0.6
 
 The local configuration database will be covered as usual by the automatic update procedure. But you will take a look at the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), since a new configuration page has been added for the AI Race Engineer. A lot of [new configuration options](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) will allow you to control the dynamic behavior of certain algorithms of the AI kernel and the integration of Jona with the setup database. The default values of all thesse new options has been chosen so, that the default behavior should be the same as before.
-
-***
 
 ## Release 3.0.4
 
 The update of the local configuration is covered by the automated update procedure, but you will be asked for a new consent for the extended setup database. Please rethink your consents and be part of the community.
 
-***
-
 ## Release 3.0.2
 
 No manual update steps necessary for this release, everything is handled automatically.
 
-***
-
 ## Release 3.0
 
 This update is handled completely without manual interaction. You might want to add the new application *Setup Database.exe* to your *launchpad* (see the ["Launch" mode](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-launch) of the "System" plugin for more information), though. Also, you might want to use the new [plugin parameter *raceEngineerOpenSetups*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin to open the setup database query tool.
-
-***
 
 ## Release 2.8.6
 
 This release finalizes the integration for *iRacing*. A new "Pitstop" mode has been introduced and Jona is aware of iRacing and can execute a pitstop automatically. Please take a look at the configuration documentation for the ["IRC" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-2), if you want to use the "Pitstop" mode on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
 
 For Developers: Some of the data fields in the telemetry interface file structure have changed, please consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration), if required.
-
-***
 
 ## Release 2.8.5
 
@@ -1552,16 +1124,12 @@ The major change in this release is the introduction of the "Pitstop" controller
   3. A new "Pitstop" mode has been introduced for both the "R3E" and "RF2" plugins. Please take a look at the configuration documentation for the ["R3E" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7) and the ["RF2" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6), if you want to use these modes on your Button Box. You also might want to adjust the [controller automation rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#configuration-of-the-controller-mode-automation) for the new plugin modes as well.
   4. This release also introduces the first version of the plugin for iRacing. If you are a fan of iRacing, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller. The automated update procedure described above will add the plugin descriptor to your local configuration, but the plugin will be deactivated. You may want to activate it using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), but to do so, you also have to add a new application on the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications), which must be named "iRacing". Please set "startIRC" as the *Startup Function Hook*. Locate the "iRacingUI.exe" application and set "ahk_exe iRacingUI.exe" as the window title. And last but not least, you may want to add "iRacing" to the list of Simulators on the [General tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general).
 
-***
-
 ## Release 2.8.2
 
 Beside the automated update, two things are worth to mention for this release:
 
   1. This release introduces localized versions of the *Controller Plugin Labels.ini* file, which was located in the *Simulator Controller\Config* folder in your *Documents* folder. The old file will be deleted during this transformation. Therefore, if you have modified this file, either directly or from the *Plugins* tab of the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), please make a backup copy, BEFORE running the update procedure, and transfer your changes afterwards.
   2. The *rFactor 2* simulation telemetry provider has been extended. Jona is now able to handle a pitstop completely on its own. Please be sure to install the Shared Memory plugin in *rFactor 2* as described in the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-rf2). If you forgot this, nothing will happen.
-
-***
 
 ## Release 2.8
 
@@ -1572,8 +1140,6 @@ As always, must of the update work in this release will be handled automatically
   3. There had been quite some changes for the internal data format of the telemetry information and also some changes in the AI kernel of Jona, but I don't think, that there is someone out there, who already worked on this stuff.
   4. Two new actions "Accept" and "Reject" have been added to the "Race Engineer" plugin, which you might wand to include in your [configuration}(https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer).
   5. (Developer only): The *Simulator Tools.targets* file changed again, so you might have to mrge your local changes, if there are any.
-
-***
 
 ## Release 2.7
 
@@ -1595,13 +1161,9 @@ Most of the changes necessary for release 2.7 will then have been handled automa
 
 Note: Please see the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#27-release-040121) for links to the documentation of all the new features.
 
-***
-
 ## Release 2.6
 
 Nothing major for this release, everything will be taken care of by the automated update procedure. For political correctness (sorry for my previous choice of words, but I am an IT guy and in the world of IT these terminology is of widespread use), I renamed "Master Controller" to "Main Controller" and "Slave Controller" to "Support Controller" for the Button Box configurations. As said, this renaming will be handled by the automated update, but if you have configured your own Button Boxes based on the preconfigured ones of the previous release, you might want to check in your configuration, whether everything is as expected after the update.
-
-***
 
 ## Release 2.5.4
 
@@ -1613,8 +1175,6 @@ Beside tremendous changes under the hood for Jona, Release 2.5.4 delivers a new 
 
 And, last but not least, the support for multiple button boxes has been extended. You can now distribute the applications of the Lauchpad and also the chat messages across multiple Button Boxes using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
-***
-
 ## Release 2.5
 
 A new tab in the configuration tool allows you to configure the language to be used for voice generation and recognition and also introduces a *Push-To-Talk* functionality for voice recognition. Please read the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), if you want to use the new features.
@@ -1622,8 +1182,6 @@ A new tab in the configuration tool allows you to configure the language to be u
 Another important change in this release is the introduction of a configuration based approach for Button Box layouts. The automatic update procedure will take care, that the predfiend Button Box visual representation will function as before, but you will want to have a look into the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts), if you had defined your own Button Box with the API based approach. Because of this new feature, Release 2.5 introduces changes in the format of the *Simulator Settings.ini* file, but the automated update procedure will take care of most of that. Nevertheless, you might have to reposition your Button Boxes, since the old saved positions will be lost after the update.
 
 Beside that, Jona learned a lot about upcoming weather changes and tyre compound recommendations with Release 2.5, but this will come for free with regards to the necessary update activities. With this release, more information is used from the *Race Engineer.settings* file. Please use the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-engineer-settings) and check all values. Especially, if you want to use Jona to setup your pitstop, this is more important than ever.
-
-***
 
 ## Release 2.4
 
@@ -1637,8 +1195,6 @@ Unfortunately, the format of some of the Settings files have changed again with 
   
 Last, but not least, the former automatically activated "Shutdown" function in the "Launch" mode now is configured by an explicit plugin argument of the *System* plugin. You must update your [plugin configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration), if you want the "Shutdown" function to still be available.
 
-***
-
 ## Release 2.3
 
 Beside lots of new functionality for Jona, the AI Race Engineer, this release introduces the first version of the plugin for rFactor 2. If you are a fan of rFactor 2, you will see growing support for this simulation, including an integration with Jona, in the upcoming releases of Simulator Controller.
@@ -1648,8 +1204,6 @@ The automated update procedure described above will add the plugin descriptor to
 A second step for the update requires the recreation of of the *Race Engineer.settings* file, since the format has changed substantially. Please start the *Race Engineer Settings* application, adjust all the settings and close the dialog with the "Ok" button.
 
 The last step is only required by the developers amongst you: If you are using a local version of the *Simulator Tools.targets* file, you need to take a look witth you favorite Diff tool, since the original file changed substantially as well.
-
-***
 
 ## Release 2.1
 
@@ -1668,8 +1222,6 @@ IMPORTANT: Jona is considered an alpha version in Release 2.1. There are a lot o
 Another new feature of Release 2.1 introduces the all new [plugin "Pedal Calibration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-pedal-calibration) for the Button Box controller. This plugin allows you to control the different calibration curves of your high end pedals directly from the Button Box. The plugin "Pedal Calibration" plugin will be added to your local configuration by the automated update procedure described above, but it will be deactivated. Activate as needed...
 
 Beside that, all other changes for Release 2.1, for example for the translation files, should be handled by the automated update procedure as well. As always, it might be a good idea to make a backup copy of your local files before you start the first application of Simulator Controller after updating the files, just to be on the safe side.
-
-***
 
 ## Release 2.0
 

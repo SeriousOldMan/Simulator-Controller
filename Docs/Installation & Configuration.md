@@ -45,7 +45,7 @@ All your (configuration) files will be saved to the *Simulator Controller* folde
 
 ### Securing your own data and files
 
-It is important to understand that all files in the installation folder will be replaced with each update of Simulator Controller, even those files that have been copied there by you and do not belong there. Therefore, if you want to add additional data, for example race reports to Simulator Controller, always place this additional data in the *Simulator Controller* folder in your user *Documents* folder. Everything in this folder will be preserved when Simulator Controller is updated. By the way, the *Database* folder with all the data from the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) is located there as well.
+It is important to understand that all files in the installation folder will be replaced with each update of Simulator Controller, even those files that have been copied there by you and do not belong there. Therefore, if you want to add additional data, for example race reports, to Simulator Controller, always place this additional data in the *Simulator Controller* folder in your user *Documents* folder. Everything in this folder will be preserved when Simulator Controller is updated. By the way, the *Database* folder with all the data from the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) is located there as well.
 
 For your safety and your peace of mind, I recommend that you always make a backup of this folder, when you change your configuration or when you update Simulator Controller to a newer version.
 

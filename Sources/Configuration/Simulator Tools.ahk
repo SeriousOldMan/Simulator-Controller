@@ -3849,7 +3849,7 @@ prepareTargets(&buildProgress, updateOnly) {
 
 startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
-	global gSpecialTargets
+	global gSpecialTargets, gBuilding
 
 	local forceExit := GetKeyState("Shift")
 	local noSpecial := GetKeyState("Alt")

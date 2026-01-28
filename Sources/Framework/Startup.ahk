@@ -195,26 +195,30 @@ loadSimulatorConfiguration() {
 			setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
 
 	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
-		if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
-			usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
-		else {
-			usage := newMultiMap()
+		Task.startTask(() {
+			local usage, diagnostics
+			
+			if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+			else {
+				usage := newMultiMap()
 
-			setMultiMapValue(usage, "General", "Created", A_Now)
-		}
+				setMultiMapValue(usage, "General", "Created", A_Now)
+			}
 
-		setMultiMapValue(usage, "General", "Updated", A_Now)
+			setMultiMapValue(usage, "General", "Updated", A_Now)
 
-		diagnostics := getMultiMapValues(settings, "Diagnostics")
+			diagnostics := getMultiMapValues(settings, "Diagnostics")
 
-		if (diagnostics.Count > 0)
-			setMultiMapValues(usage, "Diagnostics", diagnostics)
-		else
-			setMultiMapValue(usage, "Diagnostics", "Default", true)
+			if (diagnostics.Count > 0)
+				setMultiMapValues(usage, "Diagnostics", diagnostics)
+			else
+				setMultiMapValue(usage, "Diagnostics", "Default", true)
 
-		setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
+			setMultiMapValue(usage, "Applications", appName, getMultiMapValue(usage, "Applications", appName, 0) + 1)
 
-		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+			writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+		}, 1000, kLowPriority)
 	}
 
 	if kLogStartup

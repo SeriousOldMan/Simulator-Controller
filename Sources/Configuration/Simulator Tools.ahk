@@ -36,6 +36,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\Task.ahk"
 #Include "..\Framework\Extensions\Database.ahk"
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
@@ -1790,12 +1791,15 @@ updateConfigurationForV681() {
 }
 
 updateConfigurationForV680() {
-	local languages := getKeys(availableLanguages())
-	local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+	Task.startTask(() {
+		local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 
-	do(languages, (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
+		do(getKeys(availableLanguages()), (lc) => removeMultiMapValue(usage, "Languages", "Translators." . lc))
 
-	writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+	}, 0, kLowPriority)
+
+	Sleep(3000)
 }
 
 updateConfigurationForV677() {
@@ -3309,7 +3313,7 @@ runSpecialTargets(&buildProgress) {
 	if (StrLen(Trim(kMSBuildDirectory)) > 0)
 		try {
 			for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
-				if GetKeyState("Alt")
+				if GetKeyState("RAlt")
 					return
 
 				SetWorkingDir(directory)
@@ -3850,10 +3854,10 @@ prepareTargets(&buildProgress, updateOnly) {
 
 startupSimulatorTools() {
 	global gUpdateSettings, gCleanupSettings, gCopySettings, gBuildSettings, gSplashScreen, gTargetConfiguration, gTargetsCount
-	global gSpecialTargets
+	global gSpecialTargets, gBuilding
 
 	local forceExit := GetKeyState("Shift")
-	local noSpecial := GetKeyState("Alt")
+	local noSpecial := GetKeyState("RAlt")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
 	local buildProgress
@@ -3901,7 +3905,7 @@ startupSimulatorTools() {
 
 	prepareTargets(&buildProgress, updateOnly)
 
-	if (noSpecial || GetKeyState("Alt"))
+	if (noSpecial || GetKeyState("RAlt"))
 		gSpecialTargets := []
 
 	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length

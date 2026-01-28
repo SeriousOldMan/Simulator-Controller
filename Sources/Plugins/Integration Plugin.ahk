@@ -88,45 +88,65 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		super.__New(controller, name, configuration)
 
-		this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
-
-		deleteFile(this.StateFile)
-
-		this.iLanguage := this.getArgumentValue("stateFile", "EN")
-
-		if !inList(getKeys(availableLanguages()), this.iLanguage)
-			this.iLanguage := "EN"
-
-		formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
-
-		if ((formats.Length = 2) && (formats[1] = "Time") && inList(kTimeFormats, formats[2]))
-			this.iFormats["Time"] := formats[2]
-
-		for ignore, unit in string2Values(",", this.getArgumentValue("units", ""))
-			for ignore, unit in string2Values(A_Space, unit)
-				if (unit.Length = 2)
-					switch unit[1], false {
-						case "Volume":
-							if inList(kVolumeUnits, unit[2])
-								this.iUnits[unit[1]] := unit[2]
-						case "Pressure":
-							if inList(kPressureUnits, unit[2])
-								this.iUnits[unit[1]] := unit[2]
-						case "Temperature":
-							if inList(kTemperatureUnits, unit[2])
-								this.iUnits[unit[1]] := unit[2]
-						case "Speed":
-							if inList(kSpeedUnits, unit[2])
-								this.iUnits[unit[1]] := unit[2]
-					}
-
 		if (this.Active || (isDebug() && isDevelopment())) {
+			this.iStateFile := this.getArgumentValue("stateFile", kTempDirectory . "Session State.json")
+
+			deleteFile(this.StateFile)
+
+			this.iLanguage := this.getArgumentValue("stateFile", "EN")
+
+			if !inList(getKeys(availableLanguages()), this.iLanguage)
+				this.iLanguage := "EN"
+
+			formats := string2Values(A_Space, this.getArgumentValue("formats", ""))
+
+			if ((formats.Length = 2) && (formats[1] = "Time") && inList(kTimeFormats, formats[2]))
+				this.iFormats["Time"] := formats[2]
+
+			for ignore, unit in string2Values(",", this.getArgumentValue("units", ""))
+				for ignore, unit in string2Values(A_Space, unit)
+					if (unit.Length = 2)
+						switch unit[1], false {
+							case "Volume":
+								if inList(kVolumeUnits, unit[2])
+									this.iUnits[unit[1]] := unit[2]
+							case "Pressure":
+								if inList(kPressureUnits, unit[2])
+									this.iUnits[unit[1]] := unit[2]
+							case "Temperature":
+								if inList(kTemperatureUnits, unit[2])
+									this.iUnits[unit[1]] := unit[2]
+							case "Speed":
+								if inList(kSpeedUnits, unit[2])
+									this.iUnits[unit[1]] := unit[2]
+						}
+
 			this.iAssistantsStateTask := PeriodicTask(ObjBindMethod(this, "updateSessionState"), 1000, kLowPriority)
 
 			this.iAssistantsStateTask.start()
 			this.iAssistantsStateTask.pause()
 
 			this.updateSessionState()
+
+			Task.startTask(() {
+				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
+				local ignore, unit
+
+				setMultiMapValue(usage, "Integration", "Activations"
+									  , getMultiMapValue(usage, "Integration", "Activations", 0) + 1)
+
+				setMultiMapValue(usage, "Integration", "Languages." . this.Language
+									  , getMultiMapValue(usage, "Integration", "Languages." . this.Language, 0) + 1)
+
+				setMultiMapValue(usage, "Integration", "Time." . this.Format["Time"]
+									  , getMultiMapValue(usage, "Integration", "Time." . this.Format["Time"], 0) + 1)
+
+				for ignore, unit in ["Volume", "Pressure", "Temperature", "Speed"]
+					setMultiMapValue(usage, "Integration", unit . "." . this.Unit[unit]
+										  , getMultiMapValue(usage, "Integration", unit . "." . this.Unit[unit], 0) + 1)
+
+				writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
+			}, 10000, kLowPriority)
 		}
 
 		this.iDrivingCoach := this.Controller.findPlugin(kDrivingCoachPlugin)

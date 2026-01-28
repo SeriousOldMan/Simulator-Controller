@@ -529,7 +529,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 _callSimulator := callSimulator
 
-readSimulator(simulator, car, track, format := "Object") {
+readSimulator(simulator, car, track, format := "Object", parts := {}) {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 	local data := provider.readSessionData("Setup=true")
 	local telemetryData, standingsData
@@ -557,4 +557,20 @@ readSimulator(simulator, car, track, format := "Object") {
 
 _readSimulator(simulator, car := false, track := false) {
 	return readSimulator(simulator, car, track, "Text")
+}
+
+_readSession(simulator, car := false, track := false) {
+	return readSimulator(simulator, car, track, "Text", {Standings: false, Setup: false})
+}
+
+_readSession(simulator, car := false, track := false) {
+	return readSimulator(simulator, car, track, "Text", {Standings: false, Setup: false})
+}
+
+_readStandings(simulator, car := false, track := false) {
+	return readSimulator(simulator, car, track, "Text", {Session: false, Setup: false})
+}
+
+_readPitstop(simulator, car := false, track := false) {
+	return readSimulator(simulator, car, track, "Text", {Session: false, Standings: false})
 }

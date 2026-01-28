@@ -1,8 +1,8 @@
 [Development]
-Version=6.8.1.0-dev
+Version=6.8.1.0-beta
 Target=6.8.1.0-release
 Date=01/28/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VlvJqrxN/Releases/Simulator%20Controller%206.8.1.0-dev.zip
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/agnwXwbY/Releases/Simulator Controller 6.8.1.0-beta.zip
 Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator"
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
@@ -30,5 +30,5 @@ Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.8.1.0-dev
+Development=6.8.1.0-beta
 Release=6.8.0.0-release

@@ -69,6 +69,8 @@ Normally an Assistant will tell you that he didn't understand you, when the spok
 | Race Spotter     | Very basic telemetry data (both real time and historic) and no pitstop information. But current position incl. detailed standings with gap and lap time information for all opponents is provided. |
 | Driving Coach    | Beside the [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-driving-coach) that can be configured for the Driving Coach in general, the same information available to the Race Strategist is available to the Driving Coach as well. |
 
+###### Notes
+
 (1) Depending on the availabilty of the data by the current simulator.
 
 Since large parts of the knowledge base of the Assistants will be supplied to the LLM for matching, a larger model with a context window of at least 16k tokens is required for this booster. Full standings history isn't possible at the moment, since this will overflow the input context area of the LLM, at least for the *smaller* models like Mistral 7b, and so on. Time will cure this problem, and I will update the capabilities of the integration, when more capable models become available. For the time being, the position data is available for the most recent laps and also the gaps for the most important opponents are passed to the LLM (for Strategist and Spotter).
@@ -442,8 +444,8 @@ Below you find all instruction categories and the supported variables:
 
 ###### Notes
 
-(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
-(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.
+(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.<br>
+(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.<br>
 (3) Some Assistants will have *internal* instructions for special behavior (for example the "Pitstop Planning" event of the Race Engineer. To inspect and/or modify this instructions, hold down the Control key when clicking on the "Instructions..." button.
 
 ## How it works
@@ -721,7 +723,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ##### Notes
 
-1. Not available, when the Race Strategist is active.
+(1) Not available, when the Race Strategist is active.
 
 #### Events
 
@@ -743,7 +745,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ##### Notes
 
-1. Not available, when the Race Strategist is active.
+(1) Not available, when the Race Strategist is active.
 
 ### Race Strategist
 
@@ -762,8 +764,8 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ##### Notes
 
-1. This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.
-2. This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
+(1) This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.<br>
+(2) This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
 
 #### Events
 

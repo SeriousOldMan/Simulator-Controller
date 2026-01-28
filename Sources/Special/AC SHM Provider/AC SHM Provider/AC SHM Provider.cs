@@ -105,6 +105,7 @@ namespace ACSHMProvider
             {
                 memoryStatus = AC_MEMORY_STATUS.CONNECTING;
 
+                // Connect to shared memory
                 physicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_physics");
                 graphicsMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_graphics");
                 staticInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_static");
@@ -361,11 +362,20 @@ namespace ACSHMProvider
 
         public void ReadSetup()
         {
+            /*
+            Console.WriteLine("[Setup Data]");
+            if (connected)
+            {
+            }
+            */
         }
 
+        // Determine if the race is timed or lap based bceause AC doesn't provide this info correctly
         public bool IsTimedRace()
         {
             bool isTimedBasedOnRemainingTime = graphics.SessionTimeLeft >= 0;
+
+            // Race may still be time based as at the end of a timed race the session time left goes negative
             bool isTimedBasedOnTrackLength = GetRemainingLaps((long)graphics.SessionTimeLeft) <= -1;
 
             return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;

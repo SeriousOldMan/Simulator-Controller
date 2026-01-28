@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VlvJqrxN/Releases/Simulator%20Controller%206.8.1.0-dev.zip) (Early build for 6.8.1. Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database".)
+[6.8.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VlvJqrxN/Releases/Simulator%20Controller%206.8.1.0-dev.zip) (Early build for 6.8.1. Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6810) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) of this version and all the versions you might have skipped, before installing and using this version.
 

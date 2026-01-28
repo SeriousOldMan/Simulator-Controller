@@ -20,7 +20,7 @@
   - You now can attach notes to your telemetries, strategies and setups in the "Session Database".
   - All known cars will now be shown in "Setup Workbench", also those without setup editor support and even if they had not been driven yet.
   - The [SimHub plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin) which had been maintained in the past by Jordan Moss (@Mossi) had been rewritten by our team member @Awesome-XV and is now an official part of Simulator Controller. It will be installed automatically by "Simulator Setup", but it must be enabled in SimHub and to use it, the "Integration" plugin in Simulator Controller must be enabled as well.
-  - [Expert] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
+  - [Experts] The "Integration" plugin has been rewritten to support the new version of the SimHub plugin and the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration) has been rewritten as well. A couple of incompatible changes has been made to streamline the data structure, therefore take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680).
   - [Internal] The support for *Lua* 5.5 has been extended, but still not fully functional.
   - [Internal] Fixed usage statistics for translators.
   - New car models for "Setup Workbench":
@@ -65,6 +65,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - When "All" tracks had been selected in the settings of the "Session Database", all tracks that already had been driven (independent of car) will be available in the "Tracks" drop down menu. This information is collected while driving, so will only be updated starting from now.
   - Data for all cars with the *old* composite names incl. team name, car number and so on from *Le Mans Ultimate* has been removed from the session database. All removed data has been moved the folder *Simulator Controller\Database\Archive\LMU* which is located in your user *Documents* folder.
   - Car names of all cars and tracks have been added for *Le Mans Ultimate*, so that they show up in the "Session Database", even if they have not been driven yet.
+  - [Experts] Several new functions have been added to the [module "Simulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-simulator). These functions allow you to request parts of the full data set returned by the already available *Read* function.
   - [Important] The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
   - [Important] The data of all cars from *Le Mans Ultimate* with the old naming scheme (no car model, but a combination of team name and race number) has been moved from the session database to an archive. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for more information.
   - New car models for "Setup Workbench":
@@ -599,7 +600,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - The processing of many Spotter shout outs has been optimized, so that they come more in line with the actual situation on the track. The price for this is, that a configured *Rephrasing* booster is not used in those cases.
     - The Spotter no longer tells you about a car directly behind you, which you actually have just overtaken.
     - Lastly, the Spotter can now interrupt itself more often, if something urgent needs to be communicated to the driver.
-	- {Expert] A couple of updates to the *Conversation* and *Reasoning* booster events:
+	- {Experts] A couple of updates to the *Conversation* and *Reasoning* booster events:
 	  - All events for the *Conversation* and *Reasoning* booster are now fired even if the corresponding voice alert is disabled.
 	  - The "OpponentPitting" event in the *Reasoning* booster is now also signalled for *focused* opponents.
 	  - A new [event "Focus Gap Update"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#race-spotter) has been defined for the *Reasoning* booster of the Race Spotter, which is signalled, whenever the gap to the currently focused car has changed for a given amount.
@@ -1929,7 +1930,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. Two [predefined conversation actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#trigger-actions-from-conversation) for the Spotter are now available:
       - The LLM can decide to reset and recalculate the delta and lap time history for all cars.
 	  - And you can ask the LLM to reset the reference speed data of all cars around the track, when too many false positives for accidents and slow cars are given.
-  13. [Expert only] All definition files for "Simulator Setup" can be *overwritten* in the *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
+  13. [Experts] All definition files for "Simulator Setup" can be *overwritten* in the *Simulator Controller\Setup\Definitions* folder which is located in your user *Documents* folder. This can be used to introduce new bundled applications or to replace the startup video, just to name two examples.
 
 ## 5.7.6.0-release 06/14/24
   1. Minor bugfixes, as always
@@ -2733,8 +2734,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	 - The presets "Names and voices of Assistants", "Different Speaker Voices" and "Mode Automation" have been removed, since they are no longer needed. If such a preset is in use in your configuration, it will still be active, until you remove it.
 	 - The "Push-To-Talk Behavior" preset has been deprecated as well. This option is now available in the standard voice control configuration.
 	 - All presets with search images for *Assetto Corsa Competizione* has been removed, since they are no longer needed.
-	 - [Expert Only] A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
-	 - [Expert Only] When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict or happen to be the same configuration item. This means, that it is now possible to use the wizard "Simulator Setup" together with "Simulator Configuration" for configuration tasks.
+	 - [Experts] A new preset "Custom Configuration" has been added with a very extensive sample section, which helps the experts to create special configurations.
+	 - [Experts] When a new configuration is beeing created, "Simulator Setup" will first read the currently active configuration and then will generate the new configuration. The new configuration will then be integrated into the current configuration, preserving in most cases the custom additions, that may have been made with "Simulator Configuration", as long as they are not in conflict or happen to be the same configuration item. This means, that it is now possible to use the wizard "Simulator Setup" together with "Simulator Configuration" for configuration tasks.
   4. "Simulator Startup" learned a new trick. It can now unblock applications and DLLs, when holding down the Control together with the Shift key, while starting. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems) for more information.
   5. A fourth page has been added to the "Server Administration" application. This page shows a [list of all data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration) currently stored on the Team Server and also allows to compact the database, if necessary. This requires a new version of the Team Server. **If you are running your own Team Server, you should update your instance(s).**
   6. The "Practice Center" now shows the sector times, if available from the simulator data API, in the laps list and various reports.

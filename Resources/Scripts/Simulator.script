@@ -11,6 +11,9 @@
 
 __call_simulator = extern("_callSimulator")
 __read_simulator = extern("_readSimulator")
+__read_session = extern("_readSession")
+__read_standings = extern("_readStandings")
+__read_pitstop = extern("_readPitstop")
 
 
 -------------------------------------------------------------------------------
@@ -31,6 +34,24 @@ Simulator.Read = function (simulator, ...)
 	local arguments = table.pack(...)
 	
 	return __read_simulator(simulator, table.unpack(arguments))
+end
+
+Simulator.ReadSession = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __read_session(simulator, table.unpack(arguments))
+end
+
+Simulator.ReadStandings = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __read_standings(simulator, table.unpack(arguments))
+end
+
+Simulator.ReadPitstop = function (simulator, ...)
+	local arguments = table.pack(...)
+	
+	return __read_pitstop(simulator, table.unpack(arguments))
 end
 
 Simulator.Call = function (simulator, ...)

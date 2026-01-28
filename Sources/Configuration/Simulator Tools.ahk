@@ -1798,7 +1798,7 @@ updateConfigurationForV680() {
 
 		writeMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat", usage)
 	}, 0, kLowPriority)
-	
+
 	Sleep(3000)
 }
 
@@ -3313,7 +3313,7 @@ runSpecialTargets(&buildProgress) {
 	if (StrLen(Trim(kMSBuildDirectory)) > 0)
 		try {
 			for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
-				if GetKeyState("Alt")
+				if GetKeyState("RAlt")
 					return
 
 				SetWorkingDir(directory)
@@ -3857,7 +3857,7 @@ startupSimulatorTools() {
 	global gSpecialTargets, gBuilding
 
 	local forceExit := GetKeyState("Shift")
-	local noSpecial := GetKeyState("Alt")
+	local noSpecial := GetKeyState("RAlt")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
 	local buildProgress
@@ -3905,7 +3905,7 @@ startupSimulatorTools() {
 
 	prepareTargets(&buildProgress, updateOnly)
 
-	if (noSpecial || GetKeyState("Alt"))
+	if (noSpecial || GetKeyState("RAlt"))
 		gSpecialTargets := []
 
 	; gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length

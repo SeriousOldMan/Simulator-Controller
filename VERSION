@@ -1,9 +1,9 @@
 [Development]
-Version=6.8.1.0-release
-Target=6.8.1.0-release
+Version=6.8.2.0-dev
+Target=6.8.2.0-release
 Date=01/30/2026
-Download=https://cutt.ly/ktccsEBH;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/iHMTTxAJ/Releases/Simulator Controller 6.8.1.0-release.zip;https://www.dropbox.com/scl/fi/6lhjdzfwp00sl4hutkqpy/Simulator-Controller-6.8.1.0-release.zip?rlkey=d4s15d36nagu33xpehb1mxvlm&st=mlbj3suh&dl=1;http://%master%/Release/Simulator Controller 6.8.1.0	0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.1.0-release.zip
-Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator"
+Download=
+Changes="invoke" action function returns the result, New controller action function "property"
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
 Version=6.8.1.0-release
@@ -22,7 +22,7 @@ Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.8.1.0-release
+Development=6.8.2.0-dev
 Release=6.8.1.0-release

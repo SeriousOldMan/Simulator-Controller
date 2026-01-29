@@ -1,5 +1,56 @@
 # Latest stable release
 
+## 6.8.1.0
+
+#### Date: 01/30/26
+
+#### Fixes
+
+  - The meta data for all *Automobilista 2* cars added in the last release contained an error, which crashed the "Setup Database". All cars have been fixed with this release.
+  - Fixed the "Integration" plugin to accept language settings other than "English" / "EN".
+
+#### Changes
+
+  - The "Solo Center" now reloads all cars and tracks, if used for a session where a car or a track is used for the very first time.
+  - Value ranges are now checked when changing settings in the "Session Database".
+  - When "All" tracks had been selected in the settings of the "Session Database", all tracks that already had been driven (independent of car) will be available in the "Tracks" drop down menu. This information is collected while driving, so will only be updated starting from now.
+  - Data for all cars with the *old* composite names incl. team name, car number and so on from *Le Mans Ultimate* has been removed from the session database. All removed data has been moved the folder *Simulator Controller\Database\Archive\LMU* which is located in your user *Documents* folder.
+  - Car names of all cars and tracks have been added for *Le Mans Ultimate*, so that they show up in the "Session Database", even if they have not been driven yet.
+  - [Experts] The calling signature of the *Simulator.Read* function in the *Lua* script [module "Simulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-simulator) has changed. You may need to adapt your script, if you are using this function.
+  - [Important] The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
+  - [Important] The data of all cars from *Le Mans Ultimate* with the old naming scheme (no car model, but a combination of team name and race number) has been moved from the session database to an archive. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for more information.
+  - New car models for "Setup Workbench":
+    - Automobilista 2 (by @inthebagbud UK; no setup editor support)
+      - Alpine A110 GT4 Evo, Aston Martin Vantage GT4 Evo, Aston Martin Vantage GTE
+      - Audi R8 LMS GT4, Audi R8 V10 GT, BMW M4 GT4
+      - BMW M8 GTE, CARNAME, Chevrolet Camaro GT4.R
+      - Chevrolet Camaro SS, Chevrolet Corvette C3.R Convertible, Chevrolet Corvette C3.R
+      - Chevrolet Corvette C8 Z06 (+Z07 Upgrade), Chevrolet Corvette C8.R, Chevrolet Cruze Stock Car 2019
+      - Chevrolet Cruze Stock Car 2020, Chevrolet Cruze Stock Car 2021, Chevrolet Cruze Stock Car 2022
+      - Chevrolet Cruze Stock Car 2023, Chevrolet Cruze Stock Car 2024, Chevrolet Omega Stock Car 1999
+      - Citroen DS3 RX, Dodge Viper ACR, Ginetta G58
+      - Lamborghini Huracan Super Trofeo EVO2, Lola B0540 Turbo, Lola B0540 V8
+      - Maserati GT2 Stradale, McLaren 570S GT4, McLaren F1 LM
+      - Mercedes-AMG GT4, MetalMoro AJR Chevrolet, MetalMoro AJR Honda
+      - MetalMoro AJR Judd, MetalMoro AJR Nissan, MetalMoro MRX Duratec P4
+      - MetalMoro MRX Duratec Turbo P2, MetalMoro MRX Duratec Turbo P3, MetalMoro MRX Honda P3
+      - MINI Cooper JCW, MINI Countryman R60 RX, Mitsubishi Lancer Evo10 RX
+      - Porsche 911 RSR 1974, Porsche 911 RSR GTE, Porsche Cayman GT4 Clubsport MR
+      - Puma P052, Roco 001, Sigma P1
+      - Sprint Race, Stock USA Gen1, Stock USA Gen2
+      - Stock USA Gen3 LM, Stock USA Gen3, Super Trophy Trucks
+      - Super V8, Superkart 250cc, Toyota Corolla Stock Car 2020
+      - Toyota Corolla Stock Car 2021, Toyota Corolla Stock Car 2022, Toyota Corolla Stock Car 2023
+      - Toyota Corolla Stock Car 2024, Ultima GTR, Volkswagen Polo RX
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.8.0.0
 
 #### Date: 01/23/26
@@ -46,55 +97,6 @@
       - Vulkan Truck
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-680), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
-
-# Upcoming release
-
-## 6.8.1.0
-
-#### Date: 01/30/26 (planned)
-
-#### Fixes
-
-  - The meta data for all *Automobilista 2* cars added in the last release contained an error, which crashed the "Setup Database". All cars have been fixed with this release.
-  - Fixed the "Integration" plugin to accept language settings other than "English" / "EN".
-
-#### Changes
-
-  - The "Solo Center" now reloads all cars and tracks, if used for a session where a car or a track is used for the very first time.
-  - Value ranges are now checked when changing settings in the "Session Database".
-  - When "All" tracks had been selected in the settings of the "Session Database", all tracks that already had been driven (independent of car) will be available in the "Tracks" drop down menu. This information is collected while driving, so will only be updated starting from now.
-  - Data for all cars with the *old* composite names incl. team name, car number and so on from *Le Mans Ultimate* has been removed from the session database. All removed data has been moved the folder *Simulator Controller\Database\Archive\LMU* which is located in your user *Documents* folder.
-  - Car names of all cars and tracks have been added for *Le Mans Ultimate*, so that they show up in the "Session Database", even if they have not been driven yet.
-  - [Experts] The calling signature of the *Simulator.Read* function in the *Lua* script [module "Simulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-simulator) has changed. You may need to adapt your script, if you are using this function.
-  - [Important] The SimHub plugin had been updated. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for instructions on how to update to the latest version.
-  - [Important] The data of all cars from *Le Mans Ultimate* with the old naming scheme (no car model, but a combination of team name and race number) has been moved from the session database to an archive. Please see the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) for more information.
-  - New car models for "Setup Workbench":
-    - Automobilista 2 (by @inthebagbud UK; no setup editor support)
-      - Alpine A110 GT4 Evo, Aston Martin Vantage GT4 Evo, Aston Martin Vantage GTE
-      - Audi R8 LMS GT4, Audi R8 V10 GT, BMW M4 GT4
-      - BMW M8 GTE, CARNAME, Chevrolet Camaro GT4.R
-      - Chevrolet Camaro SS, Chevrolet Corvette C3.R Convertible, Chevrolet Corvette C3.R
-      - Chevrolet Corvette C8 Z06 (+Z07 Upgrade), Chevrolet Corvette C8.R, Chevrolet Cruze Stock Car 2019
-      - Chevrolet Cruze Stock Car 2020, Chevrolet Cruze Stock Car 2021, Chevrolet Cruze Stock Car 2022
-      - Chevrolet Cruze Stock Car 2023, Chevrolet Cruze Stock Car 2024, Chevrolet Omega Stock Car 1999
-      - Citroen DS3 RX, Dodge Viper ACR, Ginetta G58
-      - Lamborghini Huracan Super Trofeo EVO2, Lola B0540 Turbo, Lola B0540 V8
-      - Maserati GT2 Stradale, McLaren 570S GT4, McLaren F1 LM
-      - Mercedes-AMG GT4, MetalMoro AJR Chevrolet, MetalMoro AJR Honda
-      - MetalMoro AJR Judd, MetalMoro AJR Nissan, MetalMoro MRX Duratec P4
-      - MetalMoro MRX Duratec Turbo P2, MetalMoro MRX Duratec Turbo P3, MetalMoro MRX Honda P3
-      - MINI Cooper JCW, MINI Countryman R60 RX, Mitsubishi Lancer Evo10 RX
-      - Porsche 911 RSR 1974, Porsche 911 RSR GTE, Porsche Cayman GT4 Clubsport MR
-      - Puma P052, Roco 001, Sigma P1
-      - Sprint Race, Stock USA Gen1, Stock USA Gen2
-      - Stock USA Gen3 LM, Stock USA Gen3, Super Trophy Trucks
-      - Super V8, Superkart 250cc, Toyota Corolla Stock Car 2020
-      - Toyota Corolla Stock Car 2021, Toyota Corolla Stock Car 2022, Toyota Corolla Stock Car 2023
-      - Toyota Corolla Stock Car 2024, Ultima GTR, Volkswagen Polo RX
-	  
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
-
-# Release history
 
 ## 6.7.9.0
 

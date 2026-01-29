@@ -531,8 +531,7 @@ _callSimulator := callSimulator
 
 readSimulator(simulator, car, track, format := "Object") {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
-	local data := provider.readSessionData("Setup=true")
-	local telemetryData, standingsData
+	local data, telemetryData, standingsData
 
 	provider.acquireSessionData(&telemetryData, &standingsData)
 
@@ -542,10 +541,11 @@ readSimulator(simulator, car, track, format := "Object") {
 		track := getMultiMapValue(telemetryData, "Session Data", "Track")
 
 		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
-		data := provider.readSessionData("Setup=true")
 
 		provider.acquireSessionData(&telemetryData, &standingsData)
 	}
+
+	data := provider.readSessionData("Setup=true")
 
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 

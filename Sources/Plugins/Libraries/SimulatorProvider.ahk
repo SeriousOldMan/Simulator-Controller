@@ -529,7 +529,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 _callSimulator := callSimulator
 
-readSimulator(simulator, car, track, format := "Object", parts := {}) {
+readSimulator(simulator, car, track, topics := {}, format := "Object") {
 	local provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 	local data, telemetryData, standingsData
 
@@ -545,34 +545,26 @@ readSimulator(simulator, car, track, format := "Object", parts := {}) {
 		provider.acquireSessionData(&telemetryData, &standingsData)
 	}
 
-	if (!parts.Has("Setup") || parts.Setup)
+	if (!topics.Has("Setup") || topics.Setup)
 		data := provider.readSessionData("Setup=true")
 	else
 		data := newMultiMap()
 
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 
-	if (!parts.Has("Telemetry") || parts.Setup)
+	if (!topics.Has("Telemetry") || topics.Setup)
 		addMultiMapValues(data, telemetryData)
 
-	if (!parts.Has("Standings") || parts.Setup)
+	if (!topics.Has("Standings") || topics.Setup)
 		addMultiMapValues(data, standingsData)
 
 	return ((format = "Text") ? printMultiMap(data) : data)
 }
 
-_readSimulator(simulator, car := false, track := false) {
-	return readSimulator(simulator, car, track, "Text")
-}
-
-_readSession(simulator, car := false, track := false) {
-	return readSimulator(simulator, car, track, "Text", {Standings: false, Setup: false})
-}
-
-_readStandings(simulator, car := false, track := false) {
-	return readSimulator(simulator, car, track, "Text", {Telemetry: false, Setup: false})
-}
-
-_readPitstop(simulator, car := false, track := false) {
-	return readSimulator(simulator, car, track, "Text", {Telemetry: false, Standings: false})
+_readSimulator(simulator, topics := "All", car := false, track := false) {
+	return readSimulator(simulator, car, track
+					   , {Session: InStr(topics, "All") || InStr(topics, "Session")
+					    , Standings: InStr(topics, "All") || InStr(topics, "Standings")
+					    , Setup: InStr(topics, "All") || InStr(topics, "Pitstop")}
+					   , "Text")
 }

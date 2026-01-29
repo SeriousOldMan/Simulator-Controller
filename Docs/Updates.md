@@ -39,6 +39,8 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 2. The data of all cars from *Le Mans Ultimate* with the old naming scheme (no car model, but a combination of team name and race number) has been moved from the session database to an archive. This archive is located in the *Simulator Controller\Database\Archive\LMU* folder which is located in your user *Documents* folder. If you want to merge the data with data collected for cars with the normal naming scheme, open the files with a unicode capable text editor and copy the data to the corresponding files in *Simulator Controller\Database\User\LMU*.
 
+3. If you are using the *Lua* script module "Simulator", you have to adapt your call to *Simulator.Read* to the [new calling signature](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-simulator), if you are using more than the furst parameter.
+
 ## Release 6.8.0
 
 The session state JSON object supplied by the "Intagration" plugin has changed. The changes introduce some long awaited extension, but also some incompatible changes. Therefore, if you have build an app based on that data, this app must be updated as well.

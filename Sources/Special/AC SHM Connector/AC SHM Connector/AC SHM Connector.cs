@@ -25,17 +25,26 @@ namespace SHMConnector
 
         private const int MAX_CARS = 64;
         private const double SECTOR_APPROXIMATION = 0.33;
+        private const int SECTOR_UPDATE_INTERVAL_MS = 50;
         
         private int[] previousSector = new int[MAX_CARS];
         private int[] sector1Times = new int[MAX_CARS];
         private int[] sector2Times = new int[MAX_CARS];
         private int[] sector3Times = new int[MAX_CARS];
         private int[] sectorStartTimes = new int[MAX_CARS];
+        private readonly object sectorLock = new object();
+        
+        private Thread sectorUpdateThread;
+        private volatile bool shouldStopThread;
 
         public SHMConnector()
         {
             for (int i = 0; i < MAX_CARS; i++)
                 previousSector[i] = -1;
+            
+            sectorUpdateThread = new Thread(SectorUpdateWorker);
+            sectorUpdateThread.IsBackground = true;
+            sectorUpdateThread.Start();
         }
 
         string GetSession(AC_SESSION_TYPE session) {
@@ -275,12 +284,34 @@ namespace SHMConnector
                 return "";
         }
 
+private void SectorUpdateWorker()
+        {
+            while (!shouldStopThread)
+            {
+                try
+                {
+                    if (connected)
+                    {
+                        Graphics currentGraphics = ReadGraphics();
+                        UpdateSectorTimes(0, currentGraphics.CurrentSectorIndex, currentGraphics.iCurrentTime, currentGraphics.iLastTime);
+                    }
+                }
+                catch
+                {
+                }
+                
+                Thread.Sleep(SECTOR_UPDATE_INTERVAL_MS);
+            }
+        }
+
         private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lapTime)
         {
             if (carIndex < 0 || carIndex >= MAX_CARS)
                 return;
-                
-            int prevSector = previousSector[carIndex];
+
+            lock (sectorLock)
+            {
+                int prevSector = previousSector[carIndex];
             
             if (prevSector == -1)
             {
@@ -312,6 +343,7 @@ namespace SHMConnector
                 sectorStartTimes[carIndex] = currentTime;
                 previousSector[carIndex] = currentSector;
             }
+            }
         }
 
         public string ReadStandings()
@@ -321,10 +353,7 @@ namespace SHMConnector
             strWriter.WriteLine("[Position Data]");
             if (connected)
             {
-                graphics = ReadGraphics();
                 cars = ReadCars();
-                
-                UpdateSectorTimes(0, graphics.CurrentSectorIndex, graphics.iCurrentTime, graphics.iLastTime);
                 
                 strWriter.Write("Car.Count="); strWriter.WriteLine(cars.numVehicles);
 
@@ -348,9 +377,14 @@ namespace SHMConnector
                     int lapTime = car.lastLapTimeMS;
                     
                     int carIndex = i - 1;
-                    int sector1Time = sector1Times[carIndex];
-                    int sector2Time = sector2Times[carIndex];
-                    int sector3Time = sector3Times[carIndex];
+                    int sector1Time, sector2Time, sector3Time;
+                    
+                    lock (sectorLock)
+                    {
+                        sector1Time = sector1Times[carIndex];
+                        sector2Time = sector2Times[carIndex];
+                        sector3Time = sector3Times[carIndex];
+                    }
                     
                     if (lapTime > 0)
                     {
@@ -539,6 +573,10 @@ namespace SHMConnector
 
         public void Close()
         {
+            shouldStopThread = true;
+            if (sectorUpdateThread != null && sectorUpdateThread.IsAlive)
+                sectorUpdateThread.Join(200);
+            
             memoryStatus = AC_MEMORY_STATUS.DISCONNECTED;
 			connected = false;
         }

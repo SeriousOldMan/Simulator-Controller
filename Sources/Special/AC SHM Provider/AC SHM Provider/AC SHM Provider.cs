@@ -21,20 +21,8 @@ namespace ACSHMProvider
         Cars cars;
         StaticInfo staticInfo;
 
-        private const int MAX_CARS = 64;
-        private const double SECTOR_APPROXIMATION = 0.33;
-        
-        private int[] previousSector = new int[MAX_CARS];
-        private int[] sector1Times = new int[MAX_CARS];
-        private int[] sector2Times = new int[MAX_CARS];
-        private int[] sector3Times = new int[MAX_CARS];
-        private int[] sectorStartTimes = new int[MAX_CARS];
-
         public SHMProvider()
         {
-            for (int i = 0; i < MAX_CARS; i++)
-                previousSector[i] = -1;
-            
             connected = ConnectToSharedMemory();
         }
 
@@ -286,10 +274,7 @@ namespace ACSHMProvider
 
             if (connected)
             {
-                graphics = ReadGraphics();
                 cars = ReadCars();
-                
-                UpdateSectorTimes(0, graphics.CurrentSectorIndex, graphics.iCurrentTime, graphics.iLastTime);
                 
                 Console.Write("Car.Count="); Console.WriteLine(cars.numVehicles);
 
@@ -311,28 +296,8 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
                     int lapTime = car.lastLapTimeMS;
-                    
-                    int carIndex = i - 1;
-                    int sector1Time = sector1Times[carIndex];
-                    int sector2Time = sector2Times[carIndex];
-                    int sector3Time = sector3Times[carIndex];
-                    
-                    if (lapTime > 0)
-                    {
-                        if (sector1Time == 0 || sector2Time == 0 || sector3Time == 0)
-                        {
-                            sector1Time = (int)(lapTime * SECTOR_APPROXIMATION);
-                            sector2Time = (int)(lapTime * SECTOR_APPROXIMATION);
-                            sector3Time = lapTime - sector1Time - sector2Time;
-                        }
-                        
-                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
-                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
-                    }
-                    else
-                    {
-                        Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
-                    }
+
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
 
                     string carModel = GetStringFromBytes(car.carModel);
 
@@ -379,51 +344,6 @@ namespace ACSHMProvider
             bool isTimedBasedOnTrackLength = GetRemainingLaps((long)graphics.SessionTimeLeft) <= -1;
 
             return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;
-        }
-
-        private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lastLapTime)
-        {
-            if (carIndex < 0 || carIndex >= MAX_CARS)
-                return;
-
-            int prevSector = previousSector[carIndex];
-            
-            if (prevSector == -1)
-            {
-                previousSector[carIndex] = currentSector;
-                sectorStartTimes[carIndex] = currentTime;
-                return;
-            }
-
-            if (prevSector != currentSector)
-            {
-                if (prevSector == 2 && currentSector == 0)
-                {
-                    if (lastLapTime > 0)
-                    {
-                        sector3Times[carIndex] = lastLapTime - sector1Times[carIndex] - sector2Times[carIndex];
-                        if (sector3Times[carIndex] < 0)
-                            sector3Times[carIndex] = 0;
-                    }
-                    
-                    sectorStartTimes[carIndex] = currentTime;
-                }
-                else if (prevSector == 0 && currentSector == 1)
-                {
-                    sector1Times[carIndex] = currentTime - sectorStartTimes[carIndex];
-                    if (sector1Times[carIndex] < 0)
-                        sector1Times[carIndex] = 0;
-                }
-                else if (prevSector == 1 && currentSector == 2)
-                {
-                    int cumulativeTime = currentTime - sectorStartTimes[carIndex];
-                    sector2Times[carIndex] = cumulativeTime - sector1Times[carIndex];
-                    if (sector2Times[carIndex] < 0)
-                        sector2Times[carIndex] = 0;
-                }
-
-                previousSector[carIndex] = currentSector;
-            }
         }
 
         public void ReadData() {
@@ -478,8 +398,6 @@ namespace ACSHMProvider
             
             Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
             Console.WriteLine("Laps=" + graphics.CompletedLaps);
-            
-            UpdateSectorTimes(0, graphics.CurrentSectorIndex, graphics.iCurrentTime, graphics.iLastTime);
 
             Console.WriteLine("LapValid=true");
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);

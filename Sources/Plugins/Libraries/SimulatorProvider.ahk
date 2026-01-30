@@ -545,17 +545,17 @@ readSimulator(simulator, car, track, topics := {}, format := "Object") {
 		provider.acquireSessionData(&telemetryData, &standingsData)
 	}
 
-	if (!topics.Has("Setup") || topics.Setup)
+	if (!topics.HasProp("Setup") || topics.Setup)
 		data := provider.readSessionData("Setup=true")
 	else
 		data := newMultiMap()
 
 	setMultiMapValue(data, "System", "Time", A_TickCount)
 
-	if (!topics.Has("Telemetry") || topics.Setup)
+	if (!topics.HasProp("Telemetry") || topics.Setup)
 		addMultiMapValues(data, telemetryData)
 
-	if (!topics.Has("Standings") || topics.Setup)
+	if (!topics.HasProp("Standings") || topics.Setup)
 		addMultiMapValues(data, standingsData)
 
 	return ((format = "Text") ? printMultiMap(data) : data)

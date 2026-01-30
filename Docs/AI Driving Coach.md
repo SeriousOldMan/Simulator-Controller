@@ -96,7 +96,7 @@ The performance and - even more important - the knowledge about the motorsport d
 
 ### Generic
 
-This one supports any GPT service provider, which implements the JSON-based instruction protocol defined by OpenAI (see next entry).
+This one supports any GPT service provider, which implements the JSON-based instruction protocol defined by OpenAI (see next entry). You have to provide the complete API endpoint in the "URL", which typically ends to ".../chat/completions". In most cases, you will see no models in the "Model" drop down field, unless the model list endpoint follows the same naming rules as OpenAI itself. In those cases, enter the name of the model you want to use into the field manually.
 
 ### OpenAI
 

@@ -1008,14 +1008,14 @@ invoke(target, method, arguments*) {
 
 	try {
 		if ((target = "Controller") || (target = "Simulator Controller"))
-			ObjBindMethod(SimulatorController.Instance, method).Call(arguments*)
+			return ObjBindMethod(SimulatorController.Instance, method).Call(arguments*)
 		else if InStr(target, ".") {
 			target := ConfigurationItem.splitDescriptor(target)
 
-			ObjBindMethod(SimulatorController.Instance.findMode(target[1], target[2]), method).Call(arguments*)
+			return ObjBindMethod(SimulatorController.Instance.findMode(target[1], target[2]), method).Call(arguments*)
 		}
 		else
-			ObjBindMethod(SimulatorController.Instance.findPlugin(target), method).Call(arguments*)
+			return ObjBindMethod(SimulatorController.Instance.findPlugin(target), method).Call(arguments*)
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -1023,6 +1023,8 @@ invoke(target, method, arguments*) {
 		command := ("invoke(" . values2String(", ", target, method, arguments*) . ")")
 
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
+
+		return false
 	}
 }
 

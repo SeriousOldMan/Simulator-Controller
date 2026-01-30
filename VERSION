@@ -3,7 +3,7 @@ Version=6.8.2.0-dev
 Target=6.8.2.0-release
 Date=01/30/2026
 Download=
-Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector
+Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, New news article
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
 Version=6.8.1.0-release

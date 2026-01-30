@@ -1658,7 +1658,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if (lastSessions[simulator] != session) {
 				lastSessions[simulator] := session
 
-				simulator.updateSession(session)
+				Task.startTask(() => simulator.updateSession(session), 0, kLowPriority)
 			}
 		}
 		else
@@ -1674,7 +1674,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if (lastSessions[assistant] != (session . assistant.RaceAssistantActive)) {
 					lastSessions[assistant] := (session . assistant.RaceAssistantActive)
 
-					assistant.updateSession(session)
+					Task.startTask(ObjBindMethod(assistant, "updateSession", session), 0, kLowPriority)
 				}
 	}
 

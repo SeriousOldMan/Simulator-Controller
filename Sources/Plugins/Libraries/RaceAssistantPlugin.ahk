@@ -1010,7 +1010,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				RaceAssistantPlugin.sReplayDirectory := false
 
 			RaceAssistantPlugin.sCollectorTask
-				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 20000, kHighPriority)
+				:= PeriodicTask(ObjBindMethod(RaceAssistantPlugin, "collectSessionData"), 1000, kHighPriority)
 
 			RaceAssistantPlugin.CollectorTask.start()
 		}

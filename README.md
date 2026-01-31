@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.8.2.0-dev]() (Early build for 6.8.2. Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6820) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

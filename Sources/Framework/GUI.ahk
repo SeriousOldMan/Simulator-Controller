@@ -1274,13 +1274,22 @@ class Window extends Gui {
 			}
 
 			Set {
-				if isSet(type)
-					this.iCurrentValue := value
-				else
-					value := (this.iCurrentValue := (super.Text := value))
+				local validator := this.iValidator
 
-				if this.iValidator
-					this.iValidator.Call(this, "Update", value)
+				this.iValidator := false
+
+				try {
+					if isSet(type)
+						this.iCurrentValue := value
+					else
+						value := (this.iCurrentValue := (super.Text := value))
+
+					if this.iValidator
+						this.iValidator.Call(this, "Update", value)
+				}
+				finally {
+					this.iValidator := validator
+				}
 
 				return value
 			}
@@ -1292,13 +1301,22 @@ class Window extends Gui {
 			}
 
 			Set {
-				if isSet(type)
-					this.iCurrentValue := value
-				else
-					value := (this.iCurrentValue := (super.Value := value))
+				local validator := this.iValidator
 
-				if this.iValidator
-					this.iValidator.Call(this, "Update", value)
+				this.iValidator := false
+
+				try {
+					if isSet(type)
+						this.iCurrentValue := value
+					else
+						value := (this.iCurrentValue := (super.Value := value))
+
+					if this.iValidator
+						this.iValidator.Call(this, "Update", value)
+				}
+				finally {
+					this.iValidator := validator
+				}
 
 				return value
 			}

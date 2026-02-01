@@ -889,7 +889,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		if (operation = "Validate")
 			if (StrLen(Trim(value)) > 0) {
 				if (settingsGui["pitstopRuleDropDown"].Value == 2)
-					return (isInteger(value) ? (value >= 0) : false)
+					return (isInteger(value) ? (value > 0) : false)
 			}
 			else
 				return false
@@ -916,6 +916,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 					if (reset || InStr(value, "-")) {
 						value := string2Values("-", value)
+
 						pitOpen := value[1]
 						pitClose := value[2]
 

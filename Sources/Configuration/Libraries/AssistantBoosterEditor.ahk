@@ -111,9 +111,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		validatePercentage(fieldName, field, operation, value?) {
 			if (operation = "Validate")
-				return (isInteger(value) && (value >= 0) && (value <= 100))
-
-			Task.startTask(() => this.updateState(), 100)
+				try {
+					return (isInteger(value) && (value >= 0) && (value <= 100))
+				}
+				finally {
+					Task.startTask(() => this.updateState(), 100)
+				}
 		}
 
 		validateTokens(fieldName, field, operation, value?) {

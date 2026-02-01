@@ -547,16 +547,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			workbench.updateState()
 		}
 
-		updatePitstopRule(*) {
-			workbench.validatePitstopRule()
-		}
-
 		choosePitstopWindow(*) {
 			workbench.updateState()
-		}
-
-		updatePitstopWindow(*) {
-			workbench.validatePitstopWindow()
 		}
 
 		selectTyreSet(listView, line, selected) {
@@ -653,55 +645,42 @@ class StrategyWorkbench extends ConfigurationItem {
 			workbenchGui["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][workbenchGui["pitstopFuelServiceRuleDropdown"].Value])
 		}
 
-		validateFloat(field, minValue := 0.0) {
-			local value
+		validateFloat(fieldName, minValue := 0.0, field, operation, value?) {
+			if (operation = "Validate") {
+				value := internalValue("Float", value)
 
-			field := workbenchGui[field]
-			value := internalValue("Float", field.Text)
-
-			if (isNumber(value) && (value >= minValue))
-				field.ValidText := field.Text
-			else {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
-
-				loop 10
-					SendInput("{Right}")
+				return (isNumber(value) && (value >= minValue))
 			}
 		}
 
-		validateInteger(field, minValue := 0) {
-			field := workbenchGui[field]
+		validateInteger(fieldName, minValue := 0, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue))
+		}
 
-			if (isInteger(field.Text) && (field.Text >= minValue))
-				field.ValidText := field.Text
-			else {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
-
-				loop 10
-					SendInput("{Right}")
+		validateSimInitialFuelAmount(arguments*) {
+			try {
+				return validateInteger("simInitialFuelAmountEdit", 0, arguments*)
+			}
+			finally {
+				Task.startTask(() => workbench.updateState(), 100)
 			}
 		}
 
-		validateSimInitialFuelAmount(*) {
-			validateInteger("simInitialFuelAmountEdit", 0)
-
-			workbench.updateState()
+		validateSimAvgLapTime(arguments*) {
+			return validateFloat("simAvgLapTimeEdit", 10.0, arguments*)
 		}
 
-		validateSimAvgLapTime(*) {
-			validateFloat("simAvgLapTimeEdit", 10.0)
+		validateSimFuelConsumption(arguments*) {
+			return validateFloat("simFuelConsumptionEdit", 0.1, arguments*)
 		}
 
-		validateSimFuelConsumption(*) {
-			validateFloat("simFuelConsumptionEdit", 0.1)
+		validatePitstopFuelService(arguments*) {
+			return validateFloat("pitstopFuelServiceEdit", 1.0, arguments*)
 		}
 
-		validatePitstopFuelService(*) {
-			validateFloat("pitstopFuelServiceEdit", 1.0)
-		}
-
-		validateFuelCapacity(*) {
-			validateFloat("fuelCapacityEdit", 5.0)
+		validateFuelCapacity(arguments*) {
+			return validateFloat("fuelCapacityEdit", 5.0, arguments*)
 		}
 
 		selectSimFixedPitstop(listView, line, selected) {
@@ -1239,12 +1218,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Time", "Time + 1", "Laps", "Laps + 1"], translate)).OnEvent("Change", chooseSessionType)
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60)
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60).OnValidate("LoseFocus", validateInteger.Bind("sessionLengthEdit", 1))
+
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20 VsessionLengthLabel", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Max. Stint"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70)
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70).OnValidate("LoseFocus", validateInteger.Bind("stintLengthEdit", 1))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 70)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20", translate("Minutes"))
 
@@ -1265,12 +1245,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+23 w85 h20 +0x200", translate("Pitstop"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
-		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnValidate("LoseFocus", (args*) => this.validatePitstopRule(args*))
 		workbenchGui.Add("UpDown", "x" . x11 . " yp+1 w50 h20 Range0-99 VpitstopRuleUpDown")
 
 		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+28 w85 h20 +0x200", translate("Regular"))
 		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose1  VpitstopWindowDropDown", collect(["Always", "Window"], translate)).OnEvent("Change", choosePitstopWindow)
-		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopWindow)
+		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnValidate("LoseFocus", (args*) => this.validatePitstopWindow(args*))
 		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
 		workbenchGui.Add("Text", "x" . (x5 - 10) . " yp+22 w85 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
@@ -1335,14 +1315,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x" . x0 . " yp+20 w110 Choose2 VpitstopFuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.8)).OnEvent("Change", validatePitstopFuelService)
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.8)).OnValidate("LoseFocus", validatePitstopFuelService)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20 VpitstopFuelServiceLabel", translate("Seconds (Refuel of 10 liters)"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+24 w110 h23", translate("Service"))
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp-3 w100 Choose1 vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
 
 		workbenchGui.Add("Text", "x" . x . " yp+27 w110 h20 +0x200", translate("Fuel Capacity"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VfuelCapacityEdit", displayValue("Float", convertUnit("Volume", 125))).OnEvent("Change", validateFuelCapacity)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VfuelCapacityEdit", displayValue("Float", convertUnit("Volume", 125))).OnValidate("LoseFocus", validateFuelCapacity)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w90 h20", getUnit("Volume", true))
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w110 h23 +0x200", translate("Safety Fuel"))
@@ -1484,7 +1464,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 Choose" . chosen . " VsimCompoundDropDown", choices)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w72 h20 +0x200", translate("Initial Fuel"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnEvent("Change", validateSimInitialFuelAmount)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit", displayValue("Float", convertUnit("Volume", 90), 0)).OnValidate("LoseFocus", validateSimInitialFuelAmount)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-999", displayValue("Float", convertUnit("Volume", 90), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
@@ -1493,11 +1473,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", "n/a")
 
 		workbenchGui.Add("Text", "x" . x . " yp+23 w72 h23 +0x200", translate("Avg. Lap Time"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp w45 h20 VsimAvgLapTimeEdit", displayValue("Float", 120.0)).OnEvent("Change", validateSimAvgLapTime)
+		workbenchGui.Add("Edit", "x" . x1 . " yp w45 h20 VsimAvgLapTimeEdit", displayValue("Float", 120.0)).OnValidate("LoseFocus", validateSimAvgLapTime)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", translate("Sec."))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w72 h20 +0x200", translate("Consumption"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w45 h20 VsimFuelConsumptionEdit", displayValue("Float", convertUnit("Volume", 3.8))).OnEvent("Change", validateSimFuelConsumption)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w45 h20 VsimFuelConsumptionEdit", displayValue("Float", convertUnit("Volume", 3.8))).OnValidate("LoseFocus", validateSimFuelConsumption)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w45 r1", getUnit("Volume", true))
 
 		x := 222
@@ -3684,8 +3664,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		local result := true
 		local tyreCompound, tyreCompoundColor, translatedCompounds, count, index, laps
 
-		this.validatePitstopRule("Full")
-		this.validatePitstopWindow("Full")
+		this.Control["pitstopRuleEdit"].Validate()
+		this.Control["pitstopWindowEdit"].Validate()
 
 		validator := this.SelectedValidator
 
@@ -3947,88 +3927,85 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iSelectedScenario := strategy
 	}
 
-	validatePitstopRule(full := false) {
-		local pitstopRuleEdit := this.Control["pitstopRuleEdit"].Text
+	validatePitstopRule(field, operation, value?) {
+		local pitstopRuleEdit := field
 
-		if (StrLen(Trim(pitstopRuleEdit)) > 0) {
-			if (this.Control["pitstopRuleDropDown"].Value == 2) {
-				if isInteger(pitstopRuleEdit) {
-					if (pitstopRuleEdit < 1)
-						this.Control["pitstopRuleEdit"].Text := 1
-				}
-				else
-					this.Control["pitstopRuleEdit"].Value := 1
+		if (operation = "Validate")
+			if (StrLen(Trim(value)) > 0) {
+				if (this.Control["pitstopRuleDropDown"].Value == 2)
+					return (isInteger(value) ? (value > 0) : false)
 			}
-		}
+			else
+				return false
 	}
 
-	validatePitstopWindow(full := false) {
+	validatePitstopWindow(field, operation, value?) {
 		local reset, count, pitOpen, pitClose
-		local pitstopWindowEdit := this.Control["pitstopWindowEdit"].Text
 		local pitstopWindowDropDown := this.Control["pitstopWindowDropDown"].Value
 
-		if (StrLen(Trim(pitstopWindowEdit)) > 0) {
-			if (pitstopWindowDropDown == 1)
-				this.Control["pitstopWindowEdit"].Text := ""
-			else if (pitstopWindowDropDown == 2) {
-				reset := false
+		if (operation = "Validate")
+			if (StrLen(Trim(value)) > 0) {
+				if (pitstopWindowDropDown == 1)
+					return false
+				else if (pitstopWindowDropDown == 2) {
+					reset := false
 
-				StrReplace(pitstopWindowEdit, "-", "-", , &count)
+					StrReplace(value, "-", "-", , &count)
 
-				if (count > 1) {
-					pitstopWindowEdit := StrReplace(pitstopWindowEdit, "-", "", , , count - 1)
+					if (count > 1) {
+						value := StrReplace(value, "-", "", , , count - 1)
 
-					reset := true
-				}
+						reset := true
+					}
 
-				if (reset || InStr(pitstopWindowEdit, "-")) {
-					pitstopWindowEdit := string2Values("-", pitstopWindowEdit)
-					pitOpen := pitstopWindowEdit[1]
-					pitClose := pitstopWindowEdit[2]
+					if (reset || InStr(value, "-")) {
+						value := string2Values("-", value)
 
-					if (StrLen(Trim(pitOpen)) > 0)
-						if isInteger(pitOpen) {
-							if (pitOpen < 0) {
+						pitOpen := value[1]
+						pitClose := value[2]
+
+						if (StrLen(Trim(pitOpen)) > 0)
+							if isInteger(pitOpen) {
+								if (pitOpen < 0) {
+									pitOpen := 0
+
+									reset := true
+								}
+							}
+							else {
 								pitOpen := 0
 
 								reset := true
 							}
-						}
 						else {
 							pitOpen := 0
 
 							reset := true
 						}
-					else if (full = "Full") {
-						pitOpen := 0
 
-						reset := true
-					}
+						if (StrLen(Trim(pitClose)) > 0)
+							if isInteger(pitClose) {
+								if (pitClose <= pitOpen) {
+									pitClose := pitOpen + 10
 
-					if (StrLen(Trim(pitClose)) > 0)
-						if isInteger(pitClose) {
-							if ((full = "Full") && (pitClose <= pitOpen)) {
-								pitClose := pitOpen + 10
+									reset := true
+								}
+							}
+							else {
+								pitClose := (pitOpen + 10)
 
 								reset := true
 							}
-						}
 						else {
 							pitClose := (pitOpen + 10)
 
 							reset := true
 						}
-					else if (full = "Full") {
-						pitClose := (pitOpen + 10)
 
-						reset := true
+						return !reset
 					}
-
-					if reset
-						this.Control["pitstopWindowEdit"].Text := Round(pitOpen) . " - " . Round(pitClose)
 				}
 			}
-		}
 	}
 }
 

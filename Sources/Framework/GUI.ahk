@@ -1295,7 +1295,7 @@ class Window extends Gui {
 				if isSet(type)
 					this.iCurrentValue := value
 				else
-					value (this.iCurrentValue := (super.Value := value))
+					value := (this.iCurrentValue := (super.Value := value))
 
 				if this.iValidator
 					this.iValidator.Call(this, "Update", value)

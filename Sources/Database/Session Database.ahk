@@ -798,10 +798,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Task.startTask(selectSettingAsync)
 		}
 
-		modifySetting(focus) {
+		modifySetting(validate := false, value?) {
 			modifySettingAsync() {
 				local selected, settings, section, key, ignore, setting, range
-				local type, save, value, oldValue, newValue, settingDropDown, settingValue
+				local type, save, oldValue, newValue, settingDropDown, settingValue
 
 				if (editor.SelectedModule = "Settings") {
 					selected := editor.SettingsListView.GetNext(0)
@@ -857,52 +857,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 							value := settingValue
 						}
-						else if focus {
-							oldValue := editor.iSelectedValue
-
-							settingValue := editorGui["settingValueEdit"].Text
-
-							range := this.getSettingRange()
-
-							if (type = "Integer") {
-								if !isInteger(settingValue) {
-									settingValue := oldValue
-
-									editorGui["settingValueEdit"].Text := oldValue
-								}
-								else if range {
-									newValue := Max(range[1], Min(range[2], settingValue))
-
-									if (newValue != settingValue) {
-										settingValue := newValue
-
-										editorGui["settingValueEdit"].Text := newValue
-									}
-								}
-							}
-							else if (type = "Float") {
-								value := internalValue("Float", editorGui["settingValueEdit"].Text)
-
-								if !isNumber(value) {
-									editorGui["settingValueEdit"].Text := oldValue
-
-									value := internalValue("Float", oldValue)
-								}
-								else if range {
-									newValue := Max(range[1], Min(range[2], settingValue))
-
-									if (newValue != settingValue) {
-										settingValue := newValue
-
-										editorGui["settingValueEdit"].Text := newValue
-									}
-								}
-							}
-
-							value := settingValue
-						}
-						else
+						else {
 							save := false
+
+							if validate {
+								range := this.getSettingRange()
+
+								if (type = "Integer") {
+									if !isInteger(value)
+										return false
+									else if range {
+										newValue := Max(range[1], Min(range[2], value))
+
+										if (newValue != value)
+											return false
+									}
+								}
+								else if (type = "Float") {
+									if !isNumber(value)
+										return false
+									else if range {
+										newValue := Max(range[1], Min(range[2], settingValue))
+
+										if (newValue != settingValue)
+											return false
+									}
+								}
+
+								return (save := true)
+							}
+						}
 					}
 					finally {
 						if save {
@@ -914,18 +898,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 
-			if focus
+			if validate
 				return modifySettingAsync()
 			else
 				Task.startTask(modifySettingAsync)
 		}
 
-		updateSetting(*) {
-			modifySetting(true)
+		validateSetting(field, operation, value) {
+			if (operation = "Validate")
+				return modifySetting(true, value)
 		}
 
 		changeSetting(*) {
-			modifySetting(false)
+			modifySetting()
 		}
 
 		navSession(listView, line, selected) {
@@ -2045,7 +2030,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Value"))
 		editorGui.Add("DropDownList", "xp+94 yp w184 X:Move(0.2) Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("LoseFocus", updateSetting)
+		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnValidate("LoseFocus", validateSetting)
 		editorGui["settingValueEdit"].OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w184 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w184 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueString").OnEvent("Change", changeSetting)

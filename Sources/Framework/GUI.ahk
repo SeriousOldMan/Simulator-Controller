@@ -1323,10 +1323,16 @@ class Window extends Gui {
 		}
 
 		Validate() {
-			if (this.iValidator && !this.iValidator.Call(this, "Validate", this.Text))
+			if (this.iValidator && !this.iValidator.Call(this, "Validate", this.Text)) {
 				this.Text := this.Text["Current"]
 
-			this.Text["Current"] := this.Text
+				return false
+			}
+			else {
+				this.Text["Current"] := this.Text
+
+				return true
+			}
 		}
 
 		OnValidate(type, validator) {

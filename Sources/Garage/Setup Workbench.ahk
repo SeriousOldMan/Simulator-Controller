@@ -1816,20 +1816,23 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.startIssueAnalyzer())
 
-		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
-			characteristicsMenu.Disable(label)
+		if !isDebug()
+			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+				characteristicsMenu.Disable(label)
 
 		label := translate("Telemetry...")
 
 		characteristicsMenu.Add(label, (*) => this.openTelemetryViewer())
 
-		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
-			characteristicsMenu.Disable(label)
+		if !isDebug() {
+			if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
+				characteristicsMenu.Disable(label)
 
-		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
-			characteristicsMenu.Disable(label)
+			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+				characteristicsMenu.Disable(label)
+		}
 
 		characteristicsMenu.Show()
 	}

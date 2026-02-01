@@ -990,7 +990,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static updateTask := false
 
-	validateTemperature(fieldName, field, operation, value?) {
+	validateInteger(field, operation, value?) {
+		if (operation = "Validate") {
+			return (isInteger(value) && (value > 0))
+		}
+	}
+
+	validateTemperature(field, operation, value?) {
 		if (operation = "Validate") {
 			value := internalValue("Float", value)
 
@@ -1002,11 +1008,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		local ignore, widget
 
 		updateTemperature(widget, *) {
-			analyzerGui[widget].Validate()
-
-			analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text))
-							  , convertUnit("Temperature", internalValue("Float", widgets[2].Text))
-							  , convertUnit("Temperature", internalValue("Float", widgets[3].Text))]
+			if widget.Validate()
+				analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text), false)
+								  , convertUnit("Temperature", internalValue("Float", widgets[2].Text), false)
+								  , convertUnit("Temperature", internalValue("Float", widgets[3].Text), false)]
 		}
 
 		for ignore, widget in widgets
@@ -1014,9 +1019,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 
 	updateTemperature(name, widget, *) {
-		analyzerGui[widget].Valdate()
-
-		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text))
+		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text), false)
 	}
 
 	noSelect(listView, *) {
@@ -1421,16 +1424,20 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget1 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Steering Lock / Ratio"))
 		steerLockEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200", analyzer.SteerLock)
+		steerLockEdit.OnValidate("LoseFocus", validateInteger)
 		widget2 := steerLockEdit
 		steerRatioEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 Limit2 Number", analyzer.SteerRatio)
+		steerRatioEdit.OnValidate("LoseFocus", validateInteger)
 		widget3 := steerRatioEdit
 		widget4 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-99", analyzer.SteerRatio)
 
 		widget27 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
 		wheelbaseEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
+		wheelBaseEdit.OnValidate("LoseFocus", validateInteger)
 		widget28 := wheelbaseEdit
 		widget29 := analyzerGui.Add("UpDown", "x196 yp w18 h23 Range1-999", analyzer.Wheelbase)
 		trackWidthEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
+		trackWidthEdit.OnValidate("LoseFocus", validateInteger)
 		widget30 := trackWidthEdit
 		widget31 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-999", analyzer.TrackWidth)
 		widget32 := analyzerGui.Add("Text", "x265 yp w50 h23 +0x200", translate("cm"))
@@ -1646,11 +1653,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		for ignore, widget in [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit
 							 , minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit
 							 , maxOITemperatureDifferenceEdit
-							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
+							 , minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit
 							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
 							 , minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
-			widget.OnValidate("LoseFocus", validateTemperature.Bind(widget))
+			widget.OnValidate("LoseFocus", validateTemperature)
 
 		loop 75
 			prepareWidgets.Push(%"widget" . A_Index%)

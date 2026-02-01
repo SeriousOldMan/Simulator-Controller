@@ -1931,7 +1931,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		value := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
 
 		settingsGui.Add("Text", "x16 y82 w88 h23 +0x200 Section", translate("Avg. Lap Time"))
-		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value)
+		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value).OnValidate("LoseFocus", validateNumber.Bind("avgLaptimeEdit"))
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
 		settingsGui.Add("Text", "x158 yp+4 w51 h20", translate("Sec."))
 

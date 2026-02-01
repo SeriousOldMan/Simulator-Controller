@@ -1261,6 +1261,82 @@ class Window extends Gui {
 	iCurrentFont := false
 	iCurrentFontOptions := false
 
+	class Edit extends Gui.Edit {
+		iValidator := false
+		iCurrentValue := unset
+
+		iChangeEventHandler := false
+		iFocusEventHandler := false
+
+		Text[type?] {
+			Get {
+				return (isSet(type) ? this.iCurrentValue : super.Text)
+			}
+
+			Set {
+				if isSet(type)
+					this.iCurrentValue := value
+				else
+					value := (this.iCurrentValue := (super.Text := value))
+
+				if this.iValidator
+					this.iValidator.Call(this, "Update", value)
+
+				return value
+			}
+		}
+
+		Value[type?] {
+			Get {
+				return (isSet(type) ? this.iCurrentValue : super.Value)
+			}
+
+			Set {
+				if isSet(type)
+					this.iCurrentValue := value
+				else
+					value (this.iCurrentValue := (super.Value := value))
+
+				if this.iValidator
+					this.iValidator.Call(this, "Update", value)
+
+				return value
+			}
+		}
+
+		Validate() {
+			if (this.iValidator && !this.iValidator.Call(this, "Validate", this.Text))
+				this.Text := this.Text["Current"]
+
+			this.Text["Current"] := this.Text
+		}
+
+		OnValidate(type, validator) {
+			this.iValidator := validator
+
+			this.iValidator.Call(this, "Update", this.Text)
+
+			if (type = "Change") {
+				if this.iChangeEventHandler
+					this.OnEvent(type, this.iChangeEventHandler, 0)
+
+				this.OnEvent(type, this.iChangeEventHandler := (*) => this.Validate())
+
+				this.Text["Current"] := this.Text
+			}
+			else if (type = "LoseFocus") {
+				if this.iFocusEventHandler
+					this.OnEvent(type, this.iFocusEventHandler, 0)
+
+				this.OnEvent(type, this.iFocusEventHandler := (*) => this.Validate())
+
+				this.Text["Current"] := this.Text
+			}
+			else
+				throw "Unsupported validation event detected in Window.Edit.OnValidate..."
+		}
+	}
+
 	class ScrollBar {
 		iWindow := false
 		iScrollCallback := false
@@ -2239,6 +2315,12 @@ class Window extends Gui {
 			}
 			else
 				control := super.Add(type, options, arguments*)
+
+			if (type = "Edit") {
+				control.base := Window.Edit.Prototype
+
+				control.__Init()
+			}
 
 			ControlGetPos(&x, &y, &w, &h, control)
 

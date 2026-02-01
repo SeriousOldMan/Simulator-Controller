@@ -725,17 +725,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		wetRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)))
 	}
 
-	validateNumber(field, *) {
-		field := settingsGui[field]
-
-		if !isNumber(internalValue("Float", field.Text)) {
-			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-			loop 10
-				SendInput("{Right}")
-		}
-		else
-			field.ValidText := field.Text
+	validateNumber(fieldName, field, operation, value?) {
+		if (operation = "Validate")
+			return isNumber(internalValue("Float", value))
 	}
 
 	updateStrategyLaps(type, *) {
@@ -1803,7 +1795,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairSuspensionGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairSuspensionThresholdEdit"
-							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnValidate("LoseFocus", validateNumber.Bind("repairSuspensionThresholdEdit"))
 		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairSuspensionState()
@@ -1817,7 +1809,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairBodyworkGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairBodyworkThresholdEdit"
-							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnValidate("LoseFocus", validateNumber.Bind("repairBodyworkThresholdEdit"))
 		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairBodyworkState()
@@ -1830,7 +1822,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
 		settingsGui.Add("Text", "x245 yp+2 w14 h20 VrepairEngineGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w35 h20 VrepairEngineThresholdEdit"
-							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnValidate("LoseFocus", validateNumber.Bind("repairEngineThresholdEdit"))
 		settingsGui.Add("Text", "x303 yp+2 w84 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
 
 		updateRepairEngineState()
@@ -1866,7 +1858,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Deviation Threshold"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 VtyrePressureDeviationEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureDeviationEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1))).OnValidate("LoseFocus", validateNumber.Bind("tyrePressureDeviationEdit"))
 		settingsGui.Add("Text", "x184 yp+2 w70 h20", getUnit("Pressure", true))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
@@ -1888,7 +1880,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x147 yp+4 w145 h20", translate("based on pressure loss"))
 
 		settingsGui.Add("Edit", "x292 yp-1 w50 h20 vtyrePressureLossThresholdEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Loss.Threshold", 0.2), 1))).OnEvent("Change", validateNumber.Bind("tyrePressureLossThresholdEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Loss.Threshold", 0.2), 1))).OnValidate("LoseFocus", validateNumber.Bind("tyrePressureLossThresholdEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w60 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -1900,22 +1892,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)))).OnValidate("LoseFocus", validateNumber.Bind("tpDryFrontLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)))).OnValidate("LoseFocus", validateNumber.Bind("tpDryFrontRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)))).OnValidate("LoseFocus", validateNumber.Bind("tpDryRearLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)))).OnValidate("LoseFocus", validateNumber.Bind("tpDryRearRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -1927,22 +1919,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)))).OnValidate("LoseFocus", validateNumber.Bind("tpWetFrontLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)))).OnValidate("LoseFocus", validateNumber.Bind("tpWetFrontRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))).OnValidate("LoseFocus", validateNumber.Bind("tpWetRearLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))).OnValidate("LoseFocus", validateNumber.Bind("tpWetRearRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsTab.UseTab(1)
@@ -1955,7 +1947,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x158 yp+4 w51 h20", translate("Sec."))
 
 		settingsGui.Add("Text", "x16 yp+22 w88 h20 +0x200", translate("Fuel Consumption"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnEvent("Change", validateNumber.Bind("fuelConsumptionEdit"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnValidate("LoseFocus", validateNumber.Bind("fuelConsumptionEdit"))
 		settingsGui.Add("Text", "x158 yp+4 w51 h20", StrReplace(StrReplace(getUnit("Volume", true), "Gallone", "Gall."), "Gallon", "Gall."))
 
 		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
@@ -2064,19 +2056,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Left"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnEvent("Change", validateNumber.Bind("spDryFrontLeftEdit"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Right"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnEvent("Change", validateNumber.Bind("spDryFrontRightEdit"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Left"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnEvent("Change", validateNumber.Bind("spDryRearLeftEdit"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryRearLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Right"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnEvent("Change", validateNumber.Bind("spDryRearRightEdit"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnValidate("LoseFocus", validateNumber.Bind("spDryRearRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -2087,19 +2079,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Left"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnEvent("Change", validateNumber.Bind("spWetFrontLeftEdit"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Right"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnEvent("Change", validateNumber.Bind("spWetFrontRightEdit"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Left"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnEvent("Change", validateNumber.Bind("spWetRearLeftEdit"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetRearLeftEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Right"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnEvent("Change", validateNumber.Bind("spWetRearRightEdit"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnValidate("LoseFocus", validateNumber.Bind("spWetRearRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsTab.UseTab(4)
@@ -2185,7 +2177,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x12 yp+21 w110 Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", choosePSRefuelService)
 
 		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
-							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.8), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
+							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.8), 1)).OnValidate("LoseFocus", validateNumber.Bind("pitstopRefuelServiceEdit"))
 		settingsGui.Add("Text", "x184 yp+4 w205 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
 
 		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)

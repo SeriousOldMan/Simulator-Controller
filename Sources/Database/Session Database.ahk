@@ -796,10 +796,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Task.startTask(selectSettingAsync)
 		}
 
-		changeSetting(*) {
-			changeSettingAsync() {
+		modifySetting(focus) {
+			modifySettingAsync() {
 				local selected, settings, section, key, ignore, setting, range
-				local type, value, oldValue, newValue, settingDropDown, settingValue
+				local type, save, value, oldValue, newValue, settingDropDown, settingValue
 
 				if (editor.SelectedModule = "Settings") {
 					selected := editor.SettingsListView.GetNext(0)
@@ -826,94 +826,104 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					type := editor.getSettingType(section, key, &ignore)
 
-					if isObject(type)
-						value := type[inList(collect(type, translate), editorGui["settingValueDropDown"].Text)]
-					else if (type = "Boolean")
-						value := editorGui["settingValueCheck"].Value
-					else if (type = "String") {
-						settingValue := editorGui["settingValueString"].Value
+					try {
+						save := true
 
-						if InStr(settingValue, "`n") {
-							settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
+						if isObject(type)
+							value := type[inList(collect(type, translate), editorGui["settingValueDropDown"].Text)]
+						else if (type = "Boolean")
+							value := editorGui["settingValueCheck"].Value
+						else if (type = "String") {
+							settingValue := editorGui["settingValueString"].Value
 
-							editorGui["settingValueString"].Value := settingValue
-						}
+							if InStr(settingValue, "`n") {
+								settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
 
-						value := settingValue
-					}
-					else if (type = "Text") {
-						settingValue := editorGui["settingValueText"].Value
-
-						if InStr(settingValue, "`n") {
-							settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
-
-							editorGui["settingValueText"].Value := settingValue
-						}
-
-						value := settingValue
-					}
-					else {
-						oldValue := editor.iSelectedValue
-
-						settingValue := editorGui["settingValueEdit"].Text
-
-						range := this.getSettingRange()
-
-						if (type = "Integer") {
-							if !isInteger(settingValue) {
-								settingValue := oldValue
-
-								editorGui["settingValueEdit"].Text := oldValue
-
-								loop 10
-									SendEvent("{Right}")
+								editorGui["settingValueString"].Value := settingValue
 							}
-							else if range {
-								newValue := Min(range[2], Max(range[1], settingValue))
 
-								if (newValue != settingValue) {
-									settingValue := newValue
+							value := settingValue
+						}
+						else if (type = "Text") {
+							settingValue := editorGui["settingValueText"].Value
 
-									editorGui["settingValueEdit"].Text := newValue
+							if InStr(settingValue, "`n") {
+								settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
 
-									loop 10
-										SendEvent("{Right}")
+								editorGui["settingValueText"].Value := settingValue
+							}
+
+							value := settingValue
+						}
+						else if focus {
+							oldValue := editor.iSelectedValue
+
+							settingValue := editorGui["settingValueEdit"].Text
+
+							range := this.getSettingRange()
+
+							if (type = "Integer") {
+								if !isInteger(settingValue) {
+									settingValue := oldValue
+
+									editorGui["settingValueEdit"].Text := oldValue
+								}
+								else if range {
+									newValue := Max(range[1], Min(range[2], settingValue))
+
+									if (newValue != settingValue) {
+										settingValue := newValue
+
+										editorGui["settingValueEdit"].Text := newValue
+									}
 								}
 							}
-						}
-						else if (type = "Float") {
-							value := internalValue("Float", editorGui["settingValueEdit"].Text)
+							else if (type = "Float") {
+								value := internalValue("Float", editorGui["settingValueEdit"].Text)
 
-							if !isNumber(value) {
-								editorGui["settingValueEdit"].Text := oldValue
+								if !isNumber(value) {
+									editorGui["settingValueEdit"].Text := oldValue
 
-								value := internalValue("Float", oldValue)
+									value := internalValue("Float", oldValue)
+								}
+								else if range {
+									newValue := Max(range[1], Min(range[2], settingValue))
 
-								loop 10
-									SendEvent("{Right}")
-							}
-							else if range {
-								newValue := Min(range[2], Max(range[1], settingValue))
+									if (newValue != settingValue) {
+										settingValue := newValue
 
-								if (newValue != settingValue) {
-									settingValue := newValue
-
-									editorGui["settingValueEdit"].Text := newValue
-
-									loop 10
-										SendEvent("{Right}")
+										editorGui["settingValueEdit"].Text := newValue
+									}
 								}
 							}
+
+							value := settingValue
 						}
-
-						value := settingValue
+						else
+							save := false
 					}
+					finally {
+						if save {
+							editor.updateSetting(section, key, value)
 
-					editor.updateSetting(section, key, value)
+							this.iSelectedValue := value
+						}
+					}
 				}
 			}
 
-			Task.startTask(changeSettingAsync)
+			if focus
+				return modifySettingAsync()
+			else
+				Task.startTask(modifySettingAsync)
+		}
+
+		updateSetting(*) {
+			modifySetting(true)
+		}
+
+		changeSetting(*) {
+			modifySetting(false)
 		}
 
 		navSession(listView, line, selected) {
@@ -2033,7 +2043,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 X:Move(0.2) Y:Move +0x200", translate("Value"))
 		editorGui.Add("DropDownList", "xp+94 yp w184 X:Move(0.2) Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w50 X:Move(0.2) Y:Move vsettingValueEdit").OnEvent("LoseFocus", updateSetting)
+		editorGui["settingValueEdit"].OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w184 h57 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueText").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w184 Y:Move X:Move(0.2) W:Grow(0.8) vsettingValueString").OnEvent("Change", changeSetting)
 		editorGui.Add("CheckBox", "xp yp+4 X:Move(0.2) Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)

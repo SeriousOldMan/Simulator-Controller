@@ -56,6 +56,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
+  - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.
   - Change the startup sequence for *le Mans Ultimate* a bit, so that the short stutter at the beginning of the session happens earlier.
   - The handling of the Service URL for the [Generic GPT service provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#generic) has been changed, so that OpenAI compatible services can be called, even if they don't follow the OpenAI naming scheme for the API URL.
   - [Expert] The new controller action function ["property"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#runtime-and-host-language-interface) allows an embedded programming language like *Lua* to access properties of the main *Controller* object and all plugins.

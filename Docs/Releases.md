@@ -52,8 +52,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
+  - Fixed a critical bug for ACC, which prevented the full start sequence. This one was introduced with the last release.
   - Fixed temperature handling in the issue analyzer of "Setup Workbench", if a temperature unit other the "Celcius" is selected.
-
+  
 #### Changes
 
   - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.

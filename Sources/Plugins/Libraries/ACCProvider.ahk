@@ -213,7 +213,7 @@ class ACCProvider extends SimulatorProvider {
 					else {
 						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", carModel)
 
-						carClass := SessionDatabase.getCarClass(this.Simulator[true], carModel)
+						carClass := SessionDatabase.getCarClass(this.Simulator, carModel)
 
 						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
 									   , carClass ? carClass : ACCProvider.kUnknown)

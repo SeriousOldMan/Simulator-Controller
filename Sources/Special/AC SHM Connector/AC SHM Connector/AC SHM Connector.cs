@@ -34,6 +34,12 @@ namespace SHMConnector
         private int[] sectorStartTimes = new int[MAX_CARS];
         private readonly object sectorLock = new object();
         
+        private float sectorBoundary1;
+        private float sectorBoundary2;
+        private float sectorBoundary3;
+        private bool sectorBoundariesCalibrated;
+        private int lastObservedSector = -1;
+        
         private Thread sectorUpdateThread;
         private volatile bool shouldStopThread;
 
@@ -284,7 +290,7 @@ namespace SHMConnector
                 return "";
         }
 
-private void SectorUpdateWorker()
+        private void SectorUpdateWorker()
         {
             while (!shouldStopThread)
             {
@@ -293,7 +299,25 @@ private void SectorUpdateWorker()
                     if (connected)
                     {
                         Graphics currentGraphics = ReadGraphics();
-                        UpdateSectorTimes(0, currentGraphics.CurrentSectorIndex, currentGraphics.iCurrentTime, currentGraphics.iLastTime);
+                        Cars currentCars = ReadCars();
+                        
+                        if (!sectorBoundariesCalibrated && currentCars.numVehicles > 0)
+                        {
+                            CalibrateSectorBoundaries(currentGraphics, ref currentCars.cars[0]);
+                        }
+                        
+                        if (sectorBoundariesCalibrated && currentCars.numVehicles > 0)
+                        {
+                            for (int i = 0; i < currentCars.numVehicles; i++)
+                            {
+                                ref AcCarInfo car = ref currentCars.cars[i];
+                                if (car.isConnected == 0)
+                                    continue;
+                                    
+                                int currentSector = GetSectorFromSplinePosition(car.splinePosition);
+                                UpdateSectorTimes(i, currentSector, currentGraphics.iCurrentTime, car.lastLapTimeMS);
+                            }
+                        }
                     }
                 }
                 catch
@@ -302,6 +326,43 @@ private void SectorUpdateWorker()
                 
                 Thread.Sleep(SECTOR_UPDATE_INTERVAL_MS);
             }
+        }
+
+        private void CalibrateSectorBoundaries(Graphics graphics, ref AcCarInfo playerCar)
+        {
+            int currentSector = graphics.CurrentSectorIndex;
+            float splinePosition = playerCar.splinePosition;
+            
+            if (lastObservedSector != currentSector)
+            {
+                if (lastObservedSector == 0 && currentSector == 1)
+                {
+                    sectorBoundary1 = splinePosition;
+                }
+                else if (lastObservedSector == 1 && currentSector == 2)
+                {
+                    sectorBoundary2 = splinePosition;
+                }
+                else if (lastObservedSector == 2 && currentSector == 0)
+                {
+                    sectorBoundary3 = splinePosition;
+                    sectorBoundariesCalibrated = true;
+                }
+                
+                lastObservedSector = currentSector;
+            }
+        }
+
+        private int GetSectorFromSplinePosition(float splinePosition)
+        {
+            if (splinePosition < sectorBoundary1)
+                return 0;
+            else if (splinePosition < sectorBoundary2)
+                return 1;
+            else if (splinePosition < sectorBoundary3)
+                return 2;
+            else
+                return 0;
         }
 
         private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lapTime)

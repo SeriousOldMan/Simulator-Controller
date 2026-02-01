@@ -41,17 +41,12 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 			this.replicateSettings()
 		}
 
-		validateRSDampingFactor(*) {
-			local field := this.Control["rsDampingFactorEdit"]
-
-			if !isNumber(internalValue("Float", field.Text)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
+		validateRSDampingFactor(field, operation, value?) {
+			if (operation = "Validate") {
+				value := internalValue("Float", value)
+				
+				return (isNumber(value) && (value >= 0.1) && (value <= 1))
 			}
-			else
-				field.ValidText := field.Text
 		}
 
 		chooseRaceReportsPath(*) {
@@ -138,7 +133,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		widget17 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
 		widget18 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrsDampingFactorEdit Hidden", displayValue("Float", 0.2, 1))
-		widget18.OnEvent("Change", validateRSDampingFactor)
+		widget18.OnValidate("LoseFocus", validateRSDampingFactor)
 		widget19 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
 
 		window.SetFont("Norm", "Arial")

@@ -98,34 +98,14 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		local window := editor.Window
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
 
-		validateTemperature(*) {
-			local field := this.Control["dcTemperatureEdit"]
-			local value := field.Text
-
-			if (!isInteger(value) || (value < 0) || (value > 100)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
+		validateTemperature(field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0) && (value <= 100))
 		}
 
-		validateTokens(field, *) {
-			local value
-
-			field := this.Control[field]
-			value := field.Value
-
-			if (!isInteger(value) || (value < 32)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
+		validateTokens(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 32))
 		}
 
 		chooseConversationsPath(*) {
@@ -250,7 +230,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget11 := window.Add("Text", "x" . x0 . " yp+30 w120 h23 +0x200 vdcModelLabel Hidden", translate("Model / # Tokens"))
 		widget12 := window.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " W:Grow(0.3) vdcModelDropDown Hidden")
 		widget13 := window.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 X:Move(0.3) Number vdcMaxTokensEdit Hidden")
-		widget13.OnEvent("Change", validateTokens.Bind("dcMaxTokensEdit"))
+		widget13.OnValidate("LoseFocus", validateTokens.Bind("dcMaxTokensEdit"))
 		widget14 := window.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 0x80 X:Move(0.3) Range32-131072 vdcMaxTokensRange Hidden")
 
 		widget38 := window.Add("Text", "x" . x0 . " ys+5 w120 h23 +0x200 vdcLLMRTModelLabel Hidden", translate("Model"))
@@ -260,7 +240,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget33 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vdcLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		widget34 := window.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vdcLLMRTMaxTokensEdit Hidden")
-		widget34.OnEvent("Change", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
+		widget34.OnValidate("LoseFocus", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
 		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
 		widget36 := window.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vdcLLMRTGPULayersEdit Hidden")
 		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
@@ -272,7 +252,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget17 := window.Add("Text", "x" . x0 . " yp+20 w120 h23 +0x200 Hidden", translate("Creativity"))
 		widget18 := window.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vdcTemperatureEdit Hidden")
-		widget18.OnEvent("Change", validateTemperature)
+		widget18.OnValidate("LoseFocus", validateTemperature)
 		widget19 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100 Hidden")
 		widget20 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("%"))
 

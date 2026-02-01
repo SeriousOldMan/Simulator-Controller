@@ -1262,17 +1262,9 @@ class SoloCenter extends ConfigurationItem {
 				listView.Modify(A_Index, "-Select")
 		}
 
-		validateNumber(field, *) {
-			field := centerGui[field]
-
-			if !isNumber(internalValue("Float", field.Text)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
+		validateNumber(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return isNumber(internalValue("Float", value))
 		}
 
 		closeSoloCenter(*) {
@@ -1829,10 +1821,10 @@ class SoloCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure", true) . translate(")"))
 
-		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureFLEdit"))
-		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnEvent("Change", validateNumber.Bind("tyrePressureFREdit"))
-		centerGui.Add("Edit", "x" . x1 . " yp+22 w50 h20 Limit4 vtyrePressureRLEdit").OnEvent("Change", validateNumber.Bind("tyrePressureRLEdit"))
-		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureRREdit").OnEvent("Change", validateNumber.Bind("tyrePressureRREdit"))
+		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit4 vtyrePressureFLEdit").OnValidate("LoseFocus", validateNumber.Bind("tyrePressureFLEdit"))
+		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureFREdit").OnValidate("LoseFocus", validateNumber.Bind("tyrePressureFREdit"))
+		centerGui.Add("Edit", "x" . x1 . " yp+22 w50 h20 Limit4 vtyrePressureRLEdit").OnValidate("LoseFocus", validateNumber.Bind("tyrePressureRLEdit"))
+		centerGui.Add("Edit", "x" . (x1 + 58) . " yp w50 h20 Limit4 vtyrePressureRREdit").OnValidate("LoseFocus", validateNumber.Bind("tyrePressureRREdit"))
 
 		centerGui.Add("Button", "x" . (x + 28) . " ys+207 w135 h20 vnewRunButton", translate("New Stint")).OnEvent("Click", newRun)
 

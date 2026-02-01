@@ -990,24 +990,19 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static updateTask := false
 
-	validateTemperature(field, *) {
-		local value := internalValue("Float", field.Text)
+	validateTemperature(fieldName, field, operation, value?) {
+		if (operation = "Validate") {
+			value := internalValue("Float", value)
 
-		if (!isNumber(value) || (value <= 0)) {
-			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-			loop 10
-				SendInput("{Right}")
+			return (isNumber(value) && (value > 0))
 		}
-		else
-			field.ValidText := field.Text
 	}
 
 	createTemperatureUpdater(name, widgets) {
 		local ignore, widget
 
 		updateTemperature(widget, *) {
-			validateTemperature(widget)
+			analyzerGui[widget].Validate()
 
 			analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text))
 							  , convertUnit("Temperature", internalValue("Float", widgets[2].Text))
@@ -1019,7 +1014,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 
 	updateTemperature(name, widget, *) {
-		validateTemperature(widget)
+		analyzerGui[widget].Valdate()
 
 		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text))
 	}
@@ -1655,7 +1650,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit
 							 , minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
-			widget.OnEvent("Change", validateTemperature.Bind(widget))
+			widget.OnValidate("LoseFocus", validateTemperature.Bind(widget))
 
 		loop 75
 			prepareWidgets.Push(%"widget" . A_Index%)

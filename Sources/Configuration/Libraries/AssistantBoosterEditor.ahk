@@ -109,38 +109,16 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
 
-		validatePercentage(field, *) {
-			local value
+		validatePercentage(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0) && (value <= 100))
 
-			field := this.Control[field]
-			value := field.Text
-
-			if (!isInteger(value) || (value < 0) || (value > 100)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
-
-			this.updateState()
+			Task.startTask(() => this.updateState(), 100)
 		}
 
-		validateTokens(field, *) {
-			local value
-
-			field := this.Control[field]
-			value := field.Text
-
-			if (!isInteger(value) || (value < 32)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "200")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
+		validateTokens(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 32))
 		}
 
 		chooseConversationProvider(*) {
@@ -252,7 +230,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x" . x0 . " yp+30 w110 h23 +0x200 vviConversationModelLabel", translate("Model / # Tokens"))
 		editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vviConversationModelDropDown")
-		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnEvent("Change", validateTokens.Bind("viConversationMaxTokensEdit"))
+		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vviConversationMaxTokensEdit").OnValidate("LoseFocus", validateTokens.Bind("viConversationMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 0x80 Range32-131072 vviConversationMaxTokensRange")
 
 		editorGui.Add("Text", "x" . x0 . " ys+6 w110 h23 +0x200 vviConversationLLMRTModelLabel Hidden", translate("Model"))
@@ -260,7 +238,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviConversationLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viConversationLLMRTModelEdit"))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
-		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnEvent("Change", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
+		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnValidate("LoseFocus", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
 		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden")
 		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vviConversationLLMRTGPULayersRange Hidden")
@@ -271,14 +249,14 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200", translate("Activation"))
-		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerProbabilityEdit").OnEvent("Change", validatePercentage.Bind("viSpeakerProbabilityEdit"))
+		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerProbabilityEdit").OnValidate("LoseFocus", validatePercentage.Bind("viSpeakerProbabilityEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviSpeakerInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Speaker", translate("Rephrasing")))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
-		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viSpeakerTemperatureEdit"))
+		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviSpeakerTemperatureEdit").OnValidate("LoseFocus", validatePercentage.Bind("viSpeakerTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
@@ -293,7 +271,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviListenerInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Listener", translate("Understanding")))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
-		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviListenerTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viListenerTemperatureEdit"))
+		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviListenerTemperatureEdit").OnValidate("LoseFocus", validatePercentage.Bind("viListenerTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
@@ -310,7 +288,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviConversationInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Conversation", translate("Conversation")))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Creativity"))
-		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit").OnEvent("Change", validatePercentage.Bind("viConversationTemperatureEdit"))
+		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit").OnValidate("LoseFocus", validatePercentage.Bind("viConversationTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 

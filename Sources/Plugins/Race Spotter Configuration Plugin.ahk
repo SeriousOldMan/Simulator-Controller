@@ -41,17 +41,12 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			this.replicateSettings()
 		}
 
-		validateRSPDampingFactor(*) {
-			local field := this.Control["rspDampingFactorEdit"]
-
-			if !isNumber(internalValue("Float", field.Text)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
+		validateRSPDampingFactor(field, operation, value?) {
+			if (operation = "Validate") {
+				value := internalValue("Float", value)
+				
+				return (isNumber(value) && (value >= 0.1) && (value <= 1))
 			}
-			else
-				field.ValidText := field.Text
 		}
 
 		chooseRaceSpotterSimulator(*) {
@@ -109,7 +104,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		widget13 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
 		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrspDampingFactorEdit Hidden", displayValue("Float", 0.2, 1))
-		widget14.OnEvent("Change", validateRSPDampingFactor)
+		widget14.OnValidate("LoseFocus", validateRSPDampingFactor)
 		widget15 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
 
 		x5 := x1 + 72

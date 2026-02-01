@@ -786,16 +786,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		editRaceSettings(&updateState)
 	}
 
-	updatePitstopRule(*) {
-		validatePitstopRule()
-	}
-
 	choosePitstopWindow(*) {
 		editRaceSettings(&updateState)
-	}
-
-	updatePitstopWindow(*) {
-		validatePitstopWindow()
 	}
 
 	chooseTyreCompound(*) {
@@ -891,88 +883,84 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui["pitstopFuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopFuelServiceRuleDropdown"].Value])
 	}
 
-	validatePitstopRule(full := false) {
-		local pitstopRuleEdit := settingsGui["pitstopRuleEdit"].Text
+	validatePitstopRule(field, operation, value?) {
+		local pitstopRuleEdit := field
 
-		if (StrLen(Trim(pitstopRuleEdit)) > 0) {
-			if (settingsGui["pitstopRuleDropDown"].Value == 2) {
-				if isInteger(pitstopRuleEdit) {
-					if (pitstopRuleEdit < 1)
-						settingsGui["pitstopRuleEdit"].Text := 1
-				}
-				else
-					settingsGui["pitstopRuleEdit"].Value := 1
+		if (operation = "Validate")
+			if (StrLen(Trim(value)) > 0) {
+				if (settingsGui["pitstopRuleDropDown"].Value == 2)
+					return (isInteger(value) ? (value >= 0) : false)
 			}
-		}
+			else
+				return false
 	}
 
-	validatePitstopWindow(full := false) {
+	validatePitstopWindow(field, operation, value?) {
 		local reset, count, pitOpen, pitClose
-		local pitstopWindowEdit := settingsGui["pitstopWindowEdit"].Text
 		local pitstopWindowDropDown := settingsGui["pitstopWindowDropDown"].Value
 
-		if (StrLen(Trim(pitstopWindowEdit)) > 0) {
-			if (pitstopWindowDropDown == 1)
-				settingsGui["pitstopWindowEdit"].Text := ""
-			else if (pitstopWindowDropDown == 2) {
-				reset := false
+		if (operation = "Validate")
+			if (StrLen(Trim(value)) > 0) {
+				if (pitstopWindowDropDown == 1)
+					return false
+				else if (pitstopWindowDropDown == 2) {
+					reset := false
 
-				StrReplace(pitstopWindowEdit, "-", "-", , &count)
+					StrReplace(value, "-", "-", , &count)
 
-				if (count > 1) {
-					pitstopWindowEdit := StrReplace(pitstopWindowEdit, "-", "", , , count - 1)
+					if (count > 1) {
+						value := StrReplace(value, "-", "", , , count - 1)
 
-					reset := true
-				}
+						reset := true
+					}
 
-				if (reset || InStr(pitstopWindowEdit, "-")) {
-					pitstopWindowEdit := string2Values("-", pitstopWindowEdit)
-					pitOpen := pitstopWindowEdit[1]
-					pitClose := pitstopWindowEdit[2]
+					if (reset || InStr(value, "-")) {
+						value := string2Values("-", value)
+						pitOpen := value[1]
+						pitClose := value[2]
 
-					if (StrLen(Trim(pitOpen)) > 0)
-						if isInteger(pitOpen) {
-							if (pitOpen < 0) {
+						if (StrLen(Trim(pitOpen)) > 0)
+							if isInteger(pitOpen) {
+								if (pitOpen < 0) {
+									pitOpen := 0
+
+									reset := true
+								}
+							}
+							else {
 								pitOpen := 0
 
 								reset := true
 							}
-						}
 						else {
 							pitOpen := 0
 
 							reset := true
 						}
-					else if (full = "Full") {
-						pitOpen := 0
 
-						reset := true
-					}
+						if (StrLen(Trim(pitClose)) > 0)
+							if isInteger(pitClose) {
+								if (pitClose <= pitOpen) {
+									pitClose := pitOpen + 10
 
-					if (StrLen(Trim(pitClose)) > 0)
-						if isInteger(pitClose) {
-							if ((full = "Full") && (pitClose <= pitOpen)) {
-								pitClose := pitOpen + 10
+									reset := true
+								}
+							}
+							else {
+								pitClose := (pitOpen + 10)
 
 								reset := true
 							}
-						}
 						else {
 							pitClose := (pitOpen + 10)
 
 							reset := true
 						}
-					else if (full = "Full") {
-						pitClose := (pitOpen + 10)
 
-						reset := true
+						return !reset
 					}
-
-					if reset
-						settingsGui["pitstopWindowEdit"].Text := Round(pitOpen) . " - " . Round(pitClose)
 				}
 			}
-		}
 	}
 
 	loadTyreCompounds() {
@@ -1571,8 +1559,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			if (settingsGui["pitstopRuleDropDown"].Value = 2) {
 				setMultiMapValue(newSettings, "Session Rules", "Pitstop.Rule", settingsGui["pitstopRuleEdit"].Text)
 
-				validatePitstopRule("Full")
-				validatePitstopWindow("Full")
+				settingsGui["pitstopRuleEdit"].Validate()
+				settingsGui["pitstopWindowEdit"].Validate()
 
 				if (settingsGui["pitstopWindowDropDown"].Value = 2)
 					setMultiMapValue(newSettings, "Session Rules", "Pitstop.Window", settingsGui["pitstopWindowEdit"].Text)
@@ -1734,12 +1722,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+30 w85 h20 +0x200", translate("Pitstop"))
 		settingsGui.Add("DropDownList", "x" . x7 . " yp-2 w80 Choose1 VpitstopRuleDropDown", collect(["Optional", "Required"], translate)).OnEvent("Change", choosePitstopRule)
-		settingsGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnEvent("Change", updatePitstopRule)
+		settingsGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 Number Limit2 VpitstopRuleEdit", 1).OnValidate("LoseFocus", validatePitstopRule)
 		settingsGui.Add("UpDown", "x" . x11 . " yp+1 w50 h20 Range0-99 VpitstopRuleUpDown")
 
 		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+28 w85 h20 +0x200", translate("Regular"))
 		settingsGui.Add("DropDownList", "x" . x7 . " yp-2 w80 Choose1  VpitstopWindowDropDown", collect(["Always", "Window"], translate)).OnEvent("Change", choosePitstopWindow)
-		settingsGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopWindow)
+		settingsGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnValidate("LoseFocus", validatePitstopWindow)
 		settingsGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
 		settingsGui.Add("Text", "x" . (x5 - 10) . " yp+23 w85 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))

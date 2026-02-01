@@ -41,17 +41,12 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 			this.replicateSettings()
 		}
 
-		validateREDampingFactor(*) {
-			local field := this.Control["reDampingFactorEdit"]
-
-			if !isNumber(internalValue("Float", field.Text)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
+		validateREDampingFactor(field, operation, value?) {
+			if (operation = "Validate") {
+				value := internalValue("Float", value)
+				
+				return (isNumber(value) && (value >= 0.1) && (value <= 1))
 			}
-			else
-				field.ValidText := field.Text
 		}
 
 		chooseRaceEngineerSimulator(*) {
@@ -135,7 +130,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget23 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
 		widget24 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vreDampingFactorEdit  Hidden", displayValue("Float", 0.2, 1))
-		widget24.OnEvent("Change", validateREDampingFactor)
+		widget24.OnValidate("LoseFocus", validateREDampingFactor)
 
 		widget25 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("p. Lap"))
 

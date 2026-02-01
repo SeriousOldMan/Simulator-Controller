@@ -1483,17 +1483,9 @@ class TeamCenter extends ConfigurationItem {
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 		local menu1, menu2, menus, htmlViewer
 
-		validateNumber(field, *) {
-			field := centerGui[field]
-
-			if !isNumber(internalValue("Float", field.Text)) {
-				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
-
-				loop 10
-					SendInput("{Right}")
-			}
-			else
-				field.ValidText := field.Text
+		validateNumber(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return isNumber(internalValue("Float", value))
 		}
 
 		closeTeamCenter(*) {
@@ -1781,10 +1773,10 @@ class TeamCenter extends ConfigurationItem {
 				}
 
 				if row {
-					validateNumber("setupBasePressureFLEdit")
-					validateNumber("setupBasePressureFREdit")
-					validateNumber("setupBasePressureRLEdit")
-					validateNumber("setupBasePressureRREdit")
+					center["setupBasePressureFLEdit"].Validate()
+					center["setupBasePressureFREdit"].Validate()
+					center["setupBasePressureRLEdit"].Validate()
+					center["setupBasePressureRREdit"].Validate()
 
 					center.SetupsListView.Modify(row, "", getKeys(center.SessionDrivers)[centerGui["setupDriverDropDownMenu"].Value]
 														, translate(kWeatherConditions[centerGui["setupWeatherDropDownMenu"].Value]) . A_Space
@@ -2599,11 +2591,11 @@ class TeamCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+24 w80 h20", translate("Pressures"))
 
-		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit").OnEvent("Change", validateNumber.Bind("pitstopPressureFLEdit"))
-		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureFREdit").OnEvent("Change", validateNumber.Bind("pitstopPressureFREdit"))
+		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit").OnValidate("LoseFocus", validateNumber.Bind("pitstopPressureFLEdit"))
+		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureFREdit").OnValidate("LoseFocus", validateNumber.Bind("pitstopPressureFREdit"))
 		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure", true))
-		centerGui.Add("Edit", "x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit").OnEvent("Change", validateNumber.Bind("pitstopPressureRLEdit"))
-		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureRREdit").OnEvent("Change", validateNumber.Bind("pitstopPressureRREdit"))
+		centerGui.Add("Edit", "x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit").OnValidate("LoseFocus", validateNumber.Bind("pitstopPressureRLEdit"))
+		centerGui.Add("Edit", "x160 yp w50 h20 Limit4 vpitstopPressureRREdit").OnValidate("LoseFocus", validateNumber.Bind("pitstopPressureRREdit"))
 		centerGui.Add("Text", "x214 yp+2 w30 h20", getUnit("Pressure", true))
 
 		centerGui.Add("Text", "x24 yp+24 w80 h23 +0x200", translate("Brakes"))

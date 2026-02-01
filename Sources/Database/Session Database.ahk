@@ -791,6 +791,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 
 				editor.updateSetting(section, key, value)
+
+				this.iSelectedValue := value
 			}
 
 			Task.startTask(selectSettingAsync)

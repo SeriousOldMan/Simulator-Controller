@@ -424,9 +424,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			workbench.loadWeather(kWeatherConditions[workbenchGui["weatherDropDown"].Value])
 		}
 
-		updateTemperatures(*) {
-			this.iAirTemperature := workbenchGui["airTemperatureEdit"].Text
-			this.iTrackTemperature := workbenchGui["trackTemperatureEdit"].Text
+		validateTemperatures(field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0))
 		}
 
 		chooseDataType(*) {
@@ -653,14 +653,14 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 		}
 
-		validateInteger(fieldName, minValue := 0, field, operation, value?) {
+		validateInteger(minValue, field, operation, value?) {
 			if (operation = "Validate")
 				return (isInteger(value) && (value >= minValue))
 		}
 
 		validateSimInitialFuelAmount(arguments*) {
 			try {
-				return validateInteger("simInitialFuelAmountEdit", 0, arguments*)
+				return validateInteger(0, arguments*)
 			}
 			finally {
 				Task.startTask(() => workbench.updateState(), 100)
@@ -1081,9 +1081,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x90 yp w120 W:Grow(0.1) Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
-		workbenchGui.Add("Edit", "x215 yp w40 X:Move(0.1) Number Limit2 vairTemperatureEdit", this.AirTemperature).OnEvent("Change", updateTemperatures)
+		workbenchGui.Add("Edit", "x215 yp w40 X:Move(0.1) Number Limit2 vairTemperatureEdit", this.AirTemperature).OnValidate("LoseFocus", validateTemperatures)
 		workbenchGui.Add("UpDown", "x242 yp-2 w18 h20 X:Move(0.1) Range0-99", this.AirTemperature)
-		workbenchGui.Add("Edit", "x262 yp w40 X:Move(0.1) Number Limit2 vtrackTemperatureEdit", this.TrackTemperature).OnEvent("Change", updateTemperatures)
+		workbenchGui.Add("Edit", "x262 yp w40 X:Move(0.1) Number Limit2 vtrackTemperatureEdit", this.TrackTemperature).OnValidate("LoseFocus", validateTemperatures)
 		workbenchGui.Add("UpDown", "x289 yp w18 h20 X:Move(0.1) Range0-99", this.TrackTemperature)
 		workbenchGui.Add("Text", "x304 yp w90 h23 X:Move(0.1) +0x200", translate("Air / Track"))
 
@@ -1218,13 +1218,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Time", "Time + 1", "Laps", "Laps + 1"], translate)).OnEvent("Change", chooseSessionType)
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60).OnValidate("LoseFocus", validateInteger.Bind("sessionLengthEdit", 1))
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60).OnValidate("LoseFocus", validateInteger.Bind(1))
 
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20 VsessionLengthLabel", translate("Minutes"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w75 h23 +0x200", translate("Max. Stint"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70).OnValidate("LoseFocus", validateInteger.Bind("stintLengthEdit", 1))
+		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70).OnValidate("LoseFocus", validateInteger.Bind(1))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 70)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w50 h20", translate("Minutes"))
 
@@ -1273,9 +1273,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x" . x13 . " yp w85 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
 
 		workbenchGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit", 50).OnEvent("Change", updateTyreSet)
+		workbenchGui["tyreSetLapsEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . (x13 + 86) . " yp w18 h20 0x80 Range0-99")
 
 		workbenchGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updateTyreSet)
+		workbenchGui["tyreSetCountEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
 		x13 := (x7 + w12 + 5 + 126 - 48)
@@ -1304,12 +1306,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w110 h20 +0x200", translate("Pitlane Delta"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit", 60)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit", 60).OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-99", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", translate("Seconds (Drive through - Drive by)"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w110 h20 +0x200", translate("Tyre Service"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit", 30)
+		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit", 30).OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-99", 30)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", translate("Seconds (Change four tyres)"))
 
@@ -1326,7 +1328,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w90 h20", getUnit("Volume", true))
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w110 h23 +0x200", translate("Safety Fuel"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w50 h20 Number Limit2 VsafetyFuelEdit", displayValue("Float", convertUnit("Volume", 5), 0))
+		workbenchGui.Add("Edit", "x" . x1 . " yp+1 w50 h20 Number Limit2 VsafetyFuelEdit", displayValue("Float", convertUnit("Volume", 5), 0)).OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", displayValue("Float", convertUnit("Volume", 4), 0))
 		workbenchGui.Add("Text", "x" . x3 . " yp+2 w90 h20", getUnit("Volume", true))
 
@@ -1346,15 +1348,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w100 h23 +0x200", translate("Pitstop"))
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopEdit").OnEvent("Change", updateSimFixedPitstop)
+		workbenchGui["simFixedPitstopEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
 		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Lap"))
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopLapEdit").OnEvent("Change", updateSimFixedPitstop)
+		workbenchGui["simFixedPitstopLapEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
 		if kFixedPitstopRefuel {
 			workbenchGui.Add("Text", "x" . x2 . " yp+27 w100 h23 +0x200", translate("Refuel"))
 			workbenchGui.Add("Edit", "x" . x3 . " yp-3 w50 Limit3 Number vsimFixedPitstopRefuelEdit").OnEvent("Change", updateSimFixedPitstop)
+			workbenchGui["simFixedPitstopRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			workbenchGui.Add("UpDown", "xp yp-2 w18 Range1-999")
 			workbenchGui.Add("Text", "x" . (x3 + 55) . " yp+3 w80 h20", getUnit("Volume", true))
 		}
@@ -1424,8 +1429,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x" . x3 . " yp w" . w3 . " vsimWeatherDropDown", collect(kWeatherConditions, translate)).OnEvent("Change", updateSimWeather)
 
 		workbenchGui.Add("Edit", "x" . x6 . " yp w40 Number Limit2 vsimWeatherAirTemperatureEdit").OnEvent("Change", updateSimWeather)
+		workbenchGui["simWeatherAirTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x6 . " yp-2 w18 h20 Range0-99", this.AirTemperature)
 		workbenchGui.Add("Edit", "x" . x7 . " yp w40 Number Limit2 vsimWeatherTrackTemperatureEdit").OnEvent("Change", updateSimWeather)
+		workbenchGui["simWeatherTrackTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x7 . " yp w18 h20 Range0-99", this.TrackTemperature)
 		workbenchGui.Add("Text", "x" . x8 . " yp w70 h23 +0x200", translate("Air / Track"))
 
@@ -1470,6 +1477,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+58 w72 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit2 VsimMapEdit", "n/a").OnEvent("Change", (*) => this.updateState())
+		workbenchGui["simMapEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99", "n/a")
 
 		workbenchGui.Add("Text", "x" . x . " yp+23 w72 h23 +0x200", translate("Avg. Lap Time"))
@@ -1575,18 +1583,22 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+21 w70 h20 +0x200", translate("Map"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled", translate("n/a"))
+		workbenchGui["strategyStartMapEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("TC"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled", translate("n/a"))
+		workbenchGui["strategyStartTCEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 1)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("ABS"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled", translate("n/a"))
+		workbenchGui["strategyStartABSEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("BB"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VstrategyStartBBEdit Disabled", translate("n/a"))
+		workbenchGui["strategyStartBBEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		; workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99 Disabled", 2)
 
 		x := 186

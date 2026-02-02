@@ -725,6 +725,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		wetRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)))
 	}
 
+	validateInteger(field, operation, value?) {
+		if (operation = "Validate")
+			return isInteger(value)
+	}
+
 	validateNumber(fieldName, field, operation, value?) {
 		if (operation = "Validate")
 			return isNumber(internalValue("Float", value))
@@ -762,8 +767,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 		}
 		else
-			settingsGui["strategyUpdatePitstopCheck"].Enabled := (settingsGui["strategyUpdatePitstopEdit"].Text > 0)
-
+			settingsGui["strategyUpdatePitstopCheck"].Enabled := (isNumber(settingsGui["strategyUpdatePitstopEdit"].Text) && (settingsGui["strategyUpdatePitstopEdit"].Text > 0))
 	}
 
 	updateTyreSet(field, *) {
@@ -1717,7 +1721,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("Text", "x66 yp+32 w270 0x10")
 
 		settingsGui.Add("Text", "x16 yp+10 w75 h23 +0x200", translate("Max. Stint"))
-		settingsGui.Add("Edit", "x" . x7 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70)
+		settingsGui.Add("Edit", "x" . x7 . " yp w50 h20 Limit4 Number VstintLengthEdit", 70).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x" . (x7 + 40) . " yp-2 w18 h20 Range1-9999 0x80", 70)
 		settingsGui.Add("Text", "x" . (x7 + 54) . " yp+2 w50 h20", translate("Minutes"))
 
@@ -1751,9 +1755,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.Add("DropDownList", "x" . x13 . " yp w85 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updatePSTyreSet)
 
 		settingsGui.Add("Edit", "x" . (x13 + 86) . " yp w40 h20 Limit2 Number vtyreSetLapsEdit").OnEvent("Change", updatePSTyreSet)
+		settingsGui["tyreSetLapsEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x" . (x13 + 86) . " yp w18 h20 0x80 Range0-99")
 
 		settingsGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updatePSTyreSet)
+		settingsGui["tyreSetCountEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
 		x13 := (x7 + w12 + 5 + 126 - 48)
@@ -1770,7 +1776,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 y82 w105 h20 Section", translate("Pitstop Warning"))
 		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VpitstopWarningEdit"
-							  , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3))
+							  , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3)).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9"
 								, getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3))
 		settingsGui.Add("Text", "x184 yp+2 w70 h20", translate("Laps"))
@@ -2009,10 +2015,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+26 w88 h20", translate("Start Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))
+		settingsGui["spSetupTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
 
 		settingsGui.Add("Text", "x16 yp+24 w88 h20", translate("Pitstop Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspPitstopTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spPitstopTyreSetEdit"))
+		settingsGui["spPitstopTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
 
 		settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
@@ -2094,6 +2102,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("CheckBox", "x16 YP+30 w108 Checked" . (value > 0) . " VstrategyUpdateLapsCheck", translate("Revise every")).OnEvent("Click", updateStrategyLaps.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit2 Number VstrategyUpdateLapsEdit", value ? value : 1).OnEvent("Change", updateStrategyLaps.Bind("Edit"))
+		settingsGui["strategyUpdateLapsEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp w18 h20 Range1-99 0x80", value ? value : 1)
 		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("Laps"))
 
@@ -2104,6 +2113,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("CheckBox", "x16 YP+25 w108 Checked" . (value > 0) . " VstrategyUpdatePitstopCheck", translate("Revise if")).OnEvent("Click", updateStrategyPitstop.Bind("Check"))
 		settingsGui.Add("Edit", "x126 yp-3 w50 h20 Limit1 Number VstrategyUpdatePitstopEdit", value ? value : 4).OnEvent("Change", updateStrategyPitstop.Bind("Edit"))
+		settingsGui["strategyUpdatePitstopEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value ? value : 4)
 		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("Laps difference to Strategy"))
 
@@ -2119,7 +2129,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 
 		settingsGui.Add("Text", "x16 yp+30 w108 h20 Section", translate("Race positions"))
-		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value)
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9", value)
 		settingsGui.Add("Text", "x184 yp+2 w205 h20", translate("simulated future laps"))
 
@@ -2127,14 +2137,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x16 yp+20 w82 h23 +0x200", translate("Overtake"))
 		settingsGui.Add("Text", "x100 yp w28 h23 +0x200", translate("Abs("))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value)
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
 		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("/ laptime difference) Seconds"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
 
 		settingsGui.Add("Text", "x16 yp+20 w108 h23 +0x200", translate("Traffic"))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
 		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("% track length"))
 
@@ -2143,21 +2153,21 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 3)
 
 		settingsGui.Add("Text", "x16 yp+15 w108 h23 +0x200", translate("Pitstop Window"))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value)
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value)
 		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Laps +/- around optimal lap"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 
 		settingsGui.Add("Text", "x16 yp+22 w108 h20 +0x200", translate("Pitlane Delta"))
-		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit", value)
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
 		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Seconds (Drive through - Drive by)"))
 
 		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
 
 		settingsGui.Add("Text", "x16 yp+22 w108 h20 +0x200", translate("Tyre Service"))
-		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit", value)
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
 		settingsGui.Add("Text", "x184 yp+4 w205 h20", translate("Seconds (Change four tyres)"))
 
@@ -2177,7 +2187,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		value := displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
 
 		settingsGui.Add("Text", "x16 yp+27 w108 h23 +0x200", translate("Safety Fuel"))
-		settingsGui.Add("Edit", "x126 yp w50 h20 Number Limit2 VsafetyFuelEdit", value)
+		settingsGui.Add("Edit", "x126 yp w50 h20 Number Limit2 VsafetyFuelEdit", value).OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range0-99", value)
 		settingsGui.Add("Text", "x184 yp+2 w90 h20", getUnit("Volume", true))
 

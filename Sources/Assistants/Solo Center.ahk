@@ -1262,6 +1262,11 @@ class SoloCenter extends ConfigurationItem {
 				listView.Modify(A_Index, "-Select")
 		}
 
+		validateInteger(field, operation, value?) {
+			if (operation = "Validate")
+				return isInteger(value)
+		}
+
 		validateNumber(fieldName, field, operation, value?) {
 			if (operation = "Validate")
 				return isNumber(internalValue("Float", value))
@@ -1817,6 +1822,7 @@ class SoloCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x" . x . " yp+28 w83 h20", translate("Set"))
 		centerGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 Limit2 Number vtyreSetEdit").OnEvent("Change", updateState)
+		centerGui["tyreSetEdit"].OnValidate("LoseFocus", validateInteger)
 		centerGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range0-99")
 
 		centerGui.Add("Text", "x" . x . " yp+26 w83 h40", translate("Pressures") . translate(" (") . getUnit("Pressure", true) . translate(")"))
@@ -1848,6 +1854,7 @@ class SoloCenter extends ConfigurationItem {
 
 		centerGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 vcompoundDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreCompound)
 		centerGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vcompoundCountEdit").OnEvent("Change", updateTyreCompound)
+		centerGui["compoundCountEdit"].OnValidate("LoseFocus", validateInteger)
 		centerGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
 		x13 := (x7 + w12 + 5 + 116 - 48)

@@ -157,6 +157,9 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iTemplates := templates
 			}
 
+			if (isSet(language) && !this.iTemplates.Has(language))
+				language := "en"
+
 			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
 		}
 	}

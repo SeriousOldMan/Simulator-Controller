@@ -98,7 +98,7 @@ global kSessionDataSchemas := CaseInsenseMap("Run.Data", ["Nr", "Lap", "Driver.F
 														, "Engine.Temperature.Water", "Engine.Temperature.Oil"
 														, "Tyre.Laps.Front.Right", "Tyre.Laps.Rear.Left", "Tyre.Laps.Rear.Right", "BB"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
-										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"])
+										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Lap.Time", "Laps", "Delta", "ID", "Category", "Sectors.Time"])
 
 global kPCTyresSchemas := kTyresSchemas.Clone()
 
@@ -3869,7 +3869,7 @@ class SoloCenter extends ConfigurationItem {
 
 	addStandings(lap, data) {
 		local sessionStore := this.SessionStore
-		local prefix, driver, category, carIDs
+		local prefix, driver, category, carIDs, carData, sectorTimes
 
 		carIDs := CaseInsenseWeakMap()
 
@@ -3944,12 +3944,19 @@ class SoloCenter extends ConfigurationItem {
 			if (category = "Unknown")
 				category := kNull
 
-			sessionStore.add("Standings.Data"
-						   , Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
-										, "Position", getMultiMapValue(data, "Standings", prefix . A_Index . ".Position")
-										, "Time", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Time") / 1000, 1)
-										, "Laps", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Laps"), 1)
-										, "Delta", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Delta") / 1000, 2)))
+			carData := Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
+								  , "Position", getMultiMapValue(data, "Standings", prefix . A_Index . ".Position")
+								  , "Lap.Time", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Time") / 1000, 1)
+								  , "Laps", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Laps"), 1)
+								  , "Delta", Round(getMultiMapValue(data, "Standings", prefix . A_Index . ".Delta") / 1000, 2))
+
+			sectorTimes := getMultiMapValue(data, "Standings", prefix . A_Index . ".Time.Sectors", kUndefined)
+
+			if (sectorTimes != kUndefined)
+				carData["Sectors.Time"] := values2String(",", collect(string2Values(",", sectorTimes)
+																	, (t) => (isNumber(t) ? Round(t / 1000, 1) : t))*)
+
+			sessionStore.add("Standings.Data", carData)
 		}
 	}
 
@@ -7917,7 +7924,7 @@ class SoloCenter extends ConfigurationItem {
 		local driverSurnames := true
 		local driverNicknames := true
 		local driverCategories := (this.ReportViewer.Settings.Has("DriverCategories") && this.ReportViewer.Settings["DriverCategories"])
-		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
+		local index, position, lapTime, sectorTimes, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
 		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames
 										   , &driverFornames, &driverSurnames, &driverNicknames, &driverCategories, isRace ? "Position" : "Time")
@@ -7939,28 +7946,31 @@ class SoloCenter extends ConfigurationItem {
 		for index, position in overallPositions
 			if (position && carIDs.Has(index)) {
 				lapTime := "-"
+				sectorTimes := "-"
 				laps := "-"
 				delta := "-"
 
 				if isRace {
-					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+					result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
 
 					if (result.Length = 0)
-						result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+						result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
 				}
 				else {
-					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+					result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
 
 					if (result.Length = 0)
-						result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps"], Where: {Lap: lap.Nr, Car: cars[index]}})
+						result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps"], Where: {Lap: lap.Nr, Car: cars[index]}})
 				}
 
 				if (result.Length > 0) {
-					lapTime := result[1]["Time"]
+					lapTime := result[1]["Lap.Time"]
 					laps := result[1]["Laps"]
 
 					if isRace
 						delta := Round(result[1]["Delta"], 1)
+
+					sectorTimes := values2String(", ", collect(string2Values(",",  result[1]["Sectors.Time"]), lapTimeDisplayValue)*)
 				}
 
 				driver := driverName(driverFornames[index] , driverSurnames[index], driverNicknames[index])
@@ -7977,7 +7987,7 @@ class SoloCenter extends ConfigurationItem {
 					if multiClass
 						html .= ("<td class=`"td-std`">" . classPositions[index] . "</td>")
 
-					html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
+					html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", (sectorTimes != "-") ? (lapTimeDisplayValue(lapTime) . "<br>" . sectorTimes) : lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
 
 					pitstops := this.Pitstops[carIDs[index]]
 					numPitstops := 0

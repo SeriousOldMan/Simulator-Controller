@@ -3515,8 +3515,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	importSettings(directory, selection) {
 		local window := this.Window
 		local info := readMultiMap(directory . "\Export.info")
-		local simulator, progress, progressWindow, ignore, setting, settingsDB
-		local section, values, key, value
+		local simulator, progressWindow, ignore, setting, settingsDB
+		local section, values, key, value, count
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -3547,7 +3547,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else {
 			window := this.Window
 			simulator := this.SelectedSimulator
-			progress := 0
 
 			if ((this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "Unknown")) = simulator)
 			 && (getMultiMapValue(info, "General", "Type", "Data") = "Settings")) {
@@ -3559,8 +3558,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				try {
 					settingsDB := SettingsDatabase()
 
+					count := selection.Length
+
 					for ignore, setting in selection {
-						showProgress({progress: ++progress, message: this.getSettingLabel(setting[4], setting[5]) . translate("...")})
+						showProgress({progress: (A_Index / count) * 100, message: this.getSettingLabel(setting[4], setting[5]) . translate("...")})
 
 						Sleep(50)
 

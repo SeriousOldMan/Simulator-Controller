@@ -58,19 +58,22 @@ updatePositions(?lap) <= carLaps(!Driver.Car, FULL, ?driverLaps), carLaps(!Drive
 
 updatePositions(?, ?car, ?, ?) <= ?car =< 0, !
 updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
-		carLapTime(!Driver.Car, ?lapTime), carPosition(!Driver.Car, ?position),
+		carLapTime(!Driver.Car, ?lapTime), carSectorsTime(!Driver.Car, ?sectorTimes), carPosition(!Driver.Car, ?position),
 		Set(Position, ?position), Set(Standings.Lap, ?lap, Position, ?position),
 		Append(Standings.Lap., ?lap, .Car., !Driver.Car, ?prefix),
-		Set(?prefix, Time, ?lapTime), Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
+		Set(?prefix, Time, ?lapTime), Set(?prefix, Time.Sectors, ?sectorTimes),
+		Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
 		carClass(!Driver.Car, ?class),
 		updateStandingsClassLeader(?class, ?lap, !Driver.Car, 0, 0), updateStandingsOverallLeader(?lap, !Driver.Car, 0, 0),
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
-		?car != !Driver.Car, carLapTime(?car, ?carLapTime), lapTime(?lap, ?lapTime), carPosition(?car, ?position),
+		?car != !Driver.Car, carLapTime(?car, ?carLapTime), carSectorsTime(?car, ?carSectorTimes),
+		lapTime(?lap, ?lapTime), carPosition(?car, ?position),
 		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),
 		?standingsDistance = ?carLaps - ?driverLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
 		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
-		Set(?prefix, Time, ?carLapTime), Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
+		Set(?prefix, Time, ?carLapTime), Set(?prefix, Time.Sectors, ?carSectorTimes),
+		Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position),
 		carClass(!Driver.Car, ?class), updateStandings(?class, ?lap, ?car, ?standingsDistance, ?standingsDelta),
 		?trackDistance = ?driverRunning - ?carRunning, ?temp = ?lapTime * ?trackDistance, ?trackDelta = ?temp * -1,
 		updateTrack(?lap, ?car, ?trackDistance, ?trackDelta),

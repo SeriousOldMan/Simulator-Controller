@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gn8kP5Id/Releases/Simulator%20Controller%206.8.2.0-dev.zip) (Early build for 6.8.2. Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process.)
+[6.8.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Gn8kP5Id/Releases/Simulator%20Controller%206.8.2.0-dev.zip) (Early build for 6.8.2. Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6820) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) of this version and all the versions you might have skipped, before installing and using this version.
 

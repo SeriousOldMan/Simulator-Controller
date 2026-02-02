@@ -38,3 +38,5 @@ carPosition(?car, ?position) <= Get(Car, ?car, Position, ?position)
 
 carLapTime(?car, ?time) <= Get(Car, ?car, Time, ?time)
 
+carSectorsTime(?car, ?times) <= Get(Car, ?car, Time.Sectors, ?times)
+

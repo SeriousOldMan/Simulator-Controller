@@ -112,7 +112,7 @@ global kSessionDataSchemas := CaseInsenseMap("Stint.Data", ["Nr", "Lap", "Driver
 										   , "Pitstop.Tyre.Data", ["Pitstop", "Driver", "Laps", "Compound", "Compound.Color", "Set"
 																 , "Tyre", "Tread", "Wear", "Grain", "Blister", "FlatSpot"]
 										   , "Delta.Data", ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
-										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID", "Category"]
+										   , "Standings.Data", ["Lap", "Car", "Driver", "Position", "Lap.Time", "Laps", "Delta", "ID", "Category", "Sectors.Time"]
 										   , "Plan.Data", ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
 														 , "Fuel.Amount", "Tyre.Change"]
 										   , "Setups.Data", ["Driver", "Weather", "Temperature.Air", "Temperature.Track"
@@ -3160,7 +3160,7 @@ class TeamCenter extends ConfigurationItem {
 
 		if inList(categories, "Class") {
 			carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-		
+
 			carClass := (SessionDatabase.getCarClass(this.Simulator, getMultiMapValue(data, "Position Data"
 																						  , "Car." . car . ".Car", false)) || carClass)
 
@@ -11928,7 +11928,7 @@ class TeamCenter extends ConfigurationItem {
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, table, field, brakeWears
 		local currentListView, lapPressures, entry, standingsData, prefix, driver, category
-		local currentStint, newStint, stint, stintData, tries, carIDs, positions, row
+		local currentStint, newStint, stint, stintData, tries, carIDs, positions, row, carData, sectorTimes
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -12239,12 +12239,19 @@ class TeamCenter extends ConfigurationItem {
 								if (category = "Unknown")
 									category := kNull
 
-								sessionStore.add("Standings.Data"
-											   , Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
-															, "Position", getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Position")
-															, "Time", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
-															, "Laps", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
-															, "Delta", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2)))
+								carData := Database.Row("Lap", lap, "Car", A_Index, "ID", carIDs[A_Index], "Driver", driver, "Category", category
+													  , "Position", getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Position")
+													  , "Lap.Time", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
+													  , "Laps", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
+													  , "Delta", Round(getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2))
+
+								sectorTimes := getMultiMapValue(standingsData, "Standings", prefix . A_Index . ".Time.Sectors", kUndefined)
+
+								if (sectorTimes != kUndefined)
+									carData["Sectors.Time"] := values2String(",", collect(string2Values(",", sectorTimes)
+																						, (t) => (isNumber(t) ? Round(t / 1000, 1) : t))*)
+
+								sessionStore.add("Standings.Data", carData)
 							}
 						}
 					}
@@ -12921,7 +12928,7 @@ class TeamCenter extends ConfigurationItem {
 		local driverSurnames := true
 		local driverNicknames := true
 		local driverCategories := (this.ReportViewer.Settings.Has("DriverCategories") && this.ReportViewer.Settings["DriverCategories"])
-		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
+		local index, position, lapTime, sectorTimes, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
 		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames
 										   , &driverFornames, &driverSurnames, &driverNicknames, &driverCategories)
@@ -12943,18 +12950,21 @@ class TeamCenter extends ConfigurationItem {
 		for index, position in overallPositions
 			if (position && carIDs.Has(index)) {
 				lapTime := "-"
+				sectorTimes := "-"
 				laps := "-"
 				delta := "-"
 
-				result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+				result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
 
 				if (result.Length = 0)
-					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+					result := sessionStore.query("Standings.Data", {Select: ["Lap.Time", "Sectors.Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
 
 				if (result.Length > 0) {
-					lapTime := result[1]["Time"]
+					lapTime := result[1]["Lap.Time"]
 					laps := result[1]["Laps"]
 					delta := Round(result[1]["Delta"], 1)
+
+					sectorTimes := values2String(", ", collect(string2Values(",",  result[1]["Sectors.Time"]), lapTimeDisplayValue)*)
 				}
 
 				driver := driverName(driverFornames[index] , driverSurnames[index], driverNicknames[index])
@@ -12970,7 +12980,7 @@ class TeamCenter extends ConfigurationItem {
 				if multiClass
 					html .= ("<td class=`"td-std`">" . classPositions[index] . "</td>")
 
-				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
+				html .= ("<td class=`"td-std`">" . values2String("</td><td class=`"td-std`">", (sectorTimes != "-") ? (lapTimeDisplayValue(lapTime) . "<br>" . sectorTimes) : lapTimeDisplayValue(lapTime), laps, delta) . "</td>")
 
 				pitstops := this.Pitstops[carIDs[index]]
 				numPitstops := 0

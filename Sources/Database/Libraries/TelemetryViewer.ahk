@@ -2472,6 +2472,11 @@ class TrackMap {
 	createGui() {
 		local mapGui
 
+		validateZoom(field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 100) && (value <= 400))
+		}
+
 		selectTrackPosition(*) {
 			local coordinateX := false
 			local coordinateY := false
@@ -2656,6 +2661,7 @@ class TrackMap {
 		setButtonIcon(mapGui["resizeButton"], kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		mapGui.Add("Edit", "x88 yp w50 X:Move(0) Number Limit3 vzoomEdit", 100).OnEvent("Change", (*) => this.updateTrackMap())
+		mapGui["zoomEdit"].OnValidate("LoseFocus", validateZoom)
 		mapGui.Add("UpDown", "xp+32 yp w18 X:Move(0) Range100-400 vzoomUpDown", 100)
 		mapGui.Add("Text", "x140 yp+2 w23 X:Move(0) vzoomPercent", translate("%"))
 
@@ -3548,6 +3554,11 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 	static layouts := []
 	static layout := false
 
+	validateCluster(field, operation, value?) {
+		if (operation = "Validate")
+			return (isInteger(value) && (value >= 1) && (value <= 4))
+	}
+
 	checked(row) {
 		local index := 0
 
@@ -3819,7 +3830,7 @@ editLayoutSettings(telemetryViewerOrCommand, arguments*) {
 		setButtonIcon(layoutsGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		layoutsGui.Add("Text", "x16 yp+26 w80", translate("Groups"))
-		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1)
+		layoutsGui.Add("Edit", "x98 yp-2 w40 Number Limit1 vclusterEdit", 1).OnValidate("LoseFocus", validateCluster)
 		layoutsGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range1-4", 1)
 
 		layoutsGui["clusterEdit"].OnEvent("Change", (*) => editLayoutSettings("AdjustCluster", true))

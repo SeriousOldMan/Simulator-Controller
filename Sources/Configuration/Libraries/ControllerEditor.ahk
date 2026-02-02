@@ -756,6 +756,11 @@ class LayoutsList extends ConfigurationItemList {
 	createGui(editor, buttonBoxConfiguration, streamDeckConfiguration) {
 		local window := editor.Window
 
+		validateInteger(minValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue))
+		}
+
 		chooseLayoutType(*) {
 			this.chooseLayoutType()
 		}
@@ -791,12 +796,14 @@ class LayoutsList extends ConfigurationItemList {
 
 		bbWidget5 := window.Add("Edit", "x102 y493 w40 h21 Limit1 Number Limit2 VlayoutRowsEdit", 0)
 		bbWidget5.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget5.OnValidate("LoseFocus", validateInteger.Bind(1))
 		bbWidget6 := window.Add("UpDown", "x125 y493 w17 h21 Range1-99", 0)
 
 		bbWidget7 := window.Add("Text", "x143 y493 w23 h23 +0x200 Center", translate("x"))
 
 		bbWidget8 := window.Add("Edit", "x168 y493 w40 h21 Limit1 Number Limit2  VlayoutColumnsEdit", 0)
 		bbWidget8.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget8.OnValidate("LoseFocus", validateInteger.Bind(1))
 		bbWidget9 := window.Add("UpDown", "x195 y493 w17 h21 Range1-99", 0)
 
 		window.SetFont("s7")
@@ -810,13 +817,17 @@ class LayoutsList extends ConfigurationItemList {
 
 		bbWidget14 := window.Add("Edit", "x215 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutRowMarginEdit")
 		bbWidget14.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget14.OnValidate("LoseFocus", validateInteger.Bind(0))
 		bbWidget15 := window.Add("Edit", "x265 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutColumnMarginEdit")
 		bbWidget15.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget15.OnValidate("LoseFocus", validateInteger.Bind(0))
 		bbWidget16 := window.Add("Edit", "x315 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutSidesMarginEdit")
 		bbWidget16.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget16.OnValidate("LoseFocus", validateInteger.Bind(0))
 		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutBottomMarginEdit")
 		bbWidget17.OnEvent("Change", updateLayoutRowEditor)
-
+		bbWidget17.OnValidate("LoseFocus", validateInteger.Bind(0))
+		
 		window.Add("DropDownList", "x8 y534 w86 Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
 
 		window.Add("Edit", "x102 y534 w330 h50 W:Grow Disabled VlayoutRowEdit")

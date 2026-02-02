@@ -64,7 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files, info, newInfo
+	local name, extension, files, info, newInfo, sType
 
 	updateState() {
 		if (++step > 20) {
@@ -197,9 +197,11 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 											for ignore, type in kSetupTypes
 												loop Files, directory . type . "\*.*", "F" {
-													SplitPath(A_LoopFileName, , , , &name)
+													SplitPath(A_LoopFileName, &name, , &extension)
 
-													if (choose(files, (c) => ((c[1] = type) && c[2] = name)).Length = 0)
+													sType := type
+
+													if ((extension != "info") && (choose(files, (c) => ((c[1] = sType) && c[2] = name)).Length = 0))
 														deleteFile(A_LoopFileFullPath)
 
 													Sleep(1)

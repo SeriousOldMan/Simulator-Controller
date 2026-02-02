@@ -94,11 +94,19 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		widget5 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Learn for"))
 		widget6 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrspLearningLapsEdit Hidden")
+		widget6.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget7 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget8 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
 		widget9 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit Hidden", 5)
+		widget10.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget12 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
 
@@ -145,6 +153,10 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		widget43 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Frequency"))
 		widget44 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit3 vrspDriverUpdateTimeEdit Hidden")
+		widget44.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 10) && (value <= 999))
+		})
 		widget45 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range10-999 Hidden", 2)
 		widget46 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("seconds at least between callouts"))
 

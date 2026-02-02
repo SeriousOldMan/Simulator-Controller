@@ -311,6 +311,10 @@ class FunctionsList extends ConfigurationItemList {
 		window.Add("Text", "x16 y396 w105 h23 Y:Move +0x200", translate("Function"))
 		window.Add("DropDownList", "x124 y396 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
 		window.Add("Edit", "x220 y396 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
+		window["functionNumberEdit"].OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 999))
+		})
 		window.Add("UpDown", "Range1-999 x260 y396 w17 h21 Y:Move", 1)
 
 		window.SetFont("Norm", "Arial")

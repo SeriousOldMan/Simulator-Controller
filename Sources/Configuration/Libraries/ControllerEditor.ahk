@@ -402,6 +402,11 @@ class ControlsList extends ConfigurationItemList {
 	createGui(editor, configuration) {
 		local window := editor.Window
 
+		validateSize(field, operation, value?) {
+			if (operation := "Validate")
+				return (isInteger(value) && (value > 0))
+		}
+
 		chooseImageFilePath(*) {
 			local path, pictureFile
 
@@ -436,15 +441,9 @@ class ControlsList extends ConfigurationItemList {
 		window.Add("Button", "x403 y103 w23 h23 X:Move ", translate("...")).OnEvent("Click", chooseImageFilePath)
 
 		window.Add("Text", "x160 y127 w55 h23 X:Move(0.2) +0x200", translate("Size"))
-		window.Add("Edit", "x214 y127 w40 h21 X:Move(0.2) Limit3 Number VimageWidthEdit")
+		window.Add("Edit", "x214 y127 w40 h21 X:Move(0.2) Limit3 Number VimageWidthEdit").OnValidate("LoseFocus", validateSize)
 		window.Add("Text", "x255 y127 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
-		window.Add("Edit", "x279 y127 w40 h21 X:Move(0.2) Limit3 Number VimageHeightEdit")
-
-		/*
-		window.Add("Button", "x226 y164 w46 h23 X:Move VcontrolAddButton", translate("Add"))
-		window.Add("Button", "x275 y164 w50 h23 X:Move Disabled VcontrolDeleteButton", translate("Delete"))
-		window.Add("Button", "x371 y164 w55 h23 X:Move Disabled VcontrolUpdateButton", translate("Save"))
-		*/
+		window.Add("Edit", "x279 y127 w40 h21 X:Move(0.2) Limit3 Number VimageHeightEdit").OnValidate("LoseFocus", validateSize)
 
 		window.Add("Button", "x349 y164 w23 h23 X:Move VcontrolAddButton")
 		setButtonIcon(window["controlAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -575,6 +574,11 @@ class LabelsList extends ConfigurationItemList {
 	createGui(editor, configuration) {
 		local window := editor.Window
 
+		validateSize(field, operation, value?) {
+			if (operation := "Validate")
+				return (isInteger(value) && (value > 0))
+		}
+
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
@@ -588,15 +592,9 @@ class LabelsList extends ConfigurationItemList {
 		window.Add("Edit", "x214 y225 w105 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
 
 		window.Add("Text", "x160 y248 w55 h23 X:Move(0.2) +0x200", translate("Size"))
-		window.Add("Edit", "x214 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelWidthEdit")
+		window.Add("Edit", "x214 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelWidthEdit").OnValidate("LoseFocus", validateSize)
 		window.Add("Text", "x255 y248 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
-		window.Add("Edit", "x279 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelHeightEdit")
-
-		/*
-		window.Add("Button", "x226 y285 w46 h23 X:Move VlabelAddButton", translate("Add"))
-		window.Add("Button", "x275 y285 w50 h23 X:Move Disabled VlabelDeleteButton", translate("Delete"))
-		window.Add("Button", "x371 y285 w55 h23 X:Move Disabled VlabelUpdateButton", translate("Save"))
-		*/
+		window.Add("Edit", "x279 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelHeightEdit").OnValidate("LoseFocus", validateSize)
 
 		window.Add("Button", "x349 y285 w23 h23 X:Move VlabelAddButton")
 		setButtonIcon(window["labelAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -827,7 +825,7 @@ class LayoutsList extends ConfigurationItemList {
 		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number VlayoutBottomMarginEdit")
 		bbWidget17.OnEvent("Change", updateLayoutRowEditor)
 		bbWidget17.OnValidate("LoseFocus", validateInteger.Bind(0))
-		
+
 		window.Add("DropDownList", "x8 y534 w86 Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
 
 		window.Add("Edit", "x102 y534 w330 h50 W:Grow Disabled VlayoutRowEdit")
@@ -1273,13 +1271,13 @@ class LayoutsList extends ConfigurationItemList {
 		rows := this.iRowDefinitions.Length
 		changed := false
 
-		if (this.Control["layoutRowsEdit"].Text > rows) {
+		if (isInteger(this.Control["layoutRowsEdit"].Text) && (this.Control["layoutRowsEdit"].Text > rows)) {
 			loop this.Control["layoutRowsEdit"].Text - rows
 				this.iRowDefinitions.Push("")
 
 			changed := true
 		}
-		else if (this.Control["layoutRowsEdit"].Text < rows) {
+		else if (isInteger(this.Control["layoutRowsEdit"].Text) && (this.Control["layoutRowsEdit"].Text < rows)) {
 			this.iRowDefinitions.RemoveAt(this.Control["layoutRowsEdit"].Text + 1, rows - this.Control["layoutRowsEdit"].Text)
 
 			changed := true

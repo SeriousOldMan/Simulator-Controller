@@ -1359,8 +1359,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		if kFixedPitstopRefuel {
 			workbenchGui.Add("Text", "x" . x2 . " yp+27 w100 h23 +0x200", translate("Refuel"))
 			workbenchGui.Add("Edit", "x" . x3 . " yp-3 w50 Limit3 Number vsimFixedPitstopRefuelEdit").OnEvent("Change", updateSimFixedPitstop)
-			workbenchGui["simFixedPitstopRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
-			workbenchGui.Add("UpDown", "xp yp-2 w18 Range1-999")
+			workbenchGui["simFixedPitstopRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
+			workbenchGui.Add("UpDown", "xp yp-2 w18 Range0-999")
 			workbenchGui.Add("Text", "x" . (x3 + 55) . " yp+3 w80 h20", getUnit("Volume", true))
 		}
 

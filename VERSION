@@ -1,10 +1,10 @@
 [Development]
-Version=6.8.2.0-dev
-Target=6.8.2.0-release
-Date=01/31/2026
+Version=6.8.3.0-dev
+Target=6.8.3.0-release
+Date=02/03/2026
 Download=
-Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Optimized LMU startup sequence, New news article
-Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
+Changes=Team Server as DLC, Whisper Server as DLC
+Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.1.0-release
 Date=01/30/2026
@@ -18,11 +18,14 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.8.1.Path=Resources
 Configuration.6.8.1.Content=Setup
 Configuration.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/43-WsIDX/Components/Configuration 6.8.1.zip;http://%master%/Components/Configuration 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.1.zip
+Configuration.6.8.3.Path=Resources
+Configuration.6.8.3.Content=Setup
+Configuration.6.8.3.Download=
 Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip
 [Current]
 Type=Development
 [Version]
-Development=6.8.2.0-dev
+Development=6.8.3.0-dev
 Release=6.8.1.0-release

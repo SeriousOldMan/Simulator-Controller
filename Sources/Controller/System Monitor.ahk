@@ -2388,8 +2388,12 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.Add("Text", "x24 yp+320 w95 h20 Y:Move", translate("Log Buffer"))
 		logBufferEdit := systemMonitorGui.Add("Edit", "x120 yp-2 w50 h20 Y:Move Limit3 Number", "999")
+		logBufferEdit.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 100))
+		})
 		systemMonitorGui.Add("UpDown", "x158 yp w18 h20 Y:Move Range100-999", "999")
-
+		
 		systemMonitorGui.Add("Text", "x590 yp w95 h23 Y:Move +0x200", translate("Log Level"))
 
 		choices := kLogLevelNames

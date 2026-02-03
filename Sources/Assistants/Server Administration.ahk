@@ -805,6 +805,10 @@ administrationEditor(configurationOrCommand, arguments*) {
 		administrationGui.Add("Text", "x" . x0 . " yp+22 w95 h23 Y:Move +0x200", translate("Contingent"))
 		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow Y:Move Choose2 vaccountContractDropDown", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "UpdateState"))
 		administrationGui.Add("Edit", "x" . x3 . " yp w60 h21 X:Move Y:Move Number vaccountMinutesEdit")
+		administrationGui["accountMinutesEdit"].OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0))
+		})
 		administrationGui.Add("Text", "x" . x4 . " yp w70 h23 X:Move Y:Move +0x200", translate("Minutes"))
 		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vavailableMinutesButton").OnEvent("Click", administrationEditor.Bind(kEvent, "UpdateAvailableMinutes"))
 		setButtonIcon(administrationGui["availableMinutesButton"], kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")

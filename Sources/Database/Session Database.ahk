@@ -798,6 +798,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Task.startTask(selectSettingAsync)
 		}
 
+		validateInteger(minValue, maxValue, field, operation, value) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+		}
+		
 		modifySetting(validate := false, value?) {
 			modifySettingAsync() {
 				local selected, settings, section, key, ignore, setting, range
@@ -2154,11 +2159,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Edit", "x494 yp w40 X:Move(0.2) -Background Number Limit2 vairTemperatureEdit"
 					, Round(convertUnit("Temperature", this.iAirTemperature))).OnEvent("Change", loadPressures)
+		editorGui["airTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0, 99))
 		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 X:Move(0.2) Range0-99", Round(convertUnit("Temperature", this.iAirTemperature)))
 		editorGui.Add("Text", "xp+42 yp+2 w120 h23 X:Move(0.2) +0x200", substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)}))
 
 		editorGui.Add("Edit", "x494 yp+24 w40 X:Move(0.2) -Background Number Limit2 vtrackTemperatureEdit"
 					, Round(convertUnit("Temperature", this.iTrackTemperature))).OnEvent("Change", loadPressures)
+		editorGui["trackTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0, 99))
 		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 X:Move(0.2) Range0-99", Round(convertUnit("Temperature", this.iTrackTemperature)))
 		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200 X:Move(0.2)", substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)}))
 
@@ -8523,6 +8530,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Synchronize each"))
 		serverUpdateEdit := settingsEditorGui.Add("Edit", "x146 yp w40 Number Limit2", values)
+		serverUpdateEdit.OnValidate("LoseFocus", validateInteger.Bind(10, 90))
 		settingsEditorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range10-90", values)
 		settingsEditorGui.Add("Text", "x190 yp w90 h23 +0x200", translate("Minutes"))
 

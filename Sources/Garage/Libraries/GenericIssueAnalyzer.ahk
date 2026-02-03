@@ -990,9 +990,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static updateTask := false
 
-	validateInteger(field, operation, value?) {
+	validateInteger(minValue, maxValue, field, operation, value?) {
 		if (operation = "Validate") {
-			return (isInteger(value) && (value > 0))
+			return (isInteger(value) && (value >= minValue) && (value <= maxValue))
 		}
 	}
 
@@ -1424,20 +1424,20 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget1 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Steering Lock / Ratio"))
 		steerLockEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200", analyzer.SteerLock)
-		steerLockEdit.OnValidate("LoseFocus", validateInteger)
+		steerLockEdit.OnValidate("LoseFocus", validateInteger.Bind(0, 2000))
 		widget2 := steerLockEdit
 		steerRatioEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 Limit2 Number", analyzer.SteerRatio)
-		steerRatioEdit.OnValidate("LoseFocus", validateInteger)
+		steerRatioEdit.OnValidate("LoseFocus", validateInteger.Bind(1, 99))
 		widget3 := steerRatioEdit
 		widget4 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-99", analyzer.SteerRatio)
 
 		widget27 := analyzerGui.Add("Text", "x24 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
 		wheelbaseEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
-		wheelBaseEdit.OnValidate("LoseFocus", validateInteger)
+		wheelBaseEdit.OnValidate("LoseFocus", validateInteger.Bind(1, 999))
 		widget28 := wheelbaseEdit
 		widget29 := analyzerGui.Add("UpDown", "x196 yp w18 h23 Range1-999", analyzer.Wheelbase)
 		trackWidthEdit := analyzerGui.Add("Edit", "x216 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
-		trackWidthEdit.OnValidate("LoseFocus", validateInteger)
+		trackWidthEdit.OnValidate("LoseFocus", validateInteger.Bind(1, 999))
 		widget30 := trackWidthEdit
 		widget31 := analyzerGui.Add("UpDown", "x246 yp w18 h23 Range1-999", analyzer.TrackWidth)
 		widget32 := analyzerGui.Add("Text", "x265 yp w50 h23 +0x200", translate("cm"))
@@ -1470,6 +1470,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		widget6 := analyzerGui.Add("Text", "x32 yp+21 w130 h23 +0x200", translate("Consider less than"))
 		lowspeedThresholdEdit := analyzerGui.Add("Edit", "x166 yp w45 h23 +0x200 Number Limit3", analyzer.LowspeedThreshold)
+		lowspeedThresholdEdit.OnValidate("LoseFocus", validateInteger.Bind(1, 999))
 		widget7 := lowspeedThresholdEdit
 		widget33 := analyzerGui.Add("UpDown", "x196 yp w18 h23 Range1-999", analyzer.LowspeedThreshold)
 		widget8 := analyzerGui.Add("Text", "x215 yp w120 h23 +0x200", translate("km/h as low speed"))

@@ -123,11 +123,19 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		widget9 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Learn for"))
 		widget10 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrsLearningLapsEdit Hidden")
+		widget10.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget12 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
 		widget13 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
 		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrsLapsConsideredEdit Hidden", 5)
+		widget14.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget15 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget16 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
 

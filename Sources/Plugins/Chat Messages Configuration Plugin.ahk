@@ -31,6 +31,10 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
 		window.Add("Edit", "x110 y335 w40 h21 Y:Move Number Limit3 VchatMessageNumberEdit")
+		window["chatMessageNumberEdit"].OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 999))
+		})
 		window.Add("UpDown", "x150 y335 w17 h21 Y:Move Range1-999")
 
 		window.Add("Text", "x16 y359 w90 h23 Y:Move +0x200", translate("Label"))

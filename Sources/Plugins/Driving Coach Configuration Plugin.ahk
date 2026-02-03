@@ -243,6 +243,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		widget34.OnValidate("LoseFocus", validateTokens.Bind("dcLLMRTMaxTokensEdit"))
 		widget35 := window.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vdcLLMRTMaxTokensRange Hidden")
 		widget36 := window.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vdcLLMRTGPULayersEdit Hidden")
+		widget36.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0) && (value <= 99))
+		})
 		widget37 := window.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vdcLLMRTGPULayersRange Hidden")
 
 		window.SetFont("Italic", "Arial")
@@ -258,6 +262,10 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 
 		widget21 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("Memory"))
 		widget22 := window.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vdcMaxHistoryEdit Hidden")
+		widget22.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 10))
+		})
 		widget23 := window.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10 Hidden")
 		widget24 := window.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200 Hidden", translate("Conversations"))
 

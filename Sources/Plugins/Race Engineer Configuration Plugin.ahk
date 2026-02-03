@@ -120,11 +120,19 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget15 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("Learn for"))
 		widget16 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vreLearningLapsEdit Hidden")
+		widget16.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget17 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget18 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
 		widget19 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
 		widget20 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit Hidden", 5)
+		widget20.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget21 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget22 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("Laps"))
 
@@ -139,6 +147,10 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget28 := window.Add("Text", "x" . x0 . " ys+30 w120 h23 +0x200 Section Hidden", translate("Damage Analysis for"))
 		widget29 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 VreDamageAnalysisLapsEdit Hidden")
+		widget29.OnValidate("LoseFocus", (field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 1) && (value <= 9))
+		})
 		widget30 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
 		widget31 := window.Add("Text", "x" . x3 . " yp-2 w" . w3 . " h23 +0x200 Hidden", translate("Laps after Incident"))
 

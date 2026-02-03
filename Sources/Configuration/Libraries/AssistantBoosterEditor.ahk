@@ -109,6 +109,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW
 
+		validateInteger(minValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue))
+		}
+
 		validatePercentage(fieldName, field, operation, value?) {
 			if (operation = "Validate")
 				try {
@@ -243,7 +248,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviConversationLLMRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
 		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vviConversationLLMRTMaxTokensEdit Hidden").OnValidate("LoseFocus", validateTokens.Bind("viConversationLLMRTMaxTokensEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vviConversationLLMRTMaxTokensRange Hidden")
-		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden")
+		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vviConversationLLMRTGPULayersEdit Hidden").OnValidate("LoseFocus", validateInteger.Bind(0))
 		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vviConversationLLMRTGPULayersRange Hidden")
 
 		editorGui.SetFont("Italic", "Arial")
@@ -284,7 +289,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.SetFont("Norm", "Arial")
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Memory"))
-		editorGui.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vviConversationMaxHistoryEdit")
+		editorGui.Add("Edit", "x" . x1 . " yp w60 h23 Number Limit2 vviConversationMaxHistoryEdit").OnValidate("LoseFocus", validateInteger.Bind(1))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range1-10")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("Conversations"))
 
@@ -322,7 +327,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vviAgentLLMRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("viAgentLLMRTModelEdit"))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vviAgentLLMRTGPULayersLabel Hidden", translate("# GPULayers"))
-		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number Limit2 vviAgentLLMRTGPULayersEdit Hidden")
+		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number Limit2 vviAgentLLMRTGPULayersEdit Hidden").OnValidate("LoseFocus", validateInteger.Bind(0))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-99 vviAgentLLMRTGPULayersRange Hidden")
 
 		editorGui.Add("Button", "x" . (x + 8) . " yp+30 w100 h23 vviAgentEventsButton", translate("Events...")).OnEvent("Click", editEvents)

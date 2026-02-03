@@ -1483,6 +1483,11 @@ class TeamCenter extends ConfigurationItem {
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 		local menu1, menu2, menus, htmlViewer
 
+		validateInteger(minValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue))
+		}
+
 		validateNumber(fieldName, field, operation, value?) {
 			if (operation = "Validate")
 				return isNumber(internalValue("Float", value))
@@ -2382,13 +2387,16 @@ class TeamCenter extends ConfigurationItem {
 
 			centerGui.Add("Text", "x378 yp+28 w95 h20", translate("Lap (est. / act.)"))
 			centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanLapEdit").OnEvent("Change", updatePlan)
+			centerGui["planLapEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			centerGui.Add("UpDown", "x506 yp w18 h20 Range1-999")
 			centerGui.Add("Edit", "x528 yp w50 h20 Limit3 Number vactLapEdit").OnEvent("Change", updatePlan)
-			centerGui.Add("UpDown", "x560 yp w18 h20")
+			centerGui["actLapEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
+			centerGui.Add("UpDown", "x560 yp w18 h20 Range0-999")
 
 			centerGui.Add("Text", "x378 yp+30 w95 h20", translate("Refuel"))
 			centerGui.Add("Edit", "x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit").OnEvent("Change", updatePlan)
-			centerGui.Add("UpDown", "x506 yp-2 w18 h20 Range1-999")
+			centerGui["planRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
+			centerGui.Add("UpDown", "x506 yp-2 w18 h20 Range0-999")
 			centerGui.Add("Text", "x528 yp+2 w70 h20", getUnit("Volume", true))
 
 			centerGui.Add("Text", "x378 yp+24 w95 h23 +0x200", translate("Tyre Change"))
@@ -2433,16 +2441,19 @@ class TeamCenter extends ConfigurationItem {
 
 			centerGui.Add("Text", "x32 yp+24 w120 h23 +0x200", translate("Random Factor"))
 			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VrandomFactorEdit", 5)
+			centerGui["randomFactorEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 			centerGui.Add("UpDown", "x202 yp w18 h20 Range0-99", 5)
 			centerGui.Add("Text", "x228 yp+2 w50 h20", translate("%"))
 
 			centerGui.Add("Text", "x32 yp+22 w120 h23 +0x200", translate("# Scenarios"))
 			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VnumScenariosEdit", 20)
+			centerGui["numScenariosEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 20)
 
 			centerGui.Add("Text", "x32 yp+24 w118 h23 +0x200", translate("Variation"))
 			centerGui.Add("Text", "x150 yp w18 h23 +0x200", translate("+/-"))
 			centerGui.Add("Edit", "x170 yp w50 h20 Limit2 Number VvariationWindowEdit", 3)
+			centerGui["variationWindowEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			centerGui.Add("UpDown", "x202 yp w18 h20 Range1-99", 3)
 			centerGui.Add("Text", "x228 yp+2 w50 h20", translate("laps"))
 
@@ -2487,11 +2498,13 @@ class TeamCenter extends ConfigurationItem {
 			centerGui.Add("Text", "x32 yp+24 w95 h23 +0x200", translate("Overtake"))
 			centerGui.Add("Text", "x132 yp w28 h23 +0x200", translate("Abs("))
 			centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit", 1)
+			centerGui["overtakeDeltaEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 1)
 			centerGui.Add("Text", "x220 yp+4 w370 h20", translate("/ laptime difference) = additional seconds for each passed car"))
 
 			centerGui.Add("Text", "x32 yp+20 w120 h23 +0x200", translate("Traffic"))
 			centerGui.Add("Edit", "x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit", 5)
+			centerGui["trafficConsideredEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 			centerGui.Add("UpDown", "x194 yp-2 w18 h20 Range1-99 0x80", 5)
 			centerGui.Add("Text", "x220 yp+4 w370 h20", translate("% track length"))
 		}
@@ -2515,9 +2528,11 @@ class TeamCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x378 yp+24 w95 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("Temperatures"))
 
 		centerGui.Add("Edit", "x474 yp w40 Number Limit2 vsetupAirTemperatureEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui["setupAirTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		centerGui.Add("UpDown", "x476 yp w18 h20 Range0-99" . ((this.Mode = "Simple") ? " X:Move" : ""))
 
 		centerGui.Add("Edit", "x521 yp w40 Number Limit2 vsetupTrackTemperatureEdit" . ((this.Mode = "Simple") ? " X:Move" : "")).OnEvent("Change", updateSetup)
+		centerGui["setupTrackTemperatureEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		centerGui.Add("UpDown", "x523 yp w18 h20 Range0-99" . ((this.Mode = "Simple") ? " X:Move" : ""))
 		centerGui.Add("Text", "x563 yp w35 h23 +0x200" . ((this.Mode = "Simple") ? " X:Move" : ""), translate("A / T"))
 
@@ -2559,6 +2574,7 @@ class TeamCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 ys+33 w80 h20", translate("Lap"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit")
+		centerGui["pitstopLapEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 		centerGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999")
 
 		centerGui.Add("Button", "x240 yp w23 h23 Center +0x200 vpitstopSettingsButton").OnEvent("Click", pitstopSettings.Bind(centerGui))
@@ -2569,6 +2585,7 @@ class TeamCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+30 w80 h20", translate("Refuel"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit")
+		centerGui["pitstopRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		centerGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-999")
 		centerGui.Add("Text", "x164 yp+2 w80 h20", getUnit("Volume", true))
 
@@ -2587,6 +2604,7 @@ class TeamCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+26 w80 h20", translate("Tyre Set"))
 		centerGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit").OnEvent("Change", (*) => this.updateState())
+		centerGui["pitstopTyreSetEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
 		centerGui.Add("UpDown", "x138 yp w18 h20 Range0-99")
 
 		centerGui.Add("Text", "x24 yp+24 w80 h20", translate("Pressures"))

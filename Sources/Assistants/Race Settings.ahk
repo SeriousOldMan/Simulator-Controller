@@ -749,7 +749,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			}
 		}
 		else
-			settingsGui["strategyUpdateLapsCheck"].Enabled := (settingsGui["strategyUpdateLapsEdit"].Text > 0)
+			settingsGui["strategyUpdateLapsCheck"].Enabled := (isNumber(settingsGui["strategyUpdateLapsEdit"].Text) && (settingsGui["strategyUpdateLapsEdit"].Text > 0))
 
 	}
 

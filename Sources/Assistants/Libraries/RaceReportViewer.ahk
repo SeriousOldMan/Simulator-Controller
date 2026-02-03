@@ -1382,7 +1382,7 @@ getBoxAndWhiskerJSFunctions() {
 
 editReportSettings(raceReport, report := false, availableOptions := false) {
 	local x, y, oldEncoding
-	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
+	local laps, lap, yOption, headers, allDrivers, selectedDrivers
 	local simulator, ignore, driver, column1, column2, startLap, endLap, lap, index, chosen
 	local newLaps, newDrivers, rowNumber, classes, selectedClass, valid, categories
 
@@ -1403,6 +1403,86 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	static raceData := false
 	static options := false
 
+	computeLapsRange(laps) {
+		local lapsDef := ""
+		local baseLap := false
+		local lastLap := false
+		local ignore, lap
+
+		for ignore, lap in laps {
+			if !baseLap
+				baseLap := lap
+			else if (lap != (lastLap + 1)) {
+				if (baseLap = lastLap)
+					lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
+				else
+					lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
+
+				baseLap := lap
+			}
+
+			lastLap := lap
+		}
+
+		if (baseLap = lastLap)
+			lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
+		else
+			lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
+
+		return lapsDef
+	}
+
+	validateLapsRange(field, operation, value?) {
+		local laps, valid, ignore, lap, startLap, endLap
+
+		if (operation = "Validate") {
+			laps := CaseInsenseMap()
+			valid := true
+
+			for ignore, lap in string2Values(";", value)
+				if InStr(lap, "-") {
+					lap := string2Values("-", lap)
+					startLap := lap[1]
+					endLap := lap[2]
+
+					if isInteger(startLap) {
+						if isInteger(endLap) {
+							if (endLap = startLap)
+								laps[startLap] := startLap
+							else if (endLap < startLap) {
+								loop {
+									index := endLap + A_Index - 1
+
+									laps[index] := index
+								}
+								until (index = startLap)
+							}
+							else
+								loop {
+									index := startLap + A_Index - 1
+
+									laps[index] := index
+								}
+								until (index = endLap)
+						}
+						else
+							valid := false
+					}
+					else
+						valid := false
+				}
+				else if isInteger(lap)
+					laps[lap] := lap
+				else {
+					valid := false
+
+					break
+				}
+
+			return (valid && (laps.Count > 0))
+		}
+	}
+
 	chooseAllLapSelection(*) {
 		rangeLapsEdit.Enabled := false
 		rangeLapsEdit.Text := ""
@@ -1410,6 +1490,9 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 	chooseRangeLapSelection(*) {
 		rangeLapsEdit.Enabled := true
+
+		if (Trim(rangeLapsEdit.Text) = "")
+			rangeLapsEdit.Text := "1-99"
 	}
 
 	selectDriver(listView, line, *) {
@@ -1587,6 +1670,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			rangeLapsEdit := reportSettingsGui.Add("Edit", "x170 yp-3 w80")
 			reportSettingsGui.Add("Text", "x255 yp+3 w110", translate("(e.g.: 1-5;8;12)"))
 
+			rangeLapsEdit.OnValidate("LoseFocus", validateLapsRange)
+
 			if !raceReport.Settings.Has("Laps") {
 				allLapsRadio.Value := 1
 				rangeLapsEdit.Enabled := false
@@ -1594,33 +1679,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			else {
 				rangeLapsRadio.Value := 1
 				rangeLapsEdit.Enabled := true
-
-				lapsDef := ""
-				laps := raceReport.Settings["Laps"]
-				baseLap := false
-				lastLap := false
-
-				for ignore, lap in laps {
-					if !baseLap
-						baseLap := lap
-					else if (lap != (lastLap + 1)) {
-						if (baseLap = lastLap)
-							lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
-						else
-							lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
-
-						baseLap := lap
-					}
-
-					lastLap := lap
-				}
-
-				if (baseLap = lastLap)
-					lapsDef .= (((lapsDef != "") ? ";" : "") . baseLap)
-				else
-					lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
-
-				rangeLapsEdit.Text := lapsDef
+				rangeLapsEdit.Text := computeLapsRange(raceReport.Settings["Laps"])
 			}
 		}
 

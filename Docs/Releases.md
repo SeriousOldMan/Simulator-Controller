@@ -59,6 +59,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
+  - Sector times are now available for *Assetto Corsa*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in usefule format in the API.
   - If available, sector times will be shown in the lap reports in the "Solo Center" and "Team Center" applications.
   - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.
   - Change the startup sequence for *le Mans Ultimate* a bit, so that the short stutter at the beginning of the session happens earlier.

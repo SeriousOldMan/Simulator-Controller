@@ -346,7 +346,7 @@ namespace SHMConnector
                 else if (lastObservedSector == 2 && currentSector == 0)
                 {
                     sectorBoundary3 = splinePosition;
-                    sectorBoundariesCalibrated = true;
+                    * = true;
                 }
                 
                 lastObservedSector = currentSector;
@@ -449,15 +449,10 @@ namespace SHMConnector
                     
                     if (lapTime > 0)
                     {
-                        if (sector1Time == 0 || sector2Time == 0 || sector3Time == 0)
-                        {
-                            sector1Time = (int)(lapTime * SECTOR_APPROXIMATION);
-                            sector2Time = (int)(lapTime * SECTOR_APPROXIMATION);
-                            sector3Time = lapTime - sector1Time - sector2Time;
-                        }
-                        
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
-                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+
+                        if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
+                            strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
                     }
                     else
                     {

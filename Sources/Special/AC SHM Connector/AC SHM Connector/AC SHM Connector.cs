@@ -346,7 +346,7 @@ namespace SHMConnector
                 else if (lastObservedSector == 2 && currentSector == 0)
                 {
                     sectorBoundary3 = splinePosition;
-                    * = true;
+                    sectorBoundariesCalibrated = true;
                 }
                 
                 lastObservedSector = currentSector;

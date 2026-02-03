@@ -274,6 +274,8 @@ namespace ACSHMProvider
 
             if (connected)
             {
+                cars = ReadCars();
+                
                 Console.Write("Car.Count="); Console.WriteLine(cars.numVehicles);
 
 				int idx = 1;
@@ -294,12 +296,8 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
                     int lapTime = car.lastLapTimeMS;
-                    int sector1Time = 0;
-                    int sector2Time = 0;
-                    int sector3Time = 0;
 
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
-                    Console.Write("Car."); Console.Write(idx); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
                     string carModel = GetStringFromBytes(car.carModel);
 
@@ -364,15 +362,6 @@ namespace ACSHMProvider
 
                 session = GetSession(graphics.Session);
 
-				/*
-                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0) {
-                    if ((graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
-						session = "Finished";
-                }
-                else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
-                    session = "Finished";
-				*/
-
                 Console.Write("Session="); Console.WriteLine(session);
 
                 Console.Write("Car="); Console.WriteLine(normalizeName(staticInfo.CarModel));
@@ -381,27 +370,15 @@ namespace ACSHMProvider
                 Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 
-                /*
-                if (session == "Practice")
-                {
-                    Console.WriteLine("SessionTimeRemaining=3600000");
-                    Console.WriteLine("SessionLapsRemaining=30");
-                }
-                else
-                {
-                */
-                    timeLeft = (long)graphics.SessionTimeLeft;
+                timeLeft = (long)graphics.SessionTimeLeft;
 
                     if (timeLeft < 0)
                     {
                         timeLeft = 24 * 3600 * 1000;
                     }
 
-                    Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
-                    Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
-                /*
-                }
-                */
+                Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
+                Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
             }
             else
                 return;
@@ -419,7 +396,7 @@ namespace ACSHMProvider
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
-            Console.WriteLine("Sector=" + graphics.CurrentSectorIndex + 1);
+            Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
             Console.WriteLine("Laps=" + graphics.CompletedLaps);
 
             Console.WriteLine("LapValid=true");
@@ -429,22 +406,10 @@ namespace ACSHMProvider
             if (graphics.Flag == AC_FLAG_TYPE.AC_PENALTY_FLAG)
                 Console.WriteLine("Penalty=true");
 
-            /*
-            if (session == "Practice")
-            {
-                Console.WriteLine("StintTimeRemaining=3600000");
-                Console.WriteLine("DriverTimeRemaining=3600000");
-            }
-            else
-            {
-            */
-                long time = GetRemainingTime(timeLeft);
+            long time = GetRemainingTime(timeLeft);
 
-                Console.WriteLine("StintTimeRemaining=" + time);
-                Console.WriteLine("DriverTimeRemaining=" + time);
-            /*
-            }
-            */
+            Console.WriteLine("StintTimeRemaining=" + time);
+            Console.WriteLine("DriverTimeRemaining=" + time);
             Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
             Console.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
@@ -485,10 +450,6 @@ namespace ACSHMProvider
                                                  + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
             Console.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
                                               + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
-            /*
-            Console.WriteLine("TyreWear=" + Math.Round(physics.TyreWear[0]) + "," + Math.Round(physics.TyreWear[1]) + ","
-                                          + Math.Round(physics.TyreWear[2]) + "," + Math.Round(physics.TyreWear[3]));
-            */
             Console.WriteLine("BrakeTemperature=" + physics.BrakeTemp[0] + "," + physics.BrakeTemp[1] + ","
                                                  + physics.BrakeTemp[2] + "," + physics.BrakeTemp[3]);
 

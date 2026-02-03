@@ -2232,9 +2232,9 @@ class Window extends Gui {
 			this.Opt("+OwnDialogs -SysMenu -Border -Caption +0x800000")
 
 		if !isObject(options)
-			this.Opt("-DPIScale " . options)
+			this.Opt("-DPIScale -DPIResize " . options)
 		else
-			this.Opt("-DPIScale")
+			this.Opt("-DPIScale -DPIResize")
 
 		this.SetFont("s8", "Arial")
 

@@ -62,13 +62,17 @@ substituteVariables(text, values := false, quoted := true) {
 	local hasPercent := false
 	local isMap := isInstance(values, Map)
 	local isObject := isInstance(values, Object)
-	local variable, startPos, endPos, value, pChar
+	local variable, startPos, endPos, value, pChar, nChar
 
 	loop {
 		startPos := InStr(result, "%", false, startPos)
 
 		if startPos {
 			startPos += 1
+			nChar := SubStr(result, startPos + 1, 1)
+
+			if ((nChar != "") && isInteger(nChar))
+				continue
 
 			if (startPos > 2) {
 				pChar := SubStr(result, startPos - 2, 1)

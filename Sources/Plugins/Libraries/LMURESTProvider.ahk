@@ -1113,7 +1113,7 @@ class LMURESTProvider {
 					switch data["MultiStintState"], false {
 						case "Disabled":
 							return "Disabled"
-						case "Driving":
+						case "Driving", "END_OF_RACE_GRACE":
 							return "Driving"
 						default:
 							return "Paused"

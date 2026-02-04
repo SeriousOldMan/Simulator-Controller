@@ -56,6 +56,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed temperature handling in the issue analyzer of "Setup Workbench", if a temperature unit other the "Celcius" is selected.
   - Fixed wrong scale of the progress bar when importing settings in the "Session Database".
   - Fixed uploading of car setups to the community database.
+  - Finally found the reason, why the *Le Mans Ultimate* API signalled *Pause* at the very exact end of a session, therebey preventing the end of session processing by the Assistants.
   
 #### Changes
 

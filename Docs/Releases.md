@@ -1,5 +1,34 @@
 # Latest stable release
 
+## 6.8.2.0
+
+#### Date: 02/06/26
+
+#### Fixes
+
+  - Fixed a critical bug for ACC, which prevented the full start sequence. This one was introduced with the last release.
+  - Fixed temperature handling in the issue analyzer of "Setup Workbench", if a temperature unit other the "Celcius" is selected.
+  - Fixed wrong scale of the progress bar when importing settings in the "Session Database".
+  - Fixed uploading of car setups to the community database.
+  - Finally found the reason, why the *Le Mans Ultimate* API signalled *Pause* at the very exact end of a session, therebey preventing the end of session processing by the Assistants.
+  
+#### Changes
+
+  - Sector times are now available for *Assetto Corsa*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API. Please note, that the method only works when using the *Connector* data acquisition method, which actually is the default. If you have changed the *Simulation/Data Provider* setting in the core settings, you may reconsider it.
+  - If available, sector times will be shown in the lap reports in the "Solo Center" and "Team Center" applications.
+  - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.
+  - Changed the startup sequence for *Le Mans Ultimate* a bit, so that the short stutter at the beginning of the session happens earlier.
+  - The handling of the Service URL for the [Generic GPT service provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#generic) has been changed, so that OpenAI compatible services can be called, even if they don't follow the OpenAI naming scheme for the API URL.
+  - New article for the *News* system.
+  - [Expert] The new controller action function ["property"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#runtime-and-host-language-interface) allows an embedded programming language like *Lua* to access properties of the main *Controller* object and all plugins.
+  - [Expert] The existing controller action function ["invoke"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#runtime-and-host-language-interface) has been changed to pass its return value to the caller. This allows an embedded programming language like *Lua* to access the function result, if a method of the main *Controller* object or any plugin had been called.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.8.1.0
 
 #### Date: 01/30/26
@@ -43,33 +72,6 @@
       - Toyota Corolla Stock Car 2024, Ultima GTR, Volkswagen Polo RX
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
-
-# Upcoming release
-
-## 6.8.2.0
-
-#### Date: 02/06/26 (planned)
-
-#### Fixes
-
-  - Fixed a critical bug for ACC, which prevented the full start sequence. This one was introduced with the last release.
-  - Fixed temperature handling in the issue analyzer of "Setup Workbench", if a temperature unit other the "Celcius" is selected.
-  - Fixed wrong scale of the progress bar when importing settings in the "Session Database".
-  - Fixed uploading of car setups to the community database.
-  - Finally found the reason, why the *Le Mans Ultimate* API signalled *Pause* at the very exact end of a session, therebey preventing the end of session processing by the Assistants.
-  
-#### Changes
-
-  - Sector times are now available for *Assetto Corsa*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API.
-  - If available, sector times will be shown in the lap reports in the "Solo Center" and "Team Center" applications.
-  - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.
-  - Changed the startup sequence for *Le Mans Ultimate* a bit, so that the short stutter at the beginning of the session happens earlier.
-  - The handling of the Service URL for the [Generic GPT service provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#generic) has been changed, so that OpenAI compatible services can be called, even if they don't follow the OpenAI naming scheme for the API URL.
-  - New article for the *News* system.
-  - [Expert] The new controller action function ["property"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#runtime-and-host-language-interface) allows an embedded programming language like *Lua* to access properties of the main *Controller* object and all plugins.
-  - [Expert] The existing controller action function ["invoke"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#runtime-and-host-language-interface) has been changed to pass its return value to the caller. This allows an embedded programming language like *Lua* to access the function result, if a method of the main *Controller* object or any plugin had been called.
-
-# Release history
 
 ## 6.8.0.0
 

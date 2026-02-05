@@ -1,15 +1,15 @@
 [Development]
-Version=6.8.2.0-beta
+Version=6.8.2.0-release
 Target=6.8.2.0-release
-Date=02/04/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Up7_q5jE/Releases/Simulator Controller 6.8.2.0-beta.zip
+Date=02/06/2026
+Download=https://cutt.ly/EtbigDjN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/by2-lX7L/Releases/Simulator Controller 6.8.2.0-release.zip;https://www.dropbox.com/scl/fi/tam78wiw9nimtfr1cxys6/Simulator-Controller-6.8.2.0-release.zip?rlkey=pnwldqidazgnpvupsidbrrdov&st=pqjgdfti&dl=1;http://%master%/Releases/Simulator Controller 6.8.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.2.0-release.zip
 Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Release]
-Version=6.8.1.0-release
-Date=01/30/2026
-Download=https://cutt.ly/ktccsEBH;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/iHMTTxAJ/Releases/Simulator Controller 6.8.1.0-release.zip;https://www.dropbox.com/scl/fi/6lhjdzfwp00sl4hutkqpy/Simulator-Controller-6.8.1.0-release.zip?rlkey=d4s15d36nagu33xpehb1mxvlm&st=mlbj3suh&dl=1;http://%master%/Release/Simulator Controller 6.8.1.0	0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.1.0-release.zip
-Changes=Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator"
+Version=6.8.2.0-release
+Date=02/06/2026
+Download=https://cutt.ly/EtbigDjN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/by2-lX7L/Releases/Simulator Controller 6.8.2.0-release.zip;https://www.dropbox.com/scl/fi/tam78wiw9nimtfr1cxys6/Simulator-Controller-6.8.2.0-release.zip?rlkey=pnwldqidazgnpvupsidbrrdov&st=pqjgdfti&dl=1;http://%master%/Releases/Simulator Controller 6.8.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.2.0-release.zip
+Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU
 Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
 [Components]
 Media.5.6.1.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.8.2.0-beta
-Release=6.8.1.0-release
+Development=6.8.2.0-release
+Release=6.8.2.0-release

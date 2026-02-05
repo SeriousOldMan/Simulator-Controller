@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.1.0-release](https://cutt.ly/ktccsEBH) (Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator".)
+[6.8.2.0-release](https://cutt.ly/EtbigDjN) (Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6810) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6820) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-682) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.8.0.0-release](https://cutt.ly/ktzTpbdV) (Changes: Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench".)
+[6.8.1.0-release](https://cutt.ly/ktccsEBH) (Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator".)
 
-[6.7.9.0-release](https://cutt.ly/otkMqRoU) (Changes: New car models for "Setup Workbench", Fixed "Simulator" script module, Fixed parameter passing for "execute", TC and ABS now supported for AMS2, BB supported for most sims, Changed low fuel warning urgency by the Engineer, Profile name is editable, Profile name can be used as name for different roles, Support for extended car meta data, Support for BB in all applications, Fixed error when Race Assistant language is unknown, Fixed instruction handling for Driving Choach with machine translation, Fixed another bug for iRacing with absent cars, Fixed Telemetry/Analyzer menu item in "Setup Workbench", Settings for all cars/tracks in "Session Database".)
+[6.8.0.0-release](https://cutt.ly/ktzTpbdV) (Changes: Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench".)
 
 #### Latest development build
 
-[6.8.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Up7_q5jE/Releases/Simulator%20Controller%206.8.2.0-beta.zip) (Test build for 6.8.2. Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6820) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-681) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

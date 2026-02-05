@@ -1050,7 +1050,7 @@ property(target, property, arguments*) {
 	catch Any as exception {
 		logError(exception, true)
 
-		command := ("property(" . values2String(", ", target, proprty, arguments*) . ")")
+		command := ("property(" . values2String(", ", target, property, arguments*) . ")")
 
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}

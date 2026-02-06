@@ -20,7 +20,7 @@ Configuration.6.8.1.Content=Setup
 Configuration.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/43-WsIDX/Components/Configuration 6.8.1.zip;http://%master%/Components/Configuration 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.1.zip
 Configuration.6.8.3.Path=Resources
 Configuration.6.8.3.Content=Setup
-Configuration.6.8.3.Download=
+Configuration.6.8.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/mE67epkf/Components/Configuration%206.8.3.zip;https://www.dropbox.com/scl/fi/597lbkrexhwx6tffco1ta/Configuration-6.8.3.zip?rlkey=duh0xrqu78gtdhvbbyd2mz7h9&st=tpsjr2fo&dl=1;http://%master%/Components/Configuration 6.8.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.3.zip
 Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip

@@ -25,7 +25,17 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.8.3.0
+
+#### Date: 02/13/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
 
 # Release history
 

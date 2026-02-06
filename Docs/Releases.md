@@ -36,7 +36,42 @@
 #### Changes
 
   - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
-
+  - New car models for "Setup Workbench":
+    - Automobilista 2 (by @inthebagbud UK; no setup editor support)
+      - Aston Martin DBR9, Aston Martin Vantage GT3 Evo, Audi R8 LMS GT3 evo II
+      - Audi R8 LMS GT3, Audi V8 quattro DTM, BMW M3 Sport Evo Group A
+      - BMW M4 GT3, BMW M6 GT3, Brabham Alfa Romeo BT46B
+      - Brabham BMW BT52, Brabham BT26A, Brabham BT44
+      - Brabham Cosworth BT49, Chevrolet Corvette C5-R, Chevrolet Corvette GTP
+      - Chevrolet Corvette Z06 GT3.R, Dodge Viper GTS-R, Formula Classic Gen4 Model1
+      - Formula Classic Gen4 Model2, Formula Classic Gen4 Model3, Formula Dirt
+      - Formula HiTech Gen1 Model1, Formula HiTech Gen1 Model2, Formula HiTech Gen1 Model3
+      - Formula HiTech Gen1 Model4, Formula HiTech Gen2 Model1, Formula HiTech Gen2 Model2
+      - Formula HiTech Gen2 Model3, Formula Inter MG-15, Formula Junior
+      - Formula Retro Gen2, Formula Retro Gen3 DFY, Formula Retro Gen3 Turbo
+      - Formula Retro V12, Formula Retro V8, Formula Trainer Advanced
+      - Formula Trainer, Formula Ultimate Hybrid Gen2, Formula Ultimate Hybrid Gen3
+      - Formula USA 2023, Formula V10 Gen1, Formula V10 Gen2
+      - Formula V12, Formula V8 Gen3, Formula Vee Gen1 + Fin
+      - Formula Vee Gen1, Formula Vee Gen2, Formula Vintage Gen1 Model1
+      - Formula Vintage Gen1 Model2, Formula Vintage Gen2 Model1, Formula Vintage Gen2 Model2
+      - Lamborghini Huracan GT3 EVO2, Lamborghini Murcielago R-GT, Lola B2K00 Ford-Cosworth
+      - Lola B2K00 Mercedes-Benz, Lola B2K00 Toyota, Lola T9500 Ford-Cosworth
+      - Lola T9500 Mercedes-Benz, Lola T9800 Ford-Cosworth, Lotus 49C
+      - Lotus 72E, Lotus 79, Maserati MC12 GT1
+      - McLaren 720S GT3 Evo, McLaren 720S GT3, McLaren Cosworth MP41C
+      - McLaren Cosworth MP48, McLaren F1 GTR, McLaren Honda MP46
+      - McLaren Honda MP47A, McLaren M23, McLaren Mercedes MP412
+      - Mercedes-AMG GT3 Evo, Mercedes-AMG GT3, Mercedes-Benz 190E 2.5-16 Evo II DTM
+      - Mercedes-Benz CLK LM, Milano GT36, Nissan GT-R Nismo GT3
+      - Nissan R390 GT1, Nissan R89C, Porsche 911 GT1-98
+      - Porsche 911 GT3 R, Porsche 962C, Porsche 992 GT3 R
+      - Porsche 996 GT3 RSR, Reynard 2Ki Ford-Cosworth, Reynard 2Ki Honda
+      - Reynard 2Ki Mercedes-Benz, Reynard 2Ki Toyota, Reynard 95i Ford-Cosworth
+      - Reynard 95i Honda, Reynard 95i Mercedes-Benz, Reynard 98i Ford-Cosworth
+      - Reynard 98i Honda, Reynard 98i Mercedes-Benz, Reynard 98i Toyota
+      - Sauber Mercedes C9, Swift 009c Ford-Cosworth
+	  
 # Release history
 
 ## 6.8.1.0

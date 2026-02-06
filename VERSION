@@ -3,7 +3,7 @@ Version=6.8.3.0-dev
 Target=6.8.3.0-release
 Date=02/06/2026
 Download=
-Changes=Team Server as DLC, Whisper Server as DLC
+Changes=Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench"
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.2.0-release

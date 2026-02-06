@@ -1,0 +1,23 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Automobilista 2                 ;;;
+;;;                                         McLaren M23                     ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO) / inthebagbud UK                   ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Automobilista 2", "McLaren M23",
+										[Electronics.TC, Electronics.ABS, Electronics.Engine.Brake, Electronics.Turbo,	
+										 Aero.Splitter.Front,	
+										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right, Damper.Compression.Fast.Front.Heave,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right, Damper.Compression.Fast.Rear.Heave,
+										 Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right, Damper.Rebound.Fast.Front.Heave,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right, Damper.Rebound.Fast.Rear.Heave,
+										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave]))

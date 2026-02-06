@@ -518,7 +518,7 @@ class SetupPatch extends NamedPreset {
 	}
 }
 
-class RuntimePreset extends NamedPreset {
+class ProgramPreset extends NamedPreset {
 	iURL := false
 
 	URL {
@@ -527,9 +527,9 @@ class RuntimePreset extends NamedPreset {
 		}
 	}
 
-	Prefix {
+	Program {
 		Get {
-			throw "Virtual property RuntimePreset.Prefix must be implemented in a subclass..."
+			throw "Virtual property BinaryPreset.Program must be implemented in a subclass..."
 		}
 	}
 
@@ -570,26 +570,26 @@ class RuntimePreset extends NamedPreset {
 
 				updateTask.start()
 
-				deleteFile(A_Temp . "\" . this.Prefix . " Runtime.zip")
+				deleteFile(A_Temp . "\" . this.Program . ".zip")
 
 				for ignore, url in string2Values(";", this.URL) {
 					showProgress({color: "Blue", message: translate("Downloading...")})
 
 					try {
-						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Prefix . " Runtime.zip")
+						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Program . ".zip")
 
-						deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
+						deleteDirectory(kProgramsDirectory . this.Program . "")
 
-						DirCreate(kProgramsDirectory . this.Prefix . " Runtime")
+						DirCreate(kProgramsDirectory . this.Program)
 
 						showProgress({color: "Green", message: translate("Extracting...")})
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Prefix . " Runtime.zip' -DestinationPath '" . kProgramsDirectory . this.Prefix . " Runtime" . "' -Force", , "Hide")
+						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Program . ".zip' -DestinationPath '" . kProgramsDirectory . this.Program . "" . "' -Force", , "Hide")
 
-						if !FileExist(kProgramsDirectory . this.Prefix . " Runtime")
+						if !FileExist(kProgramsDirectory . this.Program . "")
 							throw "Archive does not contain a valid download package..."
 						else {
-							SetWorkingDir(kProgramsDirectory . this.Prefix . " Runtime")
+							SetWorkingDir(kProgramsDirectory . this.Program)
 
 							RunWait("Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File", , "Hide")
 						}
@@ -623,12 +623,20 @@ class RuntimePreset extends NamedPreset {
 	}
 
 	uninstall(wizard) {
-		deleteDirectory(kProgramsDirectory . this.Prefix . " Runtime")
+		deleteDirectory(kProgramsDirectory . this.Program)
+	}
+}
+
+class RuntimePreset extends ProgramPreset {
+	Program {
+		Get {
+			return (this.Runtime . " Runtime")
+		}
 	}
 }
 
 class LLMRuntime extends RuntimePreset {
-	Prefix {
+	Runtime {
 		Get {
 			return "LLM"
 		}
@@ -636,9 +644,46 @@ class LLMRuntime extends RuntimePreset {
 }
 
 class WhisperRuntime extends RuntimePreset {
-	Prefix {
+	Runtime {
 		Get {
 			return "Whisper"
+		}
+	}
+}
+
+class ServerPreset extends ProgramPreset {
+	Program {
+		Get {
+			return this.Server
+		}
+	}
+}
+
+class TeamServer extends ServerPreset {
+	Server {
+		Get {
+			return "Team Server"
+		}
+	}
+}
+
+class WhisperServer extends ServerPreset {
+	Server {
+		Get {
+			return "Whisper Server"
+		}
+	}
+
+	install(wizard, edit := true) {
+		local class, arguments
+
+		super.install(wizard, edit)
+
+		if !exist(wizard.loadPresets(), (p) => isInstance(p, WhisperRuntime)) {
+			class := getMultiMapValue(wizard.Definition, "Setup.Modules", "Modules.Presets.WhisperRuntime.Class")
+			arguments := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Modules", "Modules.Presets.WhisperRuntime.Arguments", ""))
+
+			wizard.installPreset(%class%("WhisperRuntime", arguments*))
 		}
 	}
 }

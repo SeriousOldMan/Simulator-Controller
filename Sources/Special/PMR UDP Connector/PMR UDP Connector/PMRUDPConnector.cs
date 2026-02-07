@@ -8,11 +8,38 @@ namespace PMRUDPConnector
 {
     public class PMRUDPConnector
     {
+        private const int MAX_CARS = 128;
+        private const int SECTOR_UPDATE_INTERVAL_MS = 50;
+        
         private PMRUDPReceiver.PMRUDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
+        private readonly int[] previousSector = new int[MAX_CARS];
+        private readonly float[] sector1Times = new float[MAX_CARS];
+        private readonly float[] sector2Times = new float[MAX_CARS];
+        private readonly float[] sector3Times = new float[MAX_CARS];
+        private readonly float[] lastLapSector1Times = new float[MAX_CARS];
+        private readonly float[] lastLapSector2Times = new float[MAX_CARS];
+        private readonly float[] lastLapSector3Times = new float[MAX_CARS];
+        private readonly float[] sectorStartTimes = new float[MAX_CARS];
+        private readonly float[] lastLapTimes = new float[MAX_CARS];
+        private readonly object sectorLock = new object();
+        private Thread sectorUpdateThread;
+        private volatile bool stopThread;
+
         public PMRUDPConnector()
         {
+            for (int i = 0; i < MAX_CARS; i++)
+            {
+                previousSector[i] = -1;
+            }
+            
+            sectorUpdateThread = new Thread(SectorUpdateWorker)
+            {
+                IsBackground = true,
+                Priority = ThreadPriority.BelowNormal
+            };
+            sectorUpdateThread.Start();
         }
 
         public int GetRemainingLaps()
@@ -99,6 +126,13 @@ namespace PMRUDPConnector
         {
             try
             {
+                stopThread = true;
+                if (sectorUpdateThread != null && sectorUpdateThread.IsAlive)
+                {
+                    if (!sectorUpdateThread.Join(200))
+                        sectorUpdateThread.Abort();
+                }
+                
                 receiver?.Stop();
                 receiver = null;
             }
@@ -309,14 +343,29 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, Math.Max(0, p.CurrentLap - 1));
                 sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));
                 sb.AppendFormat("Car.{0}.Lap.Running.Valid={1}\n", carNum, p.LapValid ? "true" : "false");
-                sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));
-
-                if (p.LastSectorTimes.Count >= 3) // Need to be tested...
+                
+                float lastLapTime;
+                float s1Time, s2Time, s3Time;
+                
+                lock (sectorLock)
                 {
+                    lastLapTime = lastLapTimes[i];
+                    s1Time = lastLapSector1Times[i];
+                    s2Time = lastLapSector2Times[i];
+                    s3Time = lastLapSector3Times[i];
+                }
+                
+                if (lastLapTime > 0)
+                {
+                    sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(lastLapTime * 1000));
                     sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
-                        I(p.LastSectorTimes[0] * 1000),
-                        I(p.LastSectorTimes[1] * 1000),
-                        I(p.LastSectorTimes[2] * 1000));
+                        F(s1Time),
+                        F(s2Time),
+                        F(s3Time));
+                }
+                else
+                {
+                    sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));
                 }
 
                 sb.AppendFormat("Car.{0}.Car={1}\n", carNum, NormalizeName(p.VehicleName));
@@ -390,6 +439,79 @@ namespace PMRUDPConnector
         private string I(int value)
         {
             return value.ToString(enUS);
+        }
+
+        private void SectorUpdateWorker()
+        {
+            while (!stopThread)
+            {
+                try
+                {
+                    if (receiver != null && receiver.HasReceivedData())
+                    {
+                        var participants = receiver.GetAllParticipantStates();
+                        if (participants != null)
+                        {
+                            for (int i = 0; i < participants.Count && i < MAX_CARS; i++)
+                            {
+                                UpdateSectorTimes(participants[i], i);
+                            }
+                        }
+                    }
+                    
+                    Thread.Sleep(SECTOR_UPDATE_INTERVAL_MS);
+                }
+                catch
+                {
+                    Thread.Sleep(SECTOR_UPDATE_INTERVAL_MS);
+                }
+            }
+        }
+
+        private void UpdateSectorTimes(UDPParticipantRaceState state, int carIndex)
+        {
+            if (state == null || carIndex >= MAX_CARS)
+                return;
+
+            int currentSector = state.CurrentSector;
+            float currentTime = state.CurrentLapTime;
+
+            lock (sectorLock)
+            {
+                if (previousSector[carIndex] == -1)
+                {
+                    previousSector[carIndex] = currentSector;
+                    sectorStartTimes[carIndex] = currentTime;
+                    return;
+                }
+
+                if (currentSector != previousSector[carIndex])
+                {
+                    float sectorTime = currentTime - sectorStartTimes[carIndex];
+
+                    if (previousSector[carIndex] == 0)
+                        sector1Times[carIndex] = sectorTime;
+                    else if (previousSector[carIndex] == 1)
+                        sector2Times[carIndex] = sectorTime;
+                    else if (previousSector[carIndex] == 2)
+                        sector3Times[carIndex] = sectorTime;
+
+                    if (currentSector == 0 && previousSector[carIndex] == 2)
+                    {
+                        lastLapSector1Times[carIndex] = sector1Times[carIndex];
+                        lastLapSector2Times[carIndex] = sector2Times[carIndex];
+                        lastLapSector3Times[carIndex] = sector3Times[carIndex];
+                        lastLapTimes[carIndex] = sector1Times[carIndex] + sector2Times[carIndex] + sector3Times[carIndex];
+                        
+                        sector1Times[carIndex] = 0;
+                        sector2Times[carIndex] = 0;
+                        sector3Times[carIndex] = 0;
+                    }
+
+                    previousSector[carIndex] = currentSector;
+                    sectorStartTimes[carIndex] = currentTime;
+                }
+            }
         }
     }
 }

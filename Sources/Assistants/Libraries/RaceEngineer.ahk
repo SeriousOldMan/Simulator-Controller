@@ -2937,8 +2937,10 @@ class RaceEngineer extends RaceAssistant {
 									  , CollectTyrePressures: this.collectTyrePressures()
 									  , SaveTyrePressures: getMultiMapValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasPressureData: false
-								, BestLapTime: 0, OverallTime: 0
+		if !this.KnowledgeBase
+			this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)})
+
+		this.updateDynamicValues({HasPressureData: false, BestLapTime: 0, OverallTime: 0
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 

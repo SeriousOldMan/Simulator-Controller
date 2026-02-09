@@ -2099,8 +2099,10 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateSessionValues({LapsDatabase: lapsDB})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasLapsData: false
-								, BestLapTime: 0, OverallTime: 0
+		if !this.KnowledgeBase
+			this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)})
+
+		this.updateDynamicValues({HasLapsData: false, BestLapTime: 0, OverallTime: 0
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 

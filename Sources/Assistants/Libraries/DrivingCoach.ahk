@@ -2464,8 +2464,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.updateConfigurationValues({LearningLaps: 1, AdjustLapTime: true, SaveSettings: false})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0
+		if !this.KnowledgeBase
+			this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)})
+
+		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 

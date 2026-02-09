@@ -64,6 +64,7 @@ remove([], ?, [])
 remove([?h | ?t], ?h, ?result) <= !, remove(?t, ?h, ?result)
 remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 
+transpose([], [])
 transpose([[] | ?], [])
 transpose(?matrix, [?row | ?rows]) <= transposeFirst(?matrix, ?row, ?restMatrix), transpose(?restMatrix, ?rows)
 

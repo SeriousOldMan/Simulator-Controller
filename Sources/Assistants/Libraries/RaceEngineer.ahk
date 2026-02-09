@@ -2923,6 +2923,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	startSession(settings, data) {
+		local prepared := this.Prepared
 		local configuration := this.Configuration
 		local facts := this.prepareSession(&settings, &data, false)
 		local simulatorName := this.Simulator
@@ -2942,7 +2943,7 @@ class RaceEngineer extends RaceAssistant {
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
-		if this.Speaker[false] {
+		if (this.Speaker[false] && !prepared) {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()
@@ -3442,6 +3443,8 @@ class RaceEngineer extends RaceAssistant {
 				}
 			}
 			else {
+				pitstopHistory := newMultiMap()
+
 				setMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
 			}
 

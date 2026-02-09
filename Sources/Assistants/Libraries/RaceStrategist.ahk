@@ -2070,6 +2070,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	startSession(settings, data) {
+		local prepared := this.Prepared
 		local configuration := this.Configuration
 		local facts := this.prepareSession(&settings, &data, false)
 		local raceEngineer := (ProcessExist("Race Engineer.exe") > 0)
@@ -2104,7 +2105,7 @@ class RaceStrategist extends GridRaceAssistant {
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 
-		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace))
+		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace) && !prepared)
 			this.getSpeaker().speakPhrase("Greeting")
 
 		if this.Debug[kDebugKnowledgeBase]

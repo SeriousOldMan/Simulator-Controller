@@ -479,6 +479,12 @@ class RaceAssistant extends ConfigurationItem {
 			super.__New(ruleEngine, facts, rules)
 		}
 
+		produce() {
+			this.RuleEngine.setTraceLevel(this.RaceAssistant.Debug[kDebugRules] ? kTraceMedium : kTraceOff)
+
+			super.produce()
+		}
+
 		execute(executable, arguments) {
 			local result := false
 			local extension, context, script, scriptFileName, message
@@ -2243,6 +2249,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}
+
 		if this.Debug[kDebugRules]
 			this.dumpRules(knowledgeBase)
 

@@ -36,6 +36,7 @@
 #### Changes
 
   - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
+  - [Developer] Enabling "Debug Rules" in the tray menu of any Assistant enables tracing in the rule engine.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
       - Aston Martin DBR9, Aston Martin Vantage GT3 Evo, Audi R8 LMS GT3 evo II

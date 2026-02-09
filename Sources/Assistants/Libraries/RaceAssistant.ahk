@@ -2742,6 +2742,25 @@ class RaceAssistant extends ConfigurationItem {
 		return sessionInfo
 	}
 
+	callStartLap(data) {
+		local startTime := A_TickCount
+
+		if !isObject(data)
+			data := readMultiMap(data)
+
+		this.startLap(&data)
+
+		if isDebug()
+			logMessage(kLogInfo, "Updating start lap for " . this.AssistantType . " took " . (A_TickCount - startTime) . " ms...")
+	}
+
+	startLap(&data) {
+		if !this.KnowledgeBase
+			this.addLap(0, &data)
+		else
+			this.updateLap(0, &data)
+	}
+
 	callAddLap(lapNumber, data) {
 		local startTime := A_TickCount
 
@@ -2773,15 +2792,21 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Lap", lapNumber)
 
-		if !this.InitialFuelAmount
-			baseLap := lapNumber
-		else
-			baseLap := this.BaseLap
+		if (lapNumber > 0) {
+			if !this.InitialFuelAmount
+				baseLap := lapNumber
+			else
+				baseLap := this.BaseLap
 
-		if (lapNumber > (this.LastLap + 1))
+			if (lapNumber > (this.LastLap + 1))
+				enoughData := false
+			else
+				enoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
+		}
+		else {
+			baseLap := 0
 			enoughData := false
-		else
-			enoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
+		}
 
 		this.iLastLap := lapNumber
 
@@ -4500,7 +4525,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if data {
 			if inList(categories, "Class") {
 				carClass := getMultiMapValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
-		
+
 				carClass := (SessionDatabase.getCarClass(this.Simulator, getMultiMapValue(data, "Position Data"
 																							  , "Car." . car . ".Car", false)) || carClass)
 
@@ -4513,7 +4538,7 @@ class GridRaceAssistant extends RaceAssistant {
 		else {
 			if inList(categories, "Class") {
 				carClass := (knowledgeBase ? knowledgeBase.getValue("Car." . car . ".Class", kUnknown) : kUnknown)
-		
+
 				carClass := (SessionDatabase.getCarClass(this.Simulator, knowledgeBase.getValue("Car." . car . ".Car", false)) || carClass)
 
 				if inList(categories, "Cup")

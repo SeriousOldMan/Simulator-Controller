@@ -142,6 +142,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.callRemote("resumeSession", arguments*)
 		}
 
+		startLap(arguments*) {
+			this.callRemote("callStartLap", arguments*)
+		}
+
 		addLap(arguments*) {
 			this.callRemote("callAddLap", arguments*)
 		}
@@ -1390,19 +1394,28 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		do(RaceAssistantPlugin.Assistants, (a) => a.prepareSimulation())
 	}
 
-	static prepareAssistantsSession(data, count) {
+	static prepareAssistantsSession(data, telemetryData, standingsData, count) {
+		local prepared := true
 		local ignore, assistant, settings
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant() {
 				settings := RaceAssistantPlugin.getSettings(assistant, data)
 
-				if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
+				if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count) {
 					RaceAssistantPlugin.Simulator.prepareSession(settings, data)
+
+					prepared := (prepared && RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count))
+				}
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
+
+				prepared := (prepared && assistant.hasPrepared(settings, data, count))
 			}
+
+		if prepared
+			RaceAssistantPlugin.startAssistantsLap(count, data, telemetryData, standingsData)
 	}
 
 	static acquireSessionData(&telemetryData, &standingsData, finished := false) {
@@ -1562,6 +1575,28 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if RaceAssistantPlugin.Simulator
 			RaceAssistantPlugin.Simulator.resumeSession()
+	}
+
+	static startAssistantsLap(running, data, telemetryData, standingsData) {
+		local ignore, assistant
+
+		if !RaceAssistantPlugin.sSessionStartTime
+			RaceAssistantPlugin.sSessionStartTime := A_Now
+
+		setMultiMapValue(data, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+		setMultiMapValue(telemetryData, "Session Data", "StartTime", RaceAssistantPlugin.sSessionStartTime)
+
+		if RaceAssistantPlugin.sStintStartTime {
+			setMultiMapValue(data, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+			setMultiMapValue(telemetryData, "Stint Data", "StartTime", RaceAssistantPlugin.sStintStartTime)
+		}
+
+		if this.Simulator
+			this.Simulator.startLap(data)
+
+		for ignore, assistant in RaceAssistantPlugin.Assistants
+			if assistant.requireRaceAssistant()
+				assistant.startLap(running, data)
 	}
 
 	static addAssistantsLap(data, telemetryData, standingsData) {
@@ -2280,6 +2315,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
+	startLap(update, data) {
+		local dataFile
+
+		if this.RaceAssistant {
+			dataFile := (kTempDirectory . this.Simulator.Code . " Data\" . this.Plugin . " Lap 0." . update . ".data")
+
+			writeMultiMap(dataFile, data)
+
+			this.RaceAssistant.startLap(dataFile)
+		}
+	}
+
 	addLap(lap, update, data) {
 		local dataFile
 
@@ -2876,7 +2923,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 						RaceAssistantPlugin.WaitForShutdown[true] := false
 
-						RaceAssistantPlugin.prepareAssistantsSession(data, RaceAssistantPlugin.LapRunning + 1)
+						RaceAssistantPlugin.prepareAssistantsSession(data, telemetryData, standingsData, RaceAssistantPlugin.LapRunning + 1)
 
 						RaceAssistantPlugin.sLapRunning := (RaceAssistantPlugin.LapRunning + 1)
 					}

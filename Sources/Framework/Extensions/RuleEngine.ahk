@@ -3988,7 +3988,7 @@ class RuleCompiler {
 		local literal := this.readLiteral(&text, &nextCharIndex)
 		local terms, term
 
-		if (literal != "") {
+		if (literal != kNotFound) {
 			if (literal == "<=") {
 				terms := []
 
@@ -4020,7 +4020,9 @@ class RuleCompiler {
 
 		literal := this.readLiteral(&text, &nextCharIndex)
 
-		if ((literal == "!") || (literal = "fail"))
+		if (literal == kNotFound)
+			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
+		else if ((literal == "!") || (literal = "fail"))
 			return literal
 		else {
 			struct := this.readStruct(&text, &nextCharIndex, literal)
@@ -4127,7 +4129,7 @@ class RuleCompiler {
 		else {
 			literal := this.readLiteral(&text, &nextCharIndex)
 
-			if ((literal = "") || (literal = kNotFound))
+			if (literal = kNotFound)
 				return kNotFound
 			else if this.skipDelimiter("(", &text, &nextCharIndex, false) {
 				structArguments := this.readStructArguments(&text, &nextCharIndex)
@@ -4182,7 +4184,7 @@ class RuleCompiler {
 					conditions.Push(Array(keyword, this.readStruct(&text, &nextCharIndex)))
 				else if (keyword = kExpression)
 					conditions.Push(Array(keyword, this.readTailTerm(&text, &nextCharIndex)))
-				else
+				else if (keyword != kNotFound)
 					conditions.Push(Array(keyword, this.readConditions(&text, &nextCharIndex)*))
 
 				this.skipDelimiter("}", &text, &nextCharIndex)
@@ -4190,18 +4192,21 @@ class RuleCompiler {
 			else if this.skipDelimiter("[", &text, &nextCharIndex, false) {
 				leftLiteral := this.readLiteral(&text, &nextCharIndex)
 
-				if (leftLiteral = kPredicate)
-					leftLiteral := this.readLiteral(&text, &nextCharIndex)
+				if (leftLiteral != kNotFound) {
+					if (leftLiteral = kPredicate)
+						leftLiteral := this.readLiteral(&text, &nextCharIndex)
 
-				if this.skipDelimiter("]", &text, &nextCharIndex, false)
-					conditions.Push(Array(leftLiteral))
-				else {
-					operator := this.readLiteral(&text, &nextCharIndex)
-					rightLiteral := this.readLiteral(&text, &nextCharIndex)
+					if this.skipDelimiter("]", &text, &nextCharIndex, false)
+						conditions.Push(Array(leftLiteral))
+					else {
+						operator := this.readLiteral(&text, &nextCharIndex)
+						rightLiteral := this.readLiteral(&text, &nextCharIndex)
 
-					conditions.Push(Array(leftLiteral, operator, rightLiteral))
+						if ((operator != kNotFound) && (rightLiteral != kNotFound))
+							conditions.Push(Array(leftLiteral, operator, rightLiteral))
 
-					this.skipDelimiter("]", &text, &nextCharIndex)
+						this.skipDelimiter("]", &text, &nextCharIndex)
+					}
 				}
 			}
 			else if priority
@@ -4217,7 +4222,7 @@ class RuleCompiler {
 
 	readActions(&text, &nextCharIndex) {
 		local actions := []
-		local action, arguments, delimiter
+		local action, arguments, delimiter, literal
 
 		loop {
 			this.skipDelimiter("(", &text, &nextCharIndex)
@@ -4228,7 +4233,7 @@ class RuleCompiler {
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
 			else if (action = kLet)
 				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
-			else {
+			else if (action != kNotFound) {
 				arguments := Array(action)
 
 				loop {
@@ -4244,7 +4249,10 @@ class RuleCompiler {
 					if ((A_Index > 1) && !this.skipDelimiter(delimiter, &text, &nextCharIndex, false))
 						break
 
-					arguments.Push(this.readLiteral(&text, &nextCharIndex))
+					literal := this.readLiteral(&text, &nextCharIndex)
+
+					if (literal != kNotFound)
+						arguments.Push(literal)
 				}
 
 				actions.Push(arguments)
@@ -4345,12 +4353,16 @@ class RuleCompiler {
 
 					return StrReplace(StrReplace(StrReplace(literal, "\\", "###" . rnd . "###"), "\", ""), "###" . rnd . "###", "\")
 				}
-				else
+				else if (nextCharIndex > beginCharIndex)
 					return literal
+				else
+					return kNotFound
 			}
 			else
 				nextCharIndex += 1
 		}
+
+		return kNotFound
 	}
 
 	parseProductions(rules) {

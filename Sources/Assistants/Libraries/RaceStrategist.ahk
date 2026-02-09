@@ -3473,7 +3473,7 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				initialAvgLapTime := (knowledgeBase.getValue("Lap." . initialLap . ".Time") / 1000)
 
-			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
+			initialTyreSet := knowledgeBase.getValue("Tyre.Set", false)
 			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
 
 			If strategy {
@@ -3665,7 +3665,8 @@ class RaceStrategist extends GridRaceAssistant {
 			for ignore, tyreSet in usedTyreSets {
 				tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
-				if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
+				if (tyreSet.HasProp("Set") && availableTyreSets.Has(tyreCompound)
+										   && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
 					availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
 			}
 

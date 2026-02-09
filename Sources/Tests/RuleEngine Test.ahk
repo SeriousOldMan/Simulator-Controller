@@ -107,6 +107,8 @@ global kExecutionTestRules := "
 
 				transposeFirst([], [], [])
 				transposeFirst([[?h | ?t] | ?rows], [?h | ?hs], [?t | ?ts]) <= transposeFirst(?rows, ?hs, ?ts)
+
+				testEmptyString(?input, "")
 )"
 
 
@@ -271,7 +273,7 @@ class Compiler extends Assert {
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
 		this.AssertEqual(5, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(32, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(33, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 

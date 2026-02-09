@@ -31,7 +31,7 @@
 
 #### Fixes
 
-  - None this time...
+  - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
   
 #### Changes
 

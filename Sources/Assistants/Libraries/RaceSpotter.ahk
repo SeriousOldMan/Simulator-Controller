@@ -3920,7 +3920,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.initializeAnnouncements()
 
-			if (formationLap && this.Speaker[false] && (this.TrackType = "Circuit")) {
+			if (formationLap && this.Speaker[false] && (this.TrackType = "Circuit") && !this.Greeted) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3991,6 +3991,8 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 				this.getSpeaker(true)
+
+				this.updateDynamicValues({Greeted: true})
 			}
 
 			Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
@@ -4099,7 +4101,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
-				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
 
@@ -4133,7 +4135,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.shutdownSpotter(true)
 
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0

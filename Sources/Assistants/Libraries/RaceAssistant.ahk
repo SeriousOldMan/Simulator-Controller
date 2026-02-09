@@ -272,6 +272,8 @@ class RaceAssistant extends ConfigurationItem {
 	iLearningLaps := 1
 
 	iPrepared := false
+	iGreeted := false
+
 	iKnowledgeBase := false
 
 	iData := newMultiMap()
@@ -806,6 +808,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	Greeted {
+		Get {
+			return this.iGreeted
+		}
+	}
+
 	KnowledgeBase {
 		Get {
 			return this.iKnowledgeBase
@@ -1210,6 +1218,9 @@ class RaceAssistant extends ConfigurationItem {
 	updateDynamicValues(values) {
 		if values.HasProp("Prepared")
 			this.iPrepared := values.Prepared
+
+		if values.HasProp("Greeted")
+			this.iGreeted := values.Greeted
 
 		if values.HasProp("KnowledgeBase")
 			this.iKnowledgeBase := values.KnowledgeBase

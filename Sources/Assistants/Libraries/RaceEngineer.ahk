@@ -2923,7 +2923,6 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	startSession(settings, data) {
-		local prepared := this.Prepared
 		local configuration := this.Configuration
 		local facts := this.prepareSession(&settings, &data, false)
 		local simulatorName := this.Simulator
@@ -2943,7 +2942,7 @@ class RaceEngineer extends RaceAssistant {
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
-		if (this.Speaker[false] && !prepared) {
+		if (this.Speaker[false] && !this.Greeted) {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()
@@ -2982,6 +2981,8 @@ class RaceEngineer extends RaceAssistant {
 			finally {
 				speaker.endTalk()
 			}
+
+			this.updateDynamicValues({Greeted: true})
 		}
 
 		if this.Debug[kDebugKnowledgeBase]
@@ -2993,7 +2994,7 @@ class RaceEngineer extends RaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
-				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
 
@@ -3053,7 +3054,7 @@ class RaceEngineer extends RaceAssistant {
 				this.shutdownSession("After")
 			}
 
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
 
 		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0

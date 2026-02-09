@@ -2490,7 +2490,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.stopIssueAnalyzer()
 
-		this.updateDynamicValues({Prepared: false})
+		this.updateDynamicValues({Prepared: false, Greeted: false})
 	}
 
 	updateLaps(lapNumber, data) {

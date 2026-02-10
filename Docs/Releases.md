@@ -32,9 +32,11 @@
 #### Fixes
 
   - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
+  - Fixed a race condition in the sector times sampling for *Assetto Corsa* which had been introduced with the last release.
   
 #### Changes
 
+  - Correct lap times and sector times for the last lap are now available for *Project Motor Racing*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API. Please note, that the method only works when using the *Connector* data acquisition method, which actually is the default. If you have changed the *Simulator/Data Provider* setting in the core settings, you may reconsider it.
   - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)

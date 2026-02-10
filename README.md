@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.3.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/b1XQWRSY/Releases/Simulator%20Controller%206.8.3.0-dev.zip) (Early build for 6.8.2. Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing.)
+[6.8.3.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/b1XQWRSY/Releases/Simulator%20Controller%206.8.3.0-dev.zip) (Early build for 6.8.2. Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6830) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-683) of this version and all the versions you might have skipped, before installing and using this version.
 

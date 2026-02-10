@@ -3429,7 +3429,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local directory := temporaryFileName("Settings", "export")
 		local progress := 0
 		local count := 0
-		local overall, simulator, ignore, car, track, mode, weather, section, key, value
+		local overall, simulator, ignore, car, track, mode, weather, section, key, value, currentDir
 
 		DirCreate(directory)
 
@@ -3504,8 +3504,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			writeMultiMap(directory . "\Export.info", info)
 
 			writeMultiMap(directory . "\Export.settings", settings)
+		
+			currentDir := A_WorkingDir
 
-			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . fileName . ".zip'", , "Hide")
+			SetWorkingDir(directory)
+			
+			try {
+				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . fileName . ".zip'", , "Hide")
+				
+				RunWait("tar -a -c -f `"" . fileName . ".zip" . "`" *.*", , "Hide")
+			}
+			finally {
+				SetWorkingDir(currentDir)
+			}
 
 			FileMove(fileName . ".zip", fileName, 1)
 		}
@@ -4751,7 +4762,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
-		local ext, folder
+		local ext, folder, currentDir
 
 		DirCreate(directory)
 
@@ -4936,7 +4947,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			writeMultiMap(directory . "\Export.info", info)
 
-			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . targetFileName . ".zip'", , "Hide")
+			currentDir := A_WorkingDir
+
+			SetWorkingDir(directory)
+			
+			try {
+				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . targetFileName . ".zip'", , "Hide")
+				
+				RunWait("tar -a -c -f `"" . targetFileName . ".zip" . "`" *.*", , "Hide")
+			}
+			finally {
+				SetWorkingDir(currentDir)
+			}
 
 			FileMove(targetFileName . ".zip", targetFileName, 1)
 		}

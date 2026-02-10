@@ -22,24 +22,30 @@ namespace PMRUDPConnector
         private readonly float[] lastLapSector2Times = new float[MAX_CARS];
         private readonly float[] lastLapSector3Times = new float[MAX_CARS];
         private readonly float[] sectorStartTimes = new float[MAX_CARS];
+        private readonly float[] previousLapTime = new float[MAX_CARS];
         private readonly float[] lastLapTimes = new float[MAX_CARS];
         private readonly object sectorLock = new object();
         private Thread sectorUpdateThread;
         private volatile bool stopThread;
 
-        public PMRUDPConnector()
+        public PMRUDPConnector() : this(true)
+        {
+        }
+
+        public PMRUDPConnector(bool enableSampler)
         {
             for (int i = 0; i < MAX_CARS; i++)
-            {
                 previousSector[i] = -1;
-            }
-            
-            sectorUpdateThread = new Thread(SectorUpdateWorker)
+
+            if (enableSampler)
             {
-                IsBackground = true,
-                Priority = ThreadPriority.BelowNormal
-            };
-            sectorUpdateThread.Start();
+                sectorUpdateThread = new Thread(SectorUpdateWorker)
+                {
+                    IsBackground = true,
+                    Priority = ThreadPriority.BelowNormal
+                };
+                sectorUpdateThread.Start();
+            }
         }
 
         public int GetRemainingLaps()
@@ -253,6 +259,21 @@ namespace PMRUDPConnector
                     sb.AppendFormat("OilTemperature={0}\n", F(playerTelem.Drivetrain.EngineOilTemperature));
             }
 
+            int playerIndex = -1;
+            for (int i = 0; i < participants.Count && i < MAX_CARS; i++)
+            {
+                if (participants[i].IsPlayer) { playerIndex = i; break; }
+            }
+
+            float sampledLastLapTime = 0;
+            if (playerIndex >= 0)
+            {
+                lock (sectorLock)
+                {
+                    sampledLastLapTime = lastLapTimes[playerIndex];
+                }
+            }
+
             sb.Append("[Stint Data]\n");
             ParseDriverName(playerState.DriverName, out string forename, out string surname, out string nickname);
             sb.AppendFormat("DriverForname={0}\n", forename);
@@ -260,7 +281,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("DriverNickname={0}\n", nickname);
             sb.AppendFormat("Position={0}\n", playerState.RacePos);
             sb.AppendFormat("LapValid={0}\n", playerState.LapValid ? "true" : "false");
-            sb.AppendFormat("LapLastTime={0}\n", I(playerState.LastLapTime * 1000));
+            sb.AppendFormat("LapLastTime={0}\n", sampledLastLapTime > 0 ? I(sampledLastLapTime * 1000) : I(playerState.BestLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", playerState.CurrentSector + 1);
             sb.AppendFormat("Laps={0}\n", Math.Max(0, playerState.CurrentLap - 1));
@@ -359,9 +380,9 @@ namespace PMRUDPConnector
                 {
                     sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(lastLapTime * 1000));
                     sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
-                        F(s1Time),
-                        F(s2Time),
-                        F(s3Time));
+                        I(s1Time * 1000),
+                        I(s2Time * 1000),
+                        I(s3Time * 1000));
                 }
                 else
                 {
@@ -470,7 +491,7 @@ namespace PMRUDPConnector
 
         private void UpdateSectorTimes(UDPParticipantRaceState state, int carIndex)
         {
-            if (state == null || carIndex >= MAX_CARS)
+            if (carIndex >= MAX_CARS)
                 return;
 
             int currentSector = state.CurrentSector;
@@ -480,14 +501,23 @@ namespace PMRUDPConnector
             {
                 if (previousSector[carIndex] == -1)
                 {
-                    previousSector[carIndex] = currentSector;
-                    sectorStartTimes[carIndex] = currentTime;
+                    if (currentSector == 0)
+                    {
+                        previousSector[carIndex] = 0;
+                        sectorStartTimes[carIndex] = currentTime;
+                    }
+                    previousLapTime[carIndex] = currentTime;
                     return;
                 }
 
                 if (currentSector != previousSector[carIndex])
                 {
-                    float sectorTime = currentTime - sectorStartTimes[carIndex];
+                    float sectorTime;
+
+                    if (currentTime < sectorStartTimes[carIndex])
+                        sectorTime = previousLapTime[carIndex] - sectorStartTimes[carIndex] + (currentTime / 2);
+                    else
+                        sectorTime = (currentTime / 2) - sectorStartTimes[carIndex];
 
                     if (previousSector[carIndex] == 0)
                         sector1Times[carIndex] = sectorTime;
@@ -502,15 +532,13 @@ namespace PMRUDPConnector
                         lastLapSector2Times[carIndex] = sector2Times[carIndex];
                         lastLapSector3Times[carIndex] = sector3Times[carIndex];
                         lastLapTimes[carIndex] = sector1Times[carIndex] + sector2Times[carIndex] + sector3Times[carIndex];
-                        
-                        sector1Times[carIndex] = 0;
-                        sector2Times[carIndex] = 0;
-                        sector3Times[carIndex] = 0;
                     }
 
                     previousSector[carIndex] = currentSector;
                     sectorStartTimes[carIndex] = currentTime;
                 }
+
+                previousLapTime[carIndex] = currentTime;
             }
         }
     }

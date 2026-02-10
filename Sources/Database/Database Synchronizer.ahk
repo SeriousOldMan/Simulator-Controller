@@ -64,7 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files, info, newInfo, sType
+	local name, extension, files, info, newInfo, sType, currentDir
 
 	updateState() {
 		if (++step > 20) {
@@ -340,11 +340,20 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 			}
 		}
 
+		currentDir := A_WorkingDir
+
+		SetWorkingDir(kTempDirectory . "Shared Database")
+
 		try {
-			RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kTempDirectory . "Shared Database\Community' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . "Shared Database\Database." . id . ".zip'", , "Hide")
+			; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kTempDirectory . "Shared Database\Community' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . "Shared Database\Database." . id . ".zip'", , "Hide")
+
+			RunWait("tar -a -c -f Database." . id . ".zip Community", , "Hide")
 		}
 		catch Any as exception {
 			logError(exception)
+		}
+		finally {
+			SetWorkingDir(currentDir)
 		}
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")

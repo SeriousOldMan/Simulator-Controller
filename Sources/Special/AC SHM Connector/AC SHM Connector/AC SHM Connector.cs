@@ -43,6 +43,8 @@ namespace SHMConnector
         private Thread sectorUpdateThread;
         private volatile bool shouldStopThread;
 
+        private volatile int dataGeneration = 0;
+
         public SHMConnector()
         {
             for (int i = 0; i < MAX_CARS; i++)
@@ -126,10 +128,12 @@ namespace SHMConnector
                 staticInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_static");
                 carsInfoMMF = MemoryMappedFile.OpenExisting("Local\\acpmf_cars");
 
+                /*
                 physics = ReadPhysics();
                 graphics = ReadGraphics();
                 staticInfo = ReadStaticInfo();
                 cars = ReadCars();
+                */
 
                 memoryStatus = AC_MEMORY_STATUS.CONNECTED;
 
@@ -298,24 +302,26 @@ namespace SHMConnector
                 {
                     if (connected)
                     {
-                        Graphics currentGraphics = ReadGraphics();
-                        Cars currentCars = ReadCars();
+                        dataGeneration++;
+
+                        graphics = ReadGraphics();
+                        cars = ReadCars();
                         
-                        if (!sectorBoundariesCalibrated && currentCars.numVehicles > 0)
+                        if (!sectorBoundariesCalibrated && cars.numVehicles > 0)
                         {
-                            CalibrateSectorBoundaries(currentGraphics, ref currentCars.cars[0]);
+                            CalibrateSectorBoundaries(graphics, ref cars.cars[0]);
                         }
                         
-                        if (sectorBoundariesCalibrated && currentCars.numVehicles > 0)
+                        if (sectorBoundariesCalibrated && cars.numVehicles > 0)
                         {
-                            for (int i = 0; i < currentCars.numVehicles; i++)
+                            for (int i = 0; i < cars.numVehicles; i++)
                             {
-                                ref AcCarInfo car = ref currentCars.cars[i];
+                                ref AcCarInfo car = ref cars.cars[i];
                                 if (car.isConnected == 0)
                                     continue;
                                     
                                 int currentSector = GetSectorFromSplinePosition(car.splinePosition);
-                                UpdateSectorTimes(i, currentSector, currentGraphics.iCurrentTime, car.lastLapTimeMS);
+                                UpdateSectorTimes(i, currentSector, graphics.iCurrentTime, car.lastLapTimeMS);
                             }
                         }
                     }
@@ -374,115 +380,124 @@ namespace SHMConnector
             {
                 int prevSector = previousSector[carIndex];
             
-            if (prevSector == -1)
-            {
-                sectorStartTimes[carIndex] = currentTime;
-                previousSector[carIndex] = currentSector;
-                return;
-            }
+                if (prevSector == -1)
+                {
+                    sectorStartTimes[carIndex] = currentTime;
+                    previousSector[carIndex] = currentSector;
+                    return;
+                }
             
-            if (currentSector != prevSector)
-            {
-                int sectorTime = currentTime - sectorStartTimes[carIndex];
+                if (currentSector != prevSector)
+                {
+                    int sectorTime = currentTime - sectorStartTimes[carIndex];
                 
-                if (prevSector == 0 && currentSector == 1)
-                {
-                    sector1Times[carIndex] = sectorTime;
-                }
-                else if (prevSector == 1 && currentSector == 2)
-                {
-                    sector2Times[carIndex] = sectorTime;
-                }
-                else if (prevSector == 2 && currentSector == 0)
-                {
-                    sector3Times[carIndex] = sectorTime;
-                    sector1Times[carIndex] = 0;
-                    sector2Times[carIndex] = 0;
-                    sector3Times[carIndex] = 0;
-                }
+                    if (prevSector == 0 && currentSector == 1)
+                    {
+                        sector1Times[carIndex] = sectorTime;
+                    }
+                    else if (prevSector == 1 && currentSector == 2)
+                    {
+                        sector2Times[carIndex] = sectorTime;
+                    }
+                    else if (prevSector == 2 && currentSector == 0)
+                    {
+                        sector3Times[carIndex] = sectorTime;
+                        sector1Times[carIndex] = 0;
+                        sector2Times[carIndex] = 0;
+                        sector3Times[carIndex] = 0;
+                    }
                 
-                sectorStartTimes[carIndex] = currentTime;
-                previousSector[carIndex] = currentSector;
-            }
+                    sectorStartTimes[carIndex] = currentTime;
+                    previousSector[carIndex] = currentSector;
+                }
             }
         }
 
         public string ReadStandings()
         {
-            StringWriter strWriter = new StringWriter();
+            StringWriter strWriter;
+            int startGeneration;
 
-            strWriter.WriteLine("[Position Data]");
-            if (connected)
+            do
             {
-                cars = ReadCars();
-                
-                strWriter.Write("Car.Count="); strWriter.WriteLine(cars.numVehicles);
+                strWriter = new StringWriter();
 
-				int idx = 1;
-				
-                for (int i = 1; i <= cars.numVehicles; ++i)
+                startGeneration = dataGeneration;
+
+                strWriter.WriteLine("[Position Data]");
+                if (connected)
                 {
-                    ref AcCarInfo car = ref cars.cars[i - 1];
-					
-					if (car.isConnected == 0)
-						continue;
+                    cars = ReadCars();
 
-					strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".ID="); strWriter.WriteLine(i);
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId);
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+                    strWriter.Write("Car.Count="); strWriter.WriteLine(cars.numVehicles);
 
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Laps="); strWriter.WriteLine(car.lapCount);
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running="); strWriter.WriteLine(car.splinePosition);
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
+                    int idx = 1;
 
-                    int lapTime = car.lastLapTimeMS;
-                    
-                    int carIndex = i - 1;
-                    int sector1Time, sector2Time, sector3Time;
-                    
-                    lock (sectorLock)
+                    for (int i = 1; i <= cars.numVehicles; ++i)
                     {
-                        sector1Time = sector1Times[carIndex];
-                        sector2Time = sector2Times[carIndex];
-                        sector3Time = sector3Times[carIndex];
+                        ref AcCarInfo car = ref cars.cars[i - 1];
+
+                        if (car.isConnected == 0)
+                            continue;
+
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".ID="); strWriter.WriteLine(i);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
+
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Laps="); strWriter.WriteLine(car.lapCount);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running="); strWriter.WriteLine(car.splinePosition);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
+
+                        int lapTime = car.lastLapTimeMS;
+
+                        int carIndex = i - 1;
+                        int sector1Time, sector2Time, sector3Time;
+
+                        lock (sectorLock)
+                        {
+                            sector1Time = sector1Times[carIndex];
+                            sector2Time = sector2Times[carIndex];
+                            sector3Time = sector3Times[carIndex];
+                        }
+
+                        if (lapTime > 0)
+                        {
+                            strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
+
+                            if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
+                                strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+                        }
+                        else
+                        {
+                            strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
+                        }
+
+                        string carModel = GetStringFromBytes(car.carModel);
+
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Car="); strWriter.WriteLine(normalizeName(carModel));
+
+                        string driverName = GetStringFromBytes(car.driverName);
+
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(driverName));
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(driverName));
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(driverName));
+
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPitLane="); strWriter.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPit="); strWriter.WriteLine((car.isCarInPit == 0) ? "false" : "true");
+
+                        idx += 1;
                     }
-                    
-                    if (lapTime > 0)
-                    {
-                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
 
-                        if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
-                            strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
-                    }
-                    else
-                    {
-                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
-                    }
-
-                    string carModel = GetStringFromBytes(car.carModel);
-
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Car="); strWriter.WriteLine(normalizeName(carModel));
-
-                    string driverName = GetStringFromBytes(car.driverName);
-
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(driverName));
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(driverName));
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(driverName));
-
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPitLane="); strWriter.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
-                    strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPit="); strWriter.WriteLine((car.isCarInPit == 0) ? "false" : "true");
-					
-					idx += 1;
+                    strWriter.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
                 }
-
-                strWriter.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
+                else
+                {
+                    strWriter.WriteLine("Active=false");
+                    strWriter.WriteLine("Car.Count=0");
+                    strWriter.WriteLine("Driver.Car=0");
+                }
             }
-            else
-            {
-                strWriter.WriteLine("Active=false");
-                strWriter.WriteLine("Car.Count=0");
-                strWriter.WriteLine("Driver.Car=0");
-            }
+            while (startGeneration != dataGeneration);
 
             return strWriter.ToString();
         }
@@ -503,118 +518,134 @@ namespace SHMConnector
             return isTimedBasedOnRemainingTime || isTimedBasedOnTrackLength;
         }
 
-        public string ReadData() {
-            StringWriter strWriter = new StringWriter();
-            string session = "";
-            long timeLeft = 0;
+        public string ReadData()
+        {
+            StringWriter strWriter;
+            int startGeneration;
 
-            strWriter.WriteLine("[Session Data]");
-            strWriter.Write("Active="); strWriter.WriteLine((connected && graphics.Status != AC_STATUS.AC_OFF) ? "true" : "false");
-            if (connected)
+            do
             {
-                strWriter.Write("Paused="); strWriter.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
+                strWriter = new StringWriter();
 
-                staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
+                startGeneration = dataGeneration;
 
-                session = GetSession(graphics.Session);
+                physics = ReadPhysics();
+                graphics = ReadGraphics();
+                staticInfo = ReadStaticInfo();
+                cars = ReadCars();
 
-                strWriter.Write("Session="); strWriter.WriteLine(session);
+                string session = "";
+                long timeLeft = 0;
 
-                strWriter.Write("Car="); strWriter.WriteLine(normalizeName(staticInfo.CarModel));
-                strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track));
-				strWriter.Write("Layout="); strWriter.WriteLine(normalizeName(staticInfo.TrackConfiguration));
-                strWriter.Write("SessionFormat="); strWriter.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
-                strWriter.Write("FuelAmount="); strWriter.WriteLine(staticInfo.MaxFuel);
-
-                timeLeft = (long)graphics.SessionTimeLeft;
-
-                if (timeLeft < 0)
+                strWriter.WriteLine("[Session Data]");
+                strWriter.Write("Active="); strWriter.WriteLine((connected && graphics.Status != AC_STATUS.AC_OFF) ? "true" : "false");
+                if (connected)
                 {
-                    timeLeft = 24 * 3600 * 1000;
+                    strWriter.Write("Paused="); strWriter.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
+
+                    staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
+
+                    session = GetSession(graphics.Session);
+
+                    strWriter.Write("Session="); strWriter.WriteLine(session);
+
+                    strWriter.Write("Car="); strWriter.WriteLine(normalizeName(staticInfo.CarModel));
+                    strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track));
+				    strWriter.Write("Layout="); strWriter.WriteLine(normalizeName(staticInfo.TrackConfiguration));
+                    strWriter.Write("SessionFormat="); strWriter.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
+                    strWriter.Write("FuelAmount="); strWriter.WriteLine(staticInfo.MaxFuel);
+
+                    timeLeft = (long)graphics.SessionTimeLeft;
+
+                    if (timeLeft < 0)
+                    {
+                        timeLeft = 24 * 3600 * 1000;
+                    }
+
+                    strWriter.Write("SessionTimeRemaining="); strWriter.WriteLine(GetRemainingTime(timeLeft));
+                    strWriter.Write("SessionLapsRemaining="); strWriter.WriteLine(GetRemainingLaps(timeLeft));
+                }
+                else
+                    return strWriter.ToString();
+
+                strWriter.WriteLine("[Stint Data]");
+
+                if (cars.numVehicles > 0)
+                {
+                    AcCarInfo car = cars.cars[0];
+
+                    strWriter.Write("Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
                 }
 
-                strWriter.Write("SessionTimeRemaining="); strWriter.WriteLine(GetRemainingTime(timeLeft));
-                strWriter.Write("SessionLapsRemaining="); strWriter.WriteLine(GetRemainingLaps(timeLeft));
-            }
-            else
-                return strWriter.ToString();
-
-            strWriter.WriteLine("[Stint Data]");
-
-            if (cars.numVehicles > 0)
-            {
-                AcCarInfo car = cars.cars[0];
-
-                strWriter.Write("Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
-            }
-
-            strWriter.WriteLine("DriverForname=" + staticInfo.PlayerName);
-            strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
-            strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
+                strWriter.WriteLine("DriverForname=" + staticInfo.PlayerName);
+                strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
+                strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
-            strWriter.WriteLine("Sector=" + graphics.CurrentSectorIndex + 1);
-            strWriter.WriteLine("Laps=" + graphics.CompletedLaps);
+                strWriter.WriteLine("Sector=" + graphics.CurrentSectorIndex + 1);
+                strWriter.WriteLine("Laps=" + graphics.CompletedLaps);
 
-            strWriter.WriteLine("LapValid=true");
-            strWriter.WriteLine("LapLastTime=" + graphics.iLastTime);
-            strWriter.WriteLine("LapBestTime=" + graphics.iBestTime);
+                strWriter.WriteLine("LapValid=true");
+                strWriter.WriteLine("LapLastTime=" + graphics.iLastTime);
+                strWriter.WriteLine("LapBestTime=" + graphics.iBestTime);
 
-            if (graphics.Flag == AC_FLAG_TYPE.AC_PENALTY_FLAG)
-                strWriter.WriteLine("Penalty=true");
+                if (graphics.Flag == AC_FLAG_TYPE.AC_PENALTY_FLAG)
+                    strWriter.WriteLine("Penalty=true");
 
-            long time = GetRemainingTime(timeLeft);
+                long time = GetRemainingTime(timeLeft);
 
-            strWriter.WriteLine("StintTimeRemaining=" + time);
-            strWriter.WriteLine("DriverTimeRemaining=" + time);
-            strWriter.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
-            strWriter.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
+                strWriter.WriteLine("StintTimeRemaining=" + time);
+                strWriter.WriteLine("DriverTimeRemaining=" + time);
+                strWriter.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
+                strWriter.WriteLine("InPitLane=" + ((graphics.IsInPitLane + graphics.IsInPit) != 0 ? "true" : "false"));
 
-            strWriter.WriteLine("[Track Data]");
-            strWriter.Write("Length="); strWriter.WriteLine(staticInfo.TrackSPlineLength);
-            strWriter.Write("Temperature="); strWriter.WriteLine(physics.RoadTemp);
-            strWriter.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
+                strWriter.WriteLine("[Track Data]");
+                strWriter.Write("Length="); strWriter.WriteLine(staticInfo.TrackSPlineLength);
+                strWriter.Write("Temperature="); strWriter.WriteLine(physics.RoadTemp);
+                strWriter.WriteLine("Grip=" + GetGrip(graphics.SurfaceGrip));
 
-			int index = 1;
+			    int index = 1;
 			
-            for (int id = 0; id < cars.numVehicles; id++)
-            { 
-                if (cars.cars[id].isConnected == 0)
-                    continue;
-                strWriter.WriteLine("Car." + index++ + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
-            }
+                for (int id = 0; id < cars.numVehicles; id++)
+                { 
+                    if (cars.cars[id].isConnected == 0)
+                        continue;
+                    strWriter.WriteLine("Car." + index++ + ".Position=" + cars.cars[id].worldPosition.x + "," + cars.cars[id].worldPosition.z);
+                }
 
-            strWriter.WriteLine("[Weather Data]");
-            strWriter.WriteLine("Temperature=" + physics.AirTemp);
-            strWriter.WriteLine("Weather=Dry");
-            strWriter.WriteLine("Weather10min=Dry");
-            strWriter.WriteLine("Weather30min=Dry");
+                strWriter.WriteLine("[Weather Data]");
+                strWriter.WriteLine("Temperature=" + physics.AirTemp);
+                strWriter.WriteLine("Weather=Dry");
+                strWriter.WriteLine("Weather10min=Dry");
+                strWriter.WriteLine("Weather30min=Dry");
 
-            strWriter.WriteLine("[Car Data]");
-            strWriter.WriteLine("MAP=n/a");
-            strWriter.WriteLine("TCRaw=" + physics.TC);
-            strWriter.WriteLine("ABSRaw=" + physics.Abs);
-            strWriter.WriteLine("BB=" + Math.Round(physics.BrakeBias * 100, 2));
+                strWriter.WriteLine("[Car Data]");
+                strWriter.WriteLine("MAP=n/a");
+                strWriter.WriteLine("TCRaw=" + physics.TC);
+                strWriter.WriteLine("ABSRaw=" + physics.Abs);
+                strWriter.WriteLine("BB=" + Math.Round(physics.BrakeBias * 100, 2));
 
-            strWriter.Write("FuelRemaining="); strWriter.WriteLine(physics.Fuel);
+                strWriter.Write("FuelRemaining="); strWriter.WriteLine(physics.Fuel);
 
-            strWriter.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);
-            strWriter.WriteLine("TyreTemperature=" + physics.TyreCoreTemperature[0] + "," + physics.TyreCoreTemperature[1] + ","
-                                                 + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
-            strWriter.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
-                                              + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
+                strWriter.WriteLine("TyreCompoundRaw=" + graphics.TyreCompound);
+                strWriter.WriteLine("TyreTemperature=" + physics.TyreCoreTemperature[0] + "," + physics.TyreCoreTemperature[1] + ","
+                                                     + physics.TyreCoreTemperature[2] + "," + physics.TyreCoreTemperature[3]);
+                strWriter.WriteLine("TyrePressure=" + physics.WheelsPressure[0] + "," + physics.WheelsPressure[1] + ","
+                                                  + physics.WheelsPressure[2] + "," + physics.WheelsPressure[3]);
             
-            strWriter.WriteLine("BrakeTemperature=" + physics.BrakeTemp[0] + "," + physics.BrakeTemp[1] + ","
-                                                 + physics.BrakeTemp[2] + "," + physics.BrakeTemp[3]);
+                strWriter.WriteLine("BrakeTemperature=" + physics.BrakeTemp[0] + "," + physics.BrakeTemp[1] + ","
+                                                     + physics.BrakeTemp[2] + "," + physics.BrakeTemp[3]);
 
-            float damageFront = physics.CarDamage[0];
-            float damageRear = physics.CarDamage[1];
-            float damageLeft = physics.CarDamage[2];
-            float damageRight = physics.CarDamage[3];
+                float damageFront = physics.CarDamage[0];
+                float damageRear = physics.CarDamage[1];
+                float damageLeft = physics.CarDamage[2];
+                float damageRight = physics.CarDamage[3];
 
-            strWriter.WriteLine("BodyworkDamage=" + damageFront + "," + damageRear + "," + damageLeft + "," + damageRight + ","
-                                                + (damageFront + damageRear + damageLeft + damageRight));
-            strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
-            strWriter.WriteLine("EngineDamage=0");
+                strWriter.WriteLine("BodyworkDamage=" + damageFront + "," + damageRear + "," + damageLeft + "," + damageRight + ","
+                                                    + (damageFront + damageRear + damageLeft + damageRight));
+                strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
+                strWriter.WriteLine("EngineDamage=0");
+            }
+            while (startGeneration != dataGeneration);
 
             return strWriter.ToString();
         }
@@ -647,11 +678,6 @@ namespace SHMConnector
 				if (!connected)
 					return "";
 			}
-
-            physics = ReadPhysics();
-            graphics = ReadGraphics();
-            staticInfo = ReadStaticInfo();
-            cars = ReadCars();
 
             if (request.StartsWith("Setup"))
                 return this.ReadSetup();

@@ -2090,7 +2090,6 @@ class RaceStrategist extends GridRaceAssistant {
 									  , RaceReview: (getMultiMapValue(configuration, "Race Strategist Shutdown", this.Simulator . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
-
 		lapsDB := RaceStrategist.SessionLapsDatabase(this)
 
 		lapsDB.Database.clear("Electronics")
@@ -2099,13 +2098,18 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateSessionValues({LapsDatabase: lapsDB})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts), HasLapsData: false
-								, BestLapTime: 0, OverallTime: 0
+		if !this.KnowledgeBase
+			this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)})
+
+		this.updateDynamicValues({HasLapsData: false, BestLapTime: 0, OverallTime: 0
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false, StrategyReported: (getMultiMapValue(data, "Stint Data", "Laps", 0) > 1)})
 
-		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace))
+		if (this.Speaker[false] && !raceEngineer && (this.Session = kSessionRace) && !this.Greeted) {
 			this.getSpeaker().speakPhrase("Greeting")
+
+			this.updateDynamicValues({Greeted: true})
+		}
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
@@ -2117,7 +2121,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
-				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
 
@@ -2191,7 +2195,7 @@ class RaceStrategist extends GridRaceAssistant {
 					this.shutdownSession("After")
 			}
 
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
@@ -2462,6 +2466,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	addLap(lapNumber, &data) {
+		local started := (lapNumber > 0)
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
@@ -2473,213 +2478,219 @@ class RaceStrategist extends GridRaceAssistant {
 
 		static lastLap := 0
 
-		if (lapNumber <= lastLap) {
-			lastLap := 0
+		if started {
+			if (lapNumber <= lastLap) {
+				lastLap := 0
 
-			this.iLastStrategyUpdate := lapNumber
+				this.iLastStrategyUpdate := lapNumber
+			}
+			else if ((lastLap == 0) && (lapNumber > 1)) {
+				lastLap := (lapNumber - 1)
+
+				this.iLastStrategyUpdate := lapNumber
+			}
+			else if (lastLap < (lapNumber - 1))
+				this.iLastStrategyUpdate := lapNumber
+
+			curContinuation := this.Continuation
 		}
-		else if ((lastLap == 0) && (lapNumber > 1)) {
-			lastLap := (lapNumber - 1)
-
-			this.iLastStrategyUpdate := lapNumber
-		}
-		else if (lastLap < (lapNumber - 1))
-			this.iLastStrategyUpdate := lapNumber
-
-		curContinuation := this.Continuation
 
 		result := super.addLap(lapNumber, &data)
 
-		if !this.Strategy
-			this.loadRules(data)
-
 		knowledgeBase := this.KnowledgeBase
-
-		if (lapNumber > 1) {
-			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
-			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
-		}
-
-		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
-			if this.Speaker[false]
-				this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
-
-		lastLap := lapNumber
-
-		if this.Strategy {
-			lastTime := (getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000)
-
-			this.Strategy.RunningLaps += 1
-			this.Strategy.RunningTime += lastTime
-
-			if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy)) {
-				this.Strategy["Rejected"].RunningLaps += 1
-				this.Strategy["Rejected"].RunningTime += lastTime
-			}
-
-			if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy["Original"])) {
-				if (this.Speaker[false] && this.Announcements["StrategySummary"])
-					if this.confirmAction("Strategy.Explain") {
-						this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
-
-						this.setContinuation(ObjBindMethod(this, "reportStrategy"))
-					}
-					else {
-						this.getSpeaker().speakPhrase("ReportStrategy")
-
-						this.reportStrategy()
-					}
-
-				this.updateDynamicValues({StrategyReported: lapNumber})
-			}
-		}
-
-		if !this.MultiClass
-			this.adjustGaps(data)
-
-		driverCar := knowledgeBase.getValue("Driver.Car", 0)
-		validLap := true
-
-		loop knowledgeBase.getValue("Car.Count") {
-			lap := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
-
-			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
-
-				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
-					knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
-
-				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
-
-				if (A_Index = driverCar)
-					validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
-			}
-		}
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (this.Session = kSessionRace) {
-			pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+		if started {
+			if !this.Strategy
+				this.loadRules(data)
 
-			if pitstop
-				pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
-		}
-		else {
-			pitstop := false
-			driverID := knowledgeBase.getValue("Car." . driverCar . ".ID", kUndefined)
-
-			if (driverID != kUndefined)
-				for index, pitstop in this.Pitstops[driverID]
-					if (pitstop.Lap = lapNumber)
-						pitstop := true
-
-			if pitstop
-				this.updateDynamicValues({EnoughData: false})
-		}
-
-		if this.CollectLaps {
-			prefix := "Lap." . lapNumber
-
-			if validLap
-				validLap := knowledgeBase.getValue(prefix . ".Valid", validLap)
-
-			if !validLap
-				lapState := "Invalid"
-			else if this.hasEnoughData(false)
-				lapState := "Valid"
-			else
-				lapState := "Warmup"
-
-			weather := knowledgeBase.getValue(prefix . ".Weather")
-			airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
-			trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
-			compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
-			compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
-			fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
-			fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
-			lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
-
-			this.Provider.supportsTyreManagement(&mixedCompounds)
-
-			if (mixedCompounds = "Wheel") {
-				compound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
-								return knowledgeBase.getValue(prefix . ".Tyre.Compound." . tyre, compound)
-							})
-				compoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
-									 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . tyre, compoundColor)
-								 })
-
-				combineCompounds(&compound, &compoundColor)
+			if (lapNumber > 1) {
+				driverForname := knowledgeBase.getValue("Driver.Forname", "John")
+				driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
+				driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 			}
-			else if (mixedCompounds = "Axle") {
-				compound := collect(["Front", "Rear"], (axle) {
-								return knowledgeBase.getValue(prefix . ".Tyre.Compound." . axle, compound)
-							})
-				compoundColor := collect(["Front", "Rear"], (axle) {
-									 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . axle, compoundColor)
-								 })
 
-				combineCompounds(&compound, &compoundColor)
+			if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
+				if this.Speaker[false]
+					this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
+
+			lastLap := lapNumber
+
+			if this.Strategy {
+				lastTime := (getMultiMapValue(data, "Stint Data", "LapLastTime", 0) / 1000)
+
+				this.Strategy.RunningLaps += 1
+				this.Strategy.RunningTime += lastTime
+
+				if (this.Strategy["Rejected"] && isInstance(this.Strategy["Rejected"], Strategy)) {
+					this.Strategy["Rejected"].RunningLaps += 1
+					this.Strategy["Rejected"].RunningTime += lastTime
+				}
+
+				if (!this.StrategyReported && this.hasEnoughData(false) && (this.Strategy == this.Strategy["Original"])) {
+					if (this.Speaker[false] && this.Announcements["StrategySummary"])
+						if this.confirmAction("Strategy.Explain") {
+							this.getSpeaker().speakPhrase("ConfirmReportStrategy", false, true)
+
+							this.setContinuation(ObjBindMethod(this, "reportStrategy"))
+						}
+						else {
+							this.getSpeaker().speakPhrase("ReportStrategy")
+
+							this.reportStrategy()
+						}
+
+					this.updateDynamicValues({StrategyReported: lapNumber})
+				}
+			}
+
+			if !this.MultiClass
+				this.adjustGaps(data)
+
+			driverCar := knowledgeBase.getValue("Driver.Car", 0)
+			validLap := true
+
+			loop knowledgeBase.getValue("Car.Count") {
+				lap := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
+
+				if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
+
+					if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
+						knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
+
+					if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+						knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
+
+					if (A_Index = driverCar)
+						validLap := knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid")
+				}
+			}
+
+			if (this.Session = kSessionRace) {
+				pitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
+				if pitstop
+					pitstop := (lapNumber == (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap") + 1))
 			}
 			else {
-				compound := [compound]
-				compoundColor := [compoundColor]
+				pitstop := false
+				driverID := knowledgeBase.getValue("Car." . driverCar . ".ID", kUndefined)
+
+				if (driverID != kUndefined)
+					for index, pitstop in this.Pitstops[driverID]
+						if (pitstop.Lap = lapNumber)
+							pitstop := true
+
+				if pitstop
+					this.updateDynamicValues({EnoughData: false})
 			}
 
-			map := knowledgeBase.getValue(prefix . ".Map")
-			tc := knowledgeBase.getValue(prefix . ".TC")
-			antiBS := knowledgeBase.getValue(prefix . ".ABS")
-			bb := knowledgeBase.getValue(prefix . ".BB")
+			if this.CollectLaps {
+				prefix := "Lap." . lapNumber
 
-			pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
-						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
-						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
-						, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)]
+				if validLap
+					validLap := knowledgeBase.getValue(prefix . ".Valid", validLap)
 
-			temperatures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
-						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)]
+				if !validLap
+					lapState := "Invalid"
+				else if this.hasEnoughData(false)
+					lapState := "Valid"
+				else
+					lapState := "Warmup"
 
-			wear := false
+				weather := knowledgeBase.getValue(prefix . ".Weather")
+				airTemperature := knowledgeBase.getValue(prefix . ".Temperature.Air")
+				trackTemperature := knowledgeBase.getValue(prefix . ".Temperature.Track")
+				compound := knowledgeBase.getValue(prefix . ".Tyre.Compound")
+				compoundColor := knowledgeBase.getValue(prefix . ".Tyre.Compound.Color")
+				fuelConsumption := Round(knowledgeBase.getValue(prefix . ".Fuel.Consumption"), 1)
+				fuelRemaining := Round(knowledgeBase.getValue(prefix . ".Fuel.Remaining"), 1)
+				lapTime := Round(knowledgeBase.getValue(prefix . ".Time") / 1000, 1)
 
-			if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
-				wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
-					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
-					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
-					   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
+				this.Provider.supportsTyreManagement(&mixedCompounds)
 
-			waterTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Water", kNull)
-			oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
+				if (mixedCompounds = "Wheel") {
+					compound := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+									return knowledgeBase.getValue(prefix . ".Tyre.Compound." . tyre, compound)
+								})
+					compoundColor := collect(["FrontLeft", "FrontRight", "RearLeft", "RearRight"], (tyre) {
+										 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . tyre, compoundColor)
+									 })
 
-			this.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-						   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS, bb
-						   , values2String(",", compound*), values2String(",", compoundColor*)
-						   , pressures, temperatures, wear, lapState
-						   , waterTemperature, oilTemperature)
-		}
+					combineCompounds(&compound, &compoundColor)
+				}
+				else if (mixedCompounds = "Axle") {
+					compound := collect(["Front", "Rear"], (axle) {
+									return knowledgeBase.getValue(prefix . ".Tyre.Compound." . axle, compound)
+								})
+					compoundColor := collect(["Front", "Rear"], (axle) {
+										 return knowledgeBase.getValue(prefix . ".Tyre.Compound.Color." . axle, compoundColor)
+									 })
 
-		if this.Strategy {
-			frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
+					combineCompounds(&compound, &compoundColor)
+				}
+				else {
+					compound := [compound]
+					compoundColor := [compoundColor]
+				}
 
-			if (frequency && this.hasEnoughData(false)
-						  && (lapNumber >= (this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5)))) {
-				if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.Continuation))
-					knowledgeBase.setFact("Strategy.Recalculate", "Regular")
+				map := knowledgeBase.getValue(prefix . ".Map")
+				tc := knowledgeBase.getValue(prefix . ".TC")
+				antiBS := knowledgeBase.getValue(prefix . ".ABS")
+				bb := knowledgeBase.getValue(prefix . ".BB")
+
+				pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
+							, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
+							, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RL"), 1)
+							, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.RR"), 1)]
+
+				temperatures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FL"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.FR"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RL"), 1)
+							   , Round(knowledgeBase.getValue(prefix . ".Tyre.Temperature.RR"), 1)]
+
+				wear := false
+
+				if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+					wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))
+						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
+
+				waterTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Water", kNull)
+				oilTemperature := knowledgeBase.getValue(prefix . ".Engine.Temperature.Oil", kNull)
+
+				this.saveLapData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+							   , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS, bb
+							   , values2String(",", compound*), values2String(",", compoundColor*)
+							   , pressures, temperatures, wear, lapState
+							   , waterTemperature, oilTemperature)
 			}
-			else
-				this.iLastStrategyUpdate := (lapNumber - 1)
+
+			if this.Strategy {
+				frequency := getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Update.Laps", false)
+
+				if (frequency && this.hasEnoughData(false)
+							  && (lapNumber >= (this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5)))) {
+					if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.Continuation))
+						knowledgeBase.setFact("Strategy.Recalculate", "Regular")
+				}
+				else
+					this.iLastStrategyUpdate := (lapNumber - 1)
+			}
+
+			if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
+				this.updateRaceInfo(this.createRaceData(data))
+
+			if (this.GridPosition && knowledgeBase.getValue("Car.Count", false))
+				this.saveStandingsData(lapNumber, simulator, car, track)
 		}
-
-		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
-			this.updateRaceInfo(this.createRaceData(data))
-
-		if (this.GridPosition && knowledgeBase.getValue("Car.Count", false))
-			this.saveStandingsData(lapNumber, simulator, car, track)
+		else
+			validLap := knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
 
 		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000, kLowPriority)
 
@@ -2690,48 +2701,55 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local noGrid := !this.GridPosition
 		local updateStrategy := false
+		local started := (lapNumber > 0)
 		local sector, result, valid
 		local simulator, car, track
 
 		static lastSector := 1
 
-		if !isObject(data)
-			data := readMultiMap(data)
+		if started {
+			if !isObject(data)
+				data := readMultiMap(data)
 
-		sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
+			sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
 
-		if (sector != lastSector) {
-			lastSector := sector
+			if (sector != lastSector) {
+				lastSector := sector
 
-			knowledgeBase.addFact("Sector", sector)
+				knowledgeBase.addFact("Sector", sector)
 
-			updateStrategy := knowledgeBase.getValue("Strategy.Recalculate", false)
+				updateStrategy := knowledgeBase.getValue("Strategy.Recalculate", false)
+			}
 		}
 
 		result := super.updateLap(lapNumber, &data)
 
-		loop knowledgeBase.getValue("Car.Count") {
-			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
+		if started {
+			loop knowledgeBase.getValue("Car.Count") {
+				valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
 
-			if (valid == false)
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", false)
+				if (valid == false)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", false)
+			}
+
+			if !this.MultiClass
+				this.adjustGaps(data)
+
+			if (updateStrategy && this.hasEnoughData(false))
+				this.recommendStrategy({Silent: true, Confirm: true, Request: updateStrategy})
 		}
-
-		if !this.MultiClass
-			this.adjustGaps(data)
-
-		if (updateStrategy && this.hasEnoughData(false))
-			this.recommendStrategy({Silent: true, Confirm: true, Request: updateStrategy})
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
-			this.updateRaceInfo(this.createRaceData(data))
+		if started {
+			if (!this.RaceInfo || (this.RaceInfo["Cars"] = 0))
+				this.updateRaceInfo(this.createRaceData(data))
 
-		if (noGrid && this.GridPosition && (lapNumber < 5))
-			this.saveStandingsData(lapNumber, simulator, car, track)
+			if (noGrid && this.GridPosition && (lapNumber < 5))
+				this.saveStandingsData(lapNumber, simulator, car, track)
+		}
 
 		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber
 											   , knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
@@ -3473,7 +3491,7 @@ class RaceStrategist extends GridRaceAssistant {
 			else
 				initialAvgLapTime := (knowledgeBase.getValue("Lap." . initialLap . ".Time") / 1000)
 
-			initialTyreSet := knowledgeBase.getValue("Tyre.Set", "false")
+			initialTyreSet := knowledgeBase.getValue("Tyre.Set", false)
 			initialMap := knowledgeBase.getValue("Lap." . initialLap . ".Map")
 
 			If strategy {
@@ -3665,7 +3683,8 @@ class RaceStrategist extends GridRaceAssistant {
 			for ignore, tyreSet in usedTyreSets {
 				tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
-				if (availableTyreSets.Has(tyreCompound) && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
+				if (tyreSet.HasProp("Set") && availableTyreSets.Has(tyreCompound)
+										   && availableTyreSets[tyreCompound][2].Has(tyreSet.Set))
 					availableTyreSets[tyreCompound][2][tyreSet.Set] += tyreSet.Laps
 			}
 

@@ -1045,18 +1045,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	supportsRaceAssistant(assistantPlugin) {
 		local hasProvider := false
-		
+
 		try
 			hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Provider").File)
-			
+
 		if !hasProvider
 			try
 				hasProvider := FileExist(SimulatorProvider.getProtocol(this.Code, "Connector").File)
-		
+
 		if (isSet(kRaceSpotterPlugin) && (assistantPlugin = kRaceSpotterPlugin))
 			try
 				hasProvider := (hasProvider && FileExist(SimulatorProvider.getProtocol(this.Code, "Spotter").File))
-				
+
 		return hasProvider
 	}
 
@@ -1210,6 +1210,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	resumeSession() {
+	}
+
+	startLap(data) {
 	}
 
 	addLap(lap, data) {

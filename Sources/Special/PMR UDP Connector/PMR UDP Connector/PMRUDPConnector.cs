@@ -515,7 +515,7 @@ namespace PMRUDPConnector
                     float sectorTime;
 
                     if (currentTime < sectorStartTimes[carIndex])
-                        sectorTime = previousLapTime[carIndex] - sectorStartTimes[carIndex] + currentTime;
+                        sectorTime = previousLapTime[carIndex] - sectorStartTimes[carIndex] + (currentTime / 2);
                     else
                         sectorTime = currentTime - sectorStartTimes[carIndex];
 

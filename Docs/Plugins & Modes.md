@@ -1535,8 +1535,8 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 2. The current implementation of the UDP API still has many gaps regarding important information at the time of writing.
 
    - There is no way to detect a paused session, so the Assistants are active and, for example, the Spotter may tell you about cars nearby in a paused game.
-   - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, will fail.
-   - Information about the timings of the last lap are not available, only for the best lap so far, which will be used instead. Obviously not the best alternative, but the only one at the moment.
+   - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, may fail.
+   - Information about the timings of the last lap are not available, only for the best lap so far as well as the time so far into the current lap. Therefore a sampling method with a 20 Hz frequency is used to derive the lap time of the last lap as well as the sector times.
    - Information about the mouunted tyres is not available, so tyre compounds will always be recognized as "Dry (Black)".
    - The API does not report about any type of damage on the car. 
    - Track Grip is not available as well.

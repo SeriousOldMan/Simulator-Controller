@@ -32,10 +32,12 @@
 #### Fixes
 
   - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
+  - Fixed a bug in the "Database Synchronizer", which caused many files to be missing from the community database since the last release.
   
 #### Changes
 
   - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
+  - [Experts] The rule engine of the Race Assistants is now enabled in the first lap as well. This will allow for additional processing in the first lap using a *Reasoning* booster. See [the custom event for cold tyre warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for an example on how to utilize that.
   - [Developer] Enabling "Debug Rules" in the tray menu of any Assistant enables tracing in the rule engine.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)

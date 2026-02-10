@@ -3459,6 +3459,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	addLap(lapNumber, &data) {
+		local started := (lapNumber > 0)
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
 		local driverSurname := ""
@@ -3481,7 +3482,7 @@ class RaceEngineer extends RaceAssistant {
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 		}
 
-		if (knowledgeBase && data.Has("Setup Data"))
+		if (started && knowledgeBase && data.Has("Setup Data"))
 			if getMultiMapValue(data, "Setup Data", "ServiceTime", false)
 				knowledgeBase.setFact("Target.Time.Box.Fixed", Round(getMultiMapValue(data, "Setup Data", "ServiceTime") * 1000))
 			else
@@ -3492,7 +3493,7 @@ class RaceEngineer extends RaceAssistant {
 		knowledgeBase := this.KnowledgeBase
 		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
 
-		if (result && ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber >= (this.BaseLap + learningLaps)))) {
+		if (started && result && ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber >= (this.BaseLap + learningLaps)))) {
 			if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false))
 				this.updatePitstop(data)
 
@@ -3548,7 +3549,7 @@ class RaceEngineer extends RaceAssistant {
 
 		this.iCurrentRemainingFuel := knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining")
 
-		if (this.SaveTyrePressures != kNever) {
+		if (started && (this.SaveTyrePressures != kNever)) {
 			knowledgeBase := this.KnowledgeBase
 
 			currentCompound := knowledgeBase.getValue("Tyre.Compound", false)
@@ -3637,6 +3638,7 @@ class RaceEngineer extends RaceAssistant {
 		local suspensionDamage := string2Values(",", getMultiMapValue(data, "Car Data", "SuspensionDamage", ""))
 		local threshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 		local changed := false
+		local started := (lapNumber > 0)
 		local fact, index, tyreType, oldValue, newValue, position, learningLaps
 		local simulator, car, track
 		local pitstopState, key, value, stateFile
@@ -3739,7 +3741,7 @@ class RaceEngineer extends RaceAssistant {
 
 		learningLaps := knowledgeBase.getValue("Session.Settings.Lap.Learning.Laps", 2)
 
-		if (this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false)) {
+		if (started && this.hasPreparedPitstop() && getMultiMapValues(data, "Setup Data", false)) {
 			if ((lapNumber <= learningLaps) || !this.TeamSession || (lapNumber >= (this.BaseLap + learningLaps)))
 				this.updatePitstop(data)
 

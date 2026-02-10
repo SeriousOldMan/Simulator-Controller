@@ -2065,7 +2065,7 @@ class CallbacksEditor {
 		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
 		local callback := this.SelectedCallback
 		local configuration := newMultiMap()
-		local index, parameter, fileName, newFileName, targetDirectory
+		local index, parameter, fileName, newFileName, targetDirectory, currentDir
 
 		if !this.saveCallback(callback)
 			return
@@ -2125,8 +2125,19 @@ class CallbacksEditor {
 			writeMultiMap(directory . "\" . callback.Name . extension, configuration)
 
 			SplitPath(fileName, , &targetDirectory, , &name)
+			
+			currentDir := A_WorkingDir
 
-			RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
+			SetWorkingDir(directory)
+			
+			try {
+				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
+				
+				RunWait("tar -a -c -f `"" . targetDirectory . "\" . name . ".zip`" *.*", , "Hide")
+			}
+			finally {
+				SetWorkingDir(currentDir)
+			}
 
 			FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
 		}

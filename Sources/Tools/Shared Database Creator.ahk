@@ -391,12 +391,10 @@ downloadUserDatabases(directory) {
 }
 
 createDatabases(inputDirectory, outputDirectory) {
-	local database
-
-	archives := []
-
-	version1 := Random(1, 1000)
-	version2 := Random(1, 1000)
+	local archives := []
+	local version1 := Random(1, 1000)
+	local version2 := Random(1, 1000)
+	local database, currentDir
 
 	updateProgress("Processing [Pressures]...")
 
@@ -441,7 +439,18 @@ createDatabases(inputDirectory, outputDirectory) {
 							if FileExist(outputDirectory . telemetriesLabel)
 								DirCopy(outputDirectory . telemetriesLabel, database, 1)
 
-						RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+						currentDir := A_WorkingDir
+
+						SetWorkingDir(database)
+						
+						try {
+							; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+				
+							RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+						}
+						finally {
+							SetWorkingDir(currentDir)
+						}
 
 						if FileExist(database . ".zip")
 							archives.Push(database . ".zip")
@@ -469,7 +478,18 @@ createDatabases(inputDirectory, outputDirectory) {
 						if FileExist(outputDirectory . strategiesLabel)
 							DirCopy(outputDirectory . strategiesLabel, database, 1)
 
-					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+					currentDir := A_WorkingDir
+
+					SetWorkingDir(database)
+					
+					try {
+						; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+				
+						RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+					}
+					finally {
+						SetWorkingDir(currentDir)
+					}
 
 					if FileExist(database . ".zip")
 						archives.Push(database . ".zip")
@@ -492,7 +512,18 @@ createDatabases(inputDirectory, outputDirectory) {
 					if FileExist(outputDirectory . setupsLabel)
 						DirCopy(outputDirectory . setupsLabel, database, 1)
 
-				RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+				currentDir := A_WorkingDir
+
+				SetWorkingDir(database)
+				
+				try {
+					; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+				
+					RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+				}
+				finally {
+					SetWorkingDir(currentDir)
+				}
 
 				if FileExist(database . ".zip")
 					archives.Push(database . ".zip")

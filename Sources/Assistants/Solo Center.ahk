@@ -4938,7 +4938,7 @@ class SoloCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, fileName, newFileName, session
+			local info, dirName, directory, fileName, newFileName, session, currentDir
 
 			saveSession(directory, fileName) {
 				try {
@@ -4960,11 +4960,17 @@ class SoloCenter extends ConfigurationItem {
 
 					setMultiMapValue(info, "Session", "Exported", true)
 
+					currentDir := A_WorkingDir
+
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 						dataFile := temporaryFileName("Practice", "zip")
 
+						SetWorkingDir(directory)
+
 						try {
-							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+							; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+							RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
 
 							file := FileOpen(dataFile, "r-wd")
 
@@ -4986,6 +4992,8 @@ class SoloCenter extends ConfigurationItem {
 							}
 						}
 						finally {
+							SetWorkingDir(currentDir)
+
 							deleteFile(dataFile)
 						}
 					}
@@ -4995,7 +5003,16 @@ class SoloCenter extends ConfigurationItem {
 
 					dataFile := temporaryFileName("Practice", "zip")
 
-					RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+					SetWorkingDir(directory)
+
+					try {
+						; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+						RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
+					}
+					finally {
+						SetWorkingDir(currentDir)
+					}
 
 					FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 

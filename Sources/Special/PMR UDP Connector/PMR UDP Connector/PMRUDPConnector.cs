@@ -535,7 +535,7 @@ namespace PMRUDPConnector
                     }
 
                     previousSector[carIndex] = currentSector;
-                    sectorStartTimes[carIndex] = currentTime;
+                    sectorStartTimes[carIndex] = (currentSector == 0) ? 0 : currentTime;
                 }
 
                 previousLapTime[carIndex] = currentTime;

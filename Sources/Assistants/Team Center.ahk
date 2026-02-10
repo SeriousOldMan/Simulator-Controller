@@ -9994,7 +9994,7 @@ class TeamCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local sessionDB, info, directory, dirName, translator, folder, file, size, dataFile
-			local session, configuration, fileName, newFileName
+			local session, configuration, fileName, newFileName, currentDir
 
 			this.showMessage(translate("Saving session"))
 
@@ -10082,11 +10082,17 @@ class TeamCenter extends ConfigurationItem {
 								setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 							}
 
+							currentDir := A_WorkingDir
+
 							if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {
 								dataFile := temporaryFileName("Race", "zip")
 
+								SetWorkingDir(directory)
+
 								try {
-									RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+									; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+									
+									RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
 
 									file := FileOpen(dataFile, "r-wd")
 
@@ -10108,6 +10114,8 @@ class TeamCenter extends ConfigurationItem {
 									}
 								}
 								finally {
+									SetWorkingDir(currentDir)
+
 									deleteFile(dataFile)
 								}
 							}
@@ -10117,7 +10125,16 @@ class TeamCenter extends ConfigurationItem {
 
 							dataFile := temporaryFileName("Race", "zip")
 
-							RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+							SetWorkingDir(directory)
+
+							try {
+								; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
+
+								RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
+							}
+							finally {
+								SetWorkingDir(currentDir)
+							}
 
 							FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 

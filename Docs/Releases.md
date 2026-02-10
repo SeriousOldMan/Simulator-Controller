@@ -32,6 +32,7 @@
 #### Fixes
 
   - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
+  - Fixed a bug in the "Database Synchronizer", which caused many files to be missing from the community database since the last release.
   
 #### Changes
 

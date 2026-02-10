@@ -3,7 +3,7 @@ Version=6.8.3.0-dev
 Target=6.8.3.0-release
 Date=02/10/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/b1XQWRSY/Releases/Simulator%20Controller%206.8.3.0-dev.zip
-Changes=Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Debug Rules enables tracing, Rule Engine is now enabled in lap 0
+Changes=Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.2.0-release

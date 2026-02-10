@@ -697,8 +697,8 @@ As a last example, the following event rules can be used the Engineer, for examp
 	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0)
 
 	priority: -20, {All: [?Pitstop.Last != Tyre.Pitstop.Last],
-						 {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, !Pitstop.Last)}} =>
-			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, !Pitstop.Last)
+						 {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, ?Pitstop.Last)}} =>
+			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, ?Pitstop.Last)
 
 	Pitstop.TyreChanged(All, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound, ?compound),
 										  ?compound != false

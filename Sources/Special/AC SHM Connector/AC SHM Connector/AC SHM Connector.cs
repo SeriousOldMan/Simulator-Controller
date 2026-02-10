@@ -31,8 +31,11 @@ namespace SHMConnector
         private int[] sector1Times = new int[MAX_CARS];
         private int[] sector2Times = new int[MAX_CARS];
         private int[] sector3Times = new int[MAX_CARS];
+        private int[] lastLapSector1Times = new int[MAX_CARS];
+        private int[] lastLapSector2Times = new int[MAX_CARS];
+        private int[] lastLapSector3Times = new int[MAX_CARS];
         private int[] sectorStartTimes = new int[MAX_CARS];
-        private readonly object sectorLock = new object();
+        private volatile int sectorGeneration;
         
         private float sectorBoundary1;
         private float sectorBoundary2;
@@ -370,40 +373,38 @@ namespace SHMConnector
             if (carIndex < 0 || carIndex >= MAX_CARS)
                 return;
 
-            lock (sectorLock)
-            {
-                int prevSector = previousSector[carIndex];
-            
+            int prevSector = previousSector[carIndex];
+
             if (prevSector == -1)
             {
-                sectorStartTimes[carIndex] = currentTime;
-                previousSector[carIndex] = currentSector;
+                if (currentSector == 0)
+                {
+                    previousSector[carIndex] = 0;
+                    sectorStartTimes[carIndex] = currentTime;
+                }
                 return;
             }
-            
+
             if (currentSector != prevSector)
             {
                 int sectorTime = currentTime - sectorStartTimes[carIndex];
-                
+
                 if (prevSector == 0 && currentSector == 1)
-                {
                     sector1Times[carIndex] = sectorTime;
-                }
                 else if (prevSector == 1 && currentSector == 2)
-                {
                     sector2Times[carIndex] = sectorTime;
-                }
                 else if (prevSector == 2 && currentSector == 0)
                 {
                     sector3Times[carIndex] = sectorTime;
-                    sector1Times[carIndex] = 0;
-                    sector2Times[carIndex] = 0;
-                    sector3Times[carIndex] = 0;
+
+                    lastLapSector1Times[carIndex] = sector1Times[carIndex];
+                    lastLapSector2Times[carIndex] = sector2Times[carIndex];
+                    lastLapSector3Times[carIndex] = sector3Times[carIndex];
+                    sectorGeneration++;
                 }
-                
+
                 sectorStartTimes[carIndex] = currentTime;
                 previousSector[carIndex] = currentSector;
-            }
             }
         }
 
@@ -439,20 +440,24 @@ namespace SHMConnector
                     
                     int carIndex = i - 1;
                     int sector1Time, sector2Time, sector3Time;
+                    int genBefore, genAfter;
                     
-                    lock (sectorLock)
-                    {
-                        sector1Time = sector1Times[carIndex];
-                        sector2Time = sector2Times[carIndex];
-                        sector3Time = sector3Times[carIndex];
-                    }
+                    do {
+                        genBefore = sectorGeneration;
+                        sector1Time = lastLapSector1Times[carIndex];
+                        sector2Time = lastLapSector2Times[carIndex];
+                        sector3Time = lastLapSector3Times[carIndex];
+                        genAfter = sectorGeneration;
+                    } while (genBefore != genAfter);
                     
                     if (lapTime > 0)
                     {
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
 
                         if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
+                        {
                             strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
+                        }
                     }
                     else
                     {

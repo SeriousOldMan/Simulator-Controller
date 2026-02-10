@@ -32,7 +32,7 @@ namespace PMRUDPProvider
             }
 
             string request = args.Length > 3 ? args[3] : "";
-            PMRUDPConnector.PMRUDPConnector connector = new PMRUDPConnector.PMRUDPConnector();
+            PMRUDPConnector.PMRUDPConnector connector = new PMRUDPConnector.PMRUDPConnector(false);
             
             if (!connector.Open(multiCastGroup, multiCastPort, useMultiCast))
             {

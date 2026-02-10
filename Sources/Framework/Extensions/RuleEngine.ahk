@@ -2175,6 +2175,9 @@ class ResultSet {
 		choicePoint := this.ChoicePoint[true]
 
 		loop {
+			if gHighMemoryUsage
+				ruleEngine.setTraceLevel(Min(kTraceLite, ruleEngine.TraceLevel))
+
 			if choicePoint.nextChoice() {
 				choicePoint := choicePoint.next()
 

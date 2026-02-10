@@ -3920,7 +3920,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.initializeAnnouncements()
 
-			if (formationLap && this.Speaker[false] && (this.TrackType = "Circuit")) {
+			if (formationLap && this.Speaker[false] && (this.TrackType = "Circuit") && !this.Greeted) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -3991,6 +3991,8 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 
 				this.getSpeaker(true)
+
+				this.updateDynamicValues({Greeted: true})
 			}
 
 			Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
@@ -4075,8 +4077,10 @@ class RaceSpotter extends GridRaceAssistant {
 									  , DriverUpdateTime: (getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".DriverUpdateTime", 0) * 1000)
 									  , SaveSettings: saveSettings})
 
-		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
-								, BestLapTime: 0, OverallTime: 0
+		if !this.KnowledgeBase
+			this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)})
+
+		this.updateDynamicValues({BestLapTime: 0, OverallTime: 0
 								, LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0
 								, EnoughData: false})
 
@@ -4099,7 +4103,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
-				this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
 
@@ -4133,7 +4137,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			this.shutdownSpotter(true)
 
-			this.updateDynamicValues({KnowledgeBase: false, Prepared: false})
+			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
 
 		this.updateDynamicValues({OverallTime: 0, BestLapTime: 0
@@ -4240,35 +4244,37 @@ class RaceSpotter extends GridRaceAssistant {
 
 		knowledgeBase := this.KnowledgeBase
 
-		if !this.MultiClass
-			this.adjustGaps(data)
+		if (lapNumber > 0) {
+			if !this.MultiClass
+				this.adjustGaps(data)
 
-		loop knowledgeBase.getValue("Car.Count") {
-			laps := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
+			loop knowledgeBase.getValue("Car.Count") {
+				laps := knowledgeBase.getValue("Car." . A_Index . ".Laps", knowledgeBase.getValue("Car." . A_Index . ".Lap", 0))
 
-			if (laps != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", laps)
+				if (laps != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", laps)
 
-				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
-					knowledgeBase.setFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
+					if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
+						knowledgeBase.setFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
 
-				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
+					if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
+						knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
+				}
 			}
+
+			lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
+
+			if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
+				this.initializeHistory(false)
+
+			if this.SessionInfos.Has("LastLap")
+				this.handleEvent("SessionOver")
+
+			if this.Speaker[false]
+				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
+					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+						this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 		}
-
-		lastPitstop := knowledgeBase.getValue("Pitstop.Last", false)
-
-		if (lastPitstop && (Abs(lapNumber - lastPitstop) <= 2))
-			this.initializeHistory(false)
-
-		if this.SessionInfos.Has("LastLap")
-			this.handleEvent("SessionOver")
-
-		if this.Speaker[false]
-			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
-				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")
@@ -4288,6 +4294,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
+		local started := (lapNumber > 0)
 		local sector, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
@@ -4296,80 +4303,84 @@ class RaceSpotter extends GridRaceAssistant {
 		static sectorIndex := 1
 		static newSector := false
 
-		if (lapNumber > this.LastLap) {
-			this.updateDynamicValues({EnoughData: false})
+		if started {
+			if (lapNumber > this.LastLap) {
+				this.updateDynamicValues({EnoughData: false})
 
-			lastLap := 0
-			lastSector := -1
-			sectorIndex := 1
-		}
-		else if (lapNumber < lastLap) {
-			lastLap := 0
-			lastSector := -1
-			sectorIndex := 1
-		}
-
-		if !isObject(data)
-			data := readMultiMap(data)
-
-		sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
-
-		if (sector != lastSector) {
-			lastSector := sector
-			sectorIndex := 1
-
-			newSector := true
-		}
-
-		knowledgeBase.setFact("Sector", sector)
-
-		sector := (sector . "." . sectorIndex++)
-
-		if !this.MultiClass
-			hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
-
-		if isDebug()
-			logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
-
-		if (lapNumber = this.LastLap) {
-			try {
-				this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+				lastLap := 0
+				lastSector := -1
+				sectorIndex := 1
 			}
-			catch Any as exception {
-				logError(exception, true)
+			else if (lapNumber < lastLap) {
+				lastLap := 0
+				lastSector := -1
+				sectorIndex := 1
 			}
 
-			if this.DriverUpdateTime {
-				if (A_TickCount >= this.iNextDriverUpdate) {
+			if !isObject(data)
+				data := readMultiMap(data)
+
+			sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
+
+			if (sector != lastSector) {
+				lastSector := sector
+				sectorIndex := 1
+
+				newSector := true
+			}
+
+			knowledgeBase.setFact("Sector", sector)
+
+			sector := (sector . "." . sectorIndex++)
+
+			if !this.MultiClass
+				hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
+
+			if isDebug()
+				logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
+
+			if (lapNumber = this.LastLap) {
+				try {
+					this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
+
+				if this.DriverUpdateTime {
+					if (A_TickCount >= this.iNextDriverUpdate) {
+						this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+						this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
+						newSector := false
+					}
+					else
+						this.updateDriver(lapNumber, sector, false, false, this.Positions)
+				}
+				else {
 					this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-					this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
 
 					newSector := false
 				}
-				else
-					this.updateDriver(lapNumber, sector, false, false, this.Positions)
-			}
-			else {
-				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-				newSector := false
 			}
 		}
 
 		result := super.updateLap(lapNumber, &data)
 
-		loop knowledgeBase.getValue("Car.Count") {
-			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
+		if started {
+			loop knowledgeBase.getValue("Car.Count") {
+				valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
 
-			if (valid == false)
-				knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", valid)
+				if (valid == false)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Running", valid)
+			}
+
+			if this.Speaker[false]
+				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
+					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+						this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 		}
-
-		if this.Speaker[false]
-			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
-				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")

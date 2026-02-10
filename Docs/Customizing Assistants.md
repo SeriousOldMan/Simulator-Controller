@@ -688,6 +688,35 @@ Another example, this time using arguments:
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Event%20Definition%201.png)
 
 This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behavior.
+
+As a last example, the following event rules can be used the Engineer, for example using the "Rules" provider, to tell the driver to be careful on fresh tyres.
+
+	{None: [?Tyre.Cold.Warned]} => (Call: Assistant.Speak("Watch out, tyres may be cold.")),
+								   (Set: Tyre.Cold.Warned)
+
+	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0)
+
+	priority: -20, {All: [?Pitstop.Last != Tyre.Pitstop.Last],
+						 {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, !Pitstop.Last)}} =>
+			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, !Pitstop.Last)
+
+	Pitstop.TyreChanged(All, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound, ?compound),
+										  ?compound != false
+
+	Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Front, ?compound),
+										   ?compound != false
+	Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Rear, ?compound),
+										   ?compound != false
+
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontLeft, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontRight, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearLeft, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearRight, ?compound),
+											?compound != false
+
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 

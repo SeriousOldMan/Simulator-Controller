@@ -39,6 +39,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	iRaceStrategist := false
 
 	iLastStrategyVersion := false
+	iLapDatabase := false
 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -437,7 +438,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 							temperatures := string2Values(",", telemetryData[17])
 							wear := string2Values(",", telemetryData[18])
 							bb := ((telemetryData.Length > 23) ? telemetryData[24] : kNull)
-							
+
 							try {
 								lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]
 														, telemetryData[14], telemetryData[15]

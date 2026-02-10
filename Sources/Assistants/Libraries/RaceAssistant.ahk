@@ -2796,6 +2796,7 @@ class RaceAssistant extends ConfigurationItem {
 	addLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
+		local started := (lapNumber > 0)
 		local driverForname, driverSurname, driverNickname, tyreSet, airTemperature, trackTemperature, sessionTimeRemaining, driverTimeRemaining
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key, noBaseLap
@@ -2810,7 +2811,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Lap", lapNumber)
 
-		if (lapNumber > 0) {
+		if started {
 			if !this.InitialFuelAmount
 				baseLap := lapNumber
 			else
@@ -2938,7 +2939,7 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
-		if (lapNumber < 5)
+		if (started && (lapNumber < 5))
 			if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
 				this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
@@ -2995,56 +2996,58 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Remaining", Round(fuelRemaining, 2))
 
-		if ((lapNumber < 5) && noBaseLap) {
-			this.updateDynamicValues({BaseLap: lapNumber
-									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
+		if started
+			if ((lapNumber < 5) && noBaseLap) {
+				this.updateDynamicValues({BaseLap: lapNumber
+										, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
-		}
-		else if (!this.InitialFuelAmount || (fuelRemaining > this.LastFuelAmount)) {
-			; This is the case after a pitstop
-			this.updateDynamicValues({BaseLap: lapNumber
-									, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", 0)
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", 0)
+			}
+			else if (!this.InitialFuelAmount || (fuelRemaining > this.LastFuelAmount)) {
+				; This is the case after a pitstop
+				this.updateDynamicValues({BaseLap: lapNumber
+										, LastFuelAmount: fuelRemaining, InitialFuelAmount: fuelRemaining, AvgFuelConsumption: 0})
 
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
-		}
-		else {
-			avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.AvgConsumption", 0))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Fuel.Consumption", 0))
+			}
+			else {
+				avgFuelConsumption := Round((this.InitialFuelAmount - fuelRemaining) / (lapNumber - baseLap), 2)
 
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
-			knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.AvgConsumption", avgFuelConsumption)
+				knowledgeBase.addFact("Lap." . lapNumber . ".Fuel.Consumption", Round(this.LastFuelAmount - fuelRemaining, 2))
 
-			this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
-		}
+				this.updateDynamicValues({LastFuelAmount: fuelRemaining, AvgFuelConsumption: avgFuelConsumption})
+			}
 
 		energyRemaining := getMultiMapValue(data, "Car Data", "EnergyRemaining", kUndefined)
 
 		if (energyRemaining != kUndefined) {
 			knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Remaining", Round(energyRemaining, 1))
 
-			if ((lapNumber < 5) && noBaseLap) {
-				this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
+			if started
+				if ((lapNumber < 5) && noBaseLap) {
+					this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
 
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", 0)
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", 0)
-			}
-			else if (!this.InitialEnergyAmount || (energyRemaining > this.LastEnergyAmount)) {
-				; This is the case after a pitstop
-				this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", 0)
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", 0)
+				}
+				else if (!this.InitialEnergyAmount || (energyRemaining > this.LastEnergyAmount)) {
+					; This is the case after a pitstop
+					this.updateDynamicValues({LastEnergyAmount: energyRemaining, InitialEnergyAmount: energyRemaining, AvgEnergyConsumption: 0})
 
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.AvgConsumption", 0))
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.Consumption", 0))
-			}
-			else {
-				avgEnergyConsumption := Round((this.InitialEnergyAmount - energyRemaining) / (lapNumber - baseLap), 1)
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.AvgConsumption", 0))
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Energy.Consumption", 0))
+				}
+				else {
+					avgEnergyConsumption := Round((this.InitialEnergyAmount - energyRemaining) / (lapNumber - baseLap), 1)
 
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", avgEnergyConsumption)
-				knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", Round(this.LastEnergyAmount - energyRemaining, 1))
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.AvgConsumption", avgEnergyConsumption)
+					knowledgeBase.addFact("Lap." . lapNumber . ".Energy.Consumption", Round(this.LastEnergyAmount - energyRemaining, 1))
 
-				this.updateDynamicValues({LastEnergyAmount: energyRemaining, AvgEnergyConsumption: avgEnergyConsumption})
-			}
+					this.updateDynamicValues({LastEnergyAmount: energyRemaining, AvgEnergyConsumption: avgEnergyConsumption})
+				}
 		}
 
 		tyrePressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))

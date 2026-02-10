@@ -2547,10 +2547,12 @@ class DrivingCoach extends GridRaceAssistant {
 	addLap(lapNumber, &data) {
 		local result := super.addLap(lapNumber, &data)
 
-		this.updateLaps(lapNumber, data)
+		if (lapNumber > 0) {
+			this.updateLaps(lapNumber, data)
 
-		if this.CoachingActive
-			this.startupTelemetryCoaching()
+			if this.CoachingActive
+				this.startupTelemetryCoaching()
+		}
 
 		return result
 	}
@@ -2558,8 +2560,9 @@ class DrivingCoach extends GridRaceAssistant {
 	updateLap(lapNumber, &data, arguments*) {
 		local result := super.updateLap(lapNumber, &data, arguments*)
 
-		if this.CoachingActive
-			this.startupTelemetryCoaching()
+		if (lapNumber > 0)
+			if this.CoachingActive
+				this.startupTelemetryCoaching()
 
 		return result
 	}

@@ -1395,26 +1395,23 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static prepareAssistantsSession(data, telemetryData, standingsData, count) {
-		local prepared := true
+		local first := true
 		local ignore, assistant, settings
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.requireRaceAssistant() {
 				settings := RaceAssistantPlugin.getSettings(assistant, data)
 
-				if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count) {
+				if !RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count)
 					RaceAssistantPlugin.Simulator.prepareSession(settings, data)
-
-					prepared := (prepared && RaceAssistantPlugin.Simulator.hasPrepared(settings, data, count))
-				}
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
-
-				prepared := (prepared && assistant.hasPrepared(settings, data, count))
+				else
+					first := false
 			}
 
-		if prepared
+		if first
 			RaceAssistantPlugin.startAssistantsLap(count, data, telemetryData, standingsData)
 	}
 

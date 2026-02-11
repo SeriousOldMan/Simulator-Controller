@@ -40,9 +40,9 @@
 #### Changes
 
   - Correct lap times and sector times for the last lap are now available for *Project Motor Racing*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API. Please note, that the method only works when using the *Connector* data acquisition method, which actually is the default. If you have changed the *Simulator/Data Provider* setting in the core settings, you may reconsider it.
-  - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
+  - The optional *Team Server* which you can host and operate on your for team session with your mate, as well as the optional *Whisper Server* which can be used to run a Whisper voice recognition system on a separate PC, are no longer part of the standard distribution package to safe some space. Rather they are now downloadable components which can be installed on the "Presets" page of "Simulator Setup".
   - [Experts] The rule engine of the Race Assistants is now enabled in the first lap as well. This will allow for additional processing in the first lap using a *Reasoning* booster. See [the custom event for cold tyre warnings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for an example on how to utilize that.
-  - [Developer] Enabling "Debug Rules" in the tray menu of any Assistant enables tracing in the rule engine.
+  - [Experts] Enabling "Debug Rules" in the tray menu of any Assistant enables tracing in the rule engine.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)
       - Aston Martin DBR9, Aston Martin Vantage GT3 Evo, Audi R8 LMS GT3 evo II

@@ -34,6 +34,8 @@
   - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
   - Fixed a race condition and several other bugs in the sector times sampling for *Assetto Corsa* which was introduced with the last release.
   - Fixed a bug in the "Database Synchronizer", which caused many files to be missing from the community database since the last release.
+  - Fixed a field validation in the settings editor of the "Session Database".
+  - Fixed a crash in the *iRacing* IBT file importer in the "Session Database".
   
 #### Changes
 

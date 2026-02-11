@@ -2099,7 +2099,7 @@ class SessionDatabase extends ConfigurationItem {
 		importFromIRacing(&info) {
 			local trackData := []
 			local trackFile := this.getTrackData(simulator, track)
-			local directory, name, importFileName, infoFileName
+			local directory, name, importFileName, infoFileName, index
 
 			if trackFile {
 				loop Read, trackFile
@@ -2122,10 +2122,12 @@ class SessionDatabase extends ConfigurationItem {
 						if (Trim(A_LoopReadLine) != "") {
 							line := string2Values(";", A_LoopReadLine)
 
-							running := (Max(1, Min(1000, Round(line[12] * 1000))) / 1000)
+							index := Max(1, Min(1000, Round(line[12] * 1000)))
 
-							line[12] := trackData[running][1]
-							line.Push(trackData[running][2])
+							running := (index / 1000)
+
+							line[12] := trackData[index][1]
+							line.Push(trackData[index][2])
 
 							FileAppend(values2String(";", line*) . "`n", importFileName)
 						}

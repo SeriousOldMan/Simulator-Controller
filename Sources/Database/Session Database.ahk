@@ -802,7 +802,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (operation = "Validate")
 				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
 		}
-		
+
 		modifySetting(validate := false, value?) {
 			modifySettingAsync() {
 				local selected, settings, section, key, ignore, setting, range
@@ -3504,14 +3504,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			writeMultiMap(directory . "\Export.info", info)
 
 			writeMultiMap(directory . "\Export.settings", settings)
-		
+
 			currentDir := A_WorkingDir
 
 			SetWorkingDir(directory)
-			
+
 			try {
 				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . fileName . ".zip'", , "Hide")
-				
+
 				RunWait("tar -a -c -f `"" . fileName . ".zip" . "`" *.*", , "Hide")
 			}
 			finally {
@@ -4950,10 +4950,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			currentDir := A_WorkingDir
 
 			SetWorkingDir(directory)
-			
+
 			try {
 				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . targetFileName . ".zip'", , "Hide")
-				
+
 				RunWait("tar -a -c -f `"" . targetFileName . ".zip" . "`" *.*", , "Hide")
 			}
 			finally {
@@ -8106,6 +8106,11 @@ editSettings(editorOrCommand, arguments*) {
 	static serverUpdateEdit := 0
 	static validateTokenButton
 	static rebuildButton
+
+	validateInteger(minValue, maxValue, field, operation, value) {
+		if (operation = "Validate")
+			return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+	}
 
 	rebuildDatabase(*) {
 		local msgResult

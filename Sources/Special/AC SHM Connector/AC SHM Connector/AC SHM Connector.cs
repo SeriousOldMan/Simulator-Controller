@@ -29,7 +29,6 @@ namespace SHMConnector
         private int[] previousSector = new int[MAX_CARS];
         private int[] sector1Times = new int[MAX_CARS];
         private int[] sector2Times = new int[MAX_CARS];
-        private int[] sector3Times = new int[MAX_CARS];
         private int[] sectorStartTimes = new int[MAX_CARS];
         private readonly object sectorLock = new object();
 
@@ -338,7 +337,7 @@ namespace SHMConnector
 
         private void CalibrateSectorBoundaries(Graphics graphics, ref AcCarInfo playerCar)
         {
-            int currentSector = graphics.CurrentSectorIndex;
+            int currentSector = Math.Min(graphics.CurrentSectorIndex, 2);
 
             if (lastObservedSector != currentSector)
             {
@@ -379,7 +378,7 @@ namespace SHMConnector
                 {
 					if (currentSector == 0) {
 						sectorStartTimes[carIndex] = currentTime;
-						previousSector[carIndex] = currentSector;
+						previousSector[carIndex] = 0;
 					}
                 }
 				else if (currentSector != prevSector)
@@ -392,19 +391,16 @@ namespace SHMConnector
                         sector2Times[carIndex] = sectorTime;
                     else
                     {
-                        sector3Times[carIndex] = sectorTime;
-
                         lastSector1Times[carIndex] = sector1Times[carIndex];
                         lastSector2Times[carIndex] = sector2Times[carIndex];
-                        lastSector3Times[carIndex] = sector3Times[carIndex];
+                        lastSector3Times[carIndex] = lapTime - sector1Times[carIndex] - sector2Times[carIndex];
 
                         sector1Times[carIndex] = 0;
                         sector2Times[carIndex] = 0;
-                        sector3Times[carIndex] = 0;
                     }
                 
                     sectorStartTimes[carIndex] = currentTime;
-                    previousSector[carIndex] = currentSector;
+                    previousSector[carIndex] = Math.Min(currentSector, 2);
                 }
             }
         }
@@ -460,7 +456,7 @@ namespace SHMConnector
                         {
                             strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
 
-                            if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
+                            if (sector1Time > 0 && sector2Time > 0 && sector3Time > 0)
                             {
                                 strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
                             }
@@ -579,7 +575,7 @@ namespace SHMConnector
                 strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
                 strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
-                strWriter.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
+                strWriter.WriteLine("Sector=" + (Math.Min(graphics.CurrentSectorIndex, 2) + 1));
                 strWriter.WriteLine("Laps=" + graphics.CompletedLaps);
 
                 strWriter.WriteLine("LapValid=true");

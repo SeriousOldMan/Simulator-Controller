@@ -39,7 +39,6 @@ namespace SHMConnector
 
         private float sectorBoundary1;
         private float sectorBoundary2;
-        private float sectorBoundary3;
         private bool sectorBoundariesCalibrated;
         private int lastObservedSector = -1;
         
@@ -350,7 +349,6 @@ namespace SHMConnector
                 else if (lastObservedSector == 1 && currentSector == 2)
                 {
                     sectorBoundary2 = playerCar.splinePosition;
-                    sectorBoundary3 = 1.0f;
                     sectorBoundariesCalibrated = true;
                 }
                 
@@ -364,10 +362,8 @@ namespace SHMConnector
                 return 0;
             else if (splinePosition < sectorBoundary2)
                 return 1;
-            else if (splinePosition < sectorBoundary3)
-                return 2;
             else
-                return 0;
+                return 2;
         }
 
         private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lapTime)
@@ -381,24 +377,20 @@ namespace SHMConnector
             
                 if (prevSector == -1)
                 {
-                    sectorStartTimes[carIndex] = currentTime;
-                    previousSector[carIndex] = currentSector;
-                    return;
+					if (currentSector == 0) {
+						sectorStartTimes[carIndex] = currentTime;
+						previousSector[carIndex] = currentSector;
+					}
                 }
-            
-                if (currentSector != prevSector)
+				else if (currentSector != prevSector)
                 {
                     int sectorTime = currentTime - sectorStartTimes[carIndex];
                 
-                    if (prevSector == 0 && currentSector == 1)
-                    {
+                    if (prevSector == 0)
                         sector1Times[carIndex] = sectorTime;
-                    }
-                    else if (prevSector == 1 && currentSector == 2)
-                    {
+                    else if (prevSector == 1)
                         sector2Times[carIndex] = sectorTime;
-                    }
-                    else if (prevSector == 2 && currentSector == 0)
+                    else
                     {
                         sector3Times[carIndex] = sectorTime;
 
@@ -468,10 +460,10 @@ namespace SHMConnector
                         {
                             strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
 
-                            // if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
-                            // {
+                            if (sector1Time != 0 && sector2Time != 0 && sector3Time != 0)
+                            {
                                 strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time.Sectors="); strWriter.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
-                            // }
+                            }
                         }
                         else
                         {
@@ -651,11 +643,11 @@ namespace SHMConnector
                 strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
                 strWriter.WriteLine("EngineDamage=0");
 
+				/*
                 strWriter.WriteLine("[Debug Data]");
                 strWriter.WriteLine("Sector1=" + Math.Round(sectorBoundary1, 2));
                 strWriter.WriteLine("Sector2=" + Math.Round(sectorBoundary2, 2));
-                strWriter.WriteLine("Sector3=" + Math.Round(sectorBoundary3, 2));
-
+				*/
             }
             while (startGeneration != dataGeneration);
 

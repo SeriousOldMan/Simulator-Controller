@@ -371,6 +371,7 @@ namespace PMRUDPConnector
                 lock (sectorLock)
                 {
                     lastLapTime = lastLapTimes[i];
+					
                     s1Time = lastLapSector1Times[i];
                     s2Time = lastLapSector2Times[i];
                     s3Time = lastLapSector3Times[i];
@@ -379,16 +380,16 @@ namespace PMRUDPConnector
                 if (lastLapTime > 0)
                 {
                     sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(lastLapTime * 1000));
-                    sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
-                        I(s1Time * 1000),
-                        I(s2Time * 1000),
-                        I(s3Time * 1000));
+					
+					if (s1Time != 0 && s2Time != 0 && s3Time != 0)
+						sb.AppendFormat("Car.{0}.Time.Sectors={1},{2},{3}\n", carNum,
+							I(s1Time * 1000),
+							I(s2Time * 1000),
+							I(s3Time * 1000));
                 }
                 else
-                {
                     sb.AppendFormat("Car.{0}.Time={1}\n", carNum, I(p.BestLapTime * 1000));
-                }
-
+                
                 sb.AppendFormat("Car.{0}.Car={1}\n", carNum, NormalizeName(p.VehicleName));
 
                 ParseDriverName(p.DriverName, out string forename, out string surname, out string nickname);
@@ -504,34 +505,26 @@ namespace PMRUDPConnector
                     if (currentSector == 0)
                     {
                         previousSector[carIndex] = 0;
-                        sectorStartTimes[carIndex] = currentTime;
+                        sectorStartTimes[carIndex] = 0;
                     }
-                    previousLapTime[carIndex] = currentTime;
-                    return;
                 }
-
-                if (currentSector != previousSector[carIndex])
+                else if (currentSector != previousSector[carIndex])
                 {
-                    float sectorTime;
-
-                    if (currentTime < sectorStartTimes[carIndex])
-                        sectorTime = previousLapTime[carIndex] - sectorStartTimes[carIndex] + (currentTime / 2);
-                    else
-                        sectorTime = (currentTime / 2) - sectorStartTimes[carIndex];
-
                     if (previousSector[carIndex] == 0)
-                        sector1Times[carIndex] = sectorTime;
+                        sector1Times[carIndex] = currentTime - sectorStartTimes[carIndex];
                     else if (previousSector[carIndex] == 1)
-                        sector2Times[carIndex] = sectorTime;
-                    else if (previousSector[carIndex] == 2)
-                        sector3Times[carIndex] = sectorTime;
+                        sector2Times[carIndex] = currentTime - sectorStartTimes[carIndex];
+                    else {
+                        sector3Times[carIndex] = previousLapTime[carIndex] - sectorStartTimes[carIndex] + (currentTime / 2);
 
-                    if (currentSector == 0 && previousSector[carIndex] == 2)
-                    {
                         lastLapSector1Times[carIndex] = sector1Times[carIndex];
                         lastLapSector2Times[carIndex] = sector2Times[carIndex];
                         lastLapSector3Times[carIndex] = sector3Times[carIndex];
                         lastLapTimes[carIndex] = sector1Times[carIndex] + sector2Times[carIndex] + sector3Times[carIndex];
+						
+						sector1Times[carIndex] = 0;
+						sector2Times[carIndex] = 0;
+						sector3Times[carIndex] = 0;
                     }
 
                     previousSector[carIndex] = currentSector;

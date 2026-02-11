@@ -14,7 +14,7 @@
   
 #### Changes
 
-  - Sector times are now available for *Assetto Corsa*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API. Please note, that the method only works when using the *Connector* data acquisition method, which actually is the default. If you have changed the *Simulation/Data Provider* setting in the core settings, you may reconsider it.
+  - Sector times are now available for *Assetto Corsa*. The solution, which was created by @Awesome-XV, is an approximation with a 20 Hz resolution, since the data is not available in a useful format in the API. Please note, that the method only works when using the *Connector* data acquisition method, which actually is the default. If you have changed the *Simulator/Data Provider* setting in the core settings, you may reconsider it.
   - If available, sector times will be shown in the lap reports in the "Solo Center" and "Team Center" applications.
   - All field value validation handlers have been rewritten, so that validation and possible range correction happens only on tab out.
   - Changed the startup sequence for *Le Mans Ultimate* a bit, so that the short stutter at the beginning of the session happens earlier.
@@ -32,7 +32,7 @@
 #### Fixes
 
   - Fixed a computation failure by the Strategist whe handling tyre sets for simulators which do not support tyre sets at all.
-  - Fixed a race condition in the sector times sampling for *Assetto Corsa* which had been introduced with the last release.
+  - Fixed a race condition and several other bugs in the sector times sampling for *Assetto Corsa* which was introduced with the last release.
   - Fixed a bug in the "Database Synchronizer", which caused many files to be missing from the community database since the last release.
   
 #### Changes

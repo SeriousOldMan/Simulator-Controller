@@ -72,7 +72,7 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 6. [Managing Settings](https://youtu.be/Pdwpbfadd5g) - This video gives an introduction into the settings used by the AI Race Assistants and how to manage these settings in the most efficient way.
 
-7. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Team Center" and using the AI Race Assistents.
+7. [Using Strategy Workbench](https://youtu.be/rDlMWS5mbOM) - In this video we take a walk in "Strategy Workbench", the premium fuel calculator of the Simulator Controller suite. You will also learn, how to use the created strategies in "Team Center" and using the AI Race Assistants.
 
 8. [Introduction to Team Races](https://youtu.be/R-6mRwMv81I) - In this video, all the functionality of the Simulator Controller suite come together to manage and control your team races. You will learn how to setup everything, how to use the services of the Race Assistants during a team race and how to remote control the pitstop settings for the currently driving team mate.
 

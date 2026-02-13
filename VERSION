@@ -6,11 +6,11 @@ Download=
 Changes=Initial support for F1 25
 Components=Media->6.9.0,Configuration->6.8.3,Utilities->6.8.1
 [Release]
-Version=6.8.2.0-release
-Date=02/06/2026
-Download=https://cutt.ly/EtbigDjN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/by2-lX7L/Releases/Simulator Controller 6.8.2.0-release.zip;https://www.dropbox.com/scl/fi/tam78wiw9nimtfr1cxys6/Simulator-Controller-6.8.2.0-release.zip?rlkey=pnwldqidazgnpvupsidbrrdov&st=pqjgdfti&dl=1;http://%master%/Releases/Simulator Controller 6.8.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.2.0-release.zip
-Changes="invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU
-Components=Media->5.6.1,Configuration->6.8.1,Utilities->6.8.1
+Version=6.8.3.0-release
+Date=02/13/2026
+Download=https://cutt.ly/9tnGZZrB;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/RihZFv7i/Releases/Simulator%20Controller%206.8.3.0-release.zip;https://www.dropbox.com/scl/fi/nuce409imud2z0i4mlji2/Simulator-Controller-6.8.3.0-release.zip?rlkey=xtaejovl98cg6difi9kj9uum4&st=a2rc4gve&dl=1;http://%master%/Releases/Simulator Controller 6.8.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.3.0-release.zip
+Changes=Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression
+Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Components]
 Media.5.6.1.Path=Resources
 Media.5.6.1.Content=Splash Media
@@ -18,9 +18,6 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Media.6.9.0.Path=Resources
 Media.6.9.0.Content=Splash Media
 Media.6.9.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y93MJ67x/Components/Media%206.9.0.zip;https://www.dropbox.com/scl/fi/hq0zwosm0ajjefnafm6ug/Media-6.9.0.zip?rlkey=3j92oswbm0yg3x9uf7qpkxwuq&st=hy0ea71c&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+6.9.0.zip
-Configuration.6.8.1.Path=Resources
-Configuration.6.8.1.Content=Setup
-Configuration.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/43-WsIDX/Components/Configuration 6.8.1.zip;http://%master%/Components/Configuration 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.1.zip
 Configuration.6.8.3.Path=Resources
 Configuration.6.8.3.Content=Setup
 Configuration.6.8.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/mE67epkf/Components/Configuration%206.8.3.zip;https://www.dropbox.com/scl/fi/597lbkrexhwx6tffco1ta/Configuration-6.8.3.zip?rlkey=duh0xrqu78gtdhvbbyd2mz7h9&st=tpsjr2fo&dl=1;http://%master%/Components/Configuration 6.8.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.3.zip
@@ -31,4 +28,4 @@ Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 Type=Development
 [Version]
 Development=6.9.0.0-dev
-Release=6.8.2.0-release
+Release=6.8.3.0-release

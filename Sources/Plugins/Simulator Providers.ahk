@@ -17,5 +17,6 @@
 #Include "Libraries\RF2Provider.ahk"
 #Include "Libraries\LMUProvider.ahk"
 #Include "Libraries\PMRProvider.ahk"
+#Include "Libraries\F125Provider.ahk"
 
 #Include "%A_MyDocuments%\Simulator Controller\Plugins\Simulator Providers.ahk"

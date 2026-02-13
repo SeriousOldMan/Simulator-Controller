@@ -3046,6 +3046,17 @@ updateConfigurationForV400() {
 }
 */
 
+updatePluginsForV690() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+
+	if ((userConfiguration.Count > 0) && !getMultiMapValue(userConfiguration, "Plugins", "F125", false)) {
+		Plugin("F125", false, false, "F1 25").saveToConfiguration(userConfiguration)
+
+		writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV675() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)

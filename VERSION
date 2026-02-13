@@ -1,9 +1,9 @@
 [Development]
-Version=6.8.3.0-release
-Target=6.8.3.0-release
+Version=6.8.4.0-dev
+Target=6.8.4.0-release
 Date=02/13/2026
-Download=https://cutt.ly/9tnGZZrB;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/RihZFv7i/Releases/Simulator%20Controller%206.8.3.0-release.zip;https://www.dropbox.com/scl/fi/nuce409imud2z0i4mlji2/Simulator-Controller-6.8.3.0-release.zip?rlkey=xtaejovl98cg6difi9kj9uum4&st=a2rc4gve&dl=1;http://%master%/Releases/Simulator Controller 6.8.3.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.3.0-release.zip
-Changes=Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression
+Download=
+Changes=Car geometry information for AMS2
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.3.0-release
@@ -22,7 +22,7 @@ Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.8.3.0-release
+Development=6.8.4.0-dev
 Release=6.8.3.0-release

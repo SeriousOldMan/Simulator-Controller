@@ -347,6 +347,10 @@ class RaceAssistant extends ConfigurationItem {
 			messageSend(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
+		shutdown(arguments*) {
+			this.callRemote("shutdown", arguments*)
+		}
+
 		savePitstopState(arguments*) {
 			this.callRemote("savePitstopState", arguments*)
 		}

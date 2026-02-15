@@ -4103,6 +4103,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
+				if (this.KnowledgeBase && this.RemoteHandler)
+					this.RemoteHandler.shutdown(ProcessExist())
+
 				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
@@ -4136,6 +4139,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			this.shutdownSpotter(true)
+
+			if this.RemoteHandler
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
@@ -4610,6 +4616,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if (phase = "After") {
+			if (this.KnowledgeBase && this.RemoteHandler)
+				this.RemoteHandler.shutdown(ProcessExist())
+
 			this.updateDynamicValues({KnowledgeBase: false})
 
 			this.finishSession()

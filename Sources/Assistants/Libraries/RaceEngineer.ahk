@@ -2996,6 +2996,9 @@ class RaceEngineer extends RaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
+				if (this.KnowledgeBase && this.RemoteHandler)
+					this.RemoteHandler.shutdown(ProcessExist())
+
 				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
@@ -3056,6 +3059,9 @@ class RaceEngineer extends RaceAssistant {
 				this.shutdownSession("After")
 			}
 
+			if this.RemoteHandler
+				this.RemoteHandler.shutdown(ProcessExist())
+
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
 
@@ -3092,6 +3098,9 @@ class RaceEngineer extends RaceAssistant {
 		if (phase = "After") {
 			if (this.Speaker[false] && pressuresSaved)
 				this.getSpeaker().speakPhrase("DataUpdated")
+
+			if (this.KnowledgeBase && this.RemoteHandler)
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false})
 

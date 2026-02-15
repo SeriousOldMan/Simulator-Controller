@@ -685,7 +685,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 
 		Set {
-			if value
+			if (value || zombie)
 				this.iRaceAssistantZombie := value
 
 			return (this.iRaceAssistant := value)
@@ -718,7 +718,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantPersistent {
+	Persistent {
 		Get {
 			return false
 		}
@@ -1269,7 +1269,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if this.StartupSettings {
 					serverURL := getMultiMapValue(this.StartupSettings, "Team Session", "Server.URL", serverURL)
 					accessToken := getMultiMapValue(this.StartupSettings, "Team Session", "Server.Token", accessToken)
-					teamIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+					teamIdentifier+ := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
 					driverIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
 					sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 				}
@@ -1523,7 +1523,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.Enabled && assistant.RaceAssistant && !assistant.RaceAssistantPersistent) {
+				if (assistant.Enabled && assistant.RaceAssistant && !assistant.Persistent) {
 					RaceAssistantPlugin.WaitForShutdown := true
 
 					break
@@ -1554,6 +1554,27 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
 			RaceAssistantPlugin.CollectorTask.Sleep := 1000
 		}
+	}
+
+	shutdown(pid) {
+		if (this.RaceAssistant[true] && (this.RaceAssistant[true].RemotePID = pid)) {
+			this.RaceAssistant[true] := false
+
+			RaceAssistantPlugin.raceAssistantShutdown(this)
+		}
+	}
+
+	static shutdownRaceAssistant(raceAssistant) {
+		local ignore, assistant
+
+		if RaceAssistantPlugin.WaitForShutdown
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if (assistant.RaceAssistant && !assistant.Persistent)
+					return false
+
+		this.WaitForShutdown[true] := false
+
+		return true
 	}
 
 	static pauseAssistantsSession() {

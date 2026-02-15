@@ -1269,7 +1269,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if this.StartupSettings {
 					serverURL := getMultiMapValue(this.StartupSettings, "Team Session", "Server.URL", serverURL)
 					accessToken := getMultiMapValue(this.StartupSettings, "Team Session", "Server.Token", accessToken)
-					teamIdentifier+ := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
+					teamIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Team.Identifier", teamIdentifier)
 					driverIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Driver.Identifier", driverIdentifier)
 					sessionIdentifier := getMultiMapValue(this.StartupSettings, "Team Session", "Session.Identifier", sessionIdentifier)
 				}
@@ -1560,19 +1560,29 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (this.RaceAssistant[true] && (this.RaceAssistant[true].RemotePID = pid)) {
 			this.RaceAssistant[true] := false
 
+			if isDebug()
+				logMessage(kLogDebug, this.Name . " is ready for restart")
+
 			RaceAssistantPlugin.raceAssistantShutdown(this)
 		}
 	}
 
-	static shutdownRaceAssistant(raceAssistant) {
+	static raceAssistantShutdown(raceAssistant) {
 		local ignore, assistant
 
-		if RaceAssistantPlugin.WaitForShutdown
+		if this.WaitForShutdown
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.RaceAssistant && !assistant.Persistent)
-					return false
+				if (assistant.RaceAssistant[true] && !assistant.Persistent) {
+					if isDebug()
+						logMessage(kLogDebug, assistant.Name . " is still active")
 
-		this.WaitForShutdown[true] := false
+					return false
+				}
+
+		if isDebug()
+			logMessage(kLogDebug, "Initiating restart...")
+
+		this.WaitForShutdown := false
 
 		return true
 	}

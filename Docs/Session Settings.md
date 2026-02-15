@@ -6,7 +6,7 @@ This settings are generally available, although you can and have to define them 
 
 | Category   | Setting                                  | Type    | Default                         | Available in "Race Settings" dialog| Description  |
 |------------|------------------------------------------|---------|---------------------------------|------------------------------------|--------------|
-| Assistants | Cooldown                                 | Integer | 90                              | No  | Number of seconds that the Assistants will wait after a finished session before they will become active again. |
+| Assistants | Cooldown                                 | Integer | 90                              | No  | Number of seconds that the Assistants will wait after a finished session for any post session data processing before they will become active again. If all Assistants are finished, the cooldown phase will be terminated earlier. |
 | Car        | Max steer angle (Steer Lock)             | Integer | 480                             | No  | The maximum number of degrees the steering wheel can be moved in one direction. |
 | Coach      | Repeat whole voice message               | Boolean | False                           | No  | When an Assistant voice output is interrupted, it will try to repeat its message. When this setting is disabled, which is the default, only the last sentence will be repeated. |
 |            | Take session information into account during Practice   | Boolean | True             | No  | If enabled (*True*), the Coach will include the "Session" instruction when transfering your question to the GPT service during a practice session. |

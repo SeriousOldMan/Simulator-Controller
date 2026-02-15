@@ -1561,7 +1561,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.RaceAssistant[true] := false
 
 			if isDebug()
-				logMessage(kLogDebug, this.Name . " is ready for restart")
+				logMessage(kLogInfo, this.Name . " is ready for restart")
 
 			RaceAssistantPlugin.raceAssistantShutdown(this)
 		}
@@ -1574,13 +1574,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			for ignore, assistant in RaceAssistantPlugin.Assistants
 				if (assistant.RaceAssistant[true] && !assistant.Persistent) {
 					if isDebug()
-						logMessage(kLogDebug, assistant.Name . " is still active")
+						logMessage(kLogInfo, assistant.Name . " is still active")
 
 					return false
 				}
 
 		if isDebug()
-			logMessage(kLogDebug, "Initiating restart...")
+			logMessage(kLogInfo, "Initiating restart...")
 
 		this.WaitForShutdown := false
 

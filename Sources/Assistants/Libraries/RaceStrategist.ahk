@@ -2188,7 +2188,8 @@ class RaceStrategist extends GridRaceAssistant {
 					asked := false
 
 				if asked {
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+									   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 					Task.startTask(forceFinishSession, 120000, kLowPriority)
 

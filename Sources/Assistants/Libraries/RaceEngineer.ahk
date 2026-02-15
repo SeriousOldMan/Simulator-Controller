@@ -3034,7 +3034,8 @@ class RaceEngineer extends RaceAssistant {
 						if this.Speaker[false] {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+											   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 							Task.startTask(forceFinishSession, 120000, kLowPriority)
 
@@ -3047,7 +3048,8 @@ class RaceEngineer extends RaceAssistant {
 						if this.Speaker[false] {
 							this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+							this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+											   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 							Task.startTask(forceFinishSession, 120000, kLowPriority)
 

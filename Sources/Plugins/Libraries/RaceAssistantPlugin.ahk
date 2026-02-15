@@ -1953,6 +1953,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateActions(session) {
 		local ignore, theAction, teamServer
 
+		static activeAssistant := false
+
+		if (session = kSessionFinished)
+			activeAssistant := false
+
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.Name ? (this.Enabled ? "Green" : "Black") : "Gray")
@@ -2000,16 +2005,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (theAction.Action = "Interrupt") {
+				if (((theAction.Action = "Accept") || (theAction.Action = "Reject")
+												   || (theAction.Action = "Call")
+												   || (theAction.Action = "Interrupt"))
+				 && (activeAssistant || (this.RaceAssistant[true] != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction))
 					theAction.Function.setIcon(this.actionIcon(theAction))
-				}
-				else if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
-				 && (this.RaceAssistant[true] != false)) {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction))
-					theAction.Function.setIcon(this.actionIcon(theAction))
+
+					activeAssistant := true
 				}
 				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)

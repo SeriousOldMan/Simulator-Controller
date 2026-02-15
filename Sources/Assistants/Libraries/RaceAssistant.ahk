@@ -3215,14 +3215,18 @@ class RaceAssistant extends ConfigurationItem {
 	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
 
-		knowledgeBase.addFact("Pitstop.Lap", lapNumber)
+		if knowledgeBase {
+			knowledgeBase.addFact("Pitstop.Lap", lapNumber)
 
-		result := knowledgeBase.produce()
+			result := knowledgeBase.produce()
 
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledgeBase(knowledgeBase)
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(knowledgeBase)
 
-		return result
+			return result
+		}
+		else
+			return false
 	}
 
 	finishPitstop(lapNumber) {

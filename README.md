@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.2.0-release](https://cutt.ly/EtbigDjN) (Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU.)
+[6.8.3.0-release](https://cutt.ly/9tnGZZrB) (Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6820) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-682) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6830) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-683) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.8.1.0-release](https://cutt.ly/ktccsEBH) (Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator".)
+[6.8.2.0-release](https://cutt.ly/EtbigDjN) (Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU.)
 
-[6.8.0.0-release](https://cutt.ly/ktzTpbdV) (Changes: Fixed some localization bugs, New SimHub Plugin, Rewritten "Integration" plugin, Extended Lua 5.5 support, More resilience for tyre laps calculation, Pitstop settings in "Team Center" can be opened always, New "Scripts" audio route, Fixed car names and track names drop downs in "Session Database", Optimized handling of tyre laps after pitstop, Upload date for entries in "Session Database", Notes field for entries in "Session Database", Fixed car model and class selection for ACC, New car models for "Setup Workbench".)
+[6.8.1.0-release](https://cutt.ly/ktccsEBH) (Changes: Auto reload of all cars and tracks in "Solo Center", Updated SimHub plugin, Value validation in "Session Database", All tracks will now work for all sims in "Session Database", Filter all "old" car names from LMU database, Fixed usage of non-English languages in "Integration" plugin, Fixed car meta data for AMS2, Add all cars and tracks of LMU for the "Session Database", New functions in the script module "Simulator".)
 
 #### Latest development build
 
-[6.8.3.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/S72EMkmf/Releases/Simulator%20Controller%206.8.3.0-beta.zip) (Test build for 6.8.3. Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6830) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-683) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

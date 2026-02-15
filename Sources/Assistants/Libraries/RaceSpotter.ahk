@@ -4127,7 +4127,8 @@ class RaceSpotter extends GridRaceAssistant {
 					if this.Speaker[false] {
 						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+						this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+										   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 						Task.startTask(forceFinishSession, 120000, kLowPriority)
 

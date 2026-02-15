@@ -1953,10 +1953,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateActions(session) {
 		local ignore, theAction, teamServer
 
-		static activeAssistant := false
-
-		if (session = kSessionFinished)
-			activeAssistant := false
+		static activeAssistants := Map()
 
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
@@ -2005,15 +2002,30 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (((theAction.Action = "Accept") || (theAction.Action = "Reject")
+				if ((theAction.Action = "Accept") || (theAction.Action = "Reject")
 												   || (theAction.Action = "Call")
-												   || (theAction.Action = "Interrupt"))
-				 && (activeAssistant || (this.RaceAssistant[true] != false)) {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction))
-					theAction.Function.setIcon(this.actionIcon(theAction))
+												   || (theAction.Action = "Interrupt")) {
+					if (this.RaceAssistant[true] != false) {
+						activeAssistants[this] := true
 
-					activeAssistant := true
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setLabel(this.actionLabel(theAction))
+						theAction.Function.setIcon(this.actionIcon(theAction))
+					}
+					else {
+						activeAssistants[this] := false
+
+						if inList(getValues(activeAssistants), true) {
+							theAction.Function.enable(kAllTrigger, theAction)
+							theAction.Function.setLabel(this.actionLabel(theAction))
+							theAction.Function.setIcon(this.actionIcon(theAction))
+						}
+						else {
+							theAction.Function.disable(kAllTrigger, theAction)
+							theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+							theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
+						}
+					}
 				}
 				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)

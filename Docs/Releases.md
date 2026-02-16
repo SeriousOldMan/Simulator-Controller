@@ -56,7 +56,7 @@
 
 # Upcoming release
 
-## 6.8.3.0
+## 6.8.4.0
 
 #### Date: 02/20/26 (planned)
 

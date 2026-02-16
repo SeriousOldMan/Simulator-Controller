@@ -34,6 +34,8 @@ end
 
 Assistant.Call = __Assistant_Call
 
+Assistant.Property = __Assistant_Property
+
 Controller.Call = __Controller_Call
 
 Function.Call = __Function_Call

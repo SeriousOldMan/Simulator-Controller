@@ -1,9 +1,9 @@
 [Development]
 Version=6.8.4.0-dev
 Target=6.8.4.0-release
-Date=02/15/2026
+Date=02/16/2026
 Download=
-Changes=Car geometry information for AMS2, Optimized Assistants cooldown phase, New script function Rules.Produce
+Changes=Car geometry information for AMS2, Optimized Assistants cooldown phase, New script function Rules.Produce, Updated LLM Runtime
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.3.0-release

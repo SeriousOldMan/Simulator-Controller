@@ -56,7 +56,22 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.8.3.0
+
+#### Date: 02/20/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The handling of the post-session cooldown phase has been optimized. The startup sequence for the next session will now be triggered as soon as all post-session data processing of the Assistants is finished. This especially helps to reduce the effect of the initial stutter in *Le Mans Ultimate* sessions, because these will now happen immediately at the beginning of a session.
+  - Technical information like steer lock and steer ratio has been added by @inthebagbud UK for all *Automobista 2* cars. This information is used by the "Setup Workbench".
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684).
+  - [Experts] When running a *Lua* script for an Assistant, for example in a *Reasoning* booster, you can now use the special function *Rules.Produce()* to run a full cycle of the Rule Engine.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684), if you are using the local LLM Runtime.
 	  
 # Release history
 

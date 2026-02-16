@@ -604,7 +604,7 @@ Additionally you can export and import actions here to build a library for you a
    
      Returns the value for the given fact in the knowledge base of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
 
-   - Rules.Execute()
+   - Rules.Execute() or Rules.Produce()
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 	 

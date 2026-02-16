@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.8.4.0-dev]() (Early build for 6.8.4. Changes: Car geometry information for AMS2, Optimized Assistants cooldown phase, New script function Rules.Produce, Updated LLM Runtime.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6840) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

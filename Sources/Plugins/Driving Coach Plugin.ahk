@@ -138,7 +138,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	RaceAssistantPersistent {
+	Persistent {
 		Get {
 			return true
 		}

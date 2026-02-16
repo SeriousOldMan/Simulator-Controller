@@ -347,6 +347,10 @@ class RaceAssistant extends ConfigurationItem {
 			messageSend(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
+		shutdown(arguments*) {
+			this.callRemote("shutdown", arguments*)
+		}
+
 		savePitstopState(arguments*) {
 			this.callRemote("savePitstopState", arguments*)
 		}
@@ -633,6 +637,40 @@ class RaceAssistant extends ConfigurationItem {
 			}
 
 			return result
+		}
+	}
+
+	class YesNoContinuation extends VoiceManager.ReplyContinuation {
+		iRejectContinuation := false
+
+		AcceptContinuation {
+			Get {
+				return this.Continuation
+			}
+		}
+
+		RejectContinuation {
+			Get {
+				return this.iRejectContinuation
+			}
+		}
+
+		__New(manager, acceptContinuation := false, rejectContinuation := false
+					 , accept := "Confirm", reject := "Okay") {
+			this.iRejectContinuation := rejectContinuation
+
+			super.__New(manager, acceptContinuation, accept, reject)
+		}
+
+		cancel() {
+			local continuation := this.RejectContinuation
+
+			super.cancel()
+
+			if isInstance(continuation, VoiceManager.VoiceContinuation)
+				continuation.next()
+			else if continuation
+				continuation()
 		}
 	}
 
@@ -2050,11 +2088,14 @@ class RaceAssistant extends ConfigurationItem {
 			return false
 	}
 
-	setContinuation(continuation) {
-		if isInstance(continuation, VoiceManager.VoiceContinuation)
-			this.VoiceManager.setContinuation(continuation)
+	setContinuation(acceptContinuation, rejectContinuation := false) {
+		if isInstance(acceptContinuation, VoiceManager.VoiceContinuation)
+			this.VoiceManager.setContinuation(acceptContinuation)
+		else if rejectContinuation
+			this.VoiceManager.setContinuation(RaceAssistant.YesNoContinuation(this, acceptContinuation, rejectContinuation
+																				  , "Confirm", "Okay"))
 		else
-			this.VoiceManager.setContinuation(VoiceManager.ReplyContinuation(this, continuation, "Confirm", "Okay"))
+			this.VoiceManager.setContinuation(VoiceManager.ReplyContinuation(this, acceptContinuation, "Confirm", "Okay"))
 	}
 
 	clearContinuation() {
@@ -3266,8 +3307,7 @@ class RaceAssistant extends ConfigurationItem {
 				if (this.AvgFuelConsumption > 0)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
-				if (settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
-					settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+				settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
 
 				if (lapTime > 10)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))

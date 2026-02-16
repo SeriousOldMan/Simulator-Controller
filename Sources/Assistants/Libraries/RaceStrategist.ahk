@@ -2121,6 +2121,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
+				if (this.KnowledgeBase && this.RemoteHandler)
+					this.RemoteHandler.shutdown(ProcessExist())
+
 				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
@@ -2185,7 +2188,8 @@ class RaceStrategist extends GridRaceAssistant {
 					asked := false
 
 				if asked {
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+									   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 					Task.startTask(forceFinishSession, 120000, kLowPriority)
 
@@ -2194,6 +2198,9 @@ class RaceStrategist extends GridRaceAssistant {
 				else
 					this.shutdownSession("After")
 			}
+
+			if this.RemoteHandler
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
@@ -2261,6 +2268,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if (phase = "After") {
 			if (this.Speaker[false] && reportSaved)
 				this.getSpeaker().speakPhrase("RaceReportSaved")
+
+			if (this.KnowledgeBase && this.RemoteHandler)
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false, HasLapsData: false})
 

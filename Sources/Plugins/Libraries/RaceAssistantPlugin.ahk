@@ -685,7 +685,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 
 		Set {
-			if value
+			if (value || zombie)
 				this.iRaceAssistantZombie := value
 
 			return (this.iRaceAssistant := value)
@@ -718,7 +718,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 	}
 
-	RaceAssistantPersistent {
+	Persistent {
 		Get {
 			return false
 		}
@@ -1523,7 +1523,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (shutdownAssistant && !restart)
 			for ignore, assistant in RaceAssistantPlugin.Assistants
-				if (assistant.Enabled && assistant.RaceAssistant && !assistant.RaceAssistantPersistent) {
+				if (assistant.Enabled && assistant.RaceAssistant && !assistant.Persistent) {
 					RaceAssistantPlugin.WaitForShutdown := true
 
 					break
@@ -1554,6 +1554,37 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
 			RaceAssistantPlugin.CollectorTask.Sleep := 1000
 		}
+	}
+
+	shutdown(pid) {
+		if (this.RaceAssistant[true] && (this.RaceAssistant[true].RemotePID = pid)) {
+			this.RaceAssistant[true] := false
+
+			if isDebug()
+				logMessage(kLogInfo, this.Name . " is ready for restart")
+
+			RaceAssistantPlugin.raceAssistantShutdown(this)
+		}
+	}
+
+	static raceAssistantShutdown(raceAssistant) {
+		local ignore, assistant
+
+		if this.WaitForShutdown
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if (assistant.RaceAssistant[true] && !assistant.Persistent) {
+					if isDebug()
+						logMessage(kLogInfo, assistant.Name . " is still active")
+
+					return false
+				}
+
+		if isDebug()
+			logMessage(kLogInfo, "Initiating restart...")
+
+		this.WaitForShutdown := false
+
+		return true
 	}
 
 	static pauseAssistantsSession() {
@@ -1922,6 +1953,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateActions(session) {
 		local ignore, theAction, teamServer
 
+		static activeAssistants := Map()
+
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
 				theAction.Function.setLabel(this.actionLabel(theAction), this.Name ? (this.Enabled ? "Green" : "Black") : "Gray")
@@ -1969,16 +2002,30 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (theAction.Action = "Interrupt") {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction))
-					theAction.Function.setIcon(this.actionIcon(theAction))
-				}
-				else if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
-				 && (this.RaceAssistant[true] != false)) {
-					theAction.Function.enable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction))
-					theAction.Function.setIcon(this.actionIcon(theAction))
+				if ((theAction.Action = "Accept") || (theAction.Action = "Reject")
+												   || (theAction.Action = "Call")
+												   || (theAction.Action = "Interrupt")) {
+					if (this.RaceAssistant[true] != false) {
+						activeAssistants[this] := true
+
+						theAction.Function.enable(kAllTrigger, theAction)
+						theAction.Function.setLabel(this.actionLabel(theAction))
+						theAction.Function.setIcon(this.actionIcon(theAction))
+					}
+					else {
+						activeAssistants[this] := false
+
+						if inList(getValues(activeAssistants), true) {
+							theAction.Function.enable(kAllTrigger, theAction)
+							theAction.Function.setLabel(this.actionLabel(theAction))
+							theAction.Function.setIcon(this.actionIcon(theAction))
+						}
+						else {
+							theAction.Function.disable(kAllTrigger, theAction)
+							theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+							theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
+						}
+					}
 				}
 				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)

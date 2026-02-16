@@ -572,11 +572,13 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Assistant_Speak")
 						scriptPushValue(context, (c) {
-							callAssistant(this.RaceAssistant, scriptGetArguments(c)*)
-
-							return Integer(0)
+							return callAssistant(this.RaceAssistant, scriptGetArguments(c)*)
 						})
 						scriptSetGlobal(context, "__Assistant_Call")
+						scriptPushValue(context, (c) {
+							return propertyAssistant(assistant, scriptGetArguments(c)*)
+						})
+						scriptSetGlobal(context, "__Assistant_Property")
 						scriptPushValue(context, (c) {
 							callController(this.RaceAssistant, scriptGetArguments(c)*)
 
@@ -2495,6 +2497,7 @@ class RaceAssistant extends ConfigurationItem {
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
 							, "Session.Track", track
+							, "Session.Settings.Assistant.Language", this.VoiceManager.Language
 							, "Session.Settings.Tyre.Service", tyreService
 							, "Session.Settings.Tyre.Management", mixedCompounds
 							, "Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
@@ -2546,6 +2549,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		return combine(this.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Mode", getMultiMapValue(data, "Session Data", "Mode", "Solo")
 									, "Session.Track.Type", getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
 									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)
 									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
@@ -5048,19 +5052,42 @@ getTime(*) {
 }
 
 callAssistant(context, method, arguments*) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local script := isInstance(context, RaceAssistant)
+	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)
+	local value
 
 	try {
-		assistant.%method%(normalizeArguments(arguments)*)
+		value := assistant.%method%(normalizeArguments(arguments)*)
+
+		return (script ? value : true)
 	}
 	catch Any as exception {
 		logError(exception, true)
-	}
 
-	return true
+		return false
+	}
 }
 
 Assistant_Call := callAssistant
+
+propertyAssistant(context, property, arguments*) {
+	local script := isInstance(context, RaceAssistant)
+	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)
+	local value
+
+	try {
+		value := assistant.%property%[normalizeArguments(arguments)*]
+
+		return (script ? value : true)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Property := propertyAssistant
 
 callFunction(context, function, arguments*) {
 	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
@@ -5499,11 +5526,13 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				})
 				scriptSetGlobal(context, "__Assistant_Speak")
 				scriptPushValue(context, (c) {
-					callAssistant(assistant, scriptGetArguments(c)*)
-
-					return Integer(0)
+					return callAssistant(assistant, scriptGetArguments(c)*)
 				})
 				scriptSetGlobal(context, "__Assistant_Call")
+				scriptPushValue(context, (c) {
+					return propertyAssistant(assistant, scriptGetArguments(c)*)
+				})
+				scriptSetGlobal(context, "__Assistant_Property")
 				scriptPushValue(context, (c) {
 					callController(assistant, scriptGetArguments(c)*)
 

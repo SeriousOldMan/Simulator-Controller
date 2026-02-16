@@ -578,9 +578,13 @@ When this script is executed, the following global variables and functions are a
    
      This table represents an array with all arguments passed to the script.
 
-   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   - Assistant.Call(method, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error.
+   
+   - Assistant.Property(property, p1, p2, ...)
+   
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
 	 
    - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    

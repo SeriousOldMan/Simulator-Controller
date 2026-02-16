@@ -584,14 +584,25 @@ class VoiceManager extends ConfigurationItem {
 			else if continuation
 				continuation()
 		}
-
-		cancel() {
-		}
 	}
 
-	class ReplyContinuation extends VoiceManager.VoiceContinuation {
+	class QuestionContinuation extends VoiceManager.VoiceContinuation {
+		iRejectContinuation := false
+
 		iAccept := false
 		iReject := false
+
+		AcceptContinuation {
+			Get {
+				return this.Continuation
+			}
+		}
+
+		RejectContinuation {
+			Get {
+				return this.iRejectContinuation
+			}
+		}
 
 		Accept {
 			Get {
@@ -605,11 +616,11 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		__New(manager, continuation := false, accept := false, reject := false) {
-			this.iAccept := accept
-			this.iReject := reject
+		__New(manager, acceptContinuation := false, rejectContinuation := false
+					 , accept := "Confirm", reject := "Okay") {
+			this.iRejectContinuation := rejectContinuation
 
-			super.__New(manager, continuation)
+			super.__New(manager, acceptContinuation, accept, reject)
 		}
 
 		next() {
@@ -620,10 +631,15 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		cancel() {
+			local continuation := this.RejectContinuation
+
 			if (this.Manager.Speaker && this.Reject)
 				this.Manager.getSpeaker().speakPhrase(this.Reject)
 
-			super.cancel()
+			if isInstance(continuation, VoiceManager.VoiceContinuation)
+				continuation.next()
+			else if continuation
+				continuation()
 		}
 	}
 

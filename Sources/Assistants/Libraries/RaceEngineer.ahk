@@ -4299,7 +4299,9 @@ class RaceEngineer extends RaceAssistant {
 					else if this.confirmAction("Pitstop.Prepare") {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+						this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																				   , false
+																				   , false, "Okay"))
 					}
 					else
 						this.preparePitstop()
@@ -5113,7 +5115,9 @@ class RaceEngineer extends RaceAssistant {
 									if this.confirmAction("Pitstop.Fuel") {
 										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																								   , false
+																								   , false, "Okay"))
 									}
 									else
 										this.preparePitstop()
@@ -5162,7 +5166,9 @@ class RaceEngineer extends RaceAssistant {
 									if this.confirmAction("Pitstop.Fuel") {
 										speaker.speakPhrase("ConfirmPrepare", false, true)
 
-										this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+										this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																								   , false
+																								   , false, "Okay"))
 									}
 									else
 										this.preparePitstop()
@@ -5208,7 +5214,9 @@ class RaceEngineer extends RaceAssistant {
 								if this.confirmAction("Pitstop.Tyre") {
 									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																							   , false
+																							   , false, "Okay"))
 								}
 								else
 									this.preparePitstop()
@@ -5258,7 +5266,9 @@ class RaceEngineer extends RaceAssistant {
 								if this.confirmAction("Pitstop.Tyre") {
 									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																							   , false
+																							   , false, "Okay"))
 								}
 								else
 									this.preparePitstop()
@@ -5308,7 +5318,9 @@ class RaceEngineer extends RaceAssistant {
 								if this.confirmAction("Pitstop.Brake") {
 									speaker.speakPhrase("ConfirmPrepare", false, true)
 
-									this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+									this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "preparePitstop")
+																							   , false
+																							   , false, "Okay"))
 								}
 								else
 									this.preparePitstop()

@@ -642,40 +642,6 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	class YesNoContinuation extends VoiceManager.ReplyContinuation {
-		iRejectContinuation := false
-
-		AcceptContinuation {
-			Get {
-				return this.Continuation
-			}
-		}
-
-		RejectContinuation {
-			Get {
-				return this.iRejectContinuation
-			}
-		}
-
-		__New(manager, acceptContinuation := false, rejectContinuation := false
-					 , accept := "Confirm", reject := "Okay") {
-			this.iRejectContinuation := rejectContinuation
-
-			super.__New(manager, acceptContinuation, accept, reject)
-		}
-
-		cancel() {
-			local continuation := this.RejectContinuation
-
-			super.cancel()
-
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
-				continuation.next()
-			else if continuation
-				continuation()
-		}
-	}
-
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
@@ -1342,7 +1308,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				this.clearContinuation()
 
-				if isInstance(continuation, VoiceManager.VoiceContinuation)
+				if isInstance(continuation, VoiceManager.QuestionContinuation)
 					continuation.cancel()
 				else if continuation
 					this.getSpeaker().speakPhrase("Okay")
@@ -1896,7 +1862,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (score > 0.5) {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
-			this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger", "Okay"))
+			this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active)
+																	   , false
+																	   , "Roger", "Okay"))
 		}
 		else
 			speaker.speakPhrase("Repeat")
@@ -2091,13 +2059,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	setContinuation(acceptContinuation, rejectContinuation := false) {
-		if isInstance(acceptContinuation, VoiceManager.VoiceContinuation)
-			this.VoiceManager.setContinuation(acceptContinuation)
-		else if rejectContinuation
-			this.VoiceManager.setContinuation(RaceAssistant.YesNoContinuation(this, acceptContinuation, rejectContinuation
-																				  , "Confirm", "Okay"))
-		else
-			this.VoiceManager.setContinuation(VoiceManager.ReplyContinuation(this, acceptContinuation, "Confirm", "Okay"))
+		if !isInstance(acceptContinuation, VoiceManager.VoiceContinuation)
+			acceptContinuation := VoiceManager.QuestionContinuation(this, acceptContinuation
+																		, rejectContinuation
+																		, "Confirm", "Okay")
+
+		this.VoiceManager.setContinuation(acceptContinuation)
 	}
 
 	clearContinuation() {

@@ -219,8 +219,6 @@ namespace SHMConnector {
 
 			if (connected)
 			{
-				strWriter.Write("Car.Count="); strWriter.WriteLine(scoring.mScoringInfo.mNumVehicles);
-
 				int index = 0;
 
 				for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
@@ -295,8 +293,10 @@ namespace SHMConnector {
 					compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".TyreCompoundRawRear="); strWriter.WriteLine(compound);
 				}
-			}
-			else
+
+                strWriter.Write("Car.Count="); strWriter.WriteLine(index);
+            }
+            else
 			{
 				strWriter.WriteLine("Active=false");
 				strWriter.WriteLine("Car.Count=0");

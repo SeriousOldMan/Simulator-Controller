@@ -1709,6 +1709,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local ignore, assistant
 
 		static lastSessions := false
+		static nextUpdate := A_TickCount
 
 		if !lastSessions {
 			lastSessions := Map()
@@ -1718,6 +1719,12 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		if (session == kUndefined)
 			session := RaceAssistantPlugin.getSession()
+
+		if ((session == kSessionFinished) && (A_TickCount > nextUpdate)) {
+			force := true
+
+			nextUpdate := (A_TickCount + 10000)
+		}
 
 		if simulator {
 			if ((lastSessions[simulator] != session) || force) {

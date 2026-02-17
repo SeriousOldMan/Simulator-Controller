@@ -276,6 +276,9 @@ class TestPitstopHandler {
 
 	saveSessionInfo(*) {
 	}
+
+	shutdown(*) {
+	}
 }
 
 

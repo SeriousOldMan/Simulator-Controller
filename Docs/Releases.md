@@ -46,7 +46,7 @@
       - McLaren Honda MP47A, McLaren M23, McLaren Mercedes MP412
       - Mercedes-AMG GT3 Evo, Mercedes-AMG GT3, Mercedes-Benz 190E 2.5-16 Evo II DTM
       - Mercedes-Benz CLK LM, Milano GT36, Nissan GT-R Nismo GT3
-      - Nissan R390 GT1, Nissan R89C, Porsche 911 GT1-98
+      - Nissan R390 GT1, Nissan R89C, Porsche 911 GT8
       - Porsche 911 GT3 R, Porsche 962C, Porsche 992 GT3 R
       - Porsche 996 GT3 RSR, Reynard 2Ki Ford-Cosworth, Reynard 2Ki Honda
       - Reynard 2Ki Mercedes-Benz, Reynard 2Ki Toyota, Reynard 95i Ford-Cosworth
@@ -62,7 +62,7 @@
 
 #### Fixes
 
-  - None this time...
+  - [Internal] Fixed a rare bug in the rule engine, where a full production cycle returned an empty result.
   
 #### Changes
 

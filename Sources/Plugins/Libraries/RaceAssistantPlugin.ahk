@@ -1584,6 +1584,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.WaitForShutdown := false
 
+		this.updateAssistantsSession(kSessionFinished)
+
 		return true
 	}
 

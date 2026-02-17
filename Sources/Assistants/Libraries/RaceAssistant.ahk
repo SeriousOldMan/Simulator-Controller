@@ -576,7 +576,7 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Assistant_Call")
 						scriptPushValue(context, (c) {
-							return propertyAssistant(assistant, scriptGetArguments(c)*)
+							return propertyAssistant(this.RaceAssistant, scriptGetArguments(c)*)
 						})
 						scriptSetGlobal(context, "__Assistant_Property")
 						scriptPushValue(context, (c) {

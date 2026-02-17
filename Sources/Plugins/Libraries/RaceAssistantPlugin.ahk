@@ -2005,8 +2005,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
 				if ((theAction.Action = "Accept") || (theAction.Action = "Reject")
-												   || (theAction.Action = "Call")
-												   || (theAction.Action = "Interrupt")) {
+												  || (theAction.Action = "Call")
+												  || (theAction.Action = "Interrupt")) {
 					if (this.RaceAssistant[true] != false) {
 						activeAssistants[this] := true
 

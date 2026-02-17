@@ -3146,6 +3146,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		}
 		else if (RaceAssistantPlugin.Session != kSessionFinished)
 			RaceAssistantPlugin.finishAssistantsSession()
+		else
+			RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
 		if isDebug()
 			logMessage(kLogInfo, "Collect session data (Overall):" . (A_TickCount - startTime) . " ms...")

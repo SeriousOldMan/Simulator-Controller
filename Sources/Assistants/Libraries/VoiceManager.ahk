@@ -619,8 +619,10 @@ class VoiceManager extends ConfigurationItem {
 		__New(manager, acceptContinuation := false, rejectContinuation := false
 					 , accept := "Confirm", reject := "Okay") {
 			this.iRejectContinuation := rejectContinuation
+			this.iAccept := accept
+			this.iReject := reject
 
-			super.__New(manager, acceptContinuation, accept, reject)
+			super.__New(manager, acceptContinuation)
 		}
 
 		next() {

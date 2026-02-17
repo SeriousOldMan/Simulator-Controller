@@ -488,7 +488,7 @@ class RaceAssistant extends ConfigurationItem {
 		produce() {
 			this.RuleEngine.setTraceLevel(this.RaceAssistant.Debug[kDebugRules] ? kTraceMedium : kTraceOff)
 
-			super.produce()
+			return super.produce()
 		}
 
 		execute(executable, arguments) {

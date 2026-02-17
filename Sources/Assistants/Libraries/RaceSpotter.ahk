@@ -1399,7 +1399,9 @@ class RaceSpotter extends GridRaceAssistant {
 			if this.Listener {
 				speaker.speakPhrase("ConfirmFocusCar", {number: number}, true)
 
-				this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateFocusCar", number), "Roger", "Okay"))
+				this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "updateFocusCar", number)
+																							   , false
+																							   , "Roger", "Okay"))
 			}
 			else
 				this.updateFocusCar(number)

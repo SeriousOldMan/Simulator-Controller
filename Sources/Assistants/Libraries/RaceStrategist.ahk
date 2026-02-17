@@ -271,7 +271,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class ConfirmStrategyUpdateContinuation extends VoiceManager.ReplyContinuation {
+	class ConfirmStrategyUpdateContinuation extends VoiceManager.QuestionContinuation {
 		iStrategy := false
 		iRemember := false
 
@@ -279,7 +279,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iStrategy := strategy
 			this.iRemember := remember
 
-			super.__New(strategist, ObjBindMethod(strategist, "chooseScenario", strategy, false), "Roger", "Okay")
+			super.__New(strategist, ObjBindMethod(strategist, "chooseScenario", strategy, false)
+								  , false
+								  , "Roger", "Okay")
 		}
 
 		cancel() {
@@ -290,7 +292,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class TyreChangeContinuation extends VoiceManager.ReplyContinuation {
+	class TyreChangeContinuation extends VoiceManager.QuestionContinuation {
 		cancel() {
 			if ProcessExist("Race Engineer.exe") {
 				if this.Manager.Listener {
@@ -306,7 +308,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class ExplainPitstopContinuation extends VoiceManager.ReplyContinuation {
+	class ExplainPitstopContinuation extends VoiceManager.QuestionContinuation {
 		iPlannedLap := false
 		iPitstopOptions := []
 
@@ -2504,6 +2506,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			curContinuation := this.Continuation
 		}
+		else
+			curContinuation := this.Continuation
 
 		result := super.addLap(lapNumber, &data)
 
@@ -4376,6 +4380,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if hasEngineer
 					this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
 																				 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions, true)
+																				 , false
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
@@ -4741,7 +4746,9 @@ class RaceStrategist extends GridRaceAssistant {
 						if this.confirmAction("Strategy.Weather") {
 							speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
+							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy")
+																						   , false
+																						   , "Confirm", "Okay"))
 						}
 						else
 							this.recommendStrategy()

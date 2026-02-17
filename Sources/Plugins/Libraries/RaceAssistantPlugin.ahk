@@ -1582,6 +1582,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if isDebug()
 			logMessage(kLogInfo, "Initiating restart...")
 
+		this.updateAssistantsSession(kSessionFinished, true)
+
 		this.WaitForShutdown := false
 
 		this.updateAssistantsSession(kSessionFinished)
@@ -1704,7 +1706,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				assistant.clearSessionInfo()
 	}
 
-	static updateAssistantsSession(session := kUndefined) {
+	static updateAssistantsSession(session := kUndefined, force := false) {
 		local simulator := RaceAssistantPlugin.Simulator
 		local ignore, assistant
 
@@ -1720,7 +1722,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			session := RaceAssistantPlugin.getSession()
 
 		if simulator {
-			if (lastSessions[simulator] != session) {
+			if ((lastSessions[simulator] != session) || force) {
 				lastSessions[simulator] := session
 
 				Task.startTask(() => simulator.updateSession(session), 0, kLowPriority)
@@ -1736,7 +1738,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if assistant.Active
-				if (lastSessions[assistant] != (session . assistant.RaceAssistantActive)) {
+				if ((lastSessions[assistant] != (session . assistant.RaceAssistantActive)) || force) {
 					lastSessions[assistant] := (session . assistant.RaceAssistantActive)
 
 					Task.startTask(ObjBindMethod(assistant, "updateSession", session), 0, kLowPriority)

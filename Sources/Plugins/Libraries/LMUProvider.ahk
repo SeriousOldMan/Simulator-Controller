@@ -363,12 +363,9 @@ class LMUProvider extends Sector397Provider {
 				splitTime := A_TickCount
 			}
 
-			if (!standings && !getMultiMapValue(telemetryData, "Stint Data", "InPit", false)
-						   && (getMultiMapValue(telemetryData, "Car Data", "FuelRemaining", 0) = 0)) {
-				setMultiMapValue(data, "Session Data", "Paused", true)
-
+			if (!standings && (getMultiMapValues(data, "Car Data").Count = 0)
+						   && (getMultiMapValue(data, "Stint Data", "Laps").Count = 0))
 				return data
-			}
 
 			sessionData := LMURESTProvider.SessionData()
 

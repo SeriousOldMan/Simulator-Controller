@@ -851,6 +851,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (this.Active || (isDebug() && isDevelopment())) {
 			RaceAssistantPlugin.Assistants.Push(this)
 
+			RaceAssistantPlugin.sAssistants
+				:= bubbleSort(&RaceAssistantPlugin.Assistants, (a1, a2) => (a1.Persistent && !a2.Persistent))
+
 			this.iName := this.getArgumentValue("name", this.getArgumentValue("raceAssistantName", false))
 			this.iLogo := this.getArgumentValue("logo", this.getArgumentValue("raceAssistantLogo", false))
 			this.iLanguage := this.getArgumentValue("language", this.getArgumentValue("raceAssistantLanguage", false))

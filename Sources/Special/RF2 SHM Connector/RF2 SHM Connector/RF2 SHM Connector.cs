@@ -226,11 +226,14 @@ namespace SHMConnector {
                     ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i - 1];
                     double speed = VehicleSpeed(ref vehicle);
 
+					/*
                     if ((vehicle.mInPits != 0) && (vehicle.mTotalLaps == 0))
                         if (speed < 5 || vehicle.mPitState == (byte)Stopped)
 							continue;
 
 					index += 1;
+					*/
+					index = i;
 
 					ref rF2VehicleTelemetry telemetry = ref GetPlayerTelemetry(vehicle.mID, ref this.telemetry);
 
@@ -489,11 +492,14 @@ namespace SHMConnector {
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
 					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+
+					/*
                     double speed = VehicleSpeed(ref vehicle);
 
                     if ((vehicle.mInPits != 0) && (vehicle.mTotalLaps == 0))
                         if (speed < 5 || vehicle.mPitState == (byte)Stopped)
                             continue;
+					*/
 
                     index += 1;
 

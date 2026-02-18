@@ -159,8 +159,6 @@ namespace RF2SHMProvider {
 
 			Console.WriteLine("[Position Data]");
 
-			Console.Write("Car.Count="); Console.WriteLine(scoring.mScoringInfo.mNumVehicles);
-
 			int index = 0;
 
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i)
@@ -234,7 +232,9 @@ namespace RF2SHMProvider {
 				compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
 				Console.Write("Car."); Console.Write(index); Console.Write(".TyreCompoundRawRear="); Console.WriteLine(compound);
 			}
-		}		
+
+            Console.Write("Car.Count="); Console.WriteLine(index);
+        }		
 		public void ReadData() {
 			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);

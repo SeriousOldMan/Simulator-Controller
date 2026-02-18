@@ -67,7 +67,7 @@
 #### Changes
 
   - The handling of the post-session cooldown phase has been optimized. The startup sequence for the next session will now be triggered as soon as all post-session data processing of the Assistants is finished. This especially helps to reduce the effect of the initial stutter in *Le Mans Ultimate* sessions, because these will now happen immediately at the beginning of a session.
-  - Cars that are in the entry list, but do not participate in the session, will now be ignored for *rFactor 2* and *Le Mans Ultimate*.
+  - Cars that are in the entry list, but do not participate in the session, will now be shown as "DNS" in various reports.
   - Technical informations like steer lock and steer ratio have been added by @inthebagbud UK for all *Automobista 2* cars. This information is used by the "Setup Workbench".
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684).
   - [Experts] A new fact "Session.Settings.Assistant.Language" in the rule engine knowledge base specifies the configured language of the current Race Assistant, so that your own scripts can use this knowledge when using "Assistant.Speak", for example.

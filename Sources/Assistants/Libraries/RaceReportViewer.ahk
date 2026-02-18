@@ -453,7 +453,7 @@ class RaceReportViewer extends RaceReportReader {
 					for ignore, car in class {
 						result := car[2]
 
-						classResults[car[1]] := ((result = "DNF") ? result : A_Index)
+						classResults[car[1]] := (((result = "DNF") || (result = "DNS")) ? result : A_Index)
 					}
 				}
 			}

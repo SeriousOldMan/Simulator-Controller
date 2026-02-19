@@ -364,7 +364,7 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if (!standings && (getMultiMapValues(data, "Car Data").Count = 0)
-						   && (getMultiMapValue(data, "Stint Data", "Laps").Count = 0))
+						   && (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0))
 				return data
 
 			sessionData := LMURESTProvider.SessionData()

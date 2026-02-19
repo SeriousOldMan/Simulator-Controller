@@ -577,7 +577,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		next() {
-			local continuation := this.ActiveContinuation
+			local continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.Continuation)
 				continuation.next()

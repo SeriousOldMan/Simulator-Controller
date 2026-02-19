@@ -553,6 +553,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		super.saveToConfiguration(configuration)
 
+		setMultiMapValues(configuration, "Agent Booster", getMultiMapValues(this.Configuration, "Agent Booster"))
+		setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(this.Configuration, "Conversation Booster"))
+
 		this.saveProviderConfiguration()
 
 		addMultiMapValues(configuration, this.iInstructions)
@@ -2125,14 +2128,14 @@ class CallbacksEditor {
 			writeMultiMap(directory . "\" . callback.Name . extension, configuration)
 
 			SplitPath(fileName, , &targetDirectory, , &name)
-			
+
 			currentDir := A_WorkingDir
 
 			SetWorkingDir(directory)
-			
+
 			try {
 				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
-				
+
 				RunWait("tar -a -c -f `"" . targetDirectory . "\" . name . ".zip`" *.*", , "Hide")
 			}
 			finally {

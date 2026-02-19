@@ -68,7 +68,7 @@ class AssistantMode extends ControllerMode {
 				else if inList([kSessionPractice, kSessionRace], session) {
 					if (theAction.Action = "FuelRatioOptimize") {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+						theAction.Function.setLabel(this.actionLabel(theAction))
 					}
 					else {
 						theAction.Function.enable(kAllTrigger, theAction)
@@ -77,7 +77,7 @@ class AssistantMode extends ControllerMode {
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction))
 				}
 	}
 }
@@ -103,10 +103,12 @@ class PitstopMode extends AssistantMode {
 				if ((session != kSessionFinished) && (session != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 	}
 }

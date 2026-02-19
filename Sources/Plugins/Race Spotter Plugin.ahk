@@ -283,13 +283,15 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 
 		for ignore, theAction in this.Actions {
 			if isInstance(theAction, RaceSpotterPlugin.TrackMappingToggleAction) {
+				theAction.Function.enable(kAllTrigger, theAction)
+				
 				theAction.Function.setLabel(this.actionLabel(theAction), this.TrackMappingEnabled ? "Green" : "Black")
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackMappingEnabled ? "Activated" : "Deactivated")
-
-				theAction.Function.enable(kAllTrigger, theAction)
 			}
 
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
+				theAction.Function.enable(kAllTrigger, theAction)
+				
 				if this.TrackAutomationEnabled {
 					if (!this.Simulator || !this.Simulator.Track)
 						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
@@ -298,11 +300,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 					else
 						theAction.Function.setLabel(this.actionLabel(theAction), "Green")
 				}
-				else
+				else				
 					theAction.Function.setLabel(this.actionLabel(theAction), "Black")
+					
 				theAction.Function.setIcon(this.actionIcon(theAction), this.TrackAutomationEnabled ? "Activated" : "Deactivated")
-
-				theAction.Function.enable(kAllTrigger, theAction)
 			}
 		}
 	}

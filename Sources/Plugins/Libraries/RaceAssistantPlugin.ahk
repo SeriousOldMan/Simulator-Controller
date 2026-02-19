@@ -1965,30 +1965,30 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	updateActions(session) {
 		local ignore, theAction, teamServer
 
-		static activeAssistants := Map()
+		; static activeAssistants := Map()
 
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceAssistantPlugin.RaceAssistantToggleAction) {
-				theAction.Function.setLabel(this.actionLabel(theAction), this.Name ? (this.Enabled ? "Green" : "Black") : "Gray")
-				theAction.Function.setIcon(this.actionIcon(theAction), this.Name ? (this.Enabled ? "Activated" : "Deactivated") : "Disabled")
-
 				if this.Name
 					theAction.Function.enable(kAllTrigger, theAction)
 				else
 					theAction.Function.disable(kAllTrigger, theAction)
+					
+				theAction.Function.setLabel(this.actionLabel(theAction), this.Name ? (this.Enabled ? "Green" : "Black") : "Gray")
+				theAction.Function.setIcon(this.actionIcon(theAction), this.Name ? (this.Enabled ? "Activated" : "Deactivated") : "Disabled")
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.TeamServerToggleAction) {
 				teamServer := this.TeamServer
 
 				if teamServer {
+					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(this.actionLabel(theAction), (teamServer.TeamServerEnabled ? "Green" : "Black"))
 					theAction.Function.setIcon(this.actionIcon(theAction), (teamServer.TeamServerEnabled ? "Activated" : "Deactivated"))
-					theAction.Function.enable(kAllTrigger, theAction)
 				}
 				else {
-					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
-					theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
 					theAction.Function.disable(kAllTrigger, theAction)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
@@ -2008,8 +2008,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 					else {
 						theAction.Function.disable(kAllTrigger, theAction)
-						theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
-						theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
+						theAction.Function.setLabel(this.actionLabel(theAction))
+						theAction.Function.setIcon(this.actionIcon(theAction))
 					}
 				}
 			}
@@ -2018,13 +2018,14 @@ class RaceAssistantPlugin extends ControllerPlugin {
 												  || (theAction.Action = "Call")
 												  || (theAction.Action = "Interrupt")) {
 					if (this.RaceAssistant[true] != false) {
-						activeAssistants[this] := true
+						; activeAssistants[this] := true
 
 						theAction.Function.enable(kAllTrigger, theAction)
 						theAction.Function.setLabel(this.actionLabel(theAction))
 						theAction.Function.setIcon(this.actionIcon(theAction))
 					}
 					else {
+						/*
 						activeAssistants[this] := false
 
 						if inList(getValues(activeAssistants), true) {
@@ -2035,8 +2036,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						else {
 							theAction.Function.disable(kAllTrigger, theAction)
 							theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
-							theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
+							theAction.Function.setIcon(this.actionIcon(theAction))
 						}
+						*/
+						
+						theAction.Function.disable(kAllTrigger, theAction)
+						theAction.Function.setLabel(this.actionLabel(theAction))
+						theAction.Function.setIcon(this.actionIcon(theAction))
 					}
 				}
 				else if this.RaceAssistantActive {
@@ -2046,8 +2052,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 				else {
 					theAction.Function.disable(kAllTrigger, theAction)
-					theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
-					theAction.Function.setIcon(this.actionIcon(theAction), "Disabled")
+					theAction.Function.setLabel(this.actionLabel(theAction))
+					theAction.Function.setIcon(this.actionIcon(theAction))
 				}
 	}
 

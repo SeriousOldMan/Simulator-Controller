@@ -62,6 +62,7 @@
 
 #### Fixes
 
+  - Fixed a bug in "Simulator Setup" which prevented changing #Tokens and the instructions of an Assistant booster for the second time.
   - [Internal] Fixed a rare bug in the rule engine, where a full production cycle returned an empty result.
   
 #### Changes

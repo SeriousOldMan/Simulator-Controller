@@ -530,7 +530,11 @@ Additionally you can export and import actions here to build a library for you a
    
    - Assistant.Call(method, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error.
+   
+   - Assistant.Property(property, p1, p2, ...)
+   
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
 	 
    - Assistant.Speak(phrase [, force])
    
@@ -572,7 +576,11 @@ Additionally you can export and import actions here to build a library for you a
    
    - Assistant.Call(method :: \<string\>, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The value returned by *method* will be returnd by *Assistant.Call*.
+   
+   - Assistant.Property(property :: \<string\>, p1, p2, ...)
+   
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with a variable number of arguments. The value of the *property* will be returnd by *Assistant.Property*.
 	 
    - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    
@@ -604,7 +612,7 @@ Additionally you can export and import actions here to build a library for you a
    
      Returns the value for the given fact in the knowledge base of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
 
-   - Rules.Execute()
+   - Rules.Execute() or Rules.Produce()
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 	 

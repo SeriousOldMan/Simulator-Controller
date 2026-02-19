@@ -1427,18 +1427,24 @@ class ControllerFunction {
 		this.iFunction := function
 	}
 
-	setLabel(text, color := "Black", overlay := false) {
+	setLabel(text, color?, overlay := false) {
 		local controller, ignore, fnController
 
 		this.Label := text
+
+		if !isSet(color)
+			color := (this.Enabled ? "Black" : "Gray")
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)
 				fnController.setControlLabel(this, text, color, overlay)
 	}
 
-	setIcon(icon, type := "Normal") {
+	setIcon(icon, type?) {
 		local controller, ignore, fnController
+
+		if !isSet(type)
+			type := (this.Enabled ? "Normal" : "Disabled")
 
 		for ignore, fnController in this.Controller.FunctionController
 			if fnController.hasFunction(this)

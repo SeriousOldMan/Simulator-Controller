@@ -279,7 +279,11 @@ class SimulatorProvider {
 		local count, driver, carNr
 
 		telemetryData := this.acquireTelemetryData()
-		standingsData := this.acquireStandingsData(telemetryData, finished)
+
+		if getMultiMapValue(telemetryData, "Session Data", "Active", false)
+			standingsData := this.acquireStandingsData(telemetryData, finished)
+		else
+			standingsData := newMultiMap()
 
 		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
 		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)

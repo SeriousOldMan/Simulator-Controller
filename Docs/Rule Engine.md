@@ -215,7 +215,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
   
 	Example: {Is: ?Pressure = ?BasePressure * ?TempFactor}
 	
-	This is another special one. It allows general expressions to be used, that also can be used in the tail of reduction rules. The Quantor is matched, if the expression succeeds. If variables are involved, these variables are changed as a side effect.
+	This is another special one. It allows general expressions to be used, that also can be used in the tail of reduction rules. The Quantor is matched, if the expression succeeds. If variables are involved, these variables may be changed as a side effect.
 
 #### Actions
 
@@ -438,7 +438,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
     - Trace
   
-	  Not really a change in behavior, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalt, of course.
+	  Not really a change in behavior, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalty, of course.
     
 	option always succeeds, even if called with an unknown setting.
 
@@ -543,6 +543,8 @@ The rule engine has some builtin predicates which can be used when formulating r
     Executes the executable or script identified by the first argument, which must be file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
 	
 	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
+	
+	Note: If the 
   
 ### Event-based programming
 
@@ -576,9 +578,13 @@ When this script is executed, the following global variables and functions are a
    
      This table represents an array with all arguments passed to the script.
 
-   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   - Assistant.Call(method, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant class with some arguments. A variable number of arguments are supported.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error.
+   
+   - Assistant.Property(property, p1, p2, ...)
+   
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
 	 
    - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    
@@ -610,7 +616,7 @@ When this script is executed, the following global variables and functions are a
    
      Returns the value for the given fact in the knowledgebase of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
 
-   - Rules.Execute()
+   - Rules.Execute() or Rules.Produce()
    
      Runs a full production cycle of the Rule Engine of the Assistant.
 

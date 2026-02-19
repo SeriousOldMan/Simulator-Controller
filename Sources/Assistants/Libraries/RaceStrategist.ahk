@@ -271,7 +271,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class ConfirmStrategyUpdateContinuation extends VoiceManager.ReplyContinuation {
+	class ConfirmStrategyUpdateContinuation extends VoiceManager.QuestionContinuation {
 		iStrategy := false
 		iRemember := false
 
@@ -279,7 +279,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.iStrategy := strategy
 			this.iRemember := remember
 
-			super.__New(strategist, ObjBindMethod(strategist, "chooseScenario", strategy, false), "Roger", "Okay")
+			super.__New(strategist, ObjBindMethod(strategist, "chooseScenario", strategy, false)
+								  , false
+								  , "Roger", "Okay")
 		}
 
 		cancel() {
@@ -290,7 +292,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class TyreChangeContinuation extends VoiceManager.ReplyContinuation {
+	class TyreChangeContinuation extends VoiceManager.QuestionContinuation {
 		cancel() {
 			if ProcessExist("Race Engineer.exe") {
 				if this.Manager.Listener {
@@ -306,7 +308,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class ExplainPitstopContinuation extends VoiceManager.ReplyContinuation {
+	class ExplainPitstopContinuation extends VoiceManager.QuestionContinuation {
 		iPlannedLap := false
 		iPitstopOptions := []
 
@@ -344,7 +346,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class RaceReviewContinuation extends VoiceManager.VoiceContinuation {
+	class RaceReviewContinuation extends VoiceManager.Continuation {
 	}
 
 	class SessionLapsDatabase extends LapsDatabase {
@@ -524,7 +526,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class RaceStrategySimulationContinuation extends VoiceManager.VoiceContinuation {
+	class RaceStrategySimulationContinuation extends VoiceManager.Continuation {
 		iData := false
 		iConfirm := false
 		iRequest := false
@@ -1791,7 +1793,7 @@ class RaceStrategist extends GridRaceAssistant {
 			logError(exception)
 		}
 
-		continuation := this.Continuation
+		continuation := this.ActiveContinuation
 
 		if isInstance(continuation, RaceStrategist.RaceReviewContinuation) {
 			this.clearContinuation()
@@ -1801,7 +1803,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateCarStatistics(statistics) {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 		local fileName
 
 		if !isObject(statistics) {
@@ -2121,6 +2123,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		forceFinishSession() {
 			if !this.SessionDataActive {
+				if (this.KnowledgeBase && this.RemoteHandler)
+					this.RemoteHandler.shutdown(ProcessExist())
+
 				this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 
 				this.finishSession()
@@ -2185,7 +2190,8 @@ class RaceStrategist extends GridRaceAssistant {
 					asked := false
 
 				if asked {
-					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true))
+					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After", true)
+									   , ObjBindMethod(this, "shutdownSession", "After", false))
 
 					Task.startTask(forceFinishSession, 120000, kLowPriority)
 
@@ -2194,6 +2200,9 @@ class RaceStrategist extends GridRaceAssistant {
 				else
 					this.shutdownSession("After")
 			}
+
+			if this.RemoteHandler
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false, Prepared: false, Greeted: false})
 		}
@@ -2261,6 +2270,9 @@ class RaceStrategist extends GridRaceAssistant {
 		if (phase = "After") {
 			if (this.Speaker[false] && reportSaved)
 				this.getSpeaker().speakPhrase("RaceReportSaved")
+
+			if (this.KnowledgeBase && this.RemoteHandler)
+				this.RemoteHandler.shutdown(ProcessExist())
 
 			this.updateDynamicValues({KnowledgeBase: false, HasLapsData: false})
 
@@ -2492,8 +2504,10 @@ class RaceStrategist extends GridRaceAssistant {
 			else if (lastLap < (lapNumber - 1))
 				this.iLastStrategyUpdate := lapNumber
 
-			curContinuation := this.Continuation
+			curContinuation := this.ActiveContinuation
 		}
+		else
+			curContinuation := this.ActiveContinuation
 
 		result := super.addLap(lapNumber, &data)
 
@@ -2676,7 +2690,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if (frequency && this.hasEnoughData(false)
 							  && (lapNumber >= (this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5)))) {
-					if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.Continuation))
+					if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.ActiveContinuation))
 						knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 				}
 				else
@@ -4366,6 +4380,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if hasEngineer
 					this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
 																				 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions, true)
+																				 , false
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
@@ -4731,7 +4746,9 @@ class RaceStrategist extends GridRaceAssistant {
 						if this.confirmAction("Strategy.Weather") {
 							speaker.speakPhrase("ConfirmUpdateStrategy", false, true)
 
-							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy"), "Confirm", "Okay"))
+							this.setContinuation(RaceStrategist.TyreChangeContinuation(this, ObjBindMethod(this, "recommendStrategy")
+																						   , false
+																						   , "Confirm", "Okay"))
 						}
 						else
 							this.recommendStrategy()

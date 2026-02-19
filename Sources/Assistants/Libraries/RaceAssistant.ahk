@@ -740,7 +740,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Continuation {
 		Get {
-			return this.VoiceManager.Continuation
+			return this.VoiceManager.ActiveContinuation
 		}
 	}
 
@@ -1292,26 +1292,33 @@ class RaceAssistant extends ConfigurationItem {
 			case "Time":
 				this.timeRecognized(words)
 			case "Yes":
-				continuation := this.Continuation
+				continuation := this.ActiveContinuation
 
-				this.clearContinuation()
-
-				if isInstance(continuation, VoiceManager.VoiceContinuation)
+				if isInstance(continuation, VoiceManager.QuestionContinuation) {
+					this.clearContinuation()
+				
 					continuation.next()
-				else if continuation {
+				}
+				else if isInstance(continuation, Func) {
+					this.clearContinuation()
+					
 					this.getSpeaker().speakPhrase("Confirm")
 
 					continuation.Call()
 				}
 			case "No":
-				continuation := this.Continuation
+				continuation := this.ActiveContinuation
 
-				this.clearContinuation()
-
-				if isInstance(continuation, VoiceManager.QuestionContinuation)
+				if isInstance(continuation, VoiceManager.QuestionContinuation) {
+					this.clearContinuation()
+				
 					continuation.cancel()
-				else if continuation
+				}
+				else if isInstance(continuation, Func) {
+					this.clearContinuation()
+					
 					this.getSpeaker().speakPhrase("Okay")
+				}
 			case "Call":
 				this.nameRecognized(words)
 			case "Activate":
@@ -1882,10 +1889,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 
 		if continuation {
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.QuestionContinuation)
 				this.handleVoiceCommand("Yes", ["Yes"])
 			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
@@ -1899,10 +1906,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	reject() {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 
 		if continuation {
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.QuestionContinuation)
 				this.handleVoiceCommand("No", ["No"])
 			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("No", ["No"])
@@ -2059,7 +2066,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	setContinuation(acceptContinuation, rejectContinuation := false) {
-		if !isInstance(acceptContinuation, VoiceManager.VoiceContinuation)
+		if !isInstance(acceptContinuation, VoiceManager.Continuation)
 			acceptContinuation := VoiceManager.QuestionContinuation(this, acceptContinuation
 																		, rejectContinuation
 																		, "Confirm", "Okay")

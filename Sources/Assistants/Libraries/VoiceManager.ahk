@@ -84,7 +84,7 @@ class VoiceManager extends ConfigurationItem {
 	iIsSpeaking := false
 	iIsListening := false
 
-	iContinuation := false
+	iActiveContinuation := false
 
 	class RemoteSpeaker {
 		iVoiceManager := false
@@ -555,7 +555,7 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	class VoiceContinuation {
+	class Continuation {
 		iManager := false
 		iContinuation := false
 
@@ -577,16 +577,16 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		next() {
-			local continuation := this.Continuation
+			local continuation := this.ActiveContinuation
 
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.Continuation)
 				continuation.next()
 			else if continuation
 				continuation()
 		}
 	}
 
-	class QuestionContinuation extends VoiceManager.VoiceContinuation {
+	class QuestionContinuation extends VoiceManager.Continuation {
 		iRejectContinuation := false
 
 		iAccept := false
@@ -638,8 +638,8 @@ class VoiceManager extends ConfigurationItem {
 			if (this.Manager.Speaker && this.Reject)
 				this.Manager.getSpeaker().speakPhrase(this.Reject)
 
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
-				continuation.next()
+			if isInstance(continuation, VoiceManager.QuestionContinuation)
+				continuation.cancel()
 			else if continuation
 				continuation()
 		}
@@ -862,9 +862,9 @@ class VoiceManager extends ConfigurationItem {
 		}
 	}
 
-	Continuation {
+	ActiveContinuation {
 		Get {
-			return this.iContinuation
+			return this.iActiveContinuation
 		}
 	}
 
@@ -1763,13 +1763,13 @@ class VoiceManager extends ConfigurationItem {
 
 	setContinuation(continuation) {
 		if continuation
-			this.iContinuation := continuation
+			this.iActiveContinuation := continuation
 		else
 			this.clearContinuation()
 	}
 
 	clearContinuation() {
-		this.iContinuation := false
+		this.iActiveContinuation := false
 	}
 
 	handleVoiceCommand(grammar, words) {

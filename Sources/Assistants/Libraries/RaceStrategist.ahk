@@ -346,7 +346,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class RaceReviewContinuation extends VoiceManager.VoiceContinuation {
+	class RaceReviewContinuation extends VoiceManager.Continuation {
 	}
 
 	class SessionLapsDatabase extends LapsDatabase {
@@ -526,7 +526,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	class RaceStrategySimulationContinuation extends VoiceManager.VoiceContinuation {
+	class RaceStrategySimulationContinuation extends VoiceManager.Continuation {
 		iData := false
 		iConfirm := false
 		iRequest := false
@@ -1793,7 +1793,7 @@ class RaceStrategist extends GridRaceAssistant {
 			logError(exception)
 		}
 
-		continuation := this.Continuation
+		continuation := this.ActiveContinuation
 
 		if isInstance(continuation, RaceStrategist.RaceReviewContinuation) {
 			this.clearContinuation()
@@ -1803,7 +1803,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	updateCarStatistics(statistics) {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 		local fileName
 
 		if !isObject(statistics) {
@@ -2504,10 +2504,10 @@ class RaceStrategist extends GridRaceAssistant {
 			else if (lastLap < (lapNumber - 1))
 				this.iLastStrategyUpdate := lapNumber
 
-			curContinuation := this.Continuation
+			curContinuation := this.ActiveContinuation
 		}
 		else
-			curContinuation := this.Continuation
+			curContinuation := this.ActiveContinuation
 
 		result := super.addLap(lapNumber, &data)
 
@@ -2690,7 +2690,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				if (frequency && this.hasEnoughData(false)
 							  && (lapNumber >= (this.BaseLap + knowledgeBase.getValue("Session.Settings.Lap.History.Considered", 5)))) {
-					if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.Continuation))
+					if ((lapNumber > (this.iLastStrategyUpdate + frequency)) && (curContinuation = this.ActiveContinuation))
 						knowledgeBase.setFact("Strategy.Recalculate", "Regular")
 				}
 				else

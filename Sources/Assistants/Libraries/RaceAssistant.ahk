@@ -1297,7 +1297,7 @@ class RaceAssistant extends ConfigurationItem {
 				if isInstance(continuation, VoiceManager.QuestionContinuation) {
 					this.clearContinuation()
 
-					continuation.next()
+					continuation.accept()
 				}
 				else if isInstance(continuation, Func) {
 					this.clearContinuation()
@@ -1312,7 +1312,7 @@ class RaceAssistant extends ConfigurationItem {
 				if isInstance(continuation, VoiceManager.QuestionContinuation) {
 					this.clearContinuation()
 
-					continuation.cancel()
+					continuation.reject()
 				}
 				else if isInstance(continuation, Func) {
 					this.clearContinuation()

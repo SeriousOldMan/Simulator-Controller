@@ -388,6 +388,12 @@ class RaceReportViewer extends RaceReportReader {
 						result := "DNF"
 				}
 
+				if (result = "DNF")
+					if !exist(positions, (p) => p.Has(car) && !extendedIsNull(p[car]))
+						result := "DNS"
+					else if !exist(times, (t) => t.Has(car) && !extendedIsNull(t[car], false))
+						result := "DNS"
+
 				min := minimum(lapTimes)
 				avg := average(lapTimes)
 
@@ -401,7 +407,7 @@ class RaceReportViewer extends RaceReportReader {
 				min := Round(minimum(lapTimes) / 1000, 1)
 				avg := Round(average(lapTimes) / 1000, 1)
 
-				hasDNF := (hasDNF || (result = "DNF"))
+				hasDNF := (hasDNF || (result = "DNF") || (result = "DNS"))
 
 				nr := cars[A_Index][1]
 
@@ -447,7 +453,7 @@ class RaceReportViewer extends RaceReportReader {
 					for ignore, car in class {
 						result := car[2]
 
-						classResults[car[1]] := ((result = "DNF") ? result : A_Index)
+						classResults[car[1]] := (((result = "DNF") || (result = "DNS")) ? result : A_Index)
 					}
 				}
 			}

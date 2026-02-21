@@ -206,11 +206,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 		super.updateActions(session)
 
 		for ignore, theAction in this.Actions
-			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize")
-			 && (!this.Simulator || (this.Simulator.Simulator[true] != "Le Mans Ultimate"))) {
-				theAction.Function.disable(kAllTrigger, theAction)
-				theAction.Function.setLabel(this.actionLabel(theAction), "Gray")
-			}
+			if (isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction) && (theAction.Action = "FuelRatioOptimize"))
+				if (!this.Simulator || (this.Simulator.Simulator[true] != "Le Mans Ultimate")) {
+					theAction.Function.disable(kAllTrigger, theAction)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+				}
+				else {
+					theAction.Function.enable(kAllTrigger, theAction)
+					theAction.Function.setLabel(this.actionLabel(theAction))
+				}
 	}
 
 	loadSettings(simulator, car, track, data := false, settings := false) {

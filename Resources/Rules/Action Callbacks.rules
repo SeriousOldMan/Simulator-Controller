@@ -17,6 +17,14 @@ Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4) <= Call(callAssistant, ?function, 
 Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
 Assistant.Call(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(callAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
 
+Assistant.Property(?function) <= Call(propertyAssistant, ?function)
+Assistant.Property(?function, ?p1) <= Call(propertyAssistant, ?function, ?p1)
+Assistant.Property(?function, ?p1, ?p2) <= Call(propertyAssistant, ?function, ?p1, ?p2)
+Assistant.Property(?function, ?p1, ?p2, ?p3) <= Call(propertyAssistant, ?function, ?p1, ?p2, ?p3)
+Assistant.Property(?function, ?p1, ?p2, ?p3, ?p4) <= Call(propertyAssistant, ?function, ?p1, ?p2, ?p3, ?p4)
+Assistant.Property(?function, ?p1, ?p2, ?p3, ?p4, ?p5) <= Call(propertyAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5)
+Assistant.Property(?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6) <= Call(propertyAssistant, ?function, ?p1, ?p2, ?p3, ?p4, ?p5, ?p6)
+
 Function.Call(?function) <= Call(callFunction, ?function)
 Function.Call(?function, ?p1) <= Call(callFunction, ?function, ?p1)
 Function.Call(?function, ?p1, ?p2) <= Call(callFunction, ?function, ?p1, ?p2)

@@ -13,6 +13,7 @@ copy "Installation & Configuration.md" "..\..\Controller.Wiki\Installation-&-Con
 copy "Overview.md" ..\..\Controller.Wiki\Overview.md
 copy "Plugins & Modes.md" "..\..\Controller.Wiki\Plugins-&-Modes.md"
 copy "Releases.md" ..\..\Controller.Wiki\Release-Notes.md
+copy "Releases Archive.md" ..\..\Controller.Wiki\Release-Notes-Archive.md
 copy "Sidebar.md" ..\..\Controller.Wiki\_Sidebar.md
 copy "Updates.md" ..\..\Controller.Wiki\Update-Notes.md
 copy "Tyre Compounds.md" ..\..\Controller.Wiki\Tyre-Compounds.md

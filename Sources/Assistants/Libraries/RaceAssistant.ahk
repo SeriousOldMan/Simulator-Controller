@@ -347,6 +347,10 @@ class RaceAssistant extends ConfigurationItem {
 			messageSend(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
+		shutdown(arguments*) {
+			this.callRemote("shutdown", arguments*)
+		}
+
 		savePitstopState(arguments*) {
 			this.callRemote("savePitstopState", arguments*)
 		}
@@ -484,7 +488,7 @@ class RaceAssistant extends ConfigurationItem {
 		produce() {
 			this.RuleEngine.setTraceLevel(this.RaceAssistant.Debug[kDebugRules] ? kTraceMedium : kTraceOff)
 
-			super.produce()
+			return super.produce()
 		}
 
 		execute(executable, arguments) {
@@ -568,11 +572,13 @@ class RaceAssistant extends ConfigurationItem {
 						})
 						scriptSetGlobal(context, "__Assistant_Speak")
 						scriptPushValue(context, (c) {
-							callAssistant(this.RaceAssistant, scriptGetArguments(c)*)
-
-							return Integer(0)
+							return callAssistant(this.RaceAssistant, scriptGetArguments(c)*)
 						})
 						scriptSetGlobal(context, "__Assistant_Call")
+						scriptPushValue(context, (c) {
+							return propertyAssistant(this.RaceAssistant, scriptGetArguments(c)*)
+						})
+						scriptSetGlobal(context, "__Assistant_Property")
 						scriptPushValue(context, (c) {
 							callController(this.RaceAssistant, scriptGetArguments(c)*)
 
@@ -732,9 +738,9 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Continuation {
+	ActiveContinuation {
 		Get {
-			return this.VoiceManager.Continuation
+			return this.VoiceManager.ActiveContinuation
 		}
 	}
 
@@ -1286,26 +1292,33 @@ class RaceAssistant extends ConfigurationItem {
 			case "Time":
 				this.timeRecognized(words)
 			case "Yes":
-				continuation := this.Continuation
+				continuation := this.ActiveContinuation
 
-				this.clearContinuation()
+				if isInstance(continuation, VoiceManager.QuestionContinuation) {
+					this.clearContinuation()
 
-				if isInstance(continuation, VoiceManager.VoiceContinuation)
 					continuation.next()
-				else if continuation {
+				}
+				else if isInstance(continuation, Func) {
+					this.clearContinuation()
+
 					this.getSpeaker().speakPhrase("Confirm")
 
 					continuation.Call()
 				}
 			case "No":
-				continuation := this.Continuation
+				continuation := this.ActiveContinuation
 
-				this.clearContinuation()
+				if isInstance(continuation, VoiceManager.QuestionContinuation) {
+					this.clearContinuation()
 
-				if isInstance(continuation, VoiceManager.VoiceContinuation)
 					continuation.cancel()
-				else if continuation
+				}
+				else if isInstance(continuation, Func) {
+					this.clearContinuation()
+
 					this.getSpeaker().speakPhrase("Okay")
+				}
 			case "Call":
 				this.nameRecognized(words)
 			case "Activate":
@@ -1856,7 +1869,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (score > 0.5) {
 			speaker.speakPhrase(active ? "ConfirmAnnouncementOn" : "ConfirmAnnouncementOff", {announcement: fragments[announcement]}, true)
 
-			this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active), "Roger", "Okay"))
+			this.setContinuation(VoiceManager.QuestionContinuation(this, ObjBindMethod(this, "updateAnnouncement", announcement, active)
+																	   , false
+																	   , "Roger", "Okay"))
 		}
 		else
 			speaker.speakPhrase("Repeat")
@@ -1874,10 +1889,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 
 		if continuation {
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.QuestionContinuation)
 				this.handleVoiceCommand("Yes", ["Yes"])
 			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
@@ -1891,10 +1906,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	reject() {
-		local continuation := this.Continuation
+		local continuation := this.ActiveContinuation
 
 		if continuation {
-			if isInstance(continuation, VoiceManager.VoiceContinuation)
+			if isInstance(continuation, VoiceManager.QuestionContinuation)
 				this.handleVoiceCommand("No", ["No"])
 			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("No", ["No"])
@@ -2050,11 +2065,13 @@ class RaceAssistant extends ConfigurationItem {
 			return false
 	}
 
-	setContinuation(continuation) {
-		if isInstance(continuation, VoiceManager.VoiceContinuation)
-			this.VoiceManager.setContinuation(continuation)
-		else
-			this.VoiceManager.setContinuation(VoiceManager.ReplyContinuation(this, continuation, "Confirm", "Okay"))
+	setContinuation(acceptContinuation, rejectContinuation := false) {
+		if !isInstance(acceptContinuation, VoiceManager.Continuation)
+			acceptContinuation := VoiceManager.QuestionContinuation(this, acceptContinuation
+																		, rejectContinuation
+																		, "Confirm", "Okay")
+
+		this.VoiceManager.setContinuation(acceptContinuation)
 	}
 
 	clearContinuation() {
@@ -2454,6 +2471,7 @@ class RaceAssistant extends ConfigurationItem {
 		return CaseInsenseMap("Session.Simulator", simulator
 							, "Session.Car", car
 							, "Session.Track", track
+							, "Session.Settings.Assistant.Language", this.VoiceManager.Language
 							, "Session.Settings.Tyre.Service", tyreService
 							, "Session.Settings.Tyre.Management", mixedCompounds
 							, "Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
@@ -2505,6 +2523,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		return combine(this.readSettings(simulator, car, track, &settings)
 					 , CaseInsenseMap("Session.Type", this.Session
+									, "Session.Mode", getMultiMapValue(data, "Session Data", "Mode", "Solo")
 									, "Session.Track.Type", getMultiMapValue(settings, ("Simulator." . simulatorName), "Track.Type", "Circuit")
 									, "Session.Track.Length", getMultiMapValue(data, "Track Data", "Length", 0)
 									, "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
@@ -3266,8 +3285,7 @@ class RaceAssistant extends ConfigurationItem {
 				if (this.AvgFuelConsumption > 0)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
-				if (settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
-					settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+				settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
 
 				if (lapTime > 10)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
@@ -5008,19 +5026,42 @@ getTime(*) {
 }
 
 callAssistant(context, method, arguments*) {
-	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
+	local script := isInstance(context, RaceAssistant)
+	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)
+	local value
 
 	try {
-		assistant.%method%(normalizeArguments(arguments)*)
+		value := assistant.%method%(normalizeArguments(arguments)*)
+
+		return (script ? value : true)
 	}
 	catch Any as exception {
 		logError(exception, true)
-	}
 
-	return true
+		return false
+	}
 }
 
 Assistant_Call := callAssistant
+
+propertyAssistant(context, property, arguments*) {
+	local script := isInstance(context, RaceAssistant)
+	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)
+	local value
+
+	try {
+		value := assistant.%property%[normalizeArguments(arguments)*]
+
+		return (script ? value : true)
+	}
+	catch Any as exception {
+		logError(exception, true)
+
+		return false
+	}
+}
+
+Assistant_Property := propertyAssistant
 
 callFunction(context, function, arguments*) {
 	local assistant := (isInstance(context, RaceAssistant) ? context : context.KnowledgeBase.RaceAssistant)
@@ -5459,11 +5500,13 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 				})
 				scriptSetGlobal(context, "__Assistant_Speak")
 				scriptPushValue(context, (c) {
-					callAssistant(assistant, scriptGetArguments(c)*)
-
-					return Integer(0)
+					return callAssistant(assistant, scriptGetArguments(c)*)
 				})
 				scriptSetGlobal(context, "__Assistant_Call")
+				scriptPushValue(context, (c) {
+					return propertyAssistant(assistant, scriptGetArguments(c)*)
+				})
+				scriptSetGlobal(context, "__Assistant_Property")
 				scriptPushValue(context, (c) {
 					callController(assistant, scriptGetArguments(c)*)
 

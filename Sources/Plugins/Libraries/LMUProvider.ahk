@@ -250,6 +250,7 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	readSessionData(options := "", protocol?) {
+		local standings := InStr(options, "Standings=true")
 		local simulator := this.Simulator
 		local carData := false
 		local splitTime := A_TickCount
@@ -362,6 +363,10 @@ class LMUProvider extends Sector397Provider {
 				splitTime := A_TickCount
 			}
 
+			if (!standings && (getMultiMapValues(data, "Car Data").Count = 0)
+						   && (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0))
+				return data
+
 			sessionData := LMURESTProvider.SessionData()
 
 			if logTimes {
@@ -445,7 +450,7 @@ class LMUProvider extends Sector397Provider {
 					throw "Unknown session state detected in LMUProvider.readSessionData..."
 			}
 
-			if !InStr(options, "Standings=true") {
+			if !standings {
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)
 				else

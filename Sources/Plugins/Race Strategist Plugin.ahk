@@ -106,7 +106,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 			if value
 				this.iRaceStrategist := value
 
-			return (super.RaceAssistant := value)
+			return (super.RaceAssistant[zombie] := value)
 		}
 	}
 

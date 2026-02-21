@@ -1214,7 +1214,7 @@ class BasicStepWizard extends StepWizard {
 
 			configuration := readMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini")
 
-			setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(kSimulatorConfiguration, "Conversation Booster"), false)
+			; setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(kSimulatorConfiguration, "Conversation Booster"), false)
 
 			setup := this.assistantSetup(assistant)
 

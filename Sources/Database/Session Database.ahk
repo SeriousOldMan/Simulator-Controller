@@ -4731,10 +4731,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						loop Files, kDatabaseDirectory . "User\Tracks\" . code . "\*.*", "F" {
-
 							SplitPath(A_LoopFileName, , , , &candidate)
 
-							if (candidate = track)
+							if ((candidate = track) || (candidate = SessionDatabase.getTrackCode(simulator, track)))
 								deleteFile(A_LoopFileFullPath)
 						}
 					case translate("Automations"):

@@ -1,9 +1,9 @@
 [Development]
 Version=6.8.5.0-dev
 Target=6.8.5.0-release
-Date=02/20/2026
+Date=02/21/2026
 Download=
-Changes=Refactord voice continuations
+Changes=Refactord voice continuations, Fixed track deletion for LMU in "Session Database"
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
 Version=6.8.4.0-release

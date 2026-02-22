@@ -1150,11 +1150,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateSessionValues(values) {
-		if values.HasProp("TrackLength") {
+		if values.HasProp("TrackLength")
 			this.iTrackLength := values.TrackLength
-
-			this.initializeGapTimings()
-		}
 
 		if values.HasProp("TrackType")
 			this.iTrackType := values.TrackType
@@ -3498,6 +3495,9 @@ class GridRaceAssistant extends RaceAssistant {
 	updateSessionValues(values) {
 		super.updateSessionValues(values)
 
+		if values.HasProp("TrackLength")
+			this.initializeGapTimings()
+
 		if (values.HasProp("Session") && (values.Session == kSessionFinished)) {
 			this.iPitstops := CaseInsenseMap()
 			this.iLastPitstopUpdate := false
@@ -4528,9 +4528,9 @@ class GridRaceAssistant extends RaceAssistant {
 	initializeGapTimings(trackLength := this.TrackLength) {
 		timings := []
 
-		timings.Capicity := Round(trackLenght / 5)
+		timings.Capacity := Round(trackLength / 5)
 
-		loop (Round(trackLenght / 5))
+		loop (Round(trackLength / 5))
 			timings.Push(false)
 
 		this.iGapTimings := timings
@@ -4991,6 +4991,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	addLap(lapNumber, &data) {
+		local knowledgeBase := this.KnowledgeBase
 		local driver, lapValid, lapPenalty
 
 		if !isObject(data)
@@ -4998,9 +4999,9 @@ class GridRaceAssistant extends RaceAssistant {
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		if this.KnowledgeBase {
-			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
-			this.KnowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
+		if knowledgeBase {
+			knowledgeBase.setFact("Lap." . lapNumber . ".Position.Overall", this.getPosition(false, "Overall", data))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Position.Class", this.getPosition(false, "Class", data))
 		}
 
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
@@ -5010,9 +5011,10 @@ class GridRaceAssistant extends RaceAssistant {
 			lapValid := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
 			lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
 
-			this.setTimeIntoLap(getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running", false)
-							  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Time", false)
-							  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Time", false))
+			if this.TrackLength
+				this.setTimeIntoLap(getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running", false)
+								  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Time", false)
+								  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Time", false))
 		}
 
 		this.updatePitstops(lapNumber, data)
@@ -5020,6 +5022,8 @@ class GridRaceAssistant extends RaceAssistant {
 		this.initializeGridPosition(data)
 
 		result := super.addLap(lapNumber, &data, true, lapValid, lapPenalty)
+
+		knowledgeBase := this.KnowledgeBase
 
 		if driver
 			for ignore, type in ["Standings.Overall.Leader", "Standings.Overall.Ahead", "Standings.Overall.Behind"
@@ -5058,9 +5062,10 @@ class GridRaceAssistant extends RaceAssistant {
 			lapValid := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Valid", lapValid)
 			lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
 
-			this.setTimeIntoLap(getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running", false)
-							  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Time", false)
-							  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Time", false))
+			if this.TrackLength
+				this.setTimeIntoLap(getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running", false)
+								  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Time", false)
+								  , getMultiMapValue(data, "Position Data", "Car." . driver . ".Time", false))
 		}
 
 		if !lapValid

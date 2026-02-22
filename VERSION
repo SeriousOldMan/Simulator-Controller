@@ -1,7 +1,7 @@
 [Development]
 Version=6.8.5.0-dev
 Target=6.8.5.0-release
-Date=02/21/2026
+Date=02/22/2026
 Download=
 Changes=Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E and PMR
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1

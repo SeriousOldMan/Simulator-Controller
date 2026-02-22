@@ -4553,8 +4553,8 @@ class GridRaceAssistant extends RaceAssistant {
 												 : normalizedRunning)
 
 			if isDebug()
-				logMessaage(kLogDebug, "Set normalized distance for " . Round(running, 2)
-									 . " to " . Round(normalizedRunning, 2))
+				logMessaage(kLogInfo, "Set normalized running for " . Round(running, 2)
+									. " to " . Round(normalizedRunning, 2))
 
 			this.iNormalizedRunnings[index] := normalizedRunning
 		}
@@ -4575,8 +4575,13 @@ class GridRaceAssistant extends RaceAssistant {
 				if !normalizedRunning
 					normalizedRunning := normalizedRunnings[index + A_Index - 1]
 
-				if normalizedRunning
+				if normalizedRunning {
+					if isDebug()
+						logMessaage(kLogInfo, "Normalized running for " . Round(running, 2)
+											. " is " . Round(normalizedRunning, 2))
+
 					return normalizedRunning
+				}
 			}
 		}
 

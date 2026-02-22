@@ -432,6 +432,8 @@ int main(int argc, char* argv[]) {
 				printf("Car.%d.Laps=%d\n", i, vehicle.mLapsCompleted);
 				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
 				printf("Car.%d.Lap.Running.Valid=%s\n", i, localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
+				if (i == localCopy->mViewedParticipantIndex + 1)
+					printf("Car.%d.Lap.Running.Time=%ld\n", i, (long)localCopy->mCurrentTime * 1000);
 				printf("Car.%d.Time=%ld\n", i, (long)(localCopy->mLastLapTimes[i - 1] * 1000));
 				printf("Car.%d.Time.Sectors=%ld,%ld,%ld\n", i, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000),
 					(long)(localCopy->mCurrentSector2Times[i - 1] * 1000),

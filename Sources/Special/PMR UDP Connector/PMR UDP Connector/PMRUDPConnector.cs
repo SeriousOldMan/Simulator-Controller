@@ -364,6 +364,11 @@ namespace PMRUDPConnector
                 sb.AppendFormat("Car.{0}.Lap.Running={1}\n", carNum, F(p.LapProgress));
                 sb.AppendFormat("Car.{0}.Lap.Running.Valid={1}\n", carNum, p.LapValid ? "true" : "false");
                 
+				float currentLapTime = p.CurrentLapTime;
+                
+				if (currentLapTime > 0)
+                    sb.AppendFormat("Car.{0}.Lap.Running.Time={1}\n", carNum, I(currentLapTime * 1000));
+				
                 float lastLapTime;
                 float s1Time, s2Time, s3Time;
                 

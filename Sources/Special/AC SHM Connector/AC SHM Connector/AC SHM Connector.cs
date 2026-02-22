@@ -440,7 +440,13 @@ namespace SHMConnector
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running="); strWriter.WriteLine(car.splinePosition);
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
-                        int lapTime = car.lastLapTimeMS;
+                        int lapTime = car.currentLapTimeMS;
+
+						if (lapTime > 0) {
+                            strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running.Time="); strWriter.WriteLine(lapTime);
+						}
+
+                        lapTime = car.lastLapTimeMS;
 
                         int carIndex = i - 1;
                         int sector1Time, sector2Time, sector3Time;

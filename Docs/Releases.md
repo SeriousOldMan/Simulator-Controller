@@ -24,7 +24,19 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 6.8.5.0
+
+#### Date: 02/27/26 (planned)
+
+#### Fixes
+
+  - Fixed track deletion in the "Session Database" when short and long track name are different.
+  
+#### Changes
+
+  - A complete new method for gap timings has been implemented, which uses a sampling method to create a map of distance into track, time into the track and current speed. This is used to derive an almost perfect estimation how long it would take the drivers car to reach a specific point on the track. Please note, that this is not yet supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing*.
+  - Changed the car class name from "LMP2 ELMS" to "LMP2 Plus" in *Le Mans Ultimate*.
+  - [Internal] Refactord voice continuations for more flexibility for future multiple steps interactions.
 	  
 # Release history
 

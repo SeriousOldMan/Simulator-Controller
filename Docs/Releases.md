@@ -36,6 +36,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - A complete new method for gap timings has been implemented, which uses a sampling method to create a map of distance into track, time into the track and current speed. This is used to derive an almost perfect estimation how long it would take the drivers car to reach a specific point on the track. Please note, that this is not yet supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing*.
   - Changed the car class name from "LMP2 ELMS" to "LMP2 Plus" in *Le Mans Ultimate*.
+  - Removed unknown values from the "System Monitor" in the first lap.
+  - Removed unknown values from the "Session State.json" file (by the "Integration" plugin) in the first lap.
   - [Internal] Refactord voice continuations for more flexibility for future multiple steps interactions.
 	  
 # Release history

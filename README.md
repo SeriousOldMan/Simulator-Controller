@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.4.0-dev]() (Early build for 6.8.4. Changes: Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E and PMR.)
+[6.8.5.0-dev]() (Early build for 6.8.4. Changes: Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E and PMR, Removed missing information from "System Monitor" in first lap.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6850) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-685) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -4999,7 +4999,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, lapValid, lapPenalty, runningTime, ignore, car
+		local driver, lapValid, lapPenalty, timeIntoLap, ignore, car
 
 		if !isObject(data)
 			data := readMultiMap(data)
@@ -5022,12 +5022,12 @@ class GridRaceAssistant extends RaceAssistant {
 
 			if (this.TrackLength && (lapNumber > 0))
 				for ignore, car in this.getCars("Class", data) {
-					runningTime := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
+					timeIntoLap := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
 
-					if runningTime
+					if timeIntoLap
 						this.setTimeIntoLap(car
 										  , getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running", false)
-										  , runningTime
+										  , timeIntoLap
 										  , getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false))
 				}
 		}
@@ -5059,7 +5059,7 @@ class GridRaceAssistant extends RaceAssistant {
 	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local noGrid := !this.GridPosition
-		local driver, lapValid, lapPenalty, result, runningTime, ignore, car
+		local driver, lapValid, lapPenalty, result, timeIntoLap, ignore, car
 
 		if !isObject(data)
 			data := readMultiMap(data)
@@ -5081,12 +5081,12 @@ class GridRaceAssistant extends RaceAssistant {
 
 			if (this.TrackLength && (lapNumber > 0))
 				for ignore, car in this.getCars("Class", data) {
-					runningTime := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
+					timeIntoLap := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
 
-					if runningTime
+					if timeIntoLap
 						this.setTimeIntoLap(car
 										  , getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running", false)
-										  , runningTime
+										  , timeIntoLap
 										  , getMultiMapValue(data, "Position Data", "Car." . car . ".Time", false))
 				}
 		}

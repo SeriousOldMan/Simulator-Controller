@@ -5020,7 +5020,7 @@ class GridRaceAssistant extends RaceAssistant {
 				lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
 			}
 
-			if this.TrackLength
+			if (this.TrackLength && (lapNumber > 0))
 				for ignore, car in this.getCars("Class", data) {
 					runningTime := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
 
@@ -5040,7 +5040,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 		knowledgeBase := this.KnowledgeBase
 
-		if driver
+		if (driver && knowledgeBase)
 			for ignore, type in ["Standings.Overall.Leader", "Standings.Overall.Ahead", "Standings.Overall.Behind"
 							   , "Standings.Class.Leader", "Standings.Class.Ahead", "Standings.Class.Behind"
 							   , "Track.Ahead", "Track.Behind"]
@@ -5079,7 +5079,7 @@ class GridRaceAssistant extends RaceAssistant {
 				lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
 			}
 
-			if this.TrackLength
+			if (this.TrackLength && (lapNumber > 0))
 				for ignore, car in this.getCars("Class", data) {
 					runningTime := getMultiMapValue(data, "Position Data", "Car." . car . ".Lap.Running.Time", false)
 
@@ -5099,7 +5099,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 		result := super.updateLap(lapNumber, &data, false, lapValid, lapPenalty)
 
-		if driver
+		if (driver && knowledgeBase)
 			for ignore, type in ["Standings.Overall.Leader", "Standings.Overall.Ahead", "Standings.Overall.Behind"
 							   , "Standings.Class.Leader", "Standings.Class.Ahead", "Standings.Class.Behind"
 							   , "Track.Ahead", "Track.Behind"]

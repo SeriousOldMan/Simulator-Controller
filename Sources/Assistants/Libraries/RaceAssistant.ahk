@@ -4595,7 +4595,8 @@ class GridRaceAssistant extends RaceAssistant {
 		if !lapTime
 			lapTime := this.getLapTime(car, data)
 
-		this.setNormalizedRunning(running, time / lapTime)
+		if lapTime
+			this.setNormalizedRunning(running, time / lapTime)
 	}
 
 	getTimeIntoLap(running, data := false, lapTime := false, variability := 25) {

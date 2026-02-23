@@ -299,6 +299,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local unit := {Type: "Volume", Unit: this.Unit["Volume"]}
 		local fuelLow := (Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
 		local state := Map("RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
+		local energyConsumption
 
 		if (fuelConsumption > 0)
 			state["LastFuelConsumption"] := state["LastConsumption"] := convertUnit(unit, fuelConsumption)
@@ -309,13 +310,21 @@ class IntegrationPlugin extends ControllerPlugin {
 		if (remainingFuel > 0)
 			state["RemainingFuel"] := convertUnit(unit, remainingFuel)
 
-		state["RemainingFuelLaps"] := state["RemainingLaps"]
+		if (fuelConsumption > 0)
+			state["RemainingFuelLaps"] := state["RemainingLaps"]
+		else
+			state.Delete("RemainingLaps")
 
-		if (getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", kUndefined) != kUndefined) {
+		if (getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
+			energyConsumption := getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption")
+
 			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 0)
-			state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
-			state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
-			state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+
+			if (energyConsumption > 0) {
+				state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
+				state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
+				state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+			}
 		}
 
 		if exist(getValues(state), (v) => (v > 0))
@@ -359,18 +368,18 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		temperatures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Temperatures", ""))
 
-		if ((temperatures.Length = 4) && all(temperatures, nonZero))
+		if ((temperatures.Length = 4) && all(temperatures, nonZero) && all(temperatures, (t) => (t > 0)))
 			state["Temperatures"] := [convertUnit(temperatureUnit, temperatures[1]), convertUnit(temperatureUnit, temperatures[2])
 									, convertUnit(temperatureUnit, temperatures[3]), convertUnit(temperatureUnit, temperatures[4])]
 
 		wear := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Wear", ""))
 
-		if ((wear.Length = 4) && all(wear, (w) => isNumber(w)))
+		if ((wear.Length = 4) && all(wear, (w) => isNumber(w)) && exist(wear, (w) => (w > 0)))
 			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
 
 		laps := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Laps", ""))
 
-		if ((laps.Length = 4) && all(laps, (l) => isNumber(l)))
+		if ((laps.Length = 4) && all(laps, (l) => isNumber(l)) && exist(laps, (l) => (l > 0)))
 			state["Laps"] := [Round(laps[1]), Round(laps[2]), Round(laps[3]), Round(laps[4])]
 
 		tyreCompound := []

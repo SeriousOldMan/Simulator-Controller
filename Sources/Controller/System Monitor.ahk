@@ -499,14 +499,14 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
 
-			if ((sessionTime != stintTime) && (!isNumber(remainingSessionTime) || (remainingSessionTime > 0))
-										   && (!isNumber(remainingStintTime) || (remainingStintTime > 0))) {
+			if ((sessionTime != stintTime) && (!isNumber(sessionTime) || (sessionTime > 0))
+										   && (!isNumber(stintTime) || (stintTime > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td class=`"td-wdg`">" . remainingSessionTime . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td class=`"td-wdg`">" . remainingStintTime . "</td></tr>")
 				if ((driverTime != stintTime) && (!isNumber(remainingDriverTime) || (remainingDriverTime > 0)))
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td class=`"td-wdg`">" . remainingDriverTime . "</td></tr>")
 			}
-			else if (!isNumber(remainingSessionTime) || (remainingSessionTime > 0))
+			else if (!isNumber(sessionTime) || (sessionTime > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . remainingSessionTime . "</td></tr>")
 
 			if (driveTime && (driveTime > 0))
@@ -517,7 +517,7 @@ systemMonitor(command := false, arguments*) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td class=`"td-wdg`">" . ((isNumber(stintLaps) && (stintLaps < 4)) ? "<font color=`"red`">" : "") . stintLaps . ((isNumber(stintLaps) && (stintLaps < 4)) ? "</font>" : "") . "</td></tr>")
 			}
-			else
+			else if (!isNumber(sessionLaps) || (sessionLaps > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
 		}
 		catch Any as exception {
@@ -601,10 +601,11 @@ systemMonitor(command := false, arguments*) {
 		local fuelConsumption := getMultiMapValue(sessionState, "Stint", "Fuel.Consumption")
 		local avgConsumption := getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption")
 		local remainingFuel := getMultiMapValue(sessionState, "Stint", "Fuel.Remaining")
+		local remainingEnergy := getMultiMapValue(sessionState, "Stint", "Energy.Remaining")
 		local fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
 		local energyLow := false
 		local html := ""
-		local lastTime, remainingLaps
+		local lastTime, remainingLaps, energyConsumption
 
 		try {
 			html .= "<table class=`"table-std`">"
@@ -621,19 +622,27 @@ systemMonitor(command := false, arguments*) {
 
 			if (getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
 				energyLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 0)) < 4)
+				energyConsumption := getMultiMapValue(sessionState, "Stint", "Energy.Consumption")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.Consumption"), 1) . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Energy") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.Remaining"), 1) . "</td></tr>")
+				if (energyConsumption > 0) {
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", energyConsumption, 1) . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
+				}
 			}
+			else
+				energyLow := false
+
+			if (remainingEnergy > 0)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Energy") . "</th><td class=`"td-wdg`">" . displayValue("Float", remainingEnergy, 1) . "</td></tr>")
 
 			remainingLaps := Min(Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")), Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 99999)))
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . remainingLaps . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
+			if ((fuelConsumption > 0) || (energyConsumption > 0))
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . remainingLaps . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
 
 			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last", kUndefined)
 
-			if ((lastTime != kUndefined) && (lastTime > 0))
+			if ((lastTime != kUndefined) && (lastTime > 0) && (remainingLaps > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . displayValue("Time", Floor(lastTime * remainingLaps)) . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
 		}
 		catch Any as exception {
@@ -737,7 +746,7 @@ systemMonitor(command := false, arguments*) {
 
 			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
 
-			if ((temperatures.Length = 4) && all(temperatures, nonZero)) {
+			if ((temperatures.Length = 4) && all(temperatures, nonZero) && all(temperatures, (t) => (t > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
@@ -748,7 +757,7 @@ systemMonitor(command := false, arguments*) {
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
 
-			if ((wear.Length = 4) && exist(wear, nonZero)) {
+			if ((wear.Length = 4) && exist(wear, nonZero) && exist(wear, (w) => (w > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[2]) . "</td></tr>")
@@ -759,7 +768,7 @@ systemMonitor(command := false, arguments*) {
 
 			laps := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Laps", ""))
 
-			if ((laps.Length = 4) && exist(laps, nonZero)) {
+			if ((laps.Length = 4) && exist(laps, nonZero) && exist(laps, (l) => (l > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Laps") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . Round(laps[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . Round(laps[2]) . "</td></tr>")

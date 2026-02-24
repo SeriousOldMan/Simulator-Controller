@@ -34,11 +34,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - A complete new method for gap timings has been implemented, which uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please note, that this is not yet supported for *rFactor 2*, *Le Mans Ultimate* and *iRacing*, because the current time into the lap is not supplied by the API of these games. A workaround may be implemented for this deficit in a future release.
+  - A complete new method for gap timings has been implemented, which uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please note, that this is not yet supported for *iRacing*, because the current time into the lap is not supplied by the API of this game. A workaround may be implemented for this deficit in a future release.
   - Changed the car class name from "LMP2 ELMS" to "LMP2 Plus" in *Le Mans Ultimate*.
   - Removed currently undefined values from the "System Monitor" in the first lap.
   - Removed currently undefined values from the "Session State.json" file created by the "Integration" plugin in the first lap.
-  - [Internal] Refactord voice continuations for more flexibility for future voice interactions with multiple steps of question / answers.
+  - [Internal] Refactored voice continuations for more flexibility for future voice interactions with multiple steps of question / answer dialogs.
 	  
 # Release history
 

@@ -1162,7 +1162,7 @@ if !GetKeyState("Ctrl") {
 	withBlockedWindows(MsgDlg, "Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
-	raceNr := (GetKeyState("Alt") ? 24 : ((GetKeyState("Shift") ? 2 : 1)))
+	raceNr := (GetKeyState("Alt") ? 26 : ((GetKeyState("Shift") ? 2 : 1)))
 
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
 							   , TestPitStopHandler(), "Jona", true, true, true, true, false, true, true, true, true, true, true)
@@ -1566,6 +1566,47 @@ else {
 
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 						}
+					}
+					else
+						engineer.updateLap(lap, &data)
+
+					if isDebug()
+						showMessage("Data " lap . "." . A_Index . " loaded...")
+				}
+			}
+		}
+		until done
+	}
+	else if (raceNr = 26) {
+		done := false
+
+		loop {
+			lap := A_Index
+
+			loop {
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
+
+				if (data.Count == 0) {
+					if (A_Index == 1)
+						done := true
+
+					break
+				}
+				else {
+					if (A_Index == 1) {
+						engineer.addLap(lap, &data)
+
+						if (lap = 5) {
+							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Wear.Warning", 25)
+
+							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+							engineer.planPitstop()
+
+							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+						}
+						else if (lap > 5)
+							done := true
 					}
 					else
 						engineer.updateLap(lap, &data)

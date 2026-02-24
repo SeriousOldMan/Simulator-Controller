@@ -64,12 +64,17 @@ remove([], ?, [])
 remove([?h | ?t], ?h, ?result) <= !, remove(?t, ?h, ?result)
 remove([?h | ?t], ?x, [?h | ?result]) <= remove(?t, ?x, ?result)
 
-transpose([], []) <= !
-transpose([[] | ?], [])
-transpose(?matrix, [?row | ?rows]) <= transposeFirst(?matrix, ?row, ?restMatrix), transpose(?restMatrix, ?rows)
+transpose([], [])
+transpose([?first | ?rest], ?transposed) <= transpose(?first, [?first | ?rest], ?transposed)
 
-transposeFirst([], [], []) <= !
-transposeFirst([[?h | ?t] | ?rows], [?h | ?hs], [?t | ?ts]) <= transposeFirst(?rows, ?hs, ?ts)
+transpose([], ?, [])
+transpose([? | ?rest], ?matrix, [?transposedFirst | ?transposedRest]) <=
+		transposeRow(?matrix, ?transposedFirst, ?matrixFirst),
+		transpose(?rest, ?matrixFirst, ?transposedRest)
+
+transposeRow([], [], [])
+transposeRow([[?rFirst | ?oFirst] | ?rest], [?rFirst | ?rRest], [?oFirst | ?oRest]) <=
+		transposeRow(?rest, ?rRest, ?oRest)
 
 index(?list, ?element, ?index) <= index(?list, ?element, 1, ?index)
 

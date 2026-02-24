@@ -242,9 +242,10 @@ namespace SHMConnector {
 
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Laps="); strWriter.WriteLine(vehicle.mTotalLaps);
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Lap.Running="); strWriter.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
-					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
+                    strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Lap.Running.Valid="); strWriter.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
+                    strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Lap.Running.Time="); strWriter.WriteLine((long)((telemetry.mElapsedTime - telemetry.mLapStartET) * 1000));
 
-					int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
+                    int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
 
 					if (lapTime == 0)
 						lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);

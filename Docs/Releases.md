@@ -31,6 +31,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Fixed track deletion in the "Session Database" when short and long track name are different.
+  - Another fix for sector time calculation in *Assetto Corsa*.
   
 #### Changes
 

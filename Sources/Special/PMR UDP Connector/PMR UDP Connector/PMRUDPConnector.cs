@@ -14,6 +14,7 @@ namespace PMRUDPConnector
         private PMRUDPReceiver.PMRUDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
+        private readonly bool[] sectorStarted = new bool[MAX_CARS];
         private readonly int[] previousSector = new int[MAX_CARS];
         private readonly float[] sector1Times = new float[MAX_CARS];
         private readonly float[] sector2Times = new float[MAX_CARS];
@@ -34,7 +35,10 @@ namespace PMRUDPConnector
         public PMRUDPConnector(bool enableSampler)
         {
             for (int i = 0; i < MAX_CARS; i++)
+            {
                 previousSector[i] = -1;
+                sectorStarted[i] = false;
+            }
 
             if (enableSampler)
             {
@@ -504,15 +508,23 @@ namespace PMRUDPConnector
 
             lock (sectorLock)
             {
-                if (previousSector[carIndex] == -1)
+                int prevSector = previousSector[carIndex];
+
+                if (!sectorStarted[carIndex])
                 {
-                    if (currentSector == 0)
+                    if ((currentSector != 0) && (prevSector == -1))
+                        previousSector[carIndex] = currentSector;
+                    else if ((prevSector > 0) && (currentSector == 0))
                     {
-                        previousSector[carIndex] = 0;
+                        sectorStarted[carIndex] = true;
                         sectorStartTimes[carIndex] = 0;
+                        previousSector[carIndex] = 0;
                     }
+
+                    return;
                 }
-                else if (currentSector != previousSector[carIndex])
+
+                if (currentSector != prevSector)
                 {
                     if (previousSector[carIndex] == 0)
                         sector1Times[carIndex] = currentTime - sectorStartTimes[carIndex];

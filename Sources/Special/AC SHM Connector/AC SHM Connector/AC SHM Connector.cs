@@ -25,7 +25,8 @@ namespace SHMConnector
 
         private const int MAX_CARS = 64;
         private const int SECTOR_UPDATE_INTERVAL_MS = 50;
-        
+
+        private bool[] sectorStarted = new bool[MAX_CARS];
         private int[] previousSector = new int[MAX_CARS];
         private int[] sector1Times = new int[MAX_CARS];
         private int[] sector2Times = new int[MAX_CARS];
@@ -44,12 +45,13 @@ namespace SHMConnector
         private Thread sectorUpdateThread;
         private volatile bool shouldStopThread;
 
-        private long dataGeneration = 0;
-
         public SHMConnector()
         {
             for (int i = 0; i < MAX_CARS; i++)
+            {
                 previousSector[i] = -1;
+                sectorStarted[i] = false;
+            }
             
             sectorUpdateThread = new Thread(SectorUpdateWorker);
             sectorUpdateThread.IsBackground = true;
@@ -302,30 +304,27 @@ namespace SHMConnector
                 try
                 {
                     if (connected)
-                    {
-                        dataGeneration++;
+                        lock (sectorLock)
+                        {
+                            graphics = ReadGraphics();
+                            cars = ReadCars();
 
-                        graphics = ReadGraphics();
-                        cars = ReadCars();
-                        
-                        if (!sectorBoundariesCalibrated && cars.numVehicles > 0)
-                        {
-                            CalibrateSectorBoundaries(graphics, ref cars.cars[0]);
-                        }
-                        
-                        if (sectorBoundariesCalibrated && cars.numVehicles > 0)
-                        {
-                            for (int i = 0; i < cars.numVehicles; i++)
+                            if (!sectorBoundariesCalibrated && cars.numVehicles > 0)
                             {
-                                ref AcCarInfo car = ref cars.cars[i];
-                                if (car.isConnected == 0)
-                                    continue;
-                                    
-                                int currentSector = GetSectorFromSplinePosition(car.splinePosition);
-                                UpdateSectorTimes(i, currentSector, graphics.iCurrentTime, car.lastLapTimeMS);
+                                CalibrateSectorBoundaries(graphics, ref cars.cars[0]);
                             }
+
+                            if (sectorBoundariesCalibrated && cars.numVehicles > 0)
+                                for (int i = 0; i < cars.numVehicles; i++)
+                                {
+                                    ref AcCarInfo car = ref cars.cars[i];
+                                    if (car.isConnected == 0)
+                                        continue;
+
+                                    int currentSector = GetSectorFromSplinePosition(car.splinePosition);
+                                    UpdateSectorTimes(i, currentSector, graphics.iCurrentTime, car.lastLapTimeMS);
+                                }
                         }
-                    }
                 }
                 catch
                 {
@@ -370,54 +369,53 @@ namespace SHMConnector
             if (carIndex < 0 || carIndex >= MAX_CARS)
                 return;
 
-            lock (sectorLock)
-            {
-                int prevSector = previousSector[carIndex];
-            
-                if (prevSector == -1)
-                {
-					if (currentSector == 0) {
-						sectorStartTimes[carIndex] = currentTime;
-						previousSector[carIndex] = 0;
-					}
-                }
-				else if (currentSector != prevSector)
-                {
-                    int sectorTime = currentTime - sectorStartTimes[carIndex];
-                
-                    if (prevSector == 0)
-                        sector1Times[carIndex] = sectorTime;
-                    else if (prevSector == 1)
-                        sector2Times[carIndex] = sectorTime;
-                    else
-                    {
-                        lastSector1Times[carIndex] = sector1Times[carIndex];
-                        lastSector2Times[carIndex] = sector2Times[carIndex];
-                        lastSector3Times[carIndex] = lapTime - sector1Times[carIndex] - sector2Times[carIndex];
+            int prevSector = previousSector[carIndex];
 
-                        sector1Times[carIndex] = 0;
-                        sector2Times[carIndex] = 0;
-                    }
-                
+            if (!sectorStarted[carIndex])
+            {
+                if ((currentSector != 0) && (prevSector == -1))
+                    previousSector[carIndex] = currentSector;
+                else if ((prevSector > 0) && (currentSector == 0))
+                {
+                    sectorStarted[carIndex] = true;
                     sectorStartTimes[carIndex] = currentTime;
-                    previousSector[carIndex] = Math.Min(currentSector, 2);
+                    previousSector[carIndex] = 0;
                 }
+
+                return;
+            }
+
+            if (currentSector != prevSector)
+            {
+                int sectorTime = currentTime - sectorStartTimes[carIndex];
+
+                if (prevSector == 0)
+                    sector1Times[carIndex] = sectorTime;
+                else if (prevSector == 1)
+                    sector2Times[carIndex] = sectorTime;
+                else
+                {
+                    lastSector1Times[carIndex] = sector1Times[carIndex];
+                    lastSector2Times[carIndex] = sector2Times[carIndex];
+                    lastSector3Times[carIndex] = lapTime - sector1Times[carIndex] - sector2Times[carIndex];
+
+                    sector1Times[carIndex] = 0;
+                    sector2Times[carIndex] = 0;
+                }
+
+                sectorStartTimes[carIndex] = currentTime;
+                previousSector[carIndex] = currentSector;
             }
         }
 
         public string ReadStandings()
         {
-            StringWriter strWriter;
-            long startGeneration;
+            StringWriter strWriter = new StringWriter();
 
-            do
-            {
-                strWriter = new StringWriter();
+            strWriter.WriteLine("[Position Data]");
 
-                startGeneration = dataGeneration;
-
-                strWriter.WriteLine("[Position Data]");
-                if (connected)
+            if (connected) {
+                lock (sectorLock)
                 {
                     cars = ReadCars();
 
@@ -433,7 +431,7 @@ namespace SHMConnector
                             continue;
 
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".ID="); strWriter.WriteLine(i);
-                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId + 1);
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Laps="); strWriter.WriteLine(car.lapCount);
@@ -442,25 +440,21 @@ namespace SHMConnector
 
                         int lapTime = car.currentLapTimeMS;
 
-						if (lapTime > 0) {
+                        if (lapTime > 0)
+                        {
                             strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Lap.Running.Time="); strWriter.WriteLine(lapTime);
-						}
+                        }
 
                         lapTime = car.lastLapTimeMS;
-
-                        int carIndex = i - 1;
-                        int sector1Time, sector2Time, sector3Time;
-
-                        lock (sectorLock)
-                        {
-                            sector1Time = lastSector1Times[carIndex];
-                            sector2Time = lastSector2Times[carIndex];
-                            sector3Time = lastSector3Times[carIndex];
-                        }
 
                         if (lapTime > 0)
                         {
                             strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Time="); strWriter.WriteLine(lapTime);
+
+                            int carIndex = i - 1;
+                            int sector1Time = lastSector1Times[carIndex];
+                            int sector2Time = lastSector2Times[carIndex];
+                            int sector3Time = lastSector3Times[carIndex];
 
                             if (sector1Time > 0 && sector2Time > 0 && sector3Time > 0)
                             {
@@ -490,14 +484,13 @@ namespace SHMConnector
 
                     strWriter.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
                 }
-                else
-                {
-                    strWriter.WriteLine("Active=false");
-                    strWriter.WriteLine("Car.Count=0");
-                    strWriter.WriteLine("Driver.Car=0");
-                }
             }
-            while (startGeneration != dataGeneration);
+            else
+            {
+                strWriter.WriteLine("Active=false");
+                strWriter.WriteLine("Car.Count=0");
+                strWriter.WriteLine("Driver.Car=0");
+            }
 
             return strWriter.ToString();
         }
@@ -520,27 +513,23 @@ namespace SHMConnector
 
         public string ReadData()
         {
-            StringWriter strWriter;
-            long startGeneration;
+            StringWriter strWriter = new StringWriter();
 
-            do
+            lock (sectorLock)
             {
-                strWriter = new StringWriter();
-
-                startGeneration = dataGeneration;
-
-                physics = ReadPhysics();
-                graphics = ReadGraphics();
-                staticInfo = ReadStaticInfo();
-                cars = ReadCars();
-
-                string session = "";
                 long timeLeft = 0;
 
                 strWriter.WriteLine("[Session Data]");
-                strWriter.Write("Active="); strWriter.WriteLine((connected && graphics.Status != AC_STATUS.AC_OFF) ? "true" : "false");
                 if (connected)
                 {
+                    string session = "";
+                    
+                    physics = ReadPhysics();
+                    graphics = ReadGraphics();
+                    staticInfo = ReadStaticInfo();
+                    cars = ReadCars();
+
+                    strWriter.Write("Active="); strWriter.WriteLine((graphics.Status != AC_STATUS.AC_OFF) ? "true" : "false");
                     strWriter.Write("Paused="); strWriter.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
 
                     staticInfo.IsTimedRace = IsTimedRace() ? 1 : 0;
@@ -551,7 +540,7 @@ namespace SHMConnector
 
                     strWriter.Write("Car="); strWriter.WriteLine(normalizeName(staticInfo.CarModel));
                     strWriter.Write("Track="); strWriter.WriteLine(normalizeName(staticInfo.Track));
-				    strWriter.Write("Layout="); strWriter.WriteLine(normalizeName(staticInfo.TrackConfiguration));
+                    strWriter.Write("Layout="); strWriter.WriteLine(normalizeName(staticInfo.TrackConfiguration));
                     strWriter.Write("SessionFormat="); strWriter.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                     strWriter.Write("FuelAmount="); strWriter.WriteLine(staticInfo.MaxFuel);
 
@@ -566,7 +555,11 @@ namespace SHMConnector
                     strWriter.Write("SessionLapsRemaining="); strWriter.WriteLine(GetRemainingLaps(timeLeft));
                 }
                 else
+                {
+                    strWriter.WriteLine("Active=false");
+
                     return strWriter.ToString();
+                }
 
                 strWriter.WriteLine("[Stint Data]");
 
@@ -651,7 +644,6 @@ namespace SHMConnector
                 strWriter.WriteLine("Sector2=" + Math.Round(sectorBoundary2, 2));
 				*/
             }
-            while (startGeneration != dataGeneration);
 
             return strWriter.ToString();
         }

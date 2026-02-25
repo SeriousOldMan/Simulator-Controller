@@ -189,7 +189,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        |
 | Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        |
 | Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        |
-| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Delta Information (11)          | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 | Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 | General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 
@@ -201,7 +201,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
 
-(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, information about cars in other classes, and so on. The warnings for faster or slower cars in multiclass races will be given independent of the configured minimum wait time between shout outs, but you may want to tweak the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to the lowest possible value.
+(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, information about cars in other classes, and so on. The warnings for faster or slower cars in multiclass races will be given independent of the configured minimum wait time between shout outs, but you may want to tweak the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to the lowest possible value and you can specify the observation range with other settings as well, for example: "Spotter: Forward traffic observation".
 
 (5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
 
@@ -214,6 +214,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
 
 (10) Only in a race session.
+
+(11) Calculating the time gaps between two cars on the track is one of the most complex mathematical problems in sim racing. Even some of the most well-known simulators don't get it right. Simulator Controller, especially the Spotter and also the Strategist, uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please not that this method is not supported for all simulators.
 
 ##### Accident detection for *Assetto Corsa Competizione*
 

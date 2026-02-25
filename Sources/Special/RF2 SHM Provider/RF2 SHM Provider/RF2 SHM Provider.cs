@@ -183,6 +183,8 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(index); Console.Write(".Laps="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 				Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
+				
+				Console.Write("Car."); Console.Write(index); Console.Write(".Lap.Running.Time="); Console.WriteLine((long)((telemetry.mElapsedTime - telemetry.mLapStartET) * 1000));
 
 				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
 

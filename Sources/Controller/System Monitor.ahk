@@ -1065,7 +1065,7 @@ systemMonitor(command := false, arguments*) {
 		local tyreSet := false
 		local hasPitstop := true
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
-		local driverRequest, driver
+		local driverRequest, driver, timeLoss
 
 		computePressure(key) {
 			local value := getMultiMapValue(sessionState, "Pitstop", key, false)
@@ -1263,7 +1263,10 @@ systemMonitor(command := false, arguments*) {
 																 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 																 . "</td></tr>")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+					timeLoss := (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane"))
+
+					if (timeLoss > 0)
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . timeLoss . translate(" Seconds") . "</td></tr>")
 				}
 				else {
 					html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
@@ -1386,7 +1389,10 @@ systemMonitor(command := false, arguments*) {
 					if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false))
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+					timeLoss := (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane"))
+
+					if (timeLoss > 0)
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . timeLoss . translate(" Seconds") . "</td></tr>")
 				}
 		}
 		catch Any as exception {

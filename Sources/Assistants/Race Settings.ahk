@@ -750,7 +750,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		}
 		else
 			settingsGui["strategyUpdateLapsCheck"].Enabled := (isNumber(settingsGui["strategyUpdateLapsEdit"].Text) && (settingsGui["strategyUpdateLapsEdit"].Text > 0))
-
 	}
 
 	updateStrategyPitstop(type, *) {

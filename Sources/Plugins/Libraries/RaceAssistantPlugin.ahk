@@ -1799,8 +1799,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	static activeSession(data) {
-		return (getMultiMapValue(data, "Session Data", "Active", false)
-			 && (getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) > 0))
+		return (this.runningSession(data) && ((getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
+										   || (getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) > 0)
+										   || (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) > 0)))
 	}
 
 	static runningSession(data) {

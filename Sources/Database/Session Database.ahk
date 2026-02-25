@@ -7724,6 +7724,7 @@ editLaps(editorOrCommand, arguments*) {
 			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Track"]))
 			  , tyreCompound
 			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Consumption"]))
+			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Remaining"]))
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (entry["Map"] = kNull) ? translate("n/a") : entry["Map"]
 			  , (entry["TC"] = kNull) ? translate("n/a") : entry["TC"]
@@ -7792,6 +7793,7 @@ editLaps(editorOrCommand, arguments*) {
 			  , displayValue("Float", convertUnit("Temperature", entry["Temperature.Track"]))
 			  , tyreCompound
 			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Consumption"]))
+			  , displayValue("Float", convertUnit("Volume", entry["Fuel.Remaining"]))
 			  , lapTimeDisplayValue(entry["Lap.Time"])
 			  , (isInteger(entry["Tyre.Laps"]) || InStr(entry["Tyre.Laps"], ",")) ? entry["Tyre.Laps"] : translate("n/a")
 			  , pressures ? values2String(seperator, pressures*) : translate("n/a")
@@ -8019,7 +8021,7 @@ editLaps(editorOrCommand, arguments*) {
 
 		electronicsListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
 													 , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
-															  , "Consumption", "Lap Time", "Map", "TC", "ABS", "BB"], translate))
+															  , "Consumption", "Remaining", "Lap Time", "Map", "TC", "ABS", "BB"], translate))
 		electronicsListView.OnEvent("Click", noSelect)
 		electronicsListView.OnEvent("DoubleClick", noSelect)
 		electronicsListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))
@@ -8034,7 +8036,8 @@ editLaps(editorOrCommand, arguments*) {
 
 		tyresListView := lapsGui.Add("ListView", "x24 ys+30 w377 h332 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit"
 											   , collect(["Weather", "Temperature (Air)", "Temperature (Track)", "Compound"
-														, "Consumption", "Lap Time", "Tyre Laps", "Pressures", "Temperatures", "Wear"], translate))
+														, "Consumption", "Remaining", "Lap Time", "Tyre Laps"
+														, "Pressures", "Temperatures", "Wear"], translate))
 		tyresListView.OnEvent("Click", noSelect)
 		tyresListView.OnEvent("DoubleClick", noSelect)
 		tyresListView.OnEvent("ItemCheck", (lv, *) => (noSelect(lv), editLaps("UpdateState")))

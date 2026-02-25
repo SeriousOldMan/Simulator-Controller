@@ -420,7 +420,7 @@ namespace SHMConnector
                             continue;
 
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".ID="); strWriter.WriteLine(i);
-                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId);
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Nr="); strWriter.WriteLine(car.carId + 1);
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Position="); strWriter.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Laps="); strWriter.WriteLine(car.lapCount);

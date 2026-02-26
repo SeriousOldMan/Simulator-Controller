@@ -1,8 +1,8 @@
 [Development]
-Version=6.8.5.0-dev
+Version=6.8.5.0-beta
 Target=6.8.5.0-release
-Date=02/25/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Iw4hU5Gw/Releases/Simulator%20Controller%206.8.5.0-dev.zip
+Date=02/26/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/tIEJ3i69/Releases/Simulator%20Controller%206.8.5.0-beta.zip
 Changes=Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E RF2 LMU and PMR, Removed missing information from "System Monitor" in first lap, Potential fix for AC sector times, Add remaining fuel to Laps viewer in "Session Database", Another fix for session startup waiting time
 Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
 [Release]
@@ -24,5 +24,5 @@ Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.8.5.0-dev
+Development=6.8.5.0-beta
 Release=6.8.4.0-release

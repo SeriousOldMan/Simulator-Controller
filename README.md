@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.4.0-release](https://cutt.ly/itQjffjZ) (Changes: Car geometry information for AMS2, Optimized Assistants cooldown phase, New script function Rules.Produce, Updated LLM Runtime, Assistant.Call returns value, New Assistant.Property, New knowledge base fact for Assistant language, Migrated to AHK 2.1-alpha.19, Removed passive cars for rF2 and LMU, Fixed rare produce bug, Show DNS in race reports.)
+[6.8.5.0-release](https://cutt.ly/ytW0BgHF) (Changes: Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E RF2 LMU and PMR, Removed missing information from "System Monitor" in first lap, Potential fix for AC sector times, Add remaining fuel to Laps viewer in "Session Database", Another fix for session startup waiting time.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6840) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6850) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-685) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.8.3.0-release](https://cutt.ly/9tnGZZrB) (Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression.)
+[6.8.4.0-release](https://cutt.ly/itQjffjZ) (Changes: Car geometry information for AMS2, Optimized Assistants cooldown phase, New script function Rules.Produce, Updated LLM Runtime, Assistant.Call returns value, New Assistant.Property, New knowledge base fact for Assistant language, Migrated to AHK 2.1-alpha.19, Removed passive cars for rF2 and LMU, Fixed rare produce bug, Show DNS in race reports.)
 
-[6.8.2.0-release](https://cutt.ly/EtbigDjN) (Changes: "invoke" action function returns the result, New controller action function "property", Changed URL handling in *Generic* LLM connector, Rework of validation handling, Optimized LMU startup sequence, Fixed unit conversion in Issue Analyzer, Fixed ACC startup process, New news article, Fixed uploading of car setups, Show sector times in lap report in "Solo Center" and "Team Center", Sector times approximation for AC, Fixed session end procession for LMU.)
+[6.8.3.0-release](https://cutt.ly/9tnGZZrB) (Changes: Team Server as DLC, Whisper Server as DLC, New car models for "Setup Workbench", Fixed tyre set computations for sims not supporting it, Fixed Strategist position calculation when sectors are missing, Lap times and sector times approximation for PMR, Debug Rules enables tracing, Rule Engine is now enabled in lap 0, Fixed ZIP file compression.)
 
 #### Latest development build
 
-[6.8.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/tIEJ3i69/Releases/Simulator%20Controller%206.8.5.0-beta.zip) (Test build for 6.8.5. Changes: Refactord voice continuations, Fixed track deletion for LMU in "Session Database", Car classes for LMU, New gap calculation for AC ACC AMS2 PCARS2 R3E RF2 LMU and PMR, Removed missing information from "System Monitor" in first lap, Potential fix for AC sector times, Add remaining fuel to Laps viewer in "Session Database", Another fix for session startup waiting time.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6850) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-685) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

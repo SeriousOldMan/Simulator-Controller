@@ -482,6 +482,8 @@ namespace PMRUDPConnector
                         var participants = receiver.GetAllParticipantStates();
                         if (participants != null)
                         {
+                            participants.Sort((a, b) => a.VehicleId.CompareTo(b.VehicleId));
+
                             for (int i = 0; i < participants.Count && i < MAX_CARS; i++)
                             {
                                 UpdateSectorTimes(participants[i], i);

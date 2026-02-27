@@ -4338,8 +4338,6 @@ class RaceSpotter extends GridRaceAssistant {
 				newSector := true
 			}
 
-			knowledgeBase.setFact("Sector", sector)
-
 			sector := (sector . "." . sectorIndex++)
 
 			if !this.MultiClass

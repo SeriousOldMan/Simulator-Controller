@@ -5066,8 +5066,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 		this.initializeGridPosition(data)
 
-		if (noGrid && this.GridPosition)
-			knowledgeBase.setFact("Grid", lapNumber)
+		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)

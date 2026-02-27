@@ -32,11 +32,8 @@ priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
 		(Clear: Position.Standings.Class.Leader.Delta),
 		(Clear: Position.Track.Ahead.Car), (Clear: Position.Track.Ahead.Distance), (Clear: Position.Track.Ahead.Delta),
 		(Clear: Position.Track.Behind.Car), (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
-[?Lap] => (Prove: updateGrid(?Lap))
-[?Grid] => (Prove: updateGrid(?Grid))
-{Any: [?Lap], [?Sector], [?Standings], [?Grid]} => (Prove: updatePositions(!Lap)), (Prove: updateTrackAhead(!Lap)), (Prove: updateTrackBehind(!Lap))
-priority: -5, [?Grid] => (Clear: Grid)
-priority: -5, [?Sector] => (Clear: Sector)
+{Any: [?Lap], [?Sector], [?Standings]} => (Prove: updateGrid(?Lap)), (Prove: updatePositions(!Lap)),
+										  (Prove: updateTrackAhead(!Lap)), (Prove: updateTrackBehind(!Lap))
 priority: -5, [?Standings] => (Clear: Standings)
 
 updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
@@ -67,9 +64,9 @@ updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
 		updateStandingsClassLeader(?class, ?lap, !Driver.Car, 0, 0), updateStandingsOverallLeader(?lap, !Driver.Car, 0, 0),
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
+		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning), ?carLaps > 1,
 		?car != !Driver.Car, carLapTime(?car, ?carLapTime), carSectorsTime(?car, ?carSectorTimes),
 		lapTime(?lap, ?lapTime), carPosition(?car, ?position),
-		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning),
 		?standingsDistance = ?carLaps - ?driverLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
 		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
 		Set(?prefix, Time, ?carLapTime), Set(?prefix, Time.Sectors, ?carSectorTimes),

@@ -2730,8 +2730,6 @@ class RaceStrategist extends GridRaceAssistant {
 			if (sector != lastSector) {
 				lastSector := sector
 
-				knowledgeBase.addFact("Sector", sector)
-
 				updateStrategy := knowledgeBase.getValue("Strategy.Recalculate", false)
 			}
 		}

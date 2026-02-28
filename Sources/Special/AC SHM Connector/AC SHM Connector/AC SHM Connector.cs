@@ -315,6 +315,9 @@ namespace SHMConnector
                             }
 
                             if (sectorBoundariesCalibrated && cars.numVehicles > 0)
+                            {
+                                int wallClock = Environment.TickCount;
+
                                 for (int i = 0; i < cars.numVehicles; i++)
                                 {
                                     ref AcCarInfo car = ref cars.cars[i];
@@ -322,8 +325,9 @@ namespace SHMConnector
                                         continue;
 
                                     int currentSector = GetSectorFromSplinePosition(car.splinePosition);
-                                    UpdateSectorTimes(i, currentSector, graphics.iCurrentTime, car.lastLapTimeMS);
+                                    UpdateSectorTimes(i, currentSector, wallClock);
                                 }
+                            }
                         }
                 }
                 catch
@@ -364,7 +368,7 @@ namespace SHMConnector
                 return 2;
         }
 
-        private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime, int lapTime)
+        private void UpdateSectorTimes(int carIndex, int currentSector, int currentTime)
         {
             if (carIndex < 0 || carIndex >= MAX_CARS)
                 return;
@@ -397,7 +401,7 @@ namespace SHMConnector
                 {
                     lastSector1Times[carIndex] = sector1Times[carIndex];
                     lastSector2Times[carIndex] = sector2Times[carIndex];
-                    lastSector3Times[carIndex] = lapTime - sector1Times[carIndex] - sector2Times[carIndex];
+                    lastSector3Times[carIndex] = sectorTime;
 
                     sector1Times[carIndex] = 0;
                     sector2Times[carIndex] = 0;

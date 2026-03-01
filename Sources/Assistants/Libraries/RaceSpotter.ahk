@@ -4304,7 +4304,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
 		local started := (lapNumber > 0)
-		local sector, result, valid, gapAhead, gapBehind
+		local standings := false
+		local deltaInformation, sector, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
 		static lastLap := 0
@@ -4354,26 +4355,32 @@ class RaceSpotter extends GridRaceAssistant {
 					logError(exception, true)
 				}
 
-				if this.DriverUpdateTime {
-					if (A_TickCount >= this.iNextDriverUpdate) {
-						this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-						this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
-
-						newSector := false
-					}
-					else
-						this.updateDriver(lapNumber, sector, false, false, this.Positions)
-				}
-				else {
-					this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-					newSector := false
-				}
+				deltaInformation := this.Announcements["DeltaInformation"]
+				standings := ((deltaInformation = "A") || ((deltaInformation = "S") && newSector))
 			}
 		}
 
+		if standings
+			knowledgeBase.setFact("Standings", true)
+
 		result := super.updateLap(lapNumber, &data)
+
+		if this.DriverUpdateTime {
+			if (A_TickCount >= this.iNextDriverUpdate) {
+				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+				this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
+				newSector := false
+			}
+			else
+				this.updateDriver(lapNumber, sector, false, false, this.Positions)
+		}
+		else {
+			this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+			newSector := false
+		}
 
 		if started {
 			loop knowledgeBase.getValue("Car.Count") {

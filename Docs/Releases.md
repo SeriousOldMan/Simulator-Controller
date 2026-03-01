@@ -21,8 +21,19 @@
 
 # Upcoming release
 
-Not yet planned...
-	  
+## 6.8.6.0
+
+#### Date: 03/05/26 (planned)
+
+#### Fixes
+
+  - Once again a fix for the sector time calculation for *Assetto Corsa*.
+  - A filter has been implemented that can handle registered but not participating cars in online races in *Le Mans Ultimate*. Previously it was possible, that gap times were reported for these cars.
+  
+#### Changes
+
+  - None this time...
+  
 # Release history
 
 ## 6.8.4.0

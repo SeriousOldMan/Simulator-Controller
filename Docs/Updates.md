@@ -33,6 +33,14 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you probably want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 6.8.6
+
+Nothing to do.
+
+## Release 6.8.5
+
+Nothing to do.
+
 ## Release 6.8.4
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.

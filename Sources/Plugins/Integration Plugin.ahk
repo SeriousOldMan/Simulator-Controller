@@ -851,6 +851,9 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 
 			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)
+
+			if (getMultiMapValue(coachingState, "Instructions", "Name", kKUndefined) != kUndefined)
+				state["Name"] := getMultiMapValue(coachingState, "Instructions", "Name")
 		}
 
 		return state

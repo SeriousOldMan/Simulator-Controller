@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.8.6
 
-Nothing to do.
+The SimHub plugin has been updated. If you have used the "old" plugin already, remove it from the SimHub installation folder and place the new plugin there. You can either use the automatic installation process on the "Basic" configuration page in "Simulator Setup" or you copy it by yourself from *Utilities\Plugins* in the installation folder of Simulator Controller.
 
 ## Release 6.8.5
 

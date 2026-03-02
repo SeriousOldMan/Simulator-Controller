@@ -1923,6 +1923,7 @@ Now let's have a look at each oject:
 	
 		"Instructions": {
 			"Corner": 3,
+			"Name": "Raidillon",
 			"Hints": [
 				{
 					"Hint": "BrakeEarlier",
@@ -1939,7 +1940,7 @@ Now let's have a look at each oject:
 			]
 		}
 	
-	Please note, that the "Message" properties are not available, if no voice support for the Driving Coach has been configured.
+	Please note, that the "Message" properties are not available, if no voice support for the Driving Coach has been configured. Additionally, corner names will be only be available, if defined in the track map.
 
 As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example *SimHub* with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
 

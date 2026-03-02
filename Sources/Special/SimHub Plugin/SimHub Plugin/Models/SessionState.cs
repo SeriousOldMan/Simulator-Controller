@@ -587,6 +587,9 @@ namespace SimulatorController.SimHub.Plugin
         [JsonProperty("Corner")]
         public int? Corner { get; set; }
 
+        [JsonProperty("Name")]
+        public string? Name { get; set; }
+
         [JsonProperty("Hints")]
         public HintData[] Hints { get; set; }
     }

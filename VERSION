@@ -3,8 +3,8 @@ Version=6.8.6.0-dev
 Target=6.8.6.0-release
 Date=03/02/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ugPQPYXV/Releases/Simulator%20Controller%206.8.6.0-dev.zip
-Changes=Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop
-Components=Media->5.6.1,Configuration->6.8.3,Utilities->6.8.1
+Changes=Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop, Corner name in "Session State.json"
+Components=Media->5.6.1,Configuration->6.8.6,Utilities->6.8.6
 [Release]
 Version=6.8.5.0-release
 Date=02/27/2026
@@ -18,9 +18,15 @@ Media.5.6.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.6.8.3.Path=Resources
 Configuration.6.8.3.Content=Setup
 Configuration.6.8.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/mE67epkf/Components/Configuration%206.8.3.zip;https://www.dropbox.com/scl/fi/597lbkrexhwx6tffco1ta/Configuration-6.8.3.zip?rlkey=duh0xrqu78gtdhvbbyd2mz7h9&st=tpsjr2fo&dl=1;http://%master%/Components/Configuration 6.8.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.3.zip
+Configuration.6.8.6.Path=Resources
+Configuration.6.8.6.Content=Setup
+Configuration.6.8.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/h7kvY3ws/Components/Configuration%206.8.6.zip;https://www.dropbox.com/scl/fi/lg54zyk85gd3d9u7f0imw/Configuration-6.8.6.zip?rlkey=o5zzpayz7cqjnz4rrjcosfg90&st=patduvvr&dl=1;http://%master%/Components/Configuration 6.8.6.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.8.6.zip
 Utilities.6.8.1.Path=.
 Utilities.6.8.1.Content=Utilities
 Utilities.6.8.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/29ZLigT4/Components/Utilities 6.8.1.zip;http://%master%/Components/Utilities 6.8.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.1.zip
+Utilities.6.8.6.Path=.
+Utilities.6.8.6.Content=Utilities
+Utilities.6.8.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HSl6YQNc/Components/Utilities%206.8.6.zip;https://www.dropbox.com/scl/fi/sxufh0ad4znxxqvpw8k9g/Utilities-6.8.6.zip?rlkey=j4ff6uablv4zz44mcgbvtaan9&st=rk0wrdzh&dl=1;http://%master%/Components/Utilities 6.8.6.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.6.zip
 [Current]
 Type=Development
 [Version]

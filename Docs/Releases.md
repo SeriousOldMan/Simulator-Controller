@@ -33,7 +33,9 @@
   
 #### Changes
 
-  - None this time...
+  - If on-track coaching is active, the name of the corner (if defined in the map data) will be supplied to SimHub. Please note, that this requires an update to the SimHub plugin. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) for instructions on how to update to the latest version.
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
   
 # Release history
 

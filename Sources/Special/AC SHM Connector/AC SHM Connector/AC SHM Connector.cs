@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -22,6 +23,8 @@ namespace SHMConnector
         Graphics graphics;
         Cars cars;
         StaticInfo staticInfo;
+
+        private string logFile = null;
 
         private const int MAX_CARS = 64;
         private const int SECTOR_UPDATE_INTERVAL_MS = 50;
@@ -56,6 +59,18 @@ namespace SHMConnector
             sectorUpdateThread = new Thread(SectorUpdateWorker);
             sectorUpdateThread.IsBackground = true;
             sectorUpdateThread.Start();
+        }
+
+        private void LogMessage(string message)
+        {
+            if (logFile != null)
+            {
+                StreamWriter output = new StreamWriter(logFile, true);
+
+                output.WriteLine(message);
+
+                output.Close();
+            }
         }
 
         string GetSession(AC_SESSION_TYPE session) {
@@ -347,11 +362,16 @@ namespace SHMConnector
                 if (lastObservedSector == 0 && currentSector == 1)
                 {
                     sectorBoundary1 = playerCar.splinePosition;
+
+                    LogMessage("Found sector 1: " + sectorBoundary1);
                 }
                 else if (lastObservedSector == 1 && currentSector == 2)
                 {
                     sectorBoundary2 = playerCar.splinePosition;
                     sectorBoundariesCalibrated = true;
+
+                    if (logFile != null)
+                        LogMessage("Found sector 2: " + sectorBoundary2);
                 }
                 
                 lastObservedSector = currentSector;
@@ -384,6 +404,9 @@ namespace SHMConnector
                     sectorStarted[carIndex] = true;
                     sectorStartTimes[carIndex] = currentTime;
                     previousSector[carIndex] = 0;
+
+                    if (logFile != null)
+                        LogMessage("Car " + carIndex + "; Sector 1 Start: " + currentTime);
                 }
 
                 return;
@@ -394,14 +417,27 @@ namespace SHMConnector
                 int sectorTime = currentTime - sectorStartTimes[carIndex];
 
                 if (prevSector == 0)
+                {
                     sector1Times[carIndex] = sectorTime;
+
+                    if (logFile != null)
+                        LogMessage("Car " + carIndex + "; Sector 1 Time: " + sectorTime);
+                }
                 else if (prevSector == 1)
+                {
                     sector2Times[carIndex] = sectorTime;
+
+                    if (logFile != null)
+                        LogMessage("Car " + carIndex + "; Sector 2 Time: " + sectorTime);
+                }
                 else
                 {
                     lastSector1Times[carIndex] = sector1Times[carIndex];
                     lastSector2Times[carIndex] = sector2Times[carIndex];
                     lastSector3Times[carIndex] = sectorTime;
+
+                    if (logFile != null)
+                        LogMessage("Car " + carIndex + "; Sector 3 Time: " + sectorTime);
 
                     sector1Times[carIndex] = 0;
                     sector2Times[carIndex] = 0;
@@ -409,6 +445,9 @@ namespace SHMConnector
 
                 sectorStartTimes[carIndex] = currentTime;
                 previousSector[carIndex] = currentSector;
+
+                if (logFile != null)
+                    LogMessage("Car " + carIndex + "; Sector " + (currentSector + 1) + " Start: " + currentTime);
             }
         }
 
@@ -658,6 +697,11 @@ namespace SHMConnector
                 connected = ConnectToSharedMemory();
 
             return connected;
+        }
+
+        public void SetLogFile(string logFile)
+        {
+            this.logFile = logFile;
         }
 
         public void Close()

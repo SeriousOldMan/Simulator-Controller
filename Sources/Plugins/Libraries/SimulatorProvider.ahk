@@ -418,6 +418,10 @@ callSimulator(simulator, options := "", protocol?) {
 					try {
 						connector := DllCall("LoadLibrary", "Str", protocol.File, "Ptr")
 
+						if isDebug()
+							try
+								DLLCall(protocol.Library . "\setLogFile", "Str", kLogsDirectory . simulator . " Connector.log")
+
 						if protocol.HasProp("Arguments")
 							DLLCall(protocol.Library . "\open", "Str", values2String(",", protocol.Arguments*))
 						else
@@ -451,6 +455,10 @@ callSimulator(simulator, options := "", protocol?) {
 						throw "Unable to find `"" . protocol.File . "`" in callSimulator..."
 
 					connector := CLR_LoadLibrary(protocol.File).CreateInstance(protocol.Instance)
+
+					if isDebug()
+						try
+							connector.SetLogFile(kLogsDirectory . simulator . " Connector.log")
 
 					if protocol.HasProp("Arguments") {
 						if (!connector.Open(protocol.Arguments*) && !isDebug())

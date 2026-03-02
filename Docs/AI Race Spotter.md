@@ -189,8 +189,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        |
 | Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        |
 | Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        |
-| Delta Information (11)          | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
-| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Delta Information (11) (12)     | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
+| Tactical Advices (4) (12)       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 | General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       |
 
 ##### Notes
@@ -216,6 +216,12 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (10) Only in a race session.
 
 (11) Calculating the time gaps between two cars on the track is one of the most complex mathematical problems in sim racing. Even some of the most well-known simulators don't get it right. Simulator Controller, especially the Spotter and also the Strategist, uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please not that this method is not supported for all simulators.
+
+(12) It depends on the simulator, how accurate the provided position data, lap times, gap times, and so on will be. Some simulators will update some or all of this information only once per sector or even less. It will also depend on your configuration, how often this information will be acquired from the simulator and how often the Spotter will provide this information to you. I recommend to start with this configuration choices:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Spotter%20Config.jpg)
+
+Also use a very low setting for "Data: Update Frequency" of around 2 - 3 seconds in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Doing all this, you will create a very verbose Spotter and you can check whether the provided information is accurate. Once you have seen, what information the Spotter provides and how accurate it is for your chosen simulator, you can reduce the frequency of the Spotter callouts again and also choose "Sector" for opponent information, for example. As a side note, the Strategist will update all this information only once per sector, even if available at a higher resolution by the simulator.
 
 ##### Accident detection for *Assetto Corsa Competizione*
 

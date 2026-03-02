@@ -2493,9 +2493,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
-		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 		local spoken := false
-		local fastSpeaker, ignore, otherIndex, carsAhead
+		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		static reportedCarsAhead := []
@@ -2503,6 +2502,11 @@ class RaceSpotter extends GridRaceAssistant {
 		static nextGeneralWarning := false
 		static nextPodiumWarning := false
 		static nextFightWarning := false
+
+		static fasterClasses := CaseInsenseMap()
+		static slowerClasses := CaseInsenseMap()
+
+		carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster() && !slowerClasses.Has(c.Class)))
 
 		try {
 			if (carsBehind.Length > 0) {
@@ -2515,6 +2519,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if ((carBehind.Position["Class"] = 1) && !inList(reportedCarsBehind, carBehind)) {
 					fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
+
+					fasterClasses[carBehind.Class] := true
 
 					return (spoken := true)
 				}
@@ -2529,6 +2535,8 @@ class RaceSpotter extends GridRaceAssistant {
 													 && carBehind.inFight(otherCarBehind)) {
 								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
+								fasterClasses[carBehind.Class] := true
+
 								nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 								return (spoken := true)
@@ -2542,29 +2550,28 @@ class RaceSpotter extends GridRaceAssistant {
 					if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
 
+						fasterClasses[carBehind.Class] := true
+
 						nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 						return (spoken := true)
 					}
-					else if (A_TickCount > nextGeneralWarning)
-						if (position <= 5) {
+					else if (A_TickCount > nextGeneralWarning) {
+						if (position <= 5)
 							fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
-
-							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
-
-							return (spoken := true)
-						}
-						else {
+						else
 							fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
 
-							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+						fasterClasses[carBehind.Class] := true
 
-							return (spoken := true)
-						}
+						nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+						return (spoken := true)
+					}
 				}
 			}
 			else {
-				carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower()))
+				carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower() && !fasterClasses.Has(c.Class)))
 
 				try {
 					if (carsAhead.Length > 0) {
@@ -2577,6 +2584,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 						if ((carAhead.Position["Class"] = 1) && !inList(reportedCarsAhead, carAhead)) {
 							fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
+
+							slowerClasses[carAhead.Class] := true
 
 							return (spoken := true)
 						}
@@ -2591,6 +2600,8 @@ class RaceSpotter extends GridRaceAssistant {
 															 && carAhead.inFight(otherCarAhead)) {
 										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
+										slowerClasses[carAhead.Class] := true
+
 										nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 										return (spoken := true)
@@ -2604,25 +2615,24 @@ class RaceSpotter extends GridRaceAssistant {
 							if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 								fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
 
+								slowerClasses[carAhead.Class] := true
+
 								nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 								return (spoken := true)
 							}
-							else if (A_TickCount > nextGeneralWarning)
-								if (position <= 5) {
+							else if (A_TickCount > nextGeneralWarning) {
+								if (position <= 5)
 									fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
-
-									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
-
-									return (spoken := true)
-								}
-								else {
+								else
 									fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
 
-									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+								slowerClasses[carAhead.Class] := true
 
-									return (spoken := true)
-								}
+								nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+								return (spoken := true)
+							}
 						}
 					}
 				}

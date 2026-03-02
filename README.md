@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.6.0-dev]() (Early build for 6.8.6. Changes: Fixed AC sector times, Fixed LMU grid for absent cars.)
+[6.8.6.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ugPQPYXV/Releases/Simulator%20Controller%206.8.6.0-dev.zip) (Early build for 6.8.6. Changes: Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6860) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) of this version and all the versions you might have skipped, before installing and using this version.
 

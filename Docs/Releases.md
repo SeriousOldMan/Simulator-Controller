@@ -27,12 +27,14 @@
 
 #### Fixes
 
+  - Added a couple of missing translations.
   - Once again a fix for the sector time calculation for *Assetto Corsa*.
   - A filter has been implemented that can handle registered but not participating cars in online races in *Le Mans Ultimate*. Previously it was possible, that gap times were reported for these cars.
   - The Spotter no longer gives wrong warnings for slower or faster cars of another class after a pitstop.
   
 #### Changes
 
+  - All tyre compound choices in the "Strategy Workbench" will adjust to changes made to the configuration of available tyre sets.
   - If on-track coaching is active, the name of the corner (if defined in the map data) will be supplied to SimHub. Please note, that this requires an update to the SimHub plugin. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) for instructions on how to update to the latest version.
   - The documentation regarding the information accuracy of the Strategist and the Spotter has been updated. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#how-it-works) and [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#simulator-integration) (especially Note #12). In short: Lap times, gap times and position data may be updated for the Strategist with each sector (if the data is provided by the simulator), whereas the situation for the Spotter is a bit more complex and depends on the data update frequency as defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" and it depends on the general configuration of the Spotter as defined in "Simulator Setup" or "Simulator Configuration".
 	  

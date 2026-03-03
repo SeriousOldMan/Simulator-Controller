@@ -31,6 +31,8 @@
   - Once again a fix for the sector time calculation for *Assetto Corsa*.
   - A filter has been implemented that can handle registered but not participating cars in online races in *Le Mans Ultimate*. Previously it was possible, that gap times were reported for these cars.
   - The Spotter no longer gives wrong warnings for slower or faster cars of another class after a pitstop.
+  - Fixed a parameter definition error for the "plan_pitstop" event of the *Reasoning* booster of the Race Engineer.
+  - Fixed a parameter definition error for the "report_low_energy" action of the *Reasoning* booster of the Race Engineer.
   
 #### Changes
 

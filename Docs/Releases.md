@@ -34,6 +34,7 @@
 #### Changes
 
   - If on-track coaching is active, the name of the corner (if defined in the map data) will be supplied to SimHub. Please note, that this requires an update to the SimHub plugin. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) for instructions on how to update to the latest version.
+  - The documentation regarding the information accuracy of the Strategist and the Spotter has been updated. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#how-it-works) and [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#simulator-integration) (especially Note #12). In short: Lap times, gap times and position data may be updated for the Strategist with each sector (if the data is provided by the simulator), whereas the situation for the Spotter is a bit more complex and depends on the data update frequency as defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" and it depends on the general configuration of the Spotter as defined in "Simulator Setup" or "Simulator Configuration".
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
   

@@ -2666,7 +2666,7 @@ class RaceSpotter extends GridRaceAssistant {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 						return false
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) > lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
@@ -2711,7 +2711,7 @@ class RaceSpotter extends GridRaceAssistant {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 						return false
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
@@ -2766,7 +2766,7 @@ class RaceSpotter extends GridRaceAssistant {
 						delta := (this.getDelta(car) / 1000)
 						inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-						if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+						if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 							return false
 						else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 							  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))

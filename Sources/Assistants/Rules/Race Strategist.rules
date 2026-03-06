@@ -332,7 +332,7 @@ pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=
 		?tempTL1 = ?targetLap + !Session.Settings.Pitstop.Strategy.Window.Considered, min(?maxLap, ?tempTL1, ?tempTL2),
 		min(!Pitstop.Strategy.Lap.Max, ?tempTL2, ?toLap)
 
-choosePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
+choosePitstopStrategy(?lap, ?fromLap, ?fromLap) <= Set(Pitstop.Strategy.Lap, ?fromLap), !
 choosePitstopStrategy(?lap, ?fromLap, ?toLap) <= createPitstopScenarios(?lap, ?fromLap, ?toLap,
 																		?laps, ?positions, ?carsInFront, ?trafficDensities),
 												 Set(Pitstop.Strategy.Evaluation.Laps, ?laps),
@@ -346,8 +346,8 @@ choosePitstopStrategy(?lap, ?fromLap, ?toLap) <= createPitstopScenarios(?lap, ?f
 createPitstopScenarios(?lap, ?fromLap, ?toLap, [], [], [], []) <= ?fromLap > ?toLap, !
 createPitstopScenarios(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions],
 											   [?carsAhead | ?carsInFront], [?trafficDensity | ?trafficDensities]) <=
-		pitstopDeltaTime(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta), !,
-		evaluatePosition(?fromLap, ?position, ?carsAhead, ?trafficDensity),
+		pitstopDeltaTime(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta),
+		evaluatePosition(?fromLap, ?position, ?carsAhead, ?trafficDensity), !,
 		?nextLap = ?fromLap + 1, createPitstopScenarios(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities)
 createPitstopScenarios(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities) <=
 		?fromLap =< ?toLap, ?nextLap = ?fromLap + 1,

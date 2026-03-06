@@ -38,9 +38,9 @@ pitstopDeltaTime(?lap, ?fuel, ?tyreCompound, ?brakeChange, ?damages, ?serviceTim
 		?repairTime = ?temp * 1000
 
 computeSeviceTimes(?fullTime, ?serviceTime, ?repairTime) <=
-		?fullTime > !Target.Time.Box.Fixed, !,
+		?fullTime > !Target.Time.Box.Fixed,
 		?serviceTime = !Target.Time.Box.Fixed,
-		?repairTime = ?fullTime - !Target.Time.Box.Fixed
+		?repairTime = ?fullTime - !Target.Time.Box.Fixed, !
 computeSeviceTimes(?fullTime, !Target.Time.Box.Fixed, 0)
 
 pitstopServiceTime(?lap, 0, false, false, 0) <= !

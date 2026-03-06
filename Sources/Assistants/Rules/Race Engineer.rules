@@ -508,7 +508,7 @@ preDamageLap(?damageType, ?, ?lap) <= !Lap > 1, ?tLap = !Lap - 1, Get(Lap, ?tLap
 									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
 preDamageLap(?damageType, ?, ?lap) <= unbound?(?lap), preDamageLap(?damageType, 0, !Lap, ?lap),
 									  Set(Lap, !Lap, Damage, ?damageType, Lap.Reference, ?lap)
-preDamageLap(?damageType, ?currentDamage, ?lap) <= unbound?(?lap), !, !Lap > 1, ?tLap = !Lap - 1,
+preDamageLap(?damageType, ?currentDamage, ?lap) <= unbound?(?lap), !Lap > 1, ?tLap = !Lap - 1,
 												   preDamageLap(?damageType, ?currentDamage, ?tLap, ?lap),
 												   Set(Lap, ?tLap, Damage, ?damageType, Lap.Reference, ?lap)
 preDamageLap(?, ?, 0) <= !, fail

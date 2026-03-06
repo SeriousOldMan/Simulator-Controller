@@ -2829,6 +2829,7 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase := this.KnowledgeBase
 
 		knowledgeBase.setFact("Lap", lapNumber)
+		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
 
 		if started {
 			if !this.InitialFuelAmount
@@ -3178,6 +3179,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		if (lapPenalty = kUndefined)
 			lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
+
+		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
 
@@ -5065,8 +5068,6 @@ class GridRaceAssistant extends RaceAssistant {
 			data := readMultiMap(data)
 
 		this.initializeGridPosition(data)
-
-		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)

@@ -615,7 +615,7 @@ systemMonitor(command := false, arguments*) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", fuelConsumption), 1) . "</td></tr>")
 
 			if (avgConsumption > 0)
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", avgConsumptio), 1) . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", avgConsumption), 1) . "</td></tr>")
 
 			if (remainingFuel > 0)
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", remainingFuel), 1) . "</td></tr>")

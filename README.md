@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.6.0-release](https://cutt.ly/FtRnSQzJ) (Changes: Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop, Corner name in "Session State.json", Update available tyre compounds in "Strategy Workbench", Added missing translations, Fixed "plan_pitstop" event for the Engineer, Fixed "report_low_energy" event for the Engineer, Fixed weather information by the Strategist in the first lap.)
+[6.8.6.1-release](https://cutt.ly/jtR2EjJe) (Changes: Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop, Corner name in "Session State.json", Update available tyre compounds in "Strategy Workbench", Added missing translations, Fixed "plan_pitstop" event for the Engineer, Fixed "report_low_energy" event for the Engineer, Fixed weather information by the Strategist in the first lap, Fixed a crash in the "Integration" plugin for SimHub, Fixed several critical bugs in the race reports.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6860) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) of this version and all the versions you might have skipped, before installing and using this version.
 

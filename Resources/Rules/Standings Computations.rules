@@ -64,7 +64,7 @@ updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
 		updateStandingsClassLeader(?class, ?lap, !Driver.Car, 0, 0), updateStandingsOverallLeader(?lap, !Driver.Car, 0, 0), !,
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
-		carLaps(?car, FULL, ?carLaps), carLaps(?car, RUNNING, ?carRunning), ?carLaps > 1,
+		carLaps(?car, FULL, ?carLaps), ?carLaps > 1, carLaps(?car, RUNNING, ?carRunning),
 		?car != !Driver.Car, carLapTime(?car, ?carLapTime), carSectorsTime(?car, ?carSectorTimes),
 		lapTime(?lap, ?lapTime), carPosition(?car, ?position),
 		?standingsDistance = ?carLaps - ?driverLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
@@ -74,6 +74,15 @@ updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
 		carClass(!Driver.Car, ?class), updateStandings(?class, ?lap, ?car, ?standingsDistance, ?standingsDelta),
 		?trackDistance = ?driverRunning - ?carRunning, ?temp = ?lapTime * ?trackDistance, ?trackDelta = ?temp * -1,
 		updateTrack(?lap, ?car, ?trackDistance, ?trackDelta), !,
+		?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
+updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
+		carLaps(?car, FULL, ?carLaps), ?carLaps =< 1, ?car != !Driver.Car,
+		carLapTime(?car, ?carLapTime), carSectorsTime(?car, ?carSectorTimes),
+		lapTime(?lap, ?lapTime), carPosition(?car, ?position),
+		?standingsDistance = ?carLaps - ?driverLaps, ?standingsDelta = ?lapTime * ?standingsDistance,
+		Append(Standings.Lap., ?lap, .Car., ?car, ?prefix),
+		Set(?prefix, Time, ?carLapTime), Set(?prefix, Time.Sectors, ?carSectorTimes),
+		Set(?prefix, Delta, ?standingsDelta), Set(?prefix, Laps, ?carLaps), Set(?prefix, Position, ?position), !,
 		?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <= ?nextCar = ?car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning)
 

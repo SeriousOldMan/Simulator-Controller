@@ -1,5 +1,14 @@
 # Latest stable release
 
+## 6.8.6.1
+
+#### Date: 03/07/26
+
+#### Fixes
+
+  - Fixed a crash in the "Integration" plugin for SimHub.
+  - Fixed several critical bugs in the race reports.
+
 ## 6.8.6.0
 
 #### Date: 03/06/26

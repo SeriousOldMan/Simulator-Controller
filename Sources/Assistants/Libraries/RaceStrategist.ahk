@@ -2706,7 +2706,7 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			validLap := knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
 
-		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000)
 
 		return result
 	}
@@ -2765,7 +2765,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber
 											   , knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-											   , data), 1000, kLowPriority)
+											   , data), 1000)
 
 		return result
 	}

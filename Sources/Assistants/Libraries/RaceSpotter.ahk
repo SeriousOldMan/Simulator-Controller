@@ -2493,9 +2493,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 	multiClassWarning(lastLap, sector, positions) {
 		local class := this.getClass()
-		local carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster()))
 		local spoken := false
-		local fastSpeaker, ignore, otherIndex, carsAhead
+		local fastSpeaker, ignore, otherIndex, carsBehind, carsAhead
 		local carBehind, otherCarBehind, carAhead, otherCarAhead, position
 
 		static reportedCarsAhead := []
@@ -2503,6 +2502,11 @@ class RaceSpotter extends GridRaceAssistant {
 		static nextGeneralWarning := false
 		static nextPodiumWarning := false
 		static nextFightWarning := false
+
+		static fasterClasses := CaseInsenseMap()
+		static slowerClasses := CaseInsenseMap()
+
+		carsBehind := choose(this.getCarsBehind(), (c) => ((c.Class != class) && c.isFaster() && !slowerClasses.Has(c.Class)))
 
 		try {
 			if (carsBehind.Length > 0) {
@@ -2515,6 +2519,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 				if ((carBehind.Position["Class"] = 1) && !inList(reportedCarsBehind, carBehind)) {
 					fastSpeaker.speakNormal("ClassLeaderBehind", {class: carBehind.Class})
+
+					fasterClasses[carBehind.Class] := true
 
 					return (spoken := true)
 				}
@@ -2529,6 +2535,8 @@ class RaceSpotter extends GridRaceAssistant {
 													 && carBehind.inFight(otherCarBehind)) {
 								fastSpeaker.speakNormal("PositionFightBehind", {class: carBehind.Class})
 
+								fasterClasses[carBehind.Class] := true
+
 								nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 								return (spoken := true)
@@ -2542,29 +2550,28 @@ class RaceSpotter extends GridRaceAssistant {
 					if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 						fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
 
+						fasterClasses[carBehind.Class] := true
+
 						nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 						return (spoken := true)
 					}
-					else if (A_TickCount > nextGeneralWarning)
-						if (position <= 5) {
+					else if (A_TickCount > nextGeneralWarning) {
+						if (position <= 5)
 							fastSpeaker.speakNormal("ClassCarBehind", {class: carBehind.Class, position: position})
-
-							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
-
-							return (spoken := true)
-						}
-						else {
+						else
 							fastSpeaker.speakNormal("FasterClassBehind", {class: carBehind.Class})
 
-							nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+						fasterClasses[carBehind.Class] := true
 
-							return (spoken := true)
-						}
+						nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+						return (spoken := true)
+					}
 				}
 			}
 			else {
-				carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower()))
+				carsAhead := choose(this.getCarsAhead(), (c) => ((c.Class != class) && c.isSlower() && !fasterClasses.Has(c.Class)))
 
 				try {
 					if (carsAhead.Length > 0) {
@@ -2577,6 +2584,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 						if ((carAhead.Position["Class"] = 1) && !inList(reportedCarsAhead, carAhead)) {
 							fastSpeaker.speakNormal("ClassLeaderAhead", {class: carAhead.Class})
+
+							slowerClasses[carAhead.Class] := true
 
 							return (spoken := true)
 						}
@@ -2591,6 +2600,8 @@ class RaceSpotter extends GridRaceAssistant {
 															 && carAhead.inFight(otherCarAhead)) {
 										fastSpeaker.speakNormal("PositionFightAhead", {class: carAhead.Class})
 
+										slowerClasses[carAhead.Class] := true
+
 										nextFightWarning := (A_TickCount + (this.DriverUpdateTime * 2))
 
 										return (spoken := true)
@@ -2604,25 +2615,24 @@ class RaceSpotter extends GridRaceAssistant {
 							if ((position <= 3) && (A_TickCount > nextPodiumWarning)) {
 								fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
 
+								slowerClasses[carAhead.Class] := true
+
 								nextPodiumWarning := (A_TickCount + (this.DriverUpdateTime * 3))
 
 								return (spoken := true)
 							}
-							else if (A_TickCount > nextGeneralWarning)
-								if (position <= 5) {
+							else if (A_TickCount > nextGeneralWarning) {
+								if (position <= 5)
 									fastSpeaker.speakNormal("ClassCarAhead", {class: carAhead.Class, position: position})
-
-									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
-
-									return (spoken := true)
-								}
-								else {
+								else
 									fastSpeaker.speakNormal("SlowerClassAhead", {class: carAhead.Class})
 
-									nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+								slowerClasses[carAhead.Class] := true
 
-									return (spoken := true)
-								}
+								nextGeneralWarning := (A_TickCount + (this.DriverUpdateTime * 4))
+
+								return (spoken := true)
+							}
 						}
 					}
 				}
@@ -2656,7 +2666,7 @@ class RaceSpotter extends GridRaceAssistant {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 						return false
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) > lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
@@ -2701,7 +2711,7 @@ class RaceSpotter extends GridRaceAssistant {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 						return false
 					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
@@ -2756,7 +2766,7 @@ class RaceSpotter extends GridRaceAssistant {
 						delta := (this.getDelta(car) / 1000)
 						inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-						if ((delta = 0) || (inPit && (Abs(delta) < 30)))
+						if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 							return false
 						else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
 							  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
@@ -4304,7 +4314,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
 		local started := (lapNumber > 0)
-		local sector, result, valid, gapAhead, gapBehind
+		local standings := false
+		local deltaInformation, sector, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
 		static lastLap := 0
@@ -4338,8 +4349,6 @@ class RaceSpotter extends GridRaceAssistant {
 				newSector := true
 			}
 
-			knowledgeBase.setFact("Sector", sector)
-
 			sector := (sector . "." . sectorIndex++)
 
 			if !this.MultiClass
@@ -4356,26 +4365,32 @@ class RaceSpotter extends GridRaceAssistant {
 					logError(exception, true)
 				}
 
-				if this.DriverUpdateTime {
-					if (A_TickCount >= this.iNextDriverUpdate) {
-						this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-						this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
-
-						newSector := false
-					}
-					else
-						this.updateDriver(lapNumber, sector, false, false, this.Positions)
-				}
-				else {
-					this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
-
-					newSector := false
-				}
+				deltaInformation := this.Announcements["DeltaInformation"]
+				standings := ((deltaInformation = "A") || ((deltaInformation = "S") && newSector))
 			}
 		}
 
+		if standings
+			knowledgeBase.setFact("Standings", true)
+
 		result := super.updateLap(lapNumber, &data)
+
+		if this.DriverUpdateTime {
+			if (A_TickCount >= this.iNextDriverUpdate) {
+				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+				this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
+				newSector := false
+			}
+			else
+				this.updateDriver(lapNumber, sector, false, false, this.Positions)
+		}
+		else {
+			this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+
+			newSector := false
+		}
 
 		if started {
 			loop knowledgeBase.getValue("Car.Count") {

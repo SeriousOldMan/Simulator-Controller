@@ -33,4 +33,4 @@ pressure_loss.2=lostPressure|Number||true|The amount of pressure in PSI, that ha
 plan_pitstop.1=targetLap|Integer||false|Indicates the lap for the pitstop, if supplied.
 plan_pitstop.2=refuelAmount|Integer||false|Indicates the amount of fuel to refill, if supplied. If not supplied, the decision is taken by the LLM.
 plan_pitstop.3=tyreChange|Boolean||false|Indicates whether the tyres should are allowed to be changed, if supplied. If not supplied, the decision is taken by the LLM.
-plan_pitstop.3=repairs|Boolean||false|Indicates whether repairs are needed, if supplied. If not supplied, the decision is taken by the LLM.
+plan_pitstop.4=repairs|Boolean||false|Indicates whether repairs are needed, if supplied. If not supplied, the decision is taken by the LLM.

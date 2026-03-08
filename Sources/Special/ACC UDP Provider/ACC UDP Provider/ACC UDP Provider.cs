@@ -373,6 +373,10 @@ namespace ACCUDPProvider {
 
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
+									
+									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Time=");
+									outStream.WriteLine(currentLap != null && currentLap.LaptimeMS != null ? currentLap.LaptimeMS : 0);
+									
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Category="); outStream.WriteLine(GetCupCategory(car.CupCategoryEnum));
 
 									if (lastLap != null)
@@ -388,7 +392,7 @@ namespace ACCUDPProvider {
 									}
 
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
-									outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
+									outStream.WriteLine(lastLap != null && lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0);
 
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Delta="); outStream.WriteLine(car.Delta);
 

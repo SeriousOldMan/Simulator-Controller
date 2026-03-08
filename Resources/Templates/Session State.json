@@ -240,7 +240,8 @@
 	"Token": "xxxxxxxx-yyyy-zzzz-aaaa-bbbbbbbbbbbb"
   },
   "Instructions": {
-	"Corner": 3,
+	"Corner": 1,
+	"Name": "Hairpin",
 	"Hints": [
 		{
 			"Hint": "BrakeEarlier",

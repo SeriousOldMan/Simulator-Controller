@@ -195,7 +195,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 	createDurationState(sessionInfo) {
 		local format := {Type: "Time", Format: this.Format["Time"]}
-		local sessionTime, stintTime, driverTime, state
+		local sessionTime, stintTime, driverTime, sessionLapsLeft, stintLapsLeft, state
 
 		if getMultiMapValue(sessionInfo, "Session", "Simulator", false) {
 			state := Map()
@@ -203,20 +203,25 @@ class IntegrationPlugin extends ControllerPlugin {
 			sessionTime := getMultiMapValue(sessionInfo, "Session", "Time.Remaining", kUndefined)
 			stintTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Stint", kUndefined)
 			driverTime := getMultiMapValue(sessionInfo, "Stint", "Time.Remaining.Driver", kUndefined)
+			sessionLapsLeft := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
+			stintLapsLeft := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
 
 			if getMultiMapValue(sessionInfo, "Session", "Format", false)
 				state["Format"] := translate(getMultiMapValue(sessionInfo, "Session", "Format"), this.Language)
 
-			state["SessionLapsLeft"] := getMultiMapValue(sessionInfo, "Session", "Laps.Remaining", 0)
-			state["StintLapsLeft"] := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", 0)
+			if (sessionLapsLeft > 0)
+				state["SessionLapsLeft"] := sessionLapsLeft
 
-			if isNumber(sessionTime)
+			if (stintLapsLeft > 0)
+				state["StintLapsLeft"] := stintLapsLeft
+
+			if (isNumber(sessionTime) && (sessionTime > 0))
 				state["SessionTimeLeft"] := displayValue(format, sessionTime)
 
-			if isNumber(stintTime)
+			if (isNumber(stintTime) && (stintTime > 0))
 				state["StintTimeLeft"] := displayValue(format, stintTime)
 
-			if isNumber(driverTime)
+			if (isNumber(driverTime) && (driverTime > 0))
 				state["DriverTimeLeft"] := displayValue(format, driverTime)
 
 			return state
@@ -269,10 +274,10 @@ class IntegrationPlugin extends ControllerPlugin {
 					   , "Lap", (getMultiMapValue(sessionInfo, "Session", "Laps", 0) + 1)
 					   , "Position", getMultiMapValue(sessionInfo, "Stint", "Position"))
 
-			if (bestTime < 3600)
+			if ((bestTime > 0) && (bestTime < 3600))
 				state["BestTime"] := displayValue(format, bestTime)
 
-			if (lastTime < 3600)
+			if ((lastTime > 0) && (lastTime < 3600))
 				state["LastTime"] := displayValue(format, lastTime)
 
 			if bestSpeed
@@ -288,22 +293,38 @@ class IntegrationPlugin extends ControllerPlugin {
 	}
 
 	createFuelState(sessionInfo) {
+		local fuelConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0)
+		local avgConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0)
+		local remainingFuel := getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0)
 		local unit := {Type: "Volume", Unit: this.Unit["Volume"]}
 		local fuelLow := (Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
-		local state := Map("LastConsumption", convertUnit(unit, getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0))
-						 , "AvgConsumption", convertUnit(unit, getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0))
-						 , "RemainingFuel", convertUnit(unit, getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0))
-						 , "RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
+		local state := Map("RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
+		local energyConsumption
 
-		state["LastFuelConsumption"] := state["LastConsumption"]
-		state["AvgFuelConsumption"] := state["AvgConsumption"]
-		state["RemainingFuelLaps"] := state["RemainingLaps"]
+		if (fuelConsumption > 0)
+			state["LastFuelConsumption"] := state["LastConsumption"] := convertUnit(unit, fuelConsumption)
 
-		if (getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", kUndefined) != kUndefined) {
+		if (avgConsumption > 0)
+			state["AvgFuelConsumption"] := state["AvgConsumption"] := convertUnit(unit, avgConsumption)
+
+		if (remainingFuel > 0)
+			state["RemainingFuel"] := convertUnit(unit, remainingFuel)
+
+		if (fuelConsumption > 0)
+			state["RemainingFuelLaps"] := state["RemainingLaps"]
+		else
+			state.Delete("RemainingLaps")
+
+		if (getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
+			energyConsumption := getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption")
+
 			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 0)
-			state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
-			state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
-			state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+
+			if (energyConsumption > 0) {
+				state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
+				state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
+				state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+			}
 		}
 
 		if exist(getValues(state), (v) => (v > 0))
@@ -347,18 +368,18 @@ class IntegrationPlugin extends ControllerPlugin {
 
 		temperatures := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Temperatures", ""))
 
-		if ((temperatures.Length = 4) && all(temperatures, nonZero))
+		if ((temperatures.Length = 4) && all(temperatures, nonZero) && all(temperatures, (t) => (t > 0)))
 			state["Temperatures"] := [convertUnit(temperatureUnit, temperatures[1]), convertUnit(temperatureUnit, temperatures[2])
 									, convertUnit(temperatureUnit, temperatures[3]), convertUnit(temperatureUnit, temperatures[4])]
 
 		wear := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Wear", ""))
 
-		if ((wear.Length = 4) && all(wear, (w) => isNumber(w)))
+		if ((wear.Length = 4) && all(wear, (w) => isNumber(w)) && exist(wear, (w) => (w > 0)))
 			state["Wear"] := [wear[1], wear[2], wear[3], wear[4]]
 
 		laps := string2Values(",", getMultiMapValue(sessionInfo, "Tyres", "Laps", ""))
 
-		if ((laps.Length = 4) && all(laps, (l) => isNumber(l)))
+		if ((laps.Length = 4) && all(laps, (l) => isNumber(l)) && exist(laps, (l) => (l > 0)))
 			state["Laps"] := [Round(laps[1]), Round(laps[2]), Round(laps[3]), Round(laps[4])]
 
 		tyreCompound := []
@@ -549,7 +570,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			if getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane", false)
 				state["PitlaneDelta"] := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Time.Pitlane")
 
-			if fuelService
+			if (fuelService && getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel"))
 				state["Fuel"] := convertUnit(volumeUnit, getMultiMapValue(sessionInfo, "Pitstop", "Planned.Refuel"))
 
 			driverRequest := getMultiMapValue(sessionInfo, "Pitstop", "Planned.Driver.Request", false)
@@ -739,7 +760,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local positionOverall := getMultiMapValue(sessionInfo, "Standings", "Position.Overall", 0)
 		local positionClass := getMultiMapValue(sessionInfo, "Standings", "Position.Class", 0)
 		local state := Map()
-		local nr, opponent
+		local nr, delta, opponent
 
 		static lastLeaderDelta := false
 		static lastAheadDelta := false
@@ -753,13 +774,16 @@ class IntegrationPlugin extends ControllerPlugin {
 			for ignore, opponent in ["Leader", "Ahead", "Behind", "Focus"]
 				if (getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time", kUndefined) != kUndefined) {
 					nr := getMultiMapValue(sessionInfo, "Standings", opponent . ".Nr", false)
+					delta := getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta")
 
-					state[opponent] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
-										 , "Delta", displayValue(format, getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta"))
-										 , "LapTime", displayValue(format, getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time"))
-										 , "InPit", (getMultiMapValue(sessionInfo, "Standings", opponent . ".InPit") ? kTrue : kFalse))
+					if (nr && (delta != 0)) {
+						state[opponent] := Map("Laps", getMultiMapValue(sessionInfo, "Standings", opponent . ".Laps")
+											 , "Delta", displayValue(format, delta)
+											 , "LapTime", displayValue(format, getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time"))
+											 , "InPit", (getMultiMapValue(sessionInfo, "Standings", opponent . ".InPit") ? kTrue : kFalse))
 
-					state[opponent]["Nr"] := (nr ? nr : kNull)
+						state[opponent]["Nr"] := (nr ? nr : kNull)
+					}
 				}
 		}
 		else
@@ -827,6 +851,9 @@ class IntegrationPlugin extends ControllerPlugin {
 			}
 
 			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)
+
+			if (getMultiMapValue(coachingState, "Instructions", "Name", kUndefined) != kUndefined)
+				state["Name"] := getMultiMapValue(coachingState, "Instructions", "Name")
 		}
 
 		return state

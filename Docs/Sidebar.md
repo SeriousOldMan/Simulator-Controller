@@ -61,6 +61,7 @@
     - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)
     - [Audio Routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing)
 	- [Keyboard shortcuts & modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers)
+	- [Data Latency](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#data-latency-and-other-real-time-issues)
 	- [Fixing problems](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#fixing-problems)
   - [Monitoring](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities)
 

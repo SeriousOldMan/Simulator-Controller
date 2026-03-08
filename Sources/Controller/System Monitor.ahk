@@ -499,23 +499,25 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Duration") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Format") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Format")) . "</td></tr>")
 
-			if (sessionTime != stintTime) {
+			if ((sessionTime != stintTime) && (!isNumber(sessionTime) || (sessionTime > 0))
+										   && (!isNumber(stintTime) || (stintTime > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Session)") . "</th><td class=`"td-wdg`">" . remainingSessionTime . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Stint)") . "</th><td class=`"td-wdg`">" . remainingStintTime . "</td></tr>")
-				if (driverTime != stintTime)
+				if ((driverTime != stintTime) && (!isNumber(remainingDriverTime) || (remainingDriverTime > 0)))
 					html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left (Driver)") . "</th><td class=`"td-wdg`">" . remainingDriverTime . "</td></tr>")
 			}
-			else
+			else if (!isNumber(sessionTime) || (sessionTime > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . remainingSessionTime . "</td></tr>")
 
-			if driveTime
+			if (driveTime && (driveTime > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Drive Time") . "</th><td class=`"td-wdg`">" . displayValue("Time", driveTime) . "</td></tr>")
 
-			if (sessionLaps != stintLaps) {
+			if ((sessionLaps != stintLaps) && (!isNumber(sessionLaps) || (sessionLaps > 0))
+										   && (!isNumber(stintLaps) || (stintLaps > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Session)") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left (Stint)") . "</th><td class=`"td-wdg`">" . ((isNumber(stintLaps) && (stintLaps < 4)) ? "<font color=`"red`">" : "") . stintLaps . ((isNumber(stintLaps) && (stintLaps < 4)) ? "</font>" : "") . "</td></tr>")
 			}
-			else
+			else if (!isNumber(sessionLaps) || (sessionLaps > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . sessionLaps . "</td></tr>")
 		}
 		catch Any as exception {
@@ -566,15 +568,17 @@ systemMonitor(command := false, arguments*) {
 		local html := ""
 
 		try {
-			lastTime := ((lastTime < 3600) ? displayValue("Time", lastTime) : "-")
-			bestTime := ((bestTime < 3600) ? displayValue("Time", bestTime) : "-")
+			lastTime := (((lastTime > 0) && (lastTime < 3600)) ? displayValue("Time", lastTime) : "-")
+			bestTime := (((bestTime > 0) && (bestTime < 3600)) ? displayValue("Time", bestTime) : "-")
 
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Stint") . "</i></div></th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Driver") . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap") . "</th><td class=`"td-wdg`">" . (lastLap + 1) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Stint", "Position") . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td class=`"td-wdg`">" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
+
+			if ((lastTime != "-") || (bestTime != "-"))
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time (Last / Best)") . "</th><td class=`"td-wdg`">" . (!lastValid ? "<font color=`"red`">" : "") . lastTime . (!lastValid ? "</font>" : "") . translate(" / ") . bestTime . "</td></tr>")
 
 			if (lastSpeed && bestSpeed)
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Top Speed (Last / Best)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Speed", lastSpeed)) . translate(" / ") . displayValue("Float", convertUnit("Speed", bestSpeed)) . "</td></tr>")
@@ -594,36 +598,51 @@ systemMonitor(command := false, arguments*) {
 	}
 
 	createFuelWidget(sessionState) {
+		local fuelConsumption := getMultiMapValue(sessionState, "Stint", "Fuel.Consumption")
+		local avgConsumption := getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption")
+		local remainingFuel := getMultiMapValue(sessionState, "Stint", "Fuel.Remaining")
+		local remainingEnergy := getMultiMapValue(sessionState, "Stint", "Energy.Remaining")
 		local fuelLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
 		local energyLow := false
 		local html := ""
-		local lastTime, remainingLaps
+		local lastTime, remainingLaps, energyConsumption
 
 		try {
 			html .= "<table class=`"table-std`">"
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`"><div id=`"header`"><i>" . translate("Fuel") . "</i></div></th></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Consumption")), 1) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.AvgConsumption")), 1) . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Stint", "Fuel.Remaining")), 1) . "</td></tr>")
 
+			if (fuelConsumption > 0)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", fuelConsumption), 1) . "</td></tr>")
 
+			if (avgConsumption > 0)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", avgConsumption), 1) . "</td></tr>")
+
+			if (remainingFuel > 0)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", remainingFuel), 1) . "</td></tr>")
 
 			if (getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
 				energyLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 0)) < 4)
+				energyConsumption := getMultiMapValue(sessionState, "Stint", "Energy.Consumption")
 
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.Consumption"), 1) . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Energy") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.Remaining"), 1) . "</td></tr>")
-
+				if (energyConsumption > 0) {
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", energyConsumption, 1) . "</td></tr>")
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
+				}
 			}
+			else
+				energyLow := false
+
+			if (remainingEnergy > 0)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Energy") . "</th><td class=`"td-wdg`">" . displayValue("Float", remainingEnergy, 1) . "</td></tr>")
 
 			remainingLaps := Min(Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")), Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 99999)))
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . remainingLaps . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
+			if ((fuelConsumption > 0) || (energyConsumption > 0))
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . remainingLaps . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
 
 			lastTime := getMultiMapValue(sessionState, "Stint", "Lap.Time.Last", kUndefined)
 
-			if (lastTime != kUndefined)
+			if ((lastTime != kUndefined) && (lastTime > 0) && (remainingLaps > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Time Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . displayValue("Time", Floor(lastTime * remainingLaps)) . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")
 		}
 		catch Any as exception {
@@ -727,7 +746,7 @@ systemMonitor(command := false, arguments*) {
 
 			temperatures := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Temperatures", ""))
 
-			if ((temperatures.Length = 4) && all(temperatures, nonZero)) {
+			if ((temperatures.Length = 4) && all(temperatures, nonZero) && all(temperatures, (t) => (t > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Temperatures") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[1])) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", convertUnit("Temperature", temperatures[2])) . "</td></tr>")
@@ -738,7 +757,7 @@ systemMonitor(command := false, arguments*) {
 
 			wear := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Wear", ""))
 
-			if ((wear.Length = 4) && exist(wear, nonZero)) {
+			if ((wear.Length = 4) && exist(wear, nonZero) && exist(wear, (w) => (w > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Wear") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . displayValue("Float", wear[2]) . "</td></tr>")
@@ -749,7 +768,7 @@ systemMonitor(command := false, arguments*) {
 
 			laps := string2Values(",", getMultiMapValue(sessionState, "Tyres", "Laps", ""))
 
-			if ((laps.Length = 4) && exist(laps, nonZero)) {
+			if ((laps.Length = 4) && exist(laps, nonZero) && exist(laps, (l) => (l > 0))) {
 				html .= ("<tr><th class=`"th-std th-left`" rowspan=`"2`">" . translate("Laps") . "</th><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . Round(laps[1]) . "</td><td class=`"td-wdg`" style=`"text-align: center`">"
 					   . Round(laps[2]) . "</td></tr>")
@@ -1046,7 +1065,7 @@ systemMonitor(command := false, arguments*) {
 		local tyreSet := false
 		local hasPitstop := true
 		local tyreCompound, tyreCompounds, tyrePressures, index, tyre, axle, fragment
-		local driverRequest, driver
+		local driverRequest, driver, timeLoss
 
 		computePressure(key) {
 			local value := getMultiMapValue(sessionState, "Pitstop", key, false)
@@ -1115,7 +1134,7 @@ systemMonitor(command := false, arguments*) {
 							html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-wdg`" colspan=`"2`">" . driver . "</td></tr>")
 					}
 
-					if fuelService
+					if (fuelService && getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Fuel") . "</th><td class=`"td-wdg`" colspan=`"2`">" . displayValue("Float", convertUnit("Volume", getMultiMapValue(sessionState, "Pitstop", "Planned.Refuel"))) . "</td></tr>")
 
 					if (tyreService = "Wheel") {
@@ -1244,7 +1263,10 @@ systemMonitor(command := false, arguments*) {
 																 . (getMultiMapValue(sessionState, "Pitstop", "Prepared") ? translate("Yes") : translate("No"))
 																 . "</td></tr>")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+					timeLoss := (getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Planned.Time.Pitlane"))
+
+					if (timeLoss > 0)
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . timeLoss . translate(" Seconds") . "</td></tr>")
 				}
 				else {
 					html .= ("<tr><th class=`"th-std th-left`" colspan=`"3`"><div id=`"header`"><i>" . translate("Pitstop") . translate(" (") . translate("Forecast") . translate(")") . "</i></div></th></tr>")
@@ -1367,7 +1389,10 @@ systemMonitor(command := false, arguments*) {
 					if (brakeService && getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false))
 						html .= ("<tr><th class=`"th-std th-left`">" . translate("Brakes") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Brake.Change", false) ? translate("Yes") : translate("No")) . "</td></tr>")
 
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane")) . translate(" Seconds") . "</td></tr>")
+					timeLoss := (getMultiMapValue(sessionState, "Pitstop", "Target.Time.Box") + getMultiMapValue(sessionState, "Pitstop", "Target.Time.Pitlane"))
+
+					if (timeLoss > 0)
+						html .= ("<tr><th class=`"th-std th-left`">" . translate("Loss of time") . "</th><td class=`"td-wdg`" colspan=`"2`">" . timeLoss . translate(" Seconds") . "</td></tr>")
 				}
 		}
 		catch Any as exception {
@@ -1426,7 +1451,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastFocusDelta, "green", "red", &colorOpen, &colorClose)
 
-				if (nr != "-")
+				if ((nr != "-") && (delta != 0))
 					if nr {
 						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Focus.Laps") . "</td></tr>")
 						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Observed #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
@@ -1445,7 +1470,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastLeaderDelta, "red", "green", &colorOpen, &colorClose)
 
-				if (nr != "-")
+				if ((nr != "-") && (delta != 0))
 					if nr {
 						leaderNr := nr
 
@@ -1466,7 +1491,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastAheadDelta, "red", "green", &colorOpen, &colorClose)
 
-				if (nr != "-")
+				if ((nr != "-") && (delta != 0))
 					if nr {
 						if (nr != leaderNr) {
 							html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Ahead #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Ahead.Laps") . "</td></tr>")
@@ -1487,7 +1512,7 @@ systemMonitor(command := false, arguments*) {
 
 				computeColorInfo(Abs(delta), &lastBehindDelta, "green", "red", &colorOpen, &colorClose)
 
-				if (nr != "-")
+				if ((nr != "-") && (delta != 0))
 					if nr {
 						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Behind #%nr% (Laps)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Standings", "Behind.Laps") . "</td></tr>")
 						html .= ("<tr><th class=`"th-std th-left`">" . substituteVariables(translate("Behind #%nr% (Delta)"), {nr: nr}) . "</th><td class=`"td-wdg`">" . colorOpen . displayValue("Time", delta) . colorClose . "</td></tr>")
@@ -2393,7 +2418,7 @@ systemMonitor(command := false, arguments*) {
 				return (isInteger(value) && (value >= 100))
 		})
 		systemMonitorGui.Add("UpDown", "x158 yp w18 h20 Y:Move Range100-999", "999")
-		
+
 		systemMonitorGui.Add("Text", "x590 yp w95 h23 Y:Move +0x200", translate("Log Level"))
 
 		choices := kLogLevelNames

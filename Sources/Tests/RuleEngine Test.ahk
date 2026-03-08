@@ -102,12 +102,17 @@ global kExecutionTestRules := "
 				scriptTestSuccess(?path) <= execute(?path, "Yes")
 				scriptTestFail(?path) <= execute(?path, "No")
 
-				transpose([], []) <= !
-				transpose([[] | ?], [])
-				transpose(?matrix, [?row | ?rows]) <= transposeFirst(?matrix, ?row, ?restMatrix), transpose(?restMatrix, ?rows)
+				transpose([], [])
+				transpose([?first | ?rest], ?transposed) <= transpose(?first, [?first | ?rest], ?transposed)
 
-				transposeFirst([], [], [])
-				transposeFirst([[?h | ?t] | ?rows], [?h | ?hs], [?t | ?ts]) <= transposeFirst(?rows, ?hs, ?ts)
+				transpose([], ?, [])
+				transpose([? | ?rest], ?matrix, [?transposedFirst | ?transposedRest]) <=
+						transposeRow(?matrix, ?transposedFirst, ?matrixFirst),
+						transpose(?rest, ?matrixFirst, ?transposedRest)
+
+				transposeRow([], [], [])
+				transposeRow([[?rFirst | ?oFirst] | ?rest], [?rFirst | ?rRest], [?oFirst | ?oRest]) <=
+						transposeRow(?rest, ?rRest, ?oRest)
 
 				testEmptyString(?input, "")
 )"
@@ -274,7 +279,7 @@ class Compiler extends Assert {
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
 		this.AssertEqual(5, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(34, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(35, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
@@ -456,14 +461,14 @@ class Unification extends Assert {
 
 	Transpose_Test() {
 		tests := [["transpose([[1,2,3], [4,5,6], [7,8,9]], ?m)"
-				, ["transpose([[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 4, 7], [2, 5, 8], [3, 6, 9]])"]]]
+				 , ["transpose([[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[1, 4, 7], [2, 5, 8], [3, 6, 9]])"]]
+				, ["transpose([[1,2,3,4], [4,5,6], [7,8,9,10]], ?m)", []]]
 
 		this.executeTests(tests)
 	}
 
 	Transpose_Empty_Test() {
-		tests := [["transpose([], ?m)"
-				, ["transpose([], [])"]]]
+		tests := [["transpose([], ?m)", ["transpose([], [])"]]]
 
 		this.executeTests(tests)
 	}

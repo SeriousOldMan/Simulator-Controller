@@ -175,23 +175,32 @@ class GapReporting extends Assert {
 	checkGap(knowledgeBase, type, behindCar, behindDelta, frontCar, frontDelta, leaderCar := false, leaderGap := false) {
 		cType := ((type = "Standings") ? "Standings.Class" : type)
 
-		if (behindCar != knowledgeBase.getValue("Position." . cType . ".Behind.Car", false))
+		car := knowledgeBase.getValue("Position." . cType . ".Behind.Car", false)
+		gap := Round(knowledgeBase.getValue("Position." . cType . ".Behind.Delta", false))
+
+		if (behindCar != car)
 			return false
 
-		if (behindDelta != Round(knowledgeBase.getValue("Position." . cType . ".Behind.Delta", false)))
+		if (behindDelta != gap)
 			return false
 
-		if (frontCar != knowledgeBase.getValue("Position." . cType . ".Ahead.Car", knowledgeBase.getValue("Position." . type . ".Front.Car", false)))
+		car := knowledgeBase.getValue("Position." . cType . ".Ahead.Car", knowledgeBase.getValue("Position." . type . ".Front.Car", false))
+		gap := Round(knowledgeBase.getValue("Position." . cType . ".Ahead.Delta", knowledgeBase.getValue("Position." . type . ".Front.Delta", false)))
+
+		if (frontCar != car)
 			return false
 
-		if (frontDelta != Round(knowledgeBase.getValue("Position." . cType . ".Ahead.Delta", knowledgeBase.getValue("Position." . type . ".Front.Delta", false))))
+		if (frontDelta != gap)
 			return false
 
 		if ((type = "Standings") && leaderCar) {
-			if (leaderCar != knowledgeBase.getValue("Position." . type . ".Overall.Leader.Car", false))
+			car := knowledgeBase.getValue("Position." . type . ".Overall.Leader.Car", false)
+			gap := Round(knowledgeBase.getValue("Position." . type . ".Overall.Leader.Delta", false))
+
+			if (leaderCar != car)
 				return false
 
-			if (leaderGap != Round(knowledgeBase.getValue("Position." . type . ".Overall.Leader.Delta", false)))
+			if (leaderGap != gap)
 				return false
 		}
 
@@ -211,15 +220,15 @@ class GapReporting extends Assert {
 
 			switch A_Index {
 				case 1:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -871, 10, 219, 1, -133938), "Unexpected standings gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -871, 10, 219, 4, 6779), "Unexpected standings gap detected in lap " . A_Index . "...")
 				case 2:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 9, -7553, 6, 582, 1, -218441), "Unexpected standings gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 9, -7553, 6, 582, 4, 10483), "Unexpected standings gap detected in lap " . A_Index . "...")
 				case 3:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 19, -9343, 6, 1446, 1, -329184), "Unexpected standings gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 19, -9343, 6, 1446, 4, 10829), "Unexpected standings gap detected in lap " . A_Index . "...")
 				case 4:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4755, 11, 6900, 1, -422693), "Unexpected standings gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4755, 11, 6900, 3, 10911), "Unexpected standings gap detected in lap " . A_Index . "...")
 				case 5:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 1, -519263), "Unexpected standings gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 3, 13633), "Unexpected standings gap detected in lap " . A_Index . "...")
 			}
 
 			if strategist.Debug[kDebugKnowledgeBase]
@@ -247,13 +256,13 @@ class GapReporting extends Assert {
 				case 1:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 6, -871, 10, 219), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 2:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 22, -6563, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 9, -7553, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 3:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 19, -9343, 6, 1446), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 4:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 6, -4755, 20, 6315), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 5:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 21, -4103, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 6, -4464, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
 			}
 
 			if strategist.Debug[kDebugKnowledgeBase]

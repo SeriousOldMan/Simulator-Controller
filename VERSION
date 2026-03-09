@@ -1,9 +1,9 @@
 [Development]
-Version=6.8.6.1-release
-Target=6.8.6.1-release
+Version=6.8.7.0-dev
+Target=6.8.7.0-release
 Date=03/09/2026
-Download=https://cutt.ly/jtR2EjJe;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1bvBECCb/Releases/Simulator%20Controller%206.8.6.1-release.zip;https://www.dropbox.com/scl/fi/k40hn08xb8oxhm0xrel6h/Simulator-Controller-6.8.6.1-release.zip?rlkey=mnfwoa6wtkef35ejra8u0fn87&st=sif0jigr&dl=1;http://%master%/Releases/Simulator Controller 6.8.6.1-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.8.6.1-release.zip
-Changes=Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop, Corner name in "Session State.json", Update available tyre compounds in "Strategy Workbench", Added missing translations, Fixed "plan_pitstop" event for the Engineer, Fixed "report_low_energy" event for the Engineer, Fixed weather information by the Strategist in the first lap, Fixed a crash in the "Integration" plugin for SimHub, Fixed several critical bugs in the race reports
+Download=
+Changes=Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus, Clarified *Verbose* setting in the *core settings*
 Components=Media->5.6.1,Configuration->6.8.6,Utilities->6.8.6
 [Release]
 Version=6.8.6.1-release
@@ -22,7 +22,7 @@ Utilities.6.8.6.Path=.
 Utilities.6.8.6.Content=Utilities
 Utilities.6.8.6.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HSl6YQNc/Components/Utilities%206.8.6.zip;https://www.dropbox.com/scl/fi/sxufh0ad4znxxqvpw8k9g/Utilities-6.8.6.zip?rlkey=j4ff6uablv4zz44mcgbvtaan9&st=rk0wrdzh&dl=1;http://%master%/Components/Utilities 6.8.6.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.6.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
-Development=6.8.6.1-release
+Development=6.8.7.0-dev
 Release=6.8.6.1-release

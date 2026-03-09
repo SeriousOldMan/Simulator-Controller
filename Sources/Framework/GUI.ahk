@@ -2301,12 +2301,16 @@ class Window extends Gui {
 		local newOptions, ignore, option, control
 		local checkBox, label, x, y, w, h
 
+		static withBorder := ((Strsplit(A_ScriptName, ".")[1] != "Simulator Tools")
+						   && getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+											 , "Windows", "Designer", isDevelopment()))
+
 		control := this.Theme.AddControl(this, type, options, arguments*)
 
 		if control
 			return control
 
-		if (isDevelopment() && (Strsplit(A_ScriptName, ".")[1] != "Simulator Tools"))
+		if withBorder
 			options .= " Border"
 
 		if type is Window.Resizer

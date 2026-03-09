@@ -28,7 +28,7 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 8. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(JA))
 
-I strongly recommed to memorize the phrases in the language you use to interact with Elisa. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
+I strongly recommed to memorize the phrases in the language you use to interact with Elisa. Beside the information in the above command reference sheets, you will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Spotter.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Spotter.grammars.de).
 
 #### Extending conversation and reasoning capabilities using a LLM
 

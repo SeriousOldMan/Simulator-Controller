@@ -457,7 +457,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 												  , telemetryData.Has(20) ? telemetryData[20] : false)
 							}
 							catch Any as exception {
-								logError(exception)
+								logError(exception, true)
 							}
 						}
 					}
@@ -491,7 +491,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 										  , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData["LapTime"])
 					}
 					catch Any as exception {
-						logError(exception)
+						logError(exception, true)
 					}
 			}
 	}

@@ -2830,7 +2830,6 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Lap", lapNumber)
 		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
-		knowledgeBase.setFact("Standings", true)
 
 		if started {
 			if !this.InitialFuelAmount
@@ -3182,7 +3181,6 @@ class RaceAssistant extends ConfigurationItem {
 			lapPenalty := getMultiMapValue(data, "Stint Data", "Penalty", false)
 
 		knowledgeBase.setFact("Sector", getMultiMapValue(data, "Stint Data", "Sector", 0))
-		knowledgeBase.setFact("Standings", true)
 
 		knowledgeBase.setFact("Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0))
 

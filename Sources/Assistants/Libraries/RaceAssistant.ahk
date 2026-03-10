@@ -4902,15 +4902,22 @@ class GridRaceAssistant extends RaceAssistant {
 		return driverName(forname, surname, nickname)
 	}
 
-	prepareData(lapNumber, data) {
+	prepareData(lapNumber, data, force := false) {
+		local sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
 		local knowledgeBase, key, value
+
+		static lastSector := false
 
 		data := super.prepareData(lapNumber, data)
 
-		knowledgeBase := this.KnowledgeBase
+		if (force || (sector != lastSector)) {
+			lastSector := sector
 
-		for key, value in getMultiMapValues(data, "Position Data")
-			knowledgeBase.setFact(key, value)
+			knowledgeBase := this.KnowledgeBase
+
+			for key, value in getMultiMapValues(data, "Position Data")
+				knowledgeBase.setFact(key, value)
+		}
 
 		return data
 	}

@@ -4245,6 +4245,10 @@ class RaceSpotter extends GridRaceAssistant {
 			return false
 	}
 
+	prepareData(lapNumber, data) {
+		return super.prepareData(lapNumber, data, true)
+	}
+
 	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPenalty := false
@@ -4314,8 +4318,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
 		local started := (lapNumber > 0)
-		local standings := false
-		local deltaInformation, sector, result, valid, gapAhead, gapBehind
+		local sector, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
 		static lastLap := 0
@@ -4357,21 +4360,16 @@ class RaceSpotter extends GridRaceAssistant {
 			if isDebug()
 				logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
 
-			if (lapNumber = this.LastLap) {
+			if (lapNumber = this.LastLap)
 				try {
 					this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
 				}
 				catch Any as exception {
 					logError(exception, true)
 				}
-
-				deltaInformation := this.Announcements["DeltaInformation"]
-				standings := ((deltaInformation = "A") || ((deltaInformation = "S") && newSector))
-			}
 		}
 
-		if standings
-			knowledgeBase.setFact("Standings", true)
+		knowledgeBase.setFact("Standings", true)
 
 		result := super.updateLap(lapNumber, &data)
 

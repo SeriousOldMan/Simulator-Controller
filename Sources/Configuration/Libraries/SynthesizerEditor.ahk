@@ -367,7 +367,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 		if load {
 			languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-			languages := availableLanguages()
+			languages := availableLanguages("Grammars")
 
 			if languages.Has(languageCode)
 				this.iLanguage := languages[languageCode]
@@ -886,10 +886,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 	getCurrentLanguage() {
 		local voiceLanguage := this.iLanguage
-		local languages := availableLanguages()
+		local languages := availableLanguages("Grammars")
 		local languageCode, code, language, ignore, grammarFile, grammarLanguageCode
 
-		for code, language in availableLanguages()
+		for code, language in languages
 			if (language = voiceLanguage)
 				return code
 

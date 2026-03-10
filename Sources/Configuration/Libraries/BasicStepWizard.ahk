@@ -637,7 +637,7 @@ class BasicStepWizard extends StepWizard {
 			if (InStr(voiceLanguage, translate("Translator")) || InStr(voiceLanguage, translate(" (translated)...")))
 				return this.assistantTranslator(assistant, editor)
 			else {
-				languages := availableLanguages()
+				languages := availableLanguages("Grammars")
 
 				for code, language in languages
 					if (language = voiceLanguage)
@@ -943,7 +943,7 @@ class BasicStepWizard extends StepWizard {
 		local key := this.Keys[assistant]
 		local choices := []
 		local languages := []
-		local allLanguages := availableLanguages()
+		local allLanguages := availableLanguages("Grammars")
 		local assistantLanguage, code, language, ignore, grammarFile, assistantTranslator
 
 		for ignore, assistant in this.Definition

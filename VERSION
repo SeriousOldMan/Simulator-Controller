@@ -1,9 +1,9 @@
 [Development]
 Version=6.8.7.0-dev
 Target=6.8.7.0-release
-Date=03/09/2026
+Date=03/10/2026
 Download=
-Changes=Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus
+Changes=Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus, Added Polish Grammars
 Components=Media->5.6.1,Configuration->6.8.6,Utilities->6.8.6
 [Release]
 Version=6.8.6.1-release

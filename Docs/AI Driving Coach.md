@@ -274,9 +274,11 @@ Information: You can disable this instruction (and every other instruction as we
 
 6. [Portuguese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(PT))
 
-7. [Chinese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(ZH))
+7. [Polish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(PL))
 
-8. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(JA))
+8. [Chinese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(ZH))
+
+9. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(JA))
 
 Normal you will use free conversation to interact with Aiden as shown in the example above. But there are also a couple of predefined grammar based commands available, for example to enable or disable the processing of specific information (see below in the next section). Beside the information in the above command reference sheets, you will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [Resources\Grammars directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Driving Coach.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Driving%20Coach.grammars.de).
 

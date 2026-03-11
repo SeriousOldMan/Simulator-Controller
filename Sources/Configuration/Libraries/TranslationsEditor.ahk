@@ -512,14 +512,16 @@ class TranslationsList extends ConfigurationItemList {
 					translations[original] := translated
 				}
 
-				this.Window.Block()
+				withTask(ProgressTask(translate("Saving") . A_Space . translate("Translations")), () {
+					this.Window.Block()
 
-				try {
-					writeTranslations(this.iLanguageCode , this.Control["languageNameEdit"].Text, translations)
-				}
-				finally {
-					this.Window.Unblock()
-				}
+					try {
+						writeTranslations(this.iLanguageCode , this.Control["languageNameEdit"].Text, translations)
+					}
+					finally {
+						this.Window.Unblock()
+					}
+				})
 
 				return true
 			}

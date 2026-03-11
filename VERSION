@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.0.0-dev
 Target=6.9.0.0-release
-Date=03/08/2026
+Date=03/11/2026
 Download=
-Changes=Initial support for F1 25
+Changes=Initial support for F1 25, Cloaking AHK post processor
 Components=Media->6.9.0,Configuration->6.8.6,Utilities->6.8.6
 [Release]
 Version=6.8.6.1-release

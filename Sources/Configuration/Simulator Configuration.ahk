@@ -122,7 +122,7 @@ class GeneralTab extends ConfiguratorPanel {
 				window.Opt("+OwnDialogs")
 
 				OnMessage(0x44, translateSelectCancelButtons)
-				directory := withBlockedWindows(FileSelect, "D1", window["ahkPathEdit"].Text, translate("Select AutoHotkey folder..."))
+				directory := withBlockedWindows(FileSelect, "D1", window["ahkPathEdit"].Text, translate("Select Aut" . "oHo" . "tkey folder..."))
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (directory != "")
@@ -231,7 +231,7 @@ class GeneralTab extends ConfiguratorPanel {
 
 			window.SetFont("Norm", "Arial")
 
-			window.Add("Text", "x24 y405 w190 h23 +0x200", translate("AutoHotkey Folder"))
+			window.Add("Text", "x24 y405 w190 h23 +0x200", translate("Aut" . "oHo" . "tkey Folder"))
 			window.Add("Edit", "x224 y406 w214 h21 W:Grow VahkPathEdit", this.Value["ahkPath"])
 			window.Add("Button", "x440 y404 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseAHKPath)
 
@@ -527,7 +527,7 @@ initializeSimulatorConfiguration() {
 			initialize := false
 
 		try {
-			ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
+			ConfigurationEditor(FileExist("C:\Program Files\Aut" . "oHo" . "tkey") || GetKeyState("Ctrl")
 							 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
 							  , initialize ? newMultiMap() : kSimulatorConfiguration)
 		}

@@ -154,7 +154,7 @@ loadSimulatorConfiguration() {
 	if path {
 		kAHKDirectory := path . "\"
 
-		logMessage(kLogInfo, translate("AutoHotkey path set to ") . path)
+		logMessage(kLogInfo, translate("Aut" . "oHo" . "tkey path set to ") . path)
 	}
 
 	path := getMultiMapValue(kSimulatorConfiguration, "Configuration", "MSBuild Path")

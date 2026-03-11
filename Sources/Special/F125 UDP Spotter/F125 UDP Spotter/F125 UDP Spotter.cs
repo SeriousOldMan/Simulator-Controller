@@ -344,7 +344,7 @@ namespace F125UDPSpotter {
 			if (!hasLastCoordinates)
 				lastCoordinates = new double[F125Constants.MaxCars, 3];
 
-			// Player velocity from motion data
+			// Player velocity
 			var playerMotion = motion.CarMotion[playerIdx];
 			double velocityX = playerMotion.WorldVelocityX;
 			double velocityY = playerMotion.WorldVelocityY;
@@ -356,7 +356,7 @@ namespace F125UDPSpotter {
 				double angle = vectorAngle(velocityX, velocityZ);
 
 				double coordinateX = playerMotion.WorldPositionX;
-				double coordinateY = playerMotion.WorldPositionY; // vertical
+				double coordinateY = playerMotion.WorldPositionY;
                 double coordinateZ = playerMotion.WorldPositionZ;
 				double speed = 0.0;
 
@@ -544,7 +544,7 @@ namespace F125UDPSpotter {
 
                     if (Math.Abs(speed - avg) > stdDev)
                     {
-                        speeds.Remove(i);
+                        speeds.RemoveAt(i);
 
                         length -= 1;
                     }

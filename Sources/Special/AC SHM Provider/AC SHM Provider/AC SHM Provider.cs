@@ -288,14 +288,20 @@ namespace ACSHMProvider
 						continue;
 
 					Console.Write("Car."); Console.Write(idx); Console.Write(".ID="); Console.WriteLine(i);
-                    Console.Write("Car."); Console.Write(idx); Console.Write(".Nr="); Console.WriteLine(car.carId);
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Nr="); Console.WriteLine(car.carId + 1);
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Position="); Console.WriteLine(car.carRealTimeLeaderboardPosition + 1);
 
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Laps="); Console.WriteLine(car.lapCount);
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition);
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
-                    int lapTime = car.lastLapTimeMS;
+					int lapTime = car.currentLapTimeMS;
+
+					if (lapTime > 0) {
+						Console.Write("Car."); Console.Write(idx); Console.Write(".Lap.Running.Time="); Console.WriteLine(lapTime);
+					}
+						
+                    lapTime = car.lastLapTimeMS;
 
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Time="); Console.WriteLine(lapTime);
 

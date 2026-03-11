@@ -3634,7 +3634,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, data), 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, data), 1000)
 
 		return result
 	}
@@ -3785,7 +3785,7 @@ class RaceEngineer extends RaceAssistant {
 		car := knowledgeBase.getValue("Session.Car")
 		track := knowledgeBase.getValue("Session.Track")
 
-		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, data), 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, data), 1000)
 
 		return result
 	}

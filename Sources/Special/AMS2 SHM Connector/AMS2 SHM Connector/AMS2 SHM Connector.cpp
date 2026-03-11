@@ -497,6 +497,11 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 				print(&output, "Car.", i); printLine(&output, ".Laps=", (long)vehicle.mLapsCompleted);
 				print(&output, "Car.", i); printLine(&output, ".Lap.Running=", vehicle.mCurrentLapDistance / localCopy->mTrackLength);
 				print(&output, "Car.", i); printLine(&output, ".Lap.Running.Valid=", localCopy->mLapsInvalidated[i - 1] ? "false" : "true");
+				
+				if (i == localCopy->mViewedParticipantIndex + 1) {
+					print(&output, "Car.", i); printLine(&output, ".Lap.Running.Time=", (long)localCopy->mCurrentTime * 1000);
+				}
+				
 				print(&output, "Car.", i); printLine(&output, ".Time=", (long)(localCopy->mLastLapTimes[i - 1] * 1000));
 				print(&output, "Car.", i); print(&output, ".Time.Sectors=");
 				print(&output, (long)(localCopy->mCurrentSector1Times[i - 1] * 1000)); print(&output, ",");

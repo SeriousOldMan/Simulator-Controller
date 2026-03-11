@@ -1,5 +1,61 @@
 # Latest stable release
 
+## 6.8.6.1
+
+#### Date: 03/07/26
+
+#### Fixes
+
+  - Fixed a crash in the "Integration" plugin for SimHub.
+  - Fixed several critical bugs in the race reports.
+
+## 6.8.6.0
+
+#### Date: 03/06/26
+
+#### Fixes
+
+  - Added a couple of missing translations.
+  - Once again a fix for the sector time calculation for *Assetto Corsa*.
+  - A filter has been implemented that can handle registered but not participating cars in online races in *Le Mans Ultimate*. Previously it was possible, that gap times were reported for these cars.
+  - The Spotter no longer gives wrong warnings for slower or faster cars of another class after a pitstop.
+  - The Strategist no longer gives incorrect weather information in rare conditions during the first lap.
+  - Fixed a parameter definition error for the "plan_pitstop" event of the *Reasoning* booster of the Race Engineer.
+  - Fixed a parameter definition error for the "report_low_energy" action of the *Reasoning* booster of the Race Engineer.
+  
+#### Changes
+
+  - All tyre compound choices in the "Strategy Workbench" will adjust to changes made to the configuration of available tyre sets.
+  - If on-track coaching is active, the name of the corner (if defined in the map data) will be supplied to SimHub. Please note, that this requires an update to the SimHub plugin. Refer to the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686) for instructions on how to update to the latest version.
+  - The documentation regarding the information accuracy of the Strategist and the Spotter has been updated. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#how-it-works) and [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#simulator-integration) (especially Note #12). In short: Lap times, gap times and position data may be updated for the Strategist with each sector (if the data is provided by the simulator), whereas the situation for the Spotter is a bit more complex and depends on the data update frequency as defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" and it depends on the general configuration of the Spotter as defined in "Simulator Setup" or "Simulator Configuration".
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 6.8.5.0
+
+#### Date: 02/27/26
+
+#### Fixes
+
+  - Fixed track deletion in the "Session Database" when short and long track name are different.
+  - Another fix for sector time calculation in *Assetto Corsa*.
+  
+#### Changes
+
+  - More optimizations for the Assistants cool down handling: A restart of the Assistants is now prevented for sessions that are already finished, for example, when running the in-lap after a qualifiying session.
+  - A complete new method for gap timings has been implemented, which uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please note, that this is not yet supported for *iRacing*, because the current time into the lap is not supplied by the API of this game. A workaround may be implemented for this deficit in a future release.
+  - Changed the car class name from "LMP2 ELMS" to "LMP2 Plus" in *Le Mans Ultimate*.
+  - Removed currently undefined values from the "System Monitor" in the first lap.
+  - Removed currently undefined values from the "Session State.json" file created by the "Integration" plugin in the first lap.
+  - The remaining fuel is now displayed in the Laps viewer of the "Session Database".
+  - [Internal] Refactored voice continuations for more flexibility for future voice interactions with multiple steps of question / answer dialogs.
+
 ## 6.8.4.0
 
 #### Date: 02/20/26
@@ -21,12 +77,6 @@
   - [Experts] New *Lua* script function "Assistant.Property" allows you to access any property of the current Race Assistant instance.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684), if you are using the local LLM Runtime.
-
-# Upcoming release
-
-Not yet planned...
-	  
-# Release history
 
 ## 6.8.3.0
 

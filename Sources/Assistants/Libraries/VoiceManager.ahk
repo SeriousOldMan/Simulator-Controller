@@ -576,12 +576,12 @@ class VoiceManager extends ConfigurationItem {
 			this.iContinuation := continuation
 		}
 
-		next() {
+		continue() {
 			local continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.Continuation)
-				continuation.next()
-			else if continuation
+				continuation.continue()
+			else if isInstance(continuation, Func)
 				continuation()
 		}
 	}
@@ -589,8 +589,8 @@ class VoiceManager extends ConfigurationItem {
 	class QuestionContinuation extends VoiceManager.Continuation {
 		iRejectContinuation := false
 
-		iAccept := false
-		iReject := false
+		iAcceptPhrase := false
+		iRejectPhrase := false
 
 		AcceptContinuation {
 			Get {
@@ -604,44 +604,52 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		Accept {
+		AcceptPhrase {
 			Get {
-				return this.iAccept
+				return this.iAcceptPhrase
 			}
 		}
 
-		Reject {
+		RejectPhrase {
 			Get {
-				return this.iReject
+				return this.iRejectPhrase
 			}
 		}
 
 		__New(manager, acceptContinuation := false, rejectContinuation := false
-					 , accept := "Confirm", reject := "Okay") {
+					 , acceptPhrase := "Confirm", rejectPhrase := "Okay") {
 			this.iRejectContinuation := rejectContinuation
-			this.iAccept := accept
-			this.iReject := reject
+			this.iAcceptPhrase := acceptPhrase
+			this.iRejectPhrase := rejectPhrase
 
 			super.__New(manager, acceptContinuation)
 		}
 
-		next() {
-			if (this.Manager.Speaker && this.Accept)
-				this.Manager.getSpeaker().speakPhrase(this.Accept)
+		continue() {
+			if (this.Manager.Speaker && this.AcceptPhrase)
+				this.Manager.getSpeaker().speakPhrase(this.AcceptPhrase)
 
-			super.next()
+			super.continue()
 		}
 
-		cancel() {
+		accept() {
+			this.continue()
+		}
+
+		abort() {
 			local continuation := this.RejectContinuation
 
-			if (this.Manager.Speaker && this.Reject)
-				this.Manager.getSpeaker().speakPhrase(this.Reject)
+			if (this.Manager.Speaker && this.RejectPhrase)
+				this.Manager.getSpeaker().speakPhrase(this.RejectPhrase)
 
 			if isInstance(continuation, VoiceManager.QuestionContinuation)
-				continuation.cancel()
-			else if continuation
+				continuation.reject()
+			else if isInstance(continuation, Func)
 				continuation()
+		}
+
+		reject() {
+			this.abort()
 		}
 	}
 

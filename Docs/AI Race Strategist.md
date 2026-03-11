@@ -206,6 +206,8 @@ The following statistical models are currently implemented:
   6. Pitstop simulation
   
      Also using the position data and a complex prediction model, Cato can determine the best lap for the next pitstop in a given pitstop window. The pitstop delta time as well as the service time is taken into account. The best pitstop lap will be selected based on position and the expected traffic after the pitstop.
+	 
+Please note that most of the data the Strategist is using will be updated in his knowledgebase once for each sector. Therefore, lap times, gap timings and so on, may not be fully correct. Depending on the current simulator it may be even worse, cause some simulators update position data, sector times, etc. only once per lap. However, if more accurate data is available, the Spotter may be more precise and can provide almost real time information depending on your configuration choices.
 
 ## Strategy Handling
 

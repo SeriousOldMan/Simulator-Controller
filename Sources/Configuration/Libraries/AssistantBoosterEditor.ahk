@@ -167,12 +167,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				this.editInstructions(type, title)
 		}
 
-		editEvents(*) {
-			this.editEvents(this.Assistant)
+		editEvents(title, *) {
+			this.editEvents(this.Assistant, title)
 		}
 
-		editActions(type, *) {
-			this.editActions(this.Assistant, type)
+		editActions(type, title, *) {
+			this.editActions(this.Assistant, type, title)
 		}
 
 		loadModels(type, *) {
@@ -302,7 +302,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Actions"))
 		editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
-		editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton").OnEvent("Click", editActions.Bind("Conversation"))
+		editorGui.Add("Button", "x" . (x1 + 61) . " yp-1 w23 h23 X:Move Center +0x200 vviConversationEditActionsButton").OnEvent("Click", editActions.Bind("Conversation", translate("Conversation")))
 		setButtonIcon(editorGui["viConversationEditActionsButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		editorGui.SetFont("Italic Bold", "Arial")
@@ -330,9 +330,9 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number Limit2 vviAgentLLMRTGPULayersEdit Hidden").OnValidate("LoseFocus", validateInteger.Bind(0))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-99 vviAgentLLMRTGPULayersRange Hidden")
 
-		editorGui.Add("Button", "x" . (x + 8) . " yp+30 w100 h23 vviAgentEventsButton", translate("Events...")).OnEvent("Click", editEvents)
+		editorGui.Add("Button", "x" . (x + 8) . " yp+30 w100 h23 vviAgentEventsButton", translate("Events...")).OnEvent("Click", editEvents.Bind(translate("Reasoning")))
 
-		editorGui.Add("Button", "x" . (x + 8) + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions...")).OnEvent("Click", editActions.Bind("Agent"))
+		editorGui.Add("Button", "x" . (x + 8) + Round((width / 2) - 50) . " yp w100 h23 vviAgentActionsButton X:Move(0.5)", translate("Actions...")).OnEvent("Click", editActions.Bind("Agent", translate("Reasoning")))
 
 		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviAgentInstructionsButton", translate("Instructions...")).OnEvent("Click", editInstructions.Bind("Agent", translate("Reasoning")))
 
@@ -1180,13 +1180,14 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
-	editEvents(assistant) {
+	editEvents(assistant, title) {
 		local window := this.Window
 
 		window.Block()
 
 		try {
 			return EventsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Events" : "Agent.LLM.Events"
+									, title
 									, (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
 																			  : ["Custom"]).editEvents(window)
 		}
@@ -1195,7 +1196,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 	}
 
-	editActions(assistant, type) {
+	editActions(assistant, type, title) {
 		local window := this.Window
 
 		window.Block()
@@ -1203,10 +1204,11 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		try {
 			if (type = "Agent")
 				return ActionsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Actions" : "Agent.LLM.Actions"
+										 , title
 										 , (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
 																				   : ["Custom"]).editActions(window)
 			else
-				return ActionsEditor(this, "Conversation.Actions", ["Builtin", "Custom"]).editActions(window)
+				return ActionsEditor(this, "Conversation.Actions", title, ["Builtin", "Custom"]).editActions(window)
 		}
 		finally {
 			window.Unblock()
@@ -1221,6 +1223,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 class CallbacksEditor {
 	iEditor := false
 	iType := false
+	iTitle := Strsplit(A_ScriptName, ".")[1]
 	iCategories := ["Builtin", "Custom"]
 
 	iWindow := false
@@ -1250,7 +1253,7 @@ class CallbacksEditor {
 		__New(editor) {
 			this.iCallbacksEditor := editor
 
-			super.__New({Descriptor: (editor.Type . " Editor"), Closeable: true, Resizeable: true, Options: "0x400000"})
+			super.__New({Descriptor: (editor.Type . " Editor"), Closeable: true, Resizeable: true, Options: "0x400000"}, editor.Title)
 		}
 
 		Close(*) {
@@ -1284,6 +1287,12 @@ class CallbacksEditor {
 	Type {
 		Get {
 			return this.iType
+		}
+	}
+
+	Title {
+		Get {
+			return this.iTitle
 		}
 	}
 
@@ -1363,9 +1372,10 @@ class CallbacksEditor {
 		}
 	}
 
-	__New(editor, type, categories := ["Builtin", "Custom"]) {
+	__New(editor, type, title, categories := ["Builtin", "Custom"]) {
 		this.iEditor := editor
 		this.iType := type
+		this.iTitle := title
 		this.iCategories := categories
 	}
 

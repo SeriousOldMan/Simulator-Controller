@@ -269,7 +269,7 @@ class LMUProvider extends Sector397Provider {
 
 		static lastPositions := false
 
-		static lastLap := 0
+		static lastLap := -1
 		static duration := 0
 		static lastWeather := false
 		static lastWeather10Min := false
@@ -388,7 +388,7 @@ class LMUProvider extends Sector397Provider {
 				lap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
 				if ((lap < lastLap) || (lap = 0) || (lap > (lastLap + 1)) || (duration = 0)) {
-					lastLap := 0
+					lastLap := -1
 
 					lastWeather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 					lastWeather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")

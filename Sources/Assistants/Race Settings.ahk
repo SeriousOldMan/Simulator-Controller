@@ -490,140 +490,147 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				}
 		}
 
-		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+		try {
+			provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 
-		data := readSimulator(simulator, car, track)
+			data := readSimulator(simulator, car, track)
 
-		car := getMultiMapValue(data, "Session Data", "Car", car)
-		track := getMultiMapValue(data, "Session Data", "Track", track)
+			car := getMultiMapValue(data, "Session Data", "Car", car)
+			track := getMultiMapValue(data, "Session Data", "Track", track)
 
-		provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+			provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 
-		data := readSimulator(simulator, car, track)
+			data := readSimulator(simulator, car, track)
 
-		car := getMultiMapValue(data, "Session Data", "Car", car)
-		track := getMultiMapValue(data, "Session Data", "Car", track)
+			car := getMultiMapValue(data, "Session Data", "Car", car)
+			track := getMultiMapValue(data, "Session Data", "Car", track)
 
-		if (getMultiMapValues(data, "Setup Data").Count > 0) {
-			provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
+			if (getMultiMapValues(data, "Setup Data").Count > 0) {
+				provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
 
-			readTyreSetup(readMultiMap(kRaceSettingsFile), simulator, car, track)
+				readTyreSetup(readMultiMap(kRaceSettingsFile), simulator, car, track)
 
-			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
-			setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
+				pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
+				setupTyreSet := getMultiMapValue(data, "Car Data", "TyreSet", setupTyreSet ? setupTyreSet : Max(0, pitstopTyreSet - 1))
 
-			if (settings && tyreSets) {
-				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", 0) != 0)
-					setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
+				if (settings && tyreSets) {
+					if (getMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", 0) != 0)
+						setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
 
-				if (getMultiMapValue(settings, "Session Setup", "Tyre.Set", 0) = 0)
-					setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
-			}
+					if (getMultiMapValue(settings, "Session Setup", "Tyre.Set", 0) = 0)
+						setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
+				}
 
-			if (mixedCompounds = "Wheel") {
-				tc := []
-				tcc := []
+				if (mixedCompounds = "Wheel") {
+					tc := []
+					tcc := []
 
-				for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . tyre))
-					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre))
+					for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+						tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . tyre))
+						tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . tyre, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . tyre))
 
-					if (index = 1) {
-						tyreCompound := tc[1]
-						tyreCompoundColor := tcc[1]
-					}
+						if (index = 1) {
+							tyreCompound := tc[1]
+							tyreCompoundColor := tcc[1]
+						}
 
-					if settings {
-						setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, tc[tc.Length])
-						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . tyre, tcc[tcc.Length])
+						if settings {
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . tyre, tc[tc.Length])
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . tyre, tcc[tcc.Length])
+						}
 					}
 				}
-			}
-			else if (mixedCompounds = "Axle") {
-				tc := []
-				tcc := []
+				else if (mixedCompounds = "Axle") {
+					tc := []
+					tcc := []
 
-				for index, axle in ["Front", "Rear"] {
-					tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . axle))
-					tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle))
+					for index, axle in ["Front", "Rear"] {
+						tc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompound" . axle))
+						tcc.Push(getMultiMapValue(data, "Setup Data", "TyreCompound" . axle, false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor" . axle))
 
-					if (index = 1) {
-						tyreCompound := tc[1]
-						tyreCompoundColor := tcc[1]
-					}
+						if (index = 1) {
+							tyreCompound := tc[1]
+							tyreCompoundColor := tcc[1]
+						}
 
-					if settings {
-						setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, tc[tc.Length])
-						setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . axle, tcc[tcc.Length])
+						if settings {
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound." . axle, tc[tc.Length])
+							setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color." . axle, tcc[tcc.Length])
+						}
 					}
 				}
-			}
-			else {
-				tyreCompound := (getMultiMapValue(data, "Setup Data", "TyreCompound", false) || getMultiMapValue(data, "Car Data", "TyreCompound"))
-				tyreCompoundColor := (getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
+				else {
+					tyreCompound := (getMultiMapValue(data, "Setup Data", "TyreCompound", false) || getMultiMapValue(data, "Car Data", "TyreCompound"))
+					tyreCompoundColor := (getMultiMapValue(data, "Setup Data", "TyreCompoundColor", false) || getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
-				tc := [tyreCompound]
-				tcc := [tyreCompoundColor]
-			}
+					tc := [tyreCompound]
+					tcc := [tyreCompoundColor]
+				}
 
-			setupTyreCompound := values2String(",", tc*)
-			setupTyreCompoundColor := values2String(",", tcc*)
-
-			if settings {
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
-			}
-
-			if (tyreCompound = "Dry") {
-				dryFrontLeft := getSetupPressure("FL", dryFrontLeft)
-				dryFrontRight := getSetupPressure("FR", dryFrontRight)
-				dryRearLeft := getSetupPressure("RL", dryRearLeft)
-				dryRearRight := getSetupPressure("RR", dryRearRight)
+				setupTyreCompound := values2String(",", tc*)
+				setupTyreCompoundColor := values2String(",", tcc*)
 
 				if settings {
-					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", dryFrontLeft), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", dryFrontRight), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", dryRearLeft), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", dryRearRight), false))
-
-					/*
-					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
-						message := (translate("Tyre setup imported: ") . translate(compound(tyreCompound, tyreCompoundColor)))
-
-						showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
-										    . dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
-											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.ico", 5000)
-					}
-					*/
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
 				}
 
-				result := tyreCompound
-			}
-			else if ((tyreCompound = "Wet") || (tyreCompound = "Intermediate")) {
-				wetFrontLeft := getSetupPressure("FL", wetFrontLeft)
-				wetFrontRight := getSetupPressure("FR", wetFrontRight)
-				wetRearLeft := getSetupPressure("RL", wetRearLeft)
-				wetRearRight := getSetupPressure("RR", wetRearRight)
+				if (tyreCompound = "Dry") {
+					dryFrontLeft := getSetupPressure("FL", dryFrontLeft)
+					dryFrontRight := getSetupPressure("FR", dryFrontRight)
+					dryRearLeft := getSetupPressure("RL", dryRearLeft)
+					dryRearRight := getSetupPressure("RR", dryRearRight)
 
-				if settings {
-					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", wetFrontLeft), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", wetFrontRight), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", wetRearLeft), false))
-					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", wetRearRight), false))
+					if settings {
+						setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", dryFrontLeft), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", dryFrontRight), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", dryRearLeft), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", dryRearRight), false))
 
-					/*
-					if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
-						message := (translate("Tyre setup imported: ") . compound(tyreCompound, tyreCompoundColor))
+						/*
+						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
+							message := (translate("Tyre setup imported: ") . translate(compound(tyreCompound, tyreCompoundColor)))
 
-						showMessage(message . translate("; ")
-											. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
-											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.ico", 5000)
+							showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
+												. dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
+												. dryRearLeft . translate(", ") . dryRearRight, false, "Information.ico", 5000)
+						}
+						*/
 					}
-					*/
-				}
 
-				result := tyreCompound
+					result := tyreCompound
+				}
+				else if ((tyreCompound = "Wet") || (tyreCompound = "Intermediate")) {
+					wetFrontLeft := getSetupPressure("FL", wetFrontLeft)
+					wetFrontRight := getSetupPressure("FR", wetFrontRight)
+					wetRearLeft := getSetupPressure("RL", wetRearLeft)
+					wetRearRight := getSetupPressure("RR", wetRearRight)
+
+					if settings {
+						setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", wetFrontLeft), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", wetFrontRight), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", wetRearLeft), false))
+						setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", wetRearRight), false))
+
+						/*
+						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
+							message := (translate("Tyre setup imported: ") . compound(tyreCompound, tyreCompoundColor))
+
+							showMessage(message . translate("; ")
+												. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
+												. wetRearLeft . translate(", ") . wetRearRight, false, "Information.ico", 5000)
+						}
+						*/
+					}
+
+					result := tyreCompound
+				}
 			}
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			result := false
 		}
 
 		return result
@@ -750,7 +757,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		}
 		else
 			settingsGui["strategyUpdateLapsCheck"].Enabled := (isNumber(settingsGui["strategyUpdateLapsEdit"].Text) && (settingsGui["strategyUpdateLapsEdit"].Text > 0))
-
 	}
 
 	updateStrategyPitstop(type, *) {

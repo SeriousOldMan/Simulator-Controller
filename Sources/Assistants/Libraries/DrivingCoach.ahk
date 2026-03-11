@@ -1673,9 +1673,8 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iInstructionHints[instruction] := true
 	}
 
-	getInstructionHints(cornerNr) {
+	getInstructionHints(cornerNr, reference, telemetry) {
 		local knowledgeBase := this.KnowledgeBase
-		local telemetry, reference
 
 		nullZero(value) {
 			return (isNull(value) ? 0 : value)
@@ -1743,8 +1742,6 @@ class DrivingCoach extends GridRaceAssistant {
 			knowledgeBase.addFact(type . ".FollowUp.Time", followUp.Time)
 			knowledgeBase.addFact(type . ".FollowUp.Length", followUp.Length)
 		}
-
-		telemetry := this.getTelemetry(&reference := true, cornerNr)
 
 		if (knowledgeBase && telemetry && reference) {
 			for index, section in telemetry.Sections
@@ -2707,7 +2704,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (A_TickCount < nextRecommendation)
 					return
 				else {
-					instructionHints := this.getInstructionHints(cornerNr)
+					instructionHints := this.getInstructionHints(cornerNr, reference, telemetry)
 
 					if (instructionHints.Length > 0)
 						instructionHints := filterInstructionHints(instructionHints)
@@ -2791,6 +2788,9 @@ class DrivingCoach extends GridRaceAssistant {
 							local ignore, hint
 
 							setMultiMapValue(state, "Instructions", "Corner", cornerNr)
+
+							if ((telemetry.Sections.Length > 0) && telemetry.Sections[1].Name)
+								setMultiMapValue(state, "Instructions", "Name", telemetry.Sections[1].Name)
 
 							setMultiMapValue(state, "Instructions", "Instructions", values2String(", ", instructionHints*))
 

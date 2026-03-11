@@ -284,16 +284,16 @@ class RaceStrategist extends GridRaceAssistant {
 								  , "Roger", "Okay")
 		}
 
-		cancel() {
+		abort() {
 			if this.iRemember
 				this.Manager.updateDynamicValues({RejectedStrategy: this.iStrategy})
 
-			super.cancel()
+			super.abort()
 		}
 	}
 
 	class TyreChangeContinuation extends VoiceManager.QuestionContinuation {
-		cancel() {
+		abort() {
 			if ProcessExist("Race Engineer.exe") {
 				if this.Manager.Listener {
 					this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
@@ -301,10 +301,10 @@ class RaceStrategist extends GridRaceAssistant {
 					this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop"))
 				}
 				else
-					super.cancel()
+					super.abort()
 			}
 			else
-				super.cancel()
+				super.abort()
 		}
 	}
 
@@ -331,7 +331,7 @@ class RaceStrategist extends GridRaceAssistant {
 			super.__New(manager, arguments*)
 		}
 
-		cancel() {
+		abort() {
 			if ProcessExist("Race Engineer.exe") {
 				if this.Manager.Listener {
 					this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
@@ -339,10 +339,10 @@ class RaceStrategist extends GridRaceAssistant {
 					this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop", this.PlannedLap, this.PitstopOptions*))
 				}
 				else
-					super.cancel()
+					super.abort()
 			}
 			else
-				super.cancel()
+				super.abort()
 		}
 	}
 
@@ -544,7 +544,7 @@ class RaceStrategist extends GridRaceAssistant {
 			super.__New(manager)
 		}
 
-		next(statistics) {
+		continue(statistics) {
 			RaceStrategist.RaceStrategySimulationTask(this.Manager, this.iData, this.iRequest, this.iConfirm
 													, statistics, this.iFullCourseYellow, this.iForcedPitstop).start()
 		}
@@ -1798,7 +1798,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if isInstance(continuation, RaceStrategist.RaceReviewContinuation) {
 			this.clearContinuation()
 
-			continuation.next()
+			continuation.continue()
 		}
 	}
 
@@ -1818,7 +1818,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if isInstance(continuation, RaceStrategist.RaceStrategySimulationContinuation) {
 			this.clearContinuation()
 
-			continuation.next(statistics)
+			continuation.continue(statistics)
 		}
 	}
 
@@ -2706,7 +2706,7 @@ class RaceStrategist extends GridRaceAssistant {
 		else
 			validLap := knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
 
-		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000, kLowPriority)
+		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber, validLap, data), 1000)
 
 		return result
 	}
@@ -2729,8 +2729,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (sector != lastSector) {
 				lastSector := sector
-
-				knowledgeBase.addFact("Sector", sector)
 
 				updateStrategy := knowledgeBase.getValue("Strategy.Recalculate", false)
 			}
@@ -2767,7 +2765,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		Task.startTask((*) => this.updateSession(simulator, car, track, lapNumber
 											   , knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
-											   , data), 1000, kLowPriority)
+											   , data), 1000)
 
 		return result
 	}

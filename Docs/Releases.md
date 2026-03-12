@@ -13,6 +13,7 @@
   - Thanks to @Przem Lis DTM we can introduce fully handcrafted support for the Polish language in Assistant speech interactions incl. language specific command reference sheets.
   - Clicking on icons in the launchpad of "Simulator Startup" will now give visual and acoustic feedback.
   - [Developer] A switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you activate the controls designer modus independent of all other development settings.
+  - [Internal] Optimized startup time of the controller background process after a configuration change.
   
 # Upcoming release
 

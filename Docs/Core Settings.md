@@ -53,7 +53,6 @@ The next group of settings is used mainly for development purposes. It allows to
 |          | LogLevel | *depending on configuration* | Defines the level of verbosity of the logging messages. Allowed values are *Debug*, *Info*, *Warn*, *Critical* and *Off*. Defult is *Warn* for production configuration and *Debug* for devlopment configuration. This option overwrites the choice as set in "Simulator Configuration" and it can be switched using the application menu. |
 |          | LogStartup | False | If *True*, special logging is enabled which gives you insights into the timing during the startup process of any of the applications of Simulator Controller. Use this, if any of the applications seems to hang during startup. |
 |          | Verbose | *depending on configuration* | Enables or disables additional and very verbose diagnostic output. Never use it in a real race, since error dialogs might popup while driving. Default is *True* for non-compiled code, when *Debug* is enabled in a *Development* configuration, *False* otherwise. |
-| Windows  | Designer | *depending on configuration* | If *True*, all controls in a window will show a small thin border, which helps in positioning during development. Default is *False* for a production (release) configuration and *True* for a development configuration. |
 
 Following are special debug settings that enable verbosity and diagnostic output of specific components and applications.
 
@@ -62,6 +61,7 @@ Following are special debug settings that enable verbosity and diagnostic output
 | Strategy | Protocol | False | If *True*, the Strategist protocols the history of strategies and also his communication with the Race Engineer in the directory %homePath%\Documents\Simulator Controller\Temp\Race Strategist\Strategy. |
 | Rules    | TraceLevel | Off | This setting lets you enable special trace output for the integrated rule engine. Allowed values are *Off*, *Lite*, *Medium*, *Full*. Trace output will be written to the standard log file. Please note, that any tracing will slow things down considerably and with *Full*, you will be bring the system to halt. |
 | Booster  | ExplainReasoning | False | If *True*, a connected LLM is asked to provide an explanation of its thoughts and conclusions, whenever an action in the *Conversation* and/or *Reasoning* booster is invoked. Whether the LLM will indeed provide an explanation depends on its capabilities. The explanation will be written to the transcript in the *Logs* directory. Please note, that this setting defaults to *True*, when running in debug mode. |
+| Windows  | Designer | *depending on configuration* | If *True*, all controls in a window will show a small thin border, which helps in positioning during development. Default is *False* for a production (release) configuration and *True* for a development configuration. |
 
 ### Voice Settings
 

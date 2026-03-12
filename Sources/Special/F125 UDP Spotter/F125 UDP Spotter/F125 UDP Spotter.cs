@@ -871,7 +871,7 @@ namespace F125UDPSpotter {
 			var playerStatus = status.CarStatus[playerIdx];
 
 			// F1 25: VehicleFIAFlags: 0=None, 1=Green, 2=Blue, 3=Yellow, 4=Red
-			byte flags = playerStatus.VehicleFIAFlags;
+			byte flags = (byte)playerStatus.VehicleFIAFlags;
 
             if ((waitYellowFlagState & YELLOW) != 0)
             {
@@ -958,8 +958,6 @@ namespace F125UDPSpotter {
 
 			return false;
 		}
-
-		bool greenFlagReported = false;
 
 		bool greenFlag() {
             // No direct green flag support in F1 25 UDP

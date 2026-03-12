@@ -1541,7 +1541,7 @@ class ControllerFunction {
 					controller.disableVoiceCommand(SubStr(theHotkey, 2), handler)
 				else
 					try {
-						Hotkey(theHotkey, "Off")
+						setHotkey(theHotkey, "Off")
 					}
 					catch Any as exception {
 						logError(exception, false, false)
@@ -2038,7 +2038,7 @@ setHotkeyEnabled(function, trigger, enabled) {
 		}
 		else
 			try {
-				Hotkey(theHotkey, state)
+				setHotkey(theHotkey, state)
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -2268,7 +2268,7 @@ initializeSimulatorController() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Controller"
 
-	SetKeyDelay(10, 30)
+	setSendDelay(10, 30)
 
 	Thread("Priority", 9999)
 

@@ -1102,7 +1102,7 @@ class VoiceServer extends ConfigurationItem {
 			case "Press":
 				if p2tHotkey
 					for ignore, key in p2tHotkey
-						Hotkey(key, ObjBindMethod(this, "listen", true), "On")
+						setHotkey(key, ObjBindMethod(this, "listen", true), "On")
 			case "Hold":
 				if p2THotkey
 					PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
@@ -1939,7 +1939,7 @@ startupVoiceServer() {
 
 		if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 						  , "Voice", "Keyboard Hook", false)
-			InstallKeybdHook(true, true)
+			installKeyboardHook(true, true)
 
 		startupProcess()
 	}

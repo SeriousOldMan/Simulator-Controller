@@ -332,6 +332,47 @@ doApplications(applications, callback) {
 	}
 }
 
+sendKeyboardCommand(command, mode := "Event", delay := false) {
+	try {
+		switch mode, false {
+			case "Event":
+				SendEvent(command)
+			case "Input":
+				SendInput(command)
+			case "Play":
+				SendPlay(command)
+			case "Raw":
+				Send("{Raw}" . command)
+			default:
+				Send(command)
+		}
+	}
+	catch Any as exception {
+		logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
+	}
+
+	if delay
+		Sleep(delay)
+}
+
+initializeUtils() {
+	global sendCommand, installKeyboardHook, setSendDelay, setHotkey
+
+	if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+								   , "Simulator", "Control", true) {
+		sendCommand := sendKeyboardCommand
+		installKeyboardHook := InstallKeybdHook
+		setSendDelay := SetKeyDelay
+		setHotKey := Hotkey
+	}
+	else {
+		sendCommand := (*) => false
+		installKeyboardHook := (*) => false
+		setSendDelay := (*) => false
+		setHotKey := (*) => false
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -625,3 +666,10 @@ testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 		}
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeUtils()

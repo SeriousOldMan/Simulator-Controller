@@ -3226,7 +3226,7 @@ startupSimulator() {
 		return false
 	}
 
-	Hotkey("Escape", cancelStartup, "On")
+	setHotkey("Escape", cancelStartup, "On")
 
 	SimulatorStartup.Instance := SimulatorStartup(kSimulatorConfiguration, readMultiMap(kSimulatorSettingsFile))
 
@@ -3338,7 +3338,7 @@ startSimulator() {
 		}
 	}
 
-	Hotkey("Escape", cancelStartup, "Off")
+	setHotkey("Escape", cancelStartup, "Off")
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
@@ -3444,7 +3444,7 @@ exitStartup(sayGoodBye := false) {
 		Task.startTask(exitStartup, 2000)
 	}
 	else {
-		Hotkey("Escape", cancelStartup, "Off")
+		setHotkey("Escape", cancelStartup, "Off")
 
 		if SimulatorStartup.Instance
 			SimulatorStartup.Instance.cancelStartup()

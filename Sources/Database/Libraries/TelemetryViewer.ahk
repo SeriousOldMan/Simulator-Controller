@@ -2833,7 +2833,7 @@ class TrackMap {
 
 		this.iEditorTask.start()
 
-		HotKey("WheelUp", (*) {
+		setHotkey("WheelUp", (*) {
 			if WinActive(this.Window) {
 				this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
@@ -2841,7 +2841,7 @@ class TrackMap {
 			}
 		}, "On")
 
-		HotKey("WheelDown", (*) {
+		setHotkey("WheelDown", (*) {
 			if WinActive(this.Window) {
 				this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
 
@@ -2861,8 +2861,8 @@ class TrackMap {
 			this.iEditorTask := false
 		}
 
-		HotKey("WheelUp", "Off")
-		HotKey("WheelDown", "Off")
+		setHotkey("WheelUp", "Off")
+		setHotkey("WheelDown", "Off")
 
 		if this.TelemetryViewer
 			this.TelemetryViewer.closedTrackMap()

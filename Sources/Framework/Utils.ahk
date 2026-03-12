@@ -359,7 +359,7 @@ initializeUtils() {
 	global sendCommand, installKeyboardHook, setSendDelay, setHotkey
 
 	if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-								   , "Simulator", "Control", true) {
+					  , "Simulator", "Control", true) {
 		sendCommand := sendKeyboardCommand
 		installKeyboardHook := InstallKeybdHook
 		setSendDelay := SetKeyDelay

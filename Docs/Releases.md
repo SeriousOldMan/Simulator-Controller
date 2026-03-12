@@ -1,5 +1,25 @@
 # Latest stable release
 
+## 6.8.7.0
+
+#### Date: 03/13/26
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - Thanks to @Przem Lis DTM we can introduce fully handcrafted support for the Polish language in Assistant speech interactions incl. language specific command reference sheets.
+  - Clicking on icons in the launchpad of "Simulator Startup" will now give visual and acoustic feedback.
+  - [Developer] A switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you activate the controls designer modus independent of all other development settings.
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.8.6.1
 
 #### Date: 03/07/26
@@ -30,24 +50,6 @@
   - The documentation regarding the information accuracy of the Strategist and the Spotter has been updated. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#how-it-works) and [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#simulator-integration) (especially Note #12). In short: Lap times, gap times and position data may be updated for the Strategist with each sector (if the data is provided by the simulator), whereas the situation for the Spotter is a bit more complex and depends on the data update frequency as defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" and it depends on the general configuration of the Spotter as defined in "Simulator Setup" or "Simulator Configuration".
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-686), if you are using the data supplied by "Integration" plugin and/or are using the SimHub plugin.
-  
-# Upcoming release
-
-## 6.8.7.0
-
-#### Date: 03/13/26 (planned)
-
-#### Fixes
-
-  - None this time...
-  
-#### Changes
-
-  - Thanks to @Przem Lis DTM we can introduce fully handcrafted support for the Polish language in Assistant speech interactions incl. language specific command reference sheets.
-  - Clicking on icons in the launchpad of "Simulator Startup" will now give visual and acoustic feedback.
-  - [Developer] A switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you activate the controls designer modus independent of all other development settings.
-
-# Release history
 
 ## 6.8.5.0
 

@@ -2681,7 +2681,10 @@ class RaceSpotter extends GridRaceAssistant {
 						talking := true
 
 						if inPit {
-							logMessage(kLogCritical, "SA Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+							logMessage(kLogCritical, "SA Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit
+												   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+												   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
+												   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
 							speaker.speakPhrase("GapCarInPit")
 						}
@@ -2729,7 +2732,10 @@ class RaceSpotter extends GridRaceAssistant {
 						talking := true
 
 						if inPit {
-							logMessage(kLogCritical, "SB Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+							logMessage(kLogCritical, "SB Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit
+												   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+												   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
+												   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
 							speaker.speakPhrase("GapCarInPit")
 						}
@@ -2789,7 +2795,10 @@ class RaceSpotter extends GridRaceAssistant {
 							talking := true
 
 							if inPit {
-								logMessage(kLogCritical, "F Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+								logMessage(kLogCritical, "F Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit
+													   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+													   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
+													   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
 								speaker.speakPhrase("GapCarInPit")
 							}

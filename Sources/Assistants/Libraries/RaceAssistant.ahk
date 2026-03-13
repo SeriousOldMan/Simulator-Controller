@@ -4013,7 +4013,10 @@ class GridRaceAssistant extends RaceAssistant {
 				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 				laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-				logMessage(kLogCritical, "SA Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+				logMessage(kLogCritical, "SA Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit
+									   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+									   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
+									   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
 				if ((car = kUndefined) || (laps == 0) || (delta == 0)) {
 					speaker.speakPhrase("NoTrackGap")
@@ -4113,7 +4116,10 @@ class GridRaceAssistant extends RaceAssistant {
 				laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 				lapped := false
 
-				logMessage(kLogCritical, "SB Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+				logMessage(kLogCritical, "SB Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit
+									   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
+									   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
+									   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
 				if ((car = kUndefined) || (laps == 0) || (delta == 0)) {
 					speaker.speakPhrase("NoTrackGap")

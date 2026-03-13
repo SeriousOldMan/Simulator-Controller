@@ -4018,6 +4018,8 @@ class GridRaceAssistant extends RaceAssistant {
 									   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
 									   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
+				this.dumpKnowledgeBase(knowledgeBase)
+
 				if ((car = kUndefined) || (laps == 0) || (delta == 0)) {
 					speaker.speakPhrase("NoTrackGap")
 
@@ -4120,6 +4122,8 @@ class GridRaceAssistant extends RaceAssistant {
 									   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
 									   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
 									   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
+
+				this.dumpKnowledgeBase(knowledgeBase)
 
 				if ((car = kUndefined) || (laps == 0) || (delta == 0)) {
 					speaker.speakPhrase("NoTrackGap")

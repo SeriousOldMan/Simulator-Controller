@@ -2686,6 +2686,8 @@ class RaceSpotter extends GridRaceAssistant {
 												   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
 												   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
 
+							this.dumpKnowledgeBase(knowledgeBase)
+
 							speaker.speakPhrase("GapCarInPit")
 						}
 					}
@@ -2736,6 +2738,8 @@ class RaceSpotter extends GridRaceAssistant {
 												   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
 												   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
 												   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
+
+							this.dumpKnowledgeBase(knowledgeBase)
 
 							speaker.speakPhrase("GapCarInPit")
 						}
@@ -2799,6 +2803,8 @@ class RaceSpotter extends GridRaceAssistant {
 													   . " Driver: " . knowledgeBase.getValue("Car." . car . ".Driver.Forname")
 													   . " Car: " . knowledgeBase.getValue("Car." . car . ".Car")
 													   . " Position: " . knowledgeBase.getValue("Car." . car . ".Position"))
+
+								this.dumpKnowledgeBase(knowledgeBase)
 
 								speaker.speakPhrase("GapCarInPit")
 							}

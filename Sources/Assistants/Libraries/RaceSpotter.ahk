@@ -2653,7 +2653,7 @@ class RaceSpotter extends GridRaceAssistant {
 	standingsGapToAhead(speaker) {
 		local knowledgeBase := this.KnowledgeBase
 		local talking := false
-		local delta, lap, car, inPit
+		local delta, lap, laps, car, inPit
 
 		if (this.getPosition(false, "Class") = 1)
 			return false
@@ -2665,11 +2665,11 @@ class RaceSpotter extends GridRaceAssistant {
 				if (car && (lap > 0)) {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
+					if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (laps == 0))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) > lap)
-						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+					else if ((laps > lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
 						speaker.beginTalk()
@@ -2680,8 +2680,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 						talking := true
 
-						if inPit
+						if inPit {
+							logMessage(kLogCritical, "Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+
 							speaker.speakPhrase("GapCarInPit")
+						}
 					}
 
 					return talking
@@ -2698,7 +2701,7 @@ class RaceSpotter extends GridRaceAssistant {
 	standingsGapToBehind(speaker) {
 		local knowledgeBase := this.KnowledgeBase
 		local talking := false
-		local delta, car, driver, inPit, lap
+		local delta, car, driver, inPit, lap, laps
 
 		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			return false
@@ -2710,11 +2713,11 @@ class RaceSpotter extends GridRaceAssistant {
 				if (car && (lap > 0)) {
 					delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+					laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-					if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
+					if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (laps == 0))
 						return false
-					else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
-						  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+					else if ((laps < lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
 					else {
 						speaker.beginTalk()
@@ -2725,8 +2728,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 						talking := true
 
-						if inPit
+						if inPit {
+							logMessage(kLogCritical, "Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+
 							speaker.speakPhrase("GapCarInPit")
+						}
 					}
 
 					return talking
@@ -2743,7 +2749,7 @@ class RaceSpotter extends GridRaceAssistant {
 	focusGap(speaker) {
 		local knowledgeBase := this.KnowledgeBase
 		local talking := false
-		local number, focusedCar, delta, car, driver, inPit, lap, ignore, candidate
+		local number, focusedCar, delta, car, driver, inPit, lap, laps, ignore, candidate
 
 		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			return false
@@ -2765,11 +2771,11 @@ class RaceSpotter extends GridRaceAssistant {
 					if car {
 						delta := (this.getDelta(car) / 1000)
 						inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
+						laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-						if ((delta = 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
+						if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
 							return false
-						else if ((knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0)) < lap)
-							  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
+						else if ((laps < lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 							return false
 						else {
 							speaker.beginTalk()
@@ -2782,8 +2788,11 @@ class RaceSpotter extends GridRaceAssistant {
 
 							talking := true
 
-							if inPit
+							if inPit {
+								logMessage(kLogCritical, "Lap: " . lap . " Car: " . car . " Laps: " . laps . " Delta: " . delta . " Pit: " . inPit)
+
 								speaker.speakPhrase("GapCarInPit")
+							}
 						}
 					}
 

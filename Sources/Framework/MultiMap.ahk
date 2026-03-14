@@ -289,6 +289,10 @@ printMultiMap(multiMap, symbolic := true) {
 	return result
 }
 
+hasMultiMapValue(multiMap, section, key) {
+	return (multiMap.Has(section) && multiMap[section].Has(StrLower(key)))
+}
+
 getMultiMapValue(multiMap, section, key, default := false) {
 	local values
 

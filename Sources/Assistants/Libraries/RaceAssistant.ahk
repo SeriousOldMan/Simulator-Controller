@@ -4931,6 +4931,8 @@ class GridRaceAssistant extends RaceAssistant {
 
 			for key, value in getMultiMapValues(data, "Position Data")
 				knowledgeBase.setFact(key, value)
+
+			knowledgeBase.clearFacts((k, v) => (InStr(k, "Car.") == 1) && !hasMultiMapValue(data, "Position Data", k))
 		}
 
 		return data

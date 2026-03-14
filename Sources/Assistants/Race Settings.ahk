@@ -39,6 +39,8 @@
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\CLR.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
+#Include "..\Database\Libraries\TyresDatabase.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 
 
@@ -855,6 +857,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		editRaceSettings(&updateState)
 	}
 
+	queryPSTyreSet(*) {
+		global gSimulator, gCar, gTrack, gWeather, gAirTemperature, gTrackTemperature
+
+		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
+															   , "Session Settings"
+															   , "Session.Settings.Tyre.Wear.Warning", false)
+		local tyreCompound := tyreSetListView.GetText(tyreSetListView.GetNext(0))
+		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack, gWeather
+													  , gAirTemperature, gTrackTemperature
+													  , compound(tyreCompound), compoundColor(tyreCompound)
+													  , wearWarning ? (100 - wearWarning) : unset)
+
+		if tyreLaps
+			settingsGui["tyreSetLapsEdit"].Text := tyreLaps
+	}
+
 	addPSTyreSet(*) {
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
@@ -1160,12 +1178,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["tyreSetLapsEdit"].Enabled := true
 			settingsGui["tyreSetCountEdit"].Enabled := true
 			settingsGui["tyreSetDeleteButton"].Enabled := true
+			settingsGui["tyreSetQueryButton"].Enabled := true
 		}
 		else {
 			settingsGui["tyreSetDropDown"].Enabled := false
 			settingsGui["tyreSetLapsEdit"].Enabled := false
 			settingsGui["tyreSetCountEdit"].Enabled := false
 			settingsGui["tyreSetDeleteButton"].Enabled := false
+			settingsGui["tyreSetQueryButton"].Enabled := false
 
 			settingsGui["tyreSetDropDown"].Choose(0)
 			settingsGui["tyreSetLapsEdit"].Text := ""
@@ -1768,9 +1788,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui["tyreSetCountEdit"].OnValidate("LoseFocus", validateInteger)
 		settingsGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
-		x13 := (x7 + w12 + 5 + 126 - 48)
+		x13 := (x7 + w12 + 5 + 126 - 73)
 
-		settingsGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addPSTyreSet)
+		settingsGui.Add("Button", "x" . x13 . " yp+6 w23 h23 Center +0x200 vtyreSetQueryButton").OnEvent("Click", queryPSTyreSet)
+		setButtonIcon(settingsGui["tyreSetQueryButton"], kIconsDirectory . "Wheel.ico", 1, "L4 T4 R4 B4")
+
+		x13 += 25
+
+		settingsGui.Add("Button", "x" . x13 . " yp w23 h23 Center +0x200 vtyreSetAddButton").OnEvent("Click", addPSTyreSet)
 		setButtonIcon(settingsGui["tyreSetAddButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 
 		x13 += 25

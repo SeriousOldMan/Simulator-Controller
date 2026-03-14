@@ -216,6 +216,9 @@ class Sector397Provider extends SimulatorProvider {
 
 				if tyreCompound
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompound", tyreCompound)
+
+				if !isDebug()
+					removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRaw")
 			}
 
 			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawFront", kUndefined)
@@ -225,6 +228,9 @@ class Sector397Provider extends SimulatorProvider {
 
 				if tyreCompound
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundFront", tyreCompound)
+
+				if !isDebug()
+					removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawFront")
 			}
 
 			tyreCompound := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawRear", kUndefined)
@@ -234,6 +240,9 @@ class Sector397Provider extends SimulatorProvider {
 
 				if tyreCompound
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRear", tyreCompound)
+
+				if !isDebug()
+					removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRawRear")
 			}
 		}
 

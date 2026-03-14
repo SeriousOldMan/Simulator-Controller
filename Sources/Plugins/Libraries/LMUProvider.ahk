@@ -212,6 +212,12 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
+			if !isDebug() {
+				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompound")
+				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundFront")
+				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRear")
+			}
+
 			parseDriverName(this.StandingsData.Driver[id], &forname, &surname, &nickname)
 
 			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)

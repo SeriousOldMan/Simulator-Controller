@@ -678,33 +678,35 @@ initializeStreamDeckPlugin() {
 	local configuration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 	local ignore, strmDeck
 
-	for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
-		strmDeck := string2Values(":", strmDeck)
+	if (controller.State = "Foreground") {
+		for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
+			strmDeck := string2Values(":", strmDeck)
 
-		try {
-			StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+			try {
+				StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+			}
+			catch Any as exception {
+				logError(exception, true)
+			}
 		}
-		catch Any as exception {
-			logError(exception, true)
-		}
+
+		registerMessageHandler("Stream Deck", handleStreamDeckMessage)
+
+		Task.startTask(() {
+			if StreamDeck.isRunning()
+				PeriodicTask(() {
+					local ignore, fnController
+
+					for ignore, fnController in SimulatorController.Instance.FunctionController
+						if isInstance(fnController, StreamDeck)
+							fnController.refresh(true)
+
+					Task.CurrentTask.Sleep := 10000
+				}, 0, kLowPriority).start()
+			else
+				return Task.CurrentTask
+		}, 1000, kLowPriority)
 	}
-
-	registerMessageHandler("Stream Deck", handleStreamDeckMessage)
-
-	Task.startTask(() {
-		if StreamDeck.isRunning()
-			PeriodicTask(() {
-				local ignore, fnController
-
-				for ignore, fnController in SimulatorController.Instance.FunctionController
-					if isInstance(fnController, StreamDeck)
-						fnController.refresh(true)
-
-				Task.CurrentTask.Sleep := 10000
-			}, 0, kLowPriority).start()
-		else
-			return Task.CurrentTask
-	}, 1000, kLowPriority)
 }
 
 

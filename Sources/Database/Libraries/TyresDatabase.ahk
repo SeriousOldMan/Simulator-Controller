@@ -382,6 +382,11 @@ class TyresDatabase extends SessionDatabase {
 		return Map()
 	}
 
+	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
+				, compound, compoundColor, maxWear := 75, driver := false) {
+		return Round(maxWear * 0.5)
+	}
+
 	lock(simulator, car, track, wait := true) {
 		local database := this.requireDatabase(simulator, car, track)
 

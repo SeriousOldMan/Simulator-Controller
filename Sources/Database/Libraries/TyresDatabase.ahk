@@ -19,6 +19,7 @@
 #Include "..\..\Framework\Extensions\Database.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SettingsDatabase.ahk"
+#Include "LapsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

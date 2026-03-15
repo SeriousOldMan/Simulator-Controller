@@ -385,6 +385,7 @@ detectRunningProcess(pid := false, winTitle := "", exePath := "") {
 
 initializeUtils() {
 	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, detectProcess
+	global activateWindow, closeWindow
 
 	if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 					  , "Simulator", "Control", true) {
@@ -392,16 +393,18 @@ initializeUtils() {
 		installKeyboardHook := InstallKeybdHook
 		setSendDelay := SetKeyDelay
 		setHotKey := Hotkey
-
 		detectProcess := detectRunningProcess
+		activateWindow := WinActivate
+		closeWindow := WinClose
 	}
 	else {
 		sendCommand := (*) => false
 		installKeyboardHook := (*) => false
 		setSendDelay := (*) => false
 		setHotKey := (*) => false
-
 		detectProcess := (p) => p
+		activateWindow := (*) => false
+		closeWindow := (*) => false
 	}
 }
 

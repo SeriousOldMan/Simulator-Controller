@@ -255,8 +255,8 @@ class Application extends ConfigurationItem {
 				logError(exception)
 
 				try {
-					; WinClose("ahk_pid " . this.iRunningPID)
-					ProcessClose(this.iRunningPID)
+					if (this.iRunningPID > 0)
+						ProcessClose(this.iRunningPID)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -268,7 +268,6 @@ class Application extends ConfigurationItem {
 		else {
 			if (this.iRunningPID > 0) {
 				try {
-					; WinClose("ahk_pid " . this.iRunningPID)
 					ProcessClose(this.iRunningPID)
 				}
 				catch Any as exception {
@@ -276,9 +275,9 @@ class Application extends ConfigurationItem {
 				}
 			}
 			else if (this.ExePath != "")
-				WinClose("ahk_exe " . this.ExePath)
+				closeWindow("ahk_exe " . this.ExePath)
 			else if (this.WindowTitle != "")
-				WinClose(this.WindowTitle)
+				closeWindow(this.WindowTitle)
 
 			this.iRunningPID := 0
 		}

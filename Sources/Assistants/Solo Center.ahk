@@ -1965,7 +1965,7 @@ class SoloCenter extends ConfigurationItem {
 
 	openTelemetryViewer(verbose := true) {
 		if this.TelemetryViewer
-			WinActivate(this.TelemetryViewer.Window)
+			activateWindow(this.TelemetryViewer.Window)
 		else if !this.SessionLoaded {
 			if !this.SessionMode
 				deleteDirectory(this.SessionDirectory . "Telemetry")
@@ -8519,7 +8519,7 @@ recommendDataRun(centerOrCommand := false, arguments*) {
 		tSplit := Round(arguments[3] / arguments[4])
 
 		if isOpen
-			WinActivate(recoGui)
+			activateWindow(recoGui)
 		else {
 			recoGui := RecommendationWindow()
 

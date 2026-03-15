@@ -980,7 +980,7 @@ mouse(button, x, y, count := 1, window := false) {
 
 	try {
 		if (window && WinExist(window))
-			WinActivate(window)
+			activateWindow(window)
 
 		MouseClick(button, x, y, count)
 	}

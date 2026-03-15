@@ -3003,7 +3003,7 @@ class TeamCenter extends ConfigurationItem {
 
 	openTelemetryViewer() {
 		if this.TelemetryViewer
-			WinActivate(this.TelemetryViewer.Window)
+			activateWindow(this.TelemetryViewer.Window)
 		else if !this.SessionLoaded {
 			DirCreate(this.SessionDirectory . "Telemetry")
 
@@ -14653,7 +14653,7 @@ pitstopSettings(teamCenterOrCommand := false, arguments*) {
 				isOpen := true
 			}
 			else
-				WinActivate(settingsGui)
+				activateWindow(settingsGui)
 		}
 		else {
 			settingsGui := Window({Descriptor: "Team Center.Pitstop Settings", Options: "0x400000"})

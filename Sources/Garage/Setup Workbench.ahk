@@ -1581,7 +1581,7 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 
 		if this.TelemetryViewer
-			WinActivate(this.TelemetryViewer.Window)
+			activateWindow(this.TelemetryViewer.Window)
 		else {
 			if ((lastActiveSimulator != this.SelectedSimulator[false]) || (lastActiveTrack != this.SelectedTrack[false])) {
 				DirCreate(kTempDirectory . "Garage")

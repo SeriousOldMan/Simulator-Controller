@@ -100,7 +100,7 @@ class R3EPitstopTester extends Plugin {
 		window := "ahk_exe RRRE64.exe"
 
 		if !WinActive(window)
-			WinActivate %window%
+			activateWindow %window%
 
 		Sleep 2000
 	}

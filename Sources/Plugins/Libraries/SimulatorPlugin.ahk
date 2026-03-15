@@ -553,7 +553,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			return false
 		}
 		else if !WinActive(window) {
-			WinActivate(window)
+			activateWindow(window)
 
 			return WinActive(window)
 		}

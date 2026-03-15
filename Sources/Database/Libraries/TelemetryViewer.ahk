@@ -1278,7 +1278,7 @@ class TelemetryViewer {
 		local simulator, car, track
 
 		if this.TrackMap
-			WinActivate(this.TrackMap.Window)
+			activateWindow(this.TrackMap.Window)
 		else {
 			this.Manager.getSessionInformation(&simulator, &car, &track)
 
@@ -2022,7 +2022,7 @@ class SectionInfoViewer {
 
 	static bringToFront() {
 		if SectionInfoViewer.Instance
-			WinActivate(SectionInfoViewer.Instance.Window)
+			activateWindow(SectionInfoViewer.Instance.Window)
 	}
 
 	static showSectionInfo(section, referenceSection := false, open := true) {

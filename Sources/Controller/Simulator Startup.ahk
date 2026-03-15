@@ -1176,7 +1176,7 @@ launchPad(command := false, arguments*) {
 
 		if ProcessExist(theApplication) {
 			try
-				WinActivate("ahk_exe " . theApplication)
+				activateWindow("ahk_exe " . theApplication)
 		}
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")

@@ -255,7 +255,7 @@ class Application extends ConfigurationItem {
 				logError(exception)
 
 				try {
-					WinClose("ahk_pid " . this.iRunningPID)
+					; WinClose("ahk_pid " . this.iRunningPID)
 					ProcessClose(this.iRunningPID)
 				}
 				catch Any as exception {
@@ -268,16 +268,15 @@ class Application extends ConfigurationItem {
 		else {
 			if (this.iRunningPID > 0) {
 				try {
-					WinClose("ahk_pid " . this.iRunningPID)
+					; WinClose("ahk_pid " . this.iRunningPID)
 					ProcessClose(this.iRunningPID)
 				}
 				catch Any as exception {
 					logError(exception)
 				}
 			}
-			else if (this.ExePath != "") {
+			else if (this.ExePath != "")
 				WinClose("ahk_exe " . this.ExePath)
-			}
 			else if (this.WindowTitle != "")
 				WinClose(this.WindowTitle)
 
@@ -305,31 +304,7 @@ class Application extends ConfigurationItem {
 	}
 
 	getProcessID() {
-		local processID := false
-		local curDetectHiddenWindows := A_DetectHiddenWindows
-
-		DetectHiddenWindows(true)
-
-		try {
-			if (this.iRunningPID > 0)
-				processID := ((ProcessExist(this.iRunningPID) != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
-
-			if (!processID && (this.WindowTitle != ""))
-				if WinExist(this.WindowTitle)
-					processID := WinGetPID(this.WindowTitle)
-
-			if (!processID && (this.ExePath != ""))
-				if WinExist("ahk_exe " . this.ExePath)
-					processID := WinGetPID("ahk_exe " . this.ExePath)
-		}
-		finally {
-			DetectHiddenWindows(curDetectHiddenWindows)
-		}
-
-		if !isNumber(processID)
-			processID := 0
-
-		return (this.iRunningPID := processID)
+		return (this.iRunningPID := detectProcess(this.iRunningPID, this.WindowTitle, this.ExePath))
 	}
 
 	static run(application, exePath, workingDirectory, options := "", wait := false) {

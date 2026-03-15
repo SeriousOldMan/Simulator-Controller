@@ -355,8 +355,36 @@ sendKeyboardCommand(command, mode := "Event", delay := false) {
 		Sleep(delay)
 }
 
+detectRunningProcess(pid := false, winTitle := "", exePath := "") {
+	local curDetectHiddenWindows := A_DetectHiddenWindows
+	local processID
+
+	DetectHiddenWindows(true)
+
+	try {
+		if pid
+			processID := (((ProcessExist(pid) != 0) || WinExist("ahk_pid " . pid)) ? pid : 0)
+
+		if (!processID && (winTitle != ""))
+			if WinExist(winTitle)
+				processID := WinGetPID(winTitle)
+
+		if (!processID && (exePath != ""))
+			if WinExist("ahk_exe " . exePath)
+				processID := WinGetPID("ahk_exe " . exePath)
+	}
+	finally {
+		DetectHiddenWindows(curDetectHiddenWindows)
+	}
+
+	if !isNumber(processID)
+		processID := false
+
+	return processID
+}
+
 initializeUtils() {
-	global sendCommand, installKeyboardHook, setSendDelay, setHotkey
+	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, detectProcess
 
 	if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 					  , "Simulator", "Control", true) {
@@ -364,12 +392,16 @@ initializeUtils() {
 		installKeyboardHook := InstallKeybdHook
 		setSendDelay := SetKeyDelay
 		setHotKey := Hotkey
+
+		detectProcess := detectRunningProcess
 	}
 	else {
 		sendCommand := (*) => false
 		installKeyboardHook := (*) => false
 		setSendDelay := (*) => false
 		setHotKey := (*) => false
+
+		detectProcess := (p) => p
 	}
 }
 

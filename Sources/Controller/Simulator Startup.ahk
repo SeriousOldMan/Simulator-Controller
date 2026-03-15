@@ -289,9 +289,12 @@ class SimulatorStartup extends ConfigurationItem {
 			if FileExist(kProgramsDirectory . "Startup.cmd")
 				Run(kProgramsDirectory . "Startup.cmd")
 
-			exePath := (kBinariesDirectory . "Process Manager.exe")
+			if getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+										   , "Simulator", "Control", true) {
+				exePath := (kBinariesDirectory . "Process Manager.exe")
 
-			Run(exePath, kBinariesDirectory)
+				Run(exePath, kBinariesDirectory)
+			}
 
 			if getMultiMapValue(this.Settings, "Core", "System Monitor", false) {
 				if !ProcessExist("System Monitor.exe") {

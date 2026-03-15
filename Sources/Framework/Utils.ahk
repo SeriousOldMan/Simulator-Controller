@@ -403,10 +403,10 @@ initializeUtils() {
 		installKeyboardHook := (*) => false
 		setSendDelay := (*) => false
 		setHotKey := (*) => false
-		detectProcess := (p) => p
+		detectProcess := (p, *) => p
 		activateWindow := (*) => false
 		closeWindow := (*) => false
-		listWindows := (*) => false
+		listWindows := (*) => []
 	}
 }
 

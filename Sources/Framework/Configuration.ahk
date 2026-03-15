@@ -12,6 +12,7 @@
 #Include "Constants.ahk"
 #Include "Variables.ahk"
 #Include "Debug.ahk"
+#Include "Utils.ahk"
 #Include "Strings.ahk"
 #Include "Collections.ahk"
 #Include "MultiMap.ahk"
@@ -275,9 +276,9 @@ class Application extends ConfigurationItem {
 				}
 			}
 			else if (this.ExePath != "")
-				closeWindow("ahk_exe " . this.ExePath)
+				WinClose("ahk_exe " . this.ExePath)
 			else if (this.WindowTitle != "")
-				closeWindow(this.WindowTitle)
+				WinClose(this.WindowTitle)
 
 			this.iRunningPID := 0
 		}

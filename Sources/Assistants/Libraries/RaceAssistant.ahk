@@ -4929,10 +4929,15 @@ class GridRaceAssistant extends RaceAssistant {
 
 			knowledgeBase := this.KnowledgeBase
 
+			loop knowledgeBase.getValue("Car.Count", 0) {
+				knowledgeBase.clearFact("Car." . A_Index . ".InPit")
+				knowledgeBase.clearFact("Car." . A_Index . ".InPitLane")
+			}
+
+			; knowledgeBase.clearFacts((k, v) => (InStr(k, "Car.") == 1) && !hasMultiMapValue(data, "Position Data", k))
+
 			for key, value in getMultiMapValues(data, "Position Data")
 				knowledgeBase.setFact(key, value)
-
-			knowledgeBase.clearFacts((k, v) => (InStr(k, "Car.") == 1) && !hasMultiMapValue(data, "Position Data", k))
 		}
 
 		return data

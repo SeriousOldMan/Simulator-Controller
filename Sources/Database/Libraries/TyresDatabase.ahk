@@ -384,7 +384,58 @@ class TyresDatabase extends SessionDatabase {
 
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
 				, compound, compoundColor, maxWear := 75, driver := false) {
-		return Round(maxWear * 0.5)
+		local lastLap := 0
+		local tyreWears := []
+		local wears, ignore, wear, lapWear
+
+		compareWears(w1, w2) {
+			return (isNumber(w1["Tyre.Laps"]) && isNumber(w2["Tyre.Laps"])
+											  && (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
+		}
+
+		if !driver
+			driver := this.ID
+
+		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor, driver)
+
+		wears := bubbleSort(&wears, compareWears)
+
+		try {
+			for ignore, wear in wears
+				if !exist(wear, (v) => !isNumber(v))
+					if (wear["Tyre.Laps"] > 25)
+						break
+					else if ((lastLap == 0) || (lastLap != wear["Tyre.Laps"])) {
+						tyreWears.Push({Laps: wear["Tyre.Laps"]
+									  , FL: [wear["Tyre.Wear.Front.Left"]], FR: [wear["Tyre.Wear.Front.Right"]]
+									  , RL: [wear["Tyre.Wear.Rear.Left"]], RR: [wear["Tyre.Wear.Rear.Right"]]})
+
+						lastLap := wear["Tyre.Laps"]
+					}
+					else {
+						lapWear := tyreWears[tyreWears.Length]
+
+						lapWear.FL.Push[wear["Tyre.Wear.Front.Left"]]
+						lapWear.FR.Push[wear["Tyre.Wear.Front.Right"]]
+						lapWear.RL.Push[wear["Tyre.Wear.Rear.Left"]]
+						lapWear.RR.Push[wear["Tyre.Wear.Rear.Right"]]
+					}
+
+			for ignore, wear in tyreWears {
+				wear.FL := (average(wear.FL) / wear.Laps)
+				wear.FR := (average(wear.FR) / wear.Laps)
+				wear.RL := (average(wear.RL) / wear.Laps)
+				wear.RR := (average(wear.RR) / wear.Laps)
+			}
+
+			wear := Max(average(collect(tyreWears, (w) => w.FL)), average(collect(tyreWears, (w) => w.FR))
+					  , average(collect(tyreWears, (w) => w.RL)), average(collect(tyreWears, (w) => w.RR)))
+
+			return Floor(maxWear / wear)
+		}
+		catch Any as exception {
+			return false
+		}
 	}
 
 	lock(simulator, car, track, wait := true) {

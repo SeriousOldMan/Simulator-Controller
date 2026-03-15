@@ -256,8 +256,9 @@ class LapsDatabase extends SessionDatabase {
 										  , drivers)
 	}
 
-	getTyreCompoundWears(weather, compound, drivers := kUndefined) {
-		return this.combineResults("Tyres", {Select: ["Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+	getTyreCompoundWears(weather, compound, compoundColor, drivers := kUndefined) {
+		return this.combineResults("Tyres", {Select: ["Tyre.Laps"
+													, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
 													, "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather

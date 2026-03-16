@@ -19,6 +19,7 @@
 #Include "..\..\Framework\Extensions\Database.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SettingsDatabase.ahk"
+#Include "LapsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -383,7 +384,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
-				, compound, compoundColor, maxWear := 75, driver := false) {
+				, compound, compoundColor, maxWear := 75, default := false, driver := false) {
 		local lastLap := 0
 		local tyreWears := []
 		local wears, ignore, wear, lapWear
@@ -421,20 +422,24 @@ class TyresDatabase extends SessionDatabase {
 						lapWear.RR.Push[wear["Tyre.Wear.Rear.Right"]]
 					}
 
-			for ignore, wear in tyreWears {
-				wear.FL := (average(wear.FL) / wear.Laps)
-				wear.FR := (average(wear.FR) / wear.Laps)
-				wear.RL := (average(wear.RL) / wear.Laps)
-				wear.RR := (average(wear.RR) / wear.Laps)
+			if (tyreWears.Length > 0) {
+				for ignore, wear in tyreWears {
+					wear.FL := (average(wear.FL) / wear.Laps)
+					wear.FR := (average(wear.FR) / wear.Laps)
+					wear.RL := (average(wear.RL) / wear.Laps)
+					wear.RR := (average(wear.RR) / wear.Laps)
+				}
+
+				wear := Max(average(collect(tyreWears, (w) => w.FL)), average(collect(tyreWears, (w) => w.FR))
+						  , average(collect(tyreWears, (w) => w.RL)), average(collect(tyreWears, (w) => w.RR)))
+
+				return Floor(maxWear / wear)
 			}
-
-			wear := Max(average(collect(tyreWears, (w) => w.FL)), average(collect(tyreWears, (w) => w.FR))
-					  , average(collect(tyreWears, (w) => w.RL)), average(collect(tyreWears, (w) => w.RR)))
-
-			return Floor(maxWear / wear)
+			else
+				return default
 		}
 		catch Any as exception {
-			return false
+			return default
 		}
 	}
 

@@ -580,7 +580,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if (row > 0) {
 				availableCompounds := collect(workbench.TyreCompounds, translate)
-				compound := availableCompounds[workbenchGui["tyreSetDropDown"].Value]
+				compound := workbenchGui["tyreSetDropDown"].Text
 				usedCompounds := []
 
 				loop workbench.TyreSetListView.GetCount()

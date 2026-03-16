@@ -1834,7 +1834,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				writeMultiMap(fileName, settings)
 
-				options := "-NoTeam -Test -File `"" . fileName . "`""
+				options := "-NoTeam -NoRules -Test -File `"" . fileName . "`""
 
 				if (editor.SelectedSimulator)
 					options .= (" -Simulator `"" . editor.SelectedSimulator . "`"")

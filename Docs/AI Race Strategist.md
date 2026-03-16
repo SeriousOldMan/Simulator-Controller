@@ -152,6 +152,8 @@ To prepare for a race with this kind of strategy handling, set *Active* to "Yes"
 
 Using the list in the lower part you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used by Cato to determine the best tyre set for each pitstop in the derived strategy. If a given compound mixture is not available in a particular race, set the number of available tyre sets to **0**.
 
+Note: If the selected or currently running simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
+
 #### Tab *Strategy*
 
 You will find settings for the race strategy analysis and simulation in the fourth tab of the settings tool.

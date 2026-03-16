@@ -2714,6 +2714,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop, found
+		local availableCompounds, found
 
 		switch line {
 			case 3:
@@ -2805,8 +2806,12 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["tyreChangeRequirementsDropDown"].Choose(inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule))
 						}
 
+						availableCompounds := []
+
 						for ignore, descriptor in strategy.TyreSets {
 							found := false
+
+							availableCompounds.Push(compound(descriptor[1], descriptor[2]))
 
 							loop this.TyreSetListView.GetCount()
 								if (translate(compound(descriptor[1], descriptor[2])) = this.TyreSetListView.GetText(A_Index, 1)) {
@@ -2831,6 +2836,19 @@ class StrategyWorkbench extends ConfigurationItem {
 										this.TyreSetListView.Modify(A_Index, "Col2", descriptor[4])
 								}
 						}
+
+						loop {
+							found := false
+
+							loop this.TyreSetListView.GetCount()
+								if !inList(availableCompounds, this.TyreSetListView.GetText(A_Index)) {
+									this.TyreSetListView.Delete(A_Index)
+
+									found := true
+
+									break
+								}
+						} until !found
 
 						this.TyreSetListView.ModifyCol()
 						this.TyreSetListView.ModifyCol(1, 65)

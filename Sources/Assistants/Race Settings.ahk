@@ -206,7 +206,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, tc, tcc, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, tyreSet, translatedCompounds, rulesActive, index
+	local tyreSets, tyreSet, translatedCompounds, rulesActive, index, availableCompounds, found
+
+	static sessionDB
+	static simulators, cars, tracks
 
 	static wheels := ["FL", "FR", "RL", "RR"]
 
@@ -232,6 +235,120 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static teams := CaseInsenseMap()
 	static drivers := CaseInsenseMap()
 	static sessions := CaseInsenseMap()
+
+	selectSimulator(*) {
+		global gSimulator, gCar
+
+		local simulator := settingsGui["simulatorDropDown"].Value
+		local index, car, carNames
+
+		if simulator
+			simulator := simulators[simulator]
+
+
+		if (!simulator || (simulator != gSimulator)) {
+			if !simulator
+				if gSimulator
+					simulator := gSimulator
+				else if (simulators.Length > 0)
+					simulator := simulators[1]
+
+			gSimulator := simulator
+
+			settingsGui["simulatorDropDown"].Choose(inList(simulators, simulator))
+
+			cars := sessionDB.getCars(simulator)
+			carNames := cars.Clone()
+
+			for index, car in cars
+				carNames[index] := sessionDB.getCarName(simulator, car)
+
+			settingsGui["carDropDown"].Delete()
+			settingsGui["carDropDown"].Add(carNames)
+
+			if !inList(cars, gCar)
+				gCar := false
+
+			selectCar()
+		}
+	}
+
+	selectCar(*) {
+		global gSimulator, gCar, gTrack
+
+		local car := settingsGui["carDropDown"].Value
+		local index, track, trackNames
+
+		if car
+			car := cars[car]
+
+		if (!car || (car != gCar)) {
+			if !car
+				if gCar
+					car := gCar
+				else if (cars.Length > 0)
+					car := cars[1]
+
+			if car {
+				gCar := car
+
+				settingsGui["carDropDown"].Choose(inList(cars, car))
+
+				tracks := sessionDB.getTracks(gSimulator, car)
+				trackNames := tracks.Clone()
+
+				for index, track in tracks
+					trackNames[index] := sessionDB.getTrackName(gSimulator, track)
+
+				settingsGui["trackDropDown"].Delete()
+				settingsGui["trackDropDown"].Add(trackNames)
+
+				if !inList(tracks, gTrack)
+					gTrack := false
+
+				selectTrack()
+			}
+		}
+	}
+
+	selectTrack(*) {
+		global gSimulator, gCar, gTrack, gTyreCompounds
+
+		local track := settingsGui["trackDropDown"].Value
+		local choices, ignore, dropDown
+
+		if track
+			track := tracks[track]
+
+		if (!track || (track != gTrack)) {
+			if !track
+				if gTrack
+					track := gTrack
+				else if (tracks.Length > 0)
+					track := tracks[1]
+
+			if track {
+				gTrack := track
+
+				settingsGui["trackDropDown"].Choose(inList(tracks, track))
+
+				gTyreCompounds := sessionDB.getTyreCompounds(gSimulator, gCar, track)
+
+				choices := collect(gTyreCompounds, translate)
+
+				for ignore, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundFRDropDown"
+									   , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"] {
+					settingsGui[dropDown].Delete()
+					settingsGui[dropDown].Add(choices)
+				}
+
+				loadTyreCompounds()
+				loadTyreChoices()
+
+				editRaceSettings(&updateState)
+			}
+		}
+	}
 
 	parseObject(properties) {
 		local result := CaseInsenseMap()
@@ -724,14 +841,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		setupTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", false)
 		pitstopTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", false)
 
-		dryFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)))
-		dryFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)))
-		dryRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)))
-		dryRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)))
-		wetFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)))
-		wetFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)))
-		wetRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)))
-		wetRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)))
+		dryFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)), 1)
+		dryFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)), 1)
+		dryRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)), 1)
+		dryRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)), 1)
+		wetFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)), 1)
+		wetFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)), 1)
+		wetRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)), 1)
+		wetRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)), 1)
 	}
 
 	validateInteger(field, operation, value?) {
@@ -802,7 +919,16 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		editRaceSettings(&updateState)
 	}
 
-	chooseTyreCompound(*) {
+	chooseTyreCompound(tyre, *) {
+		local value, ignore
+
+		if GetKeyState("Ctrl") {
+			value := settingsGui["spSetupTyreCompound" . tyre . "DropDown"].Value
+
+			for ignore, tyre in ["FL", "FR", "RL", "RR"]
+				settingsGui["spSetupTyreCompound" . tyre . "DropDown"].Choose(value)
+		}
+
 		editRaceSettings(&updateState)
 	}
 
@@ -1001,6 +1127,48 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					}
 				}
 			}
+	}
+
+	loadTyreChoices() {
+		local provider := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack)
+		local mixedCompounds, tyreSets, index, tyre, chosen
+
+		provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
+
+		readTyreSetup(oldSettings)
+
+		if (mixedCompounds = "Wheel") {
+			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
+				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
+											   , string2Values(",", setupTyreCompoundColor)[index]))
+
+				if ((chosen == 0) && (choices.Length > 0))
+					chosen := 1
+
+				settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(chosen)
+			}
+		}
+		else if (mixedCompounds = "Axle") {
+			for index, axle in ["Front", "Rear"] {
+				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
+											   , string2Values(",", setupTyreCompoundColor)[index]))
+
+				if ((chosen == 0) && (choices.Length > 0))
+					chosen := 1
+
+				settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(chosen)
+			}
+		}
+		else {
+			chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[1], string2Values(",", setupTyreCompoundColor)[1]))
+
+			if ((chosen == 0) && (choices.Length > 0))
+				chosen := 1
+
+			for index, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundFRDropDown"
+								  , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"]
+				settingsGui[dropDown].Choose(chosen)
+		}
 	}
 
 	loadTyreCompounds() {
@@ -1494,6 +1662,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		newSettings := oldSettings.Clone()
 
+		setMultiMapValue(newSettings, "Session Settings", "Simulator", gSimulator)
+		setMultiMapValue(newSettings, "Session Settings", "Car", gCar)
+		setMultiMapValue(newSettings, "Session Settings", "Track", gTrack)
+
 		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", settingsGui["pitstopWarningEdit"].Text)
 
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
@@ -1717,6 +1889,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		result := false
 
+		sessionDB := SessionDatabase()
+		simulators := sessionDB.getSimulators()
+
 		settingsGui := Window({Descriptor: "Race Settings", Options: "0x400000"})
 
 		settingsGui.SetFont("Bold", "Arial")
@@ -1746,6 +1921,139 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			tabs := collect(["Session", "Rules", "Pitstop", "Strategy"], translate)
 
 		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h470", tabs)
+
+		settingsTab.UseTab(1)
+
+		settingsGui.Add("Text", "x16 y82 w70 h23 +0x200", translate("Simulator"))
+		settingsGui.Add("DropDownList", "x106 yp w275 vsimulatorDropDown", simulators).OnEvent("Change", selectSimulator)
+
+		settingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Car"))
+		settingsGui.Add("DropDownList", "x106 yp w275 vcarDropDown").OnEvent("Change", selectCar)
+
+		settingsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Track"))
+		settingsGui.Add("DropDownList", "x106 yp w275 vtrackDropDown").OnEvent("Change", selectTrack)
+
+		value := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
+
+		settingsGui.Add("Text", "x16 yp+40 w88 h23 +0x200 Section", translate("Avg. Lap Time"))
+		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value).OnValidate("LoseFocus", validateNumber.Bind("avgLaptimeEdit"))
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
+		settingsGui.Add("Text", "x158 yp+4 w51 h20", translate("Sec."))
+
+		settingsGui.Add("Text", "x16 yp+22 w88 h20 +0x200", translate("Fuel Consumption"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnValidate("LoseFocus", validateNumber.Bind("fuelConsumptionEdit"))
+		settingsGui.Add("Text", "x158 yp+4 w51 h20", StrReplace(StrReplace(getUnit("Volume", true), "Gallone", "Gall."), "Gallon", "Gall."))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
+
+		settingsGui.Add("Text", "x212 ys w78 h23 +0x200", translate("Formation"))
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VformationLapCheck", chosen)
+		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
+
+		settingsGui.Add("Text", "x212 yp+22 w78 h23 +0x200", translate("Post Race"))
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VpostRaceLapCheck", chosen)
+		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Bold Italic", "Arial")
+
+		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
+		settingsGui.Add("Text", "x16 yp+10 w370 h20 Center BackgroundTrans", translate("Initial Setup"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 yp+30 w88 h23 +0x200", translate("Tyre Compound"))
+
+		choices := collect(gTyreCompounds, translate)
+
+		settingsGui.Add("DropDownList", "x106 yp w93 VspSetupTyreCompoundFLDropDown", choices).OnEvent("Change", chooseTyreCompound.Bind("FL"))
+		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundFRDropDown", choices).OnEvent("Change", chooseTyreCompound.Bind("FR"))
+		settingsGui.Add("DropDownList", "x106 yp+24 w93 Disabled VspSetupTyreCompoundRLDropDown", choices).OnEvent("Change", chooseTyreCompound.Bind("RL"))
+		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundRRDropDown", choices).OnEvent("Change", chooseTyreCompound.Bind("RR"))
+
+		settingsGui.Add("Text", "x16 yp+26 w88 h20", translate("Start Tyre Set"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))
+		settingsGui["spSetupTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
+
+		settingsGui.Add("Text", "x16 yp+24 w88 h20", translate("Pitstop Tyre Set"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspPitstopTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spPitstopTyreSetEdit"))
+		settingsGui["spPitstopTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
+
+		settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
+		settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
+
+		import := false
+
+		provider := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack)
+
+		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
+			if Application(simulator, kSimulatorConfiguration).isRunning() {
+				import := provider.supportsSetupImport()
+
+				break
+			}
+
+		option := (import ? "yp-25" : "yp")
+
+		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Database") . translate("...")).OnEvent("Click", openSessionDatabase)
+
+		if import {
+			local message := "Import"
+
+			settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind(&message))
+		}
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		readTyreSetup(oldSettings)
+
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryRearLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnValidate("LoseFocus", validateNumber.Bind("spDryRearRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetRearLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
+
+		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnValidate("LoseFocus", validateNumber.Bind("spWetRearRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
 		settingsTab.UseTab(2)
 
@@ -1983,165 +2291,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))).OnValidate("LoseFocus", validateNumber.Bind("tpWetRearRightEdit"))
 		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
 
-		settingsTab.UseTab(1)
-
-		value := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
-
-		settingsGui.Add("Text", "x16 y82 w88 h23 +0x200 Section", translate("Avg. Lap Time"))
-		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value).OnValidate("LoseFocus", validateNumber.Bind("avgLaptimeEdit"))
-		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
-		settingsGui.Add("Text", "x158 yp+4 w51 h20", translate("Sec."))
-
-		settingsGui.Add("Text", "x16 yp+22 w88 h20 +0x200", translate("Fuel Consumption"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnValidate("LoseFocus", validateNumber.Bind("fuelConsumptionEdit"))
-		settingsGui.Add("Text", "x158 yp+4 w51 h20", StrReplace(StrReplace(getUnit("Volume", true), "Gallone", "Gall."), "Gallon", "Gall."))
-
-		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
-
-		settingsGui.Add("Text", "x212 ys w78 h23 +0x200", translate("Formation"))
-		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VformationLapCheck", chosen)
-		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
-
-		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
-
-		settingsGui.Add("Text", "x212 yp+22 w78 h23 +0x200", translate("Post Race"))
-		settingsGui.Add("CheckBox", "x292 yp-1 w17 h21 Checked" . chosen . " VpostRaceLapCheck", chosen)
-		settingsGui.Add("Text", "x310 yp+4 w80 h20", translate("Lap"))
-
-		settingsGui.SetFont("Norm", "Arial")
-		settingsGui.SetFont("Bold Italic", "Arial")
-
-		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
-		settingsGui.Add("Text", "x16 yp+10 w370 h20 Center BackgroundTrans", translate("Initial Setup"))
-
-		settingsGui.SetFont("Norm", "Arial")
-
-		settingsGui.Add("Text", "x16 yp+30 w88 h23 +0x200", translate("Tyre Compound"))
-
-		provider := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack)
-
-		provider.supportsTyreManagement(&mixedCompounds, &tyreSets)
-
-		readTyreSetup(settingsOrCommand)
-
-		choices := collect(gTyreCompounds, translate)
-
-		settingsGui.Add("DropDownList", "x106 yp w93 VspSetupTyreCompoundFLDropDown", choices).OnEvent("Change", chooseTyreCompound)
-		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundFRDropDown", choices).OnEvent("Change", chooseTyreCompound)
-		settingsGui.Add("DropDownList", "x106 yp+24 w93 Disabled VspSetupTyreCompoundRLDropDown", choices).OnEvent("Change", chooseTyreCompound)
-		settingsGui.Add("DropDownList", "x200 yp w93 Disabled VspSetupTyreCompoundRRDropDown", choices).OnEvent("Change", chooseTyreCompound)
-
-		if (mixedCompounds = "Wheel") {
-			for index, tyre in ["FrontLeft", "FrontRight", "RearLeft", "RearRight"] {
-				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
-											   , string2Values(",", setupTyreCompoundColor)[index]))
-
-				if ((chosen == 0) && (choices.Length > 0))
-					chosen := 1
-
-				settingsGui["spSetupTyreCompound" . wheels[index] . "DropDown"].Choose(chosen)
-			}
-		}
-		else if (mixedCompounds = "Axle") {
-			for index, axle in ["Front", "Rear"] {
-				chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[index]
-											   , string2Values(",", setupTyreCompoundColor)[index]))
-
-				if ((chosen == 0) && (choices.Length > 0))
-					chosen := 1
-
-				settingsGui["spSetupTyreCompound" . wheels[index + (index - 1)] . "DropDown"].Choose(chosen)
-			}
-		}
-		else {
-			chosen := inList(gTyreCompounds, compound(string2Values(",", setupTyreCompound)[1], string2Values(",", setupTyreCompoundColor)[1]))
-
-			if ((chosen == 0) && (choices.Length > 0))
-				chosen := 1
-
-			for index, dropDown in ["spSetupTyreCompoundFLDropDown", "spSetupTyreCompoundFRDropDown"
-								  , "spSetupTyreCompoundRLDropDown", "spSetupTyreCompoundRRDropDown"]
-				settingsGui[dropDown].Choose(chosen)
-		}
-
-		settingsGui.Add("Text", "x16 yp+26 w88 h20", translate("Start Tyre Set"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspSetupTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spSetupTyreSetEdit"))
-		settingsGui["spSetupTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
-		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
-
-		settingsGui.Add("Text", "x16 yp+24 w88 h20", translate("Pitstop Tyre Set"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 VspPitstopTyreSetEdit").OnEvent("Change", updateTyreSet.Bind("spPitstopTyreSetEdit"))
-		settingsGui["spPitstopTyreSetEdit"].OnValidate("LoseFocus", validateInteger)
-		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99")
-
-		settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
-		settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
-
-		import := false
-
-		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
-			if Application(simulator, kSimulatorConfiguration).isRunning() {
-				import := provider.supportsSetupImport()
-
-				break
-			}
-
-		option := (import ? "yp-25" : "yp")
-
-		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Database") . translate("...")).OnEvent("Click", openSessionDatabase)
-
-		if import {
-			local message := "Import"
-
-			settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind(&message))
-		}
-
-		settingsGui.SetFont("Norm", "Arial")
-		settingsGui.SetFont("Italic", "Arial")
-
-		settingsGui.Add("GroupBox", "x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
-
-		settingsGui.SetFont("Norm", "Arial")
-
-		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Left"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Front Right"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spDryFrontRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Left"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spDryRearLeftEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x26 yp+24 w78 h20", translate("Rear Right"))
-		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnValidate("LoseFocus", validateNumber.Bind("spDryRearRightEdit"))
-		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.SetFont("Norm", "Arial")
-		settingsGui.SetFont("Italic", "Arial")
-
-		settingsGui.Add("GroupBox", "x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
-
-		settingsGui.SetFont("Norm", "Arial")
-
-		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Left"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Front Right"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnValidate("LoseFocus", validateNumber.Bind("spWetFrontRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Left"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnValidate("LoseFocus", validateNumber.Bind("spWetRearLeftEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
-
-		settingsGui.Add("Text", "x212 yp+24 w78 h20", translate("Rear Right"))
-		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnValidate("LoseFocus", validateNumber.Bind("spWetRearRightEdit"))
-		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure", true))
-
 		settingsTab.UseTab(4)
 
 		chosen := inList(["Yes", "No", "Custom"], getMultiMapValue(settingsOrCommand, "Assistant", "Assistant.Autonomy", "Custom"))
@@ -2300,8 +2449,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				settingsTab.Value := 5
 		}
 
-		loadTyreCompounds()
-
 		settingsGui["rulesActiveDropDown"].Choose(inList(["Yes", "No"], getMultiMapValue(settingsOrCommand, "Session Rules", "Strategy", "No")))
 		settingsGui["stintLengthEdit"].Text := getMultiMapValue(settingsOrCommand, "Session Rules", "Stint.Length", 70)
 
@@ -2320,13 +2467,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 																									  , "Pitstop.Tyre"
 																									  , "Optional")))
 
+		selectSimulator()
+
 		loop tyreSetListView.GetCount()
 			tyreSetListView.Modify(A_Index, "-Select Col3", 99)
+
+		availableCompounds := []
 
 		for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
 																						 , "Tyre.Sets", "")) {
 			if InStr(tyreCompound, ":") {
 				tyreCompound := string2Values(":", tyreCompound)
+
+				availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
 
 				loop tyreSetListView.GetCount()
 					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
@@ -2339,6 +2492,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			else {
 				tyreCompound := string2Values("#", tyreCompound)
 
+				availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
+
 				loop tyreSetListView.GetCount()
 					if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
 						tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
@@ -2346,6 +2501,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					}
 			}
 		}
+
+		loop {
+			found := false
+
+			loop tyreSetListView.GetCount()
+				if !inList(availableCompounds, tyreSetListView.GetText(A_Index)) {
+					tyreSetListView.Delete(A_Index)
+
+					found := true
+
+					break
+				}
+		} until !found
 
 		editRaceSettings(&updateState)
 
@@ -2376,7 +2544,7 @@ showRaceSettingsEditor() {
 
 	local message := "Export"
 	local icon := kIconsDirectory . "Race Settings.ico"
-	local index, fileName, settings, hasTeamServer
+	local index, fileName, settings, appSettings, hasTeamServer
 	local candidate, ignore, data
 
 	TraySetIcon(icon, "1")
@@ -2454,14 +2622,29 @@ showRaceSettingsEditor() {
 		}
 	}
 
-	if !gSimulator {
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	fileName := kRaceSettingsFile
 
-		gSimulator := getMultiMapValue(settings, "Simulator", "Simulator", false)
+	index := inList(A_Args, "-File")
+
+	if index
+		fileName := A_Args[index + 1]
+
+	settings := readMultiMap(fileName)
+
+	if !gSimulator {
+		gSimulator := getMultiMapValue(settings, "Session Settings", "Simulator", false)
+		gCar := getMultiMapValue(settings, "Session Settings", "Car", false)
+		gTrack := getMultiMapValue(settings, "Session Settings", "Track", false)
+	}
+
+	if !gSimulator {
+		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+		gSimulator := getMultiMapValue(appSettings, "Simulator", "Simulator", false)
 
 		if (gSimulator && Application(gSimulator, kSimulatorConfiguration).isRunning()) {
-			gCar := getMultiMapValue(settings, "Simulator", "Car")
-			gTrack := getMultiMapValue(settings, "Simulator", "Track")
+			gCar := getMultiMapValue(appSettings, "Simulator", "Car")
+			gTrack := getMultiMapValue(appSettings, "Simulator", "Track")
 		}
 		else
 			gSimulator := false
@@ -2475,15 +2658,6 @@ showRaceSettingsEditor() {
 
 	if (gTrackTemperature <= 0)
 		gTrackTemperature := 27
-
-	fileName := kRaceSettingsFile
-
-	index := inList(A_Args, "-File")
-
-	if index
-		fileName := A_Args[index + 1]
-
-	settings := readMultiMap(fileName)
 
 	if inList(A_Args, "-Silent")
 		gSilentMode := true

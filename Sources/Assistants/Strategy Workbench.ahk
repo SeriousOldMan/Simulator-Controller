@@ -76,6 +76,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedWeather := "Dry"
 
 	iTyreCompounds := [normalizeCompound("Dry")]
+	iAvailableTyreCompounds := [normalizeCompound("Dry")]
 
 	iAvailableCompounds := [normalizeCompound("Dry")]
 
@@ -213,6 +214,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	TyreCompounds[key?] {
 		Get {
 			return (isSet(key) ? this.iTyreCompounds[key] : this.iTyreCompounds)
+		}
+	}
+
+	AvailableTyreCompounds[key?] {
+		Get {
+			return (isSet(key) ? this.iAvailableTyreCompounds[key] : this.iAvailableTyreCompounds)
 		}
 	}
 
@@ -566,7 +573,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				if compound
 					compound := normalizeCompound(compound)
 
-				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
+				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.AvailableTyreCompounds
+																	, translate), compound))
 				workbenchGui["tyreSetLapsEdit"].Text := laps
 				workbenchGui["tyreSetCountEdit"].Text := count
 			}
@@ -603,21 +611,22 @@ class StrategyWorkbench extends ConfigurationItem {
 				workbench.TyreSetListView.ModifyCol()
 			}
 
-			workbench.updateState()
+			workbench.updateTyreCompounds(workbench.SelectedSimulator
+										, workbench.SelectedCar, workbench.SelectedTrack)
 		}
 
 		queryTyreSet(*) {
-			local wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
-																   , workbench.SelectedCar, workbench.SelectedTrack
-																   , "*", workbench.SelectedWeather
-																   , "Session Settings"
-																   , "Session.Settings.Tyre.Wear.Warning", false)
 			local availableCompounds := collect(workbench.TyreCompounds, translate)
 			local selectedCompound := workbench.TyreSetListView.GetText(workbench.TyreSetListView.GetNext(0))
 			local tyreCompound := workbench.TyreCompounds[inList(availableCompounds, selectedCompound)]
+			local wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
+																   , workbench.SelectedCar, workbench.SelectedTrack
+																   , "*", this.compoundWeather(tyreCompound)
+																   , "Session Settings"
+																   , "Session.Settings.Tyre.Wear.Warning", false)
 			local tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 														  , workbench.SelectedCar, workbench.SelectedTrack
-														  , workbench.SelectedWeather
+														  , this.compoundWeather(tyreCompound)
 														  , workbench.AirTemperature, workbench.TrackTemperature
 														  , compound(tyreCompound), compoundColor(tyreCompound)
 														  , wearWarning ? (100 - wearWarning) : unset)
@@ -627,14 +636,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		addTyreSet(*) {
-			local wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
-																   , workbench.SelectedCar, workbench.SelectedTrack
-																   , "*", workbench.SelectedWeather
-																   , "Session Settings"
-																   , "Session.Settings.Tyre.Wear.Warning", false)
 			local availableCompounds := collect(workbench.TyreCompounds, translate)
 			local usedCompounds := []
-			local index, ignore, candidate, tyreCompound, tyreWears
+			local index, ignore, candidate, tyreCompound, tyreWears, wearWarning
 
 			loop workbench.TyreSetListView.GetCount()
 				usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
@@ -647,9 +651,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 
 			tyreCompound := workbench.TyreCompounds[index]
+			wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
+															 , workbench.SelectedCar, workbench.SelectedTrack
+															 , "*", this.compoundWeather(tyreCompound)
+															 , "Session Settings"
+															 , "Session.Settings.Tyre.Wear.Warning", false)
 			tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 													, workbench.SelectedCar, workbench.SelectedTrack
-													, workbench.SelectedWeather
+													, this.compoundWeather(tyreCompound)
 													, workbench.AirTemperature, workbench.TrackTemperature
 													, compound(tyreCompound), compoundColor(tyreCompound)
 													, wearWarning ? (100 - wearWarning) : unset, 50)
@@ -663,7 +672,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			workbenchGui["tyreSetLapsEdit"].Value := tyreLaps
 			workbenchGui["tyreSetCountEdit"].Value := 99
 
-			workbench.updateState()
+			workbench.updateTyreCompounds(workbench.SelectedSimulator
+										, workbench.SelectedCar, workbench.SelectedTrack)
 		}
 
 		deleteTyreSet(*) {
@@ -672,7 +682,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (index > 0)
 				workbench.TyreSetListView.Delete(index)
 
-			workbench.updateState()
+			workbench.updateTyreCompounds(workbench.SelectedSimulator
+										, workbench.SelectedCar, workbench.SelectedTrack)
 		}
 
 		chooseRefuelService(*) {
@@ -740,8 +751,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("-"))
 					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(1)
-				else
-					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(inList(collect(this.TyreCompounds, translate), workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel)) + 1)
+				else {
+					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(inList(collect(this.AvailableTyreCompounds, translate)
+																				, workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel)) + 1)
+
+					if (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1)
+						workbench.FixedPitstopsListView.Modify(line, "Col4", translate("-"))
+				}
 			}
 
 			workbench.updateState()
@@ -757,13 +773,13 @@ class StrategyWorkbench extends ConfigurationItem {
 														 , workbenchGui["simFixedPitstopLapEdit"].Text
 														 , workbenchGui["simFixedPitstopRefuelEdit"].Text
 														 , (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1) ? translate("-")
-																													   : translate(this.TyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
+																													   : translate(this.AvailableTyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
 				else
 					workbench.FixedPitstopsListView.Modify(row, ""
 														 , workbenchGui["simFixedPitstopEdit"].Text
 														 , workbenchGui["simFixedPitstopLapEdit"].Text
 														 , (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1) ? translate("-")
-																													   : translate(this.TyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
+																													   : translate(this.AvailableTyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
 		}
 
 		addSimFixedPitstop(*) {
@@ -2547,52 +2563,52 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	loadTyreCompounds(simulator, car, track) {
 		local tyresDB := TyresDatabase()
-		local wearWarning := SettingsDatabase().readSettingValue(this.SelectedSimulator
-															   , this.SelectedCar, this.SelectedTrack
-															   , "*", this.SelectedWeather
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local compounds := SessionDatabase().getTyreCompounds(simulator, car, track)
-		local translatedCompounds, choices, index, ignore, tyreCompound, tyreLaps
+		local ignore, tyreCompound, wearWarning, tyreLaps
 
 		this.iTyreCompounds := compounds
+		this.iAvailableTyreCompounds := compounds
 
-		translatedCompounds := collect(compounds, translate)
-
-		this.Control["tyreSetDropDown"].Delete()
-		this.Control["tyreSetDropDown"].Add(translatedCompounds)
-		this.Control["simCompoundDropDown"].Delete()
-		this.Control["simCompoundDropDown"].Add(translatedCompounds)
-		this.Control["strategyCompoundDropDown"].Delete()
-		this.Control["strategyCompoundDropDown"].Add(translatedCompounds)
-		this.Control["simFixedPitstopCompoundDropDown"].Delete()
-		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate([translate("No Change")], translatedCompounds))
-
-		index := inList(compounds, this.SelectedCompound[true])
-
-		if ((index == 0) && (compounds.Length > 0))
-			index := 1
-
-		if (index > 0) {
-			this.Control["tyreSetDropDown"].Choose(index)
-			this.Control["simCompoundDropDown"].Choose(index)
-			this.Control["strategyCompoundDropDown"].Choose(index)
-		}
+		this.initializeTyreChoices()
 
 		this.TyreSetListView.Delete()
 
-		for ignore, tyreCompound in compounds
+		for ignore, tyreCompound in compounds {
+			wearWarning := SettingsDatabase().readSettingValue(this.SelectedSimulator
+															   , this.SelectedCar, this.SelectedTrack
+															   , "*", this.compoundWeather(tyreCompound)
+															   , "Session Settings"
+															   , "Session.Settings.Tyre.Wear.Warning", false)
+
 			this.TyreSetListView.Add("", translate(tyreCompound)
 									   , tyresDB.getUsableLaps(this.SelectedSimulator
 															 , this.SelectedCar, this.SelectedTrack
-															 , this.SelectedWeather
+															 , this.compoundWeather(tyreCompound)
 															 , this.AirTemperature, this.TrackTemperature
 															 , compound(tyreCompound), compoundColor(tyreCompound)
 															 , wearWarning ? (100 - wearWarning) : unset, 50)
 									   , 99)
+		}
 
 		this.TyreSetListView.ModifyCol()
 		this.TyreSetListView.ModifyCol(1, 65)
+	}
+
+	updateTyreCompounds(simulator, car, track) {
+		local availableCompounds := SessionDatabase.getTyreCompounds(this.SelectedSimulator
+																   , this.SelectedCar, this.SelectedTrack)
+		local translatedCompounds := collect(availableCompounds, translate)
+
+		this.iAvailableTyreCompounds := []
+
+		loop this.TyreSetListView.GetCount()
+			if (this.TyreSetListView.GetText(A_Index, 3) > 0)
+				this.iAvailableTyreCompounds.Push(availableCompounds[inList(translatedCompounds
+																		  , this.TyreSetListView.GetText(A_Index))])
+
+		this.initializeTyreChoices()
+
+		this.updateState()
 	}
 
 	loadCompound(compound, force := false) {
@@ -2674,6 +2690,48 @@ class StrategyWorkbench extends ConfigurationItem {
 			logError(exception)
 
 			this.showTelemetryChart(false)
+		}
+
+		this.updateState()
+	}
+
+	compoundWeather(tyreCompound) {
+		tyreCompound := compound(tyreCompound)
+
+		if (tyreCompound = "Dry")
+			return "Dry"
+		else if (tyreCompound = "Intermediate")
+			return "Drizzle"
+		else
+			return "Wet"
+	}
+
+	initializeTyreChoices() {
+		local compounds := this.AvailableTyreCompounds
+		local translatedCompounds := collect(compounds, translate)
+		local index
+
+		this.Control["tyreSetDropDown"].Delete()
+		this.Control["tyreSetDropDown"].Add(translatedCompounds)
+		this.Control["simCompoundDropDown"].Delete()
+		this.Control["simCompoundDropDown"].Add(translatedCompounds)
+		this.Control["strategyCompoundDropDown"].Delete()
+		this.Control["strategyCompoundDropDown"].Add(translatedCompounds)
+		this.Control["simFixedPitstopCompoundDropDown"].Delete()
+		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate([translate("No Change")], translatedCompounds))
+
+		loop this.FixedPitstopsListView.GetCount()
+			this.FixedPitstopsListView.Modify(A_Index, "-Select")
+
+		index := inList(compounds, this.SelectedCompound[true])
+
+		if ((index == 0) && (compounds.Length > 0))
+			index := 1
+
+		if (index > 0) {
+			this.Control["tyreSetDropDown"].Choose(index)
+			this.Control["simCompoundDropDown"].Choose(index)
+			this.Control["strategyCompoundDropDown"].Choose(index)
 		}
 
 		this.updateState()
@@ -2853,6 +2911,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.TyreSetListView.ModifyCol()
 						this.TyreSetListView.ModifyCol(1, 65)
 
+						this.updateTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+
 						this.iStintDrivers := []
 
 						numPitstops := strategy.Pitstops.Length
@@ -2923,7 +2983,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						tyreCompound := strategy.TyreCompound
 						tyreCompoundColor := strategy.TyreCompoundColor
 
-						this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+						this.Control["simCompoundDropDown"].Choose(inList(this.AvailableTyreCompounds
+																		, compound(tyreCompound, tyreCompoundColor)))
 
 						this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
 						this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
@@ -3003,7 +3064,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+							this.Control["simCompoundDropDown"].Choose(inList(this.AvailableTyreCompounds
+																			, compound(tyreCompound, tyreCompoundColor)))
 
 							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
 							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
@@ -3134,7 +3196,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound")
 							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color")
 
-							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+							this.Control["simCompoundDropDown"].Choose(inList(this.AvailableTyreCompounds
+																			, compound(tyreCompound, tyreCompoundColor)))
 						}
 
 						if (getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
@@ -3208,7 +3271,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 
 						if ((tyreCompound != kUndefined) && (tyreCompoundColor != kUndefined))
-							this.Control["simCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(tyreCompound, tyreCompoundColor)))
+							this.Control["simCompoundDropDown"].Choose(inList(this.AvailableTyreCompounds
+																			, compound(tyreCompound, tyreCompoundColor)))
 
 						map := getMultiMapValue(data, "Car Data", "Map", kUndefined)
 
@@ -3524,7 +3588,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyStartABSEdit"].Text := strategy.ABS
 		this.Control["strategyStartBBEdit"].Text := strategy.BB
 
-		this.Control["strategyCompoundDropDown"].Choose(inList(this.TyreCompounds, compound(strategy.TyreCompound, strategy.TyreCompoundColor)))
+		this.Control["strategyCompoundDropDown"].Choose(inList(this.AvailableTyreCompounds
+															 , compound(strategy.TyreCompound, strategy.TyreCompoundColor)))
 
 		this.Control["strategyPressureFLEdit"].Text := displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFL))
 		this.Control["strategyPressureFREdit"].Text := displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFR))
@@ -3707,7 +3772,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		sessionLength := this.Control["sessionLengthEdit"].Text
 		additionalLaps := this.SelectedAdditionalLaps
 
-		splitCompound(this.TyreCompounds[this.Control["simCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
+		splitCompound(this.AvailableTyreCompounds[this.Control["simCompoundDropDown"].Value]
+					, &tyreCompound, &tyreCompoundColor)
 
 		tyrePressures := false
 
@@ -3806,7 +3872,8 @@ class StrategyWorkbench extends ConfigurationItem {
 			laps := this.TyreSetListView.GetText(A_Index, 2)
 			count := this.TyreSetListView.GetText(A_Index, 3)
 
-			splitCompound(this.TyreCompounds[inList(translatedCompounds, tyreCompound)], &tyreCompound, &tyreCompoundColor)
+			splitCompound(this.TyreCompounds[inList(translatedCompounds, tyreCompound)]
+						, &tyreCompound, &tyreCompoundColor)
 
 			tyreSets.Push(Array(tyreCompound, tyreCompoundColor, count, laps))
 		}
@@ -3830,7 +3897,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel) = translate("-"))
 					fixedPitstop.Compound := false
 				else
-					fixedPitstop.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate), this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel))]
+					fixedPitstop.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate)
+																	 , this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel))]
 
 				fixedPitstops[Integer(this.FixedPitstopsListView.GetText(A_Index))] := fixedPitstop
 			}

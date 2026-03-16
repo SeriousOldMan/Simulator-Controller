@@ -233,11 +233,23 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static connected
 	static keepAliveTask := false
 
-	static serverURL, serverToken, teamName, theDriverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
+	static serverURL, serverToken, teamName, theDriverName, sessionName
+	static teamIdentifier, driverIdentifier, sessionIdentifier
 
 	static teams := CaseInsenseMap()
 	static drivers := CaseInsenseMap()
 	static sessions := CaseInsenseMap()
+
+	compoundWeather(tyreCompound) {
+		tyreCompound := compound(tyreCompound)
+
+		if (tyreCompound = "Dry")
+			return "Dry"
+		else if (tyreCompound = "Intermediate")
+			return "Drizzle"
+		else
+			return "Wet"
+	}
 
 	selectSimulator(*) {
 		global gSimulator, gCar
@@ -985,13 +997,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	queryPSTyreSet(*) {
 		global gSimulator, gCar, gTrack, gWeather, gAirTemperature, gTrackTemperature
 
-		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local selectedCompound := tyreSetListView.GetText(tyreSetListView.GetNext(0))
 		local tyreCompound := gTyreCompounds[inList(availableCompounds, selectedCompound)]
-		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack, gWeather
+		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
+															   , compoundWeather(tyreCompound)
+															   , "Session Settings"
+															   , "Session.Settings.Tyre.Wear.Warning", false)
+		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
+													  , compoundWeather(tyreCompound)
 													  , gAirTemperature, gTrackTemperature
 													  , compound(tyreCompound), compoundColor(tyreCompound)
 													  , wearWarning ? (100 - wearWarning) : unset)
@@ -1001,12 +1015,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	addPSTyreSet(*) {
-		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
-		local index, ignore, candidate, tyreCompound
+		local index, ignore, candidate, tyreCompound, wearWarning
 
 		loop tyreSetListView.GetCount()
 			usedCompounds.Push(tyreSetListView.GetText(A_Index, 1))
@@ -1020,8 +1031,14 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		tyreCompound := gTyreCompounds[index]
 
+		wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
+														 , compoundWeather(tyreCompound)
+														 , "Session Settings"
+														 , "Session.Settings.Tyre.Wear.Warning", false)
+
 		tyreSetListView.Add("", translate(tyreCompound)
-							  , TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack, gWeather
+							  , TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
+															, compoundWeather(tyreCompound)
 															, gAirTemperature, gTrackTemperature
 															, compound(tyreCompound), compoundColor(tyreCompound)
 															, wearWarning ? (100 - wearWarning) : unset, 50)
@@ -1192,11 +1209,8 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 	loadTyreCompounds() {
 		local tyresDB := TyresDatabase()
-		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local settings := (gSimulator ? SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, "*", gWeather) : newMultiMap())
-		local translatedCompounds, ignore, tyreCompound, tyreLaps
+		local translatedCompounds, ignore, tyreCompound, tyreLaps, wearWarning
 
 		if !gRulesMode
 			return
@@ -1208,13 +1222,20 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		tyreSetListView.Delete()
 
-		for ignore, tyreCompound in gTyreCompounds
+		for ignore, tyreCompound in gTyreCompounds {
+			wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
+															 , compoundWeather(tyreCompound)
+															 , "Session Settings"
+															 , "Session.Settings.Tyre.Wear.Warning", false)
+
 			tyreSetListView.Add("", translate(tyreCompound)
-								  , tyresDB.getUsableLaps(gSimulator, gCar, gTrack, gWeather
+								  , tyresDB.getUsableLaps(gSimulator, gCar, gTrack
+														, compoundWeather(tyreCompound)
 														, gAirTemperature, gTrackTemperature
 														, compound(tyreCompound), compoundColor(tyreCompound)
 														, wearWarning ? (100 - wearWarning) : unset, 50)
 								  , 99)
+		}
 
 		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
 			for tyreCompound, tyreLaps in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))

@@ -3,7 +3,7 @@ Version=6.8.8.0-dev
 Target=6.8.8.0-release
 Date=03/16/2026
 Download=
-Changes=Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench"
+Changes=Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link
 Components=Media->5.6.1,Configuration->6.8.6,Utilities->6.8.6
 [Release]
 Version=6.8.7.0-release

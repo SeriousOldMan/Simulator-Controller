@@ -863,7 +863,9 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
 															   , "Session Settings"
 															   , "Session.Settings.Tyre.Wear.Warning", false)
-		local tyreCompound := tyreSetListView.GetText(tyreSetListView.GetNext(0))
+		local availableCompounds := collect(gTyreCompounds, translate)
+		local selectedCompound := tyreSetListView.GetText(tyreSetListView.GetNext(0))
+		local tyreCompound := gTyreCompounds[inList(availableCompounds, selectedCompound)]
 		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack, gWeather
 													  , gAirTemperature, gTrackTemperature
 													  , compound(tyreCompound), compoundColor(tyreCompound)
@@ -874,9 +876,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	addPSTyreSet(*) {
+		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
+															   , "Session Settings"
+															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
-		local index, ignore, candidate
+		local index, ignore, candidate, tyreCompound, tyreLaps
 
 		loop tyreSetListView.GetCount()
 			usedCompounds.Push(tyreSetListView.GetText(A_Index, 1))
@@ -888,7 +893,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				break
 			}
 
-		tyreSetListView.Add("", collect(gTyreCompounds, translate)[index], 99)
+		tyreCompound := gTyreCompounds[index]
+		tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack, gWeather
+												, gAirTemperature, gTrackTemperature
+												, compound(tyreCompound), compoundColor(tyreCompound)
+												, wearWarning ? (100 - wearWarning) : unset, 50)
+
+		tyreSetListView.Add("", translate(tyreCompound), 99)
 		tyreSetListView.Modify(tyreSetListView.GetCount(), "Select Vis")
 
 		settingsGui["tyreSetDropDown"].Choose(index)
@@ -993,8 +1004,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	loadTyreCompounds() {
+		local tyresDB := TyresDatabase()
+		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*", gWeather
+															   , "Session Settings"
+															   , "Session.Settings.Tyre.Wear.Warning", false)
 		local settings := (gSimulator ? SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, "*", gWeather) : newMultiMap())
-		local translatedCompounds, ignore, compound, tyreLife
+		local translatedCompounds, ignore, tyreCompound, tyreLaps
 
 		translatedCompounds := collect(gTyreCompounds, translate)
 
@@ -1003,14 +1018,19 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		tyreSetListView.Delete()
 
-		for ignore, compound in gTyreCompounds
-			tyreSetListView.Add("", translate(compound), 50, 99)
+		for ignore, tyreCompound in gTyreCompounds
+			tyreSetListView.Add("", translate(tyreCompound)
+								  , tyresDB.getUsableLaps(gSimulator, gCar, gTrack, gWeather
+														, gAirTemperature, gTrackTemperature
+														, compound(tyreCompound), compoundColor(tyreCompound)
+														, wearWarning ? (100 - wearWarning) : unset, 50)
+								  , 99)
 
 		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
-			for compound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
+			for tyreCompound, tyreLaps in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
 				loop tyreSetListView.GetCount()
-					if (translate(compound) = tyreSetListView.GetText(A_Index, 1))
-						tyreSetListView.Modify(A_Index, "Col2", tyreLife)
+					if (translate(tyreCompound) = tyreSetListView.GetText(A_Index, 1))
+						tyreSetListView.Modify(A_Index, "Col2", tyreLaps)
 
 		tyreSetListView.ModifyCol()
 		tyreSetListView.ModifyCol(1, 75)

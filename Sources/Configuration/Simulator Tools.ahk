@@ -1775,6 +1775,16 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV688() {
+	local text
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := "`nSoftware.MSSpeechLibrary_pl-PL.Requested=OPTIONAL"
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+}
+
 updateConfigurationForV681() {
 	local cars := getKeys(getMultiMapValues(readMultiMap(kResourcesDirectory . "Simulator Data\LMU\Tyre Data.ini"), "Cars"))
 

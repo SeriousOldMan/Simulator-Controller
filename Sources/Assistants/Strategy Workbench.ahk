@@ -1747,6 +1747,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		if track
 			this.loadTrack(track)
 
+		this.initializeTyreChoices()
+
 		this.updateState()
 	}
 
@@ -2460,7 +2462,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				this.DataListView.Add("", values2String(", ", collect(tyreCompound, translate)*), value, category["Count"])
 
-				if (tyreCompound.Length = 1) {
+				if (tyreCompound.Length > 0) {
 					tyreCompound := tyreCompound[1]
 
 					if !inList(availableCompounds, tyreCompound)
@@ -2651,8 +2653,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], chartType))
 
-		lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar
-								  , this.SelectedTrack, this.SelectedDrivers)
+		lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, this.SelectedDrivers)
 
 		if (this.SelectedDataType = "Electronics")
 			records := lapsDB.getElectronicEntries(this.SelectedWeather, this.SelectedCompound, this.SelectedCompoundColor)

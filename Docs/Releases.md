@@ -25,6 +25,7 @@
 
   - Finally implemented a fix for the Spotter and the Strategist that could have sporadicilly reported cars to be in the pit which actually have been on the track.
   - Fixed the download link for *Real Head Motion* in "Simulator Setup".
+  - Fixed the initial tyre choice in "Strategy Workbench" to be one of the compounds for which data is available.
   
 #### Changes
 

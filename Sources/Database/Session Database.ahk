@@ -8971,7 +8971,9 @@ startupSessionDatabase() {
 		else {
 			editor := SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
 
-			editor.createGui(editor.Configuration)
+			withTask(ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1]), () {
+				editor.createGui(editor.Configuration)
+			})
 
 			editor.show()
 		}

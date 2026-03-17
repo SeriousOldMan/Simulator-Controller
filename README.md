@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.8.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/utKqUT49/Releases/Simulator%20Controller%206.8.8.0-dev.zip) (Early build for 6.8.8. Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench".)
+[6.8.8.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/utKqUT49/Releases/Simulator%20Controller%206.8.8.0-dev.zip) (Early build for 6.8.8. Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench", New startup info progress bars.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6880) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-688) of this version and all the versions you might have skipped, before installing and using this version.
 

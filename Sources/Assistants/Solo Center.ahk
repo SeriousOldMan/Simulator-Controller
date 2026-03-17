@@ -8646,10 +8646,12 @@ startupSoloCenter() {
 
 		sCenter := SoloCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"), simulator, car, track)
 
-		sCenter.createGui(sCenter.Configuration)
+		withTask(ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1]), () {
+			sCenter.createGui(sCenter.Configuration)
 
-		if load
-			sCenter.loadSession(load, false)
+			if load
+				sCenter.loadSession(load, false)
+		})
 
 		sCenter.show(false, !load)
 

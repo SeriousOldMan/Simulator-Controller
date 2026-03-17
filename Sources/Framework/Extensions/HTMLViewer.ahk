@@ -2015,7 +2015,7 @@ class WebView2Viewer extends HTMLViewer {
 	}
 
 	__New(control) {
-		local application := Strsplit(A_ScriptName, ".")[1]
+		local application := StrSplit(A_ScriptName, ".")[1]
 
 		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . Random(1, 1000), "html")
 
@@ -2188,7 +2188,7 @@ getGoogleChartsScriptTag(offline?) {
 				offline := true
 
 		if offline
-			return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
+			return ('<script type="text/javascript" src="' . kTempDirectory . "HTML\" . StrSplit(A_ScriptName, ".")[1] . '/Charts/loader.js"></script>')
 	}
 
 	return '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>'
@@ -2287,8 +2287,8 @@ initializeHTMLViewer() {
 	createWebView2Viewer(window, arguments*) {
 		local control, viewer
 
-		if !FileExist(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
-			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1] . "\Charts")
+		if !FileExist(kTempDirectory . "HTML\" . StrSplit(A_ScriptName, ".")[1] . "\Charts")
+			DirCopy(kResourcesDirectory . "Charts", kTempDirectory . "HTML\" . StrSplit(A_ScriptName, ".")[1] . "\Charts")
 
 		control := window.Add("Picture", arguments*)
 		viewer := WebView2Viewer(control)
@@ -2377,18 +2377,18 @@ initializeHTMLViewer() {
 
 	Window.Prototype.AddHTMLViewer := AddHTMLViewer
 
-	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
+	fixIE(kExplorerVersions[StrSplit(A_ScriptName, ".")[1]])
 
-	deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+	deleteDirectory(kTempDirectory . "HTML\" . StrSplit(A_ScriptName, ".")[1])
 
-	DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+	DirCreate(kTempDirectory . "HTML\" . StrSplit(A_ScriptName, ".")[1])
 
 	Window.DefineCustomControl("WebView2Viewer", createWebView2Viewer)
 	Window.DefineCustomControl("IE11Viewer", createIEViewer)
 
 	settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
-	if ((getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+	if ((getMultiMapValue(settings, "HTML", "Viewer." . StrSplit(A_ScriptName, ".")[1]
 								  , getMultiMapValue(settings, "HTML", "Viewer.*"
 															 , getMultiMapValue(settings, "HTML", "Viewer"
 																						, "IE11"))) = "WebView2")

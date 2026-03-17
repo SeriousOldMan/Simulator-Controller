@@ -4806,14 +4806,16 @@ startupStrategyWorkbench() {
 	try {
 		workbench := StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 
-		workbench.createGui(workbench.Configuration)
+		withTask(ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1]), () {
+			workbench.createGui(workbench.Configuration)
 
-		if load {
-			load := readMultiMap(load)
+			if load {
+				load := readMultiMap(load)
 
-			if (load.Count > 0)
-				workbench.selectStrategy(workbench.createStrategy(load))
-		}
+				if (load.Count > 0)
+					workbench.selectStrategy(workbench.createStrategy(load))
+			}
+		})
 
 		workbench.show()
 

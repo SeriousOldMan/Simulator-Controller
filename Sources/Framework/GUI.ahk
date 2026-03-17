@@ -2189,7 +2189,7 @@ class Window extends Gui {
 		}
 	}
 
-	__New(options := {}, title := Strsplit(A_ScriptName, ".")[1], arguments*) {
+	__New(options := {}, title := StrSplit(A_ScriptName, ".")[1], arguments*) {
 		local ignore, argument
 
 		for name, argument in options.OwnProps()
@@ -2301,7 +2301,7 @@ class Window extends Gui {
 		local newOptions, ignore, option, control
 		local checkBox, label, x, y, w, h
 
-		static withBorder := ((Strsplit(A_ScriptName, ".")[1] != "Simulator Tools")
+		static withBorder := ((StrSplit(A_ScriptName, ".")[1] != "Simulator Tools")
 						   && getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 											 , "Windows", "Designer", isDevelopment()))
 

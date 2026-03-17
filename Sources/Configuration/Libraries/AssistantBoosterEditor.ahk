@@ -1223,7 +1223,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 class CallbacksEditor {
 	iEditor := false
 	iType := false
-	iTitle := Strsplit(A_ScriptName, ".")[1]
+	iTitle := StrSplit(A_ScriptName, ".")[1]
 	iCategories := ["Builtin", "Custom"]
 
 	iWindow := false

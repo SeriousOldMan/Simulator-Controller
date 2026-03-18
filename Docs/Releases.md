@@ -31,6 +31,8 @@
 
   - Many applications now show a progress bar when startup of the application takes longer than a few seconds.
   - Tyre wear data collected in the session database can now be used for strategy development (either by the "Strategy Workbench" or dynamically using active race rules).
+  - The [setting "Engineer: Threshold value for tyre wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" has been renamed to "Pitstop: Minimum tyre tread depth".
+  - The [setting "Engineer: Threshold value for brake wear warning"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) of the "Session Database" has been renamed to "Pitstop: Minimum brake pad thickness".
   - A [new button in the tyre set list](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) let you re-initialize the number of usable laps of the selected tyre compound once it has been changed manually.
   - The "Race Settings" application now offers [selecting simulator, car and track](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for an upcoming session. In most cases, this will be determined automatically based on context or running simulator.
   - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will allow you to change the tyre compound of all four tyres with one click in the "Race Settings".

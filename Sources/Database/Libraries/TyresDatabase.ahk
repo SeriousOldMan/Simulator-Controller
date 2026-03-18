@@ -387,7 +387,7 @@ class TyresDatabase extends SessionDatabase {
 				, compound, compoundColor, maxWear := 75, default := false, driver := false) {
 		local lastLap := 0
 		local tyreWears := []
-		local wears, ignore, wear, lapWear
+		local wears, ignore, wear, lapWear, lastWear
 
 		compareWears(w1, w2) {
 			return (isNumber(w1["Tyre.Laps"]) && isNumber(w2["Tyre.Laps"])
@@ -404,14 +404,32 @@ class TyresDatabase extends SessionDatabase {
 		try {
 			for ignore, wear in wears
 				if !exist(wear, (v) => !isNumber(v))
-					if (wear["Tyre.Laps"] > 25)
+					if (wear["Tyre.Laps"] < 5)
+						continue
+					else if (wear["Tyre.Laps"] > 50)
 						break
-					else if ((lastLap == 0) || (lastLap != wear["Tyre.Laps"])) {
+					else if (lastLap == 0) {
 						tyreWears.Push({Laps: wear["Tyre.Laps"]
 									  , FL: [wear["Tyre.Wear.Front.Left"]], FR: [wear["Tyre.Wear.Front.Right"]]
 									  , RL: [wear["Tyre.Wear.Rear.Left"]], RR: [wear["Tyre.Wear.Rear.Right"]]})
 
 						lastLap := wear["Tyre.Laps"]
+					}
+					else if (lastLap != wear["Tyre.Laps"]) {
+						lastWear := tyreWears[tyreWears.Length]
+
+						if ((wear["Tyre.Wear.Front.Left"] < average(lastWear.FL))
+						 || (wear["Tyre.Wear.Front.Right"] < average(lastWear.FR))
+						 || (wear["Tyre.Wear.Rear.Left"] < average(lastWear.RL))
+						 || (wear["Tyre.Wear.Rear.Right"] < average(lastWear.RR)))
+							break
+						else {
+							tyreWears.Push({Laps: wear["Tyre.Laps"]
+										  , FL: [wear["Tyre.Wear.Front.Left"]], FR: [wear["Tyre.Wear.Front.Right"]]
+										  , RL: [wear["Tyre.Wear.Rear.Left"]], RR: [wear["Tyre.Wear.Rear.Right"]]})
+
+							lastLap := wear["Tyre.Laps"]
+						}
 					}
 					else {
 						lapWear := tyreWears[tyreWears.Length]

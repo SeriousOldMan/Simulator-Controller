@@ -1170,7 +1170,7 @@ launchPad(command := false, arguments*) {
 		}
 
 		if !clickTask {
-			clickTask := PeriodicTask(clickHandler, 500, kInterruptPriority)
+			clickTask := PeriodicTask(clickHandler, 100, kInterruptPriority)
 
 			clickTask.start()
 		}

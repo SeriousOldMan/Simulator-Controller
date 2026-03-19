@@ -1,5 +1,34 @@
 # Latest stable release
 
+## 6.8.8.0
+
+#### Date: 03/20/26
+
+#### Fixes
+
+  - Finally implemented a fix for the Spotter and the Strategist that could have sporadicilly reported cars to be in the pit which actually have been on the track.
+  - Fixed the download link for *Real Head Motion* in "Simulator Setup".
+  - Fixed the initial tyre choice in "Strategy Workbench" to be one of the compounds for which data is available.
+  - Fixed sporadically missing click sounds in "Simulator Startup" (new feature added with the last release).
+  
+#### Changes
+
+  - Many applications now show a progress bar when startup of the application takes longer than a few seconds.
+  - Tyre wear data collected in the session database can now be used for strategy development (either by the "Strategy Workbench" or dynamically using active race rules).
+  - The setting "Engineer: Threshold value for tyre wear warning" of the "Session Database" has been renamed to ["Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings). This setting has been used by the Engineer as the threshold for tyre wear warnings to the driver, but is now also used now for strategy calculations to derive the number of usable laps for a give tyre compound based on historical tyre wear data.
+  - The setting "Engineer: Threshold value for brake wear warning" of the "Session Database" has been renamed to ["Pitstop: Minimum brake pad thickness"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
+  - A [new button in the tyre set list](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) let you re-initialize the number of usable laps of the selected tyre compound once it has been changed manually.
+  - The "Race Settings" application now offers [selecting simulator, car and track](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for an upcoming session. In most cases, this will be determined automatically based on context or running simulator.
+  - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will allow you to change the tyre compound of all four tyres with one click in the "Race Settings".
+  - When tyre compounds have been deleted or marked as unavailable in the "Race Settings" or the "Strategy Workbench", they are also removed from the tyre compound selection menus.
+  - The Windows Server language pack for Polish has been added to "Simulator Setup".
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.8.7.0
 
 #### Date: 03/13/26
@@ -14,32 +43,6 @@
   - Clicking on icons in the launchpad of "Simulator Startup" will now give visual and acoustic feedback.
   - [Developer] A switch in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you activate the controls designer modus independent of all other development settings.
   - [Internal] Optimized startup time of the controller background process after a configuration change.
-  
-# Upcoming release
-
-## 6.8.8.0
-
-#### Date: 03/20/26 (planned)
-
-#### Fixes
-
-  - Finally implemented a fix for the Spotter and the Strategist that could have sporadicilly reported cars to be in the pit which actually have been on the track.
-  - Fixed the download link for *Real Head Motion* in "Simulator Setup".
-  - Fixed the initial tyre choice in "Strategy Workbench" to be one of the compounds for which data is available.
-  
-#### Changes
-
-  - Many applications now show a progress bar when startup of the application takes longer than a few seconds.
-  - Tyre wear data collected in the session database can now be used for strategy development (either by the "Strategy Workbench" or dynamically using active race rules).
-  - The setting "Engineer: Threshold value for tyre wear warning" of the "Session Database" has been renamed to ["Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings). This setting has been used by the Engineer as the threshold for tyre wear warnings to the driver, but is now also used now for strategy calculations to derive the number of usable laps for a give tyre compound based on historical tyre wear data.
-  - The setting "Engineer: Threshold value for brake wear warning" of the "Session Database" has been renamed to ["Pitstop: Minimum brake pad thickness"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
-  - A [new button in the tyre set list](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) let you re-initialize the number of usable laps of the selected tyre compound once it has been changed manually.
-  - The "Race Settings" application now offers [selecting simulator, car and track](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session) for an upcoming session. In most cases, this will be determined automatically based on context or running simulator.
-  - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) will allow you to change the tyre compound of all four tyres with one click in the "Race Settings".
-  - When tyre compounds have been deleted or marked as unavailable in the "Race Settings" or the "Strategy Workbench", they are also removed from the tyre compound selection menus.
-  - The Windows Server language pack for Polish has been added to "Simulator Setup".
-
-# Release history
 
 ## 6.8.6.1
 

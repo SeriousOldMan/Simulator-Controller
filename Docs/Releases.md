@@ -10,6 +10,7 @@
   - Fixed the download link for *Real Head Motion* in "Simulator Setup".
   - Fixed the initial tyre choice in "Strategy Workbench" to be one of the compounds for which data is available.
   - Fixed sporadically missing click sounds in "Simulator Startup" (new feature added with the last release).
+  - Fixed translation for French of several settings in the "Session Database".
   
 #### Changes
 

@@ -1020,7 +1020,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	addPSTyreSet(*) {
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
-		local index, ignore, candidate, tyreCompound, wearWarning
+		local index, ignore, candidate, tyreCompound, wearWarning, tyreLaps
 
 		loop tyreSetListView.GetCount()
 			usedCompounds.Push(tyreSetListView.GetText(A_Index, 1))

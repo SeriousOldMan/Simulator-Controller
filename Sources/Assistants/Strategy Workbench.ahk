@@ -631,8 +631,11 @@ class StrategyWorkbench extends ConfigurationItem {
 														  , compound(tyreCompound), compoundColor(tyreCompound)
 														  , wearWarning ? (100 - wearWarning) : unset)
 
-			if tyreLaps
+			if tyreLaps {
 				workbenchGui["tyreSetLapsEdit"].Text := tyreLaps
+
+				workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetNext(0), "Col2", tyreLaps)
+			}
 		}
 
 		addTyreSet(*) {

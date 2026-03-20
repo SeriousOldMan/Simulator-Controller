@@ -1677,9 +1677,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 							}
 						case translate("Tracks"), translate("Automations"):
+							if (car = "-")
+								car := false
+
 							if (type = translate("Tracks"))
 								track := SessionDatabase.getTrackCode(simulator, this.AdministrationListView.GetText(line, 2))
-							else if (!car || (car == true))
+							else if (!car || (car == true) || !inList(this.getTracks(simulator, car), track))
 								track := false
 
 							if inList(this.getTracks(simulator, true), track) {
@@ -1688,8 +1691,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								try {
 									this.selectModule("Settings")
 
-									if !this.SelectedCar
-										this.loadCar(true, true)
+									if (!this.SelectedCar || (this.SelectedCar == true))
+										this.loadCar(car ? car : true, true)
 									else if (this.SelectedCar != true)
 										if !inList(this.getTracks(simulator, this.SelectedCar), track)
 											this.loadCar(true, true)

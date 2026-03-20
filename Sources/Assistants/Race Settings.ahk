@@ -1010,14 +1010,17 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 													  , compound(tyreCompound), compoundColor(tyreCompound)
 													  , wearWarning ? (100 - wearWarning) : unset)
 
-		if tyreLaps
+		if tyreLaps {
 			settingsGui["tyreSetLapsEdit"].Text := tyreLaps
+
+			tyreSetListView.Modify(tyreSetListView.GetNext(0), "Col2", tyreLaps)
+		}
 	}
 
 	addPSTyreSet(*) {
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
-		local index, ignore, candidate, tyreCompound, wearWarning
+		local index, ignore, candidate, tyreCompound, wearWarning, tyreLaps
 
 		loop tyreSetListView.GetCount()
 			usedCompounds.Push(tyreSetListView.GetText(A_Index, 1))
@@ -1036,17 +1039,17 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 														 , "Session Settings"
 														 , "Session.Settings.Tyre.Wear.Warning", false)
 
-		tyreSetListView.Add("", translate(tyreCompound)
-							  , TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
-															, compoundWeather(tyreCompound)
-															, gAirTemperature, gTrackTemperature
-															, compound(tyreCompound), compoundColor(tyreCompound)
-															, wearWarning ? (100 - wearWarning) : unset, 50)
-							  , 99)
+		tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
+												, compoundWeather(tyreCompound)
+												, gAirTemperature, gTrackTemperature
+												, compound(tyreCompound), compoundColor(tyreCompound)
+												, wearWarning ? (100 - wearWarning) : unset, 50)
+
+		tyreSetListView.Add("", translate(tyreCompound), tyreLaps, 99)
 		tyreSetListView.Modify(tyreSetListView.GetCount(), "Select Vis")
 
 		settingsGui["tyreSetDropDown"].Choose(index)
-		settingsGui["tyreSetLapsEdit"].Value := 50
+		settingsGui["tyreSetLapsEdit"].Value := tyreLaps
 		settingsGui["tyreSetCountEdit"].Value := 99
 
 		updateTyreCompounds()

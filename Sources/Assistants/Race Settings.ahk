@@ -1038,7 +1038,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 														 , compoundWeather(tyreCompound)
 														 , "Session Settings"
 														 , "Session.Settings.Tyre.Wear.Warning", false)
-
 		tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
 												, compoundWeather(tyreCompound)
 												, gAirTemperature, gTrackTemperature

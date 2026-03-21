@@ -389,69 +389,39 @@ class TyresDatabase extends SessionDatabase {
 		local tyreWears := []
 		local wears, ignore, wear, lapWear, lastWear
 
-		compareWears(w1, w2) {
-			return (isNumber(w1["Tyre.Laps"]) && isNumber(w2["Tyre.Laps"])
-											  && (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
-		}
-
 		if !driver
 			driver := this.ID
 
-		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor, driver)
-
-		wears := bubbleSort(&wears, compareWears)
+		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
+																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
 
 		try {
-			for ignore, wear in wears
-				if !exist(wear, (v) => !isNumber(v))
-					if (wear["Tyre.Laps"] < 5)
-						continue
-					else if (wear["Tyre.Laps"] > 50)
+			for ignore, wear in bubbleSort(&wears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
+				if (wear["Tyre.Laps"] < 5)
+					continue
+				else if (wear["Tyre.Laps"] > 50)
+					break
+				else if (lastLap == 0) {
+					tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
+
+					lastLap := wear["Tyre.Laps"]
+				}
+				else if (lastLap != wear["Tyre.Laps"]) {
+					if (wear["Tyre.Wear"] < average(tyreWears[tyreWears.Length].Wears))
 						break
-					else if (lastLap == 0) {
-						tyreWears.Push({Laps: wear["Tyre.Laps"]
-									  , FL: [wear["Tyre.Wear.Front.Left"]], FR: [wear["Tyre.Wear.Front.Right"]]
-									  , RL: [wear["Tyre.Wear.Rear.Left"]], RR: [wear["Tyre.Wear.Rear.Right"]]})
+					else {
+						tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
 
 						lastLap := wear["Tyre.Laps"]
 					}
-					else if (lastLap != wear["Tyre.Laps"]) {
-						lastWear := tyreWears[tyreWears.Length]
-
-						if ((wear["Tyre.Wear.Front.Left"] < average(lastWear.FL))
-						 || (wear["Tyre.Wear.Front.Right"] < average(lastWear.FR))
-						 || (wear["Tyre.Wear.Rear.Left"] < average(lastWear.RL))
-						 || (wear["Tyre.Wear.Rear.Right"] < average(lastWear.RR)))
-							break
-						else {
-							tyreWears.Push({Laps: wear["Tyre.Laps"]
-										  , FL: [wear["Tyre.Wear.Front.Left"]], FR: [wear["Tyre.Wear.Front.Right"]]
-										  , RL: [wear["Tyre.Wear.Rear.Left"]], RR: [wear["Tyre.Wear.Rear.Right"]]})
-
-							lastLap := wear["Tyre.Laps"]
-						}
-					}
-					else {
-						lapWear := tyreWears[tyreWears.Length]
-
-						lapWear.FL.Push[wear["Tyre.Wear.Front.Left"]]
-						lapWear.FR.Push[wear["Tyre.Wear.Front.Right"]]
-						lapWear.RL.Push[wear["Tyre.Wear.Rear.Left"]]
-						lapWear.RR.Push[wear["Tyre.Wear.Rear.Right"]]
-					}
+				}
+				else
+					tyreWears[tyreWears.Length].Wears.Push(wear["Tyre.Wear"])
 
 			if (tyreWears.Length > 0) {
-				for ignore, wear in tyreWears {
-					wear.FL := (average(wear.FL) / wear.Laps)
-					wear.FR := (average(wear.FR) / wear.Laps)
-					wear.RL := (average(wear.RL) / wear.Laps)
-					wear.RR := (average(wear.RR) / wear.Laps)
-				}
+				do(tyreWears, (w) => w.Wears := Max(w.Wears*) / w.Laps)
 
-				wear := Max(average(collect(tyreWears, (w) => w.FL)), average(collect(tyreWears, (w) => w.FR))
-						  , average(collect(tyreWears, (w) => w.RL)), average(collect(tyreWears, (w) => w.RR)))
-
-				return Floor(maxWear / wear)
+				return Floor(maxWear / average(collect(tyreWears, (w) => w.Wears)))
 			}
 			else
 				return default

@@ -210,8 +210,9 @@ class StrategySimulation {
 											, "ResultMinor",		[-0.13, 0, 0.13]
 											, "FuelMax",			[-0.34, -0.22, 0, 0.22, 0.34]
 											, "TyreSetsCount", 		[-0.46, -0.18, 0, 0.18, 0.46]
-											, "TyreLapsMax",		[-0.76, -0.38, -0.24, 0, 0.24, 0.38, 0.76]
+											, "TyreLapsMax",		[-0.12, -0.06, -0.03, 0, 0.03, 0.06, 0.12]
 											, "PitstopsCount",		[-0.78, -0.52, 0, 0.52, 0.78]
+											, "TyreChanges", 		[-0.77, -0.40, -0.28, 0, 0.28, 0.40, 0.77]
 											, "PitstopsPostLaps",	[-0.43, -0.25, 0, 0.25, 0.43])
 
 		cfs := coefficients[cfs]
@@ -687,7 +688,7 @@ class StrategySimulation {
 
 	compareScenarios(scenario1, scenario2) {
 		local sLaps, cLaps, sDuration, cDuration, sFuel, cFuel, sTLaps, cTLaps, sTSets, cTSets
-		local sPLaps, cPLaps
+		local sPLaps, cPLaps, sTChanges, cTChanges
 
 		pitstopLaps(scenario) {
 			local laps := 0
@@ -707,6 +708,17 @@ class StrategySimulation {
 				fuelLevel := Max(fuelLevel, pitstop.RemainingFuel)
 
 			return fuelLevel
+		}
+
+		tyreChanges(scenario) {
+			local tyreChanges := 0
+			local ignore, pitstop
+
+			for ignore, pitstop in scenario.Pitstops
+				if pitstop.TyreChange
+					tyreChanges += 1
+
+			return tyreChanges
 		}
 
 		tyreLaps(scenario, &tyreSets) {
@@ -741,6 +753,8 @@ class StrategySimulation {
 			}
 		}
 
+		sTChanges := tyreChanges(scenario1)
+		cTChanges := tyreChanges(scenario2)
 		sTLaps := tyreLaps(scenario1, &sTSets)
 		cTLaps := tyreLaps(scenario2, &cTSets)
 		sFuel := fuelLevel(scenario1)
@@ -754,6 +768,7 @@ class StrategySimulation {
 
 		result := (this.scenarioCoefficient("PitstopsCount", scenario2.Pitstops.Length - scenario1.Pitstops.Length, 1)
 				 + this.scenarioCoefficient("FuelMax", cFuel - sFuel, 10)
+				 + this.scenarioCoefficient("TyreChanges", cTChanges - sTChanges, 1)
 				 + this.scenarioCoefficient("TyreSetsCount", sTSets - cTSets, 1))
 
 		if ((Abs(scenario1.FirstStintWeight) < 5) && (Abs(scenario2.FirstStintWeight) < 5)
@@ -1607,6 +1622,7 @@ class Strategy extends ConfigurationItem {
 	iRefuelVariation := 0
 	iTyreUsageVariation := 0
 	iTyreCompoundVariation := 0
+	iTyreCompoundLife := CaseInsenseMap()
 
 	iFirstStintWeight := 0
 	iLastStintWeight := 0
@@ -4027,8 +4043,20 @@ class Strategy extends ConfigurationItem {
 	}
 
 	tyreCompoundLife(tyreCompound, tyreCompoundColor) {
+		local tyreLife
+
 		try {
-			return this.AvailableTyreSets[compound(tyreCompound, tyreCompoundColor)][1]
+			tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+			if this.iTyreCompoundLife.Has(tyreCompound)
+				return this.iTyreCompoundLife[tyreCompound]
+			else {
+				tyreLife := this.AvailableTyreSets[tyreCompound][1]
+
+				tyreLife += (tyreLife * this.TyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100))
+
+				return (this.iTyreCompoundLife[tyreCompound] := tyreLife)
+			}
 		}
 		catch Any as exception {
 			logError(exception)
@@ -4134,7 +4162,6 @@ class Strategy extends ConfigurationItem {
 		local lastPitstopLap := 0
 		local surplusPitstops := 0
 		local pitstopNr := currentStint
-		local maxTyreLaps := this.tyreCompoundLife(this.TyreCompound, this.TyreCompoundColor)
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel
 		local tyreChange, tyreCompound, tyreCompoundColor, forcedTyreCompound, driverID, driverName, pitstop, lapsDB, candidate
@@ -4146,12 +4173,12 @@ class Strategy extends ConfigurationItem {
 		this.iStartTyreLaps := currentTyreLaps
 		this.iStintStartTime := currentStintTime
 		this.iSessionStartTime := currentSessionTime
-		this.iTyreLaps := Max((maxTyreLaps + (maxTyreLaps * tyreLapsVariation / 100 * (Min(100 - Sqrt(Random(0, 10000)), 100) / 100))) - currentTyreLaps, 0)
 		this.iStartFuelAmount := startFuel
 		this.iFuelAmount := currentFuel
 
 		this.iStintLaps := stintLaps
 		this.iTyreLapsVariation := tyreLapsVariation
+		this.iTyreLaps := Max(this.tyreCompoundLife(this.TyreCompound, this.TyreCompoundColor) - currentTyreLaps, 0)
 
 		this.iMap := ecuMap
 		this.iFuelConsumption := fuelConsumption

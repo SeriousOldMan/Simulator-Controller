@@ -282,6 +282,10 @@ namespace SHMConnector {
 							strWriter.Write("Car."); strWriter.Write(index); strWriter.WriteLine(".InPit=false");
 						}
 					}
+					else
+					{
+                        strWriter.Write("Car."); strWriter.Write(index); strWriter.WriteLine(".InPit=false");
+                    }
 
 					if (vehicle.mIsPlayer == 1)
 					{

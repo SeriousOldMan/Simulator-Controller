@@ -961,7 +961,9 @@ startupRaceReports() {
 			ExitApp(0)
 		}
 
-		reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
+		withTask(ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1]), () {
+			reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
+		})
 
 		reports.show()
 

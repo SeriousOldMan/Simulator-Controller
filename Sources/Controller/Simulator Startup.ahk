@@ -1029,9 +1029,33 @@ launchPad(command := false, arguments*) {
 
 	launchApplication(application, *) {
 		local executable := launchPad("Executable", application)
+		local x, y, w, h, mX, mY
+		local curCoordMode
 
-		if executable
+		if executable {
+			if GetKeyState("LButton") {
+				while GetKeyState("LButton")
+					Sleep(10)
+
+				launchPadGui[application].GetPos(&x, &y, &w, &h)
+
+				curCoordMode := A_CoordModeMouse
+
+				CoordMode("Mouse", "Client")
+
+				try {
+					MouseGetPos(&mX, &mY)
+				}
+				finally {
+					CoordMode("Mouse", curCoordMode)
+				}
+
+				if ((mX < x) || (mX > (x + w)) || (mY < y) || (mY > (y + h)))
+					return
+			}
+
 			launchPad("Launch", executable)
+		}
 	}
 
 	modifySettings(launchPadGui, *) {
@@ -1070,6 +1094,89 @@ launchPad(command := false, arguments*) {
 		local text
 
 		static prevHwnd := 0
+		static curControl := false
+		static clickTask := false
+
+		clickHandler() {
+			local x, y, w, h, mX, mY
+			local curCoordMode
+
+			static pressedControl := false
+
+			if !WinActive(launchPadGui) {
+				if (pressedControl && !GetKeyState("LButton")) {
+					pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
+
+					pressedControl := false
+				}
+
+				return
+			}
+
+			if (curControl && !launchPad("ToolTip", curControl))
+				return
+
+			if pressedControl {
+				pressedControl.GetPos(&x, &y, &w, &h)
+
+				curCoordMode := A_CoordModeMouse
+
+				CoordMode("Mouse", "Client")
+
+				try {
+					MouseGetPos(&mX, &mY)
+				}
+				finally {
+					CoordMode("Mouse", curCoordMode)
+				}
+
+				if ((mX < x) || (mX > (x + w)) || (mY < y) || (mY > (y + h))) {
+					if pressedControl
+						pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
+				}
+				else if pressedControl
+					pressedControl.Value := ("*w59 *h59 " . pressedControl.Value)
+			}
+			else if curControl {
+				curControl.GetPos(&x, &y, &w, &h)
+
+				curCoordMode := A_CoordModeMouse
+
+				CoordMode("Mouse", "Client")
+
+				try {
+					MouseGetPos(&mX, &mY)
+				}
+				finally {
+					CoordMode("Mouse", curCoordMode)
+				}
+
+				if ((mX < x) || (mX > (x + w)) || (mY < y) || (mY > (y + h)))
+					return
+			}
+
+			if (curControl && pressedControl && (curControl != pressedControl))
+				return
+
+			if (curControl && !pressedControl && GetKeyState("LButton")) {
+				pressedControl := curControl
+
+				curControl.Value := ("*w59 *h59 " . curControl.Value)
+
+				SoundPlay(getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			}
+			else if (pressedControl && !GetKeyState("LButton")) {
+				pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
+
+				pressedControl := false
+			}
+		}
+
+		if !clickTask {
+			clickTask := PeriodicTask(clickHandler, 100, kInterruptPriority)
+
+			clickTask.start()
+		}
 
 		try {
 			if WinActive(launchPadGui) {

@@ -32,8 +32,8 @@ priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
 		(Clear: Position.Standings.Class.Leader.Delta),
 		(Clear: Position.Track.Ahead.Car), (Clear: Position.Track.Ahead.Distance), (Clear: Position.Track.Ahead.Delta),
 		(Clear: Position.Track.Behind.Car), (Clear: Position.Track.Behind.Distance), (Clear: Position.Track.Behind.Delta)
-{Any: [?Lap], [?Sector], [?Standings]} => (Prove: updateGrid(?Lap)), (Prove: updatePositions(!Lap)),
-										  (Prove: updateTrackAhead(!Lap)), (Prove: updateTrackBehind(!Lap))
+{Any: [?Lap], [?Sector], [?Standings]} => (Prove: updateGrid(?Lap)), (Prove: updatePositions(?Lap)),
+										  (Prove: updateTrackAhead(?Lap)), (Prove: updateTrackBehind(?Lap))
 priority: -5, [?Standings] => (Clear: Standings)
 
 updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
@@ -127,39 +127,38 @@ updateStandingsOverallLeader(?, ?car, ?distance, ?delta) <= carPosition(?car, 1)
 															Set(Position.Standings.Overall.Leader.Delta, ?delta)
 updateStandingsOverallLeader(?, ?, ?, ?)
 
-updateStandingsClassAhead(?class, ?, ?car, ?distance, ?delta) <= unbound?(!Position.Standings.Class.Ahead.Car), ?delta > 0,
-																 carClass(?car, ?class), !,
+updateStandingsClassAhead(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class),
+																 unbound?(!Position.Standings.Class.Ahead.Car), ?delta > 0, !,
 																 Set(Position.Standings.Class.Ahead.Car, ?car),
 																 Set(Position.Standings.Class.Ahead.Distance, ?distance),
 																 Set(Position.Standings.Class.Ahead.Delta, ?delta)
-updateStandingsClassAhead(?class, ?, ?car, ?distance, ?delta) <= ?delta > 0,
-																 Get(Position.Standings.Class.Ahead.Delta, ?curDelta), ?delta < ?curDelta,
-																 carClass(?car, ?class), !,
+updateStandingsClassAhead(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class), ?delta > 0,
+																 Get(Position.Standings.Class.Ahead.Delta, ?curDelta), ?delta < ?curDelta, !,
 																 Set(Position.Standings.Class.Ahead.Car, ?car),
 																 Set(Position.Standings.Class.Ahead.Distance, ?distance),
 																 Set(Position.Standings.Class.Ahead.Delta, ?delta)
 updateStandingsClassAhead(?, ?, ?, ?, ?)
 
-updateStandingsClassBehind(?class, ?, ?car, ?distance, ?delta) <= unbound?(!Position.Standings.Class.Behind.Car), ?delta < 0,
-																  carClass(?car, ?class), !,
+updateStandingsClassBehind(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class),
+																  unbound?(!Position.Standings.Class.Behind.Car), ?delta < 0, !,
 																  Set(Position.Standings.Class.Behind.Car, ?car),
 																  Set(Position.Standings.Class.Behind.Distance, ?distance),
 																  Set(Position.Standings.Class.Behind.Delta, ?delta)
-updateStandingsClassBehind(?class, ?, ?car, ?distance, ?delta) <= ?delta < 0,
-																  Get(Position.Standings.Class.Behind.Delta, ?curDelta), ?delta > ?curDelta,
-																  carClass(?car, ?class), !,
+updateStandingsClassBehind(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class), ?delta < 0,
+																  Get(Position.Standings.Class.Behind.Delta, ?curDelta), ?delta > ?curDelta, !,
 																  Set(Position.Standings.Class.Behind.Car, ?car),
 																  Set(Position.Standings.Class.Behind.Distance, ?distance),
 																  Set(Position.Standings.Class.Behind.Delta, ?delta)
 updateStandingsClassBehind(?, ?, ?, ?, ?)
 
-updateStandingsClassLeader(?class, ?, ?car, ?distance, ?delta) <= unbound?(!Position.Standings.Class.Leader.Car), carClass(?car, ?class), !,
+updateStandingsClassLeader(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class), unbound?(!Position.Standings.Class.Leader.Car), !,
 																  Set(Position.Standings.Class.Leader.Car, ?car),
 																  Set(Position.Standings.Class.Leader.Distance, ?distance),
 																  Set(Position.Standings.Class.Leader.Delta, ?delta)
-updateStandingsClassLeader(?class, ?, ?car, ?distance, ?delta) <= bound?(!Position.Standings.Class.Leader.Car), carPosition(?car, ?carPosition),
+updateStandingsClassLeader(?class, ?, ?car, ?distance, ?delta) <= carClass(?car, ?class), bound?(!Position.Standings.Class.Leader.Car),
+																  carPosition(?car, ?carPosition),
 																  carPosition(!Position.Standings.Class.Leader.Car, ?leaderPosition),
-																  ?carPosition < ?leaderPosition, carClass(?car, ?class), !,
+																  ?carPosition < ?leaderPosition, !,
 																  Set(Position.Standings.Class.Leader.Car, ?car),
 																  Set(Position.Standings.Class.Leader.Distance, ?distance),
 																  Set(Position.Standings.Class.Leader.Delta, ?delta)

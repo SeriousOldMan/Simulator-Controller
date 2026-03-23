@@ -222,9 +222,13 @@ namespace RF2SHMProvider {
 					{
 						Console.Write("Car."); Console.Write(index); Console.WriteLine(".InPit=false");
 					}
-				}
+                }
+                else
+                {
+                    Console.Write("Car."); Console.Write(index); Console.WriteLine(".InPit=false");
+                }
 
-				if (vehicle.mIsPlayer == 1)
+                if (vehicle.mIsPlayer == 1)
 				{
 					Console.Write("Driver.Car=");
 					Console.WriteLine(index);

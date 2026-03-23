@@ -51,7 +51,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 			if !this.iTemplates {
 				templates := CaseInsenseMap()
 
-				for code, ignore in availableLanguages() {
+				for code, ignore in availableLanguages("Grammars") {
 					fileName := getFileName("Driving Coach.instructions." . code, kResourcesDirectory . "Instructions\")
 
 					if FileExist(fileName) {

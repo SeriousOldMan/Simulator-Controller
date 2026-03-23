@@ -476,7 +476,7 @@ class TelemetryChart {
 		if !htmlViewer {
 			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 			
-			htmlViewer := getMultiMapValue(settings, "HTML", "Viewer." . Strsplit(A_ScriptName, ".")[1]
+			htmlViewer := getMultiMapValue(settings, "HTML", "Viewer." . StrSplit(A_ScriptName, ".")[1]
 												   , getMultiMapValue(settings, "HTML", "Viewer.*"
 																			  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")))
 		}

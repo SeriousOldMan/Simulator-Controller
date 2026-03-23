@@ -74,7 +74,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local choices := []
 		local chosen := 0
 		local enIndex := 0
-		local languages := availableLanguages()
+		local languages := availableLanguages("Grammars")
 		local code, language, ignore, grammarFile, x0, x1, x2, w1, w2, x3, w3, x4, w4, voices, recognizers, halfWidth
 
 		updateLanguage(*) {
@@ -666,7 +666,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if load {
 			translator := getMultiMapValue(configuration, "Voice Control", "Translator", false)
 			languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
-			languages := availableLanguages()
+			languages := availableLanguages("Grammars")
 
 			this.Value["voiceLanguageTranslated"] := getMultiMapValue(configuration, "Voice Control", "Language.Translated", false)
 
@@ -1076,7 +1076,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local choices := []
 		local chosen := 0
 		local enIndex := 0
-		local languages := availableLanguages()
+		local languages := availableLanguages("Grammars")
 		local theTranslator := this.Value["voiceTranslator"]
 		local code, ignore, grammarFile
 
@@ -2010,7 +2010,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	getCurrentLanguage(&translated?) {
 		local languageCode := "en"
-		local languages := availableLanguages()
+		local languages := availableLanguages("Grammars")
 		local found := false
 		local voiceLanguage, code, language, ignore, grammarFile, grammarLanguageCode
 

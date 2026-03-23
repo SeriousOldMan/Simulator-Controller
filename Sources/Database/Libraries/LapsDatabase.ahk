@@ -256,6 +256,57 @@ class LapsDatabase extends SessionDatabase {
 										  , drivers)
 	}
 
+	getTyreCompoundWears(weather, compound, compoundColor
+					   , tyres := ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], drivers := kUndefined) {
+		local tyreWears := []
+		local ignore, wear, tyre
+
+		static tyreIndex := CaseInsenseMap("Front.Left", 1, "Front.Right", 2, "Rear.Left", 3, "Rear.Right", 4)
+
+		if !isObject(tyres)
+			tyres := [tyres]
+
+		for ignore, wear in this.combineResults("Tyres", {Select: ["Tyre.Laps", "Tyre.Compound", "Tyre.Compound.Color"
+																 , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+																 , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
+														, Transform: removeInvalidLaps
+														, Where: Map("Weather", weather)}
+													   , drivers) {
+			tyreCompound := string2Values(",", wear["Tyre.Compound"])
+			tyreCompoundColor := string2Values(",", wear["Tyre.Compound.Color"])
+
+			for ignore, tyre in tyres {
+				if (tyreCompound.Length = 1) {
+					if ((tyreCompound[1] = compound) && (tyreCompoundColor[1] = compoundColor))
+						if isNumber(wear["Tyre.Wear." . tyre])
+							tyreWears.Push(Database.Row("Tyre", tyre, "Tyre.Laps", wear["Tyre.Laps"]
+																	, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
+				}
+				else if (tyreCompound.Length = 2) {
+					if (tyreIndex[tyre] <= 2) {
+						if ((tyreCompound[1] = compound) && (tyreCompoundColor[1] = compoundColor))
+							if isNumber(wear["Tyre.Wear." . tyre])
+								tyreWears.Push(Database.Row("Tyre", tyre, "Tyre.Laps", wear["Tyre.Laps"	]
+																		, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
+					}
+					else {
+						if ((tyreCompound[2] = compound) && (tyreCompoundColor[2] = compoundColor))
+							if isNumber(wear["Tyre.Wear." . tyre])
+								tyreWears.Push(Database.Row("Tyre", tyre, "Tyre.Laps", wear["Tyre.Laps"]
+																		, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
+					}
+				}
+				else if (tyreCompound.Length = 4)
+					if ((tyreCompound[tyreIndex[tyre]] = compound) && (tyreCompoundColor[tyreIndex[tyre]] = compoundColor))
+						if isNumber(wear["Tyre.Wear." . tyre])
+							tyreWears.Push(Database.Row("Tyre", tyre, "Tyre.Laps", wear["Tyre.Laps"]
+																	, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
+			}
+		}
+
+		return tyreWears
+	}
+
 	getMapLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
 		this.combineCompounds(&compound, &compoundColor)
 

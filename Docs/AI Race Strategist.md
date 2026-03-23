@@ -84,11 +84,13 @@ The same principles as [described for Jona](https://github.com/SeriousOldMan/Sim
 
 6. [Portuguese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(PT))
 
-7. [Chinese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(ZH))
+7. [Polish version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(PL))
 
-8. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(JA))
+8. [Chinese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(ZH))
 
-I strongly recommed to memorize the phrases in the language you use to interact with Cato. You will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
+9. [Japanese version](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(JA))
+
+I strongly recommed to memorize the phrases in the language you use to interact with Cato. Beside the information in the above command reference sheets, you will always find the current version of the grammar files as actually used by the software in the *Resources\Grammars* folder of the Simulator Controller distribution. Or you can take a look at the files in the [*Resources\Grammars* directory on GitHub](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Resources/Grammars), for example the German version [Race Strategist.grammars.de](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Grammars/Race%20Strategist.grammars.de).
 
 #### Extending conversation and reasoning capabilities using a LLM
 
@@ -149,6 +151,8 @@ Normally, Cato will use a predefined strategy which can be created using the ["S
 To prepare for a race with this kind of strategy handling, set *Active* to "Yes" and enter the race rules using the entry fields below. This settings have more than less the same meaning as in the [tab *Rules & Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings) in the "Strategy Workbench". Most important is the number of required pitstops and whether refueling and tyre changes are required. You can also define a pitstop window here. And if the session has a restricted number of tyre sets, you can specify them as well. Please note, that additional information from the other tabs will also be used when the resulting strategy is calculated, for example the session configuration with formation lap and post race lap or the pitstop service times.
 
 Using the list in the lower part you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used by Cato to determine the best tyre set for each pitstop in the derived strategy. If a given compound mixture is not available in a particular race, set the number of available tyre sets to **0**.
+
+Note: If the selected or currently running simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
 
 #### Tab *Strategy*
 

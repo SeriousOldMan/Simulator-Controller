@@ -242,7 +242,7 @@ class ConversationBooster extends LLMBooster {
 		super.__New(configuration)
 
 		if this.Language {
-			allLanguages := availableLanguages()
+			allLanguages := availableLanguages("Grammars")
 
 			if allLanguages.Has(this.Language) {
 				this.Options["Code"] := this.Language

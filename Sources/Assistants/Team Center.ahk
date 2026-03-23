@@ -10091,7 +10091,7 @@ class TeamCenter extends ConfigurationItem {
 
 								try {
 									; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-									
+
 									RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
 
 									file := FileOpen(dataFile, "r-wd")
@@ -15000,10 +15000,12 @@ startupTeamCenter() {
 		if GetKeyState("Ctrl")
 			tCenter.iSynchronize := "Off"
 
-		tCenter.createGui(tCenter.Configuration)
+		withTask(ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1]), () {
+			tCenter.createGui(tCenter.Configuration)
 
-		if load
-			tCenter.loadSession(load, false)
+			if load
+				tCenter.loadSession(load, false)
+		})
 
 		tCenter.show(false, !load)
 

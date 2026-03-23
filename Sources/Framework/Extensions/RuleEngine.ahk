@@ -3066,6 +3066,10 @@ class KnowledgeBase {
 		return this.Facts.hasFact(fact)
 	}
 
+	clearFacts(predicate) {
+		this.Facts.clearFact(predicate)
+	}
+
 	addFact(fact, value) {
 		this.Facts.addFact(fact, value)
 	}
@@ -3266,6 +3270,17 @@ class Facts {
 
 	hasFact(fact) {
 		return this.Facts.Has(fact)
+	}
+
+	clearFacts(predicate) {
+		local keys := []
+		local key, value
+
+		for key, value in this.Facts
+			if predicate(key, value)
+				keys.Push(key)
+
+		do(keys, ObjBindMethod(this, "clearFact"))
 	}
 
 	addFact(fact, value) {

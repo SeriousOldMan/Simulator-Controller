@@ -60,23 +60,6 @@ global gTimeFormat := "[H:]M:S.##"
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-readLanguage(targetLanguageCode) {
-	local translations := Map()
-	local translation
-
-	loop Read, getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory) {
-		translation := StrSplit(A_LoopReadLine, "=>")
-
-		if (translation[1] = targetLanguageCode)
-			return translation[2]
-	}
-
-	if isDebug()
-		throw "Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage..."
-	else
-		logError("Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage...")
-}
-
 getTemperatureUnit(unit, trans := false) {
 	return (trans ? translate(unit) : unit)
 }
@@ -417,17 +400,82 @@ initializeLocalization() {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-availableLanguages() {
-	local translations := CaseInsenseMap("en", "English")
-	local ignore, fileName, languageCode
+availableLanguages(target := "UI", &scopes?) {
+	local ignore, fileName, languageCode, scope, language
 
-	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
-		SplitPath(fileName, , , &languageCode)
+	static translations := false
 
-		translations[languageCode] := readLanguage(languageCode)
+	readLanguage(targetLanguageCode, &scopes) {
+		local language := false
+		local inLocale := false
+		local translation, ignore, scope
+
+		scopes := []
+
+		loop Read, getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory) {
+			if (Trim(A_LoopReadLine) = "[Locale]")
+				inLocale := true
+			else if inLocale {
+				translation := StrSplit(A_LoopReadLine, "=>", " `t")
+
+				if (translation[1] = targetLanguageCode)
+					language := translation[2]
+				else if (translation[1] = "Scope") {
+					for ignore, scope in StrSplit(translation[2], ",", " `t")
+						if !inList(scopes, scope)
+							scopes.Push(scope)
+				}
+				else if (SubStr(translation[1], 1, 1) = "[")
+					break
+			}
+		}
+
+		if (scopes.Length = 0)
+			scopes := ["UI"]
+
+		if !language
+			if isDebug()
+				throw "Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage..."
+			else
+				logError("Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage...")
+
+		return language
 	}
 
-	return translations
+	if !translations {
+		translations := CaseInsenseMap("en.UI", "English")
+
+		for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
+			SplitPath(fileName, , , &languageCode)
+
+			language := readLanguage(languageCode, &scopes)
+
+			for ignore, scope in scopes
+				translations[languageCode . "." . scope] := language
+		}
+	}
+
+	sTranslations := CaseInsenseMap()
+
+	if (target = "Scopes") {
+		for scope, language in translations {
+			scope := ConfigurationItem.splitDescriptor(scope)
+
+			if sTranslations.Has(scope[1])
+				sTranslations[scope[1]].Push(scope[2])
+			else
+				sTranslations[scope[1]] := [scope[2]]
+		}
+	}
+	else
+		for scope, language in translations {
+			scope := ConfigurationItem.splitDescriptor(scope)
+
+			if (scope[2] = target)
+				sTranslations[scope[1]] := language
+		}
+
+	return sTranslations
 }
 
 readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor := false) {
@@ -545,10 +593,16 @@ readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor :=
 }
 
 writeTranslations(languageCode, languageName, translations) {
-	local fileName := kUserTranslationsDirectory . "Translations." . languageCode
+	local scopes := availableLanguages("Scopes")
+	local fileName := (kUserTranslationsDirectory . "Translations." . languageCode)
 	local stdTranslations := readTranslations(languageCode, false, false)
 	local hasValues := false
 	local ignore, key, value, temp, curEncoding, original, translation
+
+	if scopes.Has(languageCode)
+		scopes := scopes[languageCode]
+	else
+		scopes := ["UI"]
 
 	for ignore, value in stdTranslations {
 		hasValues := true
@@ -575,6 +629,7 @@ writeTranslations(languageCode, languageName, translations) {
 	try {
 		FileAppend("[Locale]`n", fileName)
 		FileAppend(languageCode . "=>" . languageName . "`n", fileName)
+		FileAppend("Scope=>" . values2String(", ", scopes*) . "`n", fileName)
 		FileAppend("[Translations]", fileName)
 
 		for original, translation in translations {

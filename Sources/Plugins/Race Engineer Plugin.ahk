@@ -678,7 +678,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 						}
 					}
 					catch Any as exception {
-						logError(exception)
+						logError(exception, true)
 
 						break
 					}
@@ -717,7 +717,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 		}
 		finally {

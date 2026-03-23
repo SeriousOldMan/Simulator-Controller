@@ -493,7 +493,7 @@ class SimulatorsList extends ConfigurationItemList {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeSimulatorConfiguration() {
-	global kConfigurationEditor
+	global kConfigurationEditor, __SCStartTask
 
 	local icon := kIconsDirectory . "Configuration.ico"
 	local msgResult, initialize
@@ -534,6 +534,10 @@ initializeSimulatorConfiguration() {
 		finally {
 			protectionOff()
 		}
+
+		__SCStartTask := ProgressTask(translate("Starting ") . StrSplit(A_ScriptName, ".")[1])
+
+		__SCStartTask.start()
 	}
 	catch Any as exception {
 		logError(exception, true)
@@ -547,6 +551,8 @@ initializeSimulatorConfiguration() {
 }
 
 startupSimulatorConfiguration() {
+	global __SCStartTask
+
 	local editor := ConfigurationEditor.Instance
 	local done, saved, result
 
@@ -583,6 +589,10 @@ startupSimulatorConfiguration() {
 
 		done := false
 		saved := false
+
+		__SCStartTask.stop()
+
+		__SCStartTask := false
 
 		editor.show()
 
@@ -635,6 +645,9 @@ startupSimulatorConfiguration() {
 	}
 	catch Any as exception {
 		logError(exception, true)
+
+		if __SCStartTask
+			__SCStartTask.stop()
 
 		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)

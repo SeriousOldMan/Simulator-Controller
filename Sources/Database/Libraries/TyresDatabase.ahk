@@ -19,6 +19,7 @@
 #Include "..\..\Framework\Extensions\Database.ahk"
 #Include "SessionDatabase.ahk"
 #Include "SettingsDatabase.ahk"
+#Include "LapsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -380,6 +381,54 @@ class TyresDatabase extends SessionDatabase {
 		}
 
 		return Map()
+	}
+
+	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
+				, compound, compoundColor, maxWear := 75, default := false, driver := false) {
+		local lastLap := 0
+		local tyreWears := []
+		local wears, ignore, wear, lapWear, lastWear
+
+		if !driver
+			driver := this.ID
+
+		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
+																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
+
+		try {
+			for ignore, wear in bubbleSort(&wears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
+				if (wear["Tyre.Laps"] < 5)
+					continue
+				else if (wear["Tyre.Laps"] > 50)
+					break
+				else if (lastLap == 0) {
+					tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
+
+					lastLap := wear["Tyre.Laps"]
+				}
+				else if (lastLap != wear["Tyre.Laps"]) {
+					if (wear["Tyre.Wear"] < average(tyreWears[tyreWears.Length].Wears))
+						break
+					else {
+						tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
+
+						lastLap := wear["Tyre.Laps"]
+					}
+				}
+				else
+					tyreWears[tyreWears.Length].Wears.Push(wear["Tyre.Wear"])
+
+			if (tyreWears.Length > 0) {
+				do(tyreWears, (w) => w.Wears := Max(w.Wears*) / w.Laps)
+
+				return Floor(maxWear / average(collect(tyreWears, (w) => w.Wears)))
+			}
+			else
+				return default
+		}
+		catch Any as exception {
+			return default
+		}
 	}
 
 	lock(simulator, car, track, wait := true) {

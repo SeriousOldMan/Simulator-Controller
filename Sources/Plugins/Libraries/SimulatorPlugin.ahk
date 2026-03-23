@@ -199,7 +199,6 @@ class PitstopToggleAction extends PitstopAction {
 
 class SimulatorPlugin extends ControllerPlugin {
 	static sActiveSimulator := false
-	static sActiveSimulation := false
 
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
@@ -214,27 +213,15 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	iTrackAutomation := kUndefined
 
-	static ActiveSimulator {
+	static ActiveSimulator[name := false] {
 		Get {
-			return SimulatorPlugin.sActiveSimulator
+			return (name ? SimulatorPlugin.sActiveSimulator.Simulator[true] : SimulatorPlugin.sActiveSimulator)
 		}
 	}
 
-	ActiveSimulator {
+	ActiveSimulator[name := false] {
 		Get {
-			return SimulatorPlugin.ActiveSimulator
-		}
-	}
-
-	static ActiveSimulation {
-		Get {
-			return SimulatorPlugin.sActiveSimulation
-		}
-	}
-
-	ActiveSimulation {
-		Get {
-			return SimulatorPlugin.ActiveSimulation
+			return SimulatorPlugin.ActiveSimulator[name]
 		}
 	}
 
@@ -589,34 +576,34 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	runningSimulator(active := false) {
 		if active
-			return (this.Simulator.isRunning() ? this.Simulator.Application : false)
+			return (this.Simulator.isRunning() ? this.Simulator[true] : false)
 		else
-			return (this.Simulator.isRunning() ? this.Simulator.Application
-											   : ((SimulatorPlugin.ActiveSimulation = this.Simulator.Application) ? SimulatorPlugin.ActiveSimulation : false))
+			return (this.Simulator.isRunning() ? this.Simulator[true]
+											   : ((SimulatorPlugin.ActiveSimulator[true] = this.Simulator[true])
+													  ? SimulatorPlugin.ActiveSimulator[true]
+													  : false))
 	}
 
 	simulatorStartup(simulator) {
 		super.simulatorStartup(simulator)
 
-		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator != this)) {
+		if ((simulator = this.Simulator[true]) && (SimulatorPlugin.ActiveSimulator != this)) {
 			if SimulatorPlugin.ActiveSimulator
-				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
+				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulator[true])
 
 			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := this
-			SimulatorPlugin.sActiveSimulation := simulator
 		}
 	}
 
 	simulatorShutdown(simulator) {
 		super.simulatorShutdown(simulator)
 
-		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
+		if ((simulator = this.Simulator[true]) && (SimulatorPlugin.ActiveSimulator == this)) {
 			this.updateSession(kSessionFinished, true)
 
 			SimulatorPlugin.sActiveSimulator := false
-			SimulatorPlugin.sActiveSimulation := false
 
 			callSimulator(this.Code, "Close")
 		}
@@ -650,12 +637,12 @@ class SimulatorPlugin extends ControllerPlugin {
 				this.Car := false
 				this.Track := false
 
-				this.Controller.setModes(this.Simulator.Application)
+				this.Controller.setModes(this.Simulator[true])
 			}
 			else if inList(kSessions, session)
-				this.Controller.setModes(this.Simulator.Application, kSessionNames[session])
+				this.Controller.setModes(this.Simulator[true], kSessionNames[session])
 			else
-				this.Controller.setModes(this.Simulator.Application, "Other")
+				this.Controller.setModes(this.Simulator[true], "Other")
 		}
 
 		this.updateActions(session)
@@ -1016,7 +1003,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		super.simulatorStartup(simulator)
 
-		if (simulator = this.Simulator.Application) {
+		if (simulator = this.Simulator[true]) {
 			RaceAssistantPlugin.startSimulation(this)
 
 			for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1034,7 +1021,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	simulatorShutdown(simulator) {
 		super.simulatorShutdown(simulator)
 
-		if (simulator = this.Simulator.Application) {
+		if (simulator = this.Simulator[true]) {
 			RaceAssistantPlugin.stopSimulation(this)
 
 			this.iRaceEngineer := false

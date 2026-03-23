@@ -357,7 +357,7 @@ sendKeyboardCommand(command, mode := "Event", delay := false) {
 
 detectRunningProcess(pid := false, winTitle := "", exePath := "") {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
-	local processID
+	local processID := false
 
 	DetectHiddenWindows(true)
 

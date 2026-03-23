@@ -564,12 +564,17 @@ class SimulatorPlugin extends ControllerPlugin {
 	sendCommand(command, delay?) {
 		if !isSet(delay)
 			delay := this.CommandDelay
-			
+
 		sendCommand(command, this.CommandMode, delay)
 	}
 
 	runningSimulator(active := false) {
-		if active
+		static remoteSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+												 , "Simulator", "Remote", false)
+
+		if (remoteSimulator && (remoteSimulator = this.Simulator.Application))
+			return remoteSimulator
+		else if active
 			return (this.Simulator.isRunning() ? this.Simulator.Application : false)
 		else
 			return (this.Simulator.isRunning() ? this.Simulator.Application

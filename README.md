@@ -295,7 +295,7 @@ The following applications are not part of the distribution and are not strictly
 
 | Application | Description |
 | ------ | ------ |
-| [AutoHotkey](https://www.autohotkey.com/) | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins. |
+| [AutoHotkey](https://www.autohotkey.com/) | [Development Only] Object oriented scripting language. You need it, if you want to develop your own plugins. Actually, the latest [2.1 Alpha version](https://www.autohotkey.com/download//2.1/) have to be installed to be compatible with the Simulator Controller framework. |
 | [Visual Studio](https://visualstudio.microsoft.com/de/vs/) | [Development Only] Development environment for Windows applications. Used for the development of the different telemetry interfaces of the supported simulation games. |
 | [NirCmd](https://www.nirsoft.net/utils/nircmd.html) | [Recommended] Extended Windows command shell. Used by Simulator Controller to control ingame sound volume settings during startup. |
 | [SoX](http://sox.sourceforge.net/) | [Recommended] Audio processing utility. Used by the Race Assistants for audio post processing to achieve a team radio like audio quality. |

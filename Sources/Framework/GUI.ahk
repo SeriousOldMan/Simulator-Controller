@@ -73,7 +73,7 @@ class Theme {
 	static sCurrentTheme := false
 
 	class ThemedDialog {
-		class RECT {
+		struct RECT {
 			left: i32, top: i32, right: i32, bottom: i32
 		}
 
@@ -828,17 +828,17 @@ class DarkTheme extends Theme {
 	}
 
 	class DarkListView extends Gui.ListView {
-		class RECT {
+		struct RECT {
 			left: i32, top: i32, right: i32, bottom: i32
 		}
 
-		class NMHDR {
+		struct NMHDR {
 			hwndFrom: uptr
 			idFrom  : uptr
 			code    : i32
 		}
 
-		class NMCUSTOMDRAW {
+		struct NMCUSTOMDRAW {
 			hdr        : DarkTheme.DarkListView.NMHDR
 			dwDrawStage: u32
 			hdc        : uptr
@@ -877,10 +877,10 @@ class DarkTheme extends Theme {
 				static CDRF_DODEFAULT      := 0x0
 				static CDRF_NOTIFYITEMDRAW := 0x20
 
-				if (StructFromPtr(DarkTheme.DarkListView.NMHDR, lParam).Code != NM_CUSTOMDRAW)
+				if (DarkTheme.DarkListView.NMHDR.At(lParam).Code != NM_CUSTOMDRAW)
 					return
 
-				nmcd := StructFromPtr(DarkTheme.DarkListView.NMCUSTOMDRAW, lParam)
+				nmcd := DarkTheme.DarkListView.NMCUSTOMDRAW.At(lParam)
 
 				if (nmcd.hdr.hWndFrom != lv.Header)
 					return

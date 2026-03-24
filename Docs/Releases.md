@@ -26,7 +26,22 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.8.9.0
+
+#### Date: 03/27/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug in "Session Database", that prevented the correct car and track to be selected when double clicking on an *Automation* in the "Administration" tab.
+  
+#### Changes
+
+  - The calculation of tyre wear data can now also handle setups with different compounds on each wheel.
+  - A Pangram sentence has been added for Polish language which is used when testing speech generation.
+  - Obsolete hotkey specifiers for opening and closing the Pitstop MFD for *Le Mans Ultimate* have been removed in "Simulator Setup".
+  - Additional data has been added to the post-session knowledge of the Driving Coach.
+  - Added a News article about the Coach post-session review capability.
+  - [Internal] Migrated to AHK 2.1-alpha.23.
 
 # Release history
 

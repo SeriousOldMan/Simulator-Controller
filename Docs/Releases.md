@@ -40,6 +40,7 @@
   - A Pangram sentence has been added for Polish language which is used when testing speech generation.
   - Obsolete hotkey specifiers for opening and closing the Pitstop MFD for *Le Mans Ultimate* have been removed in "Simulator Setup".
   - Additional data has been added to the post-session knowledge of the Driving Coach.
+  - Added a News article about the Coach post-session review capability.
   - [Internal] Migrated to AHK 2.1-alpha.23.
 
 # Release history

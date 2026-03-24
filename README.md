@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.8.9.0-dev]() (Early build for 6.8.9. Changes: Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Updated AHK version.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6890) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

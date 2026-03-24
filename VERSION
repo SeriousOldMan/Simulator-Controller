@@ -3,7 +3,7 @@ Version=6.8.9.0-dev
 Target=6.8.9.0-release
 Date=03/23/2026
 Download=
-Changes=Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys
+Changes=Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Providing more post session data to the Coach
 Components=Media->5.6.1,Configuration->6.8.9,Utilities->6.8.8
 [Release]
 Version=6.8.8.0-release

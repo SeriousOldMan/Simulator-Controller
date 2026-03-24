@@ -41,6 +41,7 @@
   - Obsolete hotkey specifiers for opening and closing the Pitstop MFD for *Le Mans Ultimate* have been removed in "Simulator Setup".
   - Additional data has been added to the post-session knowledge of the Driving Coach.
   - Added a News article about the Coach post-session review capability.
+  - New settings for the steer ratio, track width and wheel base of a car have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings). They are used as default values in the "Setup Workbench" for cars for which this information is not available in the meta data or elsewhere.
   - [Internal] Migrated to AHK 2.1-alpha.23.
 
 # Release history

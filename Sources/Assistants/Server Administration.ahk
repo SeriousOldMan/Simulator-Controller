@@ -660,22 +660,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					withTask(ProgressTask(translate("Compacting Database")), () {
-						try {
-							connector.CompactDatabase()
+					withBlockedWindows(() {
+						withTask(ProgressTask(translate("Compacting Database")), () {
+							try {
+								connector.CompactDatabase()
 
-							loop {
-								Sleep(1000)
+								loop {
+									Sleep(1000)
 
-								compacting := connector.CompactingDatabase()
+									compacting := connector.CompactingDatabase()
+								}
+								until (!compacting || (compacting = kFalse))
 							}
-							until (!compacting || (compacting = kFalse))
-						}
-						catch Any as exception {
-							logError(exception, true)
-						}
+							catch Any as exception {
+								logError(exception, true)
+							}
 
-						loadObjects(connector, objectsListView)
+							loadObjects(connector, objectsListView)
+						})
 					})
 			}
 		}

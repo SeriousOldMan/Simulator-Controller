@@ -2152,8 +2152,10 @@ class SessionDatabase extends ConfigurationItem {
 
 		if InStr(fileName, ".json") {
 			if verbose
-				withTask(ProgressTask(translate("Extracting ") . name), () {
-					fileName := importFromSecondMonitor(&info)
+				withBlockedWindows(() {
+					withTask(ProgressTask(translate("Extracting ") . name), () {
+						fileName := importFromSecondMonitor(&info)
+					})
 				})
 			else
 				fileName := importFromSecondMonitor(&info)
@@ -2171,8 +2173,10 @@ class SessionDatabase extends ConfigurationItem {
 			}
 
 			if verbose
-				withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
-					fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
+				withBlockedWindows(() {
+					withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
+						fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
+					})
 				})
 			else
 				fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
@@ -2181,8 +2185,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if InStr(fileName, ".irc") {
 			if verbose
-				withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
-					fileName := importFromIRacing(&info)
+				withBlockedWindows(() {
+					withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
+						fileName := importFromIRacing(&info)
+					})
 				})
 			else
 				fileName := importFromIRacing(&info)

@@ -1960,7 +1960,7 @@ class CallbacksEditor {
 		local directory := (kTempDirectory . "Callback Import")
 		local extension := (InStr(this.Type, "Events") ? ".event" : ".action")
 		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
-		local fileName, ignore
+		local fileName
 
 		importCallback(fileName) {
 			local name, newName, generation, duplicate, definition
@@ -2068,8 +2068,14 @@ class CallbacksEditor {
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0)))
-			for ignore, fileName in isObject(fileName) ? fileName : [fileName]
-				importCallback(fileName)
+			withBlockedWindows(() {
+				withTask(ProgressTask(translate("Import")), () {
+					local ignore
+
+					for ignore, fileName in isObject(fileName) ? fileName : [fileName]
+						importCallback(fileName)
+				})
+			})
 	}
 
 	exportCallback() {
@@ -2098,62 +2104,65 @@ class CallbacksEditor {
 		fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save ") . translate(type) . translate("..."), type . " (*" . extension . ")")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
-		if (fileName != "") {
-			deleteDirectory(directory)
+		if (fileName != "")
+			withBlockedWindows(() {
+				withTask(ProgressTask(translate("Export")), () {
+					deleteDirectory(directory)
 
-			DirCreate(directory)
+					DirCreate(directory)
 
-			if (callback.Type = "Assistant.Rule") {
-				callback.Definition := (this.Assistant . "." . callback.Name . ".rules")
+					if (callback.Type = "Assistant.Rule") {
+						callback.Definition := (this.Assistant . "." . callback.Name . ".rules")
 
-				FileAppend(callback.Script, directory . "\" . callback.Definition)
-			}
-			else if (callback.Type = "Assistant.Script") {
-				callback.Definition := (this.Assistant . "." . callback.Name . ".script")
+						FileAppend(callback.Script, directory . "\" . callback.Definition)
+					}
+					else if (callback.Type = "Assistant.Script") {
+						callback.Definition := (this.Assistant . "." . callback.Name . ".script")
 
-				FileAppend(callback.Script, directory . "\" . callback.Definition)
-			}
+						FileAppend(callback.Script, directory . "\" . callback.Definition)
+					}
 
-			if InStr(this.Type, "Events")
-				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-											  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
-																 , callback.Parameters.Length, callback.Description))
-			else
-				setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-											  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
-																 , callback.Parameters.Length, callback.Description))
+					if InStr(this.Type, "Events")
+						setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+													  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
+																		 , callback.Parameters.Length, callback.Description))
+					else
+						setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
+													  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
+																		 , callback.Parameters.Length, callback.Description))
 
-			loop
-				if !getMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
-					break
-				else
-					removeMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+					loop
+						if !getMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+							break
+						else
+							removeMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
 
-			for index, parameter in callback.Parameters
-				setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
-											  , values2String("|", parameter.Name, parameter.Type
-																 , values2String(",", parameter.Enumeration*)
-																 , parameter.Required, parameter.Description))
+					for index, parameter in callback.Parameters
+						setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
+													  , values2String("|", parameter.Name, parameter.Type
+																		 , values2String(",", parameter.Enumeration*)
+																		 , parameter.Required, parameter.Description))
 
-			writeMultiMap(directory . "\" . callback.Name . extension, configuration)
+					writeMultiMap(directory . "\" . callback.Name . extension, configuration)
 
-			SplitPath(fileName, , &targetDirectory, , &name)
+					SplitPath(fileName, , &targetDirectory, , &name)
 
-			currentDir := A_WorkingDir
+					currentDir := A_WorkingDir
 
-			SetWorkingDir(directory)
+					SetWorkingDir(directory)
 
-			try {
-				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
+					try {
+						; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
 
-				RunWait("tar -a -c -f `"" . targetDirectory . "\" . name . ".zip`" *.*", , "Hide")
-			}
-			finally {
-				SetWorkingDir(currentDir)
-			}
+						RunWait("tar -a -c -f `"" . targetDirectory . "\" . name . ".zip`" *.*", , "Hide")
+					}
+					finally {
+						SetWorkingDir(currentDir)
+					}
 
-			FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
-		}
+					FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
+				})
+			})
 	}
 
 	loadCallback(callback) {

@@ -221,9 +221,7 @@ class PressuresEditor {
 		local database := this.PressuresDatabase
 		local ignore, update, entry, row, connector, properties
 
-		this.Window.Block()
-
-		try {
+		withBlockedWindows(() {
 			withTask(ProgressTask(translate("Saving")), () {
 				database.reload("Tyres.Pressures.Distribution", false)
 
@@ -262,10 +260,7 @@ class PressuresEditor {
 						database.unlock("Tyres.Pressures.Distribution")
 					}
 			})
-		}
-		finally {
-			this.Window.Unblock()
-		}
+		})
 	}
 
 	editPressures() {

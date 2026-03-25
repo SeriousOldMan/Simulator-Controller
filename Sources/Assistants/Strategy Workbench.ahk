@@ -449,10 +449,8 @@ class StrategyWorkbench extends ConfigurationItem {
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes")
-						withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
-							this.Window.Block()
-
-							try {
+						withBlockedWindows(() {
+							withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
 								LapsDatabase(workbench.SelectedSimulator, workbench.SelectedCar, workbench.SelectedTrack
 										   , workbench.SelectedDrivers).cleanupData(workbench.SelectedWeather, workbench.SelectedCompound
 																				  , workbench.SelectedCompoundColor, workbench.SelectedDrivers ? workbench.SelectedDrivers : true)
@@ -460,10 +458,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								workbench.loadDataType(workbench.SelectedDataType, true)
 
 								workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
-							}
-							finally {
-								this.Window.Unblock()
-							}
+							})
 						})
 				}
 

@@ -1772,8 +1772,8 @@ class TelemetryViewer {
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
 			if (analyzer.TrackSections.Length = 0)
-				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
-					withBlockedWindows(() {
+				withBlockedWindows(() {
+					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						analyzer.requireTrackSections(telemetry)
 
 						telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
@@ -2592,8 +2592,8 @@ class TrackMap {
 			this.Window.Block()
 
 			try {
-				withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
-					withBlockedWindows(() {
+				withBlockedWindows(() {
+					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
 						local driver, lapTime, sectorTimes, telemetry, index, section

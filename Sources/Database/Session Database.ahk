@@ -1484,19 +1484,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
-				withTask(ProgressTask(translate("Importing data")), () {
-					try {
-						folder := temporaryFileName("Data", "export")
+				withBlockedWindows(() {
+					withTask(ProgressTask(translate("Importing data")), () {
+						try {
+							folder := temporaryFileName("Data", "export")
 
-						FileCopy(fileName, fileName . ".zip", 1)
+							FileCopy(fileName, fileName . ".zip", 1)
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
-						deleteFile(fileName . ".zip")
-					}
-					catch Any {
-						folder := ""
-					}
+							deleteFile(fileName . ".zip")
+						}
+						catch Any {
+							folder := ""
+						}
+					})
 				})
 
 			if (folder != "")
@@ -1564,17 +1566,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
-				withTask(ProgressTask(translate("Importing settings")), () {
-					try {
-						folder := temporaryFileName("Settings", "export")
+				withBlockedWindows(() {
+					withTask(ProgressTask(translate("Importing settings")), () {
+						try {
+							folder := temporaryFileName("Settings", "export")
 
-						FileCopy(fileName, fileName . ".zip", 1)
+							FileCopy(fileName, fileName . ".zip", 1)
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-					}
-					catch Any {
-						folder := ""
-					}
+							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+						}
+						catch Any {
+							folder := ""
+						}
+					})
 				})
 
 			if (folder != "")
@@ -6642,8 +6646,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath(fileName, &name)
 
-			withTask(ProgressTask(translate("Extracting ") . name), () {
-				RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+			withBlockedWindows(() {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
+					RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+				})
 			})
 
 			OnMessage(0x44, translateLoadCancelButtons)
@@ -7805,9 +7811,7 @@ editLaps(editorOrCommand, arguments*) {
 	}
 
 	deleteData(localTable, serverTable, removedPredicate) {
-		lapsGui.Block()
-
-		try {
+		withBlockedWindows(() {
 			withTask(ProgressTask(translate("Deleting Data")), () {
 				local ignore, connector, row, removedRows, removalRows
 
@@ -7840,10 +7844,7 @@ editLaps(editorOrCommand, arguments*) {
 					lapsDB.Database.unlock(localTable)
 				}
 			})
-		}
-		finally {
-			lapsGui.Unblock()
-		}
+		})
 	}
 
 	if (editorOrCommand = "Close")
@@ -7890,7 +7891,9 @@ editLaps(editorOrCommand, arguments*) {
 			lapsGui.Block()
 
 			try {
-				withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => lapsDB.cleanupElectronics(lapsDB.ID))
+				withBlockedWindows(() {
+					withTask(ProgressTask(translate("Cleaning ") . translate("Electronics")), () => lapsDB.cleanupElectronics(lapsDB.ID))
+				})
 
 				editLaps("LoadElectronics")
 
@@ -7911,7 +7914,9 @@ editLaps(editorOrCommand, arguments*) {
 			lapsGui.Block()
 
 			try {
-				withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => lapsDB.cleanupTyres(lapsDB.ID))
+				withBlockedWindows(() {
+					withTask(ProgressTask(translate("Cleaning ") . translate("Tyres")), () => lapsDB.cleanupTyres(lapsDB.ID))
+				})
 
 				editLaps("LoadTyres")
 

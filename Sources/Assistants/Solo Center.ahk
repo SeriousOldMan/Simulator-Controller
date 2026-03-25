@@ -5094,7 +5094,9 @@ class SoloCenter extends ConfigurationItem {
 
 				if (fileName != "")
 					if progress
-						withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
+						withBlockedWindows(() {
+							withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
+						})
 					else
 						saveSession(directory, fileName)
 			}
@@ -5455,155 +5457,159 @@ class SoloCenter extends ConfigurationItem {
 					OnMessage(0x44, translateLoadCancelButtons, 0)
 				}
 
-				withTask(ProgressTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
-					if (fileName && InStr(FileExist(fileName), "D"))
-						folder := fileName
-					else if (fileName && (fileName != "")) {
-						SplitPath(fileName, , &directory, , &fileName)
+				withBlockedWindows(() {
+					withTask(ProgressTask(StrReplace(translate("Extracting ") . translate("Session") . translate("..."), "...", "")), () {
+						if (fileName && InStr(FileExist(fileName), "D"))
+							folder := fileName
+						else if (fileName && (fileName != "")) {
+							SplitPath(fileName, , &directory, , &fileName)
 
-						folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+							folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
 
-						DirCreate(folder)
+							DirCreate(folder)
 
-						if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
-							dataFile := temporaryFileName("Session", "zip")
+							if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
+								dataFile := temporaryFileName("Session", "zip")
 
-							try {
-								session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
+								try {
+									session := sessionDB.readSession(simulator, car, track, "Solo", fileName, &meta, &size)
 
-								file := FileOpen(dataFile, "w", "")
+									file := FileOpen(dataFile, "w", "")
 
-								if file {
-									file.RawWrite(session, size)
+									if file {
+										file.RawWrite(session, size)
 
-									file.Close()
+										file.Close()
 
-									RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
-									if !FileExist(folder . "\Practice.info")
-										FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+										if !FileExist(folder . "\Practice.info")
+											FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+									}
+									else
+										folder := ""
 								}
-								else
-									folder := ""
-							}
-							catch Any as exception {
-								logError(exception)
+								catch Any as exception {
+									logError(exception)
 
-								folder := ""
+									folder := ""
+								}
+								finally {
+									deleteFile(dataFile)
+								}
 							}
-							finally {
+							else {
+								dataFile := temporaryFileName("Practice", "zip")
+
+								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
+
+								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+
+								if !FileExist(folder . "\Practice.info")
+									FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+
 								deleteFile(dataFile)
 							}
 						}
-						else {
-							dataFile := temporaryFileName("Practice", "zip")
-
-							FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-							if !FileExist(folder . "\Practice.info")
-								FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
-
-							deleteFile(dataFile)
-						}
-					}
-					else
-						folder := ""
+						else
+							folder := ""
+					})
 				})
 			}
 
 			if (folder != "") {
-				withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
-					folder := (folder . "\")
+				withBlockedWindows(() {
+					withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
+						folder := (folder . "\")
 
-					info := readMultiMap(folder . "Practice.info")
+						info := readMultiMap(folder . "Practice.info")
 
-					if (info.Count == 0) {
-						OnMessage(0x44, translateOkButton)
-						withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
-						OnMessage(0x44, translateOkButton, 0)
-					}
-					else {
-						this.UsedTyreSetsListView.Opt("-Redraw")
-						this.RunsListView.Opt("-Redraw")
-						this.LapsListView.Opt("-Redraw")
-
-						this.iSessionLoading := true
-
-						try {
-							this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
-
-							this.iSessionMode := "Loaded"
-							this.iSessionLoaded := folder
-
-							if this.TelemetryViewer
-								this.TelemetryViewer.restart(folder . "Telemetry")
-
-							this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
-							this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
-							this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
-							this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
-							this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
-							this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
-							this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
-
-							this.loadDrivers()
-							this.loadLaps()
-							this.loadRuns()
-							this.loadTelemetry()
-							this.loadPressures()
-
-							this.ReportViewer.setReport(folder . "Race Report")
-
-							this.initializeReports()
-
-							if !this.Weather {
-								lastLap := this.LastLap
-
-								if lastLap {
-									this.iWeather := lastLap.Weather
-									this.iAirTemperature := lastLap.AirTemperature
-									this.iTrackTemperature := lastLap.TrackTemperature
-									this.iWeather10Min := lastLap.Weather10Min
-									this.iWeather30Min := lastLap.Weather30Min
-								}
-							}
-
-							if !this.TyreCompound {
-								currentRun := this.CurrentRun
-
-								if currentRun {
-									this.iTyreCompound := compound(currentRun.Compounds[1])
-									this.iTyreCompoundColor := compoundColor(currentRun.Compounds[1])
-								}
-							}
-
-							loop this.RunsListView.GetCount()
-								this.RunsListView.Modify(A_Index, "-Check")
-
-							loop this.LapsListView.GetCount()
-								this.LapsListView.Modify(A_Index, "-Check")
-
-							this.updateUsedTyreSets()
-
-							this.analyzeTelemetry()
-
-							this.showReport(this.getSelectedReport("Overview"))
-
-							this.updateState()
-
-							if this.TelemetryViewer
-								this.TelemetryViewer.loadTelemetry()
+						if (info.Count == 0) {
+							OnMessage(0x44, translateOkButton)
+							withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
 						}
-						finally {
-							this.iSessionLoading := false
+						else {
+							this.UsedTyreSetsListView.Opt("-Redraw")
+							this.RunsListView.Opt("-Redraw")
+							this.LapsListView.Opt("-Redraw")
 
-							this.UsedTyreSetsListView.Opt("+Redraw")
-							this.RunsListView.Opt("+Redraw")
-							this.LapsListView.Opt("+Redraw")
+							this.iSessionLoading := true
+
+							try {
+								this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
+
+								this.iSessionMode := "Loaded"
+								this.iSessionLoaded := folder
+
+								if this.TelemetryViewer
+									this.TelemetryViewer.restart(folder . "Telemetry")
+
+								this.iSessionExported := getMultiMapValue(info, "Session", "Exported", true)
+								this.iDate := getMultiMapValue(info, "Session", "Date", A_Now)
+								this.iWeather := getMultiMapValue(info, "Weather", "Weather", false)
+								this.iWeather10Min := getMultiMapValue(info, "Weather", "Weather10Min", false)
+								this.iWeather30Min := getMultiMapValue(info, "Weather", "Weather30Min", false)
+								this.iAirTemperature := getMultiMapValue(info, "Weather", "AirTemperature", false)
+								this.iTrackTemperature := getMultiMapValue(info, "Weather", "TrackTemperature", false)
+
+								this.loadDrivers()
+								this.loadLaps()
+								this.loadRuns()
+								this.loadTelemetry()
+								this.loadPressures()
+
+								this.ReportViewer.setReport(folder . "Race Report")
+
+								this.initializeReports()
+
+								if !this.Weather {
+									lastLap := this.LastLap
+
+									if lastLap {
+										this.iWeather := lastLap.Weather
+										this.iAirTemperature := lastLap.AirTemperature
+										this.iTrackTemperature := lastLap.TrackTemperature
+										this.iWeather10Min := lastLap.Weather10Min
+										this.iWeather30Min := lastLap.Weather30Min
+									}
+								}
+
+								if !this.TyreCompound {
+									currentRun := this.CurrentRun
+
+									if currentRun {
+										this.iTyreCompound := compound(currentRun.Compounds[1])
+										this.iTyreCompoundColor := compoundColor(currentRun.Compounds[1])
+									}
+								}
+
+								loop this.RunsListView.GetCount()
+									this.RunsListView.Modify(A_Index, "-Check")
+
+								loop this.LapsListView.GetCount()
+									this.LapsListView.Modify(A_Index, "-Check")
+
+								this.updateUsedTyreSets()
+
+								this.analyzeTelemetry()
+
+								this.showReport(this.getSelectedReport("Overview"))
+
+								this.updateState()
+
+								if this.TelemetryViewer
+									this.TelemetryViewer.loadTelemetry()
+							}
+							finally {
+								this.iSessionLoading := false
+
+								this.UsedTyreSetsListView.Opt("+Redraw")
+								this.RunsListView.Opt("+Redraw")
+								this.LapsListView.Opt("+Redraw")
+							}
 						}
-					}
+					})
 				})
 			}
 		}

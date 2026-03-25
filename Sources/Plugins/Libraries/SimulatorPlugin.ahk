@@ -557,13 +557,9 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	runningSimulator(active := false) {
-		static remoteSimulator := kUndefined
-		
-		if (remoteSimulator == kUndefined)
-			if FileExist(kUserConfigDirectory . "Simulator.remote")
-				remoteSimulator := FileRead(kUserConfigDirectory . "Simulator.remote")
-			else
-				remoteSimulator := false
+		static remoteSimulator := (FileExist(kUserConfigDirectory . "Simulator.remote")
+									  ? FileRead(kUserConfigDirectory . "Simulator.remote")
+									  : false)
 
 		if (remoteSimulator && (remoteSimulator = this.Simulator[true]))
 			return remoteSimulator

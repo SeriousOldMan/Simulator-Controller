@@ -20,7 +20,9 @@ The following settings control when and how data is collected by the Assistants 
 | Collect Tyre Pressures during Race       | Boolean | True                            | No  | If enabled (*True*), pressures (hot and cold) are collected by the Engineer during race sessions. The Engineer must not be disabled for this to work. |
 | Collect Tyre Pressures during Time Trial | Boolean | False                           | No  | If enabled (*True*), pressures (hot and cold) are collected by the Engineer during time trial sessions. The Engineer must not be disabled for this to work. |
 
-### Assistant Settings
+### Assistants Settings
+
+The following settings apply to all Assistants.
 
 | Setting                                  | Type    | Default                         | Available in "Race Settings" dialog| Description  |
 |------------------------------------------|---------|---------------------------------|------------------------------------|--------------|

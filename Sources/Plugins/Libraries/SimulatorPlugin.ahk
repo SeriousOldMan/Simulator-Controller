@@ -557,8 +557,13 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	runningSimulator(active := false) {
-		static remoteSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-												 , "Simulator", "Remote", false)
+		static remoteSimulator := kUndefined
+		
+		if (remoteSimulator == kUndefined)
+			if FileExist(kUserConfigDirectory . "Simulator.remote")
+				remoteSimulator := FileRead(kUserConfigDirectory . "Simulator.remote")
+			else
+				remoteSimulator := false
 
 		if (remoteSimulator && (remoteSimulator = this.Simulator[true]))
 			return remoteSimulator

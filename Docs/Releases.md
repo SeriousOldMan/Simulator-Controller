@@ -33,6 +33,7 @@
 #### Fixes
 
   - Fixed a bug in "Session Database", that prevented the correct car and track to be selected when double clicking on an *Automation* in the "Administration" tab.
+  - Fixed a crash when importing events and actions in the Assistant Booster editor, when the export was not created from the same category (Rules or GPT).
   
 #### Changes
 
@@ -43,6 +44,7 @@
   - Added a News article about the Coach post-session review capability.
   - New settings for the steer ratio, track width and wheel base of a car have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#car-settings). They are used as default values in the "Setup Workbench" for cars for which this information is not available in the meta data or elsewhere.
   - Rearranged the documentation for all [session settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) for better structure and readability.
+  - [Export] It is now possible to move events and actions from a rule-based Assistant Booster to a GPT-based Assistant Booster and vice versa using the Export / Import functions.
   - [Internal] Migrated to AHK 2.1-alpha.23.
 
 # Release history

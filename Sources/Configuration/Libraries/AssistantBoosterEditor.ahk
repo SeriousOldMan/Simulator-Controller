@@ -2002,8 +2002,8 @@ class CallbacksEditor {
 
 					definition := readMultiMap(A_LoopFileFullPath)
 
-					if (getMultiMapValue(definition, "General", "Type", false) = this.Type) {
-						type := (this.Type . ".Custom")
+					if (true || (getMultiMapValue(definition, "General", "Type", false) = this.Type)) {
+						type := (getMultiMapValue(definition, "General", "Type") . ".Custom")
 
 						for callback, descriptor in getMultiMapValues(definition, type) {
 							descriptor := string2Values("|", descriptor)

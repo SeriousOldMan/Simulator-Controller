@@ -563,6 +563,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 		this.normalizeConfiguration(configuration)
 
+		setMultiMapValue(configuration, "Agent Booster", this.Assistant . ".Agent", false)
+
 		for ignore, provider in this.Providers {
 			providerConfiguration := this.iProviderConfigurations["Conversation." . provider]
 

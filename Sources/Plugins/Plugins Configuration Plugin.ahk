@@ -164,7 +164,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		super.saveToConfiguration(configuration)
 
 		for ignore, thePlugin in this.ItemList
-			thePlugin.saveToConfiguration(configuration)
+			thePlugin.saveToConfiguration(configuration, true, ["speakerBooster", "listenerBooster", "conversationBooster", "agentBooster"])
 
 		addMultiMapValues(configuration, this.iConversationBoosterConfiguration)
 	}
@@ -334,7 +334,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 				if (arguments.Length = 5) {
 					language := first(Translator.Languages, (l) => ((l.Identifier = arguments[3])
 																 || (l.Code = arguments[3]))).Code
-																 
+
 					setMultiMapValue(configuration, "Voice Control", "Language.Translated", true)
 					setMultiMapValue(configuration, "Voice Control", "Translator"
 												  , thePlugin.getArgumentValue("translator"))

@@ -894,15 +894,15 @@ class Plugin extends ConfigurationItem {
 			if (descriptor.Length > 0) {
 				arguments := this.computeArgments(descriptor[3])
 
+				for ignore, argument in excludes
+					if arguments.Has(argument)
+						arguments.Delete(argument)
+
 				for key, value in this.Arguments
 					arguments[key] := value
 			}
 			else
 				arguments := this.Arguments.Clone()
-
-			for ignore, argument in excludes
-				if arguments.Has(argument)
-					arguments.Delete(argument)
 
 			result := []
 

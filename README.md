@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.8.0-release](https://cutt.ly/ZtUVneHd) (Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench", New startup info progress bars, Renamed session settings.)
+[6.8.9.0-release](https://cutt.ly/JtO9Y4NU) (Changes: Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Updated AHK version, Added more car meta data to the session settings, Fixed export/import of Assistant Booster scripts.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6880) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-688) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6890) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.8.7.0-release](https://cutt.ly/etYtimUC) (Changes: Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus, Clarified *Verbose* setting in the *core settings*, Added Polish Grammars, Progress bar during translation update.)
+[6.8.8.0-release](https://cutt.ly/ZtUVneHd) (Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench", New startup info progress bars, Renamed session settings.)
 
-[6.8.6.1-release](https://cutt.ly/jtR2EjJe) (Changes: Fixed AC sector times, Fixed LMU grid for absent cars, Filter for multiclass warnings after a pitstop, Corner name in "Session State.json", Update available tyre compounds in "Strategy Workbench", Added missing translations, Fixed "plan_pitstop" event for the Engineer, Fixed "report_low_energy" event for the Engineer, Fixed weather information by the Strategist in the first lap, Fixed a crash in the "Integration" plugin for SimHub, Fixed several critical bugs in the race reports.)
+[6.8.7.0-release](https://cutt.ly/etYtimUC) (Changes: Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus, Clarified *Verbose* setting in the *core settings*, Added Polish Grammars, Progress bar during translation update.)
 
 #### Latest development build
 
-[6.8.9.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/6SGftOdg/Releases/Simulator%20Controller%206.8.9.0-beta.zip) (Test build for 6.8.9. Changes: Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Updated AHK version, Added more car meta data to the session settings.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6890) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

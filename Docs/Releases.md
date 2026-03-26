@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 6.8.9.0
+
+#### Date: 03/27/26
+
+#### Fixes
+
+  - Fixed a bug in "Session Database", that prevented the correct car and track to be selected when double clicking on an *Automation* in the "Administration" tab.
+  - Fixed a crash when importing events and actions in the Assistant Booster editor, when the export was not created from the same category (Rules or GPT).
+  
+#### Changes
+
+  - The calculation of tyre wear data can now also handle setups with different compounds on each wheel.
+  - A Pangram sentence has been added for Polish language which is used when testing speech generation.
+  - Obsolete hotkey specifiers for opening and closing the Pitstop MFD for *Le Mans Ultimate* have been removed in "Simulator Setup".
+  - Additional data has been added to the post-session knowledge of the Driving Coach.
+  - Added a News article about the Coach post-session review capability.
+  - New settings for the steer ratio, track width and wheel base of a car have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#car-settings). They are used as default values in the "Setup Workbench" for cars for which this information is not available in the meta data or elsewhere.
+  - Rearranged the documentation for all [session settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) for better structure and readability.
+  - [Export] It is now possible to move events and actions from a rule-based Assistant Booster to a GPT-based Assistant Booster and vice versa using the Export / Import functions.
+  - [Internal] Migrated to AHK 2.1-alpha.23.
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.8.8.0
 
 #### Date: 03/20/26
@@ -24,31 +51,6 @@
   - When tyre compounds have been deleted or marked as unavailable in the "Race Settings" or the "Strategy Workbench", they are also removed from the tyre compound selection menus.
   - The Windows Server language pack for Polish has been added to "Simulator Setup".
   
-# Upcoming release
-
-## 6.8.9.0
-
-#### Date: 03/27/26 (planned)
-
-#### Fixes
-
-  - Fixed a bug in "Session Database", that prevented the correct car and track to be selected when double clicking on an *Automation* in the "Administration" tab.
-  - Fixed a crash when importing events and actions in the Assistant Booster editor, when the export was not created from the same category (Rules or GPT).
-  
-#### Changes
-
-  - The calculation of tyre wear data can now also handle setups with different compounds on each wheel.
-  - A Pangram sentence has been added for Polish language which is used when testing speech generation.
-  - Obsolete hotkey specifiers for opening and closing the Pitstop MFD for *Le Mans Ultimate* have been removed in "Simulator Setup".
-  - Additional data has been added to the post-session knowledge of the Driving Coach.
-  - Added a News article about the Coach post-session review capability.
-  - New settings for the steer ratio, track width and wheel base of a car have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#car-settings). They are used as default values in the "Setup Workbench" for cars for which this information is not available in the meta data or elsewhere.
-  - Rearranged the documentation for all [session settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) for better structure and readability.
-  - [Export] It is now possible to move events and actions from a rule-based Assistant Booster to a GPT-based Assistant Booster and vice versa using the Export / Import functions.
-  - [Internal] Migrated to AHK 2.1-alpha.23.
-
-# Release history
-
 ## 6.8.7.0
 
 #### Date: 03/13/26

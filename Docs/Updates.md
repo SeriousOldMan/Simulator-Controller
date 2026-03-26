@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.8.9
 
-Nothing to do.
+If you ever used the *Reasoning* booster, start "Simulator Setup" (or "Simulator Configuration", if you are using this one) and open the Assistant Booster editor for each Assistant and close the dialog with "Okay". Then save and regenerate your configuration.
 
 ## Release 6.8.8
 

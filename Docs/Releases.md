@@ -8,6 +8,7 @@
 
   - Fixed a bug in "Session Database", that prevented the correct car and track to be selected when double clicking on an *Automation* in the "Administration" tab.
   - Fixed a crash when importing events and actions in the Assistant Booster editor, when the export was not created from the same category (Rules or GPT).
+  - Fixed a bug relating to the configuration of the *Reasoning* booster. If you ever used the *Reasoning* booster take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) for instructions how to fix your configuration.
   
 #### Changes
 
@@ -20,6 +21,8 @@
   - Rearranged the documentation for all [session settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) for better structure and readability.
   - [Export] It is now possible to move events and actions from a rule-based Assistant Booster to a GPT-based Assistant Booster and vice versa using the Export / Import functions.
   - [Internal] Migrated to AHK 2.1-alpha.23.
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) for instructions how resolve a wrong *Reasoning* booster configuration.
   
 # Upcoming release
 

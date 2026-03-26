@@ -29,6 +29,7 @@
 #Include "..\..\Framework\Extensions\CodeEditor.ahk"
 #Include "..\..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "ConfigurationEditor.ahk"
 
 
@@ -2001,55 +2002,57 @@ class CallbacksEditor {
 
 					definition := readMultiMap(A_LoopFileFullPath)
 
-					type := (this.Type . ".Custom")
+					if (getMultiMapValue(definition, "General", "Type", false) = this.Type) {
+						type := (this.Type . ".Custom")
 
-					for callback, descriptor in getMultiMapValues(definition, type) {
-						descriptor := string2Values("|", descriptor)
+						for callback, descriptor in getMultiMapValues(definition, type) {
+							descriptor := string2Values("|", descriptor)
 
-						parameters := []
+							parameters := []
 
-						loop descriptor[5] {
-							parameter := string2Values("|", getMultiMapValue(definition, this.Type . ".Parameters", ConfigurationItem.descriptor(callback, A_Index)))
+							loop descriptor[5] {
+								parameter := string2Values("|", getMultiMapValue(definition, this.Type . ".Parameters", ConfigurationItem.descriptor(callback, A_Index)))
 
-							parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
-										   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
-										   , Description: parameter[5]})
+								parameters.Push({Name: parameter[1], Type: parameter[2], Enumeration: string2Values(",", parameter[3])
+											   , Required: ((parameter[4] = kTrue) ? true : ((parameter[4] = kFalse) ? false : parameter[4]))
+											   , Description: parameter[5]})
+							}
+
+							if InStr(this.Type, "Events")
+								theCallback := {Name: newName, Active: true, Disabled: false
+											  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
+											  , Description: descriptor[6], Parameters: parameters, Builtin: false
+											  , Event: descriptor[3], Phrase: descriptor[4]}
+							else
+								theCallback := {Name: newName, Active: true, Disabled: false
+											  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
+											  , Description: descriptor[6], Parameters: parameters, Builtin: false
+											  , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
+											  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
+
+							if (theCallback.Type = "Assistant.Rule") {
+								theCallback.Script := FileRead(directory . "\" . descriptor[2])
+
+								theCallback.Definition := ""
+							}
+							else if (theCallback.Type = "Assistant.Script") {
+								theCallback.Script := FileRead(directory . "\" . descriptor[2])
+
+								theCallback.Definition := ""
+							}
+
+							this.Callbacks.Push(theCallback)
+
+							this.CallbacksListView.Add("", theCallback.Name, theCallback.Active ? translate(theCallback.Disabled ? "-" : "x") : "", theCallback.Description)
 						}
 
-						if InStr(this.Type, "Events")
-							theCallback := {Name: newName, Active: true, Disabled: false
-										  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
-										  , Description: descriptor[6], Parameters: parameters, Builtin: false
-										  , Event: descriptor[3], Phrase: descriptor[4]}
-						else
-							theCallback := {Name: newName, Active: true, Disabled: false
-										  , Type: descriptor[1], SelectedType: descriptor[1], Definition: descriptor[2]
-										  , Description: descriptor[6], Parameters: parameters, Builtin: false
-										  , Initialized: ((descriptor[3] = kTrue) ? true : ((descriptor[3] = kFalse) ? false : descriptor[3]))
-										  , Confirm: ((descriptor[4] = kTrue) ? true : ((descriptor[4] = kFalse) ? false : descriptor[4]))}
+						this.selectCallback(false)
 
-						if (theCallback.Type = "Assistant.Rule") {
-							theCallback.Script := FileRead(directory . "\" . descriptor[2])
+						this.CallbacksListView.ModifyCol()
 
-							theCallback.Definition := ""
-						}
-						else if (theCallback.Type = "Assistant.Script") {
-							theCallback.Script := FileRead(directory . "\" . descriptor[2])
-
-							theCallback.Definition := ""
-						}
-
-						this.Callbacks.Push(theCallback)
-
-						this.CallbacksListView.Add("", theCallback.Name, theCallback.Active ? translate(theCallback.Disabled ? "-" : "x") : "", theCallback.Description)
+						loop this.CallbacksListView.GetCount("Col")
+							this.CallbacksListView.ModifyCol(A_Index, "AutoHdr")
 					}
-
-					this.selectCallback(false)
-
-					this.CallbacksListView.ModifyCol()
-
-					loop this.CallbacksListView.GetCount("Col")
-						this.CallbacksListView.ModifyCol(A_Index, "AutoHdr")
 				}
 			}
 			catch Any as exception {
@@ -2083,7 +2086,7 @@ class CallbacksEditor {
 		local extension := (InStr(this.Type, "Events") ? ".event" : ".action")
 		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
 		local callback := this.SelectedCallback
-		local configuration := newMultiMap()
+		local definition := newMultiMap()
 		local index, parameter, fileName, newFileName, targetDirectory, currentDir
 
 		if !this.saveCallback(callback)
@@ -2111,6 +2114,9 @@ class CallbacksEditor {
 
 					DirCreate(directory)
 
+					setMultiMapValue(definition, "General", "Type", this.Type)
+					setMultiMapValue(definition, "Origin", "Creator", SessionDatabase.ID)
+
 					if (callback.Type = "Assistant.Rule") {
 						callback.Definition := (this.Assistant . "." . callback.Name . ".rules")
 
@@ -2123,27 +2129,27 @@ class CallbacksEditor {
 					}
 
 					if InStr(this.Type, "Events")
-						setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-													  , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
-																		 , callback.Parameters.Length, callback.Description))
+						setMultiMapValue(definition, this.Type . ".Custom", callback.Name
+												   , values2String("|", callback.Type, callback.Definition, callback.Event, callback.Phrase
+																	  , callback.Parameters.Length, callback.Description))
 					else
-						setMultiMapValue(configuration, this.Type . ".Custom", callback.Name
-													  , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
-																		 , callback.Parameters.Length, callback.Description))
+						setMultiMapValue(definition, this.Type . ".Custom", callback.Name
+												   , values2String("|", callback.Type, callback.Definition, callback.Initialized, callback.Confirm
+																	  , callback.Parameters.Length, callback.Description))
 
 					loop
-						if !getMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+						if !getMultiMapValue(definition, this.Type . ".Parameters", callback.Name . "." . A_Index)
 							break
 						else
-							removeMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . A_Index)
+							removeMultiMapValue(definition, this.Type . ".Parameters", callback.Name . "." . A_Index)
 
 					for index, parameter in callback.Parameters
-						setMultiMapValue(configuration, this.Type . ".Parameters", callback.Name . "." . index
-													  , values2String("|", parameter.Name, parameter.Type
-																		 , values2String(",", parameter.Enumeration*)
-																		 , parameter.Required, parameter.Description))
+						setMultiMapValue(definition, this.Type . ".Parameters", callback.Name . "." . index
+												   , values2String("|", parameter.Name, parameter.Type
+																	  , values2String(",", parameter.Enumeration*)
+																	  , parameter.Required, parameter.Description))
 
-					writeMultiMap(directory . "\" . callback.Name . extension, configuration)
+					writeMultiMap(directory . "\" . callback.Name . extension, definition)
 
 					SplitPath(fileName, , &targetDirectory, , &name)
 

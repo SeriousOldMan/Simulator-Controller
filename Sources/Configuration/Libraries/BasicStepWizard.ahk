@@ -882,7 +882,7 @@ class BasicStepWizard extends StepWizard {
 				dropDown.Add([voice])
 				dropDown.Choose(2)
 			}
-			else if (!editor && (voices.Length > 1))
+			else if (!editor && (voices.Length > 0))
 				dropDown.Choose(voice ? (inList(voices, voice) + 2) : 1)
 
 			dropDown.LastValue := dropDown.Value

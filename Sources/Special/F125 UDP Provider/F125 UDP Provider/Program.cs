@@ -43,8 +43,9 @@ namespace F125UDPProvider
 
             try
             {
-                string output = connector.Call(request);
-                Console.Write(output);
+                Thread.Sleep(1000);
+
+                Console.Write(connector.Call(request));
             }
             finally
             {

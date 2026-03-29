@@ -878,7 +878,7 @@ class SetupWizard extends ConfiguratorPanel {
 		else {
 			posX := (Round((A_ScreenWidth - 720 - 400) / 2) + 750)
 
-			helpWindow.Show("x800 x" . posX . " yCenter h610")
+			helpWindow.Show("x800 x" . posX . " yCenter h634")
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)

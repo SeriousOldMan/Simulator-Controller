@@ -7,7 +7,7 @@ namespace F125UDPProtocol
     // 16 packet types, 29-byte PacketHeader, all Little-Endian.
     // Default port 20777, max 22 cars.
     // Wheel order in F1 25 packets: [RL=0, RR=1, FL=2, FR=3]
-    // Our output order:              [FL=0, FR=1, RL=2, RR=3]
+    // Our output order:             [FL=0, FR=1, RL=2, RR=3]
     // Reorder indices: { 2, 3, 0, 1 }
     // ─────────────────────────────────────────────────────────────────────
 

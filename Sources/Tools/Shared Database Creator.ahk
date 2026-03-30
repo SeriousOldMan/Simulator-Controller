@@ -26,7 +26,7 @@ ListLines(false)					; Disable execution history
 ;@Ahk2Exe-SetProductName Simulator Controller
 ;@Ahk2Exe-SetVersion 0.0.0.0
 
-global kBuildConfiguration := "Development"
+global kBuildConfiguration := "Production"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -371,8 +371,9 @@ downloadUserDatabases(directory) {
 
 		updateProgress("Extracting " . idName . "...")
 
-		; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "' -Force", , "Hide")
-		
+		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "' -Force", , "Hide")
+
+		/*
 		curWorkingDir := A_WorkingDir
 
 		try {
@@ -383,6 +384,7 @@ downloadUserDatabases(directory) {
 		finally {
 			SetWorkingDir(curWorkingDir)
 		}
+		*/
 
 		deleteFile(directory . fileName)
 
@@ -453,10 +455,10 @@ createDatabases(inputDirectory, outputDirectory) {
 						currentDir := A_WorkingDir
 
 						SetWorkingDir(database)
-						
+
 						try {
 							; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
-				
+
 							RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 						}
 						finally {
@@ -492,10 +494,10 @@ createDatabases(inputDirectory, outputDirectory) {
 					currentDir := A_WorkingDir
 
 					SetWorkingDir(database)
-					
+
 					try {
 						; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
-				
+
 						RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 					}
 					finally {
@@ -526,10 +528,10 @@ createDatabases(inputDirectory, outputDirectory) {
 				currentDir := A_WorkingDir
 
 				SetWorkingDir(database)
-				
+
 				try {
 					; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
-				
+
 					RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 				}
 				finally {
@@ -548,6 +550,8 @@ createSharedDatabases() {
 
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local command, ignore, file
+
+	setDebug(false)
 
 	vProgressCount := 0
 

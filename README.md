@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.8.10.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VR5Z3mAc/Releases/Simulator%20Controller%206.8.10.0-dev.zip) (Early build for 6.8.10. Changes: Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#68100) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-6810) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -26,7 +26,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 # Upcoming release
 
-Not yet planned...
+## 6.8.10.0
+
+#### Date: 04/03/26 (planned)
+
+#### Fixes
+
+  - A bug has been fixed in the *Reasoning* booster configuration used in "Simulator Configuration", that could cause the booster to be partially active, after it had been disabled by the user in the configuration.
+  - Fixed a bug in the handling of the voice drop down in "Simulator Setup". This bug caused the menu to jump back to "Random", if only one voice was available for the selected speech synthesizer method.
+  
+#### Changes
+
+  - "Simulator Setup" now supports different configuration modes to hide more complex and seldomly used stuff from new users. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) for more information.
 
 # Release history
 

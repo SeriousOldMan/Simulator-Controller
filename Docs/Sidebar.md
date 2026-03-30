@@ -293,6 +293,11 @@
   - [Server Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#troubleshooting)
+	
+[Whisper Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server#introduction)
+  - [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Whisper-Server#installation--configuration)
 
 [Development Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts)
 ------

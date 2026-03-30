@@ -523,7 +523,7 @@ You can use an asterisk ("*") for the simulation and also for the session type, 
 | [Input.\*.\*]                | Input configuration for all active simulators.                          |
 | [Output.\*.Race]             | Output configuration, which used in race sessions in any simulator.     |
 
-Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.*]" takes precedence over "[Output.*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "*" for both will be the most unspecific.
+Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.\*]" takes precedence over "[Output.\*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "\*" for both will be the most unspecific.
 
 Important: Using audio routes is only possible, if *NirCmd* has been installed.
 

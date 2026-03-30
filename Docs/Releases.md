@@ -36,6 +36,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug in the handling of the voice drop down in "Simulator Setup". This bug caused the menu to jump back to "Random", if only one voice was available for the selected speech synthesizer method.
   - Fixed some internal problems related to extracting ZIP archives, which could lead to failure of downloading the community database. Side effect: Big performance improvements in some areas.
   - Fixed a bug in tyre wear calculation after a pitstop where not all tyres had been changed.
+  - Fixed a bug that prevented the "News, tips and tricks" menu to open after the window theme had been changed in the settings in "Simulator Startup".
   
 #### Changes
 

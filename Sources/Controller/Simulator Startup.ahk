@@ -727,7 +727,7 @@ loadNews(urls) {
 			finally {
 				SetWorkingDir(curWorkingDir)
 			}
-								
+
 			if FileExist(kTempDirectory . "News\News.htm")
 				return true
 		}
@@ -889,6 +889,8 @@ launchPad(command := false, arguments*) {
 	static startupButton
 
 	static closeCheckBox
+
+	static clickTask := false
 
 	getStartupProfile() {
 		local startupProfile := translate("Standard")
@@ -1148,7 +1150,6 @@ launchPad(command := false, arguments*) {
 
 		static prevHwnd := 0
 		static curControl := false
-		static clickTask := false
 
 		clickHandler() {
 			local x, y, w, h, mX, mY
@@ -1400,6 +1401,12 @@ launchPad(command := false, arguments*) {
 		removeMultiMapValue(startupConfig, "Simulator", "Track")
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+
+		if clickTask {
+			clickTask.stop()
+
+			clickTask := false
+		}
 
 		result := false
 		toolTips := Map()

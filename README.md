@@ -136,6 +136,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 38. [Using automatic language translation for the Assistants](https://youtu.be/FSkf-SxQ3M8) - The new functionality that supports automatic translation for speech interaction is demonstrated in this video. You will learn how to configure the Assistants to use nay language you want.
 
+39. [Using tyre wear in strategy development](https://youtu.be/XppMCAAxqEM) - This video demonstrates the impact of tyre wear data on strategy development. You will learn how the recorded data looks like and how you can use it in strategy development.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

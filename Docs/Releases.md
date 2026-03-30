@@ -37,7 +37,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - Initial support for EA F1 25. This support currently requires to run Simulator Controller on a separate PC, because the EA AntiCheat software "Javelin" flags Simulator Controller as cheating software. Beside that, the current state of implementation is to be considered *Alpha* and requires a manual configuration. In case, you want to use it, contact me on our Discord.
+  - Initial support for EA F1 25 has been added with this release. Please note, that it is currently required to run Simulator Controller on a separate PC, because the EA AntiCheat software "Javelin" flags Simulator Controller as cheating software. Beside that, the current state of implementation is to be considered *Alpha* and requires a manual configuration. In case, you want to try the F1 support in its current stage of development, contact me on our Discord.
   - "Simulator Setup" now supports different configuration modes to hide more complex and seldomly used stuff from new users. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) for more information.
   - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) has been introduced that allows you to change the new configuration mode to *Extended* in "Simulator Setup", when switching between pages.
 

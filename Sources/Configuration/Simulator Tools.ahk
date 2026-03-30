@@ -61,6 +61,8 @@ global kUpdateMessages := CaseInsenseMap("updateTranslations", "Updating transla
 global kDevelopmentCompiler := (kAHKDirectory . "Compiler\ahk2exe.exe")
 global kProductionCompiler := kDevelopmentCompiler ; (kAHKDirectory . "Compiler\ahk2exe.exe /compress 2")
 
+global kCloakIdentity := false
+
 global kSave := "save"
 global kRevert := "revert"
 
@@ -3744,32 +3746,34 @@ runBuildTargets(&buildProgress) {
 
 				compiledFile := (sourceDirectory . "\" . compiledFile)
 
-				content := FileRead(compiledFile, "RAW")
+				if kCloakIdentity {
+					content := FileRead(compiledFile, "RAW")
 
-				ordinals := collect(["A", "u", "t", "o", "H", "o", "t", "k", "e", "y"], Ord)
+					ordinals := collect(["A", "u", "t", "o", "H", "o", "t", "k", "e", "y"], Ord)
 
-				loop content.Size {
-					pos := (A_Index - 1)
+					loop content.Size {
+						pos := (A_Index - 1)
 
-					if ((pos + 10) > content.Size)
-						break
-					else {
-						for index, char in ordinals
-							if (NumGet(content, pos + A_Index - 1, "Char") != char) {
-								pos := -1
-
-								break
-							}
-
-						if (pos >= 0)
+						if ((pos + 10) > content.Size)
+							break
+						else {
 							for index, char in ordinals
-								NumPut("Char", Ord("A"), content, pos + A_Index - 1)
+								if (NumGet(content, pos + A_Index - 1, "Char") != char) {
+									pos := -1
+
+									break
+								}
+
+							if (pos >= 0)
+								for index, char in ordinals
+									NumPut("Char", Ord("A"), content, pos + A_Index - 1)
+						}
 					}
+
+					deleteFile(compiledFile)
+
+					FileAppend(content, compiledFile, "RAW")
 				}
-
-				deleteFile(compiledFile)
-
-				FileAppend(content, compiledFile, "RAW")
 
 				DirCreate(targetDirectory)
 

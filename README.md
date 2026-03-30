@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.0.0-release]() (Early build for 6.9.0. Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives.)
+[6.9.0.0-release]() (Early build for 6.9.0. Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6900) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) of this version and all the versions you might have skipped, before installing and using this version.
 

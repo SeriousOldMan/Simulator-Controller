@@ -3,7 +3,7 @@ Version=6.9.0.0-dev
 Target=6.9.0.0-release
 Date=03/29/2026
 Download=
-Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives
+Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres
 Components=Media->6.9.0,Configuration->6.9.0,Utilities->6.8.8
 [Release]
 Version=6.8.9.0-release

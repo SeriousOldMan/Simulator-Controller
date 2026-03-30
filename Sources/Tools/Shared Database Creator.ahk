@@ -371,7 +371,18 @@ downloadUserDatabases(directory) {
 
 		updateProgress("Extracting " . idName . "...")
 
-		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "' -Force", , "Hide")
+		; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "' -Force", , "Hide")
+		
+		curWorkingDir := A_WorkingDir
+
+		try {
+			SetWorkingDir(wDirectory)
+
+			RunWait("tar -xf `"" . directory . fileName . "`"", , "Hide")
+		}
+		finally {
+			SetWorkingDir(curWorkingDir)
+		}
 
 		deleteFile(directory . fileName)
 

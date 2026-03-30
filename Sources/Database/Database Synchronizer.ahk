@@ -64,7 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files, info, newInfo, sType, currentDir
+	local name, extension, files, info, newInfo, sType, curWorkingDir
 
 	updateState() {
 		if (++step > 20) {
@@ -340,7 +340,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 			}
 		}
 
-		currentDir := A_WorkingDir
+		curWorkingDir := A_WorkingDir
 
 		SetWorkingDir(kTempDirectory . "Shared Database")
 
@@ -353,7 +353,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 			logError(exception)
 		}
 		finally {
-			SetWorkingDir(currentDir)
+			SetWorkingDir(curWorkingDir)
 		}
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
@@ -386,7 +386,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local configuration := newMultiMap()
-	local ignore, fileName, type, databaseDirectory
+	local ignore, fileName, type, databaseDirectory, curWorkingDir
 
 	if FileExist(downloadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
@@ -430,7 +430,20 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 					updateState()
 
 					try {
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
+						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
+						
+						DirCreate(kTempDirectory . "Shared Database")
+
+						curWorkingDir := A_WorkingDir
+
+						try {
+							SetWorkingDir(kTempDirectory . "Shared Database")
+
+							RunWait("tar -xf `"" . kTempDirectory . fileName . "`"", , "Hide")
+						}
+						finally {
+							SetWorkingDir(curWorkingDir)
+						}
 					}
 					catch Any as exception {
 						logError(exception)
@@ -494,7 +507,9 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 	Task.Critical := true
 
 	try {
-		uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
+		if !FileExist(SessionDatabase().DatabasePath . "NOUPLOAD")
+			uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
+
 		downloadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
 	}
 	finally {

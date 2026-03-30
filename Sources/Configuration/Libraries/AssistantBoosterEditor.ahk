@@ -1967,7 +1967,7 @@ class CallbacksEditor {
 
 		importCallback(fileName) {
 			local name, newName, generation, duplicate, definition
-			local ignore, type, callback, descriptor, parameter, parameters, theCallback
+			local ignore, type, callback, descriptor, parameter, parameters, theCallback, curWorkingDir
 
 			deleteDirectory(directory)
 
@@ -1978,7 +1978,18 @@ class CallbacksEditor {
 
 				FileCopy(fileName, kTempDirectory . name . ".zip", 1)
 
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . name . ".zip" . "' -DestinationPath '" . directory . "' -Force", , "Hide")
+				; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . name . ".zip" . "' -DestinationPath '" . directory . "' -Force", , "Hide")
+
+				curWorkingDir := A_WorkingDir
+
+				try {
+					SetWorkingDir(directory)
+
+					RunWait("tar -xf `"" . kTempDirectory . name . ".zip`"", , "Hide")
+				}
+				finally {
+					SetWorkingDir(curWorkingDir)
+				}
 
 				loop Files, directory . "\*" . extension {
 					SplitPath(A_LoopFileFullPath, , , , &name)

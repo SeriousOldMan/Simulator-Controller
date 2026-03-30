@@ -10605,7 +10605,7 @@ class TeamCenter extends ConfigurationItem {
 			local track := this.Track
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory[false])
 			local folder, dirName, fileName, info, lastLap, currentStint, configuration, state
-			local sessionDB, dataFile, data, meta, size, file
+			local sessionDB, dataFile, data, meta, size, file, curWorkingDir
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -10669,8 +10669,19 @@ class TeamCenter extends ConfigurationItem {
 
 										file.Close()
 
-										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+										; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
+										curWorkingDir := A_WorkingDir
+
+										try {
+											SetWorkingDir(folder)
+
+											RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
+										}
+										finally {
+											SetWorkingDir(curWorkingDir)
+										}
+										
 										if !FileExist(folder . "\Session.info")
 											FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 									}
@@ -10691,8 +10702,19 @@ class TeamCenter extends ConfigurationItem {
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+								; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
+								curWorkingDir := A_WorkingDir
+
+								try {
+									SetWorkingDir(folder)
+
+									RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
+								}
+								finally {
+									SetWorkingDir(curWorkingDir)
+								}
+										
 								if !FileExist(folder . "\Session.info")
 									FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 

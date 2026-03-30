@@ -3388,12 +3388,25 @@ installMSI(command) {
 }
 
 installZIP(path, application) {
+	local curWorkingDir
+	
 	deleteDirectory(A_Temp . "\Simulator Controller\Temp")
 
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
 	DirCreate(normalizeDirectoryPath(kProgramsDirectory))
 
-	RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
+	; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kHomeDirectory . path . "' -DestinationPath '" . A_Temp . "\Simulator Controller\Temp' -Force", , "Hide")
+	
+	curWorkingDir := A_WorkingDir
+
+	try {
+		SetWorkingDir(A_Temp . "\Simulator Controller\Temp")
+
+		RunWait("tar -xf `"" . kHomeDirectory . path . "`"", , "Hide")
+	}
+	finally {
+		SetWorkingDir(curWorkingDir)
+	}
 
 	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, normalizeDirectoryPath(kProgramsDirectory), 1)
 

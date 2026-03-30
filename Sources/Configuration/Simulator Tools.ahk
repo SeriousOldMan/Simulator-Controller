@@ -366,7 +366,7 @@ checkInstallation() {
 																		  , "Components", ""))
 		local error := false
 		local components := []
-		local component, version, type, ignore, part, path, destination, url, urlError, componentNr
+		local component, version, type, ignore, part, path, destination, url, urlError, componentNr, curWorkingDir
 
 		for component, version in string2Map(",", "->"
 										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
@@ -411,8 +411,21 @@ checkInstallation() {
 								}
 								else
 									destination := path
+									
+								DirCreate(destination)
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "ComponentPackage.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+								; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "ComponentPackage.zip' -DestinationPath '" . destination . "' -Force", , "Hide")
+								
+								curWorkingDir := A_WorkingDir
+
+								try {
+									SetWorkingDir(destination)
+
+									RunWait("tar -xf `"" . kTempDirectory . "ComponentPackage.zip`"", , "Hide")
+								}
+								finally {
+									SetWorkingDir(curWorkingDir)
+								}
 
 								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
 									throw "Archive does not contain a valid component package..."

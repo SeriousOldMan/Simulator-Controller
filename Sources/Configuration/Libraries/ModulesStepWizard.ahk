@@ -547,7 +547,7 @@ class ProgramPreset extends NamedPreset {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local currentDirectory := A_WorkingDir
 		local counter :=  0
-		local updateTask, ignore, url, found
+		local updateTask, ignore, url, found, curWorkingDir
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -578,13 +578,24 @@ class ProgramPreset extends NamedPreset {
 					try {
 						Download(substituteVariables(url, {master: MASTER}), A_Temp . "\" . this.Program . ".zip")
 
-						deleteDirectory(kProgramsDirectory . this.Program . "")
+						deleteDirectory(kProgramsDirectory . this.Program)
 
 						DirCreate(kProgramsDirectory . this.Program)
 
 						showProgress({color: "Green", message: translate("Extracting...")})
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Program . ".zip' -DestinationPath '" . kProgramsDirectory . this.Program . "" . "' -Force", , "Hide")
+						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Program . ".zip' -DestinationPath '" . kProgramsDirectory . this.Program . "' -Force", , "Hide")
+						
+						curWorkingDir := A_WorkingDir
+
+						try {
+							SetWorkingDir(kProgramsDirectory . this.Program)
+
+							RunWait("tar -xf `"" . A_Temp . "\" . this.Program . ".zip`"", , "Hide")
+						}
+						finally {
+							SetWorkingDir(curWorkingDir)
+						}
 
 						if !FileExist(kProgramsDirectory . this.Program . "")
 							throw "Archive does not contain a valid download package..."
@@ -966,7 +977,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
-		local updateTask, ignore, found
+		local updateTask, ignore, found, curWorkingDir
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -999,7 +1010,18 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 
 						showProgress({color: "Green", message: translate("Extracting...")})
 
-						RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+						
+						curWorkingDir := A_WorkingDir
+
+						try {
+							SetWorkingDir(A_Temp . "\Simulator Controller DLC")
+
+							RunWait("tar -xf `"" . A_Temp . "\Simulator Controller DLC.zip`"", , "Hide")
+						}
+						finally {
+							SetWorkingDir(curWorkingDir)
+						}
 
 						if !FileExist(A_Temp . "\Simulator Controller DLC\*.*")
 							throw "Archive does not contain a valid download package..."
@@ -1170,7 +1192,7 @@ class SplashMedia extends DownloadablePreset {
 	loadMedia() {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
-		local updateTask, ignore, url, found
+		local updateTask, ignore, url, found, curWorkingDir
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -1202,7 +1224,18 @@ class SplashMedia extends DownloadablePreset {
 
 					showProgress({color: "Green", message: translate("Extracting...")})
 
-					RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+					; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
+					
+					curWorkingDir := A_WorkingDir
+
+					try {
+						SetWorkingDir(A_Temp . "\Simulator Controller DLC")
+
+						RunWait("tar -xf `"" . A_Temp . "\Simulator Controller DLC.zip`"", , "Hide")
+					}
+					finally {
+						SetWorkingDir(curWorkingDir)
+					}
 
 					if FileExist(A_Temp . "\Simulator Controller DLC\*.*") {
 						found := true

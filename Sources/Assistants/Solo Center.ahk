@@ -5419,7 +5419,8 @@ class SoloCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local folder := this.SessionDirectory
-			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size, file, tempFile
+			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size
+			local file, tempFile, curWorkingDir
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -5481,8 +5482,19 @@ class SoloCenter extends ConfigurationItem {
 
 										file.Close()
 
-										RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+										; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
+										curWorkingDir := A_WorkingDir
+
+										try {
+											SetWorkingDir(folder)
+
+											RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
+										}
+										finally {
+											SetWorkingDir(curWorkingDir)
+										}
+										
 										if !FileExist(folder . "\Practice.info")
 											FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 									}
@@ -5503,7 +5515,18 @@ class SoloCenter extends ConfigurationItem {
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
-								RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+								; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+								
+								curWorkingDir := A_WorkingDir
+
+								try {
+									SetWorkingDir(folder)
+
+									RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
+								}
+								finally {
+									SetWorkingDir(curWorkingDir)
+								}
 
 								if !FileExist(folder . "\Practice.info")
 									FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")

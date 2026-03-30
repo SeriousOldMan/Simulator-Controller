@@ -1475,7 +1475,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		importData(*) {
-			local folder, info, selection, fileName
+			local folder, info, selection, fileName, curWorkingDir
 
 			editorGui.Opt("+OwnDialogs")
 
@@ -1489,10 +1489,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						try {
 							folder := temporaryFileName("Data", "export")
 
+							DirCreate(folder)
+								
 							FileCopy(fileName, fileName . ".zip", 1)
 
-							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+							; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
+							curWorkingDir := A_WorkingDir
+
+							try {
+								SetWorkingDir(folder)
+
+								RunWait("tar -xf `"" . fileName . ".zip`"", , "Hide")
+							}
+							finally {
+								SetWorkingDir(curWorkingDir)
+							}
+						
 							deleteFile(fileName . ".zip")
 						}
 						catch Any {
@@ -1557,7 +1570,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		importSettings(*) {
-			local folder, info, selection, fileName
+			local folder, info, selection, fileName, curWorkingDir
 
 			editorGui.Opt("+OwnDialogs")
 
@@ -1570,10 +1583,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					withTask(ProgressTask(translate("Importing settings")), () {
 						try {
 							folder := temporaryFileName("Settings", "export")
+							
+							DirCreate(folder)
 
 							FileCopy(fileName, fileName . ".zip", 1)
 
-							RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+							; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+							
+							curWorkingDir := A_WorkingDir
+
+							try {
+								SetWorkingDir(folder)
+
+								RunWait("tar -xf `"" . fileName . ".zip`"", , "Hide")
+							}
+							finally {
+								SetWorkingDir(curWorkingDir)
+							}
 						}
 						catch Any {
 							folder := ""
@@ -8890,7 +8916,7 @@ startupSessionDatabase() {
 	local requestorPID := false
 	local import := false
 	local index := 1
-	local editor, selection, info, folder, fileName
+	local editor, selection, info, folder, fileName, curWorkingDir
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Session Database"
@@ -8952,8 +8978,19 @@ startupSessionDatabase() {
 				SplitPath(import, &fileName)
 				FileCopy(import, kTempDirectory . fileName . ".zip", 1)
 
-				RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+				; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 
+				curWorkingDir := A_WorkingDir
+
+				try {
+					SetWorkingDir(folder)
+
+					RunWait("tar -xf `"" . kTempDirectory . fileName . ".zip`"", , "Hide")
+				}
+				finally {
+					SetWorkingDir(curWorkingDir)
+				}
+							
 				import := (folder . "\")
 			}
 

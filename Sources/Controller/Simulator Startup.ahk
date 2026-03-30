@@ -697,7 +697,7 @@ showNews() {
 
 loadNews(urls) {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
-	local ignore, url
+	local ignore, url, curWorkingDir
 
 	deleteFile(A_Temp . "\News.zip")
 
@@ -715,8 +715,19 @@ loadNews(urls) {
 
 			DirCreate(kTempDirectory . "News")
 
-			RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
+			; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
 
+			curWorkingDir := A_WorkingDir
+
+			try {
+				SetWorkingDir(kTempDirectory . "News")
+
+				RunWait("tar -xf `"" . A_Temp . "\News.zip`"", , "Hide")
+			}
+			finally {
+				SetWorkingDir(curWorkingDir)
+			}
+								
 			if FileExist(kTempDirectory . "News\News.htm")
 				return true
 		}

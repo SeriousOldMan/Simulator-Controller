@@ -12,6 +12,7 @@
 #Include "Constants.ahk"
 #Include "Variables.ahk"
 #Include "Debug.ahk"
+#Include "Utils.ahk"
 #Include "Strings.ahk"
 #Include "Localization.ahk"
 #Include "MultiMap.ahk"
@@ -2869,7 +2870,7 @@ withBlockedWindows(function, arguments*) {
 	local windows := []
 	local ignore, Hwnd, theWindow
 
-	for ignore, Hwnd in WinGetList("ahk_exe " . A_ScriptName) {
+	for ignore, Hwnd in listWindows("ahk_exe " . A_ScriptName) {
 		theWindow := GuiFromHwnd(Hwnd)
 
 		if (isObject(theWindow) && isInstance(theWindow, Window)) {

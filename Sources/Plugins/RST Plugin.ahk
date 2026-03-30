@@ -20,7 +20,7 @@ startRST() {
 			WinWait("ahk_pid " . pid)
 
 			if !WinActive("ahk_pid " . pid)
-				WinActivate("ahk_pid " . pid)
+				activateWindow("ahk_pid " . pid)
 
 			protectionOn()
 

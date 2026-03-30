@@ -152,7 +152,7 @@ activateSimulatorWindow(selectedSimulator) {
 	}
 
 	if !WinActive(window)
-		WinActivate %window%
+		activateWindow %window%
 
 	return true
 }

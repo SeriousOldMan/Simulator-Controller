@@ -32,6 +32,7 @@
 #Include "RSP Plugin.ahk"
 #Include "LMU Plugin.ahk"
 #Include "PMR Plugin.ahk"
+#Include "F125 Plugin.ahk"
 
 #Include "RST Plugin.ahk"
 

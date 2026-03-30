@@ -332,6 +332,82 @@ doApplications(applications, callback) {
 	}
 }
 
+sendKeyboardCommand(command, mode := "Event", delay := false) {
+	try {
+		switch mode, false {
+			case "Event":
+				SendEvent(command)
+			case "Input":
+				SendInput(command)
+			case "Play":
+				SendPlay(command)
+			case "Raw":
+				Send("{Raw}" . command)
+			default:
+				Send(command)
+		}
+	}
+	catch Any as exception {
+		logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
+	}
+
+	if delay
+		Sleep(delay)
+}
+
+detectRunningProcess(pid := false, winTitle := "", exePath := "") {
+	local curDetectHiddenWindows := A_DetectHiddenWindows
+	local processID := false
+
+	DetectHiddenWindows(true)
+
+	try {
+		if pid
+			processID := (((ProcessExist(pid) != 0) || WinExist("ahk_pid " . pid)) ? pid : 0)
+
+		if (!processID && (winTitle != ""))
+			if WinExist(winTitle)
+				processID := WinGetPID(winTitle)
+
+		if (!processID && (exePath != ""))
+			if WinExist("ahk_exe " . exePath)
+				processID := WinGetPID("ahk_exe " . exePath)
+	}
+	finally {
+		DetectHiddenWindows(curDetectHiddenWindows)
+	}
+
+	if !isNumber(processID)
+		processID := false
+
+	return processID
+}
+
+initializeUtils() {
+	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, detectProcess
+	global activateWindow, closeWindow, listWindows
+
+	sendCommand := sendKeyboardCommand
+	installKeyboardHook := InstallKeybdHook
+	setSendDelay := SetKeyDelay
+	setHotKey := Hotkey
+	detectProcess := detectRunningProcess
+	activateWindow := WinActivate
+	closeWindow := WinClose
+	listWindows := WinGetList
+
+	/*
+	sendCommand := (*) => false
+	installKeyboardHook := (*) => false
+	setSendDelay := (*) => false
+	setHotKey := (*) => false
+	detectProcess := (p, *) => p
+	activateWindow := (*) => false
+	closeWindow := (*) => false
+	listWindows := (*) => []
+	*/
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -625,3 +701,10 @@ testAssistants(configurator, assistants := kRaceAssistants, extended := false) {
 		}
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeUtils()

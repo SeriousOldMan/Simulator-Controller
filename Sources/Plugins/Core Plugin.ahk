@@ -28,7 +28,7 @@ startAITrack() {
 				WinMove(50, 50, , , windowTitle)
 
 				while !WinActive(windowTitle) {
-					WinActivate(windowTitle)
+					activateWindow(windowTitle)
 
 					Sleep(500)
 				}
@@ -75,7 +75,7 @@ startVoiceMacro() {
 
 				WinMaximize(windowTitle)
 
-				WinActivate(windowTitle)
+				activateWindow(windowTitle)
 
 				if !WinActive(windowTitle)
 					Sleep(1000)
@@ -83,7 +83,7 @@ startVoiceMacro() {
 				WinMove(50, 50, , , windowTitle)
 
 				while !WinActive(windowTitle) {
-					WinActivate(windowTitle)
+					activateWindow(windowTitle)
 
 					Sleep(500)
 				}

@@ -99,6 +99,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-11")
 				case "PMR":
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-12")
+				case "F125":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-13")
 				default:
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes")
 			}

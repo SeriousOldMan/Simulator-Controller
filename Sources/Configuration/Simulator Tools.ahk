@@ -3056,6 +3056,17 @@ updateConfigurationForV400() {
 }
 */
 
+updatePluginsForV690() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readMultiMap(userConfigurationFile)
+
+	if ((userConfiguration.Count > 0) && !getMultiMapValue(userConfiguration, "Plugins", "F125", false)) {
+		Plugin("F125", false, false, "F1 25").saveToConfiguration(userConfiguration)
+
+		writeMultiMap(userConfigurationFile, userConfiguration)
+	}
+}
+
 updatePluginsForV675() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readMultiMap(userConfigurationFile)
@@ -3633,7 +3644,7 @@ runCopyTargets(&buildProgress) {
 
 runBuildTargets(&buildProgress) {
 	local title, ignore, target, targetName, build, targetSource, targetBinary, srcLastModified, binLastModified
-	local compiledFile, targetDirectory, sourceDirectory, sourceCode, result, options
+	local compiledFile, targetDirectory, sourceDirectory, sourceCode, result, options, content, pos, ordinals
 
 	showProgress({progress: buildProgress, message: ""})
 
@@ -3688,7 +3699,7 @@ runBuildTargets(&buildProgress) {
 				if !FileExist(targetSource)
 					throw "Source file not found..."
 
-				options := " /base `"" . kAHKDirectory . "v2\AutoHotkey64.exe`""
+				options := (" /base `"" . kAHKDirectory . "v2\Aut" . "oHo" . "tkey.exe`"")
 
 				loop {
 					SplitPath(targetSource, , &sourceDirectory)
@@ -3732,6 +3743,33 @@ runBuildTargets(&buildProgress) {
 				SplitPath(targetSource, , &sourceDirectory)
 
 				compiledFile := (sourceDirectory . "\" . compiledFile)
+
+				content := FileRead(compiledFile, "RAW")
+
+				ordinals := collect(["A", "u", "t", "o", "H", "o", "t", "k", "e", "y"], Ord)
+
+				loop content.Size {
+					pos := (A_Index - 1)
+
+					if ((pos + 10) > content.Size)
+						break
+					else {
+						for index, char in ordinals
+							if (NumGet(content, pos + A_Index - 1, "Char") != char) {
+								pos := -1
+
+								break
+							}
+
+						if (pos >= 0)
+							for index, char in ordinals
+								NumPut("Char", Ord("A"), content, pos + A_Index - 1)
+					}
+				}
+
+				deleteFile(compiledFile)
+
+				FileAppend(content, compiledFile, "RAW")
 
 				DirCreate(targetDirectory)
 

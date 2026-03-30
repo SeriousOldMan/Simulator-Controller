@@ -42,6 +42,7 @@
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Configuration\Libraries\SettingsEditor.ahk"
 #Include "..\Configuration\Libraries\TeamManagementPanel.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -430,15 +431,20 @@ class SimulatorStartup extends ConfigurationItem {
 			messageSend(kFileMessage, "Startup", "startupSimulator:" . simulator, this.ControllerPID)
 	}
 
-	startup() {
+	startup(remote := false) {
 		local startSimulator, runningIndex, hidden, hasSplashScreen, simulator
 
 		playSong(songFile) {
-			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
+			if (!remote && songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 				messageSend(kFileMessage, "Startup", "playStartupSong:" . songFile, SimulatorStartup.Instance.ControllerPID)
 		}
 
 		if this.prepareConfiguration() {
+			deleteFile(kUserConfigDirectory . "Simulator.remote")
+
+			if remote
+				FileAppend(remote, kUserConfigDirectory . "Simulator.remote")
+
 			this.iControllerPID := this.startSimulatorController(&simulator)
 
 			startSimulator := ((simulator != false) || GetKeyState("MButton"))
@@ -487,7 +493,8 @@ class SimulatorStartup extends ConfigurationItem {
 					hidden := true
 				}
 
-				this.startSimulator(simulator)
+				if !remote
+					this.startSimulator(simulator)
 			}
 
 			if !kSilentMode
@@ -911,7 +918,8 @@ launchPad(command := false, arguments*) {
 		global gStartupProfile
 
 		local x, y, w, h, mX, mY
-		local curCoordMode, clickStart, profiles, profilesMenu, ignore, profile, result, startupProfile
+		local curCoordMode, clickStart, profiles, profilesMenu, startMenu
+		local ignore, profile, provider, result, startupProfile, hasSimulator
 
 		if !configure
 			configure := GetKeyState("Ctrl")
@@ -988,6 +996,43 @@ launchPad(command := false, arguments*) {
 			}
 			else
 				startupButton.Text := ("Startup`n" . getStartupProfile())
+		}
+		else if GetKeyState("Alt") {
+			startMenu := Menu()
+
+			startMenu.Add(translate("Remote"), (*) => {})
+			startMenu.Disable(translate("Remote"))
+			startMenu.Add()
+
+			simulators := string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+
+			hasSimulator := false
+
+			for ignore, provider in SimulatorProvider.SimulatorProviders
+				if inList(simulators, provider.Simulator) {
+					protocols := SimulatorProvider.getProtocols(provider.Simulator)
+
+					if (protocols.HasProp("Connector") && (protocols.Connector.Protocol = "UDP")) {
+						startMenu.Add(provider.Simulator, (simulator, *) => result := simulator)
+
+						hasSimulator := true
+					}
+				}
+
+			if hasSimulator
+				startMenu.Add()
+
+			startMenu.Add(translate("Cancel"), (*) => result := false)
+
+			result := kUndefined
+
+			startMenu.Show( , , true)
+
+			if (result = kUndefined)
+				result := false
+
+			if result
+				launchPad("Startup", result)
 		}
 		else
 			launchPad("Startup")
@@ -1283,7 +1328,7 @@ launchPad(command := false, arguments*) {
 
 		if ProcessExist(theApplication) {
 			try
-				WinActivate("ahk_exe " . theApplication)
+				activateWindow("ahk_exe " . theApplication)
 		}
 		else {
 			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1326,7 +1371,10 @@ launchPad(command := false, arguments*) {
 	else if (command = "Startup") {
 		SimulatorStartup.StayOpen := !closeCheckBox.Value
 
-		startupSimulator()
+		if (arguments.Length > 0)
+			startupSimulator(arguments[1])
+		else
+			startupSimulator()
 
 		if !SimulatorStartup.StayOpen
 			launchPad(kClose)
@@ -3311,7 +3359,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	}
 }
 
-startupSimulator() {
+startupSimulator(remote := false) {
 	local fileName
 
 	watchStartupSemaphore() {
@@ -3333,11 +3381,11 @@ startupSimulator() {
 		return false
 	}
 
-	Hotkey("Escape", cancelStartup, "On")
+	setHotkey("Escape", cancelStartup, "On")
 
 	SimulatorStartup.Instance := SimulatorStartup(kSimulatorConfiguration, readMultiMap(kSimulatorSettingsFile))
 
-	SimulatorStartup.Instance.startup()
+	SimulatorStartup.Instance.startup(remote)
 
 	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 	;
@@ -3445,7 +3493,7 @@ startSimulator() {
 		}
 	}
 
-	Hotkey("Escape", cancelStartup, "Off")
+	setHotkey("Escape", cancelStartup, "Off")
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
@@ -3551,7 +3599,7 @@ exitStartup(sayGoodBye := false) {
 		Task.startTask(exitStartup, 2000)
 	}
 	else {
-		Hotkey("Escape", cancelStartup, "Off")
+		setHotkey("Escape", cancelStartup, "Off")
 
 		if SimulatorStartup.Instance
 			SimulatorStartup.Instance.cancelStartup()
@@ -3562,6 +3610,16 @@ exitStartup(sayGoodBye := false) {
 			ExitApp(0)
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Plugin Include Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+if kLogStartup
+	logMessage(kLogOff, "Loading plugins...")
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

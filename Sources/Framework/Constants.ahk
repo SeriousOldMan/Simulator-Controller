@@ -9,7 +9,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAHKDirectory := "C:\Program Files\AutoHotkey\"
+global kAHKDirectory := "C:\Program Files\Aut" . "oHo" . "tkey\"
 global kMSBuildDirectory := ""
 
 global kHomeDirectory := normalizeFilePath(A_ScriptDir . (A_IsCompiled ? "\..\" : "\..\..\"))

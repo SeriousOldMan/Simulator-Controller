@@ -1278,7 +1278,7 @@ class TelemetryViewer {
 		local simulator, car, track
 
 		if this.TrackMap
-			WinActivate(this.TrackMap.Window)
+			activateWindow(this.TrackMap.Window)
 		else {
 			this.Manager.getSessionInformation(&simulator, &car, &track)
 
@@ -2022,7 +2022,7 @@ class SectionInfoViewer {
 
 	static bringToFront() {
 		if SectionInfoViewer.Instance
-			WinActivate(SectionInfoViewer.Instance.Window)
+			activateWindow(SectionInfoViewer.Instance.Window)
 	}
 
 	static showSectionInfo(section, referenceSection := false, open := true) {
@@ -2833,7 +2833,7 @@ class TrackMap {
 
 		this.iEditorTask.start()
 
-		HotKey("WheelUp", (*) {
+		setHotkey("WheelUp", (*) {
 			if WinActive(this.Window) {
 				this.Window["zoomEdit"].Value := Min(400, this.Window["zoomEdit"].Value + 10)
 
@@ -2841,7 +2841,7 @@ class TrackMap {
 			}
 		}, "On")
 
-		HotKey("WheelDown", (*) {
+		setHotkey("WheelDown", (*) {
 			if WinActive(this.Window) {
 				this.Window["zoomEdit"].Value := Max(100, this.Window["zoomEdit"].Value - 10)
 
@@ -2861,8 +2861,8 @@ class TrackMap {
 			this.iEditorTask := false
 		}
 
-		HotKey("WheelUp", "Off")
-		HotKey("WheelDown", "Off")
+		setHotkey("WheelUp", "Off")
+		setHotkey("WheelDown", "Off")
 
 		if this.TelemetryViewer
 			this.TelemetryViewer.closedTrackMap()

@@ -96,7 +96,7 @@ class ACCPitstopTester extends Plugin {
 				this.logMessage("ACC not running...")
 
 		if !WinActive(window)
-			WinActivate %window%
+			activateWindow %window%
 	}
 
 	sendPitstopCommand(command) {

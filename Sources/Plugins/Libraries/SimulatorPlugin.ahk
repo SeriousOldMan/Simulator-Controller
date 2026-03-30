@@ -541,7 +541,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			return false
 		}
 		else if !WinActive(window) {
-			WinActivate(window)
+			activateWindow(window)
 
 			return WinActive(window)
 		}
@@ -550,33 +550,20 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	sendCommand(command, delay?) {
-		try {
-			switch this.CommandMode, false {
-				case "Event":
-					SendEvent(command)
-				case "Input":
-					SendInput(command)
-				case "Play":
-					SendPlay(command)
-				case "Raw":
-					Send("{Raw}" . command)
-				default:
-					Send(command)
-			}
-		}
-		catch Any as exception {
-			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
-		}
-
 		if !isSet(delay)
 			delay := this.CommandDelay
 
-		if delay
-			Sleep(delay)
+		sendCommand(command, this.CommandMode, delay)
 	}
 
 	runningSimulator(active := false) {
-		if active
+		static remoteSimulator := (FileExist(kUserConfigDirectory . "Simulator.remote")
+									  ? FileRead(kUserConfigDirectory . "Simulator.remote")
+									  : false)
+
+		if (remoteSimulator && (remoteSimulator = this.Simulator[true]))
+			return remoteSimulator
+		else if active
 			return (this.Simulator.isRunning() ? this.Simulator[true] : false)
 		else
 			return (this.Simulator.isRunning() ? this.Simulator[true]

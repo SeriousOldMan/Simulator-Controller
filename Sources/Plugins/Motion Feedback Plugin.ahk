@@ -843,7 +843,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			windowTitle := this.Application.WindowTitle
 
 			WinWait(windowTitle, , 20)
-			WinActivate(windowTitle)
+			activateWindow(windowTitle)
 			WinMaximize(windowTitle)
 		}
 
@@ -1003,7 +1003,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			window := this.Application.WindowTitle
 
 			if !WinActive(window)
-				WinActivate(window)
+				activateWindow(window)
 
 			Sleep(100)
 		}
@@ -1219,7 +1219,7 @@ startSimFeedback(stayOpen := false) {
 		if !kSimFeedbackConnector
 			WinMaximize(windowTitle)
 		else
-			WinActivate(windowTitle)
+			activateWindow(windowTitle)
 
 		if !stayOpen
 			WinMinimize(windowTitle)

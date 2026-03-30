@@ -658,8 +658,8 @@ muteSimulator() {
 
 		mouseClicked(false)
 
-		Hotkey("Escape", mouseClicked)
-		Hotkey("~LButton", mouseClicked)
+		setHotkey("Escape", mouseClicked)
+		setHotkey("~LButton", mouseClicked)
 	}
 }
 
@@ -667,8 +667,8 @@ unmuteSimulator() {
 	local plugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
 
 	if (plugin.MouseClicked || GetKeyState("LButton") || GetKeyState("Escape")) {
-		Hotkey("~LButton", "Off")
-		Hotkey("Escape", "Off")
+		setHotkey("~LButton", "Off")
+		setHotkey("Escape", "Off")
 
 		SetTimer(unmuteSimulator, 0)
 
@@ -964,18 +964,7 @@ trigger(hotkeys, method := "Event") {
 	if (thePlugin && thePlugin.activateWindow())
 		for ignore, theHotkey in string2Values("|", hotkeys)
 			try {
-				switch method, false {
-					case "Event":
-						SendEvent(theHotkey)
-					case "Input":
-						SendInput(theHotkey)
-					case "Play":
-						SendPlay(theHotkey)
-					case "Raw":
-						Send("{Raw}" . theHotkey)
-					default:
-						Send(theHotkey)
-				}
+				sendCommand(theHotkey, method)
 			}
 			catch Any as exception {
 				logError(exception, true)
@@ -991,7 +980,7 @@ mouse(button, x, y, count := 1, window := false) {
 
 	try {
 		if (window && WinExist(window))
-			WinActivate(window)
+			activateWindow(window)
 
 		MouseClick(button, x, y, count)
 	}

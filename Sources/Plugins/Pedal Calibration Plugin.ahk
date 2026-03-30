@@ -117,12 +117,12 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					WinSetAlwaysOnTop(1, windowTitle)
 					WinMoveTop(, windowTitle)
 
-					WinActivate(windowTitle)
+					activateWindow(windowTitle)
 
 					if (!WinActive(windowTitle) && SimulatorController.Instance.ActiveSimulator) {
 						Send("!{Tab}")
 
-						WinActivate(windowTitle)
+						activateWindow(windowTitle)
 					}
 
 					if WinActive(windowTitle) {

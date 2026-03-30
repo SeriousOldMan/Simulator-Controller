@@ -145,6 +145,9 @@ class SetupWizard extends ConfiguratorPanel {
 	iDefinition := false
 	iKnowledgeBase := false
 
+	iSetupLevels := CaseInsenseMap()
+	iSetupLevel := "Basic"
+
 	iCount := 0
 
 	iSteps := CaseInsenseWeakMap()
@@ -330,6 +333,14 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 
 		Set {
+			local ignore, level
+
+			this.iSetupLevels := CaseInsenseMap()
+
+			if value
+				for ignore, level in string2Values(",", getMultiMapValue(value, "Setup", "Steps.Levels", ""))
+					this.iSetupLevels[level] := string2Values(",", getMultiMapValue(value, "Setup", "Steps." . level))
+
 			return (this.iDefinition := value)
 		}
 	}
@@ -394,6 +405,32 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
+	Level {
+		Get {
+			if this.KnowledgeBase
+				return this.KnowledgeBase.getValue("Level", "Basic")
+			else
+				try {
+					return this.Levels[1]
+				}
+				catch Any {
+					return false
+				}
+		}
+	}
+
+	Levels {
+		Get {
+			return getKeys(this.iSetupLevels)
+		}
+	}
+
+	LevelSteps[level] {
+		Get {
+			return (this.iSetupLevels.Has(level) ? this.iSetupLevels[level] : [])
+		}
+	}
+
 	Initialize {
 		Get {
 			return this.iInitialize
@@ -410,7 +447,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	__New(configuration, definition := false) {
-		this.iDefinition := definition
+		this.Definition := definition
 
 		super.__New(configuration)
 
@@ -592,6 +629,13 @@ class SetupWizard extends ConfiguratorPanel {
 			this.lastPage()
 		}
 
+		chooseLevel(*) {
+			local newLevel := first(this.Levels, (l) => translate(l) = wizardGui["modeDropDown"].Text)
+
+			if (newLevel && this.finishSetup(false))
+				this.Result := newLevel
+		}
+
 		chooseLanguage(*) {
 			local code, language
 
@@ -692,6 +736,14 @@ class SetupWizard extends ConfiguratorPanel {
 
 		languages := string2Values("|", getMultiMapValue(this.Definition, "Setup", "Languages"))
 
+		wizardGui.Add("Text", "x8 yp+34 w700 0x10 Y:Move W:Grow")
+
+		choices := this.Levels
+		chosen := inList(choices, this.Level)
+
+		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Mode"))
+		wizardGui.Add("DropDownList", "x105 y580 w75 Y:Move Choose" . chosen . " VmodeDropDown", collect(choices, translate)).OnEvent("Change", chooseLevel)
+
 		choices := []
 		chosen := false
 
@@ -703,15 +755,13 @@ class SetupWizard extends ConfiguratorPanel {
 					chosen := choices.Length
 			}
 
-		wizardGui.Add("Text", "x8 yp+34 w700 0x10 Y:Move W:Grow")
-
-		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
-		wizardGui.Add("DropDownList", "x105 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
-
 		wizardGui.Add("DropDownList", "x228 y580 w260 X:Move(0.5) Y:Move VstepDropDown").OnEvent("Change", gotoStep)
 
-		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
-		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
+		wizardGui.Add("Text", "x16 y604 w85 h23 Y:Move +0x200", translate("Language"))
+		wizardGui.Add("DropDownList", "x105 y604 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
+
+		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
+		wizardGui.Add("Button", "x620 y604 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
 
 		this.iHTMLResizer := SetupWizard.HTMLResizer(wizardGui)
 
@@ -828,7 +878,7 @@ class SetupWizard extends ConfiguratorPanel {
 		else {
 			posX := (Round((A_ScreenWidth - 720 - 400) / 2) + 750)
 
-			helpWindow.Show("x800 x" . posX . " yCenter h610")
+			helpWindow.Show("x800 x" . posX . " yCenter h634")
 		}
 
 		if getWindowSize("Simulator Setup.Help", &w, &h)
@@ -873,10 +923,15 @@ class SetupWizard extends ConfiguratorPanel {
 		hoverInfo := (*) => this.showInfo()
 
 		PeriodicTask(() {
-			if WinActive(wizardWindow)
-				OnMessage(0x0200, hoverInfo)
-			else
+			try {
+				if WinActive(this.WizardWindow)
+					OnMessage(0x0200, hoverInfo)
+				else
+					OnMessage(0x0200, hoverInfo, 0)
+			}
+			catch Any {
 				OnMessage(0x0200, hoverInfo, 0)
+			}
 		}, 1000, kLowPriority).start()
 	}
 
@@ -1298,6 +1353,12 @@ class SetupWizard extends ConfiguratorPanel {
 			this.Working := true
 
 			try {
+				if (GetKeyState("Ctrl") && (this.Level != "Extended")) {
+					this.KnowledgeBase.setFact("Level", "Extended")
+
+					this.updateState()
+				}
+
 				step := false
 				page := false
 
@@ -1320,6 +1381,12 @@ class SetupWizard extends ConfiguratorPanel {
 			this.Working := true
 
 			try {
+				if (GetKeyState("Ctrl") && (this.Level != "Extended")) {
+					this.KnowledgeBase.setFact("Level", "Extended")
+
+					this.updateState()
+				}
+
 				step := false
 				page := false
 
@@ -1367,6 +1434,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
+
+		this.Control["modeDropDown"].Delete()
+		this.Control["modeDropDown"].Add(collect(this.Levels, translate))
+		this.Control["modeDropDown"].Choose(inList(this.Levels, this.Level))
 
 		loop this.Count
 			if this.Steps.Has(A_Index) {
@@ -1709,6 +1780,10 @@ class SetupWizard extends ConfiguratorPanel {
 		; return (this.isModuleSelected("Voice Control") && (this.loadPresets().Length = 0))
 
 		return this.isModuleSelected("Voice Control")
+	}
+
+	isStepAvailable(step) {
+		return inList(this.LevelSteps[this.Level], step)
 	}
 
 	installSoftware() {
@@ -2519,7 +2594,7 @@ class StepWizard extends ConfiguratorPanel {
 
 	Active {
 		Get {
-			return (this.Pages > 0)
+			return ((this.Pages > 0) && (this.SetupWizard.isStepAvailable(this.Step)))
 		}
 	}
 
@@ -3202,6 +3277,7 @@ initializeSimulatorSetup() {
 
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
+	local newLevel := false
 
 	try {
 		loop {
@@ -3211,6 +3287,12 @@ startupSimulatorSetup() {
 
 			if wizard.Debug[kDebugRules]
 				wizard.dumpRules(wizard.KnowledgeBase)
+
+			if newLevel {
+				wizard.KnowledgeBase.setFact("Level", newLevel)
+
+				newLevel := false
+			}
 
 			wizard.createGui(wizard.Configuration)
 
@@ -3241,13 +3323,30 @@ startupSimulatorSetup() {
 
 					Sleep(200)
 				}
-				until (wizard.Result == kLanguage)
+				until wizard.Result
 			}
 			finally {
 				wizard.hide()
 			}
 
 			if (wizard.Result == kLanguage) {
+				wizard.Result := false
+
+				wizard.close()
+				wizard.reset(false)
+
+				setMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
+
+				wizard.ProgressCount := 0
+
+				if !isDebug()
+					showSplashScreen("Logo")
+
+				showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
+			}
+			else if inList(wizard.Levels, wizard.Result) {
+				newLevel := wizard.Result
+
 				wizard.Result := false
 
 				wizard.close()

@@ -3284,7 +3284,9 @@ class RaceAssistant extends ConfigurationItem {
 				if (this.AvgFuelConsumption > 0)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
-				settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+				settingsDB.setSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount"
+										 , Max(Round(knowledgeBase.getValue("Session.Settings.Fuel.Max"))
+											 , settingsDB.getSettingValue(simulator, car, track, "*", "*", "Session Settings", "Fuel.Amount", 0)))
 
 				if (lapTime > 10)
 					settingsDB.setSettingValue(simulator, car, track, "*", weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))

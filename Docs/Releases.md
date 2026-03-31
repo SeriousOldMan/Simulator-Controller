@@ -43,6 +43,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - "Simulator Setup" now supports different configuration modes to hide more complex and seldomly used stuff from new users. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) for more information.
   - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) has been introduced that allows you to change the new configuration mode to *Extended* in "Simulator Setup", when switching between pages.
   - [Expert] Handling of ZIP archives can now now be configured to either use the *PowerShell* or the Windows builtin *tar* command. *Tar*, which is now the default method, is much faster and reliable, but cannot handle directories which contain symbolic links. If you have moved your user *Documents* folder to a different drive, you need to change the *Expander* method in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings).
+	  
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) for instructions how configure the new handling of ZIP archives.
 
 # Release history
 

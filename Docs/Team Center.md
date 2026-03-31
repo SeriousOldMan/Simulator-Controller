@@ -318,7 +318,7 @@ Lastly a note about brake changes: You have to decide on your own, when to chang
 
 #### Automatically select the next driver
 
-The automatic selection of the next driver is supported for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* (in the future), as long as the following apply:
+The automatic selection of the next driver is supported for *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*, as long as the following apply:
 
   1. A stint plan is available and is up to date, at least for the driver of the current and the driver for the next stint.
   2. You selected the participating drivers from all available drivers of your team and ordered them according to the entry list of the event using "Select Team..." command in the "Session" or in the "Pitstop" menu. Once you have done this, you can choose the next driver when planning a pitstop using the correspnding drop down menu.
@@ -345,7 +345,7 @@ This floating window, which can be left open all the time, will be updated once 
 
 2. *rFactor 2* and *Le Mans Ultimate*
 
-   Refuel amount, the chosen tyre compound(s) and pressures, as well as the repair settings are exact.
+   Refuel amount, the chosen tyre compound(s) and pressures, as well as the repair settings and the selected next driver are exact.
 
 3. *iRacing*
 

@@ -239,7 +239,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 	prepareConfiguration() {
 		local noConfiguration := (this.Configuration.Count == 0)
-		local editConfig := GetKeyState("Alt")
+		local editConfig := false ; GetKeyState("Alt")
 		local settings := this.Settings
 		local result
 
@@ -714,9 +714,9 @@ loadNews(urls) {
 			}
 
 			DirCreate(kTempDirectory . "News")
-					
+
 			expand(A_Temp . "\News.zip", kTempDirectory . "News")
-								
+
 			if FileExist(kTempDirectory . "News\News.htm")
 				return true
 		}

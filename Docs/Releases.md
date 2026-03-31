@@ -36,12 +36,14 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed a bug in the handling of the voice drop down in "Simulator Setup". This bug caused the menu to jump back to "Random", if only one voice was available for the selected speech synthesizer method.
   - Fixed some internal problems related to extracting ZIP archives, which could lead to failure of downloading the community database. Side effect: Big performance improvements in some areas. See also the changes section below.
   - Fixed a bug in tyre wear calculation after a pitstop where not all tyres had been changed.
+  - Fixed a bug in "Solo Center" which prevented the list of used tyre sets to be updated when saved sessions are being loaded from a file.
   
 #### Changes
 
   - Initial support for EA F1 25 has been added with this release. Please note, that it is currently required to run Simulator Controller on a separate PC, because the EA AntiCheat software "Javelin" flags Simulator Controller as cheating software. Beside that, the current state of implementation is to be considered *Alpha* and requires a manual configuration. In case, you want to try the F1 support in its current stage of development, contact me on our Discord.
   - "Simulator Setup" now supports different configuration modes to hide more complex and seldomly used stuff from new users. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool) for more information.
   - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) has been introduced that allows you to change the new configuration mode to *Extended* in "Simulator Setup", when switching between pages.
+  - Rearranged the documentation for all [keyboard modifiers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers) for better structure and readability.
   - [Expert] Handling of ZIP archives can now now be configured to either use the *PowerShell* or the Windows builtin *tar* command. *Tar*, which is now the default method, is much faster and reliable, but cannot handle directories which contain symbolic links. If you have moved your user *Documents* folder to a different drive, you need to change the *Expander* method in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings).
 	  
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) for instructions how configure the new handling of ZIP archives.

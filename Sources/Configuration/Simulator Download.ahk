@@ -190,10 +190,10 @@ downloadSimulatorController() {
 					showProgress({message: translate("Extracting installation files...")})
 
 					deleteDirectory(kTempDirectory . "SC-Install")
-					
+
 					DirCreate(kTempDirectory . "SC-Install")
-					
-					expand(kTempDirectory . "InstallPackage.zip", kTempDirectory . "SC-Install)
+
+					expand(kTempDirectory . "InstallPackage.zip", kTempDirectory . "SC-Install")
 
 					exitOthers()
 

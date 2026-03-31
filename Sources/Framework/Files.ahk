@@ -194,7 +194,7 @@ compress(directory, pattern, archive) {
 
 	static method := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 									, "Archive", "Compressor", "Tar")
-msgbox 1
+
 	directory := normalizeDirectoryPath(directory)
 
 	if (method = "PowerShell") {

@@ -547,7 +547,7 @@ class ProgramPreset extends NamedPreset {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local currentDirectory := A_WorkingDir
 		local counter :=  0
-		local updateTask, ignore, url, found, curWorkingDir
+		local updateTask, ignore, url, found
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -583,19 +583,8 @@ class ProgramPreset extends NamedPreset {
 						DirCreate(kProgramsDirectory . this.Program)
 
 						showProgress({color: "Green", message: translate("Extracting...")})
-
-						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\" . this.Program . ".zip' -DestinationPath '" . kProgramsDirectory . this.Program . "' -Force", , "Hide")
-						
-						curWorkingDir := A_WorkingDir
-
-						try {
-							SetWorkingDir(kProgramsDirectory . this.Program)
-
-							RunWait("tar -xf `"" . A_Temp . "\" . this.Program . ".zip`"", , "Hide")
-						}
-						finally {
-							SetWorkingDir(curWorkingDir)
-						}
+					
+						expand(A_Temp . "\" . this.Program . ".zip", kProgramsDirectory . this.Program)
 
 						if !FileExist(kProgramsDirectory . this.Program . "")
 							throw "Archive does not contain a valid download package..."
@@ -977,7 +966,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 	loadDefinition(url) {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
-		local updateTask, ignore, found, curWorkingDir
+		local updateTask, ignore, found
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -1009,19 +998,8 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 						DirCreate(A_Temp . "\Simulator Controller DLC")
 
 						showProgress({color: "Green", message: translate("Extracting...")})
-
-						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
-						
-						curWorkingDir := A_WorkingDir
-
-						try {
-							SetWorkingDir(A_Temp . "\Simulator Controller DLC")
-
-							RunWait("tar -xf `"" . A_Temp . "\Simulator Controller DLC.zip`"", , "Hide")
-						}
-						finally {
-							SetWorkingDir(curWorkingDir)
-						}
+					
+						expand(A_Temp . "\Simulator Controller DLC.zip", A_Temp . "\Simulator Controller DLC")
 
 						if !FileExist(A_Temp . "\Simulator Controller DLC\*.*")
 							throw "Archive does not contain a valid download package..."
@@ -1192,7 +1170,7 @@ class SplashMedia extends DownloadablePreset {
 	loadMedia() {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local counter :=  0
-		local updateTask, ignore, url, found, curWorkingDir
+		local updateTask, ignore, url, found
 
 		updateProgress() {
 			counter := Min(counter + 1, 100)
@@ -1223,19 +1201,8 @@ class SplashMedia extends DownloadablePreset {
 					DirCreate(A_Temp . "\Simulator Controller DLC")
 
 					showProgress({color: "Green", message: translate("Extracting...")})
-
-					; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\Simulator Controller DLC.zip' -DestinationPath '" . A_Temp . "\Simulator Controller DLC' -Force", , "Hide")
 					
-					curWorkingDir := A_WorkingDir
-
-					try {
-						SetWorkingDir(A_Temp . "\Simulator Controller DLC")
-
-						RunWait("tar -xf `"" . A_Temp . "\Simulator Controller DLC.zip`"", , "Hide")
-					}
-					finally {
-						SetWorkingDir(curWorkingDir)
-					}
+					expand(A_Temp . "\Simulator Controller DLC.zip", A_Temp . "\Simulator Controller DLC")
 
 					if FileExist(A_Temp . "\Simulator Controller DLC\*.*") {
 						found := true

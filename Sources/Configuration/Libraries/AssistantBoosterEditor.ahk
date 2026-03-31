@@ -1967,7 +1967,7 @@ class CallbacksEditor {
 
 		importCallback(fileName) {
 			local name, newName, generation, duplicate, definition
-			local ignore, type, callback, descriptor, parameter, parameters, theCallback, curWorkingDir
+			local ignore, type, callback, descriptor, parameter, parameters, theCallback
 
 			deleteDirectory(directory)
 
@@ -1977,19 +1977,8 @@ class CallbacksEditor {
 				SplitPath(fileName, , , , &name)
 
 				FileCopy(fileName, kTempDirectory . name . ".zip", 1)
-
-				; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . name . ".zip" . "' -DestinationPath '" . directory . "' -Force", , "Hide")
-
-				curWorkingDir := A_WorkingDir
-
-				try {
-					SetWorkingDir(directory)
-
-					RunWait("tar -xf `"" . kTempDirectory . name . ".zip`"", , "Hide")
-				}
-				finally {
-					SetWorkingDir(curWorkingDir)
-				}
+										
+				expand(kTempDirectory . name . ".zip", directory)
 
 				loop Files, directory . "\*" . extension {
 					SplitPath(A_LoopFileFullPath, , , , &name)
@@ -2100,7 +2089,7 @@ class CallbacksEditor {
 		local type := (InStr(this.Type, "Events") ? "Event" : "Action")
 		local callback := this.SelectedCallback
 		local definition := newMultiMap()
-		local index, parameter, fileName, newFileName, targetDirectory, currentDir
+		local index, parameter, fileName, newFileName, targetDirectory
 
 		if !this.saveCallback(callback)
 			return
@@ -2166,18 +2155,7 @@ class CallbacksEditor {
 
 					SplitPath(fileName, , &targetDirectory, , &name)
 
-					currentDir := A_WorkingDir
-
-					SetWorkingDir(directory)
-
-					try {
-						; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*.*' -CompressionLevel Optimal -DestinationPath '" . targetDirectory . "\" . name . ".zip'", , "Hide")
-
-						RunWait("tar -a -c -f `"" . targetDirectory . "\" . name . ".zip`" *.*", , "Hide")
-					}
-					finally {
-						SetWorkingDir(currentDir)
-					}
+					compress(directory, "*.*", targetDirectory . "\" . name . ".zip")
 
 					FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
 				})

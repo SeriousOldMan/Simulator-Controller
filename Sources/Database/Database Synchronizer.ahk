@@ -64,7 +64,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local step := 20
 	local simulator, car, track, distFile
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files, info, newInfo, sType, curWorkingDir
+	local name, extension, files, info, newInfo, sType
 
 	updateState() {
 		if (++step > 20) {
@@ -339,22 +339,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 				}
 			}
 		}
-
-		curWorkingDir := A_WorkingDir
-
-		SetWorkingDir(kTempDirectory . "Shared Database")
-
-		try {
-			; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . kTempDirectory . "Shared Database\Community' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . "Shared Database\Database." . id . ".zip'", , "Hide")
-
-			RunWait("tar -a -c -f Database." . id . ".zip Community", , "Hide")
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-		finally {
-			SetWorkingDir(curWorkingDir)
-		}
+		
+		compress(kTempDirectory . "Shared Database", "Community", kTempDirectory . "Shared Database\Database." . id . ".zip")
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
 
@@ -386,7 +372,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local configuration := newMultiMap()
-	local ignore, fileName, type, databaseDirectory, curWorkingDir
+	local ignore, fileName, type, databaseDirectory
 
 	if FileExist(downloadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
@@ -430,20 +416,9 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 					updateState()
 
 					try {
-						; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . "' -DestinationPath '" . kTempDirectory . "Shared Database' -Force", , "Hide")
-						
 						DirCreate(kTempDirectory . "Shared Database")
 
-						curWorkingDir := A_WorkingDir
-
-						try {
-							SetWorkingDir(kTempDirectory . "Shared Database")
-
-							RunWait("tar -xf `"" . kTempDirectory . fileName . "`"", , "Hide")
-						}
-						finally {
-							SetWorkingDir(curWorkingDir)
-						}
+						expand(kTempDirectory . fileName, kTempDirectory . "Shared Database")
 					}
 					catch Any as exception {
 						logError(exception)

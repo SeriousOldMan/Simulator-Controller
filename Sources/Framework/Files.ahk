@@ -188,3 +188,55 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 		return result
 	}
 }
+
+compress(directory, pattern, archive) {
+	local curWorkingDir
+
+	static method := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									, "Archive", "Compressor", "Tar")
+msgbox 1
+	directory := normalizeDirectoryPath(directory)
+
+	if (method = "PowerShell") {
+		if (pattern = "*.*")
+			pattern := "*"
+
+		RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\" . pattern . "' -CompressionLevel Optimal -DestinationPath '" . archive . "'", , "Hide")
+	}
+	else {
+		curWorkingDir := A_WorkingDir
+
+		SetWorkingDir(directory)
+
+		try {
+			RunWait("tar -a -c -f `"" . archive . "`" *.*", , "Hide")
+		}
+		finally {
+			SetWorkingDir(curWorkingDir)
+		}
+	}
+}
+
+expand(archive, directory) {
+	local curWorkingDir
+
+	static method := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+									, "Archive", "Expander", "Tar")
+
+	directory := normalizeDirectoryPath(directory)
+
+	if (method = "PowerShell")
+		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . archive . "' -DestinationPath '" . directory . "' -Force", , "Hide")
+	else {
+		curWorkingDir := A_WorkingDir
+
+		SetWorkingDir(directory)
+
+		try {
+			RunWait("tar -xf `"" . archive . "`"", , "Hide")
+		}
+		finally {
+			SetWorkingDir(curWorkingDir)
+		}
+	}
+}

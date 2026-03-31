@@ -1475,7 +1475,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		importData(*) {
-			local folder, info, selection, fileName, curWorkingDir
+			local folder, info, selection, fileName
 
 			editorGui.Opt("+OwnDialogs")
 
@@ -1492,19 +1492,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							DirCreate(folder)
 								
 							FileCopy(fileName, fileName . ".zip", 1)
-
-							; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-							curWorkingDir := A_WorkingDir
-
-							try {
-								SetWorkingDir(folder)
-
-								RunWait("tar -xf `"" . fileName . ".zip`"", , "Hide")
-							}
-							finally {
-								SetWorkingDir(curWorkingDir)
-							}
+							
+							expand(fileName . ".zip", folder)
 						
 							deleteFile(fileName . ".zip")
 						}
@@ -1570,7 +1559,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		importSettings(*) {
-			local folder, info, selection, fileName, curWorkingDir
+			local folder, info, selection, fileName
 
 			editorGui.Opt("+OwnDialogs")
 
@@ -1587,19 +1576,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							DirCreate(folder)
 
 							FileCopy(fileName, fileName . ".zip", 1)
-
-							; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
 							
-							curWorkingDir := A_WorkingDir
-
-							try {
-								SetWorkingDir(folder)
-
-								RunWait("tar -xf `"" . fileName . ".zip`"", , "Hide")
-							}
-							finally {
-								SetWorkingDir(curWorkingDir)
-							}
+							expand(fileName . ".zip", folder)
 						}
 						catch Any {
 							folder := ""
@@ -3462,7 +3440,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local directory := temporaryFileName("Settings", "export")
 		local progress := 0
 		local count := 0
-		local overall, simulator, ignore, car, track, mode, weather, section, key, value, currentDir
+		local overall, simulator, ignore, car, track, mode, weather, section, key, value
 
 		DirCreate(directory)
 
@@ -3537,19 +3515,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			writeMultiMap(directory . "\Export.info", info)
 
 			writeMultiMap(directory . "\Export.settings", settings)
-
-			currentDir := A_WorkingDir
-
-			SetWorkingDir(directory)
-
-			try {
-				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . fileName . ".zip'", , "Hide")
-
-				RunWait("tar -a -c -f `"" . fileName . ".zip" . "`" *.*", , "Hide")
-			}
-			finally {
-				SetWorkingDir(currentDir)
-			}
+			
+			compress(directory, "*.*", fileName . ".zip")
 
 			FileMove(fileName . ".zip", fileName, 1)
 		}
@@ -4794,7 +4761,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
-		local ext, folder, currentDir
+		local ext, folder
 
 		DirCreate(directory)
 
@@ -4978,19 +4945,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				setMultiMapValue(info, "Schema", schema, values2String(",", fields*))
 
 			writeMultiMap(directory . "\Export.info", info)
-
-			currentDir := A_WorkingDir
-
-			SetWorkingDir(directory)
-
-			try {
-				; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . targetFileName . ".zip'", , "Hide")
-
-				RunWait("tar -a -c -f `"" . targetFileName . ".zip" . "`" *.*", , "Hide")
-			}
-			finally {
-				SetWorkingDir(currentDir)
-			}
+			
+			compress(directory, "*.*", targetFileName . ".zip")
 
 			FileMove(targetFileName . ".zip", targetFileName, 1)
 		}
@@ -8916,7 +8872,7 @@ startupSessionDatabase() {
 	local requestorPID := false
 	local import := false
 	local index := 1
-	local editor, selection, info, folder, fileName, curWorkingDir
+	local editor, selection, info, folder, fileName
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Session Database"
@@ -8977,19 +8933,8 @@ startupSessionDatabase() {
 
 				SplitPath(import, &fileName)
 				FileCopy(import, kTempDirectory . fileName . ".zip", 1)
-
-				; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . fileName . ".zip" . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-				curWorkingDir := A_WorkingDir
-
-				try {
-					SetWorkingDir(folder)
-
-					RunWait("tar -xf `"" . kTempDirectory . fileName . ".zip`"", , "Hide")
-				}
-				finally {
-					SetWorkingDir(curWorkingDir)
-				}
+				
+				expand(kTempDirectory . fileName . ".zip", folder)
 							
 				import := (folder . "\")
 			}

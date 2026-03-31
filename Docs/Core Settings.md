@@ -97,6 +97,15 @@ Some applications of Simulator Controller uses an integrated HTML renderer to di
 | HTML          | Viewer.\*      | IE11    | Many application uses and embedded HTML viewer to show graphs or other content. Actually there are two HTML engines available - *IE11*, which is based on the old Internet Explorer, which is out of support by Micorsoft and the new *WebView2* engine, which is based on Chromium engine. Since the later uses quite some resources, *IE11* is the default as long as it is available in Windows. Beside specifying the engine for all applications using the "Viewer.\*" setting, individual applications can be configured by appending the application name. Example: "Viewer.Setup Workbench"<br><br>Note: The setting "Viewer" is still supported and equal to "Viewer.\*", but deprecated. |
 |               | Charts         | Online  | The value, which must be one of *Online* or *Offline*, specifies how the Google Charts library is loaded. *Offline* will only work, if the HTML Viewer is set to *WebView*, and is ignored for *IE11*. Do **not** change this setting unless told so by the development team. |
 
+### Archive Settings
+
+Using these settings, you can control how ZIP archives will be compressed and expanded.
+
+| Category      | Setting        | Default | Description |
+|---------------|----------------|---------|-------------|
+| Archive       | Compressor     | Tar     | Supported values are *PowerShell* and *Tar*. Specifies which Windows command will be used to create ZIP archives. *Tar* is much faster, but depending on Windows security settings, *PowerShell* may be used as well. |
+|               | Expander       | Tar     | Supported values are also *PowerShell* and *Tar*. Specifies which Windows command will be used to extract ZIP archives. *Tar* is much faster, but it cannot handle archives with symbolic links in it. Therefore, if you have moved your user *Documents* folder to a different drive, *Powershell* must be used instead. |
+
 ### Miscellaneous Settings
 
 And finally a couple of other settings which configure low level components of Simulator Controller:

@@ -193,22 +193,11 @@ startupProcessManager() {
 
 		Task.startTask(() {
 			local processed := []
-			local ignore, directory, currentDir
+			local ignore, directory
 
 			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
 				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") < A_Now) {			
-					currentDir := A_WorkingDir
-
-					SetWorkingDir(A_LoopFileFullPath)
-					
-					try {
-						; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . A_LoopFileFullPath . "\*' -CompressionLevel Optimal -DestinationPath '" . kTempDirectory . A_LoopFileName . ".zip'", , "Hide")
-				
-						RunWait("tar -a -c -f `"" . kTempDirectory . A_LoopFileName . ".zip`" *.*", , "Hide")
-					}
-					finally {
-						SetWorkingDir(currentDir)
-					}
+					compress(A_LoopFileFullPath, "*.*", kTempDirectory . A_LoopFileName . ".zip")
 
 					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
 						deleteFile(kTempDirectory . A_LoopFileName . ".zip")

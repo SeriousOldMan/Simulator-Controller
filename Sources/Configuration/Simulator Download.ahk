@@ -56,7 +56,7 @@ downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
 	local error := false
 	local options, index, cState, devVersion, release, version, package, updateTask
-	local directory, currentDirectory, ignore, url, urls, curWorkingDir
+	local directory, currentDirectory, ignore, url, urls
 
 	exitOthers() {
 		loop 20
@@ -192,19 +192,8 @@ downloadSimulatorController() {
 					deleteDirectory(kTempDirectory . "SC-Install")
 					
 					DirCreate(kTempDirectory . "SC-Install")
-
-					; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . kTempDirectory . "InstallPackage.zip' -DestinationPath '" . kTempDirectory . "SC-Install' -Force", , "Hide")
 					
-					curWorkingDir := A_WorkingDir
-
-					try {
-						SetWorkingDir(kTempDirectory . "SC-Install")
-
-						RunWait("tar -xf `"" . kTempDirectory . "InstallPackage.zip`"", , "Hide")
-					}
-					finally {
-						SetWorkingDir(curWorkingDir)
-					}
+					expand(kTempDirectory . "InstallPackage.zip", kTempDirectory . "SC-Install)
 
 					exitOthers()
 

@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 6.9.0
 
-Nothing to do.
+Depending on your PC drive architecture, you may have to chosse a different method for handling ZIP files in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings), especially, if you have moved your user *Documents* folder to a different drive.
 
 ## Release 6.8.9
 

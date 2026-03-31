@@ -1,78 +1,139 @@
 Many applications of Simulator Controller provide a couple of modifier keys for several functions. Find a list of all those modifiers and their functionalities below. Many modifier keys are also mentioned in the respective documentation, but here you have a complete overview.
 
-| Application   | Function | Modifier | Description |
-|---------------|----------|----------|-------------|
-| Applications | Exiting an application from the tray menu | Control | When Control is held down, the application will exit, even if it is still working on some background tasks. |
-| Solo Center | Loading a Session    | Control  | If you hold down the Control key while selecting the "Load Session..." command in the "Session" menu, you can load sessions stored in the old data format, which has been used, before sessions where stored in the session database by default. |
-| | Displaying reports    | Control  | Reports are normally displayed in the *Output* view in the lower right corner of the main window. Holding down the Control key will open them in a separate window. |
-| | Enabling / Disabling telemetry    | Control  | When the Control key is held down while choosing the "Telemetry..." command is chosen from the "Session" menu, telemetry collection is enabled or disabled regardless whether the Telemetry Viewer window is open or not. |
-| | Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
-| | Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or by 50 meters, if Control and Shift keys are held down. |
-| Race Assistants | Finishing a session | Control + Shift | Normally, the Race Assistants will wait for a specific cooldown time, before they startup again. While in training sessions against AI racers, you can skip this cooldown period with holding the Control together with the Shift key in the moment, when the Assistants detect a session change. But be aware, that all post-processing, like saving telemetry data or creating a race report will be skipped as well. |
-| Team Center   | Startup    | Control  | If the Control key is pressed when starting the "Team Center", it will start with session synchronzation disabled. Only the basic data (stint plan, strategy, driver selection, tyre setups and so on) is loaded, but no session data like stints, laps, telemetry information, etc. |
-| | Startup    | Alt  | The "Team Center" comes in two flavours with regards to the user interface. Holding down the Alt key while starting "Team Center" will start the Lite version with a very much simplified user interface. |
-| | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to connect to a team session. |
-| | Loading a Session    | Control  | If you hold down the Control key while selecting the "Load Session..." command in the "Session" menu, you can load sessions stored in the old data format, which has been used, before sessions where stored in the session database by default. |
-| | Load current Race Strategy    | Control  | If you hold down the Control key while selecting the "Load current Race Strategy" option in the "Strategy" menu, the "Team Center" will first try to load the strategy, which has beend released for the session before loading the currentl locally saved Race Strategy. |
-| | Loading a Strategy    | Control  | If you hold down the Control key while selecting the "Load Strategy..." command in the "Strategy" menu, you can load strategies stored anywhere on your PC. A file dialog will open up. |
-| | Displaying reports    | Control  | Reports are normally displayed in the *Output* view in the lower right corner of the main window. Holding down the Control key will open them in a separate window. |
-| | Synchronize    | Control  | If you hold down the Control key while selecting the "Synchronize..." option in the "Session" menu, you can select the number of seconds to wait between each refresh of the data collected by the Team Center. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically. |
-| | Choosing pitstop tyre compound | Control | When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well. |
-| | Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
-| | Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or if the Shift key is held down additionally, by 50 meters. |
-| Race Settings | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to configure to a team session. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically. |
-| | Choosing setup compound | Control | When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well. |
-| Session Database | Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session in the settings dialog, a login dialog pops up and you can use the team manager account name and password instead of a token to the chosen Team Server. |
-| | Openening data category documentation | Control | If you hold down the Control key when clicking on a specific data category, for example "Sessions", will open the documentation for this category. |
-| | Data scope selection | Control | Normally, the choice of the "Available Data" drop down menu only affects the data shownn in the session database and all other applications, for example the Race Assistants will use only your personal data. If you hold down the Control key, while changing the selection, you will be asked, whether the change should be reflected for all applications. |
-| | Exporting race settings | Control | Holding down the Control key down when clicking the "Export..." button will export **all** settings, independent of what is currently selected. |
-| | Editing track sections | Control | When editing track section in the track map of the Telemetry Viewer, holding down the Control key when closing the editor will revert all changes. |
-| | Managing track automations | Control | Clicking on an automations point with the Control key down will delete this automation point. |
-| Setup Workbench | Loading problems and issues | Control | Holding down the Control key while loading problem descriptions from a file, will **not** clear the current issue list but will add to it instead. |
-| | Starting and Exiting | Control | Holding down the Control when exiting will save the current issue list to a temporary file and holding down the Control key when starting "Setup Workbench" will load those saved issues, so that you can continue your work. |
-| | Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
-| | Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or if the Shift key is held down additionally, by 50 meters. |
-| Simulator Configuration | Termination of other applications | Control | The tool asks to terminate all other running applications, before working on the configuration. If you hold down the Control key, when clicking on the "Continue" button, other applications will not be terminated. |
-| | Controller Configuration | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
-| | Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware Control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
-| | Testing *Push-To-Talk* | Control | When starting the *Push-To-Talk* test mode, you can prevent starting any configured Assistant Boosters and Translators by holding down the Control key while clicking on the small button with the "Play" icon. |
-| | Modifying Icons | Control | When working on icons for the Stream Deck in the "Labels & Icons" editor, you can delete the current icon by holding down the Control key and clicking on it. |
-| | Developer configuration | Control | If you hold down the Control key while starting "Simulator Configuration", additional configuration options will appear on the first tab, especially for developers. |
-| | Assistant Booster configuration | Control | Holding down the Control key while clicking on the "Reload" button for the Assistant Booster instructions will reload all instruction categories at once. |
-| | Action configuration | Control | Holding down the Control key while clicking on the "Ok" button will open a text editor with the LLM tool definition in JSON format. |
-| | Editing *Reasoning* instructions | Control | Holding down the Control key while clicking on the "Instructions..." button for the *Reasoning* booster will open up an editor for the internal instructions for the given Assistant, if there are any. |
-| | Driving Coach configuration | Control | Holding down the Control key while clicking on the "Reload" button for Driving Coach instructions will reload all instruction categories at once. |
-| | Creating a fresh configuration | Control + Shift | If you hold down Control together with the Shift key while starting "Simulator Configuration" you will be asked whether you want to clear your current configuration and start with a new one. Be careful here. |
-| Simulator Setup | Termination of other applications | Control | The tool asks to terminate all other running applications, before working on the configuration. If you hold down the Control key, when clicking on the "Continue" button, other applications will not be terminated. |
-| | Clicking on a function | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
-| | Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware Control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
-| | Testing *Push-To-Talk* | Control | When starting the *Push-To-Talk* test mode, you can prevent starting any configured Assistant Boosters and Translators by holding down the Control key while clicking on the small button with the "Play" icon. |
-| | Switchung between pages | Control | When holding down the Control key when going to the next or previous page, the configuration mode will switch to *Extended*. |
-| | Modifying Icons | Control | When working on icons for the Stream Deck in the "Labels & Icons" editor, you can delete the current icon by holding down the Control key and clicking on it. |
-| | Connecting actions and functions | Escape | When connecting an action to a function, or vice versa (a small tooltip will follow your mouse in this mode), you can cancel the connection by pressing the Escape key. |
-| | Assistant Booster configuration | Control | Holding down the Control key while clicking on the "Reload" button for the Assistant Booster instructions will reload all instruction categories at once. |
-| | Action configuration | Control | Holding down the Control key while clicking on the "Ok" button will open a text editor with the LLM tool definition in JSON format. |
-| | Editing *Reasoning* instructions | Control | Holding down the Control key while clicking on the "Instructions..." button for the *Reasoning* booster will open up an editor for the internal instructions for the given Assistant, if there are any. |
-| | Driving Coach configuration | Control | Holding down the Control key while clicking on the "Reload" button for Driving Coach instructions will reload all instruction categories at once. |
-| | Creating a fresh configuration | Control + Shift | If you hold down Control together with the Shift key while starting "Simulator Setup" you will be asked whether you want to clear your current configuration and start with a new one. Be careful here. |
-| | Sound volume fading | Control | When leaving the first page of "Simulator Setup", which shows the splash video, you can hold down the Control key to supress the fading of the sound volume and speed up things a little bit. |
-| Simulator Startup | Automatic simulator startup | Middle Mouse Button | When starting "Simulator Startup" with the Middle Mouse Button pressed, the first simulator from the list of configured simulators will be started automatically. |
-| | Simulator startup | Shift | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Shift key, the choice of "Close on startup" will be temporarily toggled for this one startup. |
-| | Simulator startup | Control | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Control key, the editor for the startup profiles will open up, even when the small cog wheel icon was not hit. |
-| | Simulator startup | Alt | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Alt key, the the currently selected simulator will be started automatically. |
-| | Opening documentation | Control | Holding down the Control key when clicking on the "Documentation" button will open a menu with all available news articles instead of the documentation. |
-| | Editing startup profiles | Control | Holding down the Control key when clicking the "Save" button in the startup profiles editor will save the profiles and start Simulator Controller in one step. |
-| | Exporting startup profiles | Control | Holding down the Control key when clicking the "Download" button in the startup profiles editor will only include the currently selected profile in the export file. |
-| | Running Team Center | Control | When clicking *Team Center* in "Simulator Startup" while holding the Control key, the editor for the team management will open up, even when the small cog wheel icon was not hit. |
-| | Exiting "Simulator Startup" | Control | When closing "Simulator Startup" and the Control key is pressed, you will be asked, whether you want to exit all other applications of "Simulator Controller" as well. |
-| | Unblocking executables | Control + Alt | If you hold down Control together with the Alt key while starting "Simulator Startup", the application will try to acquire Admin privileges and will unblock all executables. |
-| | Editing configuration | Control | Holding down the Control key when clicking the "Configuration..." button in the settings dialog will open "Simulator Configuration" rather than "Simulator Setup". |
-| Simulator Tools | Running system build | Control | Only relevant for developers. If you hold down the Control key when starting "Simulator Tools", a window will pop up, where you can enable or disable individual build rules. |
-|                 | Running system build | Right Alt or AltGr| Only relevant for developers. If you hold down the Right Alt key or the AltGr key when starting "Simulator Tools", no special targets will be build. |
-|                 | Running system build | Shift | Only relevant for developers. If you hold down the Shift key when starting "Simulator Tools", all processes will be forced to exit before the build run. |
-| Strategy Workbench | Simulate    | Control  | If you hold down the Control key while starting a strategy simulation, the result will automatically selected as the current strategy, if the simulation was successful. |
-| | Load Settings    | Control  | If you hold down the Control key while choosing the menu command "Load from Settings..." from the "Settings" menu, you can locate a settings file on your hard drives rather than loading the standard "Race.settings" file from "Config" folder. |
-| | Select a Validator    | Control  | Holding down the Control key let you edit the contents of the validator rules file rather than than selecting it as the active validator. |
-| | Loading a Strategy    | Control  | If you hold down the Control key while selecting the "Load Strategy..." command in the "Strategy" menu, you can load strategies stored anywhere on your PC. A file dialog will open up. |
-| | Running a simulation    | Escape  | Pressing the Escape key will stop the currently running strategy simulation. |
-| Assetto Corsa Competizione | Controlling Pitstop MFD    | Control  | In those rare situations, where the search for the current pitstop settings get stucked in an endless loop, you can press Control, which will restart the process. |
+### General settings (for all applications)
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Exiting an application from the tray menu | Control | When Control is held down, the application will exit, even if it is still working on some background tasks. |
+
+### Simulator Startup
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Automatic simulator startup | Middle Mouse Button | When starting "Simulator Startup" with the Middle Mouse Button pressed, the first simulator from the list of configured simulators will be started automatically. |
+| Simulator startup | Shift | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Shift key, the choice of "Close on startup" will be temporarily toggled for this one startup. |
+| Simulator startup | Control | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Control key, the editor for the startup profiles will open up, even when the small cog wheel icon was not hit. |
+| Simulator startup | Alt | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Alt key, you can choose to *listen* to a simulator running on a remote system (PC or console) |
+| Opening documentation | Control | Holding down the Control key when clicking on the "Documentation" button will open a menu with all available news articles instead of the documentation. |
+| Editing startup profiles | Control | Holding down the Control key when clicking the "Save" button in the startup profiles editor will save the profiles and start Simulator Controller in one step. |
+| Exporting startup profiles | Control | Holding down the Control key when clicking the "Download" button in the startup profiles editor will only include the currently selected profile in the export file. |
+| Running Team Center | Control | When clicking *Team Center* in "Simulator Startup" while holding the Control key, the editor for the team management will open up, even when the small cog wheel icon was not hit. |
+| Exiting "Simulator Startup" | Control | When closing "Simulator Startup" and the Control key is pressed, you will be asked, whether you want to exit all other applications of "Simulator Controller" as well. |
+| Unblocking executables | Control + Alt | If you hold down Control together with the Alt key while starting "Simulator Startup", the application will try to acquire Admin privileges and will unblock all executables. |
+| Editing configuration | Control | Holding down the Control key when clicking the "Configuration..." button in the settings dialog will open "Simulator Configuration" rather than "Simulator Setup". |
+
+### Assistant settings (for all Assistants)
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Finishing a session | Control + Shift | Normally, the Race Assistants will wait for a specific cooldown time, before they startup again. While in training sessions against AI racers, you can skip this cooldown period with holding the Control together with the Shift key in the moment, when the Assistants detect a session change. But be aware, that all post-processing, like saving telemetry data or creating a race report will be skipped as well. |
+
+### Solo Center
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Loading a Session    | Control  | If you hold down the Control key while selecting the "Load Session..." command in the "Session" menu, you can load sessions stored in the old data format, which has been used, before sessions where stored in the session database by default. |
+| Displaying reports    | Control  | Reports are normally displayed in the *Output* view in the lower right corner of the main window. Holding down the Control key will open them in a separate window. |
+| Enabling / Disabling telemetry    | Control  | When the Control key is held down while choosing the "Telemetry..." command is chosen from the "Session" menu, telemetry collection is enabled or disabled regardless whether the Telemetry Viewer window is open or not. |
+| Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
+| Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or by 50 meters, if Control and Shift keys are held down. |
+
+### Team Center
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Startup    | Control  | If the Control key is pressed when starting the "Team Center", it will start with session synchronzation disabled. Only the basic data (stint plan, strategy, driver selection, tyre setups and so on) is loaded, but no session data like stints, laps, telemetry information, etc. |
+| Startup    | Alt  | The "Team Center" comes in two flavours with regards to the user interface. Holding down the Alt key while starting "Team Center" will start the Lite version with a very much simplified user interface. |
+| Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to connect to a team session. |
+| Loading a Session    | Control  | If you hold down the Control key while selecting the "Load Session..." command in the "Session" menu, you can load sessions stored in the old data format, which has been used, before sessions where stored in the session database by default. |
+| Load current Race Strategy    | Control  | If you hold down the Control key while selecting the "Load current Race Strategy" option in the "Strategy" menu, the "Team Center" will first try to load the strategy, which has beend released for the session before loading the currentl locally saved Race Strategy. |
+| Loading a Strategy    | Control  | If you hold down the Control key while selecting the "Load Strategy..." command in the "Strategy" menu, you can load strategies stored anywhere on your PC. A file dialog will open up. |
+| Displaying reports    | Control  | Reports are normally displayed in the *Output* view in the lower right corner of the main window. Holding down the Control key will open them in a separate window. |
+| Synchronize    | Control  | If you hold down the Control key while selecting the "Synchronize..." option in the "Session" menu, you can select the number of seconds to wait between each refresh of the data collected by the Team Center. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically. |
+| Choosing pitstop tyre compound | Control | When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well. |
+| Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
+| Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or if the Shift key is held down additionally, by 50 meters. |
+
+### Race Settings
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session, a login dialog pops up and you can use the team manager account name and password instead of a token to configure to a team session. Please do not use a refresh cycle smaller than 10 seconds when connected to a managed Team Server, since this will increase the running costs on Azure dramatically. |
+| Choosing setup compound | Control | When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well. |
+
+### Session Database
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Login    | Control  | If you hold down the Control key while pressing on the button with a small key to connect to a session in the settings dialog, a login dialog pops up and you can use the team manager account name and password instead of a token to the chosen Team Server. |
+| Openening data category documentation | Control | If you hold down the Control key when clicking on a specific data category, for example "Sessions", will open the documentation for this category. |
+| Data scope selection | Control | Normally, the choice of the "Available Data" drop down menu only affects the data shownn in the session database and all other applications, for example the Race Assistants will use only your personal data. If you hold down the Control key, while changing the selection, you will be asked, whether the change should be reflected for all applications. |
+| Exporting race settings | Control | Holding down the Control key down when clicking the "Export..." button will export **all** settings, independent of what is currently selected. |
+| Editing track sections | Control | When editing track section in the track map of the Telemetry Viewer, holding down the Control key when closing the editor will revert all changes. |
+| Managing track automations | Control | Clicking on an automations point with the Control key down will delete this automation point. |
+
+### Strategy Workbench
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Simulate    | Control  | If you hold down the Control key while starting a strategy simulation, the result will automatically selected as the current strategy, if the simulation was successful. |
+| Load Settings    | Control  | If you hold down the Control key while choosing the menu command "Load from Settings..." from the "Settings" menu, you can locate a settings file on your hard drives rather than loading the standard "Race.settings" file from "Config" folder. |
+| Loading a Strategy    | Control  | If you hold down the Control key while selecting the "Load Strategy..." command in the "Strategy" menu, you can load strategies stored anywhere on your PC. A file dialog will open up. |
+| Running a simulation    | Escape  | Pressing the Escape key will stop the currently running strategy simulation. |
+
+### Setup Workbench
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Loading problems and issues | Control | Holding down the Control key while loading problem descriptions from a file, will **not** clear the current issue list but will add to it instead. |
+| Starting and Exiting | Control | Holding down the Control when exiting will save the current issue list to a temporary file and holding down the Control key when starting "Setup Workbench" will load those saved issues, so that you can continue your work. |
+| Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
+| Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or if the Shift key is held down additionally, by 50 meters. |
+
+### Simulator Setup
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Termination of other applications | Control | The tool asks to terminate all other running applications, before working on the configuration. If you hold down the Control key, when clicking on the "Continue" button, other applications will not be terminated. |
+| Clicking on a function | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
+| Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware Control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
+| Testing *Push-To-Talk* | Control | When starting the *Push-To-Talk* test mode, you can prevent starting any configured Assistant Boosters and Translators by holding down the Control key while clicking on the small button with the "Play" icon. |
+| Switchung between pages | Control | When holding down the Control key when going to the next or previous page, the configuration mode will switch to *Extended*. |
+| Modifying Icons | Control | When working on icons for the Stream Deck in the "Labels & Icons" editor, you can delete the current icon by holding down the Control key and clicking on it. |
+| Connecting actions and functions | Escape | When connecting an action to a function, or vice versa (a small tooltip will follow your mouse in this mode), you can cancel the connection by pressing the Escape key. |
+| Assistant Booster configuration | Control | Holding down the Control key while clicking on the "Reload" button for the Assistant Booster instructions will reload all instruction categories at once. |
+| Action configuration | Control | Holding down the Control key while clicking on the "Ok" button will open a text editor with the LLM tool definition in JSON format. |
+| Editing *Reasoning* instructions | Control | Holding down the Control key while clicking on the "Instructions..." button for the *Reasoning* booster will open up an editor for the internal instructions for the given Assistant, if there are any. |
+| Driving Coach configuration | Control | Holding down the Control key while clicking on the "Reload" button for Driving Coach instructions will reload all instruction categories at once. |
+| Creating a fresh configuration | Control + Shift | If you hold down Control together with the Shift key while starting "Simulator Setup" you will be asked whether you want to clear your current configuration and start with a new one. Be careful here. |
+| Sound volume fading | Control | When leaving the first page of "Simulator Setup", which shows the splash video, you can hold down the Control key to supress the fading of the sound volume and speed up things a little bit. |
+
+### Simulator Configuration
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Termination of other applications | Control | The tool asks to terminate all other running applications, before working on the configuration. If you hold down the Control key, when clicking on the "Continue" button, other applications will not be terminated. |
+| Controller Configuration | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
+| Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware Control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
+| Testing *Push-To-Talk* | Control | When starting the *Push-To-Talk* test mode, you can prevent starting any configured Assistant Boosters and Translators by holding down the Control key while clicking on the small button with the "Play" icon. |
+| Modifying Icons | Control | When working on icons for the Stream Deck in the "Labels & Icons" editor, you can delete the current icon by holding down the Control key and clicking on it. |
+| Developer configuration | Control | If you hold down the Control key while starting "Simulator Configuration", additional configuration options will appear on the first tab, especially for developers. |
+| Assistant Booster configuration | Control | Holding down the Control key while clicking on the "Reload" button for the Assistant Booster instructions will reload all instruction categories at once. |
+| Action configuration | Control | Holding down the Control key while clicking on the "Ok" button will open a text editor with the LLM tool definition in JSON format. |
+| Editing *Reasoning* instructions | Control | Holding down the Control key while clicking on the "Instructions..." button for the *Reasoning* booster will open up an editor for the internal instructions for the given Assistant, if there are any. |
+| Driving Coach configuration | Control | Holding down the Control key while clicking on the "Reload" button for Driving Coach instructions will reload all instruction categories at once. |
+| Creating a fresh configuration | Control + Shift | If you hold down Control together with the Shift key while starting "Simulator Configuration" you will be asked whether you want to clear your current configuration and start with a new one. Be careful here. |
+
+### Simulator Tools (for developers)
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Running system build | Control | If you hold down the Control key when starting "Simulator Tools", a window will pop up, where you can enable or disable individual build rules. |
+| Running system build | Right Alt or AltGr| If you hold down the Right Alt key or the AltGr key when starting "Simulator Tools", no special targets will be build. |
+| Running system build | Shift | If you hold down the Shift key when starting "Simulator Tools", all processes will be forced to exit before the build run. |
+
+### Assetto Corsa Competizione (when active)
+
+| Function | Modifier | Description |
+|----------|----------|-------------|
+| Controlling Pitstop MFD    | Control  | In those rare situations, where the search for the current pitstop settings get stucked in an endless loop, you can press Control, which will restart the process. |

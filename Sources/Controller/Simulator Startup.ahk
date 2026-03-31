@@ -239,7 +239,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 	prepareConfiguration() {
 		local noConfiguration := (this.Configuration.Count == 0)
-		local editConfig := GetKeyState("Alt")
+		local editConfig := false ; GetKeyState("Alt")
 		local settings := this.Settings
 		local result
 
@@ -697,7 +697,7 @@ showNews() {
 
 loadNews(urls) {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
-	local ignore, url, curWorkingDir
+	local ignore, url
 
 	deleteFile(A_Temp . "\News.zip")
 
@@ -715,18 +715,7 @@ loadNews(urls) {
 
 			DirCreate(kTempDirectory . "News")
 
-			; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . A_Temp . "\News.zip' -DestinationPath '" . kTempDirectory . "News' -Force", , "Hide")
-
-			curWorkingDir := A_WorkingDir
-
-			try {
-				SetWorkingDir(kTempDirectory . "News")
-
-				RunWait("tar -xf `"" . A_Temp . "\News.zip`"", , "Hide")
-			}
-			finally {
-				SetWorkingDir(curWorkingDir)
-			}
+			expand(A_Temp . "\News.zip", kTempDirectory . "News")
 
 			if FileExist(kTempDirectory . "News\News.htm")
 				return true
@@ -879,7 +868,10 @@ launchPad(command := false, arguments*) {
 	local infoButton, profileButton, settingsButton, docsButton, shortcutsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
+	static first := true
+
 	static result := false
+	static clickTask := false
 
 	static toolTips
 	static executables
@@ -889,8 +881,6 @@ launchPad(command := false, arguments*) {
 	static startupButton
 
 	static closeCheckBox
-
-	static clickTask := false
 
 	getStartupProfile() {
 		local startupProfile := translate("Standard")
@@ -1157,13 +1147,18 @@ launchPad(command := false, arguments*) {
 
 			static pressedControl := false
 
-			if !WinActive(launchPadGui) {
-				if (pressedControl && !GetKeyState("LButton")) {
-					pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
+			try {
+				if !WinActive(launchPadGui) {
+					if (pressedControl && !GetKeyState("LButton")) {
+						pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
 
-					pressedControl := false
+						pressedControl := false
+					}
+
+					return
 				}
-
+			}
+			catch Any {
 				return
 			}
 
@@ -1594,7 +1589,11 @@ launchPad(command := false, arguments*) {
 
 		startupButton.Text := ("Startup`n" . getStartupProfile())
 
-		OnMessage(0x0200, showApplicationInfo)
+		if first {
+			OnMessage(0x0200, showApplicationInfo)
+
+			first := false
+		}
 
 		x := false
 		y := false

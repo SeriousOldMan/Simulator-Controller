@@ -4938,7 +4938,7 @@ class SoloCenter extends ConfigurationItem {
 			local simulator := this.Simulator
 			local car := this.Car
 			local track := this.Track
-			local info, dirName, directory, fileName, newFileName, session, currentDir
+			local info, dirName, directory, fileName, newFileName, session
 
 			saveSession(directory, fileName) {
 				try {
@@ -4960,17 +4960,12 @@ class SoloCenter extends ConfigurationItem {
 
 					setMultiMapValue(info, "Session", "Exported", true)
 
-					currentDir := A_WorkingDir
 
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 						dataFile := temporaryFileName("Practice", "zip")
 
-						SetWorkingDir(directory)
-
 						try {
-							; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-							RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
+							compress(directory, "*.*", dataFile)
 
 							file := FileOpen(dataFile, "r-wd")
 
@@ -4992,8 +4987,6 @@ class SoloCenter extends ConfigurationItem {
 							}
 						}
 						finally {
-							SetWorkingDir(currentDir)
-
 							deleteFile(dataFile)
 						}
 					}
@@ -5003,16 +4996,7 @@ class SoloCenter extends ConfigurationItem {
 
 					dataFile := temporaryFileName("Practice", "zip")
 
-					SetWorkingDir(directory)
-
-					try {
-						; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-						RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
-					}
-					finally {
-						SetWorkingDir(currentDir)
-					}
+					compress(directory, "*.*", dataFile)
 
 					FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
@@ -5346,8 +5330,8 @@ class SoloCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (this.LapsListView.GetCount() + 1)
 
-					lap.Compounds := run.Compounds
-					lap.TyreSet := run.TyreSet
+					lap.Compounds := lap.Run.Compounds
+					lap.TyreSet := lap.Run.TyreSet
 
 					remainingFuel := lap.FuelRemaining
 
@@ -5420,7 +5404,7 @@ class SoloCenter extends ConfigurationItem {
 			local track := this.Track
 			local folder := this.SessionDirectory
 			local sessionDB, dirName, fileName, info, lastLap, currentRun, dataFile, data, meta, size
-			local file, tempFile, curWorkingDir
+			local file, tempFile
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -5482,19 +5466,8 @@ class SoloCenter extends ConfigurationItem {
 
 										file.Close()
 
-										; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
+										expand(dataFile, folder)
 
-										curWorkingDir := A_WorkingDir
-
-										try {
-											SetWorkingDir(folder)
-
-											RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
-										}
-										finally {
-											SetWorkingDir(curWorkingDir)
-										}
-										
 										if !FileExist(folder . "\Practice.info")
 											FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 									}
@@ -5515,18 +5488,7 @@ class SoloCenter extends ConfigurationItem {
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
-								; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-								
-								curWorkingDir := A_WorkingDir
-
-								try {
-									SetWorkingDir(folder)
-
-									RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
-								}
-								finally {
-									SetWorkingDir(curWorkingDir)
-								}
+								expand(dataFile, folder)
 
 								if !FileExist(folder . "\Practice.info")
 									FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")

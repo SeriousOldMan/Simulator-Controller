@@ -9994,7 +9994,7 @@ class TeamCenter extends ConfigurationItem {
 			local car := this.Car
 			local track := this.Track
 			local sessionDB, info, directory, dirName, translator, folder, file, size, dataFile
-			local session, configuration, fileName, newFileName, currentDir
+			local session, configuration, fileName, newFileName
 
 			this.showMessage(translate("Saving session"))
 
@@ -10083,17 +10083,11 @@ class TeamCenter extends ConfigurationItem {
 									setMultiMapValue(info, "Creator", "Name", SessionDatabase.getName("Creator"))
 								}
 
-								currentDir := A_WorkingDir
-
 								if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Team"))) {
 									dataFile := temporaryFileName("Race", "zip")
 
-									SetWorkingDir(directory)
-
 									try {
-										; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-										RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
+										compress(directory, "*.*", dataFile)
 
 										file := FileOpen(dataFile, "r-wd")
 
@@ -10115,8 +10109,6 @@ class TeamCenter extends ConfigurationItem {
 										}
 									}
 									finally {
-										SetWorkingDir(currentDir)
-
 										deleteFile(dataFile)
 									}
 								}
@@ -10125,17 +10117,8 @@ class TeamCenter extends ConfigurationItem {
 								deleteFile(folder . "\" . fileName . ".data")
 
 								dataFile := temporaryFileName("Race", "zip")
-
-								SetWorkingDir(directory)
-
-								try {
-									; RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "*' -CompressionLevel Optimal -DestinationPath '" . dataFile . "'", , "Hide")
-
-									RunWait("tar -a -c -f `"" . dataFile . "`" *.*", , "Hide")
-								}
-								finally {
-									SetWorkingDir(currentDir)
-								}
+								
+								compress(directory, "*.*", dataFile)
 
 								FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 
@@ -10605,7 +10588,7 @@ class TeamCenter extends ConfigurationItem {
 			local track := this.Track
 			local directory := (this.SessionLoaded ? this.SessionLoaded : this.SessionDirectory[false])
 			local folder, dirName, fileName, info, lastLap, currentStint, configuration, state
-			local sessionDB, dataFile, data, meta, size, file, curWorkingDir
+			local sessionDB, dataFile, data, meta, size, file
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -10668,19 +10651,8 @@ class TeamCenter extends ConfigurationItem {
 										file.RawWrite(session, size)
 
 										file.Close()
-
-										; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-										curWorkingDir := A_WorkingDir
-
-										try {
-											SetWorkingDir(folder)
-
-											RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
-										}
-										finally {
-											SetWorkingDir(curWorkingDir)
-										}
+										
+										expand(dataFile, folder)
 										
 										if !FileExist(folder . "\Session.info")
 											FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
@@ -10701,19 +10673,8 @@ class TeamCenter extends ConfigurationItem {
 								dataFile := temporaryFileName("Race", "zip")
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-
-								; RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . dataFile . "' -DestinationPath '" . folder . "' -Force", , "Hide")
-
-								curWorkingDir := A_WorkingDir
-
-								try {
-									SetWorkingDir(folder)
-
-									RunWait("tar -xf `"" . dataFile . "`"", , "Hide")
-								}
-								finally {
-									SetWorkingDir(curWorkingDir)
-								}
+								
+								expand(dataFile, folder)
 										
 								if !FileExist(folder . "\Session.info")
 									FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")

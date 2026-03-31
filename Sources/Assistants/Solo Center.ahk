@@ -4960,7 +4960,7 @@ class SoloCenter extends ConfigurationItem {
 
 					setMultiMapValue(info, "Session", "Exported", true)
 
-					
+
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
 						dataFile := temporaryFileName("Practice", "zip")
 
@@ -5330,8 +5330,8 @@ class SoloCenter extends ConfigurationItem {
 					lap := this.Laps[A_Index]
 					lap.Row := (this.LapsListView.GetCount() + 1)
 
-					lap.Compounds := run.Compounds
-					lap.TyreSet := run.TyreSet
+					lap.Compounds := lap.Run.Compounds
+					lap.TyreSet := lap.Run.TyreSet
 
 					remainingFuel := lap.FuelRemaining
 
@@ -5465,9 +5465,9 @@ class SoloCenter extends ConfigurationItem {
 										file.RawWrite(session, size)
 
 										file.Close()
-										
+
 										expand(dataFile, folder)
-										
+
 										if !FileExist(folder . "\Practice.info")
 											FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
 									}
@@ -5487,7 +5487,7 @@ class SoloCenter extends ConfigurationItem {
 								dataFile := temporaryFileName("Practice", "zip")
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-								
+
 								expand(dataFile, folder)
 
 								if !FileExist(folder . "\Practice.info")

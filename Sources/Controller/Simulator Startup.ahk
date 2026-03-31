@@ -868,7 +868,10 @@ launchPad(command := false, arguments*) {
 	local infoButton, profileButton, settingsButton, docsButton, shortcutsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
+	static first := true
+
 	static result := false
+	static clickTask := false
 
 	static toolTips
 	static executables
@@ -1137,7 +1140,6 @@ launchPad(command := false, arguments*) {
 
 		static prevHwnd := 0
 		static curControl := false
-		static clickTask := false
 
 		clickHandler() {
 			local x, y, w, h, mX, mY
@@ -1145,13 +1147,18 @@ launchPad(command := false, arguments*) {
 
 			static pressedControl := false
 
-			if !WinActive(launchPadGui) {
-				if (pressedControl && !GetKeyState("LButton")) {
-					pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
+			try {
+				if !WinActive(launchPadGui) {
+					if (pressedControl && !GetKeyState("LButton")) {
+						pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
 
-					pressedControl := false
+						pressedControl := false
+					}
+
+					return
 				}
-
+			}
+			catch Any {
 				return
 			}
 
@@ -1576,7 +1583,11 @@ launchPad(command := false, arguments*) {
 
 		startupButton.Text := ("Startup`n" . getStartupProfile())
 
-		OnMessage(0x0200, showApplicationInfo)
+		if first {
+			OnMessage(0x0200, showApplicationInfo)
+
+			first := false
+		}
 
 		x := false
 		y := false

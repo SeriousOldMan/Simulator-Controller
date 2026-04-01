@@ -64,9 +64,27 @@ class SimulatorProvider {
 		}
 	}
 
+	static Simulator {
+		Get {
+			throw "Virtual property Simulator must be implemented in a subclass..."
+		}
+	}
+
+	static Code {
+		Get {
+			return SessionDatabase.getSimulatorCode(this.Simulator)
+		}
+	}
+
 	Simulator {
 		Get {
 			throw "Virtual property Simulator must be implemented in a subclass..."
+		}
+	}
+
+	Code {
+		Get {
+			return SessionDatabase.getSimulatorCode(this.Simulator)
 		}
 	}
 

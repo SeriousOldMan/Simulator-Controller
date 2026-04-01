@@ -923,6 +923,7 @@ launchPad(command := false, arguments*) {
 		local x, y, w, h, mX, mY
 		local curCoordMode, clickStart, profiles, profilesMenu, startMenu
 		local ignore, profile, provider, result, startupProfile, hasSimulator
+		local definition, plugin
 
 		if !configure
 			configure := GetKeyState("Ctrl")
@@ -1008,11 +1009,23 @@ launchPad(command := false, arguments*) {
 			startMenu.Add()
 
 			simulators := string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
+			definition := getControllerState()
 
 			hasSimulator := false
 
 			for ignore, provider in SimulatorProvider.SimulatorProviders
 				if inList(simulators, provider.Simulator) {
+					plugin := getMultiMapValue(definition, "Plugins", provider.Code, false)
+
+					if plugin {
+						plugin := string2Values("|", plugin)[1]
+
+						if ((plugin == false) || (plugin = kFalse))
+							continue
+					}
+					else
+						continue
+
 					protocols := SimulatorProvider.getProtocols(provider.Simulator)
 
 					if (protocols.HasProp("Connector") && (protocols.Connector.Protocol = "UDP")) {
@@ -1628,39 +1641,43 @@ availableFunctions(configuration, &hasTeamServer := false
 								, &hasMotionFeedback := false, &hasChassisVibration := false, &hasPedalVibration := false) {
 	local functions := []
 
+	enabled(flag) {
+		return ((flag == true) || (flag == kTrue))
+	}
+
 	hasTeamServer := getMultiMapValue(configuration, "Plugins", "Team Server", false)
 
 	if hasTeamServer
-		hasTeamServer := string2Values("|", hasTeamServer)[1]
+		hasTeamServer := enabled(string2Values("|", hasTeamServer)[1])
 
 	hasDrivingCoach := getMultiMapValue(configuration, "Plugins", "Driving Coach", false)
 
 	if hasDrivingCoach
-		hasDrivingCoach := string2Values("|", hasDrivingCoach)[1]
+		hasDrivingCoach := enabled(string2Values("|", hasDrivingCoach)[1])
 
 	hasRaceSpotter := getMultiMapValue(configuration, "Plugins", "Race Spotter", false)
 
 	if hasRaceSpotter
-		hasRaceSpotter := string2Values("|", hasRaceSpotter)[1]
+		hasRaceSpotter := enabled(string2Values("|", hasRaceSpotter)[1])
 
 	hasRaceStrategist := getMultiMapValue(configuration, "Plugins", "Race Strategist", false)
 
 	if hasRaceStrategist
-		hasRaceStrategist := string2Values("|", hasRaceStrategist)[1]
+		hasRaceStrategist := enabled(string2Values("|", hasRaceStrategist)[1])
 
 	hasRaceEngineer := getMultiMapValue(configuration, "Plugins", "Race Engineer", false)
 
 	if hasRaceEngineer
-		hasRaceEngineer := string2Values("|", hasRaceEngineer)[1]
+		hasRaceEngineer := enabled(string2Values("|", hasRaceEngineer)[1])
 
 	hasMotionFeedback := getMultiMapValue(configuration, "Plugins", "Motion Feedback", false)
 
 	if hasMotionFeedback
-		hasMotionFeedback := string2Values("|", hasMotionFeedback)[1]
+		hasMotionFeedback := enabled(string2Values("|", hasMotionFeedback)[1])
 
 	hasChassisVibration := getMultiMapValue(configuration, "Plugins", "Tactile Feedback", false)
 
-	if (hasChassisVibration && string2Values("|", hasChassisVibration)[1]) {
+	if (hasChassisVibration && enabled(string2Values("|", hasChassisVibration)[1])) {
 		hasChassisVibration := string2Values(",", string2Values("|", hasChassisVibration)[3])
 
 		hasPedalVibration := inList(hasChassisVibration, "Pedal Vibration")

@@ -1,8 +1,9 @@
+using F125UDPProtocol;
 using System;
 using System.Globalization;
 using System.Text;
 using System.Threading;
-using F125UDPProtocol;
+using static System.Collections.Specialized.BitVector32;
 
 namespace F125UDPConnector
 {
@@ -93,6 +94,57 @@ namespace F125UDPConnector
             var participants = receiver.GetParticipantsData();
             var motionEx = receiver.GetMotionExData();
 
+            int playerIdx = session.Header.PlayerCarIndex;
+            int numCars = participants != null ? participants.NumActiveCars : 0;
+
+            var playerLap = lapDataPkt.LapDataArr[playerIdx];
+            var playerHistory = receiver.GetSessionHistoryData(playerIdx);
+
+            int GetRemainingLaps() {
+                if (session.SessionType >= 10)
+                    return (int)(session.TotalLaps - Math.Max(0, playerLap.CurrentLapNum - 1));
+                else
+                    try
+                    {
+                        uint bestLap;
+
+                        if (playerHistory != null && playerHistory.BestLapTimeLapNum > 0
+                            && playerHistory.BestLapTimeLapNum <= playerHistory.NumLaps)
+                            bestLap = playerHistory.LapHistories[playerHistory.BestLapTimeLapNum - 1].LapTimeInMS;
+                        else
+                            bestLap = playerLap.LastLapTimeInMS;
+
+                        return (int)(GetRemainingTime() / bestLap);
+                    }
+                    catch
+                    {
+                        return 1;
+                    }
+            }
+
+            long GetRemainingTime()
+            {
+                if (session.SessionType >= 10)
+                    try
+                    {
+                        uint bestLap;
+
+                        if (playerHistory != null && playerHistory.BestLapTimeLapNum > 0
+                            && playerHistory.BestLapTimeLapNum <= playerHistory.NumLaps)
+                            bestLap = playerHistory.LapHistories[playerHistory.BestLapTimeLapNum - 1].LapTimeInMS;
+                        else
+                            bestLap = playerLap.LastLapTimeInMS;
+
+                        return (long)(GetRemainingLaps() * bestLap);
+                    }
+                    catch
+                    {
+                        return 60000;
+                    }
+                else
+                    return (long)(session.SessionTimeLeft * 1000);
+            }
+
             sb.Append("[Session Data]\n");
 
             if (session == null || lapDataPkt == null)
@@ -101,10 +153,6 @@ namespace F125UDPConnector
                 return sb.ToString();
             }
 
-            int playerIdx = session.Header.PlayerCarIndex;
-            int numCars = participants != null ? participants.NumActiveCars : 0;
-
-            var playerLap = lapDataPkt.LapDataArr[playerIdx];
             if (playerLap == null || playerLap.ResultStatus < 2)
             {
                 sb.Append("Active=false\n");
@@ -132,13 +180,8 @@ namespace F125UDPConnector
             // Session format & remaining
             bool isLaps = session.SessionType >= 10; // Race types
             sb.AppendFormat("SessionFormat={0}\n", isLaps ? "Laps" : "Time");
-            sb.AppendFormat("SessionTimeRemaining={0}\n", L(session.SessionTimeLeft * 1000));
-
-            if (isLaps && session.TotalLaps > 0)
-                sb.AppendFormat("SessionLapsRemaining={0}\n",
-                    I(Math.Max(0, session.TotalLaps - playerLap.CurrentLapNum + 1)));
-            else
-                sb.AppendFormat("SessionLapsRemaining={0}\n", I(0));
+            sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));
+            sb.AppendFormat("SessionLapsRemaining={0}\n", I(GetRemainingLaps()));
 
             // ── [Car Data] ──────────────────────────────────────────────
             sb.Append("[Car Data]\n");
@@ -151,7 +194,10 @@ namespace F125UDPConnector
             // Engine map
             if (playerStatus != null)
             {
-                sb.AppendFormat("MAP={0}\n", playerStatus.FuelMix < 4 ? fuelMixNames[playerStatus.FuelMix] : "n/a");
+                if (playerStatus.FuelMix < 4)
+                    sb.AppendFormat("MAP={0}\n", playerStatus.FuelMix + 1);
+                else
+                    sb.Append("MAP=n/a\n");
                 sb.AppendFormat("TC={0}\n", I(playerStatus.TractionControl));
                 sb.AppendFormat("ABS={0}\n", I(playerStatus.AntiLockBrakes));
                 sb.AppendFormat("BB={0}\n", F(playerStatus.FrontBrakeBias));
@@ -164,12 +210,15 @@ namespace F125UDPConnector
             // Bodywork damage
             if (playerDamage != null)
             {
+                int frontDamage = (playerDamage.FrontLeftWingDamage +
+                                   playerDamage.FrontRightWingDamage);
+                int rearDamage = (playerDamage.RearWingDamage + playerDamage.DiffuserDamage);
+                int leftDamage = playerDamage.SidepodDamage;
+                int rightDamage = playerDamage.SidepodDamage;
+
                 sb.AppendFormat("BodyworkDamage={0},{1},{2},{3},{4}\n",
-                    I(playerDamage.FrontLeftWingDamage),
-                    I(playerDamage.FrontRightWingDamage),
-                    I(playerDamage.RearWingDamage),
-                    I(playerDamage.FloorDamage),
-                    I(playerDamage.SidepodDamage));
+                    I(frontDamage), I(rearDamage), I(leftDamage), I(rightDamage),
+                    I(frontDamage + rearDamage + leftDamage + rightDamage));
 
                 // Suspension damage
                 sb.AppendFormat("SuspensionDamage={0},{1},{2},{3}\n",
@@ -178,13 +227,13 @@ namespace F125UDPConnector
                     I(playerDamage.TyresDamage[wr[2]]),
                     I(playerDamage.TyresDamage[wr[3]]));
 
-                sb.AppendFormat("EngineDamage={0}\n", I(playerDamage.EngineDamage));
+                sb.AppendFormat("EngineDamage={0}\n", I(playerDamage.EngineDamage + playerDamage.GearBoxDamage));
 
+                /*
                 // Damage
-                sb.AppendFormat("DiffuserDamage={0}\n", I(playerDamage.DiffuserDamage));
-                sb.AppendFormat("GearBoxDamage={0}\n", I(playerDamage.GearBoxDamage));
                 sb.AppendFormat("DRSFault={0}\n", playerDamage.DRSFault != 0 ? "true" : "false");
                 sb.AppendFormat("ERSFault={0}\n", playerDamage.ERSFault != 0 ? "true" : "false");
+                */
 
                 // Tyre wear
                 sb.AppendFormat("TyreWear={0},{1},{2},{3}\n",
@@ -204,7 +253,7 @@ namespace F125UDPConnector
             if (playerStatus != null)
             {
                 sb.AppendFormat("FuelRemaining={0}\n", F(playerStatus.FuelInTank));
-                sb.AppendFormat("FuelRemainingLaps={0}\n", F(playerStatus.FuelRemainingLaps));
+                // sb.AppendFormat("FuelRemainingLaps={0}\n", F(playerStatus.FuelRemainingLaps));
             }
 
             // Tyre temperatures & pressures
@@ -266,17 +315,14 @@ namespace F125UDPConnector
             {
                 string compound = F125Constants.GetTyreCompound(playerStatus.ActualTyreCompound);
                 string visual = F125Constants.GetTyreVisualCompound(playerStatus.VisualTyreCompound);
-                sb.AppendFormat("TyreCompound={0}\n", visual);
                 sb.AppendFormat("TyreCompoundRaw={0}\n", compound);
-                sb.AppendFormat("TyreCompoundRawFront={0}\n", compound);
-                sb.AppendFormat("TyreCompoundRawRear={0}\n", compound);
-                sb.AppendFormat("TyreSet={0}\n", I(playerStatus.TyresAgeLaps));
             }
 
             // Engine/water temperature
             if (playerTelem != null)
                 sb.AppendFormat("WaterTemperature={0}\n", I(playerTelem.EngineTemperature));
 
+            /*
             // ERS data
             if (playerStatus != null)
             {
@@ -300,6 +346,7 @@ namespace F125UDPConnector
                 sb.AppendFormat("RPM={0}\n", I(playerTelem.EngineRPM));
                 sb.AppendFormat("Gear={0}\n", I(playerTelem.Gear));
             }
+            */
 
             // ── [Stint Data] ─────────────────────────────────────────────
             sb.Append("[Stint Data]\n");
@@ -317,7 +364,6 @@ namespace F125UDPConnector
             sb.AppendFormat("LapValid={0}\n", playerLap.CurrentLapInvalid == 0 ? "true" : "false");
             sb.AppendFormat("LapLastTime={0}\n", L(playerLap.LastLapTimeInMS));
             
-            var playerHistory = receiver.GetSessionHistoryData(playerIdx);
             if (playerHistory != null && playerHistory.BestLapTimeLapNum > 0
                 && playerHistory.BestLapTimeLapNum <= playerHistory.NumLaps)
             {
@@ -330,6 +376,7 @@ namespace F125UDPConnector
             sb.AppendFormat("Sector={0}\n", I(playerLap.Sector + 1));
             sb.AppendFormat("Laps={0}\n", I(Math.Max(0, playerLap.CurrentLapNum - 1)));
 
+            /*
             if (playerLap.Sector1TimeInMS > 0 || playerLap.Sector1TimeMinutes > 0)
                 sb.AppendFormat("SectorTimes={0}", L(playerLap.Sector1TimeMinutes * 60000 + playerLap.Sector1TimeInMS));
             else
@@ -339,9 +386,10 @@ namespace F125UDPConnector
                 sb.AppendFormat(",{0}\n", L(playerLap.Sector2TimeMinutes * 60000 + playerLap.Sector2TimeInMS));
             else
                 sb.Append("\n");
+            */
 
-            sb.AppendFormat("StintTimeRemaining={0}\n", L(session.SessionTimeLeft * 1000));
-            sb.AppendFormat("DriverTimeRemaining={0}\n", L(session.SessionTimeLeft * 1000));
+            sb.AppendFormat("StintTimeRemaining={0}\n", L(GetRemainingTime()));
+            sb.AppendFormat("DriverTimeRemaining={0}\n", L(GetRemainingTime()));
 
             // Pit status
             bool inPitLane = playerLap.PitStatus == 1 || playerLap.PitStatus == 2;
@@ -350,40 +398,57 @@ namespace F125UDPConnector
             sb.AppendFormat("InPitLane={0}\n", inPitLane ? "true" : "false");
             sb.AppendFormat("NumPitStops={0}\n", I(playerLap.NumPitStops));
 
+            /*
             sb.AppendFormat("Penalties={0}\n", I(playerLap.Penalties));
             sb.AppendFormat("Warnings={0}\n", I(playerLap.TotalWarnings));
             sb.AppendFormat("CornerCuttingWarnings={0}\n", I(playerLap.CornerCuttingWarnings));
+            */
+
+            PacketEventData eventData = receiver.GetEventData();
+
+            if (eventData != null && eventData.EventStringCode == "PENA" && eventData.EventDetails[2] == playerIdx)
+            {
+                string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
+
+                if (penalty != "")
+                    sb.AppendFormat("Penalty={0}\n", penalty);
+            }
+
 
             // Delta
-            sb.AppendFormat("DeltaToCarInFront={0}\n",
+            sb.AppendFormat("GapAhead={0}\n",
                 L(playerLap.DeltaToCarInFrontMinutes * 60000 + playerLap.DeltaToCarInFrontInMS));
+            
+            /*
             sb.AppendFormat("DeltaToLeader={0}\n",
                 L(playerLap.DeltaToRaceLeaderMinutes * 60000 + playerLap.DeltaToRaceLeaderInMS));
+            */
 
             // ── [Track Data] ─────────────────────────────────────────────
             sb.Append("[Track Data]\n");
             sb.AppendFormat("Length={0}\n", I(session.TrackLength));
             sb.AppendFormat("Temperature={0}\n", I(session.TrackTemperature));
-            sb.Append("Grip=Optimum\n"); // F1 25 doesn't expose grip level directly
+            sb.AppendFormat("Grip={0}\n", session.Weather < 3 ? "Optimum" : "Wet"); // F1 25 doesn't expose grip level directly
 
             // Car pos
             if (motion != null && numCars > 0)
             {
                 for (int i = 0; i < numCars; i++)
                 {
-                    int carNum = i + 1;
                     var cm = motion.CarMotion[i];
-                    sb.AppendFormat("Car.{0}.Position={1},{2}\n", carNum,
+                    sb.AppendFormat("Car.{0}.Position={1},{2}\n", i + 1,
                         cm.WorldPositionX.ToString("F1", enUS),
                         cm.WorldPositionZ.ToString("F1", enUS));
                 }
             }
 
+            /*
             // Safety car
             sb.AppendFormat("SafetyCarStatus={0}\n",
                 session.SafetyCarStatus == 0 ? "None" :
                 session.SafetyCarStatus == 1 ? "Full" :
                 session.SafetyCarStatus == 2 ? "Virtual" : "FormationLap");
+            */
 
             // ── [Weather Data] ───────────────────────────────────────────
             sb.Append("[Weather Data]\n");
@@ -391,8 +456,8 @@ namespace F125UDPConnector
             sb.AppendFormat("Weather={0}\n", F125Constants.GetWeather(session.Weather));
 
             // Weather
-            string weather10 = F125Constants.GetWeather(session.Weather);
-            string weather30 = F125Constants.GetWeather(session.Weather);
+            string weather10 = null;
+            string weather30 = null;
             int rain10 = 0;
             int rain30 = 0;
 
@@ -401,22 +466,31 @@ namespace F125UDPConnector
                 var sample = session.WeatherForecastSamples[i];
                 if (sample == null) continue;
 
-                if (sample.TimeOffset >= 10 && weather10 == F125Constants.GetWeather(session.Weather))
+                if (sample.TimeOffset < 10 && weather10 == null)
                 {
                     weather10 = F125Constants.GetWeather(sample.Weather);
                     rain10 = sample.RainPercentage;
                 }
-                if (sample.TimeOffset >= 30 && weather30 == F125Constants.GetWeather(session.Weather))
+                if (sample.TimeOffset >= 30 && sample.TimeOffset < 40 && weather30 == null)
                 {
                     weather30 = F125Constants.GetWeather(sample.Weather);
                     rain30 = sample.RainPercentage;
                 }
             }
 
+            if (weather10 == null)
+                weather10 = F125Constants.GetWeather(session.Weather);
+
+            if (weather30 == null)
+                weather30 = F125Constants.GetWeather(session.Weather);
+
             sb.AppendFormat("Weather10Min={0}\n", weather10);
             sb.AppendFormat("Weather30Min={0}\n", weather30);
+
+            /*
             sb.AppendFormat("Rain10Min={0}\n", I(rain10));
             sb.AppendFormat("Rain30Min={0}\n", I(rain30));
+            */
 
             return sb.ToString();
         }
@@ -439,7 +513,6 @@ namespace F125UDPConnector
             {
                 sb.Append("Active=false\n");
                 sb.Append("Car.Count=0\n");
-                sb.Append("Driver.Car=0\n");
                 return sb.ToString();
             }
 
@@ -457,7 +530,7 @@ namespace F125UDPConnector
 
                 sb.AppendFormat("Car.{0}.Nr={1}\n", carNum, I(part.RaceNumber));
                 sb.AppendFormat("Car.{0}.ID={1}\n", carNum, carNum);
-                sb.AppendFormat("Car.{0}.Class={1}\n", carNum, "F1");
+                sb.AppendFormat("Car.{0}.Class={1}\n", carNum, F125Constants.GetClassName(session.Formula));
                 sb.AppendFormat("Car.{0}.Position={1}\n", carNum, I(ld.CarPosition));
                 sb.AppendFormat("Car.{0}.Laps={1}\n", carNum, I(Math.Max(0, ld.CurrentLapNum - 1)));
                 

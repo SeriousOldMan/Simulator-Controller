@@ -60,6 +60,20 @@ namespace F125UDPConnector
             catch { }
         }
 
+        public bool HasData()
+        {
+            return (receiver != null &&
+                    receiver.GetSessionData() != null &&
+                    receiver.GetSessionData() != null &&
+                    receiver.GetLapData() != null &&
+                    receiver.GetMotionData() != null &&
+                    receiver.GetCarTelemetryData() != null &&
+                    receiver.GetCarStatusData() != null &&
+                    receiver.GetCarDamageData() != null &&
+                    receiver.GetParticipantsData() != null &&
+                    receiver.GetMotionExData() != null);
+        }
+
         public string Call(string request)
         {
             try
@@ -84,6 +98,14 @@ namespace F125UDPConnector
         private string GenerateTelemetry()
         {
             var sb = new StringBuilder();
+
+            sb.Append("[Session Data]\n");
+
+            if (!HasData())
+            {
+                sb.Append("Active=false\n");
+                return sb.ToString();
+            }
 
             var session = receiver.GetSessionData();
             var lapDataPkt = receiver.GetLapData();
@@ -143,14 +165,6 @@ namespace F125UDPConnector
                     }
                 else
                     return (long)(session.SessionTimeLeft * 1000);
-            }
-
-            sb.Append("[Session Data]\n");
-
-            if (session == null || lapDataPkt == null)
-            {
-                sb.Append("Active=false\n");
-                return sb.ToString();
             }
 
             if (playerLap == null || playerLap.ResultStatus < 2)
@@ -501,20 +515,20 @@ namespace F125UDPConnector
         {
             var sb = new StringBuilder();
 
-            var session = receiver.GetSessionData();
-            var lapDataPkt = receiver.GetLapData();
-            var participants = receiver.GetParticipantsData();
-            var status = receiver.GetCarStatusData();
-            var damageData = receiver.GetCarDamageData();
-
             sb.Append("[Position Data]\n");
 
-            if (session == null || lapDataPkt == null || participants == null)
+            if (!HasData())
             {
                 sb.Append("Active=false\n");
                 sb.Append("Car.Count=0\n");
                 return sb.ToString();
             }
+
+            var session = receiver.GetSessionData();
+            var lapDataPkt = receiver.GetLapData();
+            var participants = receiver.GetParticipantsData();
+            var status = receiver.GetCarStatusData();
+            var damageData = receiver.GetCarDamageData();
 
             int numCars = participants.NumActiveCars;
             int playerIdx = session.Header.PlayerCarIndex;

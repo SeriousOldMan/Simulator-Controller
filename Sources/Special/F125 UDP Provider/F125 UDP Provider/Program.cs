@@ -43,7 +43,11 @@ namespace F125UDPProvider
 
             try
             {
-                Thread.Sleep(1000);
+                for (int i = 0; i < 15; i++)
+                    if (connector.HasData())
+                        break;
+                    else
+                        Thread.Sleep(100);
 
                 Console.Write(connector.Call(request));
             }

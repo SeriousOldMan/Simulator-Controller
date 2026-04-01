@@ -1,8 +1,8 @@
 [Development]
-Version=6.9.0.0-dev
+Version=6.9.0.0-beta
 Target=6.9.0.0-release
-Date=03/31/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/OiGO2Dcp/Releases/Simulator%20Controller%206.9.0.0-dev.zip
+Date=04/01/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XsZB3fQ-/Releases/Simulator%20Controller%206.9.0.0-beta.zip
 Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives
 Components=Media->6.9.0,Configuration->6.9.0,Utilities->6.8.8
 [Release]
@@ -30,5 +30,5 @@ Utilities.6.8.8.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.9.0.0-dev
+Development=6.9.0.0-beta
 Release=6.8.9.0-release

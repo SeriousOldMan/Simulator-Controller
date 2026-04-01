@@ -20,6 +20,22 @@ namespace F125UDPProtocol
         // Wheel reorder: F1 25 [RL,RR,FL,FR] → output [FL,FR,RL,RR]
         public static readonly int[] WheelReorder = { 2, 3, 0, 1 };
 
+        public static readonly Dictionary<byte, string> ClassNames = new Dictionary<byte, string>
+        {
+            { 0, "F1" },
+            { 1, "F1 Classic" },
+            { 2, "F2" },
+            { 1, "F1 Sprint" }
+        };
+
+        public static readonly Dictionary<byte, string> PenaltyNames = new Dictionary<byte, string>
+        {
+            { 0, "DT" },
+            { 1, "SG" },
+            { 4, "TIME" },
+            { 6, "DSQ" }
+        };
+
         // Hardcoded names for tracks. In this format ──> Track ID → Name
         public static readonly Dictionary<byte, string> TrackNames = new Dictionary<byte, string>
         {
@@ -147,9 +163,21 @@ namespace F125UDPProtocol
             { 1, "Dry" },         // Light Cloud
             { 2, "Dry" },         // Overcast
             { 3, "LightRain" },
-            { 4, "HeavyRain" },
+            { 4, "MediumRain" },
             { 5, "HeavyRain" },   // Storm
         };
+
+        public static string GetClassName(byte classId)
+        {
+            string name;
+            return ClassNames.TryGetValue(classId, out name) ? name : "Unknown";
+        }
+
+        public static string GetPenaltyName(byte penId)
+        {
+            string name;
+            return PenaltyNames.TryGetValue(penId, out name) ? name : "";
+        }
 
         public static string GetTrackName(byte trackId)
         {

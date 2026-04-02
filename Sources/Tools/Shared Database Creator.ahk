@@ -457,9 +457,9 @@ createDatabases(inputDirectory, outputDirectory) {
 						SetWorkingDir(database)
 
 						try {
-							; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+							RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
-							RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+							; RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 						}
 						finally {
 							SetWorkingDir(currentDir)
@@ -496,9 +496,9 @@ createDatabases(inputDirectory, outputDirectory) {
 					SetWorkingDir(database)
 
 					try {
-						; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+						RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
-						RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+						; RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 					}
 					finally {
 						SetWorkingDir(currentDir)
@@ -530,9 +530,9 @@ createDatabases(inputDirectory, outputDirectory) {
 				SetWorkingDir(database)
 
 				try {
-					; RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
-					RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+					; RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
 				}
 				finally {
 					SetWorkingDir(currentDir)

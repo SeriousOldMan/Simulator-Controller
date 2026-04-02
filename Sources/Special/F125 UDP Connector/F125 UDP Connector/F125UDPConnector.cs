@@ -123,7 +123,9 @@ namespace F125UDPConnector
             var playerHistory = receiver.GetSessionHistoryData(playerIdx);
 
             int GetRemainingLaps() {
-                if (session.SessionType >= 10)
+                if (session.SessionType == 18)
+                    return 1;
+                else if (session.SessionType >= 10)
                     return (int)(session.TotalLaps - Math.Max(0, playerLap.CurrentLapNum - 1));
                 else
                     try
@@ -146,7 +148,9 @@ namespace F125UDPConnector
 
             long GetRemainingTime()
             {
-                if (session.SessionType >= 10)
+                if (session.SessionType == 18)
+                    return 60000;
+                else if (session.SessionType >= 10)
                     try
                     {
                         uint bestLap;

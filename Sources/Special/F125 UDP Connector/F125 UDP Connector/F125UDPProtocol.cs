@@ -140,7 +140,7 @@ namespace F125UDPProtocol
         // Hardcoded names for session types. In this format ──> Session Type → Display Name 
         public static readonly Dictionary<byte, string> SessionTypes = new Dictionary<byte, string>
         {
-            {  0, "Unknown" },
+            {  0, "Other" },
             {  1, "Practice" },
             {  2, "Practice" },
             {  3, "Practice" },
@@ -153,7 +153,13 @@ namespace F125UDPProtocol
             { 10, "Race" },
             { 11, "Race" },
             { 12, "Race" },
-            { 13, "Time Trial" },
+            { 12, "Race" },
+            { 13, "Race" },
+            { 14, "Race" },
+            { 15, "Race" },
+            { 16, "Race" },
+            { 17, "Race" },
+            { 18, "Time Trial" },
         };
 
         // ── Weather → Display Name ───────────────────────────────────────

@@ -25,7 +25,7 @@ namespace F125UDPProtocol
             { 0, "F1" },
             { 1, "F1 Classic" },
             { 2, "F2" },
-            { 1, "F1 Sprint" }
+            { 3, "F1 Sprint" }
         };
 
         public static readonly Dictionary<byte, string> PenaltyNames = new Dictionary<byte, string>
@@ -72,7 +72,7 @@ namespace F125UDPProtocol
             { 30, "Miami" },
             { 31, "Las Vegas" },
             { 32, "Losail" },
-            { 33, "Lusail" },
+            { 33, "Lusail" }
         };
 
         // Hardcoded names for teams. In this format ──> Team ID → Name
@@ -111,7 +111,7 @@ namespace F125UDPProtocol
             { 151, "Prema '24" },
             { 152, "Trident '24" },
             { 153, "Van Amersfoort '24" },
-            { 154, "AIX '24" },
+            { 154, "AIX '24" }
         };
 
         // ── Tyre Compound → Visual Name ─────────────────────────────────
@@ -123,7 +123,7 @@ namespace F125UDPProtocol
             { 19, "Soft" },       // C2 (alternate mapping)
             { 20, "Medium" },     // C1 (alternate mapping)
             {  7, "Intermediate" },
-            {  8, "Wet" },
+            {  8, "Wet" }
         };
 
         public static readonly Dictionary<byte, string> TyreVisualCompounds = new Dictionary<byte, string>
@@ -134,7 +134,7 @@ namespace F125UDPProtocol
             { 19, "Soft" },
             { 20, "Medium" },
             {  7, "Intermediate" },
-            {  8, "Wet" },
+            {  8, "Wet" }
         };
 
         // Hardcoded names for session types. In this format ──> Session Type → Display Name 
@@ -153,13 +153,12 @@ namespace F125UDPProtocol
             { 10, "Race" },
             { 11, "Race" },
             { 12, "Race" },
-            { 12, "Race" },
             { 13, "Race" },
             { 14, "Race" },
             { 15, "Race" },
             { 16, "Race" },
             { 17, "Race" },
-            { 18, "Time Trial" },
+            { 18, "Time Trial" }
         };
 
         // ── Weather → Display Name ───────────────────────────────────────
@@ -170,7 +169,7 @@ namespace F125UDPProtocol
             { 2, "Dry" },         // Overcast
             { 3, "LightRain" },
             { 4, "MediumRain" },
-            { 5, "HeavyRain" },   // Storm
+            { 5, "HeavyRain" }   // Storm
         };
 
         public static string GetClassName(byte classId)

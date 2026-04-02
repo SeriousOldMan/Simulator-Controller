@@ -62,16 +62,7 @@ namespace F125UDPConnector
 
         public bool HasData()
         {
-            return (receiver != null &&
-                    receiver.GetSessionData() != null &&
-                    receiver.GetSessionData() != null &&
-                    receiver.GetLapData() != null &&
-                    receiver.GetMotionData() != null &&
-                    receiver.GetCarTelemetryData() != null &&
-                    receiver.GetCarStatusData() != null &&
-                    receiver.GetCarDamageData() != null &&
-                    receiver.GetParticipantsData() != null &&
-                    receiver.GetMotionExData() != null);
+            return (receiver != null && receiver.GetSessionData() != null);
         }
 
         public string Call(string request)
@@ -101,11 +92,17 @@ namespace F125UDPConnector
 
             sb.Append("[Session Data]\n");
 
+            for (int i = 0; i < 15; i++)
+                if (HasData())
+                    break;
+                else
+                    Thread.Sleep(100);
+
             if (!HasData())
-            {
-                sb.Append("Active=false\n");
-                return sb.ToString();
-            }
+                {
+                    sb.Append("Active=false\n");
+                    return sb.ToString();
+                }
 
             var session = receiver.GetSessionData();
             var lapDataPkt = receiver.GetLapData();

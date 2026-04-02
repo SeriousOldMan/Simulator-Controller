@@ -4398,6 +4398,8 @@ class RaceSpotter extends GridRaceAssistant {
 					logError(exception, true)
 				}
 		}
+		else
+			sector := "0.0"
 
 		knowledgeBase.setFact("Standings", true)
 

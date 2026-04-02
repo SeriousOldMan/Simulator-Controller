@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.8.9.0-release](https://cutt.ly/JtO9Y4NU) (Changes: Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Updated AHK version, Added more car meta data to the session settings, Fixed export/import of Assistant Booster scripts.)
+[6.9.0.0-release](https://cutt.ly/9tANLrQN) (Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6890) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-689) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6900) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.8.8.0-release](https://cutt.ly/ZtUVneHd) (Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench", New startup info progress bars, Renamed session settings.)
+[6.8.9.0-release](https://cutt.ly/JtO9Y4NU) (Changes: Include Pangram for Polski, Fixed double click on Automation in "Session Database", Tyre wear calculation can handle mixed compounds, Removed obsolete LMU Pitstop MFD keys, Updated AHK version, Added more car meta data to the session settings, Fixed export/import of Assistant Booster scripts.)
 
-[6.8.7.0-release](https://cutt.ly/etYtimUC) (Changes: Click sound for launch icons in "Simulator Startup", New core setting for Windows design modus, Clarified *Verbose* setting in the *core settings*, Added Polish Grammars, Progress bar during translation update.)
+[6.8.8.0-release](https://cutt.ly/ZtUVneHd) (Changes: Fixed gap reporting, Wear based tyre life calculation, Sim / Car / Track selector in race settings, Ctrl key modifier for tyre compound choice in "Race Settings", Remove deleted tyre compounds from "Race Settings" and "Setup Workbench", Fixed Real Head Motion download link, Polish language pack in "Simulator Setup", Fixed initial tyre compound choice in "Setup Workbench", New startup info progress bars, Renamed session settings.)
 
 #### Latest development build
 
-[6.9.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XsZB3fQ-/Releases/Simulator%20Controller%206.9.0.0-beta.zip) (Test build for 6.9.0. Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6900) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

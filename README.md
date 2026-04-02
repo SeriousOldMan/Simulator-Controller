@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XsZB3fQ-/Releases/Simulator%20Controller%206.9.0.0-beta.zip) (Test build for 6.9.0. Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives.)
+[6.9.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/XsZB3fQ-/Releases/Simulator%20Controller%206.9.0.0-beta.zip) (Test build for 6.9.0. Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6900) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-690) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -135,6 +135,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 37. [Mastering brake coaching](https://youtu.be/5RiaIpjq4v0) - This video gives you valuable insights in the configuration of the brake coaching. All specific settings are explained and it is also discussed, how to import telemetry data from different sources as reference laps for the coaching.
 
 38. [Using automatic language translation for the Assistants](https://youtu.be/FSkf-SxQ3M8) - The new functionality that supports automatic translation for speech interaction is demonstrated in this video. You will learn how to configure the Assistants to use nay language you want.
+
+39. [Using tyre wear in strategy development](https://youtu.be/XppMCAAxqEM) - This video demonstrates the impact of tyre wear data on strategy development. You will learn how the recorded data looks like and how you can use it in strategy development.
 
 This list will be extended from time to time to cover new functionalities.
 

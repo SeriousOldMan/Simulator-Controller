@@ -339,7 +339,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 				}
 			}
 		}
-		
+
 		compress(kTempDirectory . "Shared Database", "Community", kTempDirectory . "Shared Database\Database." . id . ".zip")
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")
@@ -544,10 +544,13 @@ updateSessionDatabase() {
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
 		useTelemetries := (inList(A_Args, "-Telemetries") != 0)
 
+		/*
 		id := inList(A_Args, "-ID")
 
 		if id
 			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
+		*/
+		PeriodicTask(synchronizeCommunityDatabase.Bind("42812.9640.8993", true, true, true, true), 2000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 

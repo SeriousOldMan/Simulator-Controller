@@ -1410,6 +1410,12 @@ launchPad(command := false, arguments*) {
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 
+		if clickTask {
+			clickTask.stop()
+
+			clickTask := false
+		}
+
 		result := false
 		toolTips := Map()
 		executables := Map()

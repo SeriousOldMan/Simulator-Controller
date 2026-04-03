@@ -7,7 +7,7 @@ namespace F125UDPProtocol
     // 16 packet types, 29-byte PacketHeader, all Little-Endian.
     // Default port 20777, max 22 cars.
     // Wheel order in F1 25 packets: [RL=0, RR=1, FL=2, FR=3]
-    // Our output order:              [FL=0, FR=1, RL=2, RR=3]
+    // Our output order:             [FL=0, FR=1, RL=2, RR=3]
     // Reorder indices: { 2, 3, 0, 1 }
     // ─────────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,23 @@ namespace F125UDPProtocol
         // Wheel reorder: F1 25 [RL,RR,FL,FR] → output [FL,FR,RL,RR]
         public static readonly int[] WheelReorder = { 2, 3, 0, 1 };
 
-        // ── Track ID → Name ─────────────────────────────────────────────
+        public static readonly Dictionary<byte, string> ClassNames = new Dictionary<byte, string>
+        {
+            { 0, "F1" },
+            { 1, "F1 Classic" },
+            { 2, "F2" },
+            { 3, "F1 Sprint" }
+        };
+
+        public static readonly Dictionary<byte, string> PenaltyNames = new Dictionary<byte, string>
+        {
+            { 0, "DT" },
+            { 1, "SG" },
+            { 4, "TIME" },
+            { 6, "DSQ" }
+        };
+
+        // Hardcoded names for tracks. In this format ──> Track ID → Name
         public static readonly Dictionary<byte, string> TrackNames = new Dictionary<byte, string>
         {
             {  0, "Melbourne" },
@@ -56,10 +72,10 @@ namespace F125UDPProtocol
             { 30, "Miami" },
             { 31, "Las Vegas" },
             { 32, "Losail" },
-            { 33, "Lusail" },
+            { 33, "Lusail" }
         };
 
-        // ── Team ID → Name ──────────────────────────────────────────────
+        // Hardcoded names for teams. In this format ──> Team ID → Name
         public static readonly Dictionary<byte, string> TeamNames = new Dictionary<byte, string>
         {
             {  0, "Mercedes" },
@@ -95,7 +111,7 @@ namespace F125UDPProtocol
             { 151, "Prema '24" },
             { 152, "Trident '24" },
             { 153, "Van Amersfoort '24" },
-            { 154, "AIX '24" },
+            { 154, "AIX '24" }
         };
 
         // ── Tyre Compound → Visual Name ─────────────────────────────────
@@ -107,7 +123,7 @@ namespace F125UDPProtocol
             { 19, "Soft" },       // C2 (alternate mapping)
             { 20, "Medium" },     // C1 (alternate mapping)
             {  7, "Intermediate" },
-            {  8, "Wet" },
+            {  8, "Wet" }
         };
 
         public static readonly Dictionary<byte, string> TyreVisualCompounds = new Dictionary<byte, string>
@@ -118,13 +134,13 @@ namespace F125UDPProtocol
             { 19, "Soft" },
             { 20, "Medium" },
             {  7, "Intermediate" },
-            {  8, "Wet" },
+            {  8, "Wet" }
         };
 
-        // ── Session Type → Display Name ──────────────────────────────────
+        // Hardcoded names for session types. In this format ──> Session Type → Display Name 
         public static readonly Dictionary<byte, string> SessionTypes = new Dictionary<byte, string>
         {
-            {  0, "Unknown" },
+            {  0, "Other" },
             {  1, "Practice" },
             {  2, "Practice" },
             {  3, "Practice" },
@@ -132,12 +148,17 @@ namespace F125UDPProtocol
             {  5, "Qualification" },
             {  6, "Qualification" },
             {  7, "Qualification" },
-            {  8, "Qualification" }, // Short Q
+            {  8, "Qualification" }, // Short Qual
             {  9, "Qualification" }, // OSQ
             { 10, "Race" },
             { 11, "Race" },
             { 12, "Race" },
-            { 13, "Time Trial" },
+            { 13, "Race" },
+            { 14, "Race" },
+            { 15, "Race" },
+            { 16, "Race" },
+            { 17, "Race" },
+            { 18, "Time Trial" }
         };
 
         // ── Weather → Display Name ───────────────────────────────────────
@@ -147,9 +168,21 @@ namespace F125UDPProtocol
             { 1, "Dry" },         // Light Cloud
             { 2, "Dry" },         // Overcast
             { 3, "LightRain" },
-            { 4, "HeavyRain" },
-            { 5, "HeavyRain" },   // Storm
+            { 4, "MediumRain" },
+            { 5, "HeavyRain" }   // Storm
         };
+
+        public static string GetClassName(byte classId)
+        {
+            string name;
+            return ClassNames.TryGetValue(classId, out name) ? name : "Unknown";
+        }
+
+        public static string GetPenaltyName(byte penId)
+        {
+            string name;
+            return PenaltyNames.TryGetValue(penId, out name) ? name : "";
+        }
 
         public static string GetTrackName(byte trackId)
         {
@@ -385,17 +418,6 @@ namespace F125UDPProtocol
         public byte NumSafetyCarPeriods;
         public byte NumVirtualSafetyCarPeriods;
         public byte NumRedFlagPeriods;
-        public byte EqualCarPerformance;
-        public byte RecoveryMode;
-        public byte FlashbackLimit;
-        public byte SurfaceType;
-        public byte LowFuelMode;
-        public byte RaceStarts;
-        public byte TyreSetsMode;
-        public byte GearShiftAssist;
-        public float TimeTrialPBCarIdx;
-        public float TimeTrialRivalCarIdx;
-        public byte ExtraLap;
 
         public static PacketSessionData Decode(byte[] data)
         {
@@ -454,17 +476,6 @@ namespace F125UDPProtocol
             p.NumSafetyCarPeriods = data[o++];
             p.NumVirtualSafetyCarPeriods = data[o++];
             p.NumRedFlagPeriods = data[o++];
-            p.EqualCarPerformance = data[o++];
-            p.RecoveryMode = data[o++];
-            p.FlashbackLimit = data[o++];
-            p.SurfaceType = data[o++];
-            p.LowFuelMode = data[o++];
-            p.RaceStarts = data[o++];
-            p.TyreSetsMode = data[o++];
-            p.GearShiftAssist = data[o++];
-            p.TimeTrialPBCarIdx = BitConverter.ToSingle(data, o); o += 4;
-            p.TimeTrialRivalCarIdx = BitConverter.ToSingle(data, o); o += 4;
-            p.ExtraLap = data[o++];
 
             return p;
         }
@@ -506,6 +517,8 @@ namespace F125UDPProtocol
         public ushort PitLaneTimeInLaneInMS;
         public ushort PitStopTimerInMS;
         public byte PitStopShouldServePen;
+        public float SpeedTrapFastestSpeed;
+        public ushort SpeedTrapFastestLap;
 
         public static LapData Decode(byte[] data, ref int o)
         {
@@ -541,6 +554,8 @@ namespace F125UDPProtocol
             l.PitLaneTimeInLaneInMS = BitConverter.ToUInt16(data, o); o += 2;
             l.PitStopTimerInMS = BitConverter.ToUInt16(data, o); o += 2;
             l.PitStopShouldServePen = data[o++];
+			l.SpeedTrapFastestSpeed = BitConverter.ToSingle(data, o); o += 4;
+            l.SpeedTrapFastestLap = data[o++];
             return l;
         }
     }
@@ -619,19 +634,22 @@ namespace F125UDPProtocol
             pd.MyTeam = data[o++];
             pd.RaceNumber = data[o++];
             pd.Nationality = data[o++];
-            // Name: 48 bytes, null-terminated
+            // Name: 32 bytes, null-terminated
             int nameEnd = o;
-            for (int i = 0; i < 48; i++)
+            for (int i = 0; i < 32; i++)
             {
                 if (data[o + i] == 0) { nameEnd = o + i; break; }
-                if (i == 47) nameEnd = o + 48;
+                if (i == 31) nameEnd = o + 32;
             }
             pd.Name = System.Text.Encoding.UTF8.GetString(data, o, nameEnd - o);
-            o += 48;
+            o += 32;
             pd.YourTelemetry = data[o++];
             pd.ShowOnlineNames = data[o++];
             pd.TechLevel = BitConverter.ToUInt16(data, o); o += 2;
             pd.Platform = data[o++];
+			
+			o += 13;
+			
             return pd;
         }
     }
@@ -648,7 +666,7 @@ namespace F125UDPProtocol
             p.Header = PacketHeader.Decode(data);
             int o = F125Constants.HeaderSize;
             p.NumActiveCars = data[o++];
-            for (int i = 0; i < F125Constants.MaxCars; i++)
+            for (int i = 0; i < p.NumActiveCars; i++)
                 p.Participants[i] = ParticipantData.Decode(data, ref o);
             return p;
         }
@@ -748,7 +766,6 @@ namespace F125UDPProtocol
         public ushort EngineTemperature;
         public float[] TyresPressure = new float[4];        // PSI
         public byte[] SurfaceType = new byte[4];
-        public byte Overtake;
 
         public static CarTelemetryData Decode(byte[] data, ref int o)
         {
@@ -769,7 +786,6 @@ namespace F125UDPProtocol
             t.EngineTemperature = BitConverter.ToUInt16(data, o); o += 2;
             for (int i = 0; i < 4; i++) { t.TyresPressure[i] = BitConverter.ToSingle(data, o); o += 4; }
             for (int i = 0; i < 4; i++) { t.SurfaceType[i] = data[o++]; }
-            t.Overtake = data[o++];
             return t;
         }
     }
@@ -818,7 +834,8 @@ namespace F125UDPProtocol
         public byte VisualTyreCompound;
         public byte TyresAgeLaps;
         public sbyte VehicleFIAFlags;        // -1=invalid, 0=none, 1=green, 2=blue, 3=yellow
-        public float PowerTrainTemperature;
+        public float EnginePowerICE;
+        public float EnginePowerMGUK;
         public float ERSStoreEnergy;
         public byte ERSDeployMode;           // 0=none, 1=medium, 2=hotlap, 3=overtake
         public float ERSHarvestedThisLapMGUK;
@@ -846,7 +863,8 @@ namespace F125UDPProtocol
             s.VisualTyreCompound = data[o++];
             s.TyresAgeLaps = data[o++];
             s.VehicleFIAFlags = (sbyte)data[o++];
-            s.PowerTrainTemperature = BitConverter.ToSingle(data, o); o += 4;
+            s.EnginePowerICE = BitConverter.ToSingle(data, o); o += 4;
+            s.EnginePowerMGUK = BitConverter.ToSingle(data, o); o += 4;
             s.ERSStoreEnergy = BitConverter.ToSingle(data, o); o += 4;
             s.ERSDeployMode = data[o++];
             s.ERSHarvestedThisLapMGUK = BitConverter.ToSingle(data, o); o += 4;
@@ -943,6 +961,9 @@ namespace F125UDPProtocol
         public byte Platform;
         public string Name = "";
         public byte CarNumber;
+        public byte YourTelemetry;
+        public byte ShowOnlineNames;
+        public ushort TechLevel;
         public byte ReadyStatus;
 
         public static LobbyInfoData Decode(byte[] data, ref int o)
@@ -953,14 +974,17 @@ namespace F125UDPProtocol
             l.Nationality = data[o++];
             l.Platform = data[o++];
             int nameEnd = o;
-            for (int i = 0; i < 48; i++)
+            for (int i = 0; i < 32; i++)
             {
                 if (data[o + i] == 0) { nameEnd = o + i; break; }
-                if (i == 47) nameEnd = o + 48;
+                if (i == 31) nameEnd = o + 32;
             }
             l.Name = System.Text.Encoding.UTF8.GetString(data, o, nameEnd - o);
-            o += 48;
+            o += 32;
             l.CarNumber = data[o++];
+            l.YourTelemetry = data[o++];
+            l.ShowOnlineNames = data[o++];
+            l.TechLevel = BitConverter.ToUInt16(data, o); o += 2;
             l.ReadyStatus = data[o++];
             return l;
         }
@@ -978,7 +1002,7 @@ namespace F125UDPProtocol
             p.Header = PacketHeader.Decode(data);
             int o = F125Constants.HeaderSize;
             p.NumPlayers = data[o++];
-            for (int i = 0; i < F125Constants.MaxCars; i++)
+            for (int i = 0; i < p.NumPlayers; i++)
                 p.LobbyPlayers[i] = LobbyInfoData.Decode(data, ref o);
             return p;
         }
@@ -992,6 +1016,7 @@ namespace F125UDPProtocol
         public float[] TyresWear = new float[4];       // [RL,RR,FL,FR] percentage
         public byte[] TyresDamage = new byte[4];
         public byte[] BrakesDamage = new byte[4];
+        public byte[] TyreBlisters = new byte[4];
         public byte FrontLeftWingDamage;
         public byte FrontRightWingDamage;
         public byte RearWingDamage;
@@ -1017,6 +1042,7 @@ namespace F125UDPProtocol
             for (int i = 0; i < 4; i++) { d.TyresWear[i] = BitConverter.ToSingle(data, o); o += 4; }
             for (int i = 0; i < 4; i++) d.TyresDamage[i] = data[o++];
             for (int i = 0; i < 4; i++) d.BrakesDamage[i] = data[o++];
+            for (int i = 0; i < 4; i++) d.TyreBlisters[i] = data[o++];
             d.FrontLeftWingDamage = data[o++];
             d.FrontRightWingDamage = data[o++];
             d.RearWingDamage = data[o++];

@@ -59,7 +59,7 @@ namespace F125UDPReceiver
                     }
                     catch
                     {
-                        // Not a valid multicast address — treat as broadcast/unicast
+                        // Not valid multicast address — treated as broadcast/unicast
                     }
                 }
                 else

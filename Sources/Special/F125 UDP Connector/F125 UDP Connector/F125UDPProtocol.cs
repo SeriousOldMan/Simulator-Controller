@@ -834,7 +834,8 @@ namespace F125UDPProtocol
         public byte VisualTyreCompound;
         public byte TyresAgeLaps;
         public sbyte VehicleFIAFlags;        // -1=invalid, 0=none, 1=green, 2=blue, 3=yellow
-        public float PowerTrainTemperature;
+        public float EnginePowerICE;
+        public float EnginePowerMGUK;
         public float ERSStoreEnergy;
         public byte ERSDeployMode;           // 0=none, 1=medium, 2=hotlap, 3=overtake
         public float ERSHarvestedThisLapMGUK;
@@ -862,7 +863,8 @@ namespace F125UDPProtocol
             s.VisualTyreCompound = data[o++];
             s.TyresAgeLaps = data[o++];
             s.VehicleFIAFlags = (sbyte)data[o++];
-            s.PowerTrainTemperature = BitConverter.ToSingle(data, o); o += 4;
+            s.EnginePowerICE = BitConverter.ToSingle(data, o); o += 4;
+            s.EnginePowerMGUK = BitConverter.ToSingle(data, o); o += 4;
             s.ERSStoreEnergy = BitConverter.ToSingle(data, o); o += 4;
             s.ERSDeployMode = data[o++];
             s.ERSHarvestedThisLapMGUK = BitConverter.ToSingle(data, o); o += 4;

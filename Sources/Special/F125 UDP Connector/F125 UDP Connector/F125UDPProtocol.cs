@@ -418,17 +418,6 @@ namespace F125UDPProtocol
         public byte NumSafetyCarPeriods;
         public byte NumVirtualSafetyCarPeriods;
         public byte NumRedFlagPeriods;
-        public byte EqualCarPerformance;
-        public byte RecoveryMode;
-        public byte FlashbackLimit;
-        public byte SurfaceType;
-        public byte LowFuelMode;
-        public byte RaceStarts;
-        public byte TyreSetsMode;
-        public byte GearShiftAssist;
-        public float TimeTrialPBCarIdx;
-        public float TimeTrialRivalCarIdx;
-        public byte ExtraLap;
 
         public static PacketSessionData Decode(byte[] data)
         {
@@ -487,17 +476,6 @@ namespace F125UDPProtocol
             p.NumSafetyCarPeriods = data[o++];
             p.NumVirtualSafetyCarPeriods = data[o++];
             p.NumRedFlagPeriods = data[o++];
-            p.EqualCarPerformance = data[o++];
-            p.RecoveryMode = data[o++];
-            p.FlashbackLimit = data[o++];
-            p.SurfaceType = data[o++];
-            p.LowFuelMode = data[o++];
-            p.RaceStarts = data[o++];
-            p.TyreSetsMode = data[o++];
-            p.GearShiftAssist = data[o++];
-            p.TimeTrialPBCarIdx = BitConverter.ToSingle(data, o); o += 4;
-            p.TimeTrialRivalCarIdx = BitConverter.ToSingle(data, o); o += 4;
-            p.ExtraLap = data[o++];
 
             return p;
         }
@@ -539,6 +517,8 @@ namespace F125UDPProtocol
         public ushort PitLaneTimeInLaneInMS;
         public ushort PitStopTimerInMS;
         public byte PitStopShouldServePen;
+        public float SpeedTrapFastestSpeed;
+        public ushort SpeedTrapFastestLap;
 
         public static LapData Decode(byte[] data, ref int o)
         {
@@ -574,6 +554,8 @@ namespace F125UDPProtocol
             l.PitLaneTimeInLaneInMS = BitConverter.ToUInt16(data, o); o += 2;
             l.PitStopTimerInMS = BitConverter.ToUInt16(data, o); o += 2;
             l.PitStopShouldServePen = data[o++];
+			l.SpeedTrapFastestSpeed = BitConverter.ToSingle(data, o); o += 4;
+            l.SpeedTrapFastestLap = data[o++];
             return l;
         }
     }

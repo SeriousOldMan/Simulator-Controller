@@ -59,12 +59,14 @@ namespace F125UDPConnector
             catch { }
         }
 
-        public bool HasData(string type)
+        public bool HasData(string type = "Telemetry")
         {
             if (receiver == null || receiver.GetSessionData() == null
                                  || receiver.GetLapData() == null
                                  || receiver.GetParticipantsData() != null)
                 return false;
+
+            return true;
 
             if (type == "Telemetry")
                 return (receiver.GetMotionData() != null &&

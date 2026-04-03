@@ -6,7 +6,7 @@ Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/
 Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench"
 Components=Media->6.9.0,Configuration->6.9.0,Utilities->6.8.8
 [Release]
-Version=6.8.9.0-release
+Version=6.9.0.0-release
 Date=04/03/2026
 Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HaS-2Ad1/Releases/Simulator%20Controller%206.9.0.0-release.zip;https://www.dropbox.com/scl/fi/57gmgb1ly12zybw3s5igh/Simulator-Controller-6.9.0.0-release.zip?rlkey=nqf32krbytl6s4kyfhwki61ay&st=9f06o4x5&dl=1;http://%master%/Releases/Simulator Controller 6.9.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.0.0-release.zip
 Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench"

@@ -654,17 +654,20 @@ namespace F125UDPProtocol
             pd.Nationality = data[o++];
             // Name: 48 bytes, null-terminated
             int nameEnd = o;
-            for (int i = 0; i < 48; i++)
+            for (int i = 0; i < 32; i++)
             {
                 if (data[o + i] == 0) { nameEnd = o + i; break; }
-                if (i == 47) nameEnd = o + 48;
+                if (i == 31) nameEnd = o + 32;
             }
             pd.Name = System.Text.Encoding.UTF8.GetString(data, o, nameEnd - o);
-            o += 48;
+            o += 32;
             pd.YourTelemetry = data[o++];
             pd.ShowOnlineNames = data[o++];
             pd.TechLevel = BitConverter.ToUInt16(data, o); o += 2;
             pd.Platform = data[o++];
+			
+			o += 13;
+			
             return pd;
         }
     }
@@ -781,7 +784,6 @@ namespace F125UDPProtocol
         public ushort EngineTemperature;
         public float[] TyresPressure = new float[4];        // PSI
         public byte[] SurfaceType = new byte[4];
-        public byte Overtake;
 
         public static CarTelemetryData Decode(byte[] data, ref int o)
         {
@@ -802,7 +804,6 @@ namespace F125UDPProtocol
             t.EngineTemperature = BitConverter.ToUInt16(data, o); o += 2;
             for (int i = 0; i < 4; i++) { t.TyresPressure[i] = BitConverter.ToSingle(data, o); o += 4; }
             for (int i = 0; i < 4; i++) { t.SurfaceType[i] = data[o++]; }
-            t.Overtake = data[o++];
             return t;
         }
     }

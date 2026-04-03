@@ -11,8 +11,7 @@ namespace F125UDPConnector
     {
         private F125UDPReceiver.F125UDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
-        private static readonly string[] fuelMixNames = { "Lean", "Standard", "Rich", "Max" };
-
+        
         public F125UDPConnector()
         {
         }
@@ -60,9 +59,20 @@ namespace F125UDPConnector
             catch { }
         }
 
-        public bool HasData()
+        public bool HasData(string type)
         {
-            return (receiver != null && receiver.GetSessionData() != null);
+            if (receiver == null || receiver.GetSessionData() == null
+                                 || receiver.GetLapData() == null
+                                 || receiver.GetParticipantsData() != null)
+                return false;
+
+            if (type == "Telemetry")
+                return (receiver.GetMotionData() != null &&
+                        receiver.GetCarTelemetryData() != null &&
+                        receiver.GetCarStatusData() != null &&
+                        receiver.GetCarDamageData() != null);
+            else
+                return true;
         }
 
         public string Call(string request)
@@ -93,30 +103,29 @@ namespace F125UDPConnector
             sb.Append("[Session Data]\n");
 
             for (int i = 0; i < 15; i++)
-                if (HasData())
+                if (HasData("Telemetry"))
                     break;
                 else
                     Thread.Sleep(100);
 
-            if (!HasData())
+            if (!HasData("Telemetry"))
                 {
                     sb.Append("Active=false\n");
                     return sb.ToString();
                 }
 
             var session = receiver.GetSessionData();
-            var lapDataPkt = receiver.GetLapData();
+            var lapData = receiver.GetLapData();
             var motion = receiver.GetMotionData();
             var telemetry = receiver.GetCarTelemetryData();
             var status = receiver.GetCarStatusData();
             var damage = receiver.GetCarDamageData();
             var participants = receiver.GetParticipantsData();
-            var motionEx = receiver.GetMotionExData();
 
             int playerIdx = session.Header.PlayerCarIndex;
             int numCars = participants != null ? participants.NumActiveCars : 0;
 
-            var playerLap = lapDataPkt.LapDataArr[playerIdx];
+            var playerLap = lapData.LapDataArr[playerIdx];
             var playerHistory = receiver.GetSessionHistoryData(playerIdx);
 
             int GetRemainingLaps() {
@@ -518,18 +527,22 @@ namespace F125UDPConnector
 
             sb.Append("[Position Data]\n");
 
-            if (!HasData())
+            for (int i = 0; i < 15; i++)
+                if (HasData("Standings"))
+                    break;
+                else
+                    Thread.Sleep(100);
+
+            if (!HasData("Standings"))
             {
-                sb.Append("Active=false\n");
                 sb.Append("Car.Count=0\n");
+
                 return sb.ToString();
             }
 
             var session = receiver.GetSessionData();
-            var lapDataPkt = receiver.GetLapData();
+            var lapData = receiver.GetLapData();
             var participants = receiver.GetParticipantsData();
-            var status = receiver.GetCarStatusData();
-            var damageData = receiver.GetCarDamageData();
 
             int numCars = participants.NumActiveCars;
             int playerIdx = session.Header.PlayerCarIndex;
@@ -539,7 +552,7 @@ namespace F125UDPConnector
 
             for (int i = 0; i < numCars; i++)
             {
-                var ld = lapDataPkt.LapDataArr[i];
+                var ld = lapData.LapDataArr[i];
                 var part = participants.Participants[i];
                 int carNum = i + 1;
 

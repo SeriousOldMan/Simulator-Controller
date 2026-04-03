@@ -63,7 +63,7 @@ namespace F125UDPConnector
         {
             if (receiver == null || receiver.GetSessionData() == null
                                  || receiver.GetLapData() == null
-                                 || receiver.GetParticipantsData() != null)
+                                 || receiver.GetParticipantsData() == null)
                 return false;
 
             return true;

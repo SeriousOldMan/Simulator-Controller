@@ -652,7 +652,7 @@ namespace F125UDPProtocol
             pd.MyTeam = data[o++];
             pd.RaceNumber = data[o++];
             pd.Nationality = data[o++];
-            // Name: 48 bytes, null-terminated
+            // Name: 32 bytes, null-terminated
             int nameEnd = o;
             for (int i = 0; i < 32; i++)
             {
@@ -684,7 +684,7 @@ namespace F125UDPProtocol
             p.Header = PacketHeader.Decode(data);
             int o = F125Constants.HeaderSize;
             p.NumActiveCars = data[o++];
-            for (int i = 0; i < F125Constants.MaxCars; i++)
+            for (int i = 0; i < p.NumActiveCars; i++)
                 p.Participants[i] = ParticipantData.Decode(data, ref o);
             return p;
         }

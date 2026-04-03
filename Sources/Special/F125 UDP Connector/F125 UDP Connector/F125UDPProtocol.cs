@@ -977,6 +977,9 @@ namespace F125UDPProtocol
         public byte Platform;
         public string Name = "";
         public byte CarNumber;
+        public byte YourTelemetry;
+        public byte ShowOnlineNames;
+        public ushort TechLevel;
         public byte ReadyStatus;
 
         public static LobbyInfoData Decode(byte[] data, ref int o)
@@ -987,14 +990,17 @@ namespace F125UDPProtocol
             l.Nationality = data[o++];
             l.Platform = data[o++];
             int nameEnd = o;
-            for (int i = 0; i < 48; i++)
+            for (int i = 0; i < 32; i++)
             {
                 if (data[o + i] == 0) { nameEnd = o + i; break; }
-                if (i == 47) nameEnd = o + 48;
+                if (i == 31) nameEnd = o + 32;
             }
             l.Name = System.Text.Encoding.UTF8.GetString(data, o, nameEnd - o);
-            o += 48;
+            o += 32;
             l.CarNumber = data[o++];
+            l.YourTelemetry = data[o++];
+            l.ShowOnlineNames = data[o++];
+            l.TechLevel = BitConverter.ToUInt16(data, o); o += 2;
             l.ReadyStatus = data[o++];
             return l;
         }
@@ -1012,7 +1018,7 @@ namespace F125UDPProtocol
             p.Header = PacketHeader.Decode(data);
             int o = F125Constants.HeaderSize;
             p.NumPlayers = data[o++];
-            for (int i = 0; i < F125Constants.MaxCars; i++)
+            for (int i = 0; i < p.NumPlayers; i++)
                 p.LobbyPlayers[i] = LobbyInfoData.Decode(data, ref o);
             return p;
         }
@@ -1026,6 +1032,7 @@ namespace F125UDPProtocol
         public float[] TyresWear = new float[4];       // [RL,RR,FL,FR] percentage
         public byte[] TyresDamage = new byte[4];
         public byte[] BrakesDamage = new byte[4];
+        public byte[] TyreBlisters = new byte[4];
         public byte FrontLeftWingDamage;
         public byte FrontRightWingDamage;
         public byte RearWingDamage;
@@ -1051,6 +1058,7 @@ namespace F125UDPProtocol
             for (int i = 0; i < 4; i++) { d.TyresWear[i] = BitConverter.ToSingle(data, o); o += 4; }
             for (int i = 0; i < 4; i++) d.TyresDamage[i] = data[o++];
             for (int i = 0; i < 4; i++) d.BrakesDamage[i] = data[o++];
+            for (int i = 0; i < 4; i++) d.TyreBlisters[i] = data[o++];
             d.FrontLeftWingDamage = data[o++];
             d.FrontRightWingDamage = data[o++];
             d.RearWingDamage = data[o++];

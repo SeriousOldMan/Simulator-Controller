@@ -10,17 +10,30 @@ namespace F125UDPCoach {
     public class UDPCoach
     {
         private F125UDPReceiver.F125UDPReceiver receiver;
+		
         bool connected = false;
         string host;
         int port;
         bool useMultiCast;
-        public UDPCoach(string host = "127.0.0.1", int port = 20777, bool useMultiCast = false) {
+        
+		public UDPCoach(string host = "127.0.0.1", int port = 20777, bool useMultiCast = false) {
             this.host = host;
             this.port = port;
             this.useMultiCast = useMultiCast;
 
             if (!this.connected)
                 this.Connect();
+        }
+
+        private bool HasData()
+        {
+            if (receiver == null || receiver.GetSessionData() == null
+                                 || receiver.GetLapData() == null
+                                 || receiver.GetMotionData() == null
+                                 || receiver.GetMotionExData() == null)
+                return false;
+				
+            return true;
         }
 
         private void Connect() {
@@ -42,7 +55,14 @@ namespace F125UDPCoach {
                                 started = true;
                             else
                                 Thread.Sleep(200);
-                    }
+							
+						if (started)
+							for (int i = 0; i < 15; i++)
+								if (HasData())
+									break;
+								else
+									Thread.Sleep(100);
+					}
 
                     if (!started)
                         receiver = null;

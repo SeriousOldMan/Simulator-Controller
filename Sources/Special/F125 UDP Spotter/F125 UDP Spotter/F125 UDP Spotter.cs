@@ -25,6 +25,20 @@ namespace F125UDPSpotter {
 				this.Connect();
 		}
 
+        private bool HasData()
+        {
+            if (receiver == null || receiver.GetSessionData() == null
+                                 || receiver.GetLapData() == null
+                                 || receiver.GetCarTelemetryData() == null
+                                 || receiver.GetCarStatusData() == null
+                                 || receiver.GetParticipantsData() == null
+                                 || receiver.GetMotionData() == null
+                                 || receiver.GetMotionExData() == null)
+                return false;
+				
+            return true;
+        }
+
 		private void Connect() {
 			if (!this.connected) {
 				try {
@@ -44,6 +58,13 @@ namespace F125UDPSpotter {
                                 started = true;
                             else
                                 Thread.Sleep(200);
+							
+						if (started)
+							for (int i = 0; i < 15; i++)
+								if (HasData())
+									break;
+								else
+									Thread.Sleep(100);
                     }
 
                     if (!started)

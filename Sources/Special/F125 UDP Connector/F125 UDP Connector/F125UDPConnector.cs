@@ -66,8 +66,6 @@ namespace F125UDPConnector
                                  || receiver.GetParticipantsData() == null)
                 return false;
 
-            return true;
-
             if (type == "Telemetry")
                 return (receiver.GetMotionData() != null &&
                         receiver.GetCarTelemetryData() != null &&

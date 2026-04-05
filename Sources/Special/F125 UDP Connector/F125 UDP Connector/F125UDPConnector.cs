@@ -224,8 +224,8 @@ namespace F125UDPConnector
                     sb.AppendFormat("MAP={0}\n", playerStatus.FuelMix + 1);
                 else
                     sb.Append("MAP=n/a\n");
-                sb.AppendFormat("TC={0}\n", I(playerStatus.TractionControl));
-                sb.AppendFormat("ABS={0}\n", I(playerStatus.AntiLockBrakes));
+                sb.AppendFormat("TC={0}\n", "n/a"); // I(playerStatus.TractionControl));
+                sb.AppendFormat("ABS={0}\n", "n/a"); // I(playerStatus.AntiLockBrakes));
                 sb.AppendFormat("BB={0}\n", F(playerStatus.FrontBrakeBias));
             }
             else
@@ -253,7 +253,7 @@ namespace F125UDPConnector
                     I(playerDamage.TyresDamage[wr[2]]),
                     I(playerDamage.TyresDamage[wr[3]]));
 
-                sb.AppendFormat("EngineDamage={0}\n", I(playerDamage.EngineDamage + playerDamage.GearBoxDamage));
+                sb.AppendFormat("EngineDamage={0}\n", I((playerDamage.EngineDamage + playerDamage.GearBoxDamage) / 2));
 
                 /*
                 // Damage

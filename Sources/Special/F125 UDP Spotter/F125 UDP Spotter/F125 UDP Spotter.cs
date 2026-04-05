@@ -1176,8 +1176,7 @@ namespace F125UDPSpotter {
 					float throttle = 0, brake = 0, steer = 0;
 					int gear = 0, rpm = 0;
 					float speed = (float)vehicleSpeed(playerMotion);
-					bool tcActive = false, absActive = false;
-
+					
 					if (telemetry != null)
 					{
 						var pt = telemetry.CarTelemetry[playerIdx];
@@ -1188,15 +1187,6 @@ namespace F125UDPSpotter {
 						rpm = (int)pt.EngineRPM;
 					}
 
-					// Longitudinal/lateral acceleration from motionEx
-					float gLong = 0, gLat = 0;
-					if (motionEx != null)
-					{
-						// LocalVelocityZ is forward, LocalVelocityX is lateral
-						gLong = motionEx.LocalVelocityZ;
-						gLat = motionEx.LocalVelocityX;
-					}
-
 					telemetryFile.Write(lastRunning * trackLength + ";");
 					telemetryFile.Write(throttle + ";");
 					telemetryFile.Write(brake + ";");
@@ -1204,10 +1194,10 @@ namespace F125UDPSpotter {
 					telemetryFile.Write(gear + ";");
 					telemetryFile.Write(rpm + ";");
 					telemetryFile.Write(speed + ";");
-					telemetryFile.Write(tcActive ? "1;" : "0;");
-					telemetryFile.Write(absActive ? "1;" : "0;");
-					telemetryFile.Write(gLong + ";");
-					telemetryFile.Write(gLat + ";");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write(playerMotion.GForceLongitudinal + ";");
+					telemetryFile.Write(playerMotion.GForceLateral + ";");
 					telemetryFile.Write(playerMotion.WorldPositionX + ";");
 					telemetryFile.Write(playerMotion.WorldPositionZ + ";");
 
@@ -1231,8 +1221,8 @@ namespace F125UDPSpotter {
                             file.Write("n/a;");
                             file.Write("n/a;");
 
-                            file.Write(gLong + ";");
-                            file.Write(gLat + ";");
+                            file.Write(playerMotion.GForceLongitudinal + ";");
+                            file.Write(playerMotion.GForceLateral + ";");
 
                             file.Write(playerMotion.WorldPositionX + ";");
                             file.Write(playerMotion.WorldPositionZ + ";");

@@ -411,9 +411,9 @@ checkInstallation() {
 								}
 								else
 									destination := path
-									
+
 								DirCreate(destination)
-					
+
 								expand(kTempDirectory . "ComponentPackage.zip", destination)
 
 								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
@@ -3351,15 +3351,18 @@ runSpecialTargets(&buildProgress) {
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 					try {
-						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" -t:Restore -p:RestorePackagesConfig=true > `""
+						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:Configuration=Debug -t:Restore -p:RestorePackagesConfig=true > `""
+													. kTempDirectory . "Special Build.out`"`"", , "Hide")
+
+						result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:Configuration=Release -t:Restore -p:RestorePackagesConfig=true > `""
 													. kTempDirectory . "Special Build.out`"`"", , "Hide")
 
 						if !result
 							if (InStr(solution, "Microsoft Speech") || InStr(solution, "AC UDP Provider"))
-								result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release /p:Platform=`"x64`" > `""
+								result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:Configuration=Release /p:Platform=`"x64`" > `""
 															. kTempDirectory . "Special Build.out`"`"", , "Hide")
 							else
-								result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:BuildMode=Release /p:Configuration=Release > `""
+								result := RunWait(A_ComSpec . " /c `"`"" . msBuild .  "`" `"" . file . "`" /p:Configuration=Release > `""
 															. kTempDirectory . "Special Build.out`"`"", , "Hide")
 
 						if result {

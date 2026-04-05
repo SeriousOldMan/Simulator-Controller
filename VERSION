@@ -2,25 +2,25 @@
 Version=6.9.0.0-release
 Target=6.9.0.0-release
 Date=04/03/2026
-Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HaS-2Ad1/Releases/Simulator%20Controller%206.9.0.0-release.zip;https://www.dropbox.com/scl/fi/57gmgb1ly12zybw3s5igh/Simulator-Controller-6.9.0.0-release.zip?rlkey=nqf32krbytl6s4kyfhwki61ay&st=9f06o4x5&dl=1;http://%master%/Releases/Simulator Controller 6.9.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.0.0-release.zip
+Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HaS-2Ad1/Releases/Simulator%20Controller%206.9.0.0-release.zip;http://%master%/Releases/Simulator Controller 6.9.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.0.0-release.zip;https://www.dropbox.com/scl/fi/57gmgb1ly12zybw3s5igh/Simulator-Controller-6.9.0.0-release.zip?rlkey=nqf32krbytl6s4kyfhwki61ay&st=9f06o4x5&dl=1
 Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench"
 Components=Media->6.9.0,Configuration->6.9.0,Utilities->6.8.8
 [Release]
 Version=6.9.0.0-release
 Date=04/03/2026
-Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HaS-2Ad1/Releases/Simulator%20Controller%206.9.0.0-release.zip;https://www.dropbox.com/scl/fi/57gmgb1ly12zybw3s5igh/Simulator-Controller-6.9.0.0-release.zip?rlkey=nqf32krbytl6s4kyfhwki61ay&st=9f06o4x5&dl=1;http://%master%/Releases/Simulator Controller 6.9.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.0.0-release.zip
+Download=https://cutt.ly/9tANLrQN;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/HaS-2Ad1/Releases/Simulator%20Controller%206.9.0.0-release.zip;http://%master%/Releases/Simulator Controller 6.9.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.0.0-release.zip;https://www.dropbox.com/scl/fi/57gmgb1ly12zybw3s5igh/Simulator-Controller-6.9.0.0-release.zip?rlkey=nqf32krbytl6s4kyfhwki61ay&st=9f06o4x5&dl=1
 Changes=Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench"
 Components=Media->6.9.0,Configuration->6.9.0,Utilities->6.8.8
 [Components]
 Media.6.9.0.Path=Resources
 Media.6.9.0.Content=Splash Media
-Media.6.9.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y93MJ67x/Components/Media%206.9.0.zip;https://www.dropbox.com/scl/fi/hq0zwosm0ajjefnafm6ug/Media-6.9.0.zip?rlkey=3j92oswbm0yg3x9uf7qpkxwuq&st=hy0ea71c&dl=1;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+6.9.0.zip
+Media.6.9.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y93MJ67x/Components/Media%206.9.0.zip;http://%master%/Components/Media 5.6.1.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Media+6.9.0.zip;https://www.dropbox.com/scl/fi/hq0zwosm0ajjefnafm6ug/Media-6.9.0.zip?rlkey=3j92oswbm0yg3x9uf7qpkxwuq&st=hy0ea71c&dl=1
 Configuration.6.9.0.Path=Resources
 Configuration.6.9.0.Content=Setup
 Configuration.6.9.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/nBQ7qcLl/Components/Configuration%206.9.0.zip;http://%master%/Components/Configuration 6.9.0.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Configuration+6.9.0.zip
 Utilities.6.8.8.Path=.
 Utilities.6.8.8.Content=Utilities
-Utilities.6.8.8.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/fkrA4tZT/Components/Utilities%206.8.8.zip;https://www.dropbox.com/scl/fi/94qlc5c50n4djbpb97t9m/Utilities-6.8.8.zip?rlkey=q3tqwnzbdngg1qrhdfbgvsou3&st=z4pcwnt1&dl=1;http://%master%/Components/Utilities 6.8.8.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.8.zip
+Utilities.6.8.8.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/fkrA4tZT/Components/Utilities%206.8.8.zip;http://%master%/Components/Utilities 6.8.8.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.8.zip;https://www.dropbox.com/scl/fi/94qlc5c50n4djbpb97t9m/Utilities-6.8.8.zip?rlkey=q3tqwnzbdngg1qrhdfbgvsou3&st=z4pcwnt1&dl=1
 [Current]
 Type=Release
 [Version]

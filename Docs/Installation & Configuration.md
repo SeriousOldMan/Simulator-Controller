@@ -100,7 +100,7 @@ Release 2.1 introduced Jona, an AI Race Engineer as an optional component of the
 
 #### Installation of Telemetry Providers
 
-The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2*, *Project CARS 2* and *Project Motor Racing* a change in the settings is necessary.
+The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2*, *Project CARS 2*, *Project Motor Racing* and *F1 25* a change in the settings is necessary.
 
   1. *Assetto Corsa*
   
@@ -121,6 +121,10 @@ The Assistants acquire telemetry data from the different simulation games using 
   4. *Project Motor Racing*
   
      You have to enable the UDP access in the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
+	 
+  5. *F1 25*
+  
+     The UDP configuration must allow for UDP packets to reach any system on the network.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 

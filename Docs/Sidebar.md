@@ -115,6 +115,10 @@
     - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-8)
     - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-8)
 	- [Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-project-motor-racing)
+  - [F125 - F1 25](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-f125)
+    - [Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop-8)
+    - [Assistant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-assistant-8)
+	- [Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-f1-25)
   - [Integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-integration)
     - [SimHub Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#simhub-plugin)
 

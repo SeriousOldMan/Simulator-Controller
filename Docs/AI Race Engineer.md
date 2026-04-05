@@ -334,12 +334,15 @@ The following table shows, which simulator supports which damage type:
 | rFactor 2                  | Yes      | No         | No     |
 | Le Mans Ultimate           | Yes      | Yes        | No     |
 | Project Motor Racing (2)   | -        | -          | -      |
+| F1 25 (3)                  | -        | -          | -      |
 
 ##### Notes
 
 (1) Supported but not reported in the data API.
 
 (2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+
+(3) No support for pitstop handling for *F1 25* at the time of this writing.
 
 The choice in the "Change Tyres" dropdown menu tells Jona, how to decide, wether a given tyre should be changed at the next pitstop. *Wear*, which is the default, will change a tyre, when the expected tyre wear at the end of the next stint will exceed the maximum tyre as defined by the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The choice *Laps* will ask Jona to change tyres depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the race rules (see above) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
@@ -390,6 +393,7 @@ Please note, that the range of supported pitstop services depends on the specifi
 | rFactor 2                  | Yes    | Axle            | Axle              | Yes            | Yes         | No         |
 | Le Mans Ultimate           | Yes    | Wheel           | Wheel             | Yes            | Yes         | Yes        |
 | Project Motor Racing (5)   | -      | -               | -                 | -              | -           | -          |
+| F1 25 (6)                  | -      | -               | -                 | -              | -           | -          |
 
 ##### Notes
 
@@ -402,6 +406,8 @@ Please note, that the range of supported pitstop services depends on the specifi
 (4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
 
 (5) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+
+(6) No support for pitstop handling for *F1 25* at the time of this writing.
 
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
@@ -425,12 +431,15 @@ Some final notes: If you ever perform a pitstop, which has not been planned and 
 | rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     | Yes     |
 | Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | No      | Yes     |
 | Project Motor Racing (2)   | -    | -             | -        | -              | -       | -       |
+| F1 25 (3)                  | -    | -             | -        | -              | -       | -       |
 
 ##### Notes
 
 (1) Change is detected only, if triggered by a controller action using a Button Box or a Stream Deck and alike.
 
 (2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+
+(2) No support for pitstop handling for *F1 25* at the time of this writing.
 
 It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
 
@@ -465,6 +474,10 @@ Furthermore, it is very important, that you do not use the *Automobilista 2* and
 #### *Project Motor Racing*
 
 No support for pitstop handling and also for the initial tyre setup at the time of this writing.
+
+#### *F1 25*
+
+No support for pitstop handling at the time of this writing.
 
 ### How it works
 
@@ -513,6 +526,7 @@ The following statistical models are currently implemented:
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes                     | Yes                  | No     |
      | Project Motor Racing       | No                      | No                   | No     |
+     | F1 25                      | Yes                     | Yes                  | Yes    |
 	 
 	 Notes:
 	 
@@ -673,7 +687,7 @@ You can take a look at the knowledge base by enabling "Debug" mode in the config
 
 ### Telemetry Integration
 
-A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project CARS 2* and *Project Motor Racing* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications like "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
+A considerable part of the knowledge of Jona comes from the telemetry information of the simulation game. As said, data providers for *Assetto Corsa*, *Assetto Corsa Competizione*, *RaceRoom Racing Experience*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project CARS 2*, *Project Motor Racing* and *F1 25* are already builtin. The special plugin "Race Engineer" collects the data from the simulation games and hands it over to Jona. Small applications like "ACC SHM Provider.exe" or "RF2 SHM Provider.exe", which are located in the *Binaries* folder, are used to acquire the data. They run periodically and output the following data:
 
 	[Car Data]
 	BodyworkDamage=0, 0, 0, 0, 0

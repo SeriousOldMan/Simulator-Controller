@@ -110,6 +110,7 @@ namespace PMRUDPConnector
                 
                 bool started = receiver.Start();
 				
+				/*
 				if (started) {
 					started = false;
 					
@@ -119,6 +120,7 @@ namespace PMRUDPConnector
 						else
 							Thread.Sleep(200);
 				}
+				*/
 
                 if (!started)
                     receiver = null;

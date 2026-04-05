@@ -27,6 +27,7 @@ namespace F125UDPConnector
 
                 bool started = receiver.Start();
 
+				/*
                 if (started)
                 {
                     started = false;
@@ -37,6 +38,7 @@ namespace F125UDPConnector
                         else
                             Thread.Sleep(200);
                 }
+				*/
 
                 if (!started)
                     receiver = null;

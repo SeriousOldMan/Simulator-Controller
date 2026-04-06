@@ -997,9 +997,10 @@ namespace F125UDPSpotter {
 		bool greenFlagReported = false;
 
 		bool greenFlag() {
-			var PacketEventData eventData = receiver.GetEventData();
+            var session = receiver.GetSessionData();
+            var eventData = receiver.GetEventData();
 
-            if (eventData != null && eventData.EventStringCode == "LGOT" &&
+            if (eventData != null && eventData.EventStringCode == "LGOT" && session != null &&
 									 (F125Constants.GetSessionType(session.SessionType) == "Race")) {
 				greenFlagReported = true;
 				

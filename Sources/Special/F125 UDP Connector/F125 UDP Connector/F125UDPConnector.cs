@@ -185,6 +185,14 @@ namespace F125UDPConnector
                 return sb.ToString();
             }
 
+            PacketEventData eventData = receiver.GetEventData();
+
+            if (eventData != null && eventData.EventStringCode == "SEND")
+            {
+                sb.Append("Active=false\n");
+                return sb.ToString();
+            }
+
             sb.Append("Active=true\n");
             sb.AppendFormat("Paused={0}\n", session.GamePaused != 0 ? "true" : "false");
             sb.AppendFormat("Session={0}\n", F125Constants.GetSessionType(session.SessionType));

@@ -1125,8 +1125,7 @@ namespace F125UDPSpotter {
 			var motion = receiver.GetMotionData();
 			var lapData = receiver.GetLapData();
 			var telemetry = receiver.GetCarTelemetryData();
-			var motionEx = receiver.GetMotionExData();
-
+			
 			if (session == null || motion == null || lapData == null) return;
 
 			int playerIdx = session.Header.PlayerCarIndex;

@@ -179,7 +179,7 @@ namespace F125UDPConnector
                     return (long)(session.SessionTimeLeft * 1000);
             }
 
-            if (playerLap == null)
+            if ((playerLap == null) || (playerLap.ResultStatus >= 3))
             {
                 sb.Append("Active=false\n");
                 return sb.ToString();

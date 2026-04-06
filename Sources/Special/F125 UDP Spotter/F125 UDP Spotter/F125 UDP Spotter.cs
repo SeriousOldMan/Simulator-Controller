@@ -176,6 +176,7 @@ namespace F125UDPSpotter {
 		long nextCarBehind = 0;
 
 		const int YELLOW = 1;
+		const int YELLOW_ALL = 2;
 		const int BLUE = 16;
 
 		int blueCount = 0;
@@ -894,7 +895,18 @@ namespace F125UDPSpotter {
 			// F1 25: VehicleFIAFlags: 0=None, 1=Green, 2=Blue, 3=Yellow, 4=Red
 			byte flags = (byte)playerStatus.VehicleFIAFlags;
 
-            if ((waitYellowFlagState & YELLOW) != 0)
+			if (session.SafetyCarStatus == 1)
+			{
+				if ((lastFlagState & YELLOW_ALL) == 0)
+				{
+					SendSpotterMessage("yellowFlag:All");
+
+					lastFlagState |= YELLOW_ALL;
+
+					return true;
+				}
+			}
+            else if ((waitYellowFlagState & YELLOW) != 0)
             {
                 if (yellowCount > 50)
                 {
@@ -980,11 +992,34 @@ namespace F125UDPSpotter {
 			return false;
 		}
 
-		bool greenFlag() {
-            // No direct green flag support in F1 25 UDP
+		bool greenFlagReported = false;
 
-            return false;
-        }
+		bool greenFlag() {
+			var lapData = receiver.GetLapData();
+			var session = receiver.GetSessionData();
+			var status = receiver.GetCarStatusData();
+
+			if (lapData == null || session == null || status == null)
+				return false;
+
+			int playerIdx = session.Header.PlayerCarIndex;
+			var playerStatus = status.CarStatus[playerIdx];
+
+			// F1 25: VehicleFIAFlags: 0=None, 1=Green, 2=Blue, 3=Yellow, 4=Red
+			byte flags = (byte)playerStatus.VehicleFIAFlags;
+			
+			if (!greenFlagReported && (flags == 1) && (F125Constants.GetSessionType(session.SessionType) == "Race")) {
+				greenFlagReported = true;
+				
+				SendSpotterMessage("greenFlag");
+				
+				Sleep(2000);
+				
+				return true;
+			}
+			else
+				return false;
+		}
 
 		float lastTopSpeed = 0;
         int lastLaps = 0;

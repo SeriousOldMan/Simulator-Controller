@@ -59,12 +59,14 @@ namespace F125UDPSpotter {
                             else
                                 Thread.Sleep(200);
 							
+						/*
 						if (started)
 							for (int i = 0; i < 15; i++)
 								if (HasData())
 									break;
 								else
 									Thread.Sleep(100);
+						*/
                     }
 
                     if (!started)
@@ -1283,9 +1285,7 @@ namespace F125UDPSpotter {
         }
 
         public bool active() {
-			var session = receiver.GetSessionData();
-
-			return (session != null) && receiver.HasReceivedData();
+			return HasData();
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {

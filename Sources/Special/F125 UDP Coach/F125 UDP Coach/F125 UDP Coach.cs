@@ -55,13 +55,15 @@ namespace F125UDPCoach {
                                 started = true;
                             else
                                 Thread.Sleep(200);
-							
+
+						/*	
 						if (started)
 							for (int i = 0; i < 15; i++)
 								if (HasData())
 									break;
 								else
 									Thread.Sleep(100);
+                        */
 					}
 
                     if (!started)
@@ -955,7 +957,7 @@ namespace F125UDPCoach {
 
         public bool active()
         {
-            return receiver != null && receiver.IsActive();
+            return receiver != null && receiver.IsActive() && HasData();
         }
 
         public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer) {

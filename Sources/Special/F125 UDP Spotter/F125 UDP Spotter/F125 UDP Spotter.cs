@@ -59,12 +59,14 @@ namespace F125UDPSpotter {
                             else
                                 Thread.Sleep(200);
 							
+						/*
 						if (started)
 							for (int i = 0; i < 15; i++)
 								if (HasData())
 									break;
 								else
 									Thread.Sleep(100);
+						*/
                     }
 
                     if (!started)
@@ -1158,8 +1160,7 @@ namespace F125UDPSpotter {
 			var motion = receiver.GetMotionData();
 			var lapData = receiver.GetLapData();
 			var telemetry = receiver.GetCarTelemetryData();
-			var motionEx = receiver.GetMotionExData();
-
+			
 			if (session == null || motion == null || lapData == null) return;
 
 			int playerIdx = session.Header.PlayerCarIndex;
@@ -1318,9 +1319,7 @@ namespace F125UDPSpotter {
         }
 
         public bool active() {
-			var session = receiver.GetSessionData();
-
-			return (session != null) && receiver.HasReceivedData();
+			return HasData();
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {

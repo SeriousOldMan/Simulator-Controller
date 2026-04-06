@@ -123,12 +123,13 @@ namespace F125UDPProtocol
         // ── Tyre Compound → Visual Name ─────────────────────────────────
         public static readonly Dictionary<byte, string> TyreCompounds = new Dictionary<byte, string>
         {
-            { 16, "Super Soft" },       // C5
-            { 17, "Soft" },             // C4
-            { 18, "Medium" },           // C3
-            { 19, "Soft" },             // C2
-            { 20, "Hard" },             // C1 (alternate mapping)
-            { 20, "Super Hard" },       // C0
+            { 16, "C5" },
+            { 17, "C4" },
+            { 18, "C3" },
+            { 19, "C2" },
+            { 20, "C1" },
+            { 21, "C0" },
+            { 22, "C6" },
             {  7, "Intermediate" },
             {  8, "Wet" },
             {  9, "Dry" },

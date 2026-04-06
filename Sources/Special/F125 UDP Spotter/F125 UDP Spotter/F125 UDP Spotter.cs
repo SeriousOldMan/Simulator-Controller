@@ -1385,7 +1385,7 @@ namespace F125UDPSpotter {
 
 									cycle += 1;
 
-									if (enabled)
+									if (enabled && !greenFlag())
 										if (checkAccident())
 											wait = false;
 										else if (checkFlagState() || checkPositions())

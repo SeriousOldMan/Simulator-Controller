@@ -997,20 +997,10 @@ namespace F125UDPSpotter {
 		bool greenFlagReported = false;
 
 		bool greenFlag() {
-			var lapData = receiver.GetLapData();
-			var session = receiver.GetSessionData();
-			var status = receiver.GetCarStatusData();
+			var PacketEventData eventData = receiver.GetEventData();
 
-			if (lapData == null || session == null || status == null)
-				return false;
-
-			int playerIdx = session.Header.PlayerCarIndex;
-			var playerStatus = status.CarStatus[playerIdx];
-
-			// F1 25: VehicleFIAFlags: 0=None, 1=Green, 2=Blue, 3=Yellow, 4=Red
-			byte flags = (byte)playerStatus.VehicleFIAFlags;
-			
-			if (!greenFlagReported && (flags == 1) && (F125Constants.GetSessionType(session.SessionType) == "Race")) {
+            if (eventData != null && eventData.EventStringCode == "LGOT" &&
+									 (F125Constants.GetSessionType(session.SessionType) == "Race")) {
 				greenFlagReported = true;
 				
 				SendSpotterMessage("greenFlag");
@@ -1356,6 +1346,9 @@ namespace F125UDPSpotter {
 						else if (positionTrigger)
 							checkCoordinates();
 						else if (running) {
+							if (!greenFlagReported && (counter > 8000))
+								greenFlagReported = true;
+								
 							if (carTelemetry)
 								collectCarTelemetry();
 							else {
@@ -1363,7 +1356,7 @@ namespace F125UDPSpotter {
 								int playerIdx = (lapData != null) ? lapData.Header.PlayerCarIndex : 0;
 								var playerLap = (lapData != null) ? lapData.LapDataArr[playerIdx] : null;
 								bool inPits = (playerLap != null) && (playerLap.PitStatus != 0);
-
+									
 								if (!inPits) {
 									updateTopSpeed();
 

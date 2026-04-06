@@ -123,11 +123,13 @@ namespace F125UDPProtocol
         // ── Tyre Compound → Visual Name ─────────────────────────────────
         public static readonly Dictionary<byte, string> TyreCompounds = new Dictionary<byte, string>
         {
-            { 16, "Soft" },       // C5
-            { 17, "Medium" },     // C4
-            { 18, "Hard" },       // C3
-            { 19, "Soft" },       // C2 (alternate mapping)
-            { 20, "Medium" },     // C1 (alternate mapping)
+            { 16, "C5" },
+            { 17, "C4" },
+            { 18, "C3" },
+            { 19, "C2" },
+            { 20, "C1" },
+            { 21, "C0" },
+            { 22, "C6" },
             {  7, "Intermediate" },
             {  8, "Wet" },
             {  9, "Dry" },
@@ -144,10 +146,13 @@ namespace F125UDPProtocol
             { 16, "Soft" },
             { 17, "Medium" },
             { 18, "Hard" },
-            { 19, "Soft" },
-            { 20, "Medium" },
             {  7, "Intermediate" },
-            {  8, "Wet" }
+            {  8, "Wet" },
+            {  19, "Super Soft" },
+            {  20, "Soft" },
+            {  21, "Medium" },
+            {  22, "Hard" },
+            {  15, "Wet" }
         };
 
         // Hardcoded names for session types. In this format ──> Session Type → Display Name 

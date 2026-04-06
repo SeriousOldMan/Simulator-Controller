@@ -341,7 +341,7 @@ namespace F125UDPConnector
             {
                 string compound = F125Constants.GetTyreCompound(playerStatus.ActualTyreCompound);
                 string visual = F125Constants.GetTyreVisualCompound(playerStatus.VisualTyreCompound);
-                sb.AppendFormat("TyreCompoundRaw={0}\n", compound);
+                sb.AppendFormat("TyreCompoundRaw={0}\n", visual);
             }
 
             // Engine/water temperature

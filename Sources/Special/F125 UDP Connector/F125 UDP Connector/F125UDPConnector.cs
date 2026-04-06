@@ -438,7 +438,7 @@ namespace F125UDPConnector
             sb.AppendFormat("CornerCuttingWarnings={0}\n", I(playerLap.CornerCuttingWarnings));
             */
 
-            PacketEventData eventData = receiver.GetEventData();
+            eventData = receiver.GetEventData();
 
             if (eventData != null && eventData.EventStringCode == "PENA" && eventData.EventDetails[2] == playerIdx)
             {

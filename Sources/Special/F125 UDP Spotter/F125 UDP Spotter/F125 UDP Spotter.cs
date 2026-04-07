@@ -15,9 +15,6 @@ namespace F125UDPSpotter {
 		string host;
 		int port;
 		bool useMultiCast;
-
-		long lastDataUpdate = Environment.TickCount;
-
         public UDPSpotter(string host = "127.0.0.1", int port = 20777, bool useMultiCast = true) {
             this.host = host;
             this.port = port;
@@ -1312,22 +1309,10 @@ namespace F125UDPSpotter {
         }
 
         public bool active() {
-			if (HasData()) {
-				if ((lastDataUpdate + 2000) > receiver.GetLastUpdate())
-                {
-                    lastDataUpdate = receiver.GetLastUpdate();
-
-                    return false;
-                }
-                else
-                {
-                    lastDataUpdate = receiver.GetLastUpdate();
-
-                    return true;
-                }
-            }
-            else
+			if (!HasData() || !receiver.IsActive())
                 return false;
+            else
+                return true;
         }
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {

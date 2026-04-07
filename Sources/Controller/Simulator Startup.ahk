@@ -1009,7 +1009,7 @@ launchPad(command := false, arguments*) {
 			startMenu.Add()
 
 			simulators := string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))
-			definition := getControllerState()
+			definition := getControllerState( , true)
 
 			hasSimulator := false
 

@@ -16,9 +16,7 @@ namespace F125UDPCoach {
         int port;
         bool useMultiCast;
 
-        long lastUpdate = Environment.TickCount;
-        
-		public UDPCoach(string host = "127.0.0.1", int port = 20777, bool useMultiCast = false) {
+        public UDPCoach(string host = "127.0.0.1", int port = 20777, bool useMultiCast = false) {
             this.host = host;
             this.port = port;
             this.useMultiCast = useMultiCast;
@@ -960,20 +958,7 @@ namespace F125UDPCoach {
         public bool active()
         {
             if (receiver != null && receiver.IsActive() && HasData())
-            {
-                if ((lastUpdate + 2000) > receiver.GetLastUpdate())
-                {
-                    lastUpdate = receiver.GetLastUpdate();
-
-                    return false;
-                }
-                else
-                {
-                    lastUpdate = receiver.GetLastUpdate();
-
-                    return true;
-                }
-            }
+                return true;
             else
                 return false;
         }

@@ -284,7 +284,7 @@ namespace F125UDPReceiver
         {
             lock (dataLock)
             {
-                return sessionData != null && receivedData;
+                return sessionData != null && receivedData && (Environment.TickCount - GetLastUpdate()) < 2000;
             }
         }
 

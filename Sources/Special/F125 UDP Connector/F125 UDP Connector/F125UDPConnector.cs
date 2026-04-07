@@ -13,8 +13,6 @@ namespace F125UDPConnector
         private F125UDPReceiver.F125UDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
 
-        private long lastUpdate = Environment.TickCount;
-        
         public F125UDPConnector()
         {
         }
@@ -89,14 +87,8 @@ namespace F125UDPConnector
                     if (!Open())
                         return "[Session Data]\nActive=false\n";
                 }
-                else if ((lastUpdate + 2000) > receiver.GetLastUpdate())
-                {
-                    lastUpdate = receiver.GetLastUpdate();
-
+                else if (!receiver.IsActive())
                     return "[Session Data]\nActive=false\n";
-                }
-                else
-                    lastUpdate = receiver.GetLastUpdate();
                 
                 if (request != null && request.ToLower().Contains("standings"))
                     return GenerateStandings();

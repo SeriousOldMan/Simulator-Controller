@@ -1610,16 +1610,18 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 ### Special notes for *F1 25*
 
-1. The *EA Javelin* AntiCheat software prevents using Simulator Controller on the same machine as *F1 25*. Therefore it is necessary to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
+1. The *F1 25* UDP settings must be configured for the so called broadcast mode, which is Okay for small home networks. However, if you do not want to use this, see [this article](https://www.stryder-it.de/simdashboard/help/en/For_PS4_and_XBox_One_Gamers/Advanced/Forward_UDP_Telemetry_to_other_applications_or_Devices) for an alternative. If you are using this alternative, this also affects the following points, of course.
 
-2. When the PC version of *F1 25* is used, it is also possible to run Simulator Controller in a virtual environment like [VirtualBox](https://www.virtualbox.org/) or [ProxMox](https://www.proxmox.com/). When setting up such an environment, the following applies:
+2. The *EA Javelin* AntiCheat software prevents using Simulator Controller on the same machine as *F1 25*. Therefore it is necessary to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
 
-   - The virtual environment may install a logical ethernet adapter during installation. This network adapater must be hidden either by using the Windows Network Control Panel after installation of the virtualization application, or it can be hidden in this application as well (for example in the global settings of *VirtualBox*, not the machine specific settings). Hiding the logical ethernet adapter is necessary, because *F1 25* will confused when several network adapters are available and may send the UDP packets over the wrong adapter.
+3. When the PC version of *F1 25* is used, it is also possible to run Simulator Controller in a virtual environment like [VirtualBox](https://www.virtualbox.org/) or [VMware Player](https://www.techspot.com/downloads/1969-vmware-player.html). When setting up such an environment, the following must be noted:
+
+   - The virtual environment will normally install a logical ethernet adapter during installation. This network adapater must be hidden either by using the Windows Network Control Panel after installation of the virtualization application, or it can be hidden in this application as well (for example in the global settings of *VirtualBox*, not the machine specific settings). Hiding the logical ethernet adapter is necessary, because *F1 25* will confused when several network adapters are available and may send the UDP packets over the wrong adapter.
    - The configuration of the virtual machine itself must use a bridged network adapter, so that the virtual PC is running on the same network as the host PC, so that UDP packets will be visible. If a NAT configuration is necessary for any reason, port forwarding must be configured for the UDP protocol on port 20777 (or any other configured UDP port).
 
-3. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
+4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-4. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*:
+5. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*:
 
    - Start "Simulator Configuration".
    - Go to the "Plugins" page and activate the *F125* plugin. Enter "F1 25" as the application name (mind the space between *F1* and *25*).

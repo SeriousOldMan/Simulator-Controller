@@ -63,7 +63,7 @@ Simulator Controller can provide diagnostics data to the development team to inc
 
 ## Startup Process & Settings
 
-Before starting up, "Simulator Startup" checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically. You can trigger this anytime later by holding down the Control key when clicking on the Startup icon in "Simulator Startup". The following settings dialog will show up:
+Before starting up, "Simulator Startup" checks the configuration information. If there is no valid configuration, a tool to edit the settings and supply a valid configuration will be launched automatically.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
@@ -228,6 +228,14 @@ Finally, if you are ready to start, choose the profile you want to start with an
 1. If you want "Simulator Startup" to use a specific startup profile independent from what is chosen in the configuration of the startup profiles, you can run "Simulator Startup.exe" with the "-Startup [Profile]" option, where *[Profile]* is the name of the profile you want to use (possibly enclosed in quotes). This is especially helpful together with the "-NoLaunchPad" option, when running "Simulator Startup" from a Stream Deck, for example.
 
 2. If you click on the "Startup" button and hold down the mouse button for at least a second, a menu will appear with all available startup profiles. If you choose one here, the startup process will use this profile and this profile will be selected as the default profile for all subsequent startups.
+
+### Connecting to remote simulators
+
+Some simulators allow data connections over the network - especially useful, if the simulator is running on a console. At the time of this writing, *Project Motor Racing* and *F1 25* support this type of connections. For *F1 25* this is even necessary, because the *EA Javelin* AntiCheat software prevents Simulator Controller from running on the same machine as *F1 25*.
+
+To prepare a remote connection to a remote simulator, special configuration steps may be necessary for the given simulator. See the related documentation in the [chapter about all plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) for more information.
+
+To startup everything ready to connect to a remote simulator, hold down the Alt key when clicking on the "Startup" button and choose the remote simulator from the menu that appears.
 
 ### Team Management
 

@@ -124,7 +124,7 @@ The Assistants acquire telemetry data from the different simulation games using 
 	 
   5. *F1 25*
   
-     The UDP configuration must allow for UDP packets to reach any system on the network.
+     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode).
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 

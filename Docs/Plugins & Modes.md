@@ -567,7 +567,7 @@ Using the buttons and dials you may change the pitstop settings in the same way 
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -697,7 +697,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" plugin, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" plugin, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2014.JPG)
 
@@ -808,7 +808,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -920,7 +920,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1026,7 +1026,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1143,7 +1143,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1248,7 +1248,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active race assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1349,7 +1349,7 @@ All this will be achieved using the following plugin arguments:
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more paractical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1486,7 +1486,7 @@ Not yet available...
 
 ### Mode *Assistant*
 
-This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practicle to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
 
@@ -1501,7 +1501,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-*Project Motor Racing* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 224.0.0.150,7576,true (where the last argument, *multiCast*, specifies whether *MultiCast* mode is used). If you have changed the connection information in the PMR configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
+*Project Motor Racing* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 224.0.0.150,7576,true (where the last argument, *multiCast*, specifies whether *MultiCast* mode is used). If you have changed the connection information in the *Project Motor Racing* configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
 
 	udpConnection: *ip*, *port*, *multiCast*
 
@@ -1523,7 +1523,7 @@ See the following table for the supported Assistant commands.
 | StrategyCancel | Asks the AI Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the AI Race Engineer. |
 | DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the AI Race Engineer. |
-| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. Although this command is available, it has no effect, because *Project Motor Racing* does not support pitstop automation. |
 | Accept | Accepts the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
@@ -1533,7 +1533,16 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 1. When the UDP port is not configured to 127.0.0.1 (localhost), the Firewall will ask for permission to open this port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-2. The current implementation of the UDP API still has many gaps regarding important information at the time of writing.
+2. Because the data API of *Project Motor Racing* is based on the network protocol UDP, remote connections are supported, for example, when the simulator is running on a console. If *Project Motor Racing* is not installed on the same machine as Simulator Controller, automatic configuration of the *PMR* plugin will not be supported in "Simulator Setup". In this case a few steps are necessary, before Simulator Controller will offer a remote connection to *Project Motor Racing*:
+
+   - Start "Simulator Configuration".
+   - Go to the "Plugins" page and activate the *PMR* plugin. Enter "Project Motor Racing" as the application name (mind the space between *F1* and *25*).
+   - Select the first page and enter "Project Motor Racing" into the list of all available simulators.
+   - Save the configuration.
+   
+IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
+
+3. The current implementation of the UDP API still has many deficits regarding important information at the time of writing.
 
    - There is no way to detect a paused session, so the Assistants are active and, for example, the Spotter may tell you about cars nearby in a paused game.
    - The elapsed time into the session is not available, therefore many calculations by the Assistants, for example, the end of session detection in timed sessions, may fail.
@@ -1545,6 +1554,81 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - No support for pitstop handling in any way.
    
    The developer team of the studio is informed. Let's see what they come up with.
+
+## Plugin *F125*
+
+This plugin handles the *F1 25* simulation game. An application with the name "F1 25" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startF125" as a special function hook in this configuration.
+
+### Mode *Pitstop*
+
+Not yet available...
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
+
+Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+
+### Configuration
+
+*F1 25* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 127.0.0.1,20777 (only the port is used at the moment, because connecting to *F1 25* on the same machine is not supported yet). If you have changed the port in the *F1 25* configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
+
+	udpConnection: *ip*, *port*
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported Assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
+| PitstopRecommend | Asks the AI Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the AI Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
+| StrategyCancel | Asks the AI Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the AI Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the AI Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. Although this command is available, it has no effect, because *F1 25* does not support pitstop automation. |
+| Accept | Accepts the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+
+### Special notes for *F1 25*
+
+1. The *F1 25* UDP settings must be configured for the so called broadcast mode, which is Okay for small home networks. However, if you do not want to use this, see [this article](https://www.stryder-it.de/simdashboard/help/en/For_PS4_and_XBox_One_Gamers/Advanced/Forward_UDP_Telemetry_to_other_applications_or_Devices) for an alternative. If you are using this alternative, this also affects the following points, of course.
+
+2. The *EA Javelin* AntiCheat software prevents using Simulator Controller on the same machine as *F1 25*. Therefore it is necessary to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
+
+3. When the PC version of *F1 25* is used, it is also possible to run Simulator Controller in a virtual environment like [VirtualBox](https://www.virtualbox.org/) or [VMware Player](https://www.techspot.com/downloads/1969-vmware-player.html). When setting up such an environment, the following must be noted:
+
+   - The virtual environment will normally install a logical ethernet adapter during installation. This network adapater must be hidden either by using the Windows Network Control Panel after installation of the virtualization application, or it can be hidden in this application as well (for example in the global settings of *VirtualBox*, not the machine specific settings). Hiding the logical ethernet adapter is necessary, because *F1 25* will confused when several network adapters are available and may send the UDP packets over the wrong adapter.
+   - The configuration of the virtual machine itself must use a bridged network adapter, so that the virtual PC is running on the same network as the host PC, so that UDP packets will be visible. If a NAT configuration is necessary for any reason, port forwarding must be configured for the UDP protocol on port 20777 (or any other configured UDP port).
+
+4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
+
+5. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*:
+
+   - Start "Simulator Configuration".
+   - Go to the "Plugins" page and activate the *F125* plugin. Enter "F1 25" as the application name (mind the space between *F1* and *25*).
+   - Select the first page and enter "F1 25" into the list of all available simulators.
+   - Save the configuration.
+   
+IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
 
 ## Plugin *Integration*
 

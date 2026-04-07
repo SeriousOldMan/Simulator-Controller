@@ -237,7 +237,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin {
 
 			simulatorName := tyresDB.getSimulatorName(simulator)
 
-			tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+			tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", kUndefined)
+
+			if (tpSetting == kUndefined)
+				if inList(["Assetto Corsa Competizione", "rFactor 2", "Le Mans Ultimate", "iRacing", "F1 25"], simulatorName)
+					tpSetting := "Import"
+				else
+					tpSetting := "Setup"
 
 			if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
 				compound := false

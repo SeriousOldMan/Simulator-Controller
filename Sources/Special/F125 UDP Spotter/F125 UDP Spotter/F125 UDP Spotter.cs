@@ -1313,7 +1313,7 @@ namespace F125UDPSpotter {
 
         public bool active() {
 			if (HasData()) {
-				if ((lastDataUpdate + 1000) < receiver.GetLastUpdate())
+				if ((lastDataUpdate + 2000) > receiver.GetLastUpdate())
                 {
                     lastDataUpdate = receiver.GetLastUpdate();
 

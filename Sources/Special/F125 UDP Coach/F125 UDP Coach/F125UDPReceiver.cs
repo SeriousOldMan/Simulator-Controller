@@ -106,15 +106,7 @@ namespace F125UDPReceiver
                 {
                     byte[] data = udpClient.Receive(ref remoteEndPoint);
                     if (data.Length >= F125Constants.HeaderSize)
-                    {
                         ProcessPacket(data);
-
-                        lastUpdate = Environment.TickCount;
-                    }
-                }
-                catch (SocketException)
-                {
-                    break;
                 }
                 catch
                 {
@@ -139,6 +131,9 @@ namespace F125UDPReceiver
                             break;
                         case 1:  // Session
                             sessionData = PacketSessionData.Decode(data);
+
+                            lastUpdate = Environment.TickCount;
+
                             break;
                         case 2:  // Lap Data
                             lapData = PacketLapData.Decode(data);

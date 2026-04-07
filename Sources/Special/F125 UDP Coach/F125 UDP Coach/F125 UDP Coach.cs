@@ -961,7 +961,7 @@ namespace F125UDPCoach {
         {
             if (receiver != null && receiver.IsActive() && HasData())
             {
-                if ((lastUpdate + 1000) < receiver.GetLastUpdate())
+                if ((lastUpdate + 2000) > receiver.GetLastUpdate())
                 {
                     lastUpdate = receiver.GetLastUpdate();
 

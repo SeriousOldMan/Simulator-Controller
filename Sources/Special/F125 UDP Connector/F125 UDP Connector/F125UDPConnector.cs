@@ -89,7 +89,7 @@ namespace F125UDPConnector
                     if (!Open())
                         return "[Session Data]\nActive=false\n";
                 }
-                else if ((lastUpdate + 1000) < receiver.GetLastUpdate())
+                else if ((lastUpdate + 2000) > receiver.GetLastUpdate())
                 {
                     lastUpdate = receiver.GetLastUpdate();
 

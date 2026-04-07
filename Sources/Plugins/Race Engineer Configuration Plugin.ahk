@@ -44,7 +44,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		validateREDampingFactor(field, operation, value?) {
 			if (operation = "Validate") {
 				value := internalValue("Float", value)
-				
+
 				return (isNumber(value) && (value >= 0.1) && (value <= 1))
 			}
 		}
@@ -174,7 +174,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 			simulatorConfiguration["LoadSettings"] := getMultiMapValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "SettingsDatabase"))
 
 			if (getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", kUndefined) == kUndefined) {
-				if inList(["Assetto Corsa Competizione", "rFactor 2", "Le Mans Ultimate", "iRacing"], simulator)
+				if inList(["Assetto Corsa Competizione", "rFactor 2", "Le Mans Ultimate", "iRacing", "F1 25"], simulator)
 					simulatorConfiguration["LoadTyrePressures"] := "Import"
 				else
 					simulatorConfiguration["LoadTyrePressures"] := "Setup"

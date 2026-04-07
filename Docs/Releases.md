@@ -39,6 +39,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Fixed a critical bug in the download process, when one of the download mirrors is unavailable.
+  - Added several missing translations.
   
 #### Changes
 

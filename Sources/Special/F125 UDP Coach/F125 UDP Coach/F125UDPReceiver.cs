@@ -15,6 +15,8 @@ namespace F125UDPReceiver
         private readonly string host;
         private readonly bool useMulticast;
 
+        private long lastUpdate = 0;
+
         // Packet storage — one per packet type
         private PacketMotionData motionData;
         private PacketSessionData sessionData;
@@ -89,6 +91,11 @@ namespace F125UDPReceiver
             receiveThread?.Join(1000);
         }
 
+        public long GetLastUpdate()
+        {
+            return lastUpdate;
+        }
+
         private void ReceiveData()
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
@@ -99,7 +106,11 @@ namespace F125UDPReceiver
                 {
                     byte[] data = udpClient.Receive(ref remoteEndPoint);
                     if (data.Length >= F125Constants.HeaderSize)
+                    {
                         ProcessPacket(data);
+
+                        lastUpdate = Environment.TickCount;
+                    }
                 }
                 catch (SocketException)
                 {

@@ -1,5 +1,6 @@
 using F125UDPProtocol;
 using System;
+using System.Configuration;
 using System.Globalization;
 using System.Text;
 using System.Threading;
@@ -11,6 +12,8 @@ namespace F125UDPConnector
     {
         private F125UDPReceiver.F125UDPReceiver receiver;
         private readonly CultureInfo enUS = new CultureInfo("en-US");
+
+        private long lastUpdate = Environment.TickCount;
         
         public F125UDPConnector()
         {
@@ -86,9 +89,19 @@ namespace F125UDPConnector
                     if (!Open())
                         return "[Session Data]\nActive=false\n";
                 }
+                else if ((lastUpdate + 1000) < receiver.GetLastUpdate())
+                {
+                    lastUpdate = receiver.GetLastUpdate();
 
-                bool writeStandings = request != null && request.ToLower().Contains("standings");
-                return writeStandings ? GenerateStandings() : GenerateTelemetry();
+                    return "[Session Data]\nActive=false\n";
+                }
+                else
+                    lastUpdate = receiver.GetLastUpdate();
+                
+                if (request != null && request.ToLower().Contains("standings"))
+                    return GenerateStandings();
+                else
+                    return GenerateTelemetry();
             }
             catch
             {
@@ -525,6 +538,23 @@ namespace F125UDPConnector
             sb.AppendFormat("Rain10Min={0}\n", I(rain10));
             sb.AppendFormat("Rain30Min={0}\n", I(rain30));
             */
+
+            // ── [Setup Data] ─────────────────────────────────────────────
+            PacketCarSetupData setup = receiver.GetCarSetupData();
+            
+            if (setup != null) {
+                CarSetupData playerSetup = setup.CarSetups[playerIdx];
+
+                if (playerSetup != null)
+                {
+                    sb.Append("[Setup Data]\n");
+
+                    sb.AppendFormat("TyrePressureFL={0}\n", playerSetup.FrontLeftTyrePressure);
+                    sb.AppendFormat("TyrePressureFR={0}\n", playerSetup.FrontRightTyrePressure);
+                    sb.AppendFormat("TyrePressureRL={0}\n", playerSetup.RearLeftTyrePressure);
+                    sb.AppendFormat("TyrePressureRR={0}\n", playerSetup.RearRightTyrePressure);
+                }
+            }
 
             return sb.ToString();
         }

@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.9.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/UMMnXPXK/Releases/Simulator%20Controller%206.9.1.0-dev.zip) (Early build for 6.9.1. Changes: Documentation for F1 25, Support to run Simulator Controller in a virtualized environment, Fixed fallback method of installation and update process, Updated car meta data for AMS2.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6910) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-691) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

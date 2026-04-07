@@ -25,6 +25,20 @@ namespace F125UDPSpotter {
 				this.Connect();
 		}
 
+        private bool HasData()
+        {
+            if (receiver == null || receiver.GetSessionData() == null
+                                 || receiver.GetLapData() == null
+                                 || receiver.GetCarTelemetryData() == null
+                                 || receiver.GetCarStatusData() == null
+                                 || receiver.GetParticipantsData() == null
+                                 || receiver.GetMotionData() == null
+                                 || receiver.GetMotionExData() == null)
+                return false;
+				
+            return true;
+        }
+
 		private void Connect() {
 			if (!this.connected) {
 				try {
@@ -44,6 +58,15 @@ namespace F125UDPSpotter {
                                 started = true;
                             else
                                 Thread.Sleep(200);
+							
+						/*
+						if (started)
+							for (int i = 0; i < 15; i++)
+								if (HasData())
+									break;
+								else
+									Thread.Sleep(100);
+						*/
                     }
 
                     if (!started)
@@ -155,6 +178,7 @@ namespace F125UDPSpotter {
 		long nextCarBehind = 0;
 
 		const int YELLOW = 1;
+		const int YELLOW_ALL = 2;
 		const int BLUE = 16;
 
 		int blueCount = 0;
@@ -873,7 +897,18 @@ namespace F125UDPSpotter {
 			// F1 25: VehicleFIAFlags: 0=None, 1=Green, 2=Blue, 3=Yellow, 4=Red
 			byte flags = (byte)playerStatus.VehicleFIAFlags;
 
-            if ((waitYellowFlagState & YELLOW) != 0)
+			if (session.SafetyCarStatus == 1)
+			{
+				if ((lastFlagState & YELLOW_ALL) == 0)
+				{
+					SendSpotterMessage("yellowFlag:All");
+
+					lastFlagState |= YELLOW_ALL;
+
+					return true;
+				}
+			}
+            else if ((waitYellowFlagState & YELLOW) != 0)
             {
                 if (yellowCount > 50)
                 {
@@ -959,11 +994,25 @@ namespace F125UDPSpotter {
 			return false;
 		}
 
-		bool greenFlag() {
-            // No direct green flag support in F1 25 UDP
+		bool greenFlagReported = false;
 
-            return false;
-        }
+		bool greenFlag() {
+            var session = receiver.GetSessionData();
+            var eventData = receiver.GetEventData();
+
+            if (eventData != null && eventData.EventStringCode == "LGOT" && session != null &&
+									 (F125Constants.GetSessionType(session.SessionType) == "Race")) {
+				greenFlagReported = true;
+				
+				SendSpotterMessage("greenFlag");
+				
+				Thread.Sleep(2000);
+				
+				return true;
+			}
+			else
+				return false;
+		}
 
 		float lastTopSpeed = 0;
         int lastLaps = 0;
@@ -1102,8 +1151,7 @@ namespace F125UDPSpotter {
 			var motion = receiver.GetMotionData();
 			var lapData = receiver.GetLapData();
 			var telemetry = receiver.GetCarTelemetryData();
-			var motionEx = receiver.GetMotionExData();
-
+			
 			if (session == null || motion == null || lapData == null) return;
 
 			int playerIdx = session.Header.PlayerCarIndex;
@@ -1155,8 +1203,7 @@ namespace F125UDPSpotter {
 					float throttle = 0, brake = 0, steer = 0;
 					int gear = 0, rpm = 0;
 					float speed = (float)vehicleSpeed(playerMotion);
-					bool tcActive = false, absActive = false;
-
+					
 					if (telemetry != null)
 					{
 						var pt = telemetry.CarTelemetry[playerIdx];
@@ -1167,15 +1214,6 @@ namespace F125UDPSpotter {
 						rpm = (int)pt.EngineRPM;
 					}
 
-					// Longitudinal/lateral acceleration from motionEx
-					float gLong = 0, gLat = 0;
-					if (motionEx != null)
-					{
-						// LocalVelocityZ is forward, LocalVelocityX is lateral
-						gLong = motionEx.LocalVelocityZ;
-						gLat = motionEx.LocalVelocityX;
-					}
-
 					telemetryFile.Write(lastRunning * trackLength + ";");
 					telemetryFile.Write(throttle + ";");
 					telemetryFile.Write(brake + ";");
@@ -1183,10 +1221,10 @@ namespace F125UDPSpotter {
 					telemetryFile.Write(gear + ";");
 					telemetryFile.Write(rpm + ";");
 					telemetryFile.Write(speed + ";");
-					telemetryFile.Write(tcActive ? "1;" : "0;");
-					telemetryFile.Write(absActive ? "1;" : "0;");
-					telemetryFile.Write(gLong + ";");
-					telemetryFile.Write(gLat + ";");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write(playerMotion.GForceLongitudinal + ";");
+					telemetryFile.Write(playerMotion.GForceLateral + ";");
 					telemetryFile.Write(playerMotion.WorldPositionX + ";");
 					telemetryFile.Write(playerMotion.WorldPositionZ + ";");
 
@@ -1210,8 +1248,8 @@ namespace F125UDPSpotter {
                             file.Write("n/a;");
                             file.Write("n/a;");
 
-                            file.Write(gLong + ";");
-                            file.Write(gLat + ";");
+                            file.Write(playerMotion.GForceLongitudinal + ";");
+                            file.Write(playerMotion.GForceLateral + ";");
 
                             file.Write(playerMotion.WorldPositionX + ";");
                             file.Write(playerMotion.WorldPositionZ + ";");
@@ -1272,9 +1310,7 @@ namespace F125UDPSpotter {
         }
 
         public bool active() {
-			var session = receiver.GetSessionData();
-
-			return (session != null) && receiver.HasReceivedData();
+			return HasData();
 		}
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {
@@ -1311,6 +1347,9 @@ namespace F125UDPSpotter {
 						else if (positionTrigger)
 							checkCoordinates();
 						else if (running) {
+							if (!greenFlagReported && (counter > 8000))
+								greenFlagReported = true;
+								
 							if (carTelemetry)
 								collectCarTelemetry();
 							else {
@@ -1318,7 +1357,7 @@ namespace F125UDPSpotter {
 								int playerIdx = (lapData != null) ? lapData.Header.PlayerCarIndex : 0;
 								var playerLap = (lapData != null) ? lapData.LapDataArr[playerIdx] : null;
 								bool inPits = (playerLap != null) && (playerLap.PitStatus != 0);
-
+									
 								if (!inPits) {
 									updateTopSpeed();
 
@@ -1347,7 +1386,7 @@ namespace F125UDPSpotter {
 
 									cycle += 1;
 
-									if (enabled)
+									if (enabled && !greenFlag())
 										if (checkAccident())
 											wait = false;
 										else if (checkFlagState() || checkPositions())

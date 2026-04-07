@@ -100,7 +100,7 @@ Release 2.1 introduced Jona, an AI Race Engineer as an optional component of the
 
 #### Installation of Telemetry Providers
 
-The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2*, *Project CARS 2* and *Project Motor Racing* a change in the settings is necessary.
+The Assistants acquire telemetry data from the different simulation games using so called telemetry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2*, *Project CARS 2*, *Project Motor Racing* and *F1 25* a change in the settings is necessary.
 
   1. *Assetto Corsa*
   
@@ -121,6 +121,10 @@ The Assistants acquire telemetry data from the different simulation games using 
   4. *Project Motor Racing*
   
      You have to enable the UDP access in the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
+	 
+  5. *F1 25*
+  
+     The UDP configuration must allow for UDP packets to reach any system on the network.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 
@@ -224,19 +228,20 @@ Please note, that you can remove presets later on. But depending on the type of 
 
 "Simulator Setup" scans various locations to auto detect the installed games and other applications which might be useful. However, sometimes it might be necessary to locate a software manually, especially, if this software has been installed in an uncommon location. You can use the "Locate..." button to manually identify the desired software in this case. For simulation games, this file must be a special one, which identifies the given software. Please consult the following table:
 
-| Simulator                   | File                 | Comments                                              |
-|-----------------------------|----------------------|-------------------------------------------------------|
-| Assetto Corsa               | AssettoCorsa.exe     |                                                       |
-| Assetto Corsa EVO           | AssettoCorsaEVO.exe  |                                                       |
-| Assetto Corsa  Competizione | acc.exe              |                                                       |
-| rFactor 2                   | rFactor2.exe         |                                                       |
-| Le Mans Ultimate            | Le Mans Ultimate.exe |                                                       |
-| RaceRoom Racing Experience  | RRRE64.exe           | This file is located in a subfolder named "Game\x64". |
-| iRacing                     | iRacingUI.exe        | This file is located in a subfolder named "ui".       |
-| Automobilista 2             | AMS2.exe             |                                                       |
-| Project Cars 2              | pcars2avx.exe        |                                                       |
+| Simulator                   | File                 | Comments                                               |
+|-----------------------------|----------------------|--------------------------------------------------------|
+| Assetto Corsa               | AssettoCorsa.exe     |                                                        |
+| Assetto Corsa EVO           | AssettoCorsaEVO.exe  |                                                        |
+| Assetto Corsa  Competizione | acc.exe              |                                                        |
+| rFactor 2                   | rFactor2.exe         |                                                        |
+| Le Mans Ultimate            | Le Mans Ultimate.exe |                                                        |
+| RaceRoom Racing Experience  | RRRE64.exe           | This file is located in a subfolder named "Game\x64".  |
+| iRacing                     | iRacingUI.exe        | This file is located in a subfolder named "ui".        |
+| Automobilista 2             | AMS2.exe             |                                                        |
+| Project Cars 2              | pcars2avx.exe        |                                                        |
 | Project Motor Racing        | ProjectMotorRacingGame.exe | This file is located in a subfolder named "x64". |
-| Rennsport                   | Rennsport.exe        |                                                       |
+| F1 25                       | F1_25.exe            |                                                        |
+| Rennsport                   | Rennsport.exe        |                                                        |
 
 #### Patching the configuration
 

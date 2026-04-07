@@ -13,7 +13,7 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 | Automatic simulator startup | Middle Mouse Button | When starting "Simulator Startup" with the Middle Mouse Button pressed, the first simulator from the list of configured simulators will be started automatically. |
 | Simulator startup | Shift | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Shift key, the choice of "Close on startup" will be temporarily toggled for this one startup. |
 | Simulator startup | Control | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Control key, the editor for the startup profiles will open up, even when the small cog wheel icon was not hit. |
-| Simulator startup | Alt | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Alt key, you can choose to *listen* to a simulator running on a remote system (PC or console) |
+| Simulator startup | Alt | When clicking *Startup* (green triangle) in "Simulator Startup" while holding the Alt key, you can choose to *listen* to a simulator running on a remote system (PC or console). |
 | Opening documentation | Control | Holding down the Control key when clicking on the "Documentation" button will open a menu with all available news articles instead of the documentation. |
 | Editing startup profiles | Control | Holding down the Control key when clicking the "Save" button in the startup profiles editor will save the profiles and start Simulator Controller in one step. |
 | Exporting startup profiles | Control | Holding down the Control key when clicking the "Download" button in the startup profiles editor will only include the currently selected profile in the export file. |

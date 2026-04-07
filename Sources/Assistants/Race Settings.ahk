@@ -718,7 +718,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", dryRearRight), false))
 
 						/*
-						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
+						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing", "F1 25"], simulator)) {
 							message := (translate("Tyre setup imported: ") . translate(compound(tyreCompound, tyreCompoundColor)))
 
 							showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
@@ -743,7 +743,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 						setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", wetRearRight), false))
 
 						/*
-						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing"], simulator)) {
+						if (!gSilentMode && !inList(["rFactor 2", "Le Mans Ultimate", "Automobilista 2", "Project CARS 2", "Project Motor Racing", "F1 25"], simulator)) {
 							message := (translate("Tyre setup imported: ") . compound(tyreCompound, tyreCompoundColor))
 
 							showMessage(message . translate("; ")

@@ -505,7 +505,7 @@ callSimulator(simulator, options := "", protocol?) {
 
 				DirCreate(kTempDirectory . simulator . " Data")
 
-				dataFile := temporaryFileName(simulator . " Data\SHM", "data")
+				dataFile := temporaryFileName(simulator . " Data\Provider", "data")
 
 				if protocol.HasProp("Arguments")
 					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)

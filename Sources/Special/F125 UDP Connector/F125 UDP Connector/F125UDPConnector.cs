@@ -111,6 +111,8 @@ namespace F125UDPConnector
 
         // ── Telemetry Output ──────────────────────────────────────────
 
+        private int previousLap = 0;
+
         private string GenerateTelemetry()
         {
             var sb = new StringBuilder();
@@ -192,15 +194,7 @@ namespace F125UDPConnector
                     return (long)(session.SessionTimeLeft * 1000);
             }
 
-            if ((playerLap == null) || (playerLap.ResultStatus >= 3))
-            {
-                sb.Append("Active=false\n");
-                return sb.ToString();
-            }
-
-            PacketEventData eventData = receiver.GetEventData();
-
-            if (eventData != null && eventData.EventStringCode == "SEND")
+            if (playerLap == null)
             {
                 sb.Append("Active=false\n");
                 return sb.ToString();
@@ -227,8 +221,17 @@ namespace F125UDPConnector
             // Session format & remaining
             bool isLaps = session.SessionType >= 10; // Race types
             sb.AppendFormat("SessionFormat={0}\n", isLaps ? "Laps" : "Time");
-            sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));
-            sb.AppendFormat("SessionLapsRemaining={0}\n", I(GetRemainingLaps()));
+
+            if (playerLap.ResultStatus >= 3)
+            {
+                sb.AppendFormat("SessionTimeRemaining=0\n");
+                sb.AppendFormat("SessionLapsRemaining=0\n");
+            }
+            else
+            {
+                sb.AppendFormat("SessionTimeRemaining={0}\n", L(GetRemainingTime()));
+                sb.AppendFormat("SessionLapsRemaining={0}\n", I(GetRemainingLaps()));
+            }
 
             // ── [Car Data] ──────────────────────────────────────────────
             sb.Append("[Car Data]\n");
@@ -420,8 +423,19 @@ namespace F125UDPConnector
             else
                 sb.AppendFormat("LapBestTime={0}\n", L(playerLap.LastLapTimeInMS));
 
+            int lap;
+
+            if (playerLap.ResultStatus >= 3)
+                lap = previousLap + 1;
+            else
+            {
+                lap = Math.Max(0, playerLap.CurrentLapNum - 1);
+
+                previousLap = lap;
+            }
+
             sb.AppendFormat("Sector={0}\n", I(playerLap.Sector + 1));
-            sb.AppendFormat("Laps={0}\n", I(Math.Max(0, playerLap.CurrentLapNum - 1)));
+            sb.AppendFormat("Laps={0}\n", I(lap));
 
             /*
             if (playerLap.Sector1TimeInMS > 0 || playerLap.Sector1TimeMinutes > 0)
@@ -451,7 +465,7 @@ namespace F125UDPConnector
             sb.AppendFormat("CornerCuttingWarnings={0}\n", I(playerLap.CornerCuttingWarnings));
             */
 
-            eventData = receiver.GetEventData();
+            PacketEventData eventData = receiver.GetEventData();
 
             if (eventData != null && eventData.EventStringCode == "PENA" && eventData.EventDetails[2] == playerIdx)
             {

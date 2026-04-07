@@ -1853,7 +1853,9 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local leader := state[1]
 		local driver := state[2]
 
-		if (!driver && leader && ((leader == true) || (leader.Finish <= getMultiMapValue(data, "Position Data", "Car." . leader.Car . ".Laps")))) {
+		if ((driver == true) && (leader == true))
+			return (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) == 0)
+		else if (!driver && leader && ((leader == true) || (leader.Finish <= getMultiMapValue(data, "Position Data", "Car." . leader.Car . ".Laps")))) {
 			if isDebug()
 				logMessage(kLogDebug, "Leader finished: " . leader.Finish . "; " . getMultiMapValue(data, "Position Data", "Car." . leader.Car . ".Laps"))
 
@@ -1937,7 +1939,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			return true
 		}
-		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 0) {
+		else if (getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0) <= 1) {
 			state := [true, true]
 
 			return true

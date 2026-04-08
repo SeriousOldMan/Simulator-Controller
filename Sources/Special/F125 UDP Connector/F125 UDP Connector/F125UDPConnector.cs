@@ -465,10 +465,8 @@ namespace F125UDPConnector
             {
                 string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
 
-                if (penalty != "")
-                    sb.AppendFormat("Penalty={0}\n", penalty);
+                sb.AppendFormat("Penalty={0}\n", (penalty != "") ? penalty : "true");
             }
-
 
             // Delta
             sb.AppendFormat("GapAhead={0}\n",

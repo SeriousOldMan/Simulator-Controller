@@ -34,6 +34,7 @@ namespace F125UDPReceiver
 
         private readonly object dataLock = new object();
         private bool receivedData = false;
+        private int sessionActive = 0;
 
         public F125UDPReceiver(int port = 20777, string host = "127.0.0.1", bool useMulticast = true)
         {
@@ -140,6 +141,12 @@ namespace F125UDPReceiver
                             break;
                         case 3:  // Event
                             eventData = PacketEventData.Decode(data);
+
+                            if (eventData.EventStringCode == "SSTA")
+                                sessionActive = Int32.MaxValue;
+                            else if (eventData.EventStringCode == "SEND")
+                                sessionActive = Environment.TickCount + 5000;
+
                             break;
                         case 4:  // Participants
                             participantsData = PacketParticipantsData.Decode(data);
@@ -284,7 +291,15 @@ namespace F125UDPReceiver
         {
             lock (dataLock)
             {
-                return sessionData != null && receivedData && (Environment.TickCount - GetLastUpdate()) < 2000;
+                return Environment.TickCount < sessionActive;
+            }
+        }
+
+        public bool IsPaused()
+        {
+            lock (dataLock)
+            {
+                return Environment.TickCount - GetLastUpdate() > 2000;
             }
         }
 

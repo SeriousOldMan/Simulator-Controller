@@ -1671,7 +1671,7 @@ class RaceSpotter extends GridRaceAssistant {
 				return false
 			}
 			else
-				return (sessionLapsRemaining <= 0)
+				return (sessionLapsRemaining <= 1)
 		}
 	}
 

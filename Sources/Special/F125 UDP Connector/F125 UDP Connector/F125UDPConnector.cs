@@ -193,7 +193,7 @@ namespace F125UDPConnector
             }
 
             sb.Append("Active=true\n");
-            sb.AppendFormat("Paused={0}\n", session.GamePaused != 0 ? "true" : "false");
+            sb.AppendFormat("Paused={0}\n", session.GamePaused != 0 || receiver.IsPaused() ? "true" : "false");
             sb.AppendFormat("Session={0}\n", F125Constants.GetSessionType(session.SessionType));
 
             // Car name – use team name

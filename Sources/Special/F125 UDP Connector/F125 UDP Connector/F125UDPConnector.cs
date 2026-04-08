@@ -271,6 +271,7 @@ namespace F125UDPConnector
                     I(playerDamage.TyresDamage[wr[2]]),
                     I(playerDamage.TyresDamage[wr[3]]));
                 */
+                sb.Append("SuspensionDamage=0,0,0,0\n");
 
                 sb.AppendFormat("EngineDamage={0}\n", I((playerDamage.EngineDamage + playerDamage.GearBoxDamage) / 2));
 

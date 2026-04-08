@@ -465,6 +465,8 @@ namespace F125UDPConnector
             if (penalty != null)
                 sb.AppendFormat("Penalty={0}\n", penalty);
 
+            sb.AppendFormat("Warnings={0}\n", receiver.GetLastWarnings());
+
             // Delta
             sb.AppendFormat("GapAhead={0}\n",
                 L(playerLap.DeltaToCarInFrontMinutes * 60000 + playerLap.DeltaToCarInFrontInMS));

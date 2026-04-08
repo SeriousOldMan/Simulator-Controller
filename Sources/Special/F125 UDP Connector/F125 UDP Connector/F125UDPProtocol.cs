@@ -201,6 +201,7 @@ namespace F125UDPProtocol
             { "Hamilton", "Lewis Hamilton" },
             { "Verstappen", "Max Verstappen" },
             { "Hülkenburg", "Nico Hülkenburg" },
+            { "Hülkenberg", "Nico Hülkenberg" },
             { "Magnussen", "Kevin Magnussen" },
             { "Pérez", "Sergio Pérez" },
             { "Bottas", "Valtteri Bottas" },

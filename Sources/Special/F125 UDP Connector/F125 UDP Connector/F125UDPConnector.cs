@@ -104,6 +104,7 @@ namespace F125UDPConnector
         // ── Telemetry Output ──────────────────────────────────────────
 
         private int previousLap = 0;
+        private int lastLap = 0;
 
         private string GenerateTelemetry()
         {
@@ -459,23 +460,26 @@ namespace F125UDPConnector
             sb.AppendFormat("CornerCuttingWarnings={0}\n", I(playerLap.CornerCuttingWarnings));
             */
 
-            PacketEventData eventData = receiver.GetEventData();
+            string penalty = receiver.GetLastPenalty();
 
-            if (eventData != null && eventData.EventStringCode == "PENA" && eventData.EventDetails[2] == playerIdx)
-            {
-                string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
-
-                sb.AppendFormat("Penalty={0}\n", (penalty != "") ? penalty : "true");
-            }
+            if (penalty != null)
+                sb.AppendFormat("Penalty={0}\n", penalty);
 
             // Delta
             sb.AppendFormat("GapAhead={0}\n",
                 L(playerLap.DeltaToCarInFrontMinutes * 60000 + playerLap.DeltaToCarInFrontInMS));
-            
+
             /*
             sb.AppendFormat("DeltaToLeader={0}\n",
                 L(playerLap.DeltaToRaceLeaderMinutes * 60000 + playerLap.DeltaToRaceLeaderInMS));
             */
+
+            if (lastLap != lap)
+            {
+                receiver.ClearLastPenalty();
+
+                lastLap = lap;
+            }
 
             // ── [Track Data] ─────────────────────────────────────────────
             sb.Append("[Track Data]\n");

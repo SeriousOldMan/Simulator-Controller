@@ -35,6 +35,7 @@ namespace F125UDPReceiver
         private readonly object dataLock = new object();
         private bool receivedData = false;
         private int sessionActive = 0;
+        private string lastPenalty = null;
 
         public F125UDPReceiver(int port = 20777, string host = "127.0.0.1", bool useMulticast = true)
         {
@@ -112,6 +113,7 @@ namespace F125UDPReceiver
                 catch
                 {
                     // Ignore malformed packets
+                    Thread.Sleep(20);
                 }
             }
         }
@@ -143,9 +145,26 @@ namespace F125UDPReceiver
                             eventData = PacketEventData.Decode(data);
 
                             if (eventData.EventStringCode == "SSTA")
+                            {
+                                lastPenalty = null;
                                 sessionActive = Int32.MaxValue;
+                            }
                             else if (eventData.EventStringCode == "SEND")
+                            {
+                                lastPenalty = null;
                                 sessionActive = Environment.TickCount + 5000;
+                            }
+                            else if (eventData.EventStringCode == "PENA")
+                            {
+                                string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
+
+                                if (penalty != null)
+                                    lastPenalty = penalty;
+                            }
+                            else if ((eventData.EventStringCode == "DTSV") && (lastPenalty == "DT"))
+                                lastPenalty = null;
+                            else if ((eventData.EventStringCode == "SGSV") && (lastPenalty == "SG"))
+                                lastPenalty = null;
 
                             break;
                         case 4:  // Participants
@@ -287,6 +306,12 @@ namespace F125UDPReceiver
             }
         }
 
+        public string GetLastPenalty()
+        {
+            lock (dataLock) { return lastPenalty; }
+            ;
+        }
+
         public bool IsActive()
         {
             lock (dataLock)
@@ -309,6 +334,11 @@ namespace F125UDPReceiver
             {
                 return receivedData;
             }
+        }
+
+        public void ClearLastPenalty()
+        {
+            lastPenalty = null;
         }
 
         public void ClearSessionData()

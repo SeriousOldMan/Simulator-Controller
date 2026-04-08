@@ -187,8 +187,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              | No                        | No                        |
 | Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             | No               | No                        | No                        |
 | Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              | No                        | Yes                       |
-| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        | Yes                        |
+| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (14)                 |
+| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        | Yes (14)                    |
 | Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        | No                        |
 | Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (13)                    |
 | Delta Information (11) (12)     | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
@@ -221,11 +221,13 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 
 (12) It depends on the simulator, how accurate the provided position data, lap times, gap times, and so on will be. Some simulators will update some or all of this information only once per sector or even less. It will also depend on your configuration, how often this information will be acquired from the simulator and how often the Spotter will provide this information to you. I recommend to start with this configuration choices:
 
-(13) Depending on system performance, the session start may be too fast for the AI to catch up and the "Green, Green, Green" shoutout will be skipped.
-
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Spotter%20Config.jpg)
 
 Also use a very low setting for "Data: Update Frequency" of around 2 - 3 seconds in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Doing all this, you will create a very verbose Spotter and you can check whether the provided information is accurate. Once you have seen, what information the Spotter provides and how accurate it is for your chosen simulator, you can reduce the frequency of the Spotter callouts again and also choose "Sector" for opponent information, for example. As a side note, the Strategist will update all this information only once per sector, even if available at a higher resolution by the simulator.
+
+(13) Depending on system performance, the session start may be too fast for the AI to catch up and the "Green, Green, Green" shoutout will be skipped.
+
+(14) Not always reported correctly, when UDP packets ar lost du to high frequency events.
 
 ##### Accident detection for *Assetto Corsa Competizione*
 

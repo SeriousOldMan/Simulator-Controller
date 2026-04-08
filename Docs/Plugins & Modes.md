@@ -1632,11 +1632,10 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 6. The current implementation of the *F1 25* API shows the following problems:
 
-   - The last lap data is not reported when the drivers car has crossed the finish line. Therefore the data for the last lap is missing from all reports.
+   - The data for the the last lap is not reported when the drivers car has crossed the finish line. Therefore, the last lap is missing from all reports, race review, and so on.
    - If you quit a session before finishing it, the end of the session is not detected by the Assustints - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
    - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
-   - Suspension damage cannot be detected in the data.
-   - Penalties are also not detected correctly.
+   - Suspension damage cannot be detected in the data. There is a tyre damage information available (for example when jumping over sausage curbs), but this damage is issued too often to be used as substitute for suspension damage.
    
 ## Plugin *Integration*
 

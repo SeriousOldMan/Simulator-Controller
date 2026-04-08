@@ -957,7 +957,7 @@ namespace F125UDPCoach {
 
         public bool active()
         {
-            if (receiver != null && receiver.IsActive() && HasData())
+            if (receiver != null && HasData() && receiver.IsPaused())
                 return true;
             else
                 return false;

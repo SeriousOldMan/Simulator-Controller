@@ -1309,7 +1309,7 @@ namespace F125UDPSpotter {
         }
 
         public bool active() {
-			if (!HasData() || !receiver.IsActive())
+			if (!HasData() || receiver.IsPaused())
                 return false;
             else
                 return true;

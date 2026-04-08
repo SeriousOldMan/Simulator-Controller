@@ -711,6 +711,7 @@ namespace F125UDPProtocol
         public byte RearSuspensionHeight;
         public byte BrakePressure;
         public byte BrakeBias;
+        public byte EngineBraking;
         public float RearLeftTyrePressure;
         public float RearRightTyrePressure;
         public float FrontLeftTyrePressure;
@@ -737,6 +738,7 @@ namespace F125UDPProtocol
             s.RearSuspensionHeight = data[o++];
             s.BrakePressure = data[o++];
             s.BrakeBias = data[o++];
+            s.EngineBraking = data[o++];
             s.RearLeftTyrePressure = BitConverter.ToSingle(data, o); o += 4;
             s.RearRightTyrePressure = BitConverter.ToSingle(data, o); o += 4;
             s.FrontLeftTyrePressure = BitConverter.ToSingle(data, o); o += 4;

@@ -193,7 +193,7 @@ namespace F125UDPConnector
             }
 
             sb.Append("Active=true\n");
-            sb.AppendFormat("Paused={0}\n", session.GamePaused != 0 ? "true" : "false");
+            sb.AppendFormat("Paused={0}\n", session.GamePaused != 0 || receiver.IsPaused() ? "true" : "false");
             sb.AppendFormat("Session={0}\n", F125Constants.GetSessionType(session.SessionType));
 
             // Car name – use team name
@@ -262,12 +262,14 @@ namespace F125UDPConnector
                     I(frontDamage), I(rearDamage), I(leftDamage), I(rightDamage),
                     I(frontDamage + rearDamage + leftDamage + rightDamage));
 
+                /*
                 // Suspension damage
                 sb.AppendFormat("SuspensionDamage={0},{1},{2},{3}\n",
                     I(playerDamage.TyresDamage[wr[0]]),
                     I(playerDamage.TyresDamage[wr[1]]),
                     I(playerDamage.TyresDamage[wr[2]]),
                     I(playerDamage.TyresDamage[wr[3]]));
+                */
 
                 sb.AppendFormat("EngineDamage={0}\n", I((playerDamage.EngineDamage + playerDamage.GearBoxDamage) / 2));
 

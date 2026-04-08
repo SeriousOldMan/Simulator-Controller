@@ -692,7 +692,13 @@ namespace F125UDPConnector
             {
                 forename = parts[0];
                 surname = "";
-                nickname = parts[0].Length > 0 ? parts[0].Substring(0, 1) : "";
+
+                string newName = F125Constants.GetDriverName(forename);
+
+                if (newName == forename)
+                    nickname = parts[0].Length > 0 ? parts[0].Substring(0, 1) : "";
+                else
+                    ParseDriverName(newName, out forename, out surname, out nickname);
             }
             else
             {

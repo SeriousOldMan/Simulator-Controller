@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace F125UDPProtocol
 {
@@ -190,6 +191,104 @@ namespace F125UDPProtocol
             { 5, "HeavyRain" }   // Storm
         };
 
+        // ── Driver Names ─────────────────────────────────────────────────
+        public static readonly Dictionary<string, string> DriverNames = new Dictionary<string, string>
+        {
+            { "Sainz", "Carlos Sainz" },
+            { "Ricciardo", "Daniel Ricciardo" },
+            { "Alonso", "Fernando Alonso" },
+            { "Massa", "Felipe Massa" },
+            { "Hamilton", "Lewis Hamilton" },
+            { "Verstappen", "Max Verstappen" },
+            { "Hülkenburg", "Nico Hülkenburg" },
+            { "Magnussen", "Kevin Magnussen" },
+            { "Pérez", "Sergio Pérez" },
+            { "Bottas", "Valtteri Bottas" },
+            { "Ocon", "Esteban Ocon" },
+            { "Stroll", "Lance Stroll" },
+            { "Barnes", "Arron Barnes" },
+            { "Giles", "Martin Giles" },
+            { "Murray", "Alex Murray" },
+            { "Roth", "Lucas Roth" },
+            { "Correia", "Igor Correia" },
+            { "Levasseur", "Sophie Levasseur" },
+            { "Schiffer", "Jonas Schiffer" },
+            { "Forest", "Alain Forest" },
+            { "Letourneau", "Jay Letourneau" },
+            { "Saari", "Esto Saari" },
+            { "Atiyeh", "Yasar Atiyeh" },
+            { "Calabresi", "Callisto Calabresi" },
+            { "Izumi", "Naota Izumi" },
+            { "Clarke", "Howard Clarke" },
+            { "Kaufmann", "Lars Kaufmann" },
+            { "Laursen", "Marie Laursen" },
+            { "Nieves", "Flavio Nieves" },
+            { "Michalski", "Klimek Michalski" },
+            { "Moreno", "Santiago Moreno" },
+            { "Coppens", "Benjamin Coppens" },
+            { "Visser", "Noah Visser" },
+            { "Russell", "George Russell" },
+            { "Norris", "Lando Norris" },
+            { "Leclerc", "Charles Leclerc" },
+            { "Gasly", "Pierre Gasly" },
+            { "Albon", "Alexander Albon" },
+            { "Dürksen", "Joshua Dürksen" },
+            { "Nair", "Rashid Nair" },
+            { "Antonelli", "Andrea-Kimi Antonelli" },
+            { "Tremblay", "Jack Tremblay" },
+            { "Miyata", "Ritomo Miyata" },
+            { "Senna", "Ayrton Senna" },
+            { "Villagómez", "Rafael Villagómez" },
+            { "Zhou", "Guanyu Zhou" },
+            { "O’Sullivan", "Zak O’Sullivan" },
+            { "Correa", "Juan Manuel Correa" },
+            { "Marti", "Pepe Marti" },
+            { "Schumacher", "Michael Schumacher" },
+            { "Hayes", "Sonny Hayes" },
+            { "Tsunoda", "Yuki Tsunoda" },
+            { "Pearce", "Joshua Pearce" },
+            { "Jackson", "Aidan Jackson" },
+            { "Voisin", "Callum Voisin" },
+            { "Button", "Jenson Button" },
+            { "Zagazeta", "Matias Zagazeta" },
+            { "Coulthard", "David Coulthard" },
+            { "Tsolov", "Nikola Tsolov" },
+            { "Piastri", "Oscar Piastri" },
+            { "Tramnitz", "Tim Tramnitz" },
+            { "Lawson", "Liam Lawson" },
+            { "Cortez", "Luca Cortez" },
+            { "Verschoor", "Richard Verschoor" },
+            { "Fittipaldi", "Enzo Fittipaldi" },
+            { "Webber", "Mark Webber" },
+            { "Villeneuve", "Jacques Villeneuve" },
+            { "Mayer", "Callie Mayer" },
+            { "Sargeant", "Logan Sargeant" },
+            { "Doohan", "Jack Doohan" },
+            { "Cordeel", "Amaury Cordeel" },
+            { "Hauger", "Dennis Hauger" },
+            { "Maloney", "Zane Maloney" },
+            { "Martins", "Victor Martins" },
+            { "Bearman", "Oliver Bearman" },
+            { "Crawford", "Jak Crawford" },
+            { "Hadjar", "Isack Hadjar" },
+            { "Stanek", "Roman Stanek" },
+            { "Maini", "Kush Maini" },
+            { "Leigh", "Brendon Leigh" },
+            { "Tonizza", "David Tonizza" },
+            { "Opmeer", "Jarno Opmeer" },
+            { "Blakeley", "Lucas Blakeley" },
+            { "Aron", "Paul Aron" },
+            { "Bortoleto", "Gabriel Bortoleto" },
+            { "Colapinto", "Franco Colapinto" },
+            { "Barnard", "Taylor Barnard" }
+        };
+
+        static F125Constants()
+        {
+            foreach (KeyValuePair<string, string> entry in DriverNames.ToList())
+                DriverNames.Add(entry.Key.ToLower(), entry.Value);
+        }
+
         public static string GetClassName(byte classId)
         {
             string name;
@@ -236,6 +335,12 @@ namespace F125UDPProtocol
         {
             string name;
             return WeatherTypes.TryGetValue(weatherId, out name) ? name : "Dry";
+        }
+
+        public static string GetDriverName(string name)
+        {
+            string gameName;
+            return DriverNames.TryGetValue(name.ToLower(), out gameName) ? gameName : name;
         }
     }
 

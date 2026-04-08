@@ -321,7 +321,7 @@ The upper area with the dropdown menus give you you control over several decisio
 
 In many cases it is not a good idea to decide based on the repair duration, whether a repair is useful. Sometimes a damage, for example at the side of the car, has no negative influence on lap time. Therefore I recommend to use the "Impact" rule, at least for bodywork and engine damage, whenever possible. Suspension damage is a different topic, though.
 
-The following table shows, which simulator supports which damage type:
+The following table shows, which simulator supports which damage types:
 
 | Simulator                  | Bodywork | Suspension | Engine |
 |----------------------------|----------|------------|--------|
@@ -334,7 +334,7 @@ The following table shows, which simulator supports which damage type:
 | rFactor 2                  | Yes      | No         | No     |
 | Le Mans Ultimate           | Yes      | Yes        | No     |
 | Project Motor Racing (2)   | -        | -          | -      |
-| F1 25 (3)                  | -        | -          | -      |
+| F1 25 (3)                  | Yes      | No         | Yes    |
 
 ##### Notes
 
@@ -526,7 +526,7 @@ The following statistical models are currently implemented:
      | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
      | Le Mans Ultimate           | Yes                     | Yes                  | No     |
      | Project Motor Racing       | No                      | No                   | No     |
-     | F1 25                      | Yes                     | Yes                  | Yes    |
+     | F1 25                      | Yes                     | No                   | Yes    |
 	 
 	 Notes:
 	 

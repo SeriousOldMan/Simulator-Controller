@@ -1628,8 +1628,16 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - Select the first page and enter "F1 25" into the list of all available simulators.
    - Save the configuration.
    
-IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
+   IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
 
+6. The current implementation of the *F1 25* API shows the following problems:
+
+   - The last lap data is not reported when the drivers car has crossed the finish line. Therefore the data for the last lap is missing from all reports.
+   - If you quit a session before finishing it, the end of the session is not detected by the Assustints - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
+   - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
+   - Suspension damage cannot be detected in the data.
+   - Penalties are also not detected correctly.
+   
 ## Plugin *Integration*
 
 This plugin, which is normally not automatically included and enabled, can export the internal state of Simulator Controller - especially a lot of the knowledge of all Race Assistants and plenty of information about the currently running simulator session - to other applications using a JSON file.

@@ -43,8 +43,7 @@
     <ApplicationIcon>Engine.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="F125 UDP Connector, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="F125 UDP Connector">
       <HintPath>..\..\F125 UDP Connector\Debug\F125 UDP Connector.dll</HintPath>
     </Reference>
     <Reference Include="System" />

@@ -1316,7 +1316,8 @@ namespace F125UDPSpotter {
         }
 
 		public void Run(bool mapTrack, bool positionTrigger, string telemetryFolder = "") {
-			bool running = true;
+			bool running = false;
+			int countdown = 4000;
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
 
@@ -1348,63 +1349,78 @@ namespace F125UDPSpotter {
 						}
 						else if (positionTrigger)
 							checkCoordinates();
-						else if (running) {
-							if (!greenFlagReported && (counter > 8000))
-								greenFlagReported = true;
-								
-							if (carTelemetry)
-								collectCarTelemetry();
-							else {
-								var lapData = receiver.GetLapData();
-								int playerIdx = (lapData != null) ? lapData.Header.PlayerCarIndex : 0;
-								var playerLap = (lapData != null) ? lapData.LapDataArr[playerIdx] : null;
-								bool inPits = (playerLap != null) && (playerLap.PitStatus != 0);
-									
-								if (!inPits) {
-									updateTopSpeed();
+						else {
+							if (!running)
+							{
+								if (greenFlagReported)
+									running = true;
+								else if (vehicleSpeed(receiver.GetMotionData().CarMotion[receiver.GetPlayerCarIndex()]) > 100)
+									running = true;
+								else if (countdown-- <= 0)
+									running = true;
+							}
 
-									if (cycle > nextSpeedUpdate)
-									{
-										var motion = receiver.GetMotionData();
-										float speed = 0;
-										if (motion != null)
-											speed = (float)vehicleSpeed(motion.CarMotion[playerIdx]);
+							if (running)
+							{
+								if (!greenFlagReported && (counter > 8000))
+									greenFlagReported = true;
 
-										nextSpeedUpdate = cycle + 50;
-
-										if ((speed >= thresholdSpeed) && !enabled)
-										{
-											enabled = true;
-
-											SendSpotterMessage("enableSpotter");
-										}
-										else if ((speed < thresholdSpeed) && enabled)
-										{
-											enabled = false;
-
-											SendSpotterMessage("disableSpotter");
-										}
-									}
-
-									cycle += 1;
-
-									if (enabled && !greenFlag())
-										if (checkAccident())
-											wait = false;
-										else if (checkFlagState() || checkPositions())
-											wait = false;
-										else
-											wait = !checkPitWindow();
-								}
+								if (carTelemetry)
+									collectCarTelemetry();
 								else
 								{
-									longitudinalRearDistance = 5;
+									var lapData = receiver.GetLapData();
+									int playerIdx = (lapData != null) ? lapData.Header.PlayerCarIndex : 0;
+									var playerLap = (lapData != null) ? lapData.LapDataArr[playerIdx] : null;
+									bool inPits = (playerLap != null) && (playerLap.PitStatus != 0);
 
-									lastSituation = CLEAR;
-									carBehind = false;
-									carBehindReported = false;
+									if (!inPits)
+									{
+										updateTopSpeed();
 
-									lastFlagState = 0;
+										if (cycle > nextSpeedUpdate)
+										{
+											var motion = receiver.GetMotionData();
+											float speed = 0;
+											if (motion != null)
+												speed = (float)vehicleSpeed(motion.CarMotion[playerIdx]);
+
+											nextSpeedUpdate = cycle + 50;
+
+											if ((speed >= thresholdSpeed) && !enabled)
+											{
+												enabled = true;
+
+												SendSpotterMessage("enableSpotter");
+											}
+											else if ((speed < thresholdSpeed) && enabled)
+											{
+												enabled = false;
+
+												SendSpotterMessage("disableSpotter");
+											}
+										}
+
+										cycle += 1;
+
+										if (enabled && !greenFlag())
+											if (checkAccident())
+												wait = false;
+											else if (checkFlagState() || checkPositions())
+												wait = false;
+											else
+												wait = !checkPitWindow();
+									}
+									else
+									{
+										longitudinalRearDistance = 5;
+
+										lastSituation = CLEAR;
+										carBehind = false;
+										carBehindReported = false;
+
+										lastFlagState = 0;
+									}
 								}
 							}
 						}

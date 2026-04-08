@@ -31,29 +31,33 @@ namespace F125UDPProvider
                 }
             }
 
-            string request = args.Length > 3 ? args[3] : "";
-            F125UDPConnector.F125UDPConnector connector = new F125UDPConnector.F125UDPConnector();
-            
-            if (!connector.Open(host, port, useMultiCast))
+            while (true)
             {
-                Console.WriteLine("[Session Data]");
-                Console.WriteLine("Active=false");
-                return;
-            }
+                string request = args.Length > 3 ? args[3] : "";
+                F125UDPConnector.F125UDPConnector connector = new F125UDPConnector.F125UDPConnector();
 
-            try
-            {
-                for (int i = 0; i < 15; i++)
-                    if (connector.HasData())
-                        break;
-                    else
-                        Thread.Sleep(100);
+                if (!connector.Open(host, port, useMultiCast))
+                {
+                    Console.WriteLine("[Session Data]");
+                    Console.WriteLine("Active=false");
+                    // return;
+                }
 
-                Console.Write(connector.Call(request));
-            }
-            finally
-            {
-                connector.Close();
+                try
+                {
+                    for (int i = 0; i < 15; i++)
+                        if (connector.HasData())
+                            break;
+                        else
+                            Thread.Sleep(100);
+
+                    while (true)
+                    Console.Write(connector.Call(request));
+                }
+                finally
+                {
+                    connector.Close();
+                }
             }
         }
     }

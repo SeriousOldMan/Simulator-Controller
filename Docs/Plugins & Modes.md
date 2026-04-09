@@ -1618,6 +1618,10 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
    - The virtual environment will normally install a logical ethernet adapter during installation. This network adapater must be hidden either by using the Windows Network Control Panel after installation of the virtualization application, or it can be hidden in this application as well (for example in the global settings of *VirtualBox*, not the machine specific settings). Hiding the logical ethernet adapter is necessary, because *F1 25* will confused when several network adapters are available and may send the UDP packets over the wrong adapter.
    - The configuration of the virtual machine itself must use a bridged network adapter, so that the virtual PC is running on the same network as the host PC, so that UDP packets will be visible. If a NAT configuration is necessary for any reason, port forwarding must be configured for the UDP protocol on port 20777 (or any other configured UDP port).
+   
+   The following video demonstrates the required setup and configuration steps for VirtualBox and Simulator Controller:
+   
+   https://youtu.be/Q2nOAtrHOL8
 
 4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 

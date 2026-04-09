@@ -36,6 +36,7 @@ namespace F125UDPReceiver
         private bool receivedData = false;
         private int sessionActive = 0;
         private string lastPenalty = null;
+        private int lastWarnings = 0;
 
         public F125UDPReceiver(int port = 20777, string host = "127.0.0.1", bool useMulticast = true)
         {
@@ -147,24 +148,37 @@ namespace F125UDPReceiver
                             if (eventData.EventStringCode == "SSTA")
                             {
                                 lastPenalty = null;
+                                lastWarnings = 0;
                                 sessionActive = Int32.MaxValue;
                             }
                             else if (eventData.EventStringCode == "SEND")
                             {
                                 lastPenalty = null;
+                                lastWarnings = 0;
                                 sessionActive = Environment.TickCount + 5000;
                             }
                             else if (eventData.EventStringCode == "PENA")
                             {
-                                string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
+                                if (eventData.EventDetails[2] == GetPlayerCarIndex())
+                                {
+                                    string penalty = F125Constants.GetPenaltyName(eventData.EventDetails[0]);
 
-                                if (penalty != null)
-                                    lastPenalty = penalty;
+                                    if (penalty != null)
+                                        lastPenalty = penalty;
+                                    else if (eventData.EventDetails[0] >= 10 && eventData.EventDetails[0] <= 15 &&
+                                                eventData.EventDetails[1] >= 7 && eventData.EventDetails[1] <= 10)
+                                        lastWarnings += 1;
+                                }
                             }
                             else if ((eventData.EventStringCode == "DTSV") && (lastPenalty == "DT"))
+                            {
                                 lastPenalty = null;
-                            else if ((eventData.EventStringCode == "SGSV") && (lastPenalty == "SG"))
+                                lastWarnings = 0;
+                            }
+                            else if ((eventData.EventStringCode == "SGSV") && (lastPenalty == "SG")) {
                                 lastPenalty = null;
+                                lastWarnings = 0;
+                            }
 
                             break;
                         case 4:  // Participants
@@ -312,6 +326,12 @@ namespace F125UDPReceiver
             ;
         }
 
+        public int GetLastWarnings()
+        {
+            lock (dataLock) { return lastWarnings; }
+            ;
+        }
+
         public bool IsActive()
         {
             lock (dataLock)
@@ -339,6 +359,11 @@ namespace F125UDPReceiver
         public void ClearLastPenalty()
         {
             lastPenalty = null;
+        }
+
+        public void ClearLastWarnings()
+        {
+            lastWarnings = 0;
         }
 
         public void ClearSessionData()

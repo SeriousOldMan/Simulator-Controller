@@ -138,6 +138,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 39. [Using tyre wear in strategy development](https://youtu.be/XppMCAAxqEM) - This video demonstrates the impact of tyre wear data on strategy development. You will learn how the recorded data looks like and how you can use it in strategy development.
 
+40. [Running Simulator Controller in a VirtualBox](https://youtu.be/Q2nOAtrHOL8) - You will learn how to setup a virtual machine for Simulator Controller, so that it can be run alongside of F1 25 on the same PC.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

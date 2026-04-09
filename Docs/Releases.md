@@ -46,7 +46,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Changed session finish detection for races based on a fixed number of laps.
   - Support has been added to run Simulator Controller in a virtualized environment like [VirtualBox](https://www.virtualbox.org/).
   - Support has been added to connect to simulators running on a remote machine, which can also be consoles. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Connecting-to-remote-simulators) for more information.
-  - Full documentation has been added for the [*F1 25* integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-f125), especially the [important notes on operation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25). Please note, that the *F1 25* integration is still in *Alpha* stage. Please report any problems you encounter.
+  - Full documentation and an installation video have been added for the [*F1 25* integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-f125), especially the [important notes on operation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25). Please note, that the *F1 25* integration is still in *Alpha* stage. Please report any problems you encounter.
   - The car meta data for *Automobilista 2* has been updated by @inthebagbud UK.
   - New car models for "Setup Workbench":
     - Automobilista 2 (by @inthebagbud UK; no setup editor support)

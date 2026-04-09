@@ -1621,7 +1621,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    
    The following video demonstrates the required setup and configuration steps for VirtualBox and Simulator Controller:
    
-   https://youtu.be/Q2nOAtrHOL8
+   [![](https://img.youtube.com/vi/Q2nOAtrHOL8/0.jpg)](https://www.youtube.com/watch?v=Q2nOAtrHOL8)
 
 4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 

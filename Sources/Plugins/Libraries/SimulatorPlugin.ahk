@@ -1113,24 +1113,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		static lastCar := false
 		static lastTrack := false
 
-		registerSimulator(simulator, car, track) {
-			local settings
-
-			SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
-
-			SessionDatabase.registerTrack(simulator, car, track
-										, SessionDatabase.getTrackName(simulator, track, false)
-										, SessionDatabase.getTrackName(simulator, track, true))
-
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
-			setMultiMapValue(settings, "Simulator", "Car", car)
-			setMultiMapValue(settings, "Simulator", "Track", track)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-		}
-
 		this.Settings := settings
 
 		this.Car := car
@@ -1141,7 +1123,21 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			lastCar := car
 			lastTrack := track
 
-			Task.startTask(registerSimulator.Bind(simulator, car, track), 1000, kLowPriority)
+			SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
+
+			SessionDatabase.registerTrack(simulator, car, track
+										, SessionDatabase.getTrackName(simulator, track, false)
+										, SessionDatabase.getTrackName(simulator, track, true))
+
+			Task.startTask(() {
+				local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+				setMultiMapValue(settings, "Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
+				setMultiMapValue(settings, "Simulator", "Car", car)
+				setMultiMapValue(settings, "Simulator", "Track", track)
+
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			}, 1000, kLowPriority)
 		}
 
 		if this.supportsTyreManagement(&mixedCompounds) {

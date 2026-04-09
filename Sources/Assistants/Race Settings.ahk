@@ -209,7 +209,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, tc, tcc, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, tyreSet, translatedCompounds, rulesActive, index, availableCompounds, found
+	local tyreSets, tyreSet, translatedCompounds, rulesActive, index, availableCompounds, found, ruleCompounds
 
 	static sessionDB
 	static simulators, cars, tracks
@@ -2549,45 +2549,39 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					tyreSetListView.Modify(A_Index, "-Select Col3", 99)
 
 				availableCompounds := []
+				ruleCompounds := string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules", "Tyre.Sets", ""))
 
-				for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
-																								 , "Tyre.Sets", "")) {
-					if InStr(tyreCompound, ":") {
-						tyreCompound := string2Values(":", tyreCompound)
+				if (ruleCompounds.Length > 0) {
+					for ignore, tyreCompound in ruleCompounds {
+						if InStr(tyreCompound, ":") {
+							tyreCompound := string2Values(":", tyreCompound)
 
-						availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
+							availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
 
-						loop tyreSetListView.GetCount()
-							if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-								tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
+							loop tyreSetListView.GetCount()
+								if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+									tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 
-								if (tyreCompound.Length > 3)
+									if (tyreCompound.Length > 3)
+										tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
+								}
+						}
+						else {
+							tyreCompound := string2Values("#", tyreCompound)
+
+							availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
+
+							loop tyreSetListView.GetCount()
+								if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+									tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 									tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
 							}
-					}
-					else {
-						tyreCompound := string2Values("#", tyreCompound)
-
-						availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
-
-						loop tyreSetListView.GetCount()
-							if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-								tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
-								tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
 						}
 					}
 				}
-				else {
-					tyreCompound := string2Values("#", tyreCompound)
-
-					availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
-
+				else
 					loop tyreSetListView.GetCount()
-						if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-							tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
-							tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
-						}
-				}
+						availableCompounds.Push(tyreSetListView.GetText(A_Index))
 
 				loop {
 					found := false

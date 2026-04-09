@@ -124,7 +124,7 @@ The Assistants acquire telemetry data from the different simulation games using 
 	 
   5. *F1 25*
   
-     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode).
+     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode). Unfortunately, Simulator Controller cannot be used on the same machine as *F1 25* at the time of this writing, because it is flagged by Javelin as cheating software. However, there are solutions to this problem. See the [special notes for *F1 25*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25) for more information.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 

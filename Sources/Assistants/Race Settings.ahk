@@ -209,7 +209,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	local dllFile, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, tc, tcc, fileName, token
 	local x, y, e, directory, connection, settings, serverURLs, settingsTab, oldTChoice, oldFChoice
-	local tyreSets, tyreSet, translatedCompounds, rulesActive, index, availableCompounds, found
+	local tyreSets, tyreSet, translatedCompounds, rulesActive, index, availableCompounds, found, ruleCompounds
 
 	static sessionDB
 	static simulators, cars, tracks
@@ -239,6 +239,10 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	static teams := CaseInsenseMap()
 	static drivers := CaseInsenseMap()
 	static sessions := CaseInsenseMap()
+
+	static remoteSimulator := (FileExist(kUserConfigDirectory . "Simulator.remote")
+								  ? FileRead(kUserConfigDirectory . "Simulator.remote")
+								  : false)
 
 	compoundWeather(tyreCompound) {
 		tyreCompound := compound(tyreCompound)
@@ -281,8 +285,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["carDropDown"].Delete()
 			settingsGui["carDropDown"].Add(carNames)
 
-			if !inList(cars, gCar)
-				gCar := false
+			gCar := false
 
 			selectCar()
 		}
@@ -304,25 +307,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				else if (cars.Length > 0)
 					car := cars[1]
 
-			if car {
-				gCar := car
+			gCar := car
 
-				settingsGui["carDropDown"].Choose(inList(cars, car))
+			settingsGui["carDropDown"].Choose(inList(cars, car))
 
-				tracks := sessionDB.getTracks(gSimulator, car)
-				trackNames := tracks.Clone()
+			tracks := sessionDB.getTracks(gSimulator, car)
+			trackNames := tracks.Clone()
 
-				for index, track in tracks
-					trackNames[index] := sessionDB.getTrackName(gSimulator, track)
+			for index, track in tracks
+				trackNames[index] := sessionDB.getTrackName(gSimulator, track)
 
-				settingsGui["trackDropDown"].Delete()
-				settingsGui["trackDropDown"].Add(trackNames)
+			settingsGui["trackDropDown"].Delete()
+			settingsGui["trackDropDown"].Add(trackNames)
 
-				if !inList(tracks, gTrack)
-					gTrack := false
+			gTrack := false
 
-				selectTrack()
-			}
+			selectTrack()
 		}
 	}
 
@@ -330,6 +330,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		global gSimulator, gCar, gTrack, gTyreCompounds, gAvailableTyreCompounds
 
 		local track := settingsGui["trackDropDown"].Value
+		local protocols, import
 
 		if track
 			track := tracks[track]
@@ -341,23 +342,31 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				else if (tracks.Length > 0)
 					track := tracks[1]
 
-			if track {
-				gTrack := track
+			gTrack := track
 
-				settingsGui["trackDropDown"].Choose(inList(tracks, track))
+			settingsGui["trackDropDown"].Choose(inList(tracks, track))
 
-				gTyreCompounds := sessionDB.getTyreCompounds(gSimulator, gCar, track)
-				gAvailableTyreCompounds := gTyreCompounds
+			gTyreCompounds := sessionDB.getTyreCompounds(gSimulator, gCar, track)
+			gAvailableTyreCompounds := gTyreCompounds
 
-				initializeTyreChoices()
+			initializeTyreChoices()
 
-				if gRulesMode
-					loadTyreCompounds()
+			if gRulesMode
+				loadTyreCompounds()
 
-				loadTyreChoices()
+			loadTyreChoices()
 
-				editRaceSettings(&updateState)
-			}
+			protocols := SimulatorProvider.getProtocols(gSimulator)
+
+			if (((protocols.HasProp("Connector") && (protocols.Connector.Protocol = "UDP")))
+			 || Application(gSimulator, kSimulatorConfiguration).isRunning())
+				import := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack).supportsSetupImport()
+			else
+				import := false
+
+			settingsGui["importSetupButton"].Enabled := import
+
+			editRaceSettings(&updateState)
 		}
 	}
 
@@ -607,7 +616,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			simulator := false
 
 			for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
-				if Application(candidate, kSimulatorConfiguration).isRunning() {
+				if ((candidate = remoteSimulator) || Application(candidate, kSimulatorConfiguration).isRunning()) {
 					simulator := candidate
 					prefix := SessionDatabase.getSimulatorCode(simulator)
 
@@ -2061,26 +2070,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui["spSetupTyreSetEdit"].Text := (setupTyreSet ? setupTyreSet : translate("Auto "))
 			settingsGui["spPitstopTyreSetEdit"].Text := (pitstopTyreSet ? pitstopTyreSet : translate("Auto "))
 
-			import := false
-
-			provider := SimulatorProvider.createSimulatorProvider(gSimulator, gCar, gTrack)
-
-			for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
-				if Application(simulator, kSimulatorConfiguration).isRunning() {
-					import := provider.supportsSetupImport()
-
-					break
-				}
-
-			option := (import ? "yp-25" : "yp")
+			option := "yp-25" ; (import ? "yp-25" : "yp")
 
 			settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Database") . translate("...")).OnEvent("Click", openSessionDatabase)
 
-			if import {
-				local message := "Import"
+			local message := "Import"
 
-				settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind(&message))
-			}
+			settingsGui.Add("Button", "x292 yp+25 w90 h23 vimportSetupButton", translate("Import")).OnEvent("Click", editRaceSettings.Bind(&message))
 
 			settingsGui.SetFont("Norm", "Arial")
 			settingsGui.SetFont("Italic", "Arial")
@@ -2553,45 +2549,39 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					tyreSetListView.Modify(A_Index, "-Select Col3", 99)
 
 				availableCompounds := []
+				ruleCompounds := string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules", "Tyre.Sets", ""))
 
-				for ignore, tyreCompound in string2Values(";", getMultiMapValue(settingsOrCommand, "Session Rules"
-																								 , "Tyre.Sets", "")) {
-					if InStr(tyreCompound, ":") {
-						tyreCompound := string2Values(":", tyreCompound)
+				if (ruleCompounds.Length > 0) {
+					for ignore, tyreCompound in ruleCompounds {
+						if InStr(tyreCompound, ":") {
+							tyreCompound := string2Values(":", tyreCompound)
 
-						availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
+							availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
 
-						loop tyreSetListView.GetCount()
-							if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-								tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
+							loop tyreSetListView.GetCount()
+								if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+									tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 
-								if (tyreCompound.Length > 3)
+									if (tyreCompound.Length > 3)
+										tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
+								}
+						}
+						else {
+							tyreCompound := string2Values("#", tyreCompound)
+
+							availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
+
+							loop tyreSetListView.GetCount()
+								if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
+									tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
 									tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
 							}
-					}
-					else {
-						tyreCompound := string2Values("#", tyreCompound)
-
-						availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
-
-						loop tyreSetListView.GetCount()
-							if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-								tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
-								tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
 						}
 					}
 				}
-				else {
-					tyreCompound := string2Values("#", tyreCompound)
-
-					availableCompounds.Push(translate(compound(tyreCompound[1], tyreCompound[2])))
-
+				else
 					loop tyreSetListView.GetCount()
-						if (translate(compound(tyreCompound[1], tyreCompound[2])) = tyreSetListView.GetText(A_Index, 1)) {
-							tyreSetListView.Modify(A_Index, "Col3", tyreCompound[3])
-							tyreSetListView.Modify(A_Index, "Col2", tyreCompound[4])
-						}
-				}
+						availableCompounds.Push(tyreSetListView.GetText(A_Index))
 
 				loop {
 					found := false
@@ -2639,6 +2629,9 @@ showRaceSettingsEditor() {
 	global gTeamMode, gRulesMode, gTestMode
 
 	local message := "Export"
+	local remoteSimulator := (FileExist(kUserConfigDirectory . "Simulator.remote")
+								  ? FileRead(kUserConfigDirectory . "Simulator.remote")
+								  : false)
 	local icon := kIconsDirectory . "Race Settings.ico"
 	local index, fileName, settings, appSettings, hasTeamServer
 	local candidate, ignore, data
@@ -2693,7 +2686,7 @@ showRaceSettingsEditor() {
 
 	if !gSimulator {
 		for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
-			if Application(candidate, kSimulatorConfiguration).isRunning() {
+			if ((remoteSimulator = candidate) || Application(candidate, kSimulatorConfiguration).isRunning()) {
 				gSimulator := candidate
 
 				break
@@ -2738,7 +2731,7 @@ showRaceSettingsEditor() {
 
 		gSimulator := getMultiMapValue(appSettings, "Simulator", "Simulator", false)
 
-		if (gSimulator && Application(gSimulator, kSimulatorConfiguration).isRunning()) {
+		if (gSimulator && ((remoteSimulator = gSimulator) || Application(gSimulator, kSimulatorConfiguration).isRunning())) {
 			gCar := getMultiMapValue(appSettings, "Simulator", "Car")
 			gTrack := getMultiMapValue(appSettings, "Simulator", "Track")
 		}

@@ -83,6 +83,10 @@ class F125Provider extends SimulatorProvider {
 		return true
 	}
 
+	supportsSetupImport() {
+		return true
+	}
+
 	readSessionData(options := "", protocol?) {
 		local simulator := this.Simulator
 		local car := this.Car

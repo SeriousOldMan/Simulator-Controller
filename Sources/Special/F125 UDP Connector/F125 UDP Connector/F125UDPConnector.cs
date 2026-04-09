@@ -73,7 +73,8 @@ namespace F125UDPConnector
                 return (receiver.GetMotionData() != null &&
                         receiver.GetCarTelemetryData() != null &&
                         receiver.GetCarStatusData() != null &&
-                        receiver.GetCarDamageData() != null);
+                        receiver.GetCarDamageData() != null &&
+                        receiver.GetCarSetupData() != null);
             else
                 return true;
         }
@@ -130,6 +131,7 @@ namespace F125UDPConnector
             var telemetry = receiver.GetCarTelemetryData();
             var status = receiver.GetCarStatusData();
             var damage = receiver.GetCarDamageData();
+            var setup = receiver.GetCarSetupData();
             var participants = receiver.GetParticipantsData();
 
             int playerIdx = session.Header.PlayerCarIndex;
@@ -553,8 +555,6 @@ namespace F125UDPConnector
             */
 
             // ── [Setup Data] ─────────────────────────────────────────────
-            PacketCarSetupData setup = receiver.GetCarSetupData();
-            
             if (setup != null) {
                 CarSetupData playerSetup = setup.CarSetups[playerIdx];
 

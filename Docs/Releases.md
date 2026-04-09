@@ -9,6 +9,7 @@
   - Fixed a critical bug in the download process, when one of the download mirrors is unavailable.
   - Added several missing translations.
   - Fixed a bug in "Race Settings", which caused the tyre compound drop downs to be empty when this application is run for the very first time.
+  - Fixed a so called race condition when a new car/track is recognized, which caused the car and or track drop down menus in "Solo Center" to be empty.
   
 #### Changes
 

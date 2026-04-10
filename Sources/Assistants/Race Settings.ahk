@@ -646,7 +646,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				data := readSimulator(simulator, car, track)
 
 				car := getMultiMapValue(data, "Session Data", "Car", car)
-				track := getMultiMapValue(data, "Session Data", "Car", track)
+				track := getMultiMapValue(data, "Session Data", "Track", track)
 			}
 
 			if (getMultiMapValues(data, "Setup Data").Count > 0) {

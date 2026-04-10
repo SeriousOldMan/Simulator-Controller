@@ -156,9 +156,9 @@ class SimulatorProvider {
 			return protocols
 		}
 		catch Any as exception {
-			logError(exception, true)
+			logError(exception)
 
-			return []
+			return {}
 		}
 	}
 
@@ -389,6 +389,12 @@ callSimulator(simulator, options := "", protocol?) {
 	if !protocols.Has(simulator)
 		try {
 			protocols[simulator] := SimulatorProvider.getProtocols(simulator)
+
+			if (protocols[simulator].Length = 0) {
+				protocols.Delete(simulator)
+
+				throw "Unsupported simulator detected in callSimulator..."
+			}
 		}
 		catch Any {
 			throw "Unsupported simulator detected in callSimulator..."

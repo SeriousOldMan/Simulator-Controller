@@ -126,25 +126,62 @@ class BasicStepWizard extends StepWizard {
 		}
 
 		locateSimulator(*) {
-			local fileName, simulator
+			local fileName, simulator, simulatorMenu, ignore, hasSimulator, result, protocols
 
 			window.Opt("+OwnDialogs")
 
-			OnMessage(0x44, translateSelectCancelButtons)
-			fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
-			OnMessage(0x44, translateSelectCancelButtons, 0)
+			if GetKeyState("Alt") {
+				simulatorMenu := Menu()
 
-			if (fileName != "") {
-				if isDebug()
-					logMessage(kLogDebug, "Locating " . fileName . "...")
+				simulatorMenu.Add(translate("Remote"), (*) => {})
+				simulatorMenu.Disable(translate("Remote"))
+				simulatorMenu.Add()
 
-				simulator := standardApplication(this.SetupWizard.Definition, ["Applications.Simulators"], fileName)
+				hasSimulator := false
 
-				if simulator {
+				for ignore, simulator in getKeys(getMultiMapValues(this.SetupWizard.Definition, "Applications.Simulators"))
+					try {
+						protocols := SimulatorProvider.getProtocols(simulator)
+
+						if (protocols.HasProp("Connector") && (protocols.Connector.Protocol = "UDP")) {
+							simulatorMenu.Add(simulator, (simulator, *) => result := simulator)
+
+							hasSimulator := true
+						}
+					}
+
+				if hasSimulator
+					simulatorMenu.Add()
+
+				simulatorMenu.Add(translate("Cancel"), (*) => result := false)
+
+				result := kUndefined
+
+				simulatorMenu.Show( , , true)
+
+				if (result = kUndefined)
+					result := false
+
+				if result
+					this.locateSimulator(result, "Remote")
+			}
+			else {
+				OnMessage(0x44, translateSelectCancelButtons)
+				fileName := withBlockedWindows(FileSelect, 1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
+				OnMessage(0x44, translateSelectCancelButtons, 0)
+
+				if (fileName != "") {
 					if isDebug()
-						logMessage(kLogDebug, "Found " . simulator)
+						logMessage(kLogDebug, "Locating " . fileName . "...")
 
-					this.locateSimulator(simulator, fileName)
+					simulator := standardApplication(this.SetupWizard.Definition, ["Applications.Simulators"], fileName)
+
+					if simulator {
+						if isDebug()
+							logMessage(kLogDebug, "Found " . simulator)
+
+						this.locateSimulator(simulator, fileName)
+					}
 				}
 			}
 		}
@@ -908,7 +945,10 @@ class BasicStepWizard extends StepWizard {
 
 				executable := wizard.applicationPath(simulator)
 
-				iconFile := findInstallProperty(simulator, "DisplayIcon")
+				if (executable = "Remote")
+					iconFile := (kResourcesDirectory . "Setup\Images\Controller.ico")
+				else
+					iconFile := findInstallProperty(simulator, "DisplayIcon")
 
 				if iconFile
 					icons.Push(iconFile)
@@ -917,7 +957,7 @@ class BasicStepWizard extends StepWizard {
 				else
 					icons.Push("")
 
-				rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length + 1), simulator, executable ? executable : translate("Not installed")))
+				rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length + 1), simulator, executable ? ((executable = "Remote") ? translate("Remote") : executable) : translate("Not installed")))
 			}
 		}
 

@@ -44,6 +44,7 @@
 #Include "Libraries\ConfigurationEditor.ahk"
 #Include "Libraries\ControllerActionsEditor.ahk"
 #Include "Libraries\ControllerEditor.ahk"
+#Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "..\Plugins\Voice Control Configuration Plugin.ahk"
 #Include "..\Plugins\Driving Coach Configuration Plugin.ahk"
 #Include "..\Plugins\Race Engineer Configuration Plugin.ahk"
@@ -1689,8 +1690,13 @@ class SetupWizard extends ConfiguratorPanel {
 		local installed := this.isApplicationInstalled(application)
 		local ignore, section, descriptor, applications, index
 
-		if check
-			executable := false
+		if check {
+			if (knowledgeBase.getValue("Application." . application . ".Path") = "Remote")
+				executable := "Remote"
+
+			if (executable != "Remote")
+				executable := false
+		}
 
 		if isDebug()
 			logMessage(kLogDebug, "Locate: " . application . ", Installed: " . installed . ", Exist: " . FileExist(this.applicationPath(application)))
@@ -3392,7 +3398,7 @@ installZIP(path, application) {
 
 	DirCreate(A_Temp . "\Simulator Controller\Temp")
 	DirCreate(normalizeDirectoryPath(kProgramsDirectory))
-					
+
 	expand(kHomeDirectory . path, A_Temp . "\Simulator Controller\Temp")
 
 	FileCopy(A_Temp . "\Simulator Controller\Temp\" . application, normalizeDirectoryPath(kProgramsDirectory), 1)
@@ -3640,6 +3646,8 @@ initializeSimulatorSetup()
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Wizard Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Plugins\Simulator Providers.ahk"
 
 #Include "Libraries\BasicStepWizard.ahk"
 #Include "Libraries\ModulesStepWizard.ahk"

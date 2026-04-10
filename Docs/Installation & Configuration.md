@@ -239,9 +239,15 @@ Please note, that you can remove presets later on. But depending on the type of 
 | iRacing                     | iRacingUI.exe        | This file is located in a subfolder named "ui".        |
 | Automobilista 2             | AMS2.exe             |                                                        |
 | Project Cars 2              | pcars2avx.exe        |                                                        |
-| Project Motor Racing        | ProjectMotorRacingGame.exe | This file is located in a subfolder named "x64". |
-| F1 25                       | F1_25.exe            |                                                        |
+| Project Motor Racing (1)    | ProjectMotorRacingGame.exe | This file is located in a subfolder named "x64". |
+| F1 25 (2)                   | F1_25.exe            |                                                        |
 | Rennsport                   | Rennsport.exe        |                                                        |
+
+##### Notes
+
+(1) If *Project Motor Racing* is installed on a console, hold down the left Alt key when clicking on "Locate...". This will allow you to configure *Project Motor Racing*, even when it cannot be found.
+
+(2) Because the EA AntiCheat system *Javelin* does not allow Simulator Controller to be used on the same machine as *F1 25*, hold down the left Alt key when clicking on "Locate..." to configure *F1 25*.
 
 #### Patching the configuration
 

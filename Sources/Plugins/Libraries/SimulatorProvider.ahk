@@ -158,7 +158,7 @@ class SimulatorProvider {
 		catch Any as exception {
 			logError(exception, true)
 
-			throw "Unsupported simulator detected in SimulatorProvider.getProtocols..."
+			return []
 		}
 	}
 

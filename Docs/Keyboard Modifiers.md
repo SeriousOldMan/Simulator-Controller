@@ -95,6 +95,7 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 | Function | Modifier | Description |
 |----------|----------|-------------|
 | Termination of other applications | Control | The tool asks to terminate all other running applications, before working on the configuration. If you hold down the Control key, when clicking on the "Continue" button, other applications will not be terminated. |
+| Locating simulators | Alt | When a simulator is not installed on the same machine as Simulator Controller, hold down the left Alt key when clicking on "Locate...". This will present you a list of games, which can be run remotely, for example on a console. |
 | Clicking on a function | Control | While configuring a Button Box or Stream Deck, this shortcut will open the input dialog to enter the function number directly, rather than open the context menu, when you click on a function with the Control key pressed. |
 | Searching for trigger | Escape | When you have activated the trigger search mode to identify a hardware Control on a Button Box or your steering wheel (a small tooltip will follow your mouse in this mode), you can press Escape to cancel the detection mode. |
 | Testing *Push-To-Talk* | Control | When starting the *Push-To-Talk* test mode, you can prevent starting any configured Assistant Boosters and Translators by holding down the Control key while clicking on the small button with the "Play" icon. |

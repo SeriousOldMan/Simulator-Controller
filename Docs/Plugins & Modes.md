@@ -1533,7 +1533,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 1. When the UDP port is not configured to 127.0.0.1 (localhost), the Firewall will ask for permission to open this port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-2. Because the data API of *Project Motor Racing* is based on the network protocol UDP, remote connections are supported, for example, when the simulator is running on a console. If *Project Motor Racing* is not installed on the same machine as Simulator Controller, automatic configuration of the *PMR* plugin will not be supported in "Simulator Setup". In this case a few steps are necessary, before Simulator Controller will offer a remote connection to *Project Motor Racing*:
+2. Because the data API of *Project Motor Racing* is based on the network protocol UDP, remote connections are supported, for example, when the simulator is running on a console. If *Project Motor Racing* is not installed on the same machine as Simulator Controller, you must *locate* *Project Motor Racing* for remote execution in "Simulator Setup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) for more information. If you are using the low-level tool "Simulator Configuration" for all your configuration work, use the following steps:
 
    - Start "Simulator Configuration".
    - Go to the "Plugins" page and activate the *PMR* plugin. Enter "Project Motor Racing" as the application name (mind the space between *F1* and *25*).
@@ -1625,7 +1625,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-5. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*:
+5. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*. You must *locate* *F1 25* for remote execution in "Simulator Setup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) for more information. If you are using the low-level tool "Simulator Configuration" for all your configuration work, use the following steps:
 
    - Start "Simulator Configuration".
    - Go to the "Plugins" page and activate the *F125* plugin. Enter "F1 25" as the application name (mind the space between *F1* and *25*).

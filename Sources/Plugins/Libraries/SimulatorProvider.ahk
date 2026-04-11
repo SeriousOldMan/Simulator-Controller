@@ -367,7 +367,7 @@ class SimulatorProvider {
 
 callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
-	local connector, curWorkingDir, buf, arguments
+	local connector, curWorkingDir, buf, arguments, theProtocols
 
 	static defaultProtocol := false
 	static protocols := CaseInsenseMap()
@@ -388,13 +388,12 @@ callSimulator(simulator, options := "", protocol?) {
 
 	if !protocols.Has(simulator)
 		try {
-			protocols[simulator] := SimulatorProvider.getProtocols(simulator)
+			theProtocols := SimulatorProvider.getProtocols(simulator)
 
-			if (protocols[simulator].Length = 0) {
-				protocols.Delete(simulator)
-
+			if (!theProtocols.HasProp("Connector") && !theProtocols.HasProp("Provider"))
 				throw "Unsupported simulator detected in callSimulator..."
-			}
+			else
+				protocols[simulator] := theProtocols
 		}
 		catch Any {
 			throw "Unsupported simulator detected in callSimulator..."

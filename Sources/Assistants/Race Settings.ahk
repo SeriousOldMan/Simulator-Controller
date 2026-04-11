@@ -601,7 +601,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local car := gCar
 		local track := gTrack
 		local candidate, ignore, data, tyreCompound, tyreCompoundColor, tc, tcc
-		local mixedCompounds, tyreSets, index, tyre, axle, provider
+		local mixedCompounds, tyreSets, index, tyre, axle, provider, newCar, newTrack
 
 		getSetupPressure(tyre, default) {
 			return displayValue("Float"
@@ -634,15 +634,20 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 			data := readSimulator(simulator, car, track)
 
-			car := getMultiMapValue(data, "Session Data", "Car", car)
-			track := getMultiMapValue(data, "Session Data", "Track", track)
+			newCar := getMultiMapValue(data, "Session Data", "Car", car)
+			newTrack := getMultiMapValue(data, "Session Data", "Track", track)
 
-			provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
+			if ((newCar != car) || (newTrack != track)) {
+				car := newCar
+				track := newTrack
 
-			data := readSimulator(simulator, car, track)
+				provider := SimulatorProvider.createSimulatorProvider(simulator, car, track)
 
-			car := getMultiMapValue(data, "Session Data", "Car", car)
-			track := getMultiMapValue(data, "Session Data", "Track", track)
+				data := readSimulator(simulator, car, track)
+
+				car := getMultiMapValue(data, "Session Data", "Car", car)
+				track := getMultiMapValue(data, "Session Data", "Track", track)
+			}
 
 			if (getMultiMapValues(data, "Setup Data").Count > 0) {
 				provider.supportsTyreManagement(&mixedCompounds, &tyreSets)

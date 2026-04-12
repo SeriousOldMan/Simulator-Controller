@@ -43,7 +43,7 @@ class LLMTool {
 
 			iReader := (v) => v
 
-			Descriptor {
+			Descriptor[schema := "OpenAI"] {
 				Get {
 					local descriptor := {description: this.Description, type: this.Type}
 
@@ -107,22 +107,30 @@ class LLMTool {
 			}
 		}
 
-		Descriptor {
+		Descriptor[schema := "OpenAI"] {
 			Get {
 				local required := []
 				local parameters := {}
 				local ignore, parameter
 
 				for ignore, parameter in this.Parameters {
-					parameters.%parameter.Name% := parameter.Descriptor
+					parameters.%parameter.Name% := parameter.Descriptor[schema]
 
 					if parameter.Required
 						required.Push(parameter.Name)
 				}
 
-				return {type: "function"
-					  , function: {name: this.Name, description: this.Description
-								 , parameters: {type: "object", properties: parameters, required: required}}}
+				if (schema = "OpenAI")
+					return {type: "function"
+						  , function: {name: this.Name, description: this.Description
+									 , parameters: {type: "object", properties: parameters, required: required}}}
+				else if (schema = "Anthropic")
+					return {name: this.Name, description: this.Description
+						  , input_schema: { type: "object"
+										  , properties: parameters
+										  , required: required}}
+				else
+					throw "Unsupported tool schema detected in LLMTool.Function.Descriptor..."
 			}
 		}
 
@@ -175,7 +183,7 @@ class LLMTool {
 		}
 	}
 
-	Descriptor {
+	Descriptor[schema := "OpenAI"] {
 		Get {
 			throw "Virtual property LLMTool.Descriptor must be implemeneted in a subclass..."
 		}
@@ -199,9 +207,9 @@ class LLMTool {
 		}
 	}
 
-	JSON {
+	JSON[schema := "OpenAI"] {
 		Get {
-			return JSON.print(this.Descriptor, "  ")
+			return JSON.print(this.Descriptor[schema], "  ")
 		}
 	}
 
@@ -325,6 +333,44 @@ class LLMConnector {
 			return false
 		}
 
+		ProcessAnswer(tools, answer, &calls?) {
+			answer := answer["choices"][1]
+
+			if answer.Has("message") {
+				answer := answer["message"]
+
+				if isSet(calls)
+					toolCall := this.ProcessToolCalls(tools, answer, &calls)
+				else
+					toolCall := this.ProcessToolCalls(tools, answer)
+
+				if toolCall {
+					if answer.Has("content") {
+						answer := answer["content"]
+
+						if ((answer = kNull) || (Trim(answer) = ""))
+							answer := true
+					}
+					else
+						answer := true
+				}
+				else if answer.Has("content") {
+					answer := answer["content"]
+
+					if ((answer = kNull) || (Trim(answer) = ""))
+						answer := false
+					else
+						answer := this.ParseAnswer(answer)
+				}
+				else
+					answer := false
+			}
+			else if answer.Has("text")
+				answer := this.ParseAnswer(answer["text"])
+			else
+				throw "Unknown answer format detected..."
+		}
+
 		Ask(question, instructions := false, tools := false, &calls?) {
 			local headers := this.CreateHeaders(Map("Content-Type", "application/json"))
 			local body := {model: this.Model, temperature: this.Temperature}
@@ -396,41 +442,7 @@ class LLMConnector {
 					}
 
 					try {
-						answer := answer["choices"][1]
-
-						if answer.Has("message") {
-							answer := answer["message"]
-
-							if isSet(calls)
-								toolCall := this.ProcessToolCalls(tools, answer, &calls)
-							else
-								toolCall := this.ProcessToolCalls(tools, answer)
-
-							if toolCall {
-								if answer.Has("content") {
-									answer := answer["content"]
-
-									if ((answer = kNull) || (Trim(answer) = ""))
-										answer := true
-								}
-								else
-									answer := true
-							}
-							else if answer.Has("content") {
-								answer := answer["content"]
-
-								if ((answer = kNull) || (Trim(answer) = ""))
-									answer := false
-								else
-									answer := this.ParseAnswer(answer)
-							}
-							else
-								answer := false
-						}
-						else if answer.Has("text")
-							answer := this.ParseAnswer(answer["text"])
-						else
-							throw "Unknown answer format detected..."
+						answer := this.ProcessAnswer(tools, answer, &calls)
 
 						if (answer && (answer != true))
 							this.AddConversation(question, answer)
@@ -464,6 +476,12 @@ class LLMConnector {
 	}
 
 	class APIConnector extends LLMConnector.HTTPConnector {
+		Schema {
+			Get {
+				return "OpenAI"
+			}
+		}
+
 		Models {
 			Get {
 				return this.LoadModels()
@@ -518,7 +536,7 @@ class LLMConnector {
 		}
 
 		CreateTools(body, tools) {
-			body.tools := collect(tools, (t) => t.Descriptor)
+			body.tools := collect(tools, (t) => t.Descriptor[this.Schema])
 
 			return body
 		}
@@ -533,50 +551,64 @@ class LLMConnector {
 			return false
 		}
 
-		CallTool(tools, tool) {
-			local name, arguments, argument
+		ParseArguments(function, arguments) {
+			local result := []
+			local ignore, paramater, name, argument, value
 
-			getArguments(function, arguments) {
-				local result := []
-				local ignore, paramater, name, argument, value
+			for ignore, parameter in function.Parameters {
+				value := kUndefined
 
-				for ignore, parameter in function.Parameters {
-					value := kUndefined
+				for name, argument in arguments
+					if (name = parameter.Name) {
+						value := parameter.Reader.Call(argument)
 
-					for name, argument in arguments
-						if (name = parameter.Name) {
-							value := parameter.Reader.Call(argument)
+						break
+					}
 
-							break
-						}
-
-					result.Push((value = kUndefined) ? unset : value)
-				}
-
-				return result
+				result.Push((value = kUndefined) ? unset : value)
 			}
 
-			if tool.Has("function") {
-				tool := tool["function"]
+			return result
+		}
+
+		ParseTool(tools, descriptor, &name, &arguments) {
+			local tool
+
+			if descriptor.Has("function") {
+				tool := descriptor["function"]
+
+				name := tool["name"]
 				arguments := tool["arguments"]
 
-				tool := this.FindTool(tools, tool["name"])
+				tool := this.FindTool(tools, name)
 
 				if tool {
 					if isInstance(arguments, String)
 						arguments := JSON.parse(arguments)
 
-					arguments := getArguments(tool, toMap(arguments))
+					arguments := this.ParseArguments(tool, toMap(arguments))
 
-					tool.Callable.Call(arguments*)
-
-					return Array(tool, arguments)
+					return tool
 				}
 				else
 					return false
 			}
 			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.CallTool..."
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseTool..."
+		}
+
+		CallTool(tools, tool) {
+			local name, arguments
+
+			tool := this.ParseTool(tools, tool, &name, &arguments)
+
+			if tool {
+				tool.Callable.Call(arguments*)
+
+				return Array(tool, arguments)
+			}
+			else
+				return false
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {
@@ -776,8 +808,87 @@ class LLMConnector {
 
 			return result
 		}
+	}
 
+	class AnthropicConnector extends LLMConnector.APIConnector {
+		static Models {
+			Get {
+				return ["Claude Opus 4.6", "Claude Sonnet 4.6", "Claude Haiku 4.5"]
+			}
+		}
 
+		Schema {
+			Get {
+				return "Anthropic"
+			}
+		}
+
+		Models {
+			Get {
+				return choose(super.Models, (m) => (InStr(m, "Claude") = 1))
+			}
+		}
+
+		Model[external := false] {
+			Get {
+				return (external ? super.Model[true] : StrReplace(super.Model[false], ".", "-"))
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://api.anthropic.com"
+			serviceKey := ""
+			model := "Claude Haiku 4.5"
+		}
+
+		CreateHeaders(headers?) {
+			if !isSet(headers)
+				headers := Map()
+
+			if (Trim(this.Token) != "")
+				headers["X-Api-Key"] := this.Token
+
+			return headers
+		}
+
+		ParseTool(tools, descriptor, &name, &arguments) {
+			local tool
+
+			if (descriptor.Has("type") && (descriptor["type"] = "tool_use")) {
+				name := descriptor["name"]
+				arguments := descriptor["input"]
+
+				tool := this.FindTool(tools, name)
+
+				if tool {
+					if isInstance(arguments, String)
+						arguments := JSON.parse(arguments)
+
+					arguments := this.ParseArguments(tool, toMap(arguments))
+
+					return tool
+				}
+				else
+					return false
+			}
+			else
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseTool..."
+		}
+
+		ProcessToolCalls(tools, message, &calls?) {
+			local toolCalls := choose(message["content"], (c) => c["type"] = "tool_use")
+
+			if (toolCalls.Length > 0) {
+				if isSet(calls)
+					calls := choose(collect(toolCalls, ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+				else
+					do(toolCalls, ObjBindMethod(this, "CallTool", tools))
+
+				return true
+			}
+			else
+				return false
+		}
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {

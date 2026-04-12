@@ -1107,7 +1107,9 @@ class LMURESTProvider {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if data {
-				if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+				if (data.Has("status") && (data["status"] = "unavailable"))
+					return "Inactive"
+				else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
 					return "Not Driving"
 				else if data.Has("MultiStintState") {
 					switch data["MultiStintState"], false {
@@ -1123,7 +1125,7 @@ class LMURESTProvider {
 					return "Paused"
 			}
 			else
-				return "Disabled"
+				return "Inactive"
 		}
 
 		getDuration(session) {

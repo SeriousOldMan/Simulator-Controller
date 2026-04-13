@@ -322,11 +322,11 @@ class LLMConnector {
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
-			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
+			throw "Virtual method LLMConnector.HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
 		CreateTools(body, tools) {
-			throw "Virtual method HTTPConnector.CreateTools must be implemented in a subclass..."
+			throw "Virtual method LLMConnector.HTTPConnector.CreateTools must be implemented in a subclass..."
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {
@@ -334,41 +334,7 @@ class LLMConnector {
 		}
 
 		ProcessAnswer(tools, answer, &calls?) {
-			answer := answer["choices"][1]
-
-			if answer.Has("message") {
-				answer := answer["message"]
-
-				if isSet(calls)
-					toolCall := this.ProcessToolCalls(tools, answer, &calls)
-				else
-					toolCall := this.ProcessToolCalls(tools, answer)
-
-				if toolCall {
-					if answer.Has("content") {
-						answer := answer["content"]
-
-						if ((answer = kNull) || (Trim(answer) = ""))
-							answer := true
-					}
-					else
-						answer := true
-				}
-				else if answer.Has("content") {
-					answer := answer["content"]
-
-					if ((answer = kNull) || (Trim(answer) = ""))
-						answer := false
-					else
-						answer := this.ParseAnswer(answer)
-				}
-				else
-					answer := false
-			}
-			else if answer.Has("text")
-				answer := this.ParseAnswer(answer["text"])
-			else
-				throw "Unknown answer format detected..."
+			throw "Virtual method LLMConnector.HTTPConnector.ProcessAnswer must be implemented in a subclass..."
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
@@ -624,6 +590,46 @@ class LLMConnector {
 				return false
 		}
 
+		ProcessAnswer(tools, answer, &calls?) {
+			answer := answer["choices"][1]
+
+			if answer.Has("message") {
+				answer := answer["message"]
+
+				if isSet(calls)
+					toolCall := this.ProcessToolCalls(tools, answer, &calls)
+				else
+					toolCall := this.ProcessToolCalls(tools, answer)
+
+				if toolCall {
+					if answer.Has("content") {
+						answer := answer["content"]
+
+						if ((answer = kNull) || (Trim(answer) = ""))
+							answer := true
+					}
+					else
+						answer := true
+				}
+				else if answer.Has("content") {
+					answer := answer["content"]
+
+					if ((answer = kNull) || (Trim(answer) = ""))
+						answer := false
+					else
+						answer := this.ParseAnswer(answer)
+				}
+				else
+					answer := false
+
+				return answer
+			}
+			else if answer.Has("text")
+				return this.ParseAnswer(answer["text"])
+			else
+				throw "Unknown answer format detected..."
+		}
+
 		ParseModels(response) {
 			local result := []
 
@@ -835,6 +841,12 @@ class LLMConnector {
 			}
 		}
 
+		Temperature {
+			Get {
+				return 1.0
+			}
+		}
+
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://api.anthropic.com"
 			serviceKey := ""
@@ -849,6 +861,12 @@ class LLMConnector {
 				headers["X-Api-Key"] := this.Token
 
 			return headers
+		}
+
+		CreatePrompt(body, instructions, tools, question) {
+			body.DeleteProp("temperature")
+
+			return super.CreatePrompt(body, instructions, tools, question)
 		}
 
 		ParseTool(tools, descriptor, &name, &arguments) {
@@ -888,6 +906,44 @@ class LLMConnector {
 			}
 			else
 				return false
+		}
+
+		ProcessAnswer(tools, answer, &calls?) {
+			local text
+
+			if answer.Has("content") {
+				text := first(answer, (c) => c["type"] = "text")
+
+				if isSet(calls)
+					toolCall := this.ProcessToolCalls(tools, answer, &calls)
+				else
+					toolCall := this.ProcessToolCalls(tools, answer)
+
+				if toolCall {
+					if text {
+						answer := text["text"]
+
+						if ((answer = kNull) || (Trim(answer) = ""))
+							answer := true
+					}
+					else
+						answer := true
+				}
+				else if text {
+					answer := text["text"]
+
+					if ((answer = kNull) || (Trim(answer) = ""))
+						answer := false
+					else
+						answer := this.ParseAnswer(answer)
+				}
+				else
+					answer := false
+
+				return answer
+			}
+			else
+				throw "Unknown answer format detected..."
 		}
 	}
 
@@ -1178,9 +1234,9 @@ class LLMConnector {
 	static Providers {
 		Get {
 			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

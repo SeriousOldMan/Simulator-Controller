@@ -474,17 +474,29 @@ class LLMConnector {
 
 		CreatePrompt(body, instructions, tools, question) {
 			local messages := []
-			local ignore, instruction, conversation
-
-			if (!question || (question == true) || (Trim(question) = ""))
-				throw Error("Invalid question detected in LLMConnector.APIConnector.CreatePrompt...")
+			local ignore, instruction, conversation, system
 
 			addInstruction(instruction) {
 				if (instruction && (Trim(instruction) != ""))
 					messages.Push({role: "system", content: instruction})
 			}
 
-			do(instructions, addInstruction)
+			if (!question || (question == true) || (Trim(question) = ""))
+				throw Error("Invalid question detected in LLMConnector.APIConnector.CreatePrompt...")
+
+			if (this.Schema = "OpenAI")
+				do(instructions, addInstruction)
+			else if (this.Schema = "Anthropic") {
+				system := []
+
+				for ignore, instruction in instructions
+					if (instruction && (Trim(instruction) != ""))
+						system.Push({type: "text", text: instruction})
+
+				body.system := system
+			}
+			else
+				throw "Unsupported tool schema detected in LLMConnector.APIConnector.CreatePrompt..."
 
 			for ignore, conversation in (this.History ? this.History : []) {
 				messages.Push({role: "user", content: conversation[1]})
@@ -853,6 +865,22 @@ class LLMConnector {
 			model := "claude-sonnet-4-6"
 		}
 
+		CreateServerURL(server) {
+			server := super.CreateServerURL(server)
+
+			if InStr(server, "/v1/messages")
+				server := StrReplace(server, "/v1/messages", "")
+
+			if (SubStr(server, StrLen(server)) = "/")
+				return SubStr(server, 1, StrLen(server) - 1)
+			else
+				return server
+		}
+
+		CreateServiceURL(server) {
+			return (this.CreateServerURL(server) . "/v1/messages")
+		}
+
 		CreateHeaders(headers?) {
 			if !isSet(headers)
 				headers := Map()
@@ -899,7 +927,7 @@ class LLMConnector {
 			local toolCalls
 
 			if (message.Has("content") && isObject(message["content"])) {
-				toolCalls := choose(message["content"], (c) => c["type"] = "tool_use")
+				toolCalls := choose(message["content"], (c) => (c["type"] = "tool_use"))
 
 				if (toolCalls.Length > 0) {
 					if isSet(calls)
@@ -922,7 +950,7 @@ class LLMConnector {
 			local text
 
 			if answer.Has("content") {
-				text := first(answer, (c) => c["type"] = "text")
+				text := first(answer["content"], (c) => (c["type"] = "text"))
 
 				if isSet(calls)
 					toolCall := this.ProcessToolCalls(tools, answer, &calls)

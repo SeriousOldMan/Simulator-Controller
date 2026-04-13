@@ -896,18 +896,26 @@ class LLMConnector {
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {
-			local toolCalls := choose(message["content"], (c) => c["type"] = "tool_use")
+			local toolCalls
 
-			if (toolCalls.Length > 0) {
-				if isSet(calls)
-					calls := choose(collect(toolCalls, ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+			if (message.Has("content") && isObject(message["content"])) {
+				toolCalls := choose(message["content"], (c) => c["type"] = "tool_use")
+
+				if (toolCalls.Length > 0) {
+					if isSet(calls)
+						calls := choose(collect(toolCalls, ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+					else
+						do(toolCalls, ObjBindMethod(this, "CallTool", tools))
+
+					return true
+				}
 				else
-					do(toolCalls, ObjBindMethod(this, "CallTool", tools))
-
-				return true
+					return false
 			}
+			else if isSet(calls)
+				return super.ProcessToolCalls(tools, message, &calls)
 			else
-				return false
+				return super.ProcessToolCalls(tools, message)
 		}
 
 		ProcessAnswer(tools, answer, &calls?) {
@@ -944,8 +952,10 @@ class LLMConnector {
 
 				return answer
 			}
+			else if isSet(calls)
+				return super.ProcessAnswer(tools, answer, &calls)
 			else
-				throw "Unknown answer format detected..."
+				return super.ProcessAnswer(tools, answer)
 		}
 	}
 

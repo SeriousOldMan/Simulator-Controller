@@ -27,6 +27,20 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Global Functions Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global sendCommand := sendKeyboardCommand
+global installKeyboardHook := InstallKeybdHook
+global setSendDelay := SetKeyDelay
+global setHotKey := Hotkey
+global detectProcess := detectRunningProcess
+global activateWindow := WinActivate
+global closeWindow := WinClose
+global listWindows := (arguments*) => WinGetList(arguments*)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Classes Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -384,6 +398,7 @@ detectRunningProcess(pid := false, winTitle := "", exePath := "") {
 }
 
 initializeUtils() {
+	/*
 	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, detectProcess
 	global activateWindow, closeWindow, listWindows
 
@@ -395,6 +410,7 @@ initializeUtils() {
 	activateWindow := WinActivate
 	closeWindow := WinClose
 	listWindows := WinGetList
+	*/
 
 	/*
 	sendCommand := (*) => false

@@ -191,7 +191,7 @@ class LLMTool {
 
 	Type {
 		Get {
-			throw "Virtual property LLTool.Type must be implemeneted in a subclass..."
+			throw "Virtual property LLMTool.Type must be implemeneted in a subclass..."
 		}
 	}
 
@@ -537,7 +537,7 @@ class LLMConnector {
 			return result
 		}
 
-		ParseTool(tools, descriptor, &name, &arguments) {
+		ParseToolCall(tools, descriptor, &name, &arguments) {
 			local tool
 
 			if descriptor.Has("function") {
@@ -560,13 +560,13 @@ class LLMConnector {
 					return false
 			}
 			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseTool..."
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseToolCall..."
 		}
 
 		CallTool(tools, tool) {
 			local name, arguments
 
-			tool := this.ParseTool(tools, tool, &name, &arguments)
+			tool := this.ParseToolCall(tools, tool, &name, &arguments)
 
 			if tool {
 				tool.Callable.Call(arguments*)
@@ -627,7 +627,7 @@ class LLMConnector {
 			else if answer.Has("text")
 				return this.ParseAnswer(answer["text"])
 			else
-				throw "Unknown answer format detected..."
+				throw "Unknown answer format detected in LLMConnector.APIConnector.ProcessAnswer..."
 		}
 
 		ParseModels(response) {
@@ -658,7 +658,7 @@ class LLMConnector {
 					return this.ParseModels(answer.JSON)
 				else {
 					if isDebug()
-						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in APIConnector.LoadModels...")
+						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in LLMConnector.APIConnector.LoadModels...")
 
 					return []
 				}
@@ -819,7 +819,7 @@ class LLMConnector {
 	class AnthropicConnector extends LLMConnector.APIConnector {
 		static Models {
 			Get {
-				return ["Claude Opus 4.6", "Claude Sonnet 4.6", "Claude Haiku 4.5"]
+				return ["claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5"]
 			}
 		}
 
@@ -831,7 +831,7 @@ class LLMConnector {
 
 		Models {
 			Get {
-				return choose(super.Models, (m) => (InStr(m, "Claude") = 1))
+				return choose(super.Models, (m) => (InStr(m, "claude") = 1))
 			}
 		}
 
@@ -850,7 +850,7 @@ class LLMConnector {
 		static GetDefaults(&serviceURL, &serviceKey, &model) {
 			serviceURL := "https://api.anthropic.com"
 			serviceKey := ""
-			model := "Claude Haiku 4.5"
+			model := "claude-sonnet-4-6"
 		}
 
 		CreateHeaders(headers?) {
@@ -859,6 +859,8 @@ class LLMConnector {
 
 			if (Trim(this.Token) != "")
 				headers["X-Api-Key"] := this.Token
+
+			headers["anthropic-version"] := "2023-06-01"
 
 			return headers
 		}
@@ -869,7 +871,7 @@ class LLMConnector {
 			return super.CreatePrompt(body, instructions, tools, question)
 		}
 
-		ParseTool(tools, descriptor, &name, &arguments) {
+		ParseToolCall(tools, descriptor, &name, &arguments) {
 			local tool
 
 			if (descriptor.Has("type") && (descriptor["type"] = "tool_use")) {
@@ -890,7 +892,7 @@ class LLMConnector {
 					return false
 			}
 			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseTool..."
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseToolCall..."
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {

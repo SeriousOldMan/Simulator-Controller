@@ -2,7 +2,6 @@
   1. Support for unit conversions per simulator
   2. Make the location of the local data folder configurable during installation process
   3. Support for tool calling in the local LLM Runtime
-  4. Support for Anthropic REST API
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

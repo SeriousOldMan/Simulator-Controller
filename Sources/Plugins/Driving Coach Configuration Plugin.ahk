@@ -478,7 +478,12 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Driving Coach Service", provider . ".GPULayers", defaults["GPULayers"])
 
 			try {
-				LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				try {
+					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				}
+				catch Any {
+					%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				}
 			}
 			catch Any {
 				serviceURL := ""

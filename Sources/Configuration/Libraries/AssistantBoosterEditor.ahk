@@ -86,7 +86,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				return LLMConnector.%StrReplace(provider, A_Space, "")%Connector.Models
 			}
 			catch Any {
-				return []
+				try {
+					return %StrReplace(provider, A_Space, "")%Connector.Models
+				}
+				catch Any {
+					return []
+				}
 			}
 		}
 	}
@@ -354,7 +359,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		else {
 			if provider {
 				try {
-					connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
+					try {
+						connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
+					}
+					catch Any {
+						connector := %StrReplace(provider, A_Space, "")%Connector(this, model)
+					}
 
 					if isInstance(connector, LLMConnector.APIConnector) {
 						connector.Connect(serviceURL, serviceKey)
@@ -472,7 +482,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Conversation Booster", provider . ".GPULayers", defaults["ConversationGPULayers"])
 
 				try {
-					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					try {
+						LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					}
+					catch Any {
+						%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					}
 				}
 				catch Any {
 					serviceURL := ""
@@ -526,7 +541,12 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 					providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Agent Booster", provider . ".GPULayers", defaults["AgentGPULayers"])
 
 				try {
-					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					try {
+						LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					}
+					catch Any {
+						%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+					}
 				}
 				catch Any {
 					serviceURL := ""

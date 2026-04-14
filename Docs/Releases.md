@@ -32,7 +32,19 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.9.2.0
+
+#### Date: 04/17/26 (planned)
+
+#### Fixes
+
+  - Fixed the session end detection for *Le Mans Ultimate* when leaving the server or a session. This was broken with the latest update of *Le Mans Ultimate*.
+  
+#### Changes
+
+  - The native interface (for the experts: the *Messages* API) of Anthropic is now supported as [GPT provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#anthropic).
+  - [Experts] A new version of the Lua 5.5 runtime is included. Default is still version 5.4 for compatibility reasons.
+  - [Internal] Migrated to AHK 2.1-alpha.24.
 
 # Release history
 

@@ -111,9 +111,13 @@ When you have chosen OpenAI, which I recommend, you will have to create an accou
 
 Thanks to the intensive collaboration between OpenAI and Microsoft, many OpenAI models are also available on the Azure Cloud. The performance is a little better, the cost is a little higher. In order to gain access to OpenAI models in the Azure Cloud, an entry must be made in the Azure Console, but this is usually approved. After approval you can get an communication endpoint and API key which then must be used in the configuration of the AI Driving Coach. You also must note down your Azure service endpoint, which must be inserted in the "Service URL" field in the configuration.
 
+### Anthropic
+
+Very similar to OpenAI. Create an account on [Anthropic](https://platform.claude.com/). Anthropic offers with the *Claude* models exceptional performance for reasoning and agent processing. Therefore, it is a good candidate for the *Reasoning* booster. To get the best out of this, the native API (aka the *Messages* API) of Anthropic is used, when using this GPT provider.
+
 ### Mistral AI
 
-Very similar to OpenAI. Create an account on [Mistral AI](https://console.mistral.ai/). You will have to register your credit card, but you will only be charged for usage, which is very, very cheap for the Open Weight models. Then create an API key and include it in the configuration as described above. I recommend using the Open Mixtral 8x22b model for the start, which has the best price / performance ratio.
+Also very similar to OpenAI. Create an account on [Mistral AI](https://console.mistral.ai/). You will have to register your credit card, but you will only be charged for usage, which is very, very cheap for the Open Weight models. Then create an API key and include it in the configuration as described above. I recommend using the Open Mixtral 8x22b model for the start, which has the best price / performance ratio.
 
 ### Google
 

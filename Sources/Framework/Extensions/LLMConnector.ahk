@@ -43,7 +43,7 @@ class LLMTool {
 
 			iReader := (v) => v
 
-			Descriptor {
+			Descriptor[schema := "OpenAI"] {
 				Get {
 					local descriptor := {description: this.Description, type: this.Type}
 
@@ -107,22 +107,30 @@ class LLMTool {
 			}
 		}
 
-		Descriptor {
+		Descriptor[schema := "OpenAI"] {
 			Get {
 				local required := []
 				local parameters := {}
 				local ignore, parameter
 
 				for ignore, parameter in this.Parameters {
-					parameters.%parameter.Name% := parameter.Descriptor
+					parameters.%parameter.Name% := parameter.Descriptor[schema]
 
 					if parameter.Required
 						required.Push(parameter.Name)
 				}
 
-				return {type: "function"
-					  , function: {name: this.Name, description: this.Description
-								 , parameters: {type: "object", properties: parameters, required: required}}}
+				if (schema = "OpenAI")
+					return {type: "function"
+						  , function: {name: this.Name, description: this.Description
+									 , parameters: {type: "object", properties: parameters, required: required}}}
+				else if (schema = "Anthropic")
+					return {name: this.Name, description: this.Description
+						  , input_schema: { type: "object"
+										  , properties: parameters
+										  , required: required}}
+				else
+					throw "Unsupported tool schema detected in LLMTool.Function.Descriptor..."
 			}
 		}
 
@@ -175,7 +183,7 @@ class LLMTool {
 		}
 	}
 
-	Descriptor {
+	Descriptor[schema := "OpenAI"] {
 		Get {
 			throw "Virtual property LLMTool.Descriptor must be implemeneted in a subclass..."
 		}
@@ -183,7 +191,7 @@ class LLMTool {
 
 	Type {
 		Get {
-			throw "Virtual property LLTool.Type must be implemeneted in a subclass..."
+			throw "Virtual property LLMTool.Type must be implemeneted in a subclass..."
 		}
 	}
 
@@ -199,9 +207,9 @@ class LLMTool {
 		}
 	}
 
-	JSON {
+	JSON[schema := "OpenAI"] {
 		Get {
-			return JSON.print(this.Descriptor, "  ")
+			return JSON.print(this.Descriptor[schema], "  ")
 		}
 	}
 
@@ -314,15 +322,19 @@ class LLMConnector {
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
-			throw "Virtual method HTTPConnector.CreatePrompt must be implemented in a subclass..."
+			throw "Virtual method LLMConnector.HTTPConnector.CreatePrompt must be implemented in a subclass..."
 		}
 
 		CreateTools(body, tools) {
-			throw "Virtual method HTTPConnector.CreateTools must be implemented in a subclass..."
+			throw "Virtual method LLMConnector.HTTPConnector.CreateTools must be implemented in a subclass..."
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {
 			return false
+		}
+
+		ProcessAnswer(tools, answer, &calls?) {
+			throw "Virtual method LLMConnector.HTTPConnector.ProcessAnswer must be implemented in a subclass..."
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
@@ -396,41 +408,7 @@ class LLMConnector {
 					}
 
 					try {
-						answer := answer["choices"][1]
-
-						if answer.Has("message") {
-							answer := answer["message"]
-
-							if isSet(calls)
-								toolCall := this.ProcessToolCalls(tools, answer, &calls)
-							else
-								toolCall := this.ProcessToolCalls(tools, answer)
-
-							if toolCall {
-								if answer.Has("content") {
-									answer := answer["content"]
-
-									if ((answer = kNull) || (Trim(answer) = ""))
-										answer := true
-								}
-								else
-									answer := true
-							}
-							else if answer.Has("content") {
-								answer := answer["content"]
-
-								if ((answer = kNull) || (Trim(answer) = ""))
-									answer := false
-								else
-									answer := this.ParseAnswer(answer)
-							}
-							else
-								answer := false
-						}
-						else if answer.Has("text")
-							answer := this.ParseAnswer(answer["text"])
-						else
-							throw "Unknown answer format detected..."
+						answer := this.ProcessAnswer(tools, answer, &calls)
 
 						if (answer && (answer != true))
 							this.AddConversation(question, answer)
@@ -464,6 +442,12 @@ class LLMConnector {
 	}
 
 	class APIConnector extends LLMConnector.HTTPConnector {
+		Schema {
+			Get {
+				return "OpenAI"
+			}
+		}
+
 		Models {
 			Get {
 				return this.LoadModels()
@@ -490,17 +474,29 @@ class LLMConnector {
 
 		CreatePrompt(body, instructions, tools, question) {
 			local messages := []
-			local ignore, instruction, conversation
-
-			if (!question || (question == true) || (Trim(question) = ""))
-				throw Error("Invalid question detected in LLMConnector.APIConnector.CreatePrompt...")
+			local ignore, instruction, conversation, system
 
 			addInstruction(instruction) {
 				if (instruction && (Trim(instruction) != ""))
 					messages.Push({role: "system", content: instruction})
 			}
 
-			do(instructions, addInstruction)
+			if (!question || (question == true) || (Trim(question) = ""))
+				throw Error("Invalid question detected in LLMConnector.APIConnector.CreatePrompt...")
+
+			if (this.Schema = "OpenAI")
+				do(instructions, addInstruction)
+			else if (this.Schema = "Anthropic") {
+				system := []
+
+				for ignore, instruction in instructions
+					if (instruction && (Trim(instruction) != ""))
+						system.Push({type: "text", text: instruction})
+
+				body.system := system
+			}
+			else
+				throw "Unsupported tool schema detected in LLMConnector.APIConnector.CreatePrompt..."
 
 			for ignore, conversation in (this.History ? this.History : []) {
 				messages.Push({role: "user", content: conversation[1]})
@@ -518,7 +514,7 @@ class LLMConnector {
 		}
 
 		CreateTools(body, tools) {
-			body.tools := collect(tools, (t) => t.Descriptor)
+			body.tools := collect(tools, (t) => t.Descriptor[this.Schema])
 
 			return body
 		}
@@ -533,50 +529,64 @@ class LLMConnector {
 			return false
 		}
 
-		CallTool(tools, tool) {
-			local name, arguments, argument
+		ParseArguments(function, arguments) {
+			local result := []
+			local ignore, paramater, name, argument, value
 
-			getArguments(function, arguments) {
-				local result := []
-				local ignore, paramater, name, argument, value
+			for ignore, parameter in function.Parameters {
+				value := kUndefined
 
-				for ignore, parameter in function.Parameters {
-					value := kUndefined
+				for name, argument in arguments
+					if (name = parameter.Name) {
+						value := parameter.Reader.Call(argument)
 
-					for name, argument in arguments
-						if (name = parameter.Name) {
-							value := parameter.Reader.Call(argument)
+						break
+					}
 
-							break
-						}
-
-					result.Push((value = kUndefined) ? unset : value)
-				}
-
-				return result
+				result.Push((value = kUndefined) ? unset : value)
 			}
 
-			if tool.Has("function") {
-				tool := tool["function"]
+			return result
+		}
+
+		ParseToolCall(tools, descriptor, &name, &arguments) {
+			local tool
+
+			if descriptor.Has("function") {
+				tool := descriptor["function"]
+
+				name := tool["name"]
 				arguments := tool["arguments"]
 
-				tool := this.FindTool(tools, tool["name"])
+				tool := this.FindTool(tools, name)
 
 				if tool {
 					if isInstance(arguments, String)
 						arguments := JSON.parse(arguments)
 
-					arguments := getArguments(tool, toMap(arguments))
+					arguments := this.ParseArguments(tool, toMap(arguments))
 
-					tool.Callable.Call(arguments*)
-
-					return Array(tool, arguments)
+					return tool
 				}
 				else
 					return false
 			}
 			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.CallTool..."
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseToolCall..."
+		}
+
+		CallTool(tools, tool) {
+			local name, arguments
+
+			tool := this.ParseToolCall(tools, tool, &name, &arguments)
+
+			if tool {
+				tool.Callable.Call(arguments*)
+
+				return Array(tool, arguments)
+			}
+			else
+				return false
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {
@@ -590,6 +600,46 @@ class LLMConnector {
 			}
 			else
 				return false
+		}
+
+		ProcessAnswer(tools, answer, &calls?) {
+			answer := answer["choices"][1]
+
+			if answer.Has("message") {
+				answer := answer["message"]
+
+				if isSet(calls)
+					toolCall := this.ProcessToolCalls(tools, answer, &calls)
+				else
+					toolCall := this.ProcessToolCalls(tools, answer)
+
+				if toolCall {
+					if answer.Has("content") {
+						answer := answer["content"]
+
+						if ((answer = kNull) || (Trim(answer) = ""))
+							answer := true
+					}
+					else
+						answer := true
+				}
+				else if answer.Has("content") {
+					answer := answer["content"]
+
+					if ((answer = kNull) || (Trim(answer) = ""))
+						answer := false
+					else
+						answer := this.ParseAnswer(answer)
+				}
+				else
+					answer := false
+
+				return answer
+			}
+			else if answer.Has("text")
+				return this.ParseAnswer(answer["text"])
+			else
+				throw "Unknown answer format detected in LLMConnector.APIConnector.ProcessAnswer..."
 		}
 
 		ParseModels(response) {
@@ -620,7 +670,7 @@ class LLMConnector {
 					return this.ParseModels(answer.JSON)
 				else {
 					if isDebug()
-						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in APIConnector.LoadModels...")
+						logMessage(kLogDebug, "LLM API call returned " . answer.Status . " in LLMConnector.APIConnector.LoadModels...")
 
 					return []
 				}
@@ -776,8 +826,165 @@ class LLMConnector {
 
 			return result
 		}
+	}
 
+	class AnthropicConnector extends LLMConnector.APIConnector {
+		static Models {
+			Get {
+				return ["claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5"]
+			}
+		}
 
+		Schema {
+			Get {
+				return "Anthropic"
+			}
+		}
+
+		Models {
+			Get {
+				return choose(super.Models, (m) => (InStr(m, "claude") = 1))
+			}
+		}
+
+		Model[external := false] {
+			Get {
+				return (external ? super.Model[true] : StrReplace(super.Model[false], ".", "-"))
+			}
+		}
+
+		Temperature {
+			Get {
+				return 1.0
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://api.anthropic.com"
+			serviceKey := ""
+			model := "claude-sonnet-4-6"
+		}
+
+		CreateServerURL(server) {
+			server := super.CreateServerURL(server)
+
+			if InStr(server, "/v1/messages")
+				server := StrReplace(server, "/v1/messages", "")
+
+			if (SubStr(server, StrLen(server)) = "/")
+				return SubStr(server, 1, StrLen(server) - 1)
+			else
+				return server
+		}
+
+		CreateServiceURL(server) {
+			return (this.CreateServerURL(server) . "/v1/messages")
+		}
+
+		CreateHeaders(headers?) {
+			if !isSet(headers)
+				headers := Map()
+
+			if (Trim(this.Token) != "")
+				headers["X-Api-Key"] := this.Token
+
+			headers["anthropic-version"] := "2023-06-01"
+
+			return headers
+		}
+
+		CreatePrompt(body, instructions, tools, question) {
+			body.DeleteProp("temperature")
+
+			return super.CreatePrompt(body, instructions, tools, question)
+		}
+
+		ParseToolCall(tools, descriptor, &name, &arguments) {
+			local tool
+
+			if (descriptor.Has("type") && (descriptor["type"] = "tool_use")) {
+				name := descriptor["name"]
+				arguments := descriptor["input"]
+
+				tool := this.FindTool(tools, name)
+
+				if tool {
+					if isInstance(arguments, String)
+						arguments := JSON.parse(arguments)
+
+					arguments := this.ParseArguments(tool, toMap(arguments))
+
+					return tool
+				}
+				else
+					return false
+			}
+			else
+				return super.ParseToolCall(tools, descriptor, &name, &arguments)
+		}
+
+		ProcessToolCalls(tools, message, &calls?) {
+			local toolCalls
+
+			if (message.Has("content") && isObject(message["content"])) {
+				toolCalls := choose(message["content"], (c) => (c["type"] = "tool_use"))
+
+				if (toolCalls.Length > 0) {
+					if isSet(calls)
+						calls := choose(collect(toolCalls, ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+					else
+						do(toolCalls, ObjBindMethod(this, "CallTool", tools))
+
+					return true
+				}
+				else
+					return false
+			}
+			else if isSet(calls)
+				return super.ProcessToolCalls(tools, message, &calls)
+			else
+				return super.ProcessToolCalls(tools, message)
+		}
+
+		ProcessAnswer(tools, answer, &calls?) {
+			local text
+
+			if answer.Has("content") {
+				text := first(answer["content"], (c) => (c["type"] = "text"))
+
+				if isSet(calls)
+					toolCall := this.ProcessToolCalls(tools, answer, &calls)
+				else
+					toolCall := this.ProcessToolCalls(tools, answer)
+
+				if toolCall {
+					if text {
+						answer := text["text"]
+
+						if ((answer = kNull) || (Trim(answer) = ""))
+							answer := true
+					}
+					else
+						answer := true
+				}
+				else if text {
+					answer := text["text"]
+
+					if ((answer = kNull) || (Trim(answer) = ""))
+						answer := false
+					else
+						answer := this.ParseAnswer(answer)
+				}
+				else
+					answer := false
+
+				return answer
+			}
+			else if isSet(calls)
+				return super.ProcessAnswer(tools, answer, &calls)
+			else
+				return super.ProcessAnswer(tools, answer)
+		}
 	}
 
 	class OpenRouterConnector extends LLMConnector.APIConnector {
@@ -1067,9 +1274,9 @@ class LLMConnector {
 	static Providers {
 		Get {
 			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
-				return ["Generic", "OpenAI", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

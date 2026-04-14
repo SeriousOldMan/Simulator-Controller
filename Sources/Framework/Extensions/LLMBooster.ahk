@@ -107,7 +107,12 @@ class LLMBooster extends ConfigurationItem {
 				this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Model"], this.Options["GPULayers"])
 			else
 				try {
-					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
+					try {
+						this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
+					}
+					catch Any {
+						this.iConnector := %StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Model"])
+					}
 
 					this.Connector.Connect(service[2], service[3])
 				}

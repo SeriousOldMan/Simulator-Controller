@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.9.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QrDX9GuO/Releases/Simulator%20Controller%206.9.2.0-dev.zip) (Early build for 6.9.2. Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6920) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-692) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -174,7 +176,7 @@ The Driving Coach can even use telemetry data to give you instructions how to im
 
 [![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
-The AI Driving Coach can use LLM runtimes of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, using a local runtime, which comes with Simulator Controller or using tools like Ollama or GPT4All.
+The AI Driving Coach can use GPT services of OpenAI, Mistral and alike, but if your PC is powerful enough, you can also use an integrated runtime for a variety of LLM architectures, like Llama, Falcon, Mistral, GPT, and so on, using a local runtime, which comes with Simulator Controller or using tools like Ollama or GPT4All.
 
 ##### Race Engineer & Race Strategist
 

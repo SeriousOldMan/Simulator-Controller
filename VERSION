@@ -1,10 +1,10 @@
 [Development]
 Version=6.9.2.0-dev
 Target=6.9.2.0-release
-Date=04/12/2026
+Date=04/14/2026
 Download=
-Changes=Fixed session end detection when in LMU main screen
-Components=Media->6.9.0,Configuration->6.9.1,Utilities->6.8.8
+Changes=Fixed session end detection when in LMU main screen, New Lua 5.5 runtime
+Components=Media->6.9.0,Configuration->6.9.1,Utilities->6.9.2
 [Release]
 Version=6.9.1.0-release
 Date=04/10/2026
@@ -21,8 +21,11 @@ Configuration.6.9.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/p
 Utilities.6.8.8.Path=.
 Utilities.6.8.8.Content=Utilities
 Utilities.6.8.8.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/fkrA4tZT/Components/Utilities%206.8.8.zip;http://%master%/Components/Utilities 6.8.8.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.8.8.zip;https://www.dropbox.com/scl/fi/94qlc5c50n4djbpb97t9m/Utilities-6.8.8.zip?rlkey=q3tqwnzbdngg1qrhdfbgvsou3&st=z4pcwnt1&dl=1
+Utilities.6.9.2.Path=.
+Utilities.6.9.2.Content=Utilities
+Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vSM_QhzO/Components/Utilities%206.9.2.zip;https://www.dropbox.com/scl/fi/zvm2x5i4ytxud6jba3gff/Utilities-6.9.2.zip?rlkey=6w7ppdn25mvc8bc0ea0hejigx&st=ax2pi4zn&dl=1;http://%master%/Components/Utilities 6.9.2.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.9.2.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=6.9.2.0-dev
 Release=6.9.1.0-release

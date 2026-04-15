@@ -96,3 +96,46 @@ global kLogOff := 5
 
 global kLogLevels := Map("Off", kLogOff, "Debug", kLogDebug, "Info", kLogInfo, "Warn", kLogWarn, "Critical", kLogCritical)
 global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeUserPaths(userPath) {
+	global kUserHomeDirectory, kLogsDirectory, kTempDirectory, kProgramsDirectory, kDatabaseDirectory
+	global kUserPluginsDirectory, kUserConfigDirectory, kUserTranslationsDirectory
+	global kUserGrammarsDirectory, kUserRulesDirectory
+	global kUserSplashMediaDirectory, kUserScreenImagesDirectory
+
+	kUserHomeDirectory := (normalizeDirectoryPath(userPath) . "\")
+
+	kLogsDirectory := kUserHomeDirectory . "Logs\"
+	kTempDirectory := kUserHomeDirectory . "Temp\"
+	kProgramsDirectory := kUserHomeDirectory . "Programs\"
+	kDatabaseDirectory := kUserHomeDirectory . "Database\"
+
+	kUserPluginsDirectory := kUserHomeDirectory . "Plugins\"
+	kUserConfigDirectory := kUserHomeDirectory . "Config\"
+	kUserTranslationsDirectory := kUserHomeDirectory . "Translations\"
+	kUserGrammarsDirectory := kUserHomeDirectory . "Grammars\"
+	kUserRulesDirectory := kUserHomeDirectory . "Rules\"
+	kUserSplashMediaDirectory := kUserHomeDirectory . "Splash Media\"
+	kUserScreenImagesDirectory := kUserHomeDirectory . "Screen Images\"
+}
+
+initializeConstants() {
+	local userLocation := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+										 , "Install", "User"
+										 , RegRead("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+												 , "UserLocation", kUserHomeDirectory))
+
+	initializeUserPaths(userLocation)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeConstants()

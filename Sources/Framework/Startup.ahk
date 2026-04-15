@@ -51,7 +51,7 @@ loadSimulatorConfiguration() {
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
 
-	checkInstallation(components) {
+	updateNeeded(components) {
 		local component, version, ignore, part, type, installedVersion
 
 		for component, version in components {
@@ -63,23 +63,23 @@ loadSimulatorConfiguration() {
 				path := kHomeDirectory
 
 			if !FileExist(path)
-				return false
+				return true
 
 			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content")) {
 				type := FileExist(path . part)
 
 				if !type
-					return false
+					return true
 				else if InStr(type, "D") {
 					installedVersion := getMultiMapValue(readMultiMap(path . part . "\VERSION"), "Component", "Version", false)
 
 					if (installedVersion != version)
-						return false
+						return true
 				}
 			}
 		}
 
-		return true
+		return false
 	}
 
 	if kLogStartup
@@ -108,7 +108,7 @@ loadSimulatorConfiguration() {
 
 	if type {
 		if (inList(kForegroundApps, appName) && !inList(A_Args, "-Repair"))
-			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
+			if updateNeeded(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
 				Run("`"" . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 
 				ExitApp(0)
@@ -128,7 +128,7 @@ loadSimulatorConfiguration() {
 	pid := ProcessExist()
 
 	logMessage(kLogOff, "---------------------------------------------------------------------")
-	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
+	logMessage(kLogOff, translate("      Running ") . StrSplit(appName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
 	logMessage(kLogOff, "---------------------------------------------------------------------")
 
 	if (kSimulatorConfiguration.Count == 0)
@@ -197,7 +197,7 @@ loadSimulatorConfiguration() {
 	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
 		Task.startTask(() {
 			local usage, diagnostics
-			
+
 			if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
 				usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 			else {
@@ -227,7 +227,10 @@ loadSimulatorConfiguration() {
 
 initializeEnvironment() {
 	global kSimulatorConfiguration, kDetachedInstallation, kProperInstallation, kTempDirectory, kProgramsDirectory
-	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult, path, settings
+	global kUserHomeDirectory, kBuildConfiguration
+
+	local installOptions, installLocation, userLocation, install, newID, idFileName, ID, ticks
+	local wait, major, minor, msgResult, path, settings, buildConfiguration
 
 	if kLogStartup
 		logMessage(kLogOff, "Initializing environment...")
@@ -251,14 +254,16 @@ initializeEnvironment() {
 				kDetachedInstallation := true
 		}
 
+		installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+
+		installLocation := getMultiMapValue(installOptions, "Install", "Location"
+														  , RegRead("HKLM\" . kUninstallKey, "InstallLocation", ""))
+		userLocation := getMultiMapValue(installOptions, "Install", "User"
+													   , RegRead("HKLM\" . kUninstallKey, "UserLocation", kUserHomeDirectory))
+
 		if !isDetachedInstallation() {
 			if kLogStartup
 				logMessage(kLogOff, "Ensuring correct installation...")
-
-			installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", "")
-
-			installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-			installLocation := getMultiMapValue(installOptions, "Install", "Location", installLocation)
 
 			install := (installLocation && (installLocation != "") && (InStr(kHomeDirectory, installLocation) != 1))
 			install := (install || !installLocation || (installLocation = ""))
@@ -285,11 +290,31 @@ initializeEnvironment() {
 			}
 		}
 	}
+	else {
+		installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+
+		installLocation := getMultiMapValue(installOptions, "Install", "Location"
+														  , RegRead("HKLM\" . kUninstallKey, "InstallLocation", ""))
+		userLocation := getMultiMapValue(installOptions, "Install", "User"
+													   , RegRead("HKLM\" . kUninstallKey, "UserLocation", ""))
+	}
+
+	initializeUserPaths(userLocation)
+
+	buildConfiguration := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+										 , "Build", "Configuration", kUndefined)
+
+	if (buildConfiguration != kUndefined)
+		kBuildConfiguration := buildConfiguration
 
 	if kLogStartup
 		logMessage(kLogOff, "Preparing standard folders...")
 
 	DirCreate(A_MyDocuments . "\Simulator Controller")
+	DirCreate(A_MyDocuments . "\Simulator Controller\Config")
+	DirCreate(A_MyDocuments . "\Simulator Controller\Plugins")
+
+	DirCreate(normalizeDirectoryPath(kUserHomeDirectory))
 	DirCreate(kUserHomeDirectory . "Config")
 	DirCreate(kUserHomeDirectory . "Actions")
 	DirCreate(kUserHomeDirectory . "Rules")
@@ -306,7 +331,6 @@ initializeEnvironment() {
 	DirCreate(kUserHomeDirectory . "Sounds")
 	DirCreate(kUserHomeDirectory . "Splash Media")
 	DirCreate(kUserHomeDirectory . "Screen Images")
-	DirCreate(kUserHomeDirectory . "Plugins")
 	DirCreate(kUserHomeDirectory . "Translations")
 	DirCreate(kUserHomeDirectory . "Grammars")
 	DirCreate(kUserHomeDirectory . "Simulator Data")

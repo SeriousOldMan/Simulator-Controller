@@ -120,13 +120,13 @@ installOptions(options, *) {
 
 	static update := false
 
-	chooseInstallLocationPath(*) {
+	chooseLocationPath(location, type, *) {
 		local valid, empty, directory
 
 		installGui.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSelectCancelButtons)
-		directory := withBlockedWindows(FileSelect, "D1", installGui["installLocationPathEdit"].Text, translate("Select Installation folder..."))
+		directory := withBlockedWindows(FileSelect, "D1", installGui[location . "LocationPathEdit"].Text, translate("Select " . type . " folder..."))
 		OnMessage(0x44, translateSelectCancelButtons, 0)
 
 		if (directory != "") {
@@ -160,10 +160,10 @@ installOptions(options, *) {
 				}
 
 			if (empty && valid)
-				installGui["installLocationPathEdit"].Text := directory
+				installGui[location . "LocationPathEdit"].Text := directory
 			else if (!empty && !update) {
 				OnMessage(0x44, translateOkButton)
-				withBlockedWindows(MsgDlg, translate("The installation folder must be empty."), translate("Error"), 262160)
+				withBlockedWindows(MsgDlg, translate("The " . StrLower(type) . " folder must be empty."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
@@ -236,9 +236,13 @@ installOptions(options, *) {
 		installGui.Add("Text", "x16 yp+60 w100 h23 +0x200", translate("Installation Type"))
 		installGui.Add("DropDownList", "x116 yp w80 " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
 
-		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Installation Folder"))
+		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Program Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vinstallLocationPathEdit", options.InstallLocation)
-		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseInstallLocationPath)
+		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("install", "Installation"))
+
+		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Data Folder"))
+		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vuserLocationPathEdit", options.UserLocation)
+		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("data", "Data"))
 
 		checked := (options.AutomaticUpdates ? "Checked" : "")
 
@@ -275,6 +279,7 @@ installOptions(options, *) {
 		if (result == kOk) {
 			options.InstallType := ["Registry", "Portable"][installGui["installationTypeDropDown"].Value]
 			options.InstallLocation := installGui["installLocationPathEdit"].Text
+			options.UserLocation := installGui["userLocationPathEdit"].Text
 			options.AutomaticUpdates := installGui["automaticUpdatesCheck"].Value
 			options.StartMenuShortcuts := installGui["startMenuShortcutsCheck"].Value
 			options.DesktopShortcuts := installGui["desktopShortcutsCheck"].Value
@@ -351,6 +356,7 @@ checkInstallation() {
 
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local installLocation := ""
+	local userLocation := ""
 	local installInfo, quiet, options, msgResult, hasSplash, command, component, source
 	local install, index, options, isNew, packageLocation, packageInfo, packageType, version
 	local ignore, directory, currentDirectory
@@ -477,15 +483,18 @@ checkInstallation() {
 
 	try {
 		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", false)
+		userLocation := RegRead("HKLM\" . kUninstallKey, "UserLocation", false)
 	}
 	catch Any as exception {
 		logError(exception, false, false)
 
 		installLocation := false
+		userLocation := false
 	}
 
 	installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
+	userLocation := getMultiMapValue(installInfo, "Install", "User", userLocation)
 
 	if (installLocation && inList(A_Args, "-Repair")) {
 		if !A_IsAdmin {
@@ -583,6 +592,7 @@ checkInstallation() {
 
 		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
 				  , InstallLocation: normalizeDirectoryPath(installLocation)
+				  , UserLocation: normalizeDirectoryPath(userLocation)
 				  , AutomaticUpdates: getMultiMapValue(installInfo, "Updates", "Automatic", true)
 				  , DesktopShortcuts: getMultiMapValue(installInfo, "Shortcuts", "Desktop", false)
 				  , StartMenuShortcuts: getMultiMapValue(installInfo, "Shortcuts", "StartMenu", true)
@@ -693,6 +703,7 @@ checkInstallation() {
 
 			options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
 					  , InstallLocation: normalizeDirectoryPath(getMultiMapValue(installInfo, "Install", "Location", installLocation))
+					  , UserLocation: normalizeDirectoryPath(getMultiMapValue(installInfo, "Install", "User", userLocation))
 					  , AutomaticUpdates: getMultiMapValue(installInfo, "Updates", "Automatic", true)
 					  , Verbose: getMultiMapValue(installInfo, "Updates", "Verbose", false)
 					  , DesktopShortcuts: getMultiMapValue(installInfo, "Shortcuts", "Desktop", false)
@@ -727,6 +738,7 @@ checkInstallation() {
 
 				setMultiMapValue(installInfo, "Install", "Type", options.InstallType)
 				setMultiMapValue(installInfo, "Install", "Location", installLocation)
+				setMultiMapValue(installInfo, "Install", "User", options.UserLocation)
 				setMultiMapValue(installInfo, "Updates", "Automatic", options.AutomaticUpdates)
 				setMultiMapValue(installInfo, "Updates", "Verbose", options.Verbose)
 				setMultiMapValue(installInfo, "Shortcuts", "Desktop", options.DesktopShortcuts)

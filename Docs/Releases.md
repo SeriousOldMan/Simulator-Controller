@@ -42,8 +42,9 @@
   
 #### Changes
 
-  - The native interface (for the experts: the *Messages* API) of Anthropic is now supported as [GPT provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#anthropic).
+  - The native interface of Anthropic (for the experts: the *Messages* API) is now supported as [GPT provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#anthropic).
   - [Experts] A new version of the Lua 5.5 runtime is included. Default is still version 5.4 for compatibility reasons.
+  - [Developer] The class tree of "LLMConnector" is no longer *sealed*, i.e. it is now possible to create own connector classes in custom plugins.
   - [Internal] Migrated to AHK 2.1-alpha.24.
 
 # Release history

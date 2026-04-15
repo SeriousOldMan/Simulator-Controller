@@ -51,7 +51,7 @@ loadSimulatorConfiguration() {
 	if kLogStartup
 		logMessage(kLogOff, "Loading configuration...")
 
-	checkInstallation(components) {
+	updateNeeded(components) {
 		local component, version, ignore, part, type, installedVersion
 
 		for component, version in components {
@@ -63,23 +63,23 @@ loadSimulatorConfiguration() {
 				path := kHomeDirectory
 
 			if !FileExist(path)
-				return false
+				return true
 
 			for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content")) {
 				type := FileExist(path . part)
 
 				if !type
-					return false
+					return true
 				else if InStr(type, "D") {
 					installedVersion := getMultiMapValue(readMultiMap(path . part . "\VERSION"), "Component", "Version", false)
 
 					if (installedVersion != version)
-						return false
+						return true
 				}
 			}
 		}
 
-		return true
+		return false
 	}
 
 	if kLogStartup
@@ -108,7 +108,7 @@ loadSimulatorConfiguration() {
 
 	if type {
 		if (inList(kForegroundApps, appName) && !inList(A_Args, "-Repair"))
-			if !checkInstallation(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
+			if updateNeeded(string2Map(",", "->", getMultiMapValue(packageInfo, type, "Components", ""))) {
 				Run("`"" . kBinariesDirectory . "Simulator Tools.exe`" -Repair -Start `"" . A_ScriptName . "`"")
 
 				ExitApp(0)
@@ -128,7 +128,7 @@ loadSimulatorConfiguration() {
 	pid := ProcessExist()
 
 	logMessage(kLogOff, "---------------------------------------------------------------------")
-	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
+	logMessage(kLogOff, translate("      Running ") . StrSplit(appName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
 	logMessage(kLogOff, "---------------------------------------------------------------------")
 
 	if (kSimulatorConfiguration.Count == 0)
@@ -197,7 +197,7 @@ loadSimulatorConfiguration() {
 	if getMultiMapValue(settings, "Diagnostics", "Usage", true) {
 		Task.startTask(() {
 			local usage, diagnostics
-			
+
 			if FileExist(kUserHomeDirectory . "Diagnostics\Usage.stat")
 				usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
 			else {

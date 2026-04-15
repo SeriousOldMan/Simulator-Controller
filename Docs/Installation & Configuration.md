@@ -904,6 +904,6 @@ As you expect, there is a graphical tool to edit this language specific configur
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Labels%20Icons%20Editor.jpg)
 
-Simulator Controller comes with preconfigured labels for all supported languages, but you may have to create your own icon definitions.
+Simulator Controller comes with preconfigured labels for most supported languages, and the icons may speak for themselves. Howerver you are free to change everything according to your own preferences.
 
 Note: This editor can be opened from the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.

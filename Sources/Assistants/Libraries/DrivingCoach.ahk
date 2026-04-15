@@ -684,7 +684,12 @@ class DrivingCoach extends GridRaceAssistant {
 					this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Driving Coach.Model"]
 																			, this.Options["Driving Coach.GPULayers"])
 				else {
-					this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
+					try {
+						this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
+					}
+					catch Any {
+						this.iConnector := %StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Driving Coach.Model"])
+					}
 
 					this.Connector.Connect(service[2], service[3])
 

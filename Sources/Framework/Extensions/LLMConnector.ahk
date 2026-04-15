@@ -920,7 +920,7 @@ class LLMConnector {
 					return false
 			}
 			else
-				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseToolCall..."
+				return super.ParseToolCall(tools, descriptor, &name, &arguments)
 		}
 
 		ProcessToolCalls(tools, message, &calls?) {

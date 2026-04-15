@@ -2818,8 +2818,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			else
 				data := this.acquireSessionData(&telemetryData, &standingsData)
 
-			if (!this.Session && !this.activeSession(data))
+			if (!this.Session && !this.activeSession(data)) {
+				this.finishAssistantsSession()
+
 				return
+			}
 
 			if isDebug() {
 				deleteFile(kTempDirectory . "Race Assistant.data")

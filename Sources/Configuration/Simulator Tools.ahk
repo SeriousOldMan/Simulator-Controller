@@ -695,6 +695,9 @@ checkInstallation() {
 			if (!installLocation || (installLocation = ""))
 				installLocation := normalizeDirectoryPath(kInstallDirectory)
 
+			if (!userLocation || (userLocation = ""))
+				userLocation := normalizeDirectoryPath(A_MyDocuments . "\Simulator Controller")
+
 			isNew := !FileExist(installLocation)
 
 			if !isNew

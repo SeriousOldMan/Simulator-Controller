@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.2.0-dev
 Target=6.9.2.0-release
-Date=04/14/2026
+Date=04/15/2026
 Download=
-Changes=Fixed session end detection when in LMU main screen, Added native Anthropic support for LLM integration
+Changes=Fixed session end detection when in LMU main screen, Added native Anthropic support for LLM integration, Configurable location of the data folder
 Components=Media->6.9.0,Configuration->6.9.1,Utilities->6.8.8
 [Release]
 Version=6.9.1.0-release

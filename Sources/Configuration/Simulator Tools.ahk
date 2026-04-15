@@ -242,7 +242,7 @@ installOptions(options, *) {
 
 		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Data Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vuserLocationPathEdit", options.UserLocation)
-		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("data", "Data"))
+		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("user", "Data"))
 
 		checked := (options.AutomaticUpdates ? "Checked" : "")
 

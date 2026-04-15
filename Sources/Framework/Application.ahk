@@ -314,7 +314,7 @@ checkForUpdates() {
 					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
-						automaticUpdates := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
+						automaticUpdates := getMultiMapValue(readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
 							Run((!A_IsAdmin ? "*RunAs `"" : "`"") . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")

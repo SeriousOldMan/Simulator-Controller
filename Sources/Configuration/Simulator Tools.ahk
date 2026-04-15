@@ -492,7 +492,7 @@ checkInstallation() {
 		userLocation := false
 	}
 
-	installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	installInfo := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 	userLocation := getMultiMapValue(installInfo, "Install", "User", userLocation)
 
@@ -610,10 +610,11 @@ checkInstallation() {
 			if options.DeleteUserFiles {
 				showProgress({message: translate("Removing User files...")})
 
+				deleteDirectory(A_MyDocuments . "\Simulator Controller")
 				deleteDirectory(kUserHomeDirectory)
 			}
 			else
-				deleteFile(kUserConfigDirectory . "Simulator Controller.install")
+				deleteFile(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 
 			if options.StartMenuShortcuts {
 				showProgress({progress: gProgressCount, message: translate("Removing Start menu shortcuts...")})
@@ -825,7 +826,7 @@ checkInstallation() {
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
 
-					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installInfo)
+					writeMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install", installInfo)
 
 					if (installLocation != packageLocation) {
 						showProgress({progress: gProgressCount++, message: translate("Removing installation files...")})
@@ -1706,7 +1707,7 @@ renewConsent() {
 
 /*
 updateInstallationForV586() {
-	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installInfo := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
 	deleteFile(installLocation . "\Binaries\Race Center.exe")
@@ -1744,7 +1745,7 @@ updateInstallationForV586() {
 }
 
 updateInstallationForV541() {
-	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installInfo := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
 	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
@@ -1762,7 +1763,7 @@ updateInstallationForV541() {
 }
 
 updateInstallationForV500() {
-	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installInfo := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
 	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {

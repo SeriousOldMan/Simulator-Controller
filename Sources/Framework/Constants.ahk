@@ -125,7 +125,7 @@ initializeUserPaths(userPath) {
 }
 
 initializeConstants() {
-	local userLocation := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local userLocation := getMultiMapValue(readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 										 , "Install", "User"
 										 , RegRead("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 												 , "UserLocation", kUserHomeDirectory))

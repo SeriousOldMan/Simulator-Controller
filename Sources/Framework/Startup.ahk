@@ -254,7 +254,7 @@ initializeEnvironment() {
 				kDetachedInstallation := true
 		}
 
-		installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+		installOptions := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 
 		installLocation := getMultiMapValue(installOptions, "Install", "Location"
 														  , RegRead("HKLM\" . kUninstallKey, "InstallLocation", ""))
@@ -291,12 +291,20 @@ initializeEnvironment() {
 		}
 	}
 	else {
-		installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+		installOptions := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
 
 		installLocation := getMultiMapValue(installOptions, "Install", "Location"
 														  , RegRead("HKLM\" . kUninstallKey, "InstallLocation", ""))
 		userLocation := getMultiMapValue(installOptions, "Install", "User"
 													   , RegRead("HKLM\" . kUninstallKey, "UserLocation", ""))
+	}
+
+	if !InStr(normalizeDirectoryPath(userLocation), A_MyDocuments . "\Simulator Controller") {
+		deleteDirectory(A_MyDocuments . "\Simulator Controller\Temp")
+
+		path := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
+		if (!path || !InStr(path, A_MyDocuments . "\Simulator Controller\Database"))
+			deleteDirectory(A_MyDocuments . "\Simulator Controller\Database")
 	}
 
 	initializeUserPaths(userLocation)

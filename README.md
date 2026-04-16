@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QrDX9GuO/Releases/Simulator%20Controller%206.9.2.0-dev.zip) (Early build for 6.9.2. Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
+[6.9.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ABWy82uV/Releases/Simulator%20Controller%206.9.2.0-beta.zip) (Test build for 6.9.2. Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6920) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-692) of this version and all the versions you might have skipped, before installing and using this version.
 

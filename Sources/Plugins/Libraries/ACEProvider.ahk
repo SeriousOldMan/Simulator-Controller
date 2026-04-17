@@ -18,8 +18,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class ACEProvider extends SimulatorProvider {
-	static kUnknown := false
-
 	static sCarData := false
 
 	iCarMetaData := CaseInsenseMap()
@@ -51,9 +49,6 @@ class ACEProvider extends SimulatorProvider {
 	}
 
 	__New(car, track, provider := false) {
-		if !ACEProvider.kUnknown
-			ACEProvider.kUnknown := translate("Unknown")
-
 		this.iUDPProvider := (provider ? provider : ACEUDPProvider())
 
 		super.__New(car, track)
@@ -73,12 +68,12 @@ class ACEProvider extends SimulatorProvider {
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
-		refuelService := true
-		tyreService := "Axle"
-		brakeService := true
-		repairService := ["Bodywork"]
+		refuelService := false
+		tyreService := false
+		brakeService := false
+		repairService := []
 
-		return true
+		return false
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
@@ -195,7 +190,7 @@ class ACEProvider extends SimulatorProvider {
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local standingsData, session
-		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate
+		local driverID, driverForname, driverSurname, driverNickname, lapTime, car, driverCar, driverCarCandidate
 
 		ACEProvider.requireCarDatabase()
 
@@ -231,14 +226,17 @@ class ACEProvider extends SimulatorProvider {
 			driverCarCandidate := false
 
 			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-				car := SessionDatabase.getCarCode(simulator
+				car := SessionDatabase.getCarCode(this.Simulator
 												, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car"))
 
 				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
 							   , getMultiMapValue(ACEProvider.sCarData, "Car Classes", car, "Unknown"))
 
-				if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID)
+				if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
 					driverCar := A_Index
+
+					this.iLastDriverCar := driverCar
+				}
 				else if !driverCar
 					if ((getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
 					 && (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {

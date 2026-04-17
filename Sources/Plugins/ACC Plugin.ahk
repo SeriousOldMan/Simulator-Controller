@@ -15,6 +15,7 @@
 #Include "Libraries\SimulatorPlugin.ahk"
 #Include "Libraries\ACCUDPProvider.ahk"
 #Include "Libraries\ACCProvider.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 

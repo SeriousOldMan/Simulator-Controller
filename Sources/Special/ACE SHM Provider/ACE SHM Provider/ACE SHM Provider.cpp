@@ -130,12 +130,23 @@ string normalizeName(string result) {
 
 	return result;
 }
+AC_UNKNOWN -1
+#define AC_TIME_ATTACK 0
+#define AC_RACE 1
+#define AC_HOT_STINT 2
+#define AC_CRUISE 3
 
 inline const string getSession(int sessionType, string phaseName) {
-	if (phaseName == "Qualify")
-		return "Qualification";
+	if (sessionType == AC_RACE) {
+		if (phaseName == "Qualify")
+			return "Qualification";
+		else
+			return phaseName;
+	}
+	else if (sessionType == AC_TIME_ATTACK)
+		return "Time Trial";
 	else
-		return phaseName;
+		return "Other";
 }
 
 long getRemainingTime(long timeLeft);
@@ -255,8 +266,6 @@ int main(int argc, char* argv[])
 
 		wcout << "TyreCompoundRawFront=" << gf->tyre_lf.tyre_compound_front << endl;
 		wcout << "TyreCompoundRawRear=" << gf->tyre_lf.tyre_compound_rear << endl;
-
-		
 		
 		printData(L"TyreTemperature", pf->tyreCoreTemperature);
 		printData(L"TyreInnerTemperature", pf->tyreTempI);

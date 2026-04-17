@@ -238,7 +238,7 @@ installOptions(options, *) {
 
 		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Program Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vinstallLocationPathEdit", options.InstallLocation)
-		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("install", "Installation"))
+		installGui.Add("Button", "x304 yp-1 w23 h23 " . disabled, translate("...")).OnEvent("Click", chooseLocationPath.Bind("install", "Program"))
 
 		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Data Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vuserLocationPathEdit", options.UserLocation)
@@ -246,7 +246,7 @@ installOptions(options, *) {
 
 		checked := (options.AutomaticUpdates ? "Checked" : "")
 
-		installGui.Add("Text", "x16 yp+34 w100 h23 +0x200", translate("Updates"))
+		installGui.Add("Text", "x16 yp+34 w140 h23 +0x200", translate("Updates"))
 		installGui.Add("CheckBox", "x116 yp+3 w180 " . checked . " vautomaticUpdatesCheck", translate("  Automatic"))
 
 		checked := (options.StartMenuShortcuts ? "Checked" : "")
@@ -694,6 +694,9 @@ checkInstallation() {
 
 			if (!installLocation || (installLocation = ""))
 				installLocation := normalizeDirectoryPath(kInstallDirectory)
+
+			if (!userLocation || (userLocation = ""))
+				userLocation := normalizeDirectoryPath(A_MyDocuments . "\Simulator Controller")
 
 			isNew := !FileExist(installLocation)
 

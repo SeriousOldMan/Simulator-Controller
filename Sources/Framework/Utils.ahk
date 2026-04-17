@@ -6,6 +6,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Global Functions Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global sendCommand := sendKeyboardCommand
+global installKeyboardHook := InstallKeybdHook
+global setSendDelay := SetKeyDelay
+global setHotKey := Hotkey
+global detectProcess := detectRunningProcess
+global activateWindow := WinActivate
+global closeWindow := WinClose
+global listWindows := (arguments*) => WinGetList(arguments*)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -24,20 +38,6 @@
 
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Global Functions Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global sendCommand := sendKeyboardCommand
-global installKeyboardHook := InstallKeybdHook
-global setSendDelay := SetKeyDelay
-global setHotKey := Hotkey
-global detectProcess := detectRunningProcess
-global activateWindow := WinActivate
-global closeWindow := WinClose
-global listWindows := (arguments*) => WinGetList(arguments*)
 
 
 ;;;-------------------------------------------------------------------------;;;

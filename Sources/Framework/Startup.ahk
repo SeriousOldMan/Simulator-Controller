@@ -296,15 +296,26 @@ initializeEnvironment() {
 		installLocation := getMultiMapValue(installOptions, "Install", "Location"
 														  , RegRead("HKLM\" . kUninstallKey, "InstallLocation", ""))
 		userLocation := getMultiMapValue(installOptions, "Install", "User"
-													   , RegRead("HKLM\" . kUninstallKey, "UserLocation", ""))
+													   , RegRead("HKLM\" . kUninstallKey, "UserLocation", kUserHomeDirectory))
 	}
 
 	if !InStr(normalizeDirectoryPath(userLocation), A_MyDocuments . "\Simulator Controller") {
+		deleteFile(A_MyDocuments . "\Simulator Controller\Config\ID")
+		deleteFile(A_MyDocuments . "\Simulator Controller\Config\UPDATES")
+
 		deleteDirectory(A_MyDocuments . "\Simulator Controller\Temp")
 
 		path := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 		if (!path || !InStr(path, A_MyDocuments . "\Simulator Controller\Database"))
 			deleteDirectory(A_MyDocuments . "\Simulator Controller\Database")
+
+		path := []
+
+		loop Files, A_MyDocuments . "\Simulator Controller\*.*", "D"
+			if !inList(["Config", "Plugins", "Database"], A_LoopFileName)
+				path.Push(A_LoopFileFullPath)
+
+		do(path, deleteDirectory)
 	}
 
 	initializeUserPaths(userLocation)

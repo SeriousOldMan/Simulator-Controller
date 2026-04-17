@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - ACC Provider                    ;;;
+;;;   Modular Simulator Controller System - ACE Provider                    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
@@ -10,17 +10,19 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
-#Include "ACCUDPProvider.ahk"
+#Include "ACEUDPProvider.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACCProvider extends SimulatorProvider {
+class ACEProvider extends SimulatorProvider {
 	static kUnknown := false
 
 	static sCarData := false
+
+	iCarMetaData := CaseInsenseMap()
 
 	iUDPProvider := false
 
@@ -28,13 +30,13 @@ class ACCProvider extends SimulatorProvider {
 
 	static Simulator {
 		Get {
-			return "Assetto Corsa Competizione"
+			return "Assetto Corsa EVO"
 		}
 	}
 
 	Simulator {
 		Get {
-			return ACCProvider.Simulator
+			return ACEProvider.Simulator
 		}
 	}
 
@@ -45,14 +47,14 @@ class ACCProvider extends SimulatorProvider {
 	}
 
 	static __New(arguments*) {
-		SimulatorProvider.registerSimulatorProvider("ACC", ACCProvider)
+		SimulatorProvider.registerSimulatorProvider("ACE", ACEProvider)
 	}
 
 	__New(car, track, provider := false) {
-		if !ACCProvider.kUnknown
-			ACCProvider.kUnknown := translate("Unknown")
+		if !ACEProvider.kUnknown
+			ACEProvider.kUnknown := translate("Unknown")
 
-		this.iUDPProvider := (provider ? provider : ACCUDPProvider())
+		this.iUDPProvider := (provider ? provider : ACEUDPProvider())
 
 		super.__New(car, track)
 	}
@@ -60,11 +62,11 @@ class ACCProvider extends SimulatorProvider {
 	static requireCarDatabase() {
 		local data
 
-		if !ACCProvider.sCarData {
-			data := readMultiMap(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini")
+		if !ACEProvider.sCarData {
+			data := readMultiMap(kResourcesDirectory . "Simulator Data\ACE\Car Data.ini")
 
-			if FileExist(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini")
-				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\ACC\Car Data.ini"))
+			if FileExist(kUserHomeDirectory . "Simulator Data\ACE\Car Data.ini")
+				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\ACE\Car Data.ini"))
 
 			ACCProvider.sCarData := data
 		}
@@ -72,16 +74,16 @@ class ACCProvider extends SimulatorProvider {
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
-		tyreService := "All"
+		tyreService := "Axle"
 		brakeService := true
-		repairService := ["Bodywork", "Suspension"]
+		repairService := ["Bodywork"]
 
 		return true
 	}
 
 	supportsTyreManagement(&mixedCompounds?, &tyreSets?) {
-		mixedCompounds := false
-		tyreSets := true
+		mixedCompounds := "Axle"
+		tyreSets := false
 
 		return true
 	}
@@ -122,7 +124,47 @@ class ACCProvider extends SimulatorProvider {
 
 	acquireTelemetryData() {
 		local data := super.acquireTelemetryData()
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local track := getMultiMapValue(data, "Session Data", "Track", "")
+		local layout := getMultiMapValue(data, "Session Data", "Layout", "")
+		local extension := ""
+		local forname, surname, nickname, name
 		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
+
+		if ((getMultiMapValue(data, "Stint Data", "Laps", 0) == 0)
+		 && (getMultiMapValue(data, "Session Data", "SessionFormat", "Laps") = "Time")) {
+			setMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+			setMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
+		}
+
+		if (track != "") {
+			setMultiMapValue(data, "Session Data", "Track", track . "-" . layout)
+
+			if (layout != "")
+				extension := (" (" . layout . ")")
+
+			setMultiMapValue(data, "Session Data", "TrackShortName"
+								 , SessionDatabase.getTrackName(simulator, track, false) . extension)
+			setMultiMapValue(data, "Session Data", "TrackLongName"
+								 , SessionDatabase.getTrackName(simulator, track, true) . extension)
+		}
+
+		forname := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
+		surname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+		nickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JD")
+
+		if ((forname = surname) && (surname = nickname)) {
+			name := string2Values(A_Space, forname, 2)
+
+			if (isObject(name) && (name.Length > 0)) {
+				setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
+				setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length > 1) ? name[2] : "")
+			}
+			else
+				setMultiMapValue(data, "Stint Data", "DriverSurname", "")
+
+			setMultiMapValue(data, "Stint Data", "DriverNickname", "")
+		}
 
 		if !getMultiMapValue(data, "Stint Data", "InPit", false)
 			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
@@ -154,17 +196,8 @@ class ACCProvider extends SimulatorProvider {
 	acquireStandingsData(telemetryData, finished := false) {
 		local standingsData, session
 		local driverID, driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate
-		local carID, carClass, carModel
 
-		static carIDs := false
-		; static carCategories := false
-
-		if !carIDs {
-			ACCProvider.requireCarDatabase()
-
-			carIDs := getMultiMapValues(ACCProvider.sCarData, "Car IDs")
-			; carCategories := getMultiMapValues(ACCProvider.sCarData, "Car Categories")
-		}
+		ACEProvider.requireCarDatabase()
 
 		try {
 			standingsData := this.UDPProvider.acquire()
@@ -198,58 +231,35 @@ class ACCProvider extends SimulatorProvider {
 			driverCarCandidate := false
 
 			loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-				carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+				car := SessionDatabase.getCarCode(simulator
+												, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car"))
 
-				if (carID != kUndefined) {
-					carModel := (carIDs.Has(carID) ? carIDs[carID] : ACCProvider.kUnknown)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
+							   , getMultiMapValue(ACEProvider.sCarData, "Car Classes", car, "Unknown"))
 
-					if (carModel = ACCProvider.kUnknown) {
-						if isDebug()
-							showMessage("Unknown car with ID " . carID . " detected...")
-
-						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", ACCProvider.kUnknown)
-						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class", ACCProvider.kUnknown)
-					}
-					else {
-						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", carModel)
-
-						carClass := SessionDatabase.getCarClass(this.Simulator, carModel)
-
-						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Class"
-									   , carClass ? carClass : ACCProvider.kUnknown)
-					}
-
-					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID) {
+				if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID", false) = driverID)
+					driverCar := A_Index
+				else if !driverCar
+					if ((getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+					 && (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 						driverCar := A_Index
 
 						this.iLastDriverCar := driverCar
 					}
-					else if !driverCar
-						if ((getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
-							driverCar := A_Index
-
-							this.iLastDriverCar := driverCar
-						}
-				}
 			}
 
 			if !driverCar
-				loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
-					carID := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+				loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
+					if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position")
+					  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
+						driverCar := A_Index
 
-					if (carID != kUndefined)
-						if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position")
-						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
-							driverCar := A_Index
+						this.iLastDriverCar := driverCar
 
-							this.iLastDriverCar := driverCar
-
-							break
-						}
-						else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCarCandidate := A_Index
-				}
+						break
+					}
+					else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+						driverCarCandidate := A_Index
 
 			if !driverCar
 				driverCar := (this.iLastDriverCar ? this.iLastDriverCar : driverCarCandidate)
@@ -260,5 +270,43 @@ class ACCProvider extends SimulatorProvider {
 		}
 		else
 			this.UDPProvider.shutdown(true)
+	}
+
+	readSessionData(options := "", protocol?) {
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
+		local data := super.readSessionData(options, protocol?)
+		local tyreCompound, tyreCompoundColor, ignore, postFix
+
+		static tyres := ["Front", "Rear"]
+
+		if !car
+			car := getMultiMapValue(data, "Session Data", "Car", false)
+
+		if !track
+			track := getMultiMapValue(data, "Session Data", "Track", false)
+
+		for ignore, section in ["Car Data", "Setup Data"]
+			for ignore, postfix in tyres {
+				tyreCompound := getMultiMapValue(data, section, "TyreCompound" . postFix, kUndefined)
+
+				if (tyreCompound = kUndefined) {
+					tyreCompound := getMultiMapValue(data, section, "TyreCompoundRaw" . postFix, kUndefined)
+
+					if ((tyreCompound != kUndefined) && tyreCompound) {
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, section, "TyreCompound" . postFix, tyreCompound)
+							setMultiMapValue(data, section, "TyreCompoundColor" . postFix, tyreCompoundColor)
+						}
+					}
+				}
+			}
+
+		return data
 	}
 }

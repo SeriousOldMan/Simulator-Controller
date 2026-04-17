@@ -16,7 +16,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kACEApplication := "Rennsport"
+global kACEApplication := "Assetto Corsa EVO"
 
 global kACEPlugin := "ACE"
 

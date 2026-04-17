@@ -17,8 +17,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class ACProvider extends SimulatorProvider {
-	iCarMetaData := CaseInsenseMap()
-
 	static sCarData := false
 
 	static Simulator {
@@ -49,6 +47,13 @@ class ACProvider extends SimulatorProvider {
 		SimulatorProvider.registerSimulatorProvider("AC", ACProvider)
 	}
 
+	__New(car, track) {
+		super.__New(car, track)
+
+		if !ACProvider.sCarData
+			Task.startTask(ObjBindMethod(ACProvider, "requireCarDatabase"), 1000, kLowPriority)
+	}
+
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "All"
@@ -67,13 +72,6 @@ class ACProvider extends SimulatorProvider {
 
 	supportsTrackMap() {
 		return true
-	}
-
-	__New(car, track) {
-		super.__New(car, track)
-
-		if !ACProvider.sCarData
-			Task.startTask(ObjBindMethod(ACProvider, "requireCarDatabase"), 1000, kLowPriority)
 	}
 
 	static requireCarDatabase() {

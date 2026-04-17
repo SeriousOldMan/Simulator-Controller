@@ -590,6 +590,9 @@ checkInstallation() {
 						, false, true, ["Simulator Tools"], true)
 			ExitApp(1)
 
+		if (!userLocation || (userLocation = ""))
+			userLocation := normalizeDirectoryPath(A_MyDocuments . "\Simulator Controller")
+
 		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
 				  , InstallLocation: normalizeDirectoryPath(installLocation)
 				  , UserLocation: normalizeDirectoryPath(userLocation)

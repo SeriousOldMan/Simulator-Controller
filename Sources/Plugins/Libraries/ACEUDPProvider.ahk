@@ -71,23 +71,24 @@ class ACEUDPProvider {
 		readStandingsData() {
 			local fileName, standingsData
 
-			return newMultiMap()
-
-			if FileExist(kTempDirectory . "ACEUDP.cmd")
-				return false
-			else {
-				fileName := (kTempDirectory . "ACEUDP.out")
-
-				if !FileExist(fileName)
+			if true
+				return newMultiMap()
+			else
+				if FileExist(kTempDirectory . "ACEUDP.cmd")
 					return false
 				else {
-					standingsData := readMultiMap(fileName)
+					fileName := (kTempDirectory . "ACEUDP.out")
 
-					deleteFile(fileName)
+					if !FileExist(fileName)
+						return false
+					else {
+						standingsData := readMultiMap(fileName)
 
-					return standingsData
+						deleteFile(fileName)
+
+						return standingsData
+					}
 				}
-			}
 		}
 
 		run() {
@@ -225,40 +226,41 @@ class ACEUDPProvider {
 		local fileName := temporaryFileName("Positions", "data")
 		local options
 
-		return newMultiMap()
+		if true
+			return newMultiMap()
+		else
+			try {
+				deleteFile(fileName)
 
-		try {
-			deleteFile(fileName)
+				options := ""
 
-			options := ""
+				if this.UDPConnection
+					options := ("-Connect " . this.UDPConnection)
 
-			if this.UDPConnection
-				options := ("-Connect " . this.UDPConnection)
+				Run("`"" . exePath . "`" -Collect `"" . fileName . "`" " . options, kBinariesDirectory, "Hide", &udpClient)
 
-			Run("`"" . exePath . "`" -Collect `"" . fileName . "`" " . options, kBinariesDirectory, "Hide", &udpClient)
+				if udpClient {
+					while ProcessExist(udpClient)
+						Sleep(100)
 
-			if udpClient {
-				while ProcessExist(udpClient)
-					Sleep(100)
-
-				return readMultiMap(fileName)
+					return readMultiMap(fileName)
+				}
 			}
-		}
-		catch Any as exception {
-			logError(exception, true)
+			catch Any as exception {
+				logError(exception, true)
 
-			logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACE", protocol: "UDP"})
-								   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-								   . kBinariesDirectory . translate(")"))
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACE", protocol: "UDP"})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
-			if !kSilentMode
-				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
-											  , {exePath: exePath, simulator: "ACE", protocol: "UDP"})
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-		}
-		finally {
-			deleteFile(fileName)
-		}
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: "ACE", protocol: "UDP"})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+			finally {
+				deleteFile(fileName)
+			}
 	}
 
 	startup(force := false) {

@@ -176,10 +176,11 @@ class ACEProvider extends SimulatorProvider {
 				setMultiMapValue(data, "Session Data", "Paused", true)
 
 		if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
-			brakePadThickness := string2Values(",", getMultiMapValue(data, "Car Data", "BrakePadLifeRaw"))
 			frontBrakePadCompound := getMultiMapValue(data, "Car Data", "FrontBrakePadCompoundRaw")
 			rearBrakePadCompound := getMultiMapValue(data, "Car Data", "RearBrakePadCompoundRaw")
 
+			/*
+			brakePadThickness := string2Values(",", getMultiMapValue(data, "Car Data", "BrakePadLifeRaw"))
 			brakePadWear := [this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[1])
 						   , this.computeBrakePadWear("Front", frontBrakePadCompound, brakePadThickness[2])
 						   , this.computeBrakePadWear("Rear", frontBrakePadCompound, brakePadThickness[3])
@@ -193,6 +194,7 @@ class ACEProvider extends SimulatorProvider {
 				removeMultiMapValue(data, "Car Data", "FrontBrakePadCompoundRaw")
 				removeMultiMapValue(data, "Car Data", "RearBrakePadCompoundRaw")
 			}
+			*/
 		}
 
 		return data

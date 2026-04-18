@@ -265,14 +265,14 @@ int main(int argc, char* argv[])
 		printData(L"TyreOuterTemperature", pf->tyreTempO);
 		*/
 		
-		printData(L"TyreWear", pf->tyreWear);
+		// printData(L"TyreWear", pf->tyreWear);
 		printData(L"TyreTemperature", pf->tyreCoreTemperature);
 		printData(L"TyrePressure", pf->wheelsPressure);
 		printData(L"BrakeTemperature", pf->brakeTemp);
-		printData(L"BrakePadLifeRaw", pf->padLife);
-		printData(L"BrakeDiscLifeRaw", pf->discLife);
-		printData(L"FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
-		printData(L"RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
+		// printData(L"BrakePadLifeRaw", pf->padLife);
+		// printData(L"BrakeDiscLifeRaw", pf->discLife);
+		// printData(L"FrontBrakePadCompoundRaw", pf->frontBrakeCompound + 1);
+		// printData(L"RearBrakePadCompoundRaw", pf->rearBrakeCompound + 1);
 
 		if (pf->waterTemp)
 			printData(L"WaterTemperature", pf->waterTemp);

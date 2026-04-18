@@ -4922,10 +4922,22 @@ class GridRaceAssistant extends RaceAssistant {
 
 	prepareData(lapNumber, data, force := false) {
 		local sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
-		local knowledgeBase, key, value
+		local knowledgeBase, key, value, running
 
 		static lastlap := false
 		static lastSector := false
+
+		if (sector = 0) {
+			running := getMultiMapValue(data, "Stint Data", "Running", kUndefined)
+
+			if (running != kUndefined)
+				if (running > 0.66)
+					sector := 3
+				else if (running > 0.33)
+					sector := 2
+				else
+					sector := 1
+		}
 
 		data := super.prepareData(lapNumber, data)
 

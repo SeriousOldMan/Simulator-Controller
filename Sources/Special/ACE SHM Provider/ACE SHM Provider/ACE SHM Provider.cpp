@@ -258,9 +258,14 @@ int main(int argc, char* argv[])
 		wcout << "TyreCompoundRawRear=" << gf->tyre_lf.tyre_compound_rear << endl;
 		
 		printData(L"TyreTemperature", pf->tyreCoreTemperature);
+		
+		/*
 		printData(L"TyreInnerTemperature", pf->tyreTempI);
 		printData(L"TyreMiddleTemperature", pf->tyreTempM);
 		printData(L"TyreOuterTemperature", pf->tyreTempO);
+		*/
+		
+		printData(L"TyreWear", pf->tyreWear);
 		printData(L"TyreTemperature", pf->tyreCoreTemperature);
 		printData(L"TyrePressure", pf->wheelsPressure);
 		printData(L"BrakeTemperature", pf->brakeTemp);
@@ -281,6 +286,7 @@ int main(int argc, char* argv[])
 		wcout << "DriverSurname=" << gf->driver_surname << endl;
 		wcout << "DriverNickname=" << endl;
 		// printData(L"Sector", gf->currentSectorIndex + 1);
+		printData(L"Running", gf->npos);
 		printData(L"Laps", gf->total_lap_count);
 		
 		wcout << "LapValid=" << (gf->is_valid_lap ? "true" : "false") << endl;

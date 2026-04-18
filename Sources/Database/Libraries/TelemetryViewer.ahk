@@ -147,7 +147,7 @@ class TelemetryChart {
 					if (InStr(value, ":")) {
 						value := string2Values(":", value)
 
-						value := ((value[1] * 60000) + (value[2] * 1000))
+						value := ((value[1] * 60000) + (StrReplace(value[2], ",", ".") * 1000))
 					}
 
 					if !isNumber(value)
@@ -1379,7 +1379,7 @@ class TelemetryViewer {
 					if (InStr(value, ":")) {
 						value := string2Values(":", value)
 
-						value := ((value[1] * 60000) + (value[2] * 1000))
+						value := ((value[1] * 60000) + (StrReplace(value[2], ",", ".") * 1000))
 					}
 
 					if !isNumber(value)

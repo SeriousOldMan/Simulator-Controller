@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <iostream>
 #include "SharedFileOut.h"
+
 using namespace std;
 template <typename T, unsigned S> inline unsigned arraysize(const T(&v)[S]) {
 	return S;
@@ -332,17 +333,15 @@ int main(int argc, char* argv[])
 		wcout << "InPit=" << (gf->is_in_pit_box ? "true" : "false") << endl;
 
 		wcout << "[Track Data]" << endl;
-
+		printData(L"Length", sf->track_length_m);
 		printData(L"Temperature", pf->roadTemp);
 
 		wcout << "Grip=" << getGrip(sf->starting_grip).c_str() << endl;
 
-		/*
-		for (int id = 0; id < gf->activeCars; id++) {
-			wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
-			wcout << "Car." << id + 1 << ".Position=" << gf->carCoordinates[id][0] << "," << gf->carCoordinates[id][2] << endl;
+		for (int id = 0; id < gf->active_cars; id++) {
+			// wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			wcout << "Car." << id + 1 << ".Position=" << gf->car_coordinates[id][0] << "," << gf->car_coordinates[id][2] << endl;
 		}
-		*/
 
 		wcout << "[Weather Data]" << endl;
 
@@ -369,16 +368,6 @@ int main(int argc, char* argv[])
 			printData(L"SessionLapsRemaining", 1000);
 		else
 			printData(L"SessionLapsRemaining", (gf->last_laptime_ms > 0) ? timeLeft / gf->last_laptime_ms : 99);
-	}
-
-	if (strlen(request) == 0 || getArgument(request, "Setup") != "")
-	{
-		SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
-		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-
-		wcout << "[Setup Data]" << endl;
-
-		printData(L"FuelAmount", gf->pit_info.fuel);
 	}
 
 	dismiss(m_graphics);

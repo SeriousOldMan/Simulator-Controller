@@ -71,6 +71,8 @@ class ACEUDPProvider {
 		readStandingsData() {
 			local fileName, standingsData
 
+			return newMultiMap()
+
 			if FileExist(kTempDirectory . "ACEUDP.cmd")
 				return false
 			else {
@@ -222,6 +224,8 @@ class ACEUDPProvider {
 		local exePath := (kBinariesDirectory . "Providers\ACE UDP Provider.exe")
 		local fileName := temporaryFileName("Positions", "data")
 		local options
+
+		return newMultiMap()
 
 		try {
 			deleteFile(fileName)

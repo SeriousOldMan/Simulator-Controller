@@ -130,19 +130,10 @@ string normalizeName(string result) {
 
 	return result;
 }
-AC_UNKNOWN -1
-#define AC_TIME_ATTACK 0
-#define AC_RACE 1
-#define AC_HOT_STINT 2
-#define AC_CRUISE 3
 
 inline const string getSession(int sessionType, string phaseName) {
-	if (sessionType == AC_RACE) {
-		if (phaseName == "Qualify")
-			return "Qualification";
-		else
-			return phaseName;
-	}
+	if (sessionType == AC_RACE)
+		return "Race";
 	else if (sessionType == AC_TIME_ATTACK)
 		return "Time Trial";
 	else
@@ -289,16 +280,11 @@ int main(int argc, char* argv[])
 		
 		wcout << "DriverForname=" << gf->driver_name << endl;
 		wcout << "DriverSurname=" << gf->driver_surname << endl;
-		try {
-			wcout << "DriverNickname=" << gf->driver_name[0] + gf->driver_surname[0] << endl;
-		}
-		catch (const exception& e) {
-			wcout << "DriverNickname=" << endl;
-		}
+		wcout << "DriverNickname=" << endl;
 		// printData(L"Sector", gf->currentSectorIndex + 1);
 		printData(L"Laps", gf->total_lap_count);
 		
-		printData(L"LapValid", gf->is_valid_lap ? "true" : "false");
+		wcout << "LapValid=" << (gf->is_valid_lap ? "true" : "false") << endl;
 		printData(L"LapLastTime", gf->last_laptime_ms);
 		printData(L"LapBestTime", gf->best_laptime_ms);
 
@@ -342,14 +328,14 @@ int main(int argc, char* argv[])
 		printData(L"StintTimeRemaining", getRemainingTime(timeLeft));
 		printData(L"DriverTimeRemaining", getRemainingTime(timeLeft));
 
-		printData(L"InPitLane", (gf->is_in_pit_lane || gf->is_in_pit_box) ? "true" : "false");
-		printData(L"InPit", gf->is_in_pit_box ? "true" : "false");
+		wcout << "InPitLane=" << ((gf->is_in_pit_lane || gf->is_in_pit_box) ? "true" : "false") << endl;
+		wcout << "InPit=" << (gf->is_in_pit_box ? "true" : "false") << endl;
 
 		wcout << "[Track Data]" << endl;
 
 		printData(L"Temperature", pf->roadTemp);
 
-		wcout << "Grip" << getGrip(sf->starting_grip).c_str() << endl;
+		wcout << "Grip=" << getGrip(sf->starting_grip).c_str() << endl;
 
 		/*
 		for (int id = 0; id < gf->activeCars; id++) {
@@ -361,15 +347,15 @@ int main(int argc, char* argv[])
 		wcout << "[Weather Data]" << endl;
 
 		printData(L"Temperature", pf->airTemp);
-		printData(L"Weather", "Dry");
-		printData(L"Weather10min", "Dry");
-		printData(L"Weather30min", "Dry");
+		wcout << "Weather=Dry" << endl;
+		wcout << "Weather10Min=Dry" << endl;
+		wcout << "Weather30Min=Dry" << endl;
 
 		wcout << "[Session Data]" << endl;
 
-		printData(L"Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData(L"Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
-		printData(L"Session", getSession(sf->session, gf->session_state.phase_name));
+		wcout << "Active=" << (((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
+		wcout << "Paused=" << (((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
+		wcout << "Session=" << getSession(sf->session, gf->session_state.phase_name).c_str() << endl;
 		wcout << "ID=" << gf->player_car_id_a << endl;
 		wcout << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		wcout << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;

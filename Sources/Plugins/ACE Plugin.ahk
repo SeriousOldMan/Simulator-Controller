@@ -29,10 +29,14 @@ global kACEPlugin := "ACE"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ACEPlugin extends SimulatorPlugin {
+class ACEPlugin extends RaceAssistantSimulatorPlugin {
+	static sCarData := false
+
 	iUDPProvider := false
 
 	iSessionID := 0
+
+	iStandingsDataFuture := false
 
 	class ACEProvider extends ACEProvider {
 		iPlugin := false

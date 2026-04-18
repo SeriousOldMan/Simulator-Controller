@@ -63,7 +63,7 @@ class ACEProvider extends SimulatorProvider {
 			if FileExist(kUserHomeDirectory . "Simulator Data\ACE\Car Data.ini")
 				addMultiMapValues(data, readMultiMap(kUserHomeDirectory . "Simulator Data\ACE\Car Data.ini"))
 
-			ACCProvider.sCarData := data
+			ACEProvider.sCarData := data
 		}
 	}
 

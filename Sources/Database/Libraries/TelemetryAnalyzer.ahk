@@ -1591,7 +1591,16 @@ class TelemetryAnalyzer {
 		else {
 			index := channel.Indices[1]
 
-			return (data.Has(index) ? data[index] : ((default != kUndefined) ? default : kNull))
+			if data.Has(index) {
+				value := data[index]
+
+				if channel.HasProp("Converter")
+					value := channel.Converter[1](value)
+
+				return value
+			}
+
+			return ((default != kUndefined) ? default : kNull)
 		}
 	}
 
@@ -1602,9 +1611,16 @@ class TelemetryAnalyzer {
 		loop Read, fileName {
 			entry := string2Values(";", A_LoopReadLine)
 
-			for index, value in entry
+			for index, value in entry {
+				if (InStr(value, ":")) {
+					value := string2Values(":", value)
+
+					value := ((value[1] * 60000) + (value[2] * 1000))
+				}
+
 				if !isNumber(value)
 					entry[index] := kNull
+			}
 
 			data.Push(entry)
 		}

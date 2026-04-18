@@ -143,11 +143,18 @@ class TelemetryChart {
 
 				running := kNull
 
-				for index, value in entry
+				for index, value in entry {
+					if (InStr(value, ":")) {
+						value := string2Values(":", value)
+
+						value := ((value[1] * 60000) + (value[2] * 1000))
+					}
+
 					if !isNumber(value)
 						entry[index] := kNull
 					else if (index = 1)
 						running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
+				}
 
 				referenceLapTelemetry[running] := entry
 			}
@@ -209,12 +216,12 @@ class TelemetryChart {
 										 , {margin: margin})
 
 			before .= "`n function drawChart() {"
-			
+
 			loop chartFunctions.Length
 				before .= (" drawChart" . A_Index . "();")
 
 			before .= " }`n"
-			
+
 			before .= "`n function selectTelemetry(row) {"
 
 			loop chartFunctions.Length
@@ -472,10 +479,10 @@ class TelemetryChart {
 		local settings, data, x
 
 		static htmlViewer := false
-		
+
 		if !htmlViewer {
 			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-			
+
 			htmlViewer := getMultiMapValue(settings, "HTML", "Viewer." . StrSplit(A_ScriptName, ".")[1]
 												   , getMultiMapValue(settings, "HTML", "Viewer.*"
 																			  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")))
@@ -1368,9 +1375,16 @@ class TelemetryViewer {
 			loop Read, fileName {
 				entry := string2Values(";", A_LoopReadLine)
 
-				for index, value in entry
+				for index, value in entry {
+					if (InStr(value, ":")) {
+						value := string2Values(":", value)
+
+						value := ((value[1] * 60000) + (value[2] * 1000))
+					}
+
 					if !isNumber(value)
 						entry[index] := kNull
+				}
 
 				data.Push(entry)
 			}

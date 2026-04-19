@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[6.9.3.0-dev]() (Early build for 6.9.3. Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6930) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-693) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

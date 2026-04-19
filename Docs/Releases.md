@@ -18,7 +18,21 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.9.3.0
+
+#### Date: 04/24/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug introduced with the last release which prevented uninstalling Simulator Controller, when the data folder was not located in the user *Documents* folder.
+  - Fixed a bug which prevented in rare cases that coaching instrutions was passed to SimHub using the "Session State.json" file (by the "Integration" plugin).
+  
+#### Changes
+
+  - Support for the shared memory API of *Assetto Corsa EVO* version 0.6 has been added, thereby introducing full integration for this great game.
+    - The *Assetto Corsa EVO* API is not yet complete - participant information is missing, no weather information is available, and so on.
+    - Tyre compound information for all current cars has been added by @neophyte.
+	- Configuration support is available in "Simulator Setup".
 
 # Release history
 

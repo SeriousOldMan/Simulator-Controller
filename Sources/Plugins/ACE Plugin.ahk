@@ -116,12 +116,21 @@ class ACEPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	prepareSession(settings, data) {
+		local shortName, longName
+
 		if (getMultiMapValue(data, "Session Data", "Track", "") != "")
+			shortName := getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
+			longName := getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown")
+
+			shortName := StrReplace(shortName, "Circuit of the Americas", "COTA")
+			shortName := StrReplace(shortName, "Circuit de Spa Francorchamps", "Spa")
+			shortName := StrReplace(shortName, "Sebring International Raceway", "Sebring")
+			shortName := StrReplace(shortName, "Watkins Glen International", "Watkins Glen")
+
 			SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 										, getMultiMapValue(data, "Session Data", "Car", "Unknown")
 										, getMultiMapValue(data, "Session Data", "Track")
-										, getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
-										, getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
+										, shortName, longName)
 
 		super.prepareSession(settings, data)
 	}

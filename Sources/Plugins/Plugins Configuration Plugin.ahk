@@ -101,6 +101,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-12")
 				case "F125":
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-13")
+				case "ACE":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-14")
 				default:
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes")
 			}

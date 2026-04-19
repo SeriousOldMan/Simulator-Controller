@@ -241,14 +241,14 @@ class ACCProvider extends SimulatorProvider {
 					if (carID != kUndefined)
 						if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Position")
 						  = getMultiMapValue(telemetryData, "Stint Data", "Position", kUndefined)) {
-						driverCar := A_Index
+							driverCar := A_Index
 
-						this.iLastDriverCar := driverCar
+							this.iLastDriverCar := driverCar
 
-						break
-					}
-					else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-						driverCarCandidate := A_Index
+							break
+						}
+						else if (getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+							driverCarCandidate := A_Index
 				}
 
 			if !driverCar

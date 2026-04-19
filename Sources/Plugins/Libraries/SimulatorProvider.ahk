@@ -315,10 +315,15 @@ class SimulatorProvider {
 			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", carNr)
 		}
 
-		if (driver && (count > 0))
+		if (driver && (count > 0)) {
 			if (getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".InPitLane", false)
 			 && !getMultiMapValue(telemetryData, "Stint Data", "InPitLane", false))
 				setMultiMapValue(telemetryData, "Stint Data", "InPitLane", true)
+
+			if (getMultiMapValue(telemetryData, "Stint Data", "Running", kUndefined) == kUndefined)
+				setMultiMapValue(telemetryData, "Stint Data", "Running"
+							   , getMultiMapValue(standingsData, "Position Data", "Car." . driver . ".Running", 0))
+		}
 	}
 
 	readSessionData(options := "", protocol?) {

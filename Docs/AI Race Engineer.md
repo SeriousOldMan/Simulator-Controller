@@ -326,6 +326,7 @@ The following table shows, which simulator supports which damage types:
 | Simulator                  | Bodywork | Suspension | Engine |
 |----------------------------|----------|------------|--------|
 | Assetto Corsa              | Yes      | No (1)     | No (1) |
+| Assetto Corsa EVO (4)      | Yes      | Yes        | No     |
 | Assetto Corsa Competizione | Yes      | Yes        | No     |
 | Automobilista 2            | Yes      | Yes        | Yes    |
 | iRacing                    | No       | No         | No     |
@@ -343,6 +344,8 @@ The following table shows, which simulator supports which damage types:
 (2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
 
 (3) No support for pitstop handling for *F1 25* at the time of this writing.
+
+(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
 
 The choice in the "Change Tyres" dropdown menu tells Jona, how to decide, wether a given tyre should be changed at the next pitstop. *Wear*, which is the default, will change a tyre, when the expected tyre wear at the end of the next stint will exceed the maximum tyre as defined by the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The choice *Laps* will ask Jona to change tyres depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the race rules (see above) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
@@ -385,6 +388,7 @@ Please note, that the range of supported pitstop services depends on the specifi
 | Simulator                  | Refuel | Tyre Change (1) | Tyre Compound (2) | Tyre Pressures | Repairs (3) | Brakes     |
 | -------------------------- | ------ | --------------- | ----------------- | -------------- | ----------- | ---------- |
 | Assetto Corsa              | Yes    | All             | Uniform           | Yes            | Yes         | No         |
+| Assetto Corsa EVO    (7)   | -      | -               | -                 | -              | -           | -          |
 | Assetto Corsa Competizione | Yes    | All             | Uniform           | Yes            | Yes         | Yes        |
 | Automobilista 2            | Yes    | All             | Uniform           | Yes            | Yes         | No         |
 | iRacing                    | Yes    | Wheel           | Uniform           | Yes            | No (4)      | No         |
@@ -409,6 +413,8 @@ Please note, that the range of supported pitstop services depends on the specifi
 
 (6) No support for pitstop handling for *F1 25* at the time of this writing.
 
+(7) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
+
 Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
 #### Performing a pitstop
@@ -423,6 +429,7 @@ Some final notes: If you ever perform a pitstop, which has not been planned and 
 | Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Brakes  | Repairs |
 | -------------------------- | ---- | ------------- | -------- | -------------- | ------- | ------- |
 | Assetto Corsa              | No   | No            | -        | No             | No      | No      |
+| Assetto Corsa EVO (4)      | -    | -             | -        | -              | -       | -       |
 | Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | Yes (1) | Yes (1) |
 | Automobilista 2            | No   | No            | -        | No             | No      | No      |
 | iRacing                    | Yes  | Yes           | -        | Yes            | No      | No      |
@@ -439,9 +446,15 @@ Some final notes: If you ever perform a pitstop, which has not been planned and 
 
 (2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
 
-(2) No support for pitstop handling for *F1 25* at the time of this writing.
+(3) No support for pitstop handling for *F1 25* at the time of this writing.
+
+(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
 
 It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
+
+#### *Assetto Corsa* and *Assetto Corsa EVO*
+
+Both simulators do not provide any data interface for initial setup information. So you must take care, that everything is entered correctly into the settings tool, before you head out onto the track. On the other hand, pitstop handling is not supported for *Assetto Corsa EVO*, so you might skip tyre pressure information here alltogether.
 
 #### *Assetto Corsa Competizione*
 
@@ -518,6 +531,7 @@ The following statistical models are currently implemented:
 	 | Simulator                  | Bodywork & Aerodynamics | Suspension & Chassis | Engine |
      | -------------------------- | ----------------------- | -------------------- | ------ |
      | Assetto Corsa              | Yes (1)                 | No (1)               | No (1) |
+     | Assetto Corsa EVO          | Yes                     | Yes                  | No     |
      | Assetto Corsa Competizione | Yes                     | Yes                  | No     |
      | Automobilista 2            | Yes                     | Yes                  | Yes    |
      | iRacing                    | No                      | No                   | No     |
@@ -536,11 +550,15 @@ The following statistical models are currently implemented:
   
      Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
 	 
-	 Some remarks regarding simulator specific restrictions for the different damage types:
+	 Some remarks regarding simulator specific restrictions for the different damage types:v
 	 
 	 - *Assetto Corsa*
 	   
 	   Bodywork repair will be recommended, but you have to select suspension or engine repair on your own as needed.
+	 
+	 - *Assetto Corsa EVO*
+	   
+	   Bodywork and suspension repair will be recommended, but you have to select it in the pitstop settings on your own as needed.
 	 
 	 - *Assetto Corsa Competizione*
 	   
@@ -595,9 +613,9 @@ The following statistical models are currently implemented:
 	 
 	 Finally some remarks regarding simulator specific restrictions:
 	 
-	 - *Assetto Corsa*
+	 - *Assetto Corsa* and *Assetto Corsa EVO*
 	   
-	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available.
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available. For *Assetto Corsa EVO*, however, no pitstop automation is supported (yet).
 	 
 	 - *Assetto Corsa Competizione*
 	   

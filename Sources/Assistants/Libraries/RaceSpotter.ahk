@@ -4285,7 +4285,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local wasValid := true
 		local lastWarnings := 0
 		local laps, lastPitstop, result
-		local simulator, car, track
+		local simulator, car, track, sector, running
 
 		if knowledgeBase {
 			lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
@@ -4323,10 +4323,24 @@ class RaceSpotter extends GridRaceAssistant {
 			if this.SessionInfos.Has("LastLap")
 				this.handleEvent("SessionOver")
 
+			sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
+
+			if (sector == 0) {
+				running := getMultiMapValue(data, "Stint Data", "Running", kUndefined)
+
+				if (running != kUndefined)
+					if (running > 0.66)
+						sector := 3
+					else if (running > 0.33)
+						sector := 2
+					else
+						sector := 1
+			}
+
 			if this.Speaker[false]
-				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
+				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, sector, lastPenalty))
 					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-						this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+						this.cutWarning(lapNumber, sector, wasValid, lastWarnings)
 		}
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
@@ -4348,7 +4362,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
 		local started := (lapNumber > 0)
-		local sector, result, valid, gapAhead, gapBehind
+		local sector, sectorDesc, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
 		static lastLap := 0
@@ -4375,6 +4389,18 @@ class RaceSpotter extends GridRaceAssistant {
 
 			sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
 
+			if (sector == 0) {
+				running := getMultiMapValue(data, "Stint Data", "Running", kUndefined)
+
+				if (running != kUndefined)
+					if (running > 0.66)
+						sector := 3
+					else if (running > 0.33)
+						sector := 2
+					else
+						sector := 1
+			}
+
 			if (sector != lastSector) {
 				lastSector := sector
 				sectorIndex := 1
@@ -4382,13 +4408,13 @@ class RaceSpotter extends GridRaceAssistant {
 				newSector := true
 			}
 
-			sector := (sector . "." . sectorIndex++)
+			sectorDesc := (sector . "." . sectorIndex++)
 
 			if !this.MultiClass
 				hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
 
 			if isDebug()
-				logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sector ", " . newSector)
+				logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sectorDesc ", " . newSector)
 
 			if (lapNumber = this.LastLap)
 				try {
@@ -4399,7 +4425,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 		}
 		else
-			sector := "0.0"
+			sectorDesc := "0.0"
 
 		knowledgeBase.setFact("Standings", true)
 
@@ -4407,17 +4433,17 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if this.DriverUpdateTime {
 			if (A_TickCount >= this.iNextDriverUpdate) {
-				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+				this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
 
 				this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
 
 				newSector := false
 			}
 			else
-				this.updateDriver(lapNumber, sector, false, false, this.Positions)
+				this.updateDriver(lapNumber, sectorDesc, false, false, this.Positions)
 		}
 		else {
-			this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+			this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
 
 			newSector := false
 		}
@@ -4431,9 +4457,9 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if this.Speaker[false]
-				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
+				if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, sector, lastPenalty))
 					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-						this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+						this.cutWarning(lapNumber, sector, wasValid, lastWarnings)
 		}
 
 		simulator := knowledgeBase.getValue("Session.Simulator")

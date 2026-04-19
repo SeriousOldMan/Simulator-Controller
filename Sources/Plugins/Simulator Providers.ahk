@@ -10,6 +10,7 @@
 
 #Include "Libraries\ACProvider.ahk"
 #Include "Libraries\ACCProvider.ahk"
+#Include "Libraries\ACEProvider.ahk"
 #Include "Libraries\AMS2Provider.ahk"
 #Include "Libraries\IRCProvider.ahk"
 #Include "Libraries\PCARS2Provider.ahk"

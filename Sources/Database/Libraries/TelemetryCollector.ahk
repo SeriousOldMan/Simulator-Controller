@@ -33,7 +33,7 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"]}
 							, {Name: "Lat G/Long G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
 							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
-							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [(t) => isNumber(t) ? (t / 1000) : kNull]}
+							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [normalizeTime]}
 							, {Name: "PosX", Indices: [12], Channels: []}
 							, {Name: "PosY", Indices: [13], Channels: []}]
 
@@ -564,4 +564,14 @@ computeCurvature(data) {
 	}
 	else
 		return kNull
+}
+
+normalizeTime(time) {
+	if InStr(time, ":") {
+		time := string2Values(":", time)
+
+		return ((time[1] * 60000) + (time[2] * 1000))
+	}
+	else
+		return (isNumber(time) ? (time / 1000) : kNull)
 }

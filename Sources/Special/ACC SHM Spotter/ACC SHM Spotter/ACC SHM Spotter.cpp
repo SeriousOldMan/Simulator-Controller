@@ -1820,7 +1820,7 @@ int main(int argc, char* argv[])
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 
-	int countdown = 4000;
+	int countdown = carTelemetry ? 0 : 4000;
 	int safety = 200;
 	long counter = 0;
 	

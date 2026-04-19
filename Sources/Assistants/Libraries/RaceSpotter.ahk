@@ -4433,17 +4433,17 @@ class RaceSpotter extends GridRaceAssistant {
 
 		if this.DriverUpdateTime {
 			if (A_TickCount >= this.iNextDriverUpdate) {
-				this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+				this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
 
 				this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
 
 				newSector := false
 			}
 			else
-				this.updateDriver(lapNumber, sector, false, false, this.Positions)
+				this.updateDriver(lapNumber, sectorDesc, false, false, this.Positions)
 		}
 		else {
-			this.updateDriver(lapNumber, sector, true, newSector, this.Positions)
+			this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
 
 			newSector := false
 		}

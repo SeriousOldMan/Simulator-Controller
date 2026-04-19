@@ -1497,8 +1497,6 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
-
 ### Configuration
 
 *Project Motor Racing* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 224.0.0.150,7576,true (where the last argument, *multiCast*, specifies whether *MultiCast* mode is used). If you have changed the connection information in the *Project Motor Racing* configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
@@ -1575,9 +1573,7 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
-
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
-
+					   
 ### Configuration
 
 *F1 25* provides an UDP interface to gather telemetry data, position information for all the cars in the grid, and so on. The default login to this service is 127.0.0.1,20777 (only the port is used at the moment, because connecting to *F1 25* on the same machine is not supported yet). If you have changed the port in the *F1 25* configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
@@ -1640,6 +1636,61 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - If you quit a session before finishing it, the end of the session is not detected by the Assustints - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
    - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
    - Suspension damage cannot be detected in the data. There is a tyre damage information available (for example when jumping over sausage curbs), but this damage is issued too often to be used as substitute for suspension damage.
+
+## Plugin *ACE*
+
+This plugin handles the *Assetto Corsa EVO* simulation game. An application with the name "Assetto Corsa EVO" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startACE" as a special function hook in this configuration.
+
+### Mode *Pitstop*
+
+Not yet available...
+
+### Mode *Assistant*
+
+This mode allows you to group all the available actions of the active Race Assistants into one layer of controls on your hardware controller. Although all these actions are also available as plugin actions of the "Race Engineer" and "Race Strategist" plugins, it may be more practical to use the "Assistant" mode, when your set of available hardware controls is limited, since plugin actions always occupy a given control.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%2012.JPG)
+
+The above will be achieved using the following plugin argument:
+
+	assistantCommands: InformationRequest Position Button.1, InformationRequest LapTimes Button.2,
+					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
+					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
+					   Accept Button.7, Reject Button.8
+
+### Configuration
+
+With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
+
+	assistantCommands: PitstopRecommend *function*, StrategyCancel *function*,
+					   PitstopPlan *function*, PitstopPrepare *function*,
+					   Accept *acceptFunction*, Reject *rejectFunction*,
+					   InformationRequest *requestFunction* *command* [*arguments*], ...
+					 
+See the following table for the supported Assistant commands.
+
+| Command | Description |
+| ------ | ------ |
+| InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your Race Assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
+| FCYRecommend | This command can be triggered, when the track is under Full Course Yellow with pitstops allowed. The Race Strategist will then check whether a pitstop under full course yellow will have a strategical benefit.  |
+| PitstopRecommend | Asks the AI Race Strategist for a recommendation for the next pitstop. |
+| StrategyRecommend | Asks the AI Race Strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
+| StrategyCancel | Asks the AI Race Strategist to drop the currently active strategy. |
+| PitstopPlan | Requests a pitstop plan from the AI Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the AI Race Engineer. |
+| PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. Although this command is available, it has no effect, because *Assetto Corsa EVO* does not support pitstop automation. |
+| Accept | Accepts the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+| Reject | Cancels or rejects the last recommendation by one of the AI Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
+
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+
+### Special notes for *Assetto Corsa EVO*
+
+1. The current state of the API does not provide any information about other participants. Therefore, race reports, traffic based strategy handling, and so on, are not supported yet.
+
+2. Pitstop automation is not supported (yet) as well.
+
+3. The API is far from complete during early access of *Assetto Corsa EVO*. For example, weather information is not available, track grip information is not available, and so on. As these informations will become available, they will be added of course.
    
 ## Plugin *Integration*
 

@@ -38,16 +38,6 @@ class ACEProvider extends SimulatorProvider {
 		}
 	}
 
-	static Protocols {
-		Get {
-			local protocols := super.Protocols
-
-			protocols.DeleteProp("Connector")
-
-			return protocols
-		}
-	}
-
 	UDPProvider {
 		Get {
 			return this.iUDPProvider

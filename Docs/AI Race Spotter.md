@@ -175,25 +175,25 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate | Project Motor Racing | F1 25     |
+| Capability                      | Assetto Corsa | Assetto Corsa EVO | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate | Project Motor Racing | F1 25     |
 | ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- | ------------------------- | ------------------------- |
-| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Accidents Ahead (7)             | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Accidents Behind (7) (10)       | Yes           | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Slow Cars (7)                   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             | No               | No                        | Yes                        |
-| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              | No                        | No                        |
-| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             | No               | No                        | No                        |
-| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (14)                 |
-| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        | Yes (14)                    |
-| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        | No                        |
-| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (13)                    |
-| Delta Information (11) (12)     | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| Tactical Advices (4) (12)       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
-| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Side Alert                      | Yes (1)       | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Behind Alert                    | Yes           | Yes                        | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Accidents Ahead (7)             | Yes           | Yes                        | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Accidents Behind (7) (10)       | Yes           | Yes                        | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Slow Cars (7)                   | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Yellow Flag                     | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Full Course Yellow              | No            | No                         | No                         | No              | No      | No                         | No        | No             | No               | No                        | Yes                        |
+| Sector Yellow                   | No            | No                        | Yes                        | No              | No      | Yes                        | Yes       | No             | Yes              | No                        | No                        |
+| Yellow Distance                 | No            | No                         | No                         | No              | No      | Yes                        | No        | No             | No               | No                        | No                        |
+| Blue Flag                       | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes                        | Yes             | Yes (9) | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (14)                 |
+| Penalty Information             | No            | No (15)                        | Yes                        | No              | No      | Yes                        | Yes (6)   | No             | Yes (6)          | No                        | Yes (14)                    |
+| Pit Window                      | No            | No              | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   | No               | No                        | No                        |
+| Race Start (Green Flag) (16)         | No            | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | No                        | Yes (13)                    |
+| Delta Information (11) (12)     | Yes           | No (15)                    | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| Tactical Advices (4) (12)       | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
+| General Session Information (5) | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
 
 ##### Notes
 
@@ -228,6 +228,10 @@ Also use a very low setting for "Data: Update Frequency" of around 2 - 3 seconds
 (13) Depending on system performance, the session start may be too fast for the AI to catch up and the "Green, Green, Green" shoutout will be skipped.
 
 (14) Not always reported correctly, when UDP packets ar lost du to high frequency events.
+
+(15) This information is not available in the API of *Assetto Corsa EVO* for the current early access version.
+
+(16) The "Green, green, green" shout out may be too late for standing starts.
 
 ##### Accident detection for *Assetto Corsa Competizione*
 

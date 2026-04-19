@@ -237,7 +237,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
     - Add splash screens and title melodies using a spedial editor for a more emotional startup experience
     - Full support for sophisticated application automation - for example, start your favorite voice chat software like TeamSpeak and automatically switch to your standard channel 
   - Several plugins are supplied out of the box:
-    - Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project Motor Racing*, *RaceRoom Racing Experience* and *Project CARS 2* is already builtin, other simulation games will follow, when they become available
+    - Support for *Assetto Corsa*, *Assetto Corsa EVO*, *Assetto Corsa Competizione*, *rFactor 2*, *Le Mans Ultimate*, *iRacing*, *Automobilista 2*, *Project Motor Racing*, *RaceRoom Racing Experience*, *Project CARS 2* and *F1 25* is already builtin, other simulation games will follow, when they become available
     - Fully customizable plugins supplied for total control of SimHub and SimFeedback - change your settings while racing using the dials and switches on your favorite Button Box
 	- Control the calibration curves of your high end pedals by a simple button press with the plugin for the Heusinkveld pedal family
     - Send your predefined kudos and rants to the ingame chat without touching the keyboard

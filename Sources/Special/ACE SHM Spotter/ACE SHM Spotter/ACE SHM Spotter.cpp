@@ -1543,8 +1543,8 @@ void collectCarTelemetry() {
 		}
 	*/
 
-	if (trackSplineReady) {
-		float driverRunning = getRunning(carID);
+	if (true || trackSplineReady) {
+		float driverRunning = gf->npos; // getRunning(carID);
 
 		if (driverRunning > 0)
 			try {

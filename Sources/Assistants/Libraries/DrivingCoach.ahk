@@ -2577,7 +2577,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
 		local wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
-		local cornerNr, instruct, telemetry, reference, command, instructionHints, problemsInstruction
+		local cornerNr, instruct, telemetry, telemetryJSON, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
@@ -2728,19 +2728,19 @@ class DrivingCoach extends GridRaceAssistant {
 
 								this.Mode := "Coaching"
 
-								telemetry := telemetry.JSON
+								telemetryJSON := telemetry.JSON
 
 								problemsInstruction := this.Instructions["Coaching.Corner.Problems"]
 
 								if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
-									telemetry := (substituteVariables(problemsInstruction
-																	, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
-																	 , corner: cornerNr})
-												. "\n\n" . telemetry)
+									telemetryJSON := (substituteVariables(problemsInstruction
+																		, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
+																		 , corner: cornerNr})
+													. "\n\n" . telemetryJSON)
 
 								try {
 									command := substituteVariables(this.Instructions["Coaching.Corner.Approaching"]
-																 , {telemetry: telemetry, corner: cornerNr})
+																 , {telemetry: telemetryJSON, corner: cornerNr})
 
 									if reference
 										command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]

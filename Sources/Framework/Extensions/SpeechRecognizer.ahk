@@ -1862,13 +1862,20 @@ class Grammar {
 
 			if alternatives
 				part.combinePhrases(phrases)
-			else {
-				temp := []
+			else
+				try {
+					temp := []
 
-				part.combinePhrases(temp)
+					part.combinePhrases(temp)
 
-				pPhrases.Push(temp)
-			}
+					pPhrases.Push(temp)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					try
+						logMessage(kLogCritical, "Badly formed phrases detected: " . values2String(", ", part))
+				}
 		}
 
 		if !alternatives {

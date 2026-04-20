@@ -34,6 +34,7 @@
     - The *Assetto Corsa EVO* API is not yet complete - participant information is missing, no weather information is available, and so on.
     - Tyre compound information for all current cars has been added by @neophyte.
 	- Configuration support is available in "Simulator Setup".
+	- The current implementation is far from being complete, as is the current state of implementation of the API of *Assetto Corsa EVO*.
 
 # Release history
 

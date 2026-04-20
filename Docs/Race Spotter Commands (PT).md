@@ -62,7 +62,7 @@ Announcements=informações delta, aconselhamento tático, alertas laterais, ale
 
    [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre, por favor]
 
-   [Sim {por favor, claro}, {perfeito} prossiga, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
+   [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
 
    [Não {obrigado, não agora, eu vou te ligar mais tarde}, Não no momento, Negativo]
 
@@ -70,11 +70,11 @@ Announcements=informações delta, aconselhamento tático, alertas laterais, ale
 
    [Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Eu {preciso, devo} focar agora]
 
-   [Ok, você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
+   [Ok você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
 
-   [Por favor, sem mais (Announcements), Sem mais (Announcements), Sem mais (Announcements) por favor]
+   [Por favor sem mais (Announcements), Sem mais (Announcements), Sem mais (Announcements) por favor]
 
-   [Por favor, me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor]
+   [Por favor me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor]
 
 2. Informação
 

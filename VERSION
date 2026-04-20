@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.3.0-dev
 Target=6.9.3.0-release
-Date=04/19/2026
+Date=04/20/2026
 Download=
-Changes=Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE
+Changes=Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.2.0-release

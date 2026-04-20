@@ -62,7 +62,7 @@ Information=informações da sessão, informações do stint, informações de m
 
    [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre, por favor]
 
-   [Sim {por favor, claro}, {perfeito} prossiga, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
+   [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
 
    [Não {obrigado, não agora, eu vou te ligar mais tarde}, Não no momento, Negativo]
 
@@ -70,11 +70,11 @@ Information=informações da sessão, informações do stint, informações de m
 
    [Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Eu {preciso, devo} focar agora]
 
-   [Ok, você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
+   [Ok você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
 
-   [Por favor, sem mais (Information), Sem mais (Information), Sem mais (Information) por favor]
+   [Por favor sem mais (Information), Sem mais (Information), Sem mais (Information) por favor]
 
-   [Por favor, me dê (Information), Você pode me dar (Information), Você pode me dar (Information) por favor, Me dê (Information), Me dê (Information) por favor]
+   [Por favor me dê (Information), Você pode me dar (Information), Você pode me dar (Information) por favor, Me dê (Information), Me dê (Information) por favor]
 
 2. Informação
 
@@ -82,9 +82,9 @@ Information=informações da sessão, informações do stint, informações de m
 	
 3. Treinamento
 
-   [(CanYou) dar-me um {treinamento}, (CanWe) corra uma sessão de {treinamento, treinamento, prática, prática}, (CanYou) {ajudar, me ajudar} com {o, meu} {treinamento, prática}, (CanYou) {observar} meu {treinamento, condução}, (CanYou) {verificar, assistir} minha {técnica} de condução, (CanWe) melhorar minhas capacidades de condução]
+   [(CanYou) dar-me {um, um treinamento}, (CanWe) corra uma sessão de {treinamento, treinamento, prática, prática}, (CanYou) {ajudar, me ajudar} com {o, meu} {treinamento, prática}, (CanYou) {observar meu, meu} {treinamento, condução}, (CanYou) {verificar, assistir} {minha, minha técnica} de condução, (CanWe) melhorar minhas capacidades de condução]
 
-   [Obrigado {pela sua ajuda, eu aprendi muito, isso foi ótimo}, Isso foi ótimo, obrigado. Ok, já chega por hoje]
+   [Obrigado {pela sua ajuda, eu aprendi muito, isso foi ótimo}, Isso foi ótimo obrigado, Ok já chega por hoje]
 
    [(CanYou) me dê {uma visão geral, uma visão geral curva por curva, uma visão geral volta por volta, uma visão geral da volta inteira, uma visão completa, uma visão completa curva por curva}, {Por favor, dê, Dê} uma olhada na pista completa, Onde posso melhorar na pista]
    
@@ -96,7 +96,7 @@ Information=informações da sessão, informações do stint, informações de m
    
    [(CanYou) me dizer onde estão os pontos de frenagem, {Por favor, me diga, Diga} onde frear, (CanWe) praticar {frenagem, pontos de frenagem}]
 
-   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor dê} uma {olhada mais de perto, olhada} na {curva, curva número, volta, volta número} (Number), Onde posso melhorar na {curva, curva número, volta, volta número} (Number), O que devo considerar {na} {curva, curva número, volta, volta número} (Number), O que devo procurar na {curva, curva número, volta, volta número} (Number)]
+   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor dê uma, Por favor dê} {olhada mais de perto, olhada} na {curva, curva número, volta, volta número} (Number), Onde posso melhorar na {curva, curva número, volta, volta número} (Number), O que devo considerar {na} {curva, curva número, volta, volta número} (Number), O que devo procurar na {curva, curva número, volta, volta número} (Number)]
 
    [(CanWe) utilizar a {volta mais rápida, última volta} como {referência, volta de referência}, {Please use, Use} a {volta mais rápida, última volta} como {referência, volta de referência}]
 

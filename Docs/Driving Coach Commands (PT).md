@@ -60,7 +60,7 @@ Information=informações da sessão, informações do stint, informações de m
 
 1. Conversação
 
-   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre, por favor]
+   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre por favor]
 
    [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
 

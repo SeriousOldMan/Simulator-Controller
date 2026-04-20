@@ -60,7 +60,7 @@ Announcements=informações delta, aconselhamento tático, alertas laterais, ale
 
 1. Conversation
 
-   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre, por favor]
+   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre por favor]
 
    [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
 

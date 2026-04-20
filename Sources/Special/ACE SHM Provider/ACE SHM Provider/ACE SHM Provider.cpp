@@ -148,7 +148,7 @@ long getRemainingLaps(long timeLeft)
 
 	if (getSession(sf->session, gf->session_state.phase_name) != "Practice")
 	{
-		if (sf->is_timed_race == 0)
+		if (!sf->is_timed_race)
 			return (gf->session_state.total_lap - gf->total_lap_count);
 		else
 		{
@@ -172,7 +172,7 @@ long getRemainingTime(long timeLeft)
 	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
 	SPageFileStaticEvo* sf = (SPageFileStaticEvo*)m_static.mapFileBuffer;
 
-	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race != 0)
+	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race)
 	{
 		long time = (timeLeft - (gf->best_laptime_ms * gf->total_lap_count));
 
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
 		wcout << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		wcout << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		wcout << "Layout=" << normalizeName(getString(sf->track_configuration)).c_str() << endl;
-		wcout << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race != 0) ? "Time" : "Laps") << endl;
+		wcout << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race) ? "Time" : "Laps") << endl;
 		printData(L"FuelAmount", gf->max_fuel);
 
 		printData(L"SessionTimeRemaining", getRemainingTime(timeLeft));

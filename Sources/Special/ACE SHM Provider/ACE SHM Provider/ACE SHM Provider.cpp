@@ -135,6 +135,8 @@ string normalizeName(string result) {
 inline const string getSession(int sessionType, string phaseName) {
 	if (sessionType == AC_RACE)
 		return "Race";
+	else if ((sessionType == AC_TIME_ATTACK) || (sessionType == AC_HOT_STINT))
+		return "Time Trial";
 	else
 		return "Other";
 }

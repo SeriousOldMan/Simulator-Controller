@@ -424,6 +424,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		else
 			printData(&output, "SessionLapsRemaining", (gf->last_laptime_ms > 0) ? timeLeft / gf->last_laptime_ms : 99);
 	}
+
+	strcpy_s(result, size, output.str().c_str());
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule,

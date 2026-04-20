@@ -169,6 +169,10 @@ inline const string getSession(int sessionType, string phaseName) {
 		return "Other";
 }
 
+inline bool isTimedRace() {
+	return !((SPageFileStaticEvo*)m_static.mapFileBuffer)->is_timed_race;
+}
+
 long getRemainingTime(long timeLeft);
 
 long getRemainingLaps(long timeLeft)
@@ -178,7 +182,7 @@ long getRemainingLaps(long timeLeft)
 
 	if (getSession(sf->session, gf->session_state.phase_name) != "Practice")
 	{
-		if (!sf->is_timed_race)
+		if (!isTimedRace())
 			return (gf->session_state.total_lap - gf->total_lap_count);
 		else
 		{
@@ -202,7 +206,7 @@ long getRemainingTime(long timeLeft)
 	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
 	SPageFileStaticEvo* sf = (SPageFileStaticEvo*)m_static.mapFileBuffer;
 
-	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race)
+	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || isTimedRace())
 	{
 		long time = (timeLeft - (gf->best_laptime_ms * gf->total_lap_count));
 
@@ -414,7 +418,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		output << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		output << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		output << "Layout=" << normalizeName(getString(sf->track_configuration)).c_str() << endl;
-		output << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race) ? "Time" : "Laps") << endl;
+		output << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || isTimedRace()) ? "Time" : "Laps") << endl;
 		printData(&output, "FuelAmount", gf->max_fuel);
 
 		printData(&output, "SessionTimeRemaining", getRemainingTime(timeLeft));
@@ -422,7 +426,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		if (getSession(sf->session, gf->session_state.phase_name) == "Practice")
 			printData(&output, "SessionLapsRemaining", 1000);
 		else
-			printData(&output, "SessionLapsRemaining", (gf->last_laptime_ms > 0) ? timeLeft / gf->last_laptime_ms : 99);
+			printData(&output, "SessionLapsRemaining", getRemainingLaps(timeLeft));
 	}
 
 	strcpy_s(result, size, output.str().c_str());

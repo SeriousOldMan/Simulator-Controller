@@ -139,6 +139,10 @@ inline const string getSession(int sessionType, string phaseName) {
 		return "Other";
 }
 
+inline bool isTimedRace() {
+	return !((SPageFileStaticEvo*)m_static.mapFileBuffer)->is_timed_race;
+}
+
 long getRemainingTime(long timeLeft);
 
 long getRemainingLaps(long timeLeft)
@@ -148,7 +152,7 @@ long getRemainingLaps(long timeLeft)
 
 	if (getSession(sf->session, gf->session_state.phase_name) != "Practice")
 	{
-		if (!sf->is_timed_race)
+		if (!isTimedRace())
 			return (gf->session_state.total_lap - gf->total_lap_count);
 		else
 		{
@@ -172,7 +176,7 @@ long getRemainingTime(long timeLeft)
 	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
 	SPageFileStaticEvo* sf = (SPageFileStaticEvo*)m_static.mapFileBuffer;
 
-	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race)
+	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || isTimedRace())
 	{
 		long time = (timeLeft - (gf->best_laptime_ms * gf->total_lap_count));
 
@@ -363,7 +367,7 @@ int main(int argc, char* argv[])
 		wcout << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		wcout << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		wcout << "Layout=" << normalizeName(getString(sf->track_configuration)).c_str() << endl;
-		wcout << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || sf->is_timed_race) ? "Time" : "Laps") << endl;
+		wcout << "SessionFormat=" << ((getSession(sf->session, gf->session_state.phase_name) == "Practice" || isTimedRace()) ? "Time" : "Laps") << endl;
 		printData(L"FuelAmount", gf->max_fuel);
 
 		printData(L"SessionTimeRemaining", getRemainingTime(timeLeft));
@@ -371,7 +375,7 @@ int main(int argc, char* argv[])
 		if (getSession(sf->session, gf->session_state.phase_name) == "Practice")
 			printData(L"SessionLapsRemaining", 1000);
 		else
-			printData(L"SessionLapsRemaining", (gf->last_laptime_ms > 0) ? timeLeft / gf->last_laptime_ms : 99);
+			printData(L"SessionLapsRemaining", getRemainingLaps(timeLeft));
 	}
 
 	dismiss(m_graphics);

@@ -444,6 +444,7 @@ int main(int argc, char* argv[])
 				wprintf_s(L"LapBestTime=%ld\n", (long)(normalize(map_buffer->lap_time_previous_self) * 1000));
 
 			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector));
+			wprintf_s(L"Running=%f\n", (float)map_buffer->lap_distance_fraction);
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
 			char* penalty = getPenalty(map_buffer->penalties);

@@ -2978,7 +2978,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						splitTime := A_TickCount
 					}
 
-					if getMultiMapValue(data, "Stint Data", "InPit", false) {
+					if (getMultiMapValue(data, "Stint Data", "InPit", false) && (dataLastLap > 0)) {
 						; Car is in the Pit
 
 						if !this.InPit {

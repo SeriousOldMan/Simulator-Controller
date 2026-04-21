@@ -155,8 +155,6 @@ namespace RF2SHMProvider {
 
 		public void ReadStandings()
 		{
-			ref rF2VehicleScoring playerVehicle = ref GetPlayerScoring(ref scoring);
-
 			Console.WriteLine("[Position Data]");
 
 			int index = 0;
@@ -328,6 +326,7 @@ namespace RF2SHMProvider {
                     Console.WriteLine("Penalty=true");
 
                 Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
+				Console.Write("Running="); Console.WriteLine(playerScoring.mLapDist / scoring.mScoringInfo.mLapDist);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
 				/*

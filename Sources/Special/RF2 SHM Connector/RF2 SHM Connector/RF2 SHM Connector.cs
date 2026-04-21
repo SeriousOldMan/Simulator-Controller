@@ -213,8 +213,7 @@ namespace SHMConnector {
 		public string ReadStandings()
 		{
 			StringWriter strWriter = new StringWriter();
-            ref rF2VehicleScoring playerVehicle = ref GetPlayerScoring(ref scoring);
-
+            
             strWriter.WriteLine("[Position Data]");
 
 			if (connected)
@@ -400,6 +399,9 @@ namespace SHMConnector {
 					strWriter.WriteLine("Penalty=true");
 
 				strWriter.Write("Sector="); strWriter.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
+
+				strWriter.Write("Running="); strWriter.WriteLine(playerScoring.mLapDist / scoring.mScoringInfo.mLapDist);
+                    
 				strWriter.Write("Laps="); strWriter.WriteLine(playerScoring.mTotalLaps);
 
 				long time = GetRemainingTime(ref playerScoring);

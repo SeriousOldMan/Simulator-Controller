@@ -1093,8 +1093,11 @@ void writeData(std::ostringstream * output, const irsdk_header *header, const ch
 			if (!getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 				trackLocations = 0;
 
-			if (trackPositions)
+			if (trackPositions) {
 				printLine(output, "Sector=" + std::to_string((int)min(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)]))));
+				
+				printLine(output, "Running=" + std::to_string(((float*)trackPositions)[atoi(playerCarIdx)]));
+			}
 
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
 				printLine(output, "Position=" + std::string(result));

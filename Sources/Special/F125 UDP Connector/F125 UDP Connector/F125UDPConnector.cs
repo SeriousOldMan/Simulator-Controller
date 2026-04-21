@@ -431,8 +431,10 @@ namespace F125UDPConnector
 
                 previousLap = lap;
             }
-
+					
             sb.AppendFormat("Sector={0}\n", I(playerLap.Sector + 1));
+            sb.AppendFormat("Runninig={0}\n", F((session.TrackLength > 0) ?
+													Math.Max(0, Math.Min(1, playerLap.LapDistance / session.TrackLength)) : 0));
             sb.AppendFormat("Laps={0}\n", I(lap));
 
             /*

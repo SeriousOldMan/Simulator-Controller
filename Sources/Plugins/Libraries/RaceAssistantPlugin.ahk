@@ -2988,7 +2988,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 							this.sInPit := dataLastLap
 
-							if (this.Simulator.Simulator[true] != "Assetto Corsa Competizione")
+							if !inList(["Assetto Corsa Competizione", "Assetto Corsa EVO"], this.Simulator.Simulator[true])
 								skip := (A_TickCount + 60000)
 						}
 					}

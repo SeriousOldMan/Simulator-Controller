@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.3.0-dev]() (Early build for 6.9.3. Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
+[6.9.3.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/9rfvzxOH/Releases/Simulator%20Controller%206.9.3.0-alpha.zip) (Test build for 6.9.3. Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6930) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-693) of this version and all the versions you might have skipped, before installing and using this version.
 

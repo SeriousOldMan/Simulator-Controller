@@ -403,6 +403,7 @@ namespace ACSHMProvider
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
             Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
+            Console.WriteLine("Running=" + cars.cars[0].splinePosition);
             Console.WriteLine("Laps=" + graphics.CompletedLaps);
 
             Console.WriteLine("LapValid=true");

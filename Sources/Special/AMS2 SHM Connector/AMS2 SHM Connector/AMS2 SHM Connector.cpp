@@ -430,6 +430,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "LapBestTime=", (long)(normalize(localCopy->mLastLapTime) * 1000));
 
 		printLine(&output, "Sector=", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mCurrentSector + 1));
+		printLine(&output, "Running=", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mCurrentLapDistance / localCopy->mTrackLength));
 		printLine(&output, "Laps=", (long)normalize(localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted));
 
 		long timeRemaining = getRemainingTime(localCopy);

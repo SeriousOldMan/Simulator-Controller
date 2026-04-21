@@ -1126,8 +1126,11 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			if (!getRawDataValue(trackLocations, header, data, "CarIdxTrackSurface"))
 				trackLocations = 0;
 
-			if (trackPositions)
+			if (trackPositions) {
 				printf("Sector=%d\n", (int)min(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)])));
+				
+				printf("Running=%f\n", ((float*)trackPositions)[atoi(playerCarIdx)]);
+			}
 
 			if (getDataValue(result, header, data, "PlayerCarPosition"))
 				printf("Position=%d\n", atoi(result));

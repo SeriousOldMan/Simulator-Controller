@@ -618,6 +618,7 @@ namespace SHMConnector
                 strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
             
                 strWriter.WriteLine("Sector=" + (Math.Min(graphics.CurrentSectorIndex, 2) + 1));
+                strWriter.WriteLine("Running=" + cars.cars[0].splinePosition);
                 strWriter.WriteLine("Laps=" + graphics.CompletedLaps);
 
                 strWriter.WriteLine("LapValid=true");

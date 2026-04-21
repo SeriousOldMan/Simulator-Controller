@@ -2978,7 +2978,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						splitTime := A_TickCount
 					}
 
-					if getMultiMapValue(data, "Stint Data", "InPit", false) {
+					if (getMultiMapValue(data, "Stint Data", "InPit", false) && (dataLastLap > 0)) {
 						; Car is in the Pit
 
 						if !this.InPit {
@@ -2988,7 +2988,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 							this.sInPit := dataLastLap
 
-							if (this.Simulator.Simulator[true] != "Assetto Corsa Competizione")
+							if !inList(["Assetto Corsa Competizione", "Assetto Corsa EVO"], this.Simulator.Simulator[true])
 								skip := (A_TickCount + 60000)
 						}
 					}

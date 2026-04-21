@@ -516,6 +516,9 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeIntOption(result, "LapBestTime=", (long)(normalize(map_buffer->lap_time_previous_self) * 1000), &pos);
 
 			writeIntOption(result, "Sector=", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector), &pos);
+			
+			writeFloatOption(result, "Running=", (float)map_buffer->lap_distance_fraction, &pos);
+				
 			writeIntOption(result, "Laps=", (long)normalize(map_buffer->completed_laps), &pos);
 
 			char* penalty = getPenalty(map_buffer->penalties);

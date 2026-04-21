@@ -289,6 +289,7 @@ namespace PMRUDPConnector
             sb.AppendFormat("LapLastTime={0}\n", sampledLastLapTime > 0 ? I(sampledLastLapTime * 1000) : I(playerState.BestLapTime * 1000));
             sb.AppendFormat("LapBestTime={0}\n", I(playerState.BestLapTime * 1000));
             sb.AppendFormat("Sector={0}\n", Math.Min(playerState.CurrentSector, 2) + 1);
+			sb.AppendFormat("Running={0}\n", F(participants[playerIndex].LapProgress));
             sb.AppendFormat("Laps={0}\n", Math.Max(0, playerState.CurrentLap - 1));
             sb.AppendFormat("StintTimeRemaining={0}\n", L(GetRemainingTime()));
             sb.AppendFormat("DriverTimeRemaining={0}\n", L(GetRemainingTime()));

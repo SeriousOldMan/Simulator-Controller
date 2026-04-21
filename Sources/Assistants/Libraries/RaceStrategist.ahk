@@ -2144,7 +2144,8 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if (shutdown && review && this.RaceReview && (this.Session = kSessionRace)
 						 && (lastLap > this.LearningLaps)
-						 && (knowledgeBase.getValue("Lap.Penalty", false) != "DSQ")) {
+						 && (knowledgeBase.getValue("Lap.Penalty", false) != "DSQ")
+						 && (knowledgeBase.getValue("Car.Count", 0) > 0)) {
 				this.finishSessionWithReview(shutdown)
 
 				return
@@ -2165,7 +2166,8 @@ class RaceStrategist extends GridRaceAssistant {
 						if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-						else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
+						else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)
+						 && (knowledgeBase.getValue("Car.Count", 0) > 0))
 							this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
 						else if ((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
@@ -2177,7 +2179,8 @@ class RaceStrategist extends GridRaceAssistant {
 						  || (this.CollectLaps && (this.SaveTelemetry = kAsk) && this.HasLapsData))
 						 && ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)))
 							this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-						else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace))
+						else if ((this.SaveRaceReport = kAsk) && (this.Session == kSessionRace)
+						 && (knowledgeBase.getValue("Car.Count", 0) > 0))
 							this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
 						else if (((this.SaveSettings = kAsk) && (this.Session == kSessionRace))
 							  || (this.CollectLaps && (this.SaveTelemetry = kAsk) && this.HasLapsData))
@@ -2253,7 +2256,7 @@ class RaceStrategist extends GridRaceAssistant {
 					this.saveSessionSettings()
 
 			if (((phase = "After") && (this.SaveRaceReport = kAsk) && confirmed) || ((phase = "Before") && (this.SaveRaceReport = kAlways)))
-				if (this.Session == kSessionRace) {
+				if ((this.Session == kSessionRace) && (this.KnowledgeBase.getValue("Car.Count", 0) > 0)) {
 					reportSaved := true
 
 					this.createRaceReport()

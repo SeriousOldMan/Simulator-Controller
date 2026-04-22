@@ -44,65 +44,65 @@ Abaixo você encontrará uma lista completa de todos os comandos de voz reconhec
 
 #### Predefined Choices
 
-TellMe=Você poderia me contar, Por favor me conte, Conte-me, Você pode me dar, Por favor me dê, Me dê
+TellMe=Você pode me dizer, Você pode me falar, Por favor me diga, Por favor me fale, Diga-me, Me diga, Me fala, Você pode me dar, Por favor me dê, Me dê
 
-WhatAre=Conte-me, O que são
+WhatAre=Diga-me, Me diga, Me dê, Quais são, Quais são os
 
-WhatIs=Conte-me, O que é, Fale sobre
+WhatIs=Diga-me, Me diga, Me dê, O que é, Qual é
 
-CanYou=Você pode
+CanYou=Você pode, Pode, Podemos, Por favor
 
-CanWe=Podemos
+CanWe=Você pode, Pode, Podemos, Por favor
 
-Information=informações da sessão, informações do stint, informações de manuseio
+Information=informações da sessão, informações do stint, informações de pilotagem
 
 #### Comandos
 
 1. Conversação
 
-   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre por favor]
+   [{Oi, Ei, Olá} %name%, %name% você me ouve, %name% está me ouvindo, %name% preciso de você, %name% onde você está, %name% responde por favor, %name% fala comigo]
 
-   [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
+   [Sim {por favor, claro}, {Sim, Perfeito} continue, {Pode, Ok} {continuar, continuar por favor, seguir, seguir por favor}, Pode falar, Prossiga, Concordo, Certo, Correto, Confirmado, Eu confirmo, Afirmativo]
 
-   [Não {obrigado, não agora, eu vou te ligar mais tarde}, Não no momento, Negativo]
+   [Não {obrigado, não agora, eu te chamo mais tarde}, Agora não, Não no momento, Negativo]
 
-   [(CanYou) contar uma piada, Você tem uma piada para mim]
+   [(CanYou) me contar uma piada, Você tem uma piada para mim, (CanYou) me dizer uma piada]
 
-   [Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Eu {preciso, devo} focar agora]
+   [Cale-se, Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Preciso focar agora, Eu {preciso, devo} focar agora]
 
-   [Ok você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
+   [Ok, você pode falar, Tudo bem, pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}, Pode voltar a falar]
 
-   [Por favor sem mais (Information), Sem mais (Information), Sem mais (Information) por favor]
+   [{Por favor, ignore, Ignore} (Information), {Por favor, não considere, Não considere} mais (Information), Sem mais (Information), Sem mais (Information) por favor]
 
-   [Por favor me dê (Information), Você pode me dar (Information), Você pode me dar (Information) por favor, Me dê (Information), Me dê (Information) por favor]
+   [{Por favor, considere, Considere} (Information) novamente, {Por favor, volte a considerar, Volte a considerar} (Information), {Por favor, me dê, Me dê} (Information), Leve (Information) em {consideração, conta}]
 
 2. Informação
 
-   [(TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
+   [(TellMe) o horário, (TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
 	
 3. Treinamento
 
-   [(CanYou) dar-me {um, um treinamento}, (CanWe) corra uma sessão de {treinamento, treinamento, prática, prática}, (CanYou) {ajudar, me ajudar} com {o, meu} {treinamento, prática}, (CanYou) {observar meu, meu} {treinamento, condução}, (CanYou) {verificar, assistir} {minha, minha técnica} de condução, (CanWe) melhorar minhas capacidades de condução]
+   [(CanYou) me dar {treinamento, coaching, uma sessão de coaching}, (CanWe) fazer uma sessão de {coaching, treino, prática}, (CanYou) {me ajudar, ajudar} com {o meu treino, a minha prática, a minha pilotagem}, (CanYou) {observar, acompanhar} {o meu treino, a minha prática, a minha pilotagem}, (CanYou) {avaliar, observar} a minha técnica de pilotagem, (CanWe) melhorar minhas habilidades de pilotagem]
 
-   [Obrigado {pela sua ajuda, eu aprendi muito, isso foi ótimo}, Isso foi ótimo obrigado, Ok já chega por hoje]
+   [Obrigado {pela ajuda, aprendi muito, isso foi ótimo}, Isso foi ótimo, obrigado, Ok, já chega por hoje, Por hoje já está bom]
 
-   [(CanYou) me dê {uma visão geral, uma visão geral curva por curva, uma visão geral volta por volta, uma visão geral da volta inteira, uma visão completa, uma visão completa curva por curva}, {Por favor, dê, Dê} uma olhada na pista completa, Onde posso melhorar na pista]
-   
-   [{Obrigado agora, Agora} quero me concentrar, {Ok, deixe} eu {aplicar, tentar} {suas recomendações, suas instruções, isso} agora, {Por favor, pare} de me dar {recomendações, dicas, instruções, recomendações para cada curva, recomendações para cada volta, dicas para cada curva, dicas para cada volta, instruções para cada curva, instruções para cada volta}, {Por favor, não} de mais {instruções, instruções por favor}]
+   [(CanYou) me dar {uma visão geral, uma visão geral curva por curva, uma visão geral da volta inteira, uma visão completa, uma visão completa curva por curva}, {Por favor, dê, Dê} uma olhada na {volta completa, pista toda}, Onde posso melhorar na pista]
 
-   [(CanYou) me dê {recomendações, dicas, instruções} {enquanto eu estiver dirigindo, para cada curva, para cada volta}, {Diga por favor} {antes de, para} cada {curva, volta} o que eu {posso, devo} mudar, (CanYou) treinar-me {na pista, enquanto eu estiver dirigindo, enquanto estiver dirigindo}]
+   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor, dê, Dê} uma {olhada mais de perto, olhada} na {curva, curva número} (Number), Onde posso melhorar na {curva, curva número} (Number), O que devo considerar na {curva, curva número} (Number), O que devo observar na {curva, curva número} (Number)]
 
-   [(CanWe) {focar em, praticar} {curva, curva número} (Número), Vamos {focar em, praticar} {curva, curva número} (Número), (CanYou) me dê {recomendações, dicas, um guia, instruções} para {curva, curva número} (Número)]
-   
+   [(CanYou) me dar {recomendações, dicas, instruções, orientação} {enquanto eu estiver dirigindo, durante a pilotagem, para cada curva}, {Por favor, me diga, Diga} {antes de, para} cada {curva, trecho} o que eu {posso, devo} mudar, (CanYou) me treinar {na pista, enquanto eu estiver dirigindo, durante a pilotagem}]
+
    [(CanYou) me dizer onde estão os pontos de frenagem, {Por favor, me diga, Diga} onde frear, (CanWe) praticar {frenagem, pontos de frenagem}]
 
-   [(CanWe) {focar na, falar sobre a} {curva número, curva} (Number), {Por favor dê uma, Por favor dê} {olhada mais de perto, olhada} na {curva, curva número, volta, volta número} (Number), Onde posso melhorar na {curva, curva número, volta, volta número} (Number), O que devo considerar {na} {curva, curva número, volta, volta número} (Number), O que devo procurar na {curva, curva número, volta, volta número} (Number)]
+   [{Obrigado, Agora} quero focar, {Ok, Deixa} eu {aplicar, testar} {suas recomendações, suas instruções, isso} agora, {Por favor, pare, Pare} de me dar {recomendações, dicas, instruções, recomendações para cada curva, dicas para cada curva, instruções para cada curva}, {Por favor, sem, Sem} mais {instruções, instruções por favor}]
 
-   [(CanWe) utilizar a {volta mais rápida, última volta} como {referência, volta de referência}, {Please use, Use} a {volta mais rápida, última volta} como {referência, volta de referência}]
+   [(CanWe) usar a volta {mais rápida, última} como {referência, volta de referência}, {Por favor, use, Use} a volta {mais rápida, última} como {referência, volta de referência}]
 
-   [{Por favor} não utilizar uma referência da {volta}]
+   [{Por favor, não, Não} usar volta de {referência, referência por favor}]
 
-   [(CanWe) {focar, focar novamente} em todo o percurso, Vamos {focar, focar novamente} em toda a faixa]
+   [(CanWe) {focar na, praticar a} {curva, curva número} (Number), Vamos {focar na, praticar a} {curva, curva número} (Number), (CanYou) me dar {recomendações, dicas, instruções, orientação} para a {curva, curva número} (Number)]
+
+   [(CanWe) {focar, voltar a focar} na pista toda, Vamos {focar, voltar a focar} na pista toda]
 
 #### Conversa
 

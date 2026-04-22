@@ -44,76 +44,76 @@ Abaixo você encontrará uma lista completa de todos os comandos de voz reconhec
 
 #### Predefined Choices
 
-TellMe=Você poderia me contar, Por favor me conte, Conte-me, Você pode me dar, Por favor me dê, Me dê
+TellMe=Você pode me dizer, Você pode me falar, Por favor me diga, Por favor me fale, Diga-me, Me diga, Me fala, Você pode me dar, Por favor me dê, Me dê
 
-WhatAre=Conte-me, O que são
+WhatAre=Diga-me, Me diga, Me dê, Quais são, Quais são os
 
-WhatIs=Conte-me, O que é, Fale sobre
+WhatIs=Diga-me, Me diga, Me dê, O que é, Qual é
 
-CanYou=Você pode
+CanYou=Você pode, Pode, Podemos, Por favor
 
-CanWe=Podemos
+CanWe=Você pode, Pode, Podemos, Por favor
 
-Announcements=informações delta, aconselhamento tático, alertas laterais, alertas traseiros, avisos de bandeira azul, avisos de bandeira amarela, avisos de corte, informações de penalidade, avisos de carro lento, avisos de acidentes à frente, informações de acidentes atrás
+Announcements=informações de delta, conselhos táticos, alertas laterais, alertas traseiros, avisos de bandeira azul, avisos de bandeira amarela, avisos de corte, informações de penalidade, avisos de carro lento, avisos de acidentes à frente, informações de acidentes atrás
 
 #### Commands
 
 1. Conversation
 
-   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre por favor]
+   [{Oi, Ei, Olá} %name%, %name% você me ouve, %name% está me ouvindo, %name% preciso de você, %name% onde você está, %name% responde por favor, %name% fala comigo]
 
-   [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
+   [Sim {por favor, claro}, {Sim, Perfeito} continue, {Pode, Ok} {continuar, continuar por favor, seguir, seguir por favor}, Pode falar, Prossiga, Concordo, Certo, Correto, Confirmado, Eu confirmo, Afirmativo]
 
-   [Não {obrigado, não agora, eu vou te ligar mais tarde}, Não no momento, Negativo]
+   [Não {obrigado, não agora, eu te chamo mais tarde}, Agora não, Não no momento, Negativo]
 
-   [(CanYou) contar uma piada, Você tem uma piada para mim]
+   [(CanYou) me contar uma piada, Você tem uma piada para mim, (CanYou) me dizer uma piada]
 
-   [Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Eu {preciso, devo} focar agora]
+   [Cale-se, Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Preciso focar agora, Eu {preciso, devo} focar agora]
 
-   [Ok você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
+   [Ok, você pode falar, Tudo bem, pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}, Pode voltar a falar]
 
-   [Por favor sem mais (Announcements), Sem mais (Announcements), Sem mais (Announcements) por favor]
+   [Por favor, sem mais (Announcements), Sem mais (Announcements), Chega de (Announcements), Sem mais (Announcements) por favor]
 
-   [Por favor me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor]
+   [Por favor, me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor, Volte a me dar (Announcements)]
 
 2. Informação
 
-   [(TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
+   [(TellMe) o horário, (TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
 
-   [(WhatIs) {minha} posição, (TellMe) {minha} minha posição]
+   [(WhatIs) {a minha posição, minha posição, minha posição de corrida, minha posição atual}, (TellMe) {a minha posição, minha posição, minha posição de corrida, minha posição atual}]
 
-   [(TellMe) o gap para o {carro à frente, próximo carro}, (WhatIs) o gap para o {carro à frente, próximo carro}, Qual é diferença para o {carro à frente, próximo carro}]
+   [(TellMe) a diferença para o {carro da frente, carro à frente, carro seguinte, próximo carro, posição à frente}, (WhatIs) a diferença para o {carro da frente, carro à frente, carro seguinte, próximo carro, posição à frente}, Qual é a diferença para o {carro da frente, carro à frente, carro seguinte, próximo carro, posição à frente}]
+ 
+   [(TellMe) a diferença para {o carro atrás, o carro atrás de mim, a posição atrás de mim, o carro de trás}, (WhatIs) a diferença para {o carro atrás, o carro atrás de mim, a posição atrás de mim, o carro de trás}, Qual é a diferença para {o carro atrás, o carro atrás de mim, a posição atrás de mim, o carro de trás}]
 
-   [(TellMe) o gap para {o carro atrás de mim, a posição atrás de mim, o carro anterior}, (WhatIs) o gap para {o carro atrás de mim, a posição atrás de mim, o carro anterior}, Qual é diferença para {o carro atrás de mim, a posição atrás de mim, o carro anterior}]
+   [(TellMe) a diferença para o {carro líder, líder}, (WhatIs) a diferença para o {carro líder, líder}, Qual é a diferença para o {carro líder, líder}]
 
-   [(TellMe) o gap para o {carro líder, líder}, (WhatIs) o gap para o the {carro líder, líder}, Qual é diferença para o {carro líder, líder}]
+   [(TellMe) a diferença para o {carro, carro número, número} (Number), (WhatIs) a diferença para o {carro, carro número, número} (Number), Qual é a diferença para o {carro, carro número, número} (Number)]
 
-   [(TellMe) o gap para o {carro, carro número, número} (Number), (WhatIs) o gap para o {carro, carro número, número} (Number), Qual a dimensão da diferença para {carro, carro número, número} (Number)]
+   [(TellMe) o {nome do piloto, nome do piloto à frente, piloto do carro} à frente, (WhatIs) o {nome do piloto, nome do piloto à frente, piloto do carro} à frente]
 
-   [(TellMe) o {nome do piloto, piloto do carro} adiante, (WhatIs) o {nome do piloto, piloto do carro} adiante]
+   [(TellMe) o {nome do piloto, nome do piloto atrás, piloto do carro} atrás, (WhatIs) o {nome do piloto, nome do piloto atrás, piloto do carro} atrás]
 
-   [(TellMe) o {nome do piloto, piloto do carro} atrás, (WhatIs) o {nome do piloto, piloto do carro} atrás]
+   [(TellMe) a {classe do carro, categoria do carro} à frente, (WhatIs) a {classe do carro, categoria do carro} à frente]
 
-   [(TellMe) a {classe do carro} adiante, (WhatIs) a {classe do carro} adiante]
+   [(TellMe) a {classe do carro, categoria do carro} atrás, (WhatIs) a {classe do carro, categoria do carro} atrás]
 
-   [(TellMe) a {class of the car} atrás, (WhatIs) a {class of the car} atrás]
+   [(TellMe) a {categoria da copa do carro, categoria de copa do carro, copa do carro} à frente, (WhatIs) a {categoria da copa do carro, categoria de copa do carro, copa do carro} à frente]
 
-   [(TellMe) a {categoria de copa do carro, copa do carro} adiante, (WhatIs) a {categoria de copa do carro, copa do carro} adiante]
+   [(TellMe) a {categoria da copa do carro, categoria de copa do carro, copa do carro} atrás, (WhatIs) a {categoria da copa do carro, categoria de copa do carro, copa do carro} atrás]
 
-   [(TellMe) o {categoria de copa do carro, copa do carro} atrás, (WhatIs) a {categoria de copa do carro, copa do carro} atrás]
+   [(TellMe) o tempo da {volta atual, última volta, volta} do {carro, carro número, número} (Number), (WhatIs) o tempo da {volta atual, última volta, volta} do {carro, carro número, número} (Number)]
 
-   [(TellMe) a {volta atual, última volta, volta} o tempo do {carro, número do carro, número} (Number), (WhatIs) a {volta atual, última volta, volta} tempo da {volta atual, última volta, volta} do carro (Number)]
+   [(TellMe) o tempo da {volta atual, última volta, volta} da posição (Number), (WhatIs) o tempo da {volta atual, última volta, volta} da posição (Number)]
 
-   [(TellMe) a {volta atual, última volta, volta} o tempo de posição (Number), (WhatIs) a {volta atual, última volta, volta} tempo da posição (Number)]
+   [(TellMe) {o meu, meu, o} tempo de {volta atual, última volta, volta}, (WhatIs) {o meu, meu, o} tempo de {volta atual, última volta, volta}]
 
-   [(TellMe) {o, meu} tempo de {volta atual, última volta, volta}, (WhatIs) {o, meu} tempo de {volta}]
-
-   [(TellMe) a {volta atual, volta} os tempos, (WhatAre) a {volta atual, volta} tempos]
+   [(TellMe) os tempos de {volta atual, volta}, (WhatAre) os tempos de {volta atual, volta}]
 
    [(TellMe) o número de {carros, carros na pista, carros na sessão, carros ativos, carros ainda ativos}, (WhatAre) o número de {carros, carros na pista, carros na sessão}, Quantos carros {estão, ainda estão} {ativos, na pista, na sessão}]
 
-   [(TellMe) quantas {vezes} {carro, carro número, número} (Number) {entra, foi} nos boxes, Quantas paradas nos boxes tem o {carro, carro número, número} (Number), Com que frequência o {carro, carro número, número} (Number) esteve nos boxes]
+   [(TellMe) quantas {vezes, paradas} o {carro, carro número, número} (Number) {entrou nos boxes, foi aos boxes}, Quantas paradas nos boxes tem o {carro, carro número, número} (Number), Com que frequência o {carro, carro número, número} (Number) esteve nos boxes]
    
-   [(CanYou) {focar em, observe} {carro, carro número, número} (Number), (CanYou) dar mais informações sobre {carro, carro número, número} (Number)]
+   [(CanYou) {focar no, focar em, observar} {carro, carro número, número} (Number), (CanYou) me dar {mais informações, informação} sobre {carro, carro número, número} (Number), (CanYou) acompanhar {o carro, o carro número, o número} (Number)]
 
-   [Por favor, não há mais informações sobre {carro, carro número, número} (Number), Pare de relatar sobre {carro, carro número, número} (Number) por favor]
+   [Por favor, sem mais informações sobre {carro, carro número, número} (Number), Pare de relatar sobre {carro, carro número, número} (Number) por favor, Não quero mais informações sobre {carro, carro número, número} (Number)]

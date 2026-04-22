@@ -16,7 +16,7 @@ Simulator Controller today supports multiple different languages for the user in
 - Jose Krilin (@jkrilin) and @alejandrocq for the Spanish translation
 - @SlatMars for the French translation
 - Diego Falcone (@Diego Falcone Dev_Dk HawkOne) for the Italien translation
-- @Hudson Alves for the Portuguese translation
+- @Hudson Alves and @Jimmy Sant'ana for the Portuguese translation
 - @rysimabd for the Chinese translation
 - @PAL2000 for the Japanese translation
 

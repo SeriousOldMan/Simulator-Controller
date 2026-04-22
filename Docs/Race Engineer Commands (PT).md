@@ -44,15 +44,15 @@ Abaixo você encontrará uma lista completa de todos os comandos de voz reconhec
 
 #### Predefined Choices
 
-TellMe=Você poderia me contar, Por favor me conte, Conte-me, Você pode me dar, Por favor me dê, Me dê
+TellMe=Você pode me dizer, Você pode me falar, Por favor me diga, Por favor me fale, Diga-me, Me diga, Me fala, Você pode me dar, Por favor me dê, Me dê
 
-WhatAre=Conte-me, O que são
+WhatAre=Diga-me, Me diga, Me dê, Quais são, Quais são os
 
-WhatIs=Conte-me, O que é, Fale sobre
+WhatIs=Diga-me, Me diga, Me dê, O que é, Qual é
 
-CanYou=Você pode
+CanYou=Você pode, Pode, Podemos, Por favor
 
-CanWe=Podemos
+CanWe=Você pode, Pode, Podemos, Por favor
 
 Announcements=avisos de combustível, avisos de desgaste dos pneus, avisos de desgaste do freio, avisos de danos, análise de danos, atualizações meteorológicas, avisos de pressão
 
@@ -60,57 +60,57 @@ Announcements=avisos de combustível, avisos de desgaste dos pneus, avisos de de
 
 1. Conversation
 
-   [{Hi, Hey} %name%, %name% Esta me ouvindo?, %name% Eu preciso de você, %name% Estou em casa, %name% Entre por favor]
+   [{Oi, Ei, Olá} %name%, %name% você me ouve, %name% está me ouvindo, %name% preciso de você, %name% onde você está, %name% responde por favor, %name% fala comigo]
 
-   [Sim {por favor, claro}, {perfeito prossiga, prossiga}, {Vai, Ok vai} {sobre, por favor, à frente}, Concordo, Certo, Correto, Confirmado, Confirmo, Afirmativo]
+   [Sim {por favor, claro}, {Sim, Perfeito} continue, {Pode, Ok} {continuar, continuar por favor, seguir, seguir por favor}, Pode falar, Prossiga, Concordo, Certo, Correto, Confirmado, Eu confirmo, Afirmativo]
 
-   [Não {obrigado, não agora, eu vou te ligar mais tarde}, Não no momento, Negativo]
+   [Não {obrigado, não agora, eu te chamo mais tarde}, Agora não, Não no momento, Negativo]
 
-   [(CanYou) contar uma piada, Você tem uma piada para mim]
+   [(CanYou) me contar uma piada, Você tem uma piada para mim, (CanYou) me dizer uma piada]
 
-   [Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Eu {preciso, devo} focar agora]
+   [Cale-se, Silêncio por favor, Fique quieto por favor, Preciso me concentrar, Preciso focar agora, Eu {preciso, devo} focar agora]
 
-   [Ok você pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}]
+   [Ok, você pode falar, Tudo bem, pode falar, Posso ouvir {agora, de novo}, Você pode falar {agora, de novo}, Mantenha-me {informado, atualizado, a par}, Pode voltar a falar]
 
-   [Por favor sem mais (Announcements), Sem mais (Announcements), Sem mais (Announcements) por favor]
+   [Por favor, sem mais (Announcements), Sem mais (Announcements), Chega de (Announcements), Sem mais (Announcements) por favor]
 
-   [Por favor me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor]
+   [Por favor, me dê (Announcements), Você pode me dar (Announcements), Você pode me dar (Announcements) por favor, Me dê (Announcements), Me dê (Announcements) por favor, Volte a me dar (Announcements)]
 
 2. Informação
 
-   [(TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
+   [(TellMe) o horário, (TellMe) as horas, Que horas são, Qual é o {horário atual, horário}]
 
-   [(WhatAre) {as temperaturas do motor, as temperaturas atuais do motor}, (TellMe) {as temperaturas do motor, as temperaturas atuais do motor}]
+   [(WhatAre) {as temperaturas do motor, as temperaturas atuais do motor}, (TellMe) {as temperaturas do motor, as temperaturas atuais do motor}, Quais são as temperaturas do motor]
 
-   [(WhatAre) {as, as frias, as de configuração, as atuais} {pressões dos pneus, pressões}, (TellMe) {as, as frias, as de configuração, as atuais} {pressões dos pneus, pressões}]
+   [(WhatAre) {as pressões dos pneus, as pressões, as pressões atuais dos pneus, as pressões de acerto, as pressões frias}, (TellMe) {as pressões dos pneus, as pressões, as pressões atuais dos pneus, as pressões de acerto, as pressões frias}]
 
    [(WhatAre) {as temperaturas dos pneus, as temperaturas atuais dos pneus, as temperaturas no momento}, (TellMe) {as temperaturas dos pneus, as temperaturas atuais dos pneus, as temperaturas no momento}]
 
-   [{Verifique, Por favor verifique} {o desgaste dos pneus, o desgaste dos pneus no momento}, (TellMe) {o desgaste dos pneus, o desgaste dos pneus no momento}]
+   [{Verifique, Por favor verifique, Cheque} {o desgaste dos pneus, o desgaste atual dos pneus}, (TellMe) {o desgaste dos pneus, o desgaste atual dos pneus}]
 
    [(WhatAre) {as temperaturas dos freios, as temperaturas atuais dos freios, as temperaturas dos freios no momento}, (TellMe) {as temperaturas dos freios, as temperaturas atuais dos freios, as temperaturas dos freios no momento}]
 
-   [{Verifique, Por favor verifique} {o desgaste dos freios, o desgaste dos freios no momento}, (TellMe) {o desgaste dos freios, o desgaste dos freios no momento}]
+   [{Verifique, Por favor verifique, Cheque} {o desgaste dos freios, o desgaste atual dos freios}, (TellMe) {o desgaste dos freios, o desgaste atual dos freios}]
 
-   [(TellMe) as voltas restantes, Quantas voltas faltam, Quantas voltas restam, Quantas voltas para o fim, Quanto falta para o fim]
+   [(TellMe) as voltas restantes, Quantas voltas restam, Quantas voltas faltam, Quantas voltas faltam para acabar, Quanto falta]
 
-   [Quanto {gasolina, combustível} resta, Quanto {gasolina, combustível} ainda tem, (TellMe) o restante {gasolina, combustível}, (WhatIs) o restante {gasolina, combustível}]
-
-   [E o clima, vai chover à frente, a qualquer momento, mudanças climáticas à vista, (CanYou) verifique o {clima, clima por favor}]
+   [Quanto {combustível, gasolina} resta, Quanto {combustível, gasolina} {tem no tanque, ainda tem}, (TellMe) o {combustível restante, combustível}, (WhatIs) o {combustível restante, combustível}]
+   
+   [E o tempo, Como está o tempo, Vai chover mais à frente, {Há alguma, Existem} mudanças no tempo à vista, (CanYou) verificar o {tempo, tempo por favor}]
 
 3. Pitstop
 
-   [(CanWe) {otimizar, recalcular, calcular} a proporção de combustível, (CanWe) otimizar a quantidade de combustível, (CanWe) otimizar o reabastecimento de energia]
+   [(CanWe) {otimizar, recalcular, calcular} a quantidade de combustível, (CanWe) otimizar o reabastecimento, (CanWe) otimizar a quantidade para abastecer]
 
-   [(CanWe) {planejar a parada, criar um plano para a parada, criar um plano de parada, elaborar um plano de parada}]
+   (CanWe) {planejar a parada, criar um plano para a parada, criar um plano de parada, montar um plano de parada}
 
-   [(CanWe) {planejar a troca de motorista, criar um plano para a troca de motorista, criar um plano de troca de motorista, elaborar um plano de troca de motorista}]
+   (CanWe) {planejar a troca de piloto, criar um plano para a troca de piloto, criar um plano de troca de piloto, montar um plano de troca de piloto}
 
-   [(CanWe) {preparar a parada, deixar a equipe preparar a parada, configurar tudo para a parada}]
+   (CanWe) {preparar a parada, deixar a equipe preparar a parada, deixar tudo pronto para a parada}
 
-   [(CanWe) {reabastecer, reabastecer até} (Number) {litros, galões}, Precisamos de {reabastecer, reabastecer até} (Number) {litros, galões}]
+   [(CanWe) {reabastecer, reabastecer até} (Number) {litros, galões}, Precisamos {reabastecer, reabastecer até} (Number) {litros, galões}]
 
-   [(CanWe) {usar, trocar para} pneus molhados, {Can we, Please} {usar, trocar para} pneus secos, {Can we, Please} {usar, trocar para} pneus intermediários]
+   [(CanWe) {usar, trocar para} pneus de chuva, (CanWe) {usar, trocar para} pneus secos, (CanWe) {usar, trocar para} pneus intermediários]
 
    [(CanWe) aumentar {frente esquerda, frente direita, traseira esquerda, traseira direita, todos} por (Digit) {ponto, vírgula} (Digit), (Digit) {ponto, vírgula} (Digit) mais pressão para {o pneu dianteiro esquerdo, o pneu dianteiro direito, o pneu traseiro esquerdo, o pneu traseiro direito, todos os pneus}]
 
@@ -118,14 +118,14 @@ Announcements=avisos de combustível, avisos de desgaste dos pneus, avisos de de
 
    [(CanWe) deixar a {pressão dos pneus, pressão} inalterada, (CanWe) deixar a {pressão dos pneus, pressão} como está, (CanWe) deixar as {pressões dos pneus, pressões} inalteradas, (CanWe) {deixar, manter} as {pressões dos pneus, pressões} como estão]
 
-   [(CanWe) {deixar, manter} os pneus do carro, {Please} não mudar os pneus, (CanWe) {deixar, manter} os pneus inalterados, Não mudar os pneus, por favor]
+   [(CanWe) {deixar, manter} os pneus no carro, Por favor não trocar os pneus, (CanWe) {deixar, manter} os pneus inalterados, Sem troca de pneus por favor]
 
-   [(CanWe) reparar a suspensão, {Please} não reparar a suspensão]
+   [(CanWe) reparar a suspensão, Por favor não reparar a suspensão]
 
-   [(CanWe) reparar a carroçaria, {Please} não reparar a carroçaria]
+   [(CanWe) reparar a carroceria, Por favor não reparar a carroceria]
 
-   [(CanWe) reparar o motor, {Please} não reparar o motor]
+   [(CanWe) reparar o motor, Por favor não reparar o motor]
 
-   [(CanWe) compensar a perda de {pressão dos pneus, pressão}, {Favor compensar, Compensar} a perda de {pressão dos pneus, pressão} dos pneus]
+   [(CanWe) compensar a perda de {pressão dos pneus, pressão}, {Por favor compense, Compense} a perda de {pressão dos pneus, pressão}, {Leve, Por favor leve} a perda de {pressão dos pneus, pressão} em {consideração, conta}]
 
-   [{Não, Favor não} {compensar} a perda de {pressão dos pneus, pressão} dos pneus, Sem mais compensação para perda de {pressão dos pneus, pressão}]
+   [{Não, Por favor não} compensar a perda de {pressão dos pneus, pressão}, Sem mais compensação da perda de {pressão dos pneus, pressão}]

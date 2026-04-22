@@ -1692,7 +1692,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 3. Only quick race sessions are recognized at the moment, because the API reports Hotstint or Time Trial for all other sessions.
 
-4. The API is far from complete during early access of *Assetto Corsa EVO*. For example, weather information is not available, track grip information is not available, and so on. As these informations will become available, they will be added of course.
+4. The rest of the API is also far from complete during early access of *Assetto Corsa EVO*. For example, weather information is not available, track grip information is not available, and so on. As these informations will become available, they will be added, of course.
    
 ## Plugin *Integration*
 

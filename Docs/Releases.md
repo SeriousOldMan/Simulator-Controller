@@ -36,7 +36,6 @@
     - Tyre compound information for all current cars has been added by @neophyte.
 	- Configuration support is available in "Simulator Setup".
 	- The current implementation is far from being complete, as is the current state of implementation of the API of *Assetto Corsa EVO*.
-  - [Internal] Migrated to AHK 2.1-alpha.27.
 
 # Release history
 

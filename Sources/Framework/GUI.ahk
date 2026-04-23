@@ -842,11 +842,13 @@ class DarkTheme extends Theme {
 			hdr        : DarkTheme.DarkListView.NMHDR
 			dwDrawStage: u32
 			hdc        : uptr
-			; rc         : DarkTheme.DarkListView.RECT
+			rc         : DarkTheme.DarkListView.RECT
+			/*
 			rc1		   : i32
 			rc2		   : i32
 			rc3		   : i32
 			rc4		   : i32
+			*/
 			dwItemSpec : uptr
 			uItemState : u32
 			lItemlParam: iptr

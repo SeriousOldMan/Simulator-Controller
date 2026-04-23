@@ -123,7 +123,7 @@ namespace SHMConnector
         {
             if (GetSession(graphics.Session) == "Practice" || staticInfo.IsTimedRace != 0)
             {
-                long time = (timeLeft - (graphics.iBestTime * graphics.NumberOfLaps));
+                long time = timeLeft; // (timeLeft - (graphics.iBestTime * graphics.NumberOfLaps));
 
                 if (time > 0)
                     return time;

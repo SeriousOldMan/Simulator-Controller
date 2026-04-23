@@ -76,7 +76,7 @@ namespace ACSHMProvider
         {
             if (GetSession(graphics.Session) == "Practice" || staticInfo.IsTimedRace != 0)
             {
-                long time = (timeLeft - (graphics.iBestTime * graphics.NumberOfLaps));
+                long time = timeLeft; //  (timeLeft - (graphics.iBestTime * graphics.NumberOfLaps));
 
                 if (time > 0)
                     return time;
@@ -378,10 +378,10 @@ namespace ACSHMProvider
 
                 timeLeft = (long)graphics.SessionTimeLeft;
 
-                    if (timeLeft < 0)
-                    {
-                        timeLeft = 24 * 3600 * 1000;
-                    }
+                if (timeLeft < 0)
+                {
+                    timeLeft = 24 * 3600 * 1000;
+                }
 
                 Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
                 Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));

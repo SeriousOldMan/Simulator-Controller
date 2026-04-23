@@ -210,7 +210,7 @@ long getRemainingTime(long timeLeft)
 
 	if (getSession(sf->session, gf->session_state.phase_name) == "Practice" || isTimedRace())
 	{
-		long time = (timeLeft - (gf->best_laptime_ms * gf->total_lap_count));
+		long time = timeLeft; //  (timeLeft - (gf->best_laptime_ms * gf->total_lap_count));
 
 		if (time > 0)
 			return time;

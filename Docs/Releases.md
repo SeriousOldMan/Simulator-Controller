@@ -24,6 +24,7 @@
 
 #### Fixes
 
+  - Fixed calculation of remaining session time in timed sessions for *Assetto Corsa*.
   - Fixed a bug introduced with the last release which prevented uninstalling Simulator Controller, when the data folder was not located in the user *Documents* folder.
   - Fixed a bug which prevented in rare cases that coaching instrutions was passed to SimHub using the "Session State.json" file (by the "Integration" plugin).
   - Fixed a couple of smaller issues in the Portuguese grammar files for the Assistants.

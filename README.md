@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.9.2.0-release](https://cutt.ly/qtG2N620) (Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
+[6.9.3.0-release](https://cutt.ly/ntJ0gcsQ) (Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6920) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-692) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6930) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-693) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.9.1.0-release](https://cutt.ly/DtD3iJvP) (Changes: Documentation for F1 25, Support to run Simulator Controller in a virtualized environment, Fixed fallback method of installation and update process, Updated car meta data for AMS2, New car models for "Setup Workbench".)
+[6.9.2.0-release](https://cutt.ly/qtG2N620) (Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
 
-[6.9.0.0-release](https://cutt.ly/9tANLrQN) (Changes: Initial support for F1 25, Support to listen to remotely running simulators, Cloaking AHK post processor, Fixed Reasoning booster configuration, Fixed voice drop down in "Simulator Setup", Configuration modes in "Simulator Setup", Fixed extracting ZIP archives, Fixed tyre wear calculation for mixed tyres, New core settings for archives, New car models for "Setup Workbench".)
+[6.9.1.0-release](https://cutt.ly/DtD3iJvP) (Changes: Documentation for F1 25, Support to run Simulator Controller in a virtualized environment, Fixed fallback method of installation and update process, Updated car meta data for AMS2, New car models for "Setup Workbench".)
 
 #### Latest development build
 
-[6.9.3.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/itNK0ZEb/Releases/Simulator%20Controller%206.9.3.0-beta.zip) (Test build for 6.9.3. Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6930) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-693) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

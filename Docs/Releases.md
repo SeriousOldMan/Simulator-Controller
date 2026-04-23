@@ -1,26 +1,8 @@
 # Latest stable release
 
-## 6.9.2.0
-
-#### Date: 04/17/26
-
-#### Fixes
-
-  - Fixed the session end detection for *Le Mans Ultimate* when leaving the server or a session. This was broken with the latest update of *Le Mans Ultimate*.
-  
-#### Changes
-
-  - The native interface of Anthropic (for the experts: the *Messages* API) is now supported as [GPT provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#anthropic).
-  - The installer of Simulator Controller now allows new users to specify the location of the local data folder, which is normally located in the user *Documents* folder. There will still be a small folder in the *Documents* folder, though, to point to the *real* data folder, if a different location is chosen.
-  - [Experts] A new version of the Lua 5.5 runtime is included. Default is still version 5.4 for compatibility reasons.
-  - [Developer] The class tree of "LLMConnector" is no longer *sealed*, i.e. it is now possible to create own connector classes in custom plugins.
-  - [Internal] Migrated to AHK 2.1-alpha.24.
-  
-# Upcoming release
-
 ## 6.9.3.0
 
-#### Date: 04/24/26 (planned)
+#### Date: 04/24/26
 
 #### Fixes
 
@@ -38,8 +20,28 @@
 	- Configuration support is available in "Simulator Setup".
 	- The current implementation is far from being complete, as is the current state of implementation of the API of *Assetto Corsa EVO*.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
 
+## 6.9.2.0
+
+#### Date: 04/17/26
+
+#### Fixes
+
+  - Fixed the session end detection for *Le Mans Ultimate* when leaving the server or a session. This was broken with the latest update of *Le Mans Ultimate*.
+  
+#### Changes
+
+  - The native interface of Anthropic (for the experts: the *Messages* API) is now supported as [GPT provider](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#anthropic).
+  - The installer of Simulator Controller now allows new users to specify the location of the local data folder, which is normally located in the user *Documents* folder. There will still be a small folder in the *Documents* folder, though, to point to the *real* data folder, if a different location is chosen.
+  - [Experts] A new version of the Lua 5.5 runtime is included. Default is still version 5.4 for compatibility reasons.
+  - [Developer] The class tree of "LLMConnector" is no longer *sealed*, i.e. it is now possible to create own connector classes in custom plugins.
+  - [Internal] Migrated to AHK 2.1-alpha.24.
+  
 ## 6.9.1.0
 
 #### Date: 04/10/26

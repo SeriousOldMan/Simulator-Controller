@@ -78,6 +78,8 @@ class Theme {
 		}
 
 		static Call(_this, params*) {
+			local timerID, iconNumber, iconFile
+
 			static WM_COMMNOTIFY := 0x44
 			static WM_INITDIALOG := 0x0110
 
@@ -117,7 +119,8 @@ class Theme {
 			SetThreadDpiAwarenessContext(-5)
 
 			if InStr(_this.Name, "MsgBox")
-				OnMessage(WM_COMMNOTIFY, ON_WM_COMMNOTIFY, -1)
+				timerID := DllCall("User32\SetTimer", "ptr", 0, "ptr", 0, "uint", 10, "ptr"
+													, CallbackCreate(InitMsgBox), "ptr")
 			else
 				OnMessage(WM_INITDIALOG, ON_WM_INITDIALOG, -1)
 
@@ -129,14 +132,24 @@ class Theme {
 				WNDENUMPROC(hwnd)
 			}
 
+			/*
 			ON_WM_COMMNOTIFY(wParam, lParam, msg, hwnd) {
 				DetectHiddenWindows(true)
 
 				if ((msg = 68) && (wParam = 1027))
 					OnMessage(0x44, ON_WM_COMMNOTIFY, 0), EnumThreadWindows(GetCurrentThreadId(), CallbackCreate(WNDENUMPROC), 0)
 			}
+			*/
+
+			InitMsgBox() {
+				DllCall("User32\KillTimer", "ptr", 0, "ptr", timerID)
+
+				EnumThreadWindows(GetCurrentThreadId(), CallbackCreate(WNDENUMPROC), 0)
+			}
 
 			WNDENUMPROC(hwnd, *) {
+				local dwAttribute, pvAttribute
+
 				static SM_CICON         := "W" SysGet(11) " H" SysGet(12)
 				static SM_CSMICON       := "W" SysGet(49) " H" SysGet(50)
 				static ICON_BIG         := 1
@@ -180,6 +193,9 @@ class Theme {
 			}
 
 			GWL_WNDPROC(winId := "", hIcons*) {
+				local btns, btnHwnd, iconHwnd, ctrl, classNN
+				local WindowProcOld
+
 				static SetWindowLong     := DllCall.Bind(A_PtrSize = 8 ? "SetWindowLongPtr" : "SetWindowLong", "ptr", , "int", , "ptr", , "ptr")
 				static BS_FLAT           := 0x8000
 				static BS_BITMAP         := 0x0080
@@ -218,8 +234,9 @@ class Theme {
 
 				WindowProcOld := SetWindowLong(winId, -4, CallbackCreate(WNDPROC))
 
-				WNDPROC(hwnd, uMsg, wParam, lParam)
-				{
+				WNDPROC(hwnd, uMsg, wParam, lParam) {
+					local hbrush, _hwnd, btnY, btnH, rcC, v
+
 					SetWinDelay(-1)
 					SetControlDelay(-1)
 
@@ -239,7 +256,7 @@ class Theme {
 							ControlGetPos(, &btnY, , &btnH, btnHwnd)
 
 							hdc        := GetDC(winId)
-							rcC.top    := btnY - (rcC.bottom - (btnY+btnH))
+							rcC.top    := btnY - (rcC.bottom - (btnY + btnH))
 							rcC.bottom *= 2
 							rcC.right  *= 2
 
@@ -842,13 +859,11 @@ class DarkTheme extends Theme {
 			hdr        : DarkTheme.DarkListView.NMHDR
 			dwDrawStage: u32
 			hdc        : uptr
-			rc         : DarkTheme.DarkListView.RECT
-			/*
+			; rc         : DarkTheme.DarkListView.RECT
 			rc1		   : i32
 			rc2		   : i32
 			rc3		   : i32
 			rc4		   : i32
-			*/
 			dwItemSpec : uptr
 			uItemState : u32
 			lItemlParam: iptr

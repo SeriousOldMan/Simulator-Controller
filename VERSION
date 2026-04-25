@@ -3,7 +3,7 @@ Version=6.9.4.0-dev
 Target=6.9.4.0-release
 Date=04/24/2026
 Download=
-Changes=Fixed loading of controller state, Migrated to AHK 2.1 Alpha 27
+Changes=Fixed loading of controller state
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.3.0-release

@@ -2981,7 +2981,7 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 	local y := "Center"
 	local w := Min(500, 300 + Round(StrLen(textOrCommand) / 5))
 	local h := 100
-	local messageGui, newOptions, iconFile
+	local messageGui, newOptions, iconFile, buttons, offset
 
 	static kResult := "__Result"
 
@@ -3046,6 +3046,23 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 
 			if (options.Options & 64)
 				options.Mode := "Info"
+
+			buttons := (options.Options & 15)
+
+			if (buttons == 0)
+				options.Buttons := ["Ok"]
+			else if (buttons == 1)
+				options.Buttons := ["Ok", "Cancel"]
+			else if (buttons == 2)
+				options.Buttons := ["Abort", "Retry", "Ignore"]
+			else if (buttons == 3)
+				options.Buttons := ["Yes", "No", "Cancel"]
+			else if (buttons == 4)
+				options.Buttons := ["Yes", "No"]
+			else if (buttons == 5)
+				options.Buttons := ["Retry", "Cancel"]
+			else if (buttons == 6)
+				options.Buttons := ["Cancel", "Try Again", "Continue"]
 		}
 
 		if !options.HasProp("Mode")
@@ -3053,6 +3070,8 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 
 		if !options.HasProp("Buttons")
 			options.Buttons := ["Ok"]
+
+		w := Max((options.Buttons.Length * 80) + ((options.Buttons.Length - 1) * 10), w)
 
 		result := false
 
@@ -3076,7 +3095,15 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 
 		messageGui.Add("Text", "x0 w" . w . " 0x10")
 
-		messageGui.Add("Button", "x" . (w - 88) . " w80 h23 Default", translate("Ok")).OnEvent("Click", messageDialog.Bind(kResult . 1))
+		offset := 0
+
+		loop options.Buttons.Length {
+			messageGui.Add("Button", "x" . (w - 88 - offset) . " w80 h23 Default" . ((A_Index > 1) ? " YP" : "")
+								   , options.Buttons[options.Buttons.Length - A_Index + 1]).OnEvent("Click"
+																								  , messageDialog.Bind(kResult . (options.Buttons.Length - A_Index + 1)))
+
+			offset += 90
+		}
 
 		messageGui.MarginX := 0
 
@@ -3086,7 +3113,7 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 			Sleep(100)
 
 		try {
-			return result
+			return options.Buttons[result]
 		}
 		finally {
 			messageGui.Destroy()

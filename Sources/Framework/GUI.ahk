@@ -2673,8 +2673,8 @@ class RecolorizerTask extends PeriodicTask {
 MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
 ; MsgDlg(Text?, Title?, Options?, IconPath?) => messageDialog(Text?, Title?, Options?, IconPath?)
 
-; InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
-InputDlg(Prompt?, Title?, Options?, Default?) => inputDialog(Prompt?, Title?, Options?, Default?)
+InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
+; InputDlg(Prompt?, Title?, Options?, Default?) => inputDialog(Prompt?, Title?, Options?, Default?)
 
 getAllUIThemes(configuration) {
 	return [ClassicTheme(), GrayTheme(), LightTheme(), DarkTheme()]

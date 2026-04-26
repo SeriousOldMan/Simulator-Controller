@@ -1,5 +1,13 @@
 # Latest stable release
 
+## 6.9.3.1
+
+#### Date: 04/26/26
+
+#### Fixes
+
+  - Fixed a critical bug in the timing calculations of the telemetry analyzer, which caused startup problems of on-track coaching and brake coaching in many cases.
+
 ## 6.9.3.0
 
 #### Date: 04/24/26

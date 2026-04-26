@@ -4599,9 +4599,11 @@ class GridRaceAssistant extends RaceAssistant {
 			normalizedRunning := (currentRunning ? ((currentRunning + normalizedRunning) / 2)
 												 : normalizedRunning)
 
+			/*
 			if isDebug()
 				logMessage(kLogDebug, "Set normalized running for " . Round(running, 2)
 								    . " to " . Round(normalizedRunning, 2))
+			*/
 
 			this.iNormalizedRunnings[index] := normalizedRunning
 		}

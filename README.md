@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.9.3.0-release](https://cutt.ly/ntJ0gcsQ) (Changes: Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
+[6.9.3.1-release](https://cutt.ly/5tKOovjz) (Changes: Fixed timing calculations for coaching, Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6930) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-693) of this version and all the versions you might have skipped, before installing and using this version.
 

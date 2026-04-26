@@ -573,5 +573,5 @@ normalizeTime(time) {
 		return ((time[1] * 60000) + (time[2] * 1000))
 	}
 	else
-		return (isNumber(time) ? (time / 1000) : kNull)
+		return (isNumber(time) ? time : kNull)
 }

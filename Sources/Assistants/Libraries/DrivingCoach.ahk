@@ -2094,9 +2094,8 @@ class DrivingCoach extends GridRaceAssistant {
 		return (this.iBrakeTriggerPID != false)
 	}
 
-	updateBrakeTrigger(telemetry) {
+	updateBrakeTrigger(telemetry, lap?) {
 		local knowledgeBase := this.KnowledgeBase
-		local lap := knowledgeBase.getValue("Lap")
 		local lapTime := telemetry.getValue(telemetry.Data.Length, "Time", 0)
 		local collector := this.TelemetryCollector
 		local triggerFile := temporaryFileName("Brake", "trigger.tmp")
@@ -2191,6 +2190,9 @@ class DrivingCoach extends GridRaceAssistant {
 					 || ((section2.End >= section1.Start) || (section2.End <= section1.End)))
 		}
 
+		if !isSet(lap)
+			lap := knowledgeBase.getValue("Lap")
+
 		if ((telemetry == lastTelemetry) && (lap < nextLap))
 			return
 		else {
@@ -2198,7 +2200,7 @@ class DrivingCoach extends GridRaceAssistant {
 			nextLap := (lap + 2)
 		}
 
-		if (this.Speaker[true] && this.iBrakeTriggerPID && collector && brakeCommand)
+		if (this.Speaker[true] && (this.iBrakeTriggerPID || isDebug()) && collector && brakeCommand)
 			try {
 				trackLength := collector.TrackLength
 

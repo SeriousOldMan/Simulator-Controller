@@ -443,12 +443,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if (dataTypeDropDown > 2) {
 				if ((dataTypeDropDown = 4) && (workbench.SelectedSimulator && workbench.SelectedCar && workbench.SelectedTrack)) {
-					OnMessage(0x44, translateYesNoButtons)
 					msgResult := withBlockedWindows(MsgDlg, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
-									  , translate("Delete"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+														  , translate("Delete")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Yes"))
 						withBlockedWindows(() {
 							withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
 								LapsDatabase(workbench.SelectedSimulator, workbench.SelectedCar, workbench.SelectedTrack
@@ -803,11 +803,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			row := workbench.FixedPitstopsListView.GetNext(0)
 
 			if row {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected fixed pitstop?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected fixed pitstop?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes") {
+				if (msgResult = translate("Yes")) {
 					workbench.FixedPitstopsListView.Delete(row)
 
 					workbench.updateState()
@@ -858,19 +859,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		addSimDriver(*) {
 			local row := workbench.DriversListView.GetNext(0)
-			local msgResult, numRows, driver, translator
+			local msgResult, numRows, driver
 
 			if row {
-				translator := translateMsgDlgButtons.Bind(["Before", "After", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?")
+													  , translate("Insert")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Before", "After", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Cancel")
+				if (msgResult = translate("Cancel"))
 					return
 
-				if (msgResult = "No")
+				if (msgResult = translate("After"))
 					row += 1
 
 				workbench.DriversListView.Insert(row, "Select", "", "")
@@ -907,11 +907,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			row := workbench.DriversListView.GetNext(0)
 
 			if row {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected driver?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes") {
+				if (msgResult = translate("Yes")) {
 					workbench.DriversListView.Delete(row)
 
 					workbench.StintDrivers.RemoveAt(row)
@@ -968,7 +969,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		addSimWeather(*) {
 			local after := false
-			local row, msgResult, translator, lastWeather, lastAirTemperature, lastTrackTemperature, lastTime, currentTime
+			local row, msgResult, lastWeather, lastAirTemperature, lastTrackTemperature, lastTime, currentTime
 
 			row := workbench.WeatherListView.GetNext(0)
 
@@ -978,16 +979,15 @@ class StrategyWorkbench extends ConfigurationItem {
 				lastAirTemperature := workbench.WeatherListView.GetText(row, 3)
 				lastTrackTemperature := workbench.WeatherListView.GetText(row, 4)
 
-				translator := translateMsgDlgButtons.Bind(["Before", "After", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?")
+													  , translate("Insert")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Before", "After", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Cancel")
+				if (msgResult = translate("Cancel"))
 					return
 
-				if (msgResult = "No") {
+				if (msgResult = translate("After")) {
 					row += 1
 
 					after := true
@@ -1050,11 +1050,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			row := workbench.WeatherListView.GetNext(0)
 
 			if row {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected change of weather?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected change of weather?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes") {
+				if (msgResult = translate("Yes")) {
 					workbench.WeatherListView.Delete(row)
 
 					workbench.updateState()
@@ -3011,17 +3012,11 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.updateState()
 						this.updateSettingsMenu()
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 6: ; "Load from Settings..."
 				if (simulator && car && track) {
 					if GetKeyState("Ctrl") {
@@ -3144,11 +3139,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 7, "Database":
 				if (simulator && car && track) {
 					settings := SettingsDatabase().loadSettings(simulator, car, track, "*", this.SelectedWeather)
@@ -3212,11 +3204,8 @@ class StrategyWorkbench extends ConfigurationItem {
 										this.TyreSetListView.Modify(A_Index, "Col2", tyreLife)
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 8: ; "Update from Telemetry..."
 				if (simulator && car && track) {
 					lapsDB := LapsDatabase(simulator, car, track, this.SelectedDrivers)
@@ -3235,19 +3224,14 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You must first select a car and a track."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 9: ; "Import from Simulation..."
 				if simulator {
 					prefix := SessionDatabase.getSimulatorCode(simulator)
 
 					if !prefix {
-						OnMessage(0x44, translateOkButton)
 						withBlockedWindows(MsgDlg, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
 
 						return
 					}
@@ -3279,11 +3263,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["simMapEdit"].Text := (isNumber(map) ? Round(map) : map)
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You must first select a simulation."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 11:
 				if this.FixedPitstops {
 					this.iFixedPitstops := false
@@ -3291,11 +3272,12 @@ class StrategyWorkbench extends ConfigurationItem {
 					this.updateState()
 				}
 				else {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to use fixed pitstops? Using fixed pitstops can result in invalid strategies."), translate("Warning"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to use fixed pitstops? Using fixed pitstops can result in invalid strategies.")
+														  , translate("Warning")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes") {
+					if (msgResult = translate("Yes")) {
 						this.iFixedPitstops := true
 
 						this.updateState()
@@ -3353,11 +3335,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				if strategy
 					this.selectStrategy(strategy)
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current scenario. Please run a simulation first..."), translate("Error"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 	}
 
@@ -3393,11 +3372,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.chooseSettingsMenu("Strategy")
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no active Race Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 4: ; "Load Strategy..."
 				if GetKeyState("Ctrl") {
 					this.Window.Opt("+OwnDialogs")
@@ -3521,11 +3497,8 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 7: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
@@ -3552,11 +3525,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 					writeMultiMap(kUserConfigDirectory . "Race.strategy", configuration)
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 10: ; "Clear Strategy..."
 				deleteFile(kUserConfigDirectory . "Race.strategy")
 		}
@@ -4198,20 +4168,17 @@ class ValidatorsEditor {
 		}
 
 		Close(*) {
-			local translator
-
 			if this.Closeable {
-				translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?")
+													  , translate("Close")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?"), translate("Close"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					this.ValidatorsEditor.iResult := kOk
-				else if (msgResult = "No")
+				else if (msgResult = translate("No"))
 					this.ValidatorsEditor.iResult := kCancel
-				else if (msgResult = "Cancel")
+				else if (msgResult = translate("Cancel"))
 					return true
 			}
 			else
@@ -4494,7 +4461,7 @@ class ValidatorsEditor {
 	}
 
 	addValidator() {
-		local validator, translator, msgResult
+		local validator, msgResult
 
 		if this.SelectedValidator
 			if !this.saveValidator(this.SelectedValidator) {
@@ -4503,16 +4470,15 @@ class ValidatorsEditor {
 				return
 			}
 
-		translator := translateMsgDlgButtons.Bind(["Rules", "Script", "Cancel"])
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you want to use rules or do you want to write a script?")
+											  , translate("Validator")
+											  , {Options: 262179, Mode: "Question"
+											   , Buttons: collect(["Rules", "Script", "Cancel"], translate)})
 
-		OnMessage(0x44, translator)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you want to use rules or do you want to write a script?"), translate("Validator"), 262179)
-		OnMessage(0x44, translator, 0)
-
-		if (msgResult = "Cancel")
+		if (msgResult = translate("Cancel"))
 			return
 
-		if (msgResult = "Yes")
+		if (msgResult = translate("Rules"))
 			validator := {Type: "Rules", Name: "", Builtin: false, Script: ""}
 		else
 			validator := {Type: "Script", Name: "", Builtin: false, Script: ""}
@@ -4641,9 +4607,7 @@ class ValidatorsEditor {
 			if (StrLen(errorMessage) > 0)
 				errorMessage := ("`n" . errorMessage)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 
 		return valid
@@ -4822,9 +4786,7 @@ startupStrategyWorkbench() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Strategy Workbench"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

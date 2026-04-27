@@ -590,10 +590,8 @@ class SplashScreensList extends ConfigurationItemList {
 			media := this.Control["videoFilePathEdit"].Text
 		}
 		else {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 

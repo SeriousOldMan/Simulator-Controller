@@ -583,7 +583,7 @@ class ProgramPreset extends NamedPreset {
 						DirCreate(kProgramsDirectory . this.Program)
 
 						showProgress({color: "Green", message: translate("Extracting...")})
-					
+
 						expand(A_Temp . "\" . this.Program . ".zip", kProgramsDirectory . this.Program)
 
 						if !FileExist(kProgramsDirectory . this.Program . "")
@@ -614,11 +614,8 @@ class ProgramPreset extends NamedPreset {
 				hideProgress()
 			}
 
-			if !found {
-				OnMessage(0x44, translateOkButton)
+			if !found
 				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 	}
 
@@ -837,9 +834,7 @@ class DownloadablePreset extends NamedPreset {
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 
@@ -874,9 +869,7 @@ class DownloadablePreset extends NamedPreset {
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 
@@ -896,9 +889,7 @@ class DownloadablePreset extends NamedPreset {
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
@@ -923,9 +914,7 @@ class DownloadablePreset extends NamedPreset {
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
@@ -998,7 +987,7 @@ class AssettoCorsaCarMetas extends DownloadablePreset {
 						DirCreate(A_Temp . "\Simulator Controller DLC")
 
 						showProgress({color: "Green", message: translate("Extracting...")})
-					
+
 						expand(A_Temp . "\Simulator Controller DLC.zip", A_Temp . "\Simulator Controller DLC")
 
 						if !FileExist(A_Temp . "\Simulator Controller DLC\*.*")
@@ -1201,7 +1190,7 @@ class SplashMedia extends DownloadablePreset {
 					DirCreate(A_Temp . "\Simulator Controller DLC")
 
 					showProgress({color: "Green", message: translate("Extracting...")})
-					
+
 					expand(A_Temp . "\Simulator Controller DLC.zip", A_Temp . "\Simulator Controller DLC")
 
 					if FileExist(A_Temp . "\Simulator Controller DLC\*.*") {
@@ -1224,11 +1213,8 @@ class SplashMedia extends DownloadablePreset {
 
 				return true
 			}
-			else {
-				OnMessage(0x44, translateOkButton)
+			else
 				withBlockedWindows(MsgDlg, translate("The download repository is currently unavailable. Please try again later."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 
 		return false

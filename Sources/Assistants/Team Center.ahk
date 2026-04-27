@@ -1652,7 +1652,7 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		addPlan(*) {
-			local row, translator, msgResult
+			local row, msgResult
 
 			row := center.PlanListView.GetNext(0)
 
@@ -1664,19 +1664,18 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 			if row {
-				translator := translateMsgDlgButtons.Bind(["Before", "After", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?")
+													  , translate("Insert")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Cancel")
+				if (msgResult = translate("Cancel"))
 					return
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					center.withExceptionhandler(ObjBindMethod(center, "addPlan", "Before"))
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					center.withExceptionhandler(ObjBindMethod(center, "addPlan", "After"))
 			}
 			else
@@ -1696,11 +1695,12 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 			if row {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected plan entry?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected plan entry?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					center.withExceptionhandler(ObjBindMethod(center, "deletePlan"))
 			}
 		}
@@ -1805,11 +1805,8 @@ class TeamCenter extends ConfigurationItem {
 		addSetup(*) {
 			if (center.SessionDrivers.Count > 0)
 				center.withExceptionhandler(ObjBindMethod(center, "addSetup"))
-			else {
-				OnMessage(0x44, translateOkButton)
+			else
 				withBlockedWindows(MsgDlg, translate("There are no drivers available. Please select a valid session first."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 
 		copySetup(*) {
@@ -1838,11 +1835,12 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 			if row {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the current driver specific setup?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the current driver specific setup?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					center.withExceptionhandler(ObjBindMethod(center, "deleteSetup"))
 			}
 		}
@@ -1933,15 +1931,12 @@ class TeamCenter extends ConfigurationItem {
 		releaseSetups(*) {
 			if center.SessionActive
 				center.withExceptionhandler(ObjBindMethod(center, "releaseSetups"))
-			else {
-				OnMessage(0x44, translateOkButton)
+			else
 				withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 
 		uploadSetups(*) {
-			local fileName, translator, msgResult
+			local fileName, msgResult
 
 			centerGui.Opt("+OwnDialogs")
 
@@ -1951,19 +1946,18 @@ class TeamCenter extends ConfigurationItem {
 
 			if (fileName != "")
 				if (center.SessionStore.Tables["Setups.Data"].Length > 0) {
-					translator := translateMsgDlgButtons.Bind(["Insert", "Replace", "Cancel"])
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?")
+														  , translate("Import")
+														  , {Options: 262179, Mode: "Question"
+														   , Buttons: collect(["Insert", "Replace", "Cancel"], translate)})
 
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Cancel")
+					if (msgResult = translate("Cancel"))
 						return
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Insert"))
 						center.withExceptionhandler(ObjBindMethod(center, "importSetups", fileName, false))
 
-					if (msgResult = "No")
+					if (msgResult = translate("Replace"))
 						center.withExceptionhandler(ObjBindMethod(center, "importSetups", fileName, true))
 				}
 				else
@@ -2863,12 +2857,9 @@ class TeamCenter extends ConfigurationItem {
 				if (this.Mode = "Normal")
 					window["serverTokenEdit"].Text := ""
 
-				if !silent {
-					OnMessage(0x44, translateOkButton)
+				if !silent
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ")
 											  . (isObject(exception) ? exception.Message : exception)), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 
 				this.loadTeams()
 			}
@@ -3016,11 +3007,8 @@ class TeamCenter extends ConfigurationItem {
 
 			this.TelemetryViewer.show()
 		}
-		else {
-			OnMessage(0x44, translateOkButton)
+		else
 			withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 	}
 
 	closedTelemetryViewer() {
@@ -3839,11 +3827,12 @@ class TeamCenter extends ConfigurationItem {
 			delete := false
 
 			if verbose {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all driver specific setups?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all driver specific setups?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					delete := true
 			}
 			else
@@ -3901,11 +3890,8 @@ class TeamCenter extends ConfigurationItem {
 				logError(exception, true)
 			}
 		}
-		else if verbose {
-			OnMessage(0x44, translateOkButton)
+		else if verbose
 			withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 	}
 
 	getPlanDrivers() {
@@ -3980,7 +3966,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	updatePlanFromStrategy() {
-		local pitstops, pitstop, numStints, time, currentTime, last, lastTime, msgResult, translator
+		local pitstops, pitstop, numStints, time, currentTime, last, lastTime, msgResult
 		local driver, forname, surname, nickname, found, ignore, candidate
 		local sForname, sSurname, sNickname
 
@@ -3999,16 +3985,15 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 			if (numStints < this.PlanListView.GetCount()) {
-				translator := translateMsgDlgButtons.Bind(["Beginning", "End", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("The plan has more stints than the strategy. Do you want to remove surplus stints from the beginning or from the end of the plan?")
+													  , translate("Plan")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Beginning", "End", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("The plan has more stints than the strategy. Do you want to remove surplus stints from the beginning or from the end of the plan?"), translate("Plan"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Cancel")
+				if (msgResult = translate("Cancel"))
 					return
 
-				if (msgResult = "Yes") {
+				if (msgResult = translate("Beginning")) {
 					while (this.PlanListView.GetCount() > numStints)
 						this.PlanListView.Delete(1)
 
@@ -4016,17 +4001,14 @@ class TeamCenter extends ConfigurationItem {
 						this.PlanListView.Modify(1, "Col5", "-", "-", "-", "-")
 				}
 
-				if (msgResult = "No")
+				if (msgResult = translate("End"))
 					while (this.PlanListView.GetCount() > numStints)
 						this.PlanListView.Delete(this.PlanListView.GetCount())
 			}
 
 			if (this.PlanListView.GetCount() < numStints) {
-				if (this.PlanListView.GetCount() > 0) {
-					OnMessage(0x44, translateOkButton)
+				if (this.PlanListView.GetCount() > 0)
 					withBlockedWindows(MsgDlg, translate("The plan has less stints than the strategy. Additional stints will be added at the end of the plan."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 
 				while (this.PlanListView.GetCount() < numStints) {
 					if (this.PlanListView.GetCount() == 0)
@@ -4141,11 +4123,12 @@ class TeamCenter extends ConfigurationItem {
 			delete := false
 
 			if verbose {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the current plan?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the current plan?")
+													  , translate("Delete")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					delete := true
 			}
 			else
@@ -4345,11 +4328,8 @@ class TeamCenter extends ConfigurationItem {
 				logError(exception, true)
 			}
 		}
-		else if verbose {
-			OnMessage(0x44, translateOkButton)
+		else if verbose
 			withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 	}
 
 	initializePitstopSettings(&lap, &refuel, &tyreCompound, &tyreCompoundColor) {
@@ -5217,9 +5197,7 @@ class TeamCenter extends ConfigurationItem {
 			if (exception != "No active session...")
 				logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("You must be connected to an active session to plan a pitstop."), translate("Error"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 
@@ -5305,18 +5283,16 @@ class TeamCenter extends ConfigurationItem {
 					this.connect()
 				case 4: ; Clear...
 					if this.SessionActive {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all data from the currently active session? This can take quite a while..."), translate("Delete"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+						msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all data from the currently active session? This can take quite a while...")
+															  , translate("Delete")
+															  , {Options: 262436, Mode: "Question"
+															   , Buttons: collect(["Yes", "No"], translate)})
 
-						if (msgResult = "Yes")
+						if (msgResult = translate("Yes"))
 							this.clearSession()
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				case 6: ; Synchronize
 					if GetKeyState("Ctrl") {
 						synchronizeMenu := Menu()
@@ -5371,11 +5347,8 @@ class TeamCenter extends ConfigurationItem {
 				case 12: ; Save Session...
 					if this.HasData
 						this.saveSession(true)
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("There is no session data to be saved."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				case 14: ; Telemetry Viewer
 					this.openTelemetryViewer()
 				case 16: ; Update Statistics
@@ -5499,11 +5472,8 @@ class TeamCenter extends ConfigurationItem {
 						if (strategy.Count > 0)
 							this.selectStrategy(this.createStrategy(strategy, false, false), true)
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("There is no active Race Strategy."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
 			case 4:
 				if GetKeyState("Ctrl") {
@@ -5579,11 +5549,8 @@ class TeamCenter extends ConfigurationItem {
 						writeMultiMap(fileName, configuration)
 					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 7: ; Strategy Summary
 				if this.Strategy {
 					viewer := GetKeyState("Ctrl")
@@ -5593,11 +5560,8 @@ class TeamCenter extends ConfigurationItem {
 					if !viewer
 						this.iSelectedDetailReport := "Strategy"
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 9: ; Use Session Data
 				this.iUseSessionData := !this.UseSessionData
 
@@ -5625,9 +5589,7 @@ class TeamCenter extends ConfigurationItem {
 			case 14: ; Run Simulation
 				if this.Strategy {
 					if (this.UseTraffic && !this.SessionActive) {
-						OnMessage(0x44, translateOkButton)
 						withBlockedWindows(MsgDlg, translate("A traffic-based strategy simulation is only possible in an active session."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
 
 						this.iUseTraffic := false
 
@@ -5636,51 +5598,37 @@ class TeamCenter extends ConfigurationItem {
 
 					this.runSimulation(this.Strategy.SessionType, this.Strategy.AdditionalLaps)
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 16, 19: ; Release Strategy
 				if this.Strategy {
 					if this.SessionActive
 						this.updateStrategy(line == 19)
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 17: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
-						OnMessage(0x44, translateYesNoButtons)
-						msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to discard the active strategy? Strategist will be instructed immediately..."), translate("Strategy"), 262436)
-						OnMessage(0x44, translateYesNoButtons, 0)
+						msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to discard the active strategy? Strategist will be instructed immediately...")
+															  , translate("Strategy")
+															  , {Options: 262436, Mode: "Question"
+															   , Buttons: collect(["Yes", "No"], translate)})
 
-						if (msgResult = "Yes") {
+						if (msgResult = translate("Yes")) {
 							this.discardStrategy()
 
 							if (this.SelectedDetailReport = "Strategy")
 								this.showDetails(false)
 						}
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 
 		this.updateStrategyMenu()
@@ -5699,11 +5647,8 @@ class TeamCenter extends ConfigurationItem {
 			case 8:
 				if this.SessionActive
 					this.releasePlan()
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 
 		this.updatePlanMenu()
@@ -5719,7 +5664,7 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		uploadSetups(*) {
-			local fileName, translator, msgResult
+			local fileName, msgResult
 
 			this.Window.Opt("+OwnDialogs")
 
@@ -5729,19 +5674,18 @@ class TeamCenter extends ConfigurationItem {
 
 			if (fileName != "")
 				if (this.SessionStore.Tables["Setups.Data"].Length > 0) {
-					translator := translateMsgDlgButtons.Bind(["Insert", "Replace", "Cancel"])
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?")
+														  , translate("Import")
+														  , {Options: 262179, Mode: "Question"
+														   , Buttons: collect(["Insert", "Replace", "Cancel"], translate)})
 
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Cancel")
+					if (msgResult = translate("Cancel"))
 						return
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Insert"))
 						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, false))
 
-					if (msgResult = "No")
+					if (msgResult = translate("Replace"))
 						this.withExceptionhandler(ObjBindMethod(this, "importSetups", fileName, true))
 				}
 				else
@@ -5918,9 +5862,7 @@ class TeamCenter extends ConfigurationItem {
 			catch Any as exception {
 				logError(exception, true)
 
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 			}
 	}
 
@@ -10117,7 +10059,7 @@ class TeamCenter extends ConfigurationItem {
 								deleteFile(folder . "\" . fileName . ".data")
 
 								dataFile := temporaryFileName("Race", "zip")
-								
+
 								compress(directory, "*.*", dataFile)
 
 								FileMove(dataFile, folder . "\" . fileName . ".data", 1)
@@ -10651,9 +10593,9 @@ class TeamCenter extends ConfigurationItem {
 										file.RawWrite(session, size)
 
 										file.Close()
-										
+
 										expand(dataFile, folder)
-										
+
 										if !FileExist(folder . "\Session.info")
 											FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 									}
@@ -10673,9 +10615,9 @@ class TeamCenter extends ConfigurationItem {
 								dataFile := temporaryFileName("Race", "zip")
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
-								
+
 								expand(dataFile, folder)
-										
+
 								if !FileExist(folder . "\Session.info")
 									FileCopy(directory . "\" . fileName . ".team", folder . "\Session.info")
 
@@ -10693,12 +10635,9 @@ class TeamCenter extends ConfigurationItem {
 
 				info := readMultiMap(folder . "Session.info")
 
-				if (info.Count == 0) {
-					OnMessage(0x44, translateOkButton)
+				if (info.Count == 0)
 					withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
-				else {
+				else
 					withBlockedWindows(() {
 						withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
 							this.iSyncTask.pause()
@@ -10797,7 +10736,6 @@ class TeamCenter extends ConfigurationItem {
 							this.updateState()
 						})
 					})
-				}
 			}
 		}
 
@@ -14739,9 +14677,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 				catch Any as exception {
 					logError(exception, true)
 
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					return false
 				}
@@ -15010,9 +14946,7 @@ startupTeamCenter() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Team Center"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

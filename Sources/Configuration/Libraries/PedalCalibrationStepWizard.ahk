@@ -165,11 +165,12 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		if super.savePage(page) {
 			if !this.SetupWizard.isSoftwareInstalled("SmartControl") {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?")
+													  , translate("Warning")
+													  , {Options: 262436, Mode: "Warning"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					return false
 			}
 

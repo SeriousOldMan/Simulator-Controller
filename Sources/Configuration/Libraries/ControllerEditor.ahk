@@ -525,10 +525,8 @@ class ControlsList extends ConfigurationItemList {
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["controlNameEdit"].Text) = "") || !inList([1, 2, 3, 4], this.Control["controlTypeDropDown"].Value)
 		 || (Trim(this.Control["imageFilePathEdit"].Text) = "") || !isInteger(this.Control["imageWidthEdit"].Text) || !isInteger(this.Control["imageHeightEdit"].Text)) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 		else
@@ -670,10 +668,8 @@ class LabelsList extends ConfigurationItemList {
 
 	buildItemFromEditor(isNew := false) {
 		if ((Trim(this.Control["labelNameEdit"].Text) = "") || !isInteger(this.Control["labelWidthEdit"].Text) || !isInteger(this.Control["labelHeightEdit"].Text)) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 		else
@@ -1139,10 +1135,8 @@ class LayoutsList extends ConfigurationItemList {
 						  || !isInteger(this.Control["layoutColumnMarginEdit"].Text)
 						  || !isInteger(this.Control["layoutSidesMarginEdit"].Text)
 						  || !isInteger(this.Control["layoutBottomMarginEdit"].Text)))) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 		else {
@@ -1159,10 +1153,8 @@ class LayoutsList extends ConfigurationItemList {
 						duplicate := true
 
 			if duplicate {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-
+				
 				return false
 			}
 

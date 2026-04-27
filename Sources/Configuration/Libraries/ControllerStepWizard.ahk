@@ -328,9 +328,7 @@ class ControllerStepWizard extends StepWizard {
 
 		if super.savePage(page) {
 			if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 
 				return false
 			}
@@ -348,11 +346,12 @@ class ControllerStepWizard extends StepWizard {
 
 			if this.iFunctionTriggers
 				if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
+														  , translate("Warning")
+														  , {Options: 262436, Mode: "Warning"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "No")
+					if (msgResult = translate("No"))
 						return false
 				}
 
@@ -1114,11 +1113,12 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				this.saveActions()
 
 			if !this.validateActions() {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Not all chosen functions has been completely configured. Do you really want to proceed?"), translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Not all chosen functions has been completely configured. Do you really want to proceed?")
+													  , translate("Warning")
+													  , {Options: 262436, Mode: "Warning"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					return false
 			}
 
@@ -1474,7 +1474,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		local action := this.getAction(row)
 		local actionDescriptor := this.getActionDescriptor(row)
 		local functionType := ConfigurationItem.splitDescriptor(function)[1]
-		local action, msgResult, translator, currentFunction
+		local action, msgResult, buttons, currentFunction
 
 		if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
 			function := [function]
@@ -1484,13 +1484,14 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			function := [function]
 		else {
 			if (actionDescriptor[2] == "Toggle")
-				translator := translateMsgDlgButtons.Bind(["On/Off", "Off", "Cancel"])
+				buttons := translateMsgDlgButtons.Bind(["On/Off", "Off", "Cancel"])
 			else
-				translator := translateMsgDlgButtons.Bind(["Increase", "Decrease", "Cancel"])
+				buttons := translateMsgDlgButtons.Bind(["Increase", "Decrease", "Cancel"])
 
-			OnMessage(0x44, translator)
-			msgResult := withBlockedWindows(MsgDlg, translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
-			OnMessage(0x44, translator, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Trigger for ") . action . translate("?")
+												  , translate("Trigger")
+												  , {Options: 262179, Mode: "Question"
+												   , Buttons: collect(buttons, translate)})
 
 			currentFunction := this.getActionFunction(mode, action)
 
@@ -1498,9 +1499,9 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				currentFunction := currentFunction.Clone()
 
 			switch msgResult, false {
-				case "Cancel":
+				case translate("Cancel"):
 					function := false
-				case "Yes":
+				case translate("On/Off"), translate("Increase"):
 					if currentFunction {
 						if (currentFunction.Length == 1)
 							function := [function, ""]
@@ -1512,7 +1513,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 					}
 					else
 						function := [function, ""]
-				case "No":
+				case translate("Off"), translate("Decrease"):
 					if currentFunction {
 						if (currentFunction.Length == 1)
 							function := ["", function]

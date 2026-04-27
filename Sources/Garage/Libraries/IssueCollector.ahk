@@ -166,7 +166,7 @@ class IssueCollector {
 		DirCreate(this.iSoundsDirectory)
 
 		FileCopy(kResourcesDirectory . "Sounds\*", this.iSoundsDirectory)
-		FileCopy(kUserHomeDirectory . "Sounds\*", this.iSoundsDirectory)
+		FileCopy(kUserHomeDirectory . "Sounds\*", this.iSoundsDirectory, 1)
 
 		OnExit((*) {
 			deleteDirectory(this.iSoundsDirectory)

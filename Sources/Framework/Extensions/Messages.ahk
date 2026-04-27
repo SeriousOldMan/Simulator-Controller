@@ -215,7 +215,7 @@ class MessageManager extends PeriodicTask {
 
 					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-					if isLogLevel(kLogInfo)
+					if (!isDebug() && isLogLevel(kLogInfo))
 						logMessage(kLogInfo, translate("Dispatching message `"") . category . translate("`": ") . data[2])
 
 					result.Push(Array(messageHandler, category, decode(data[2])))
@@ -268,7 +268,7 @@ class MessageManager extends PeriodicTask {
 
 					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-					if isLogLevel(kLogInfo)
+					if (!isDebug() && isLogLevel(kLogInfo))
 						logMessage(kLogInfo, translate("Dispatching message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
 					if (request = "INTR") {
@@ -411,19 +411,19 @@ class MessageManager extends PeriodicTask {
 
 		switch messageType {
 			case kLocalMessage:
-				if isLogLevel(kLogInfo)
+				if (!isDebug() && isLogLevel(kLogInfo))
 					logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" in current process"))
 
 				messageHandlers := MessageManager.MessageHandlers
 
 				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandler := messageHandlers["*"])
 
-				if isLogLevel(kLogInfo)
+				if (!isDebug() && isLogLevel(kLogInfo))
 					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
 				Task.startTask(ObjBindMethod(messageHandler, "call", category, data))
 			case kWindowMessage:
-				if isLogLevel(kLogInfo)
+				if (!isDebug() && isLogLevel(kLogInfo))
 					logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" to target ") . target)
 
 				if (request = "INTR")
@@ -431,12 +431,12 @@ class MessageManager extends PeriodicTask {
 				else
 					this.OutgoingMessages.Push(sendWindowMessage.Bind(target, category, data, request))
 			case kPipeMessage:
-				if isLogLevel(kLogInfo)
+				if (!isDebug() && isLogLevel(kLogInfo))
 					logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
 				this.OutgoingMessages.Push(ObjBindMethod(this, "sendPipeMessage", category, data))
 			case kFileMessage:
-				if isLogLevel(kLogInfo)
+				if (!isDebug() && isLogLevel(kLogInfo))
 					logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" to target ") . target)
 
 				this.OutgoingMessages.Push(ObjBindMethod(this, "sendFileMessage", target, category, data, request))
@@ -580,7 +580,7 @@ receiveWindowMessage(wParam, lParam, *) {
 
 	messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : messageHandlers["*"])
 
-	if isLogLevel(kLogInfo)
+	if (!isDebug() && isLogLevel(kLogInfo))
 		logMessage(kLogInfo, translate("Dispatching message `"") . request . "/" . category . (data ? translate("`": ") . data : translate("`"")))
 
 	if ((request = "RS") || (request = "DC") || (request = "INTR")) {

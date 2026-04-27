@@ -2217,6 +2217,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - 1500), &x, &y)
 						instructions .= (section . A_Space . "Set" . A_Space . x . A_Space . y . A_Space . distance . A_Space . countdownTwo . "`n")
+
 					if telemetry.findCoordinates("Time", normalizeTime(brakeTime - delta), &x, &y)
 						instructions .= (section . A_Space . "Brake" . A_Space . x . A_Space . y . A_Space . distance . A_Space . brakeCommand)
 

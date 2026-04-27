@@ -1027,8 +1027,9 @@ namespace ACSHMCoach {
 				physics = ReadPhysics();
 				graphics = ReadGraphics();
 				staticInfo = ReadStaticInfo();
+                cars = ReadCars();
 
-				if (handlingAnalyzer)
+                if (handlingAnalyzer)
                 {
                     if (collectTelemetry(soundsDirectory, audioDevice))
 					{

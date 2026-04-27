@@ -2670,8 +2670,8 @@ class RecolorizerTask extends PeriodicTask {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
-; MsgDlg(Text?, Title?, Options?, IconPath?) => messageDialog(Text?, Title?, Options?, IconPath?)
+; MsgDlg(Text?, Title?, Options?, IconPath?) => Theme.ThemedDialog(MsgBox, Text?, Title?, Options?, IconPath?)
+MsgDlg(Text?, Title?, Options?, IconPath?) => messageDialog(Text?, Title?, Options?, IconPath?)
 
 InputDlg(Prompt?, Title?, Options?, Default?) => Theme.ThemedDialog(InputBox, Prompt?, Title?, Options?, Default?)
 ; InputDlg(Prompt?, Title?, Options?, Default?) => inputDialog(Prompt?, Title?, Options?, Default?)
@@ -3035,41 +3035,45 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 		h := (options.HasProp("Height") ? options.Height : h)
 
 		if options.HasProp("Options") {
-			if (options.Options & 16)
-				options.Mode := "Error"
+			if !options.HasProp("Mode") {
+				if ((options.Options & 16) == 16)
+					options.Mode := "Error"
 
-			if (options.Options & 32)
-				options.Mode := "Question"
+				if ((options.Options & 32) == 32)
+					options.Mode := "Question"
 
-			if (options.Options & 48)
-				options.Mode := "Warning"
+				if ((options.Options & 48) == 48)
+					options.Mode := "Warning"
 
-			if (options.Options & 64)
-				options.Mode := "Info"
+				if ((options.Options & 64) == 64)
+					options.Mode := "Info"
+			}
 
-			buttons := (options.Options & 15)
+			if !options.HasProp("Buttons") {
+				buttons := (options.Options & 15)
 
-			if (buttons == 0)
-				options.Buttons := ["Ok"]
-			else if (buttons == 1)
-				options.Buttons := ["Ok", "Cancel"]
-			else if (buttons == 2)
-				options.Buttons := ["Abort", "Retry", "Ignore"]
-			else if (buttons == 3)
-				options.Buttons := ["Yes", "No", "Cancel"]
-			else if (buttons == 4)
-				options.Buttons := ["Yes", "No"]
-			else if (buttons == 5)
-				options.Buttons := ["Retry", "Cancel"]
-			else if (buttons == 6)
-				options.Buttons := ["Cancel", "Try Again", "Continue"]
+				if (buttons == 0)
+					options.Buttons := ["Ok"]
+				else if (buttons == 1)
+					options.Buttons := ["Ok", "Cancel"]
+				else if (buttons == 2)
+					options.Buttons := ["Abort", "Retry", "Ignore"]
+				else if (buttons == 3)
+					options.Buttons := ["Yes", "No", "Cancel"]
+				else if (buttons == 4)
+					options.Buttons := ["Yes", "No"]
+				else if (buttons == 5)
+					options.Buttons := ["Retry", "Cancel"]
+				else if (buttons == 6)
+					options.Buttons := ["Cancel", "Try Again", "Continue"]
+			}
 		}
 
 		if !options.HasProp("Mode")
 			options.Mode := "Info"
 
 		if !options.HasProp("Buttons")
-			options.Buttons := ["Ok"]
+			options.Buttons := [translate("Ok")]
 
 		w := Max((options.Buttons.Length * 80) + ((options.Buttons.Length - 1) * 10), w)
 
@@ -3087,6 +3091,8 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 		}
 
 		messageGui := Window({Options: "0x400000"}, title)
+
+		messageGui.Opt("+AlwaysOnTop")
 
 		messageGui.SetFont("Norm", "Arial")
 

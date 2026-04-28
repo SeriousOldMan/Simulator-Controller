@@ -249,11 +249,12 @@ class TranslationsEditor extends ConfiguratorPanel {
 	deleteLanguage() {
 		local msgResult, languageCode, code, language, ignore, fileName
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete this translation?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete this translation?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			this.iLanguagesChanged := true
 
 			languageCode := kUndefined
@@ -440,9 +441,7 @@ class TranslationsList extends ConfigurationItemList {
 			if ((index > this.CurrentItem) && (translation[2] = ""))
 				return index
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, translate("There is no missing translation..."), translate("Information"), 262192)
-		OnMessage(0x44, translateOkButton, 0)
 
 		return false
 	}
@@ -486,11 +485,12 @@ class TranslationsList extends ConfigurationItemList {
 			this.updateItem()
 
 		if this.iChanged {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes? Any existing translations will be overwritten."), translate("Save"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes? Any existing translations will be overwritten.")
+												  , translate("Save")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes") {
+			if (msgResult = translate("Yes")) {
 				this.iChanged := false
 
 				translations := CaseInsenseMap()
@@ -502,9 +502,7 @@ class TranslationsList extends ConfigurationItemList {
 					translated := item[2]
 
 					if (translations.Has(original) && (translated != translations[original])) {
-						OnMessage(0x44, translateOkButton)
 						withBlockedWindows(MsgDlg, translate("Inconsistent translations detected - please correct..."), translate("Error"), 262160)
-						OnMessage(0x44, translateOkButton, 0)
 
 						return false
 					}

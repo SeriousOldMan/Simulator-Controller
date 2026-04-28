@@ -947,11 +947,12 @@ class TelemetryViewer {
 
 			if this.SelectedLap {
 				if isNumber(this.SelectedLap) {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?")
+														  , translate("Delete")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Yes"))
 						if all
 							this.clear()
 						else
@@ -2519,11 +2520,12 @@ class TrackMap {
 
 					if section {
 						if (false && GetKeyState("Ctrl")) {
-							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
-							OnMessage(0x44, translateYesNoButtons, 0)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?")
+																  , translate("Delete")
+																  , {Options: 262436, Mode: "Question"
+																   , Buttons: collect(["Yes", "No"], translate)})
 
-							if (msgResult = "Yes")
+							if (msgResult = translate("Yes"))
 								this.deleteTrackSection(section)
 						}
 						else {

@@ -514,11 +514,12 @@ initializeSimulatorConfiguration() {
 			Sleep(2000)
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to start with a fresh configuration?")
+												  , translate("Configuration")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				initialize := true
 			else
 				initialize := false
@@ -542,9 +543,7 @@ initializeSimulatorConfiguration() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}
@@ -649,9 +648,7 @@ startupSimulatorConfiguration() {
 		if __SCStartTask
 			__SCStartTask.stop()
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Configuration"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

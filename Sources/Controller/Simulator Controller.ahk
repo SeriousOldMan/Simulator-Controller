@@ -2305,9 +2305,7 @@ initializeSimulatorController() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}
@@ -2338,9 +2336,7 @@ startupSimulatorController() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Controller"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

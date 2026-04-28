@@ -183,9 +183,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 					return connectorOrCommand.GetSessionToken()
 				}
 				catch Any as exception {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					return false
 				}
@@ -1707,9 +1705,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 					throw "Invalid or missing token..."
 			}
 			catch Any as exception {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
 	}
@@ -1729,9 +1725,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		 || !isPositiveNumber(settingsGui["fuelConsumptionEdit"].Text, settingsGui["pitstopRefuelServiceEdit"].Text
 							, settingsGui["repairSuspensionThresholdEdit"].Text, settingsGui["repairBodyworkThresholdEdit"].Text, settingsGui["repairEngineThresholdEdit"].Text)
 		 || (!isInteger(settingsGui["trafficConsideredEdit"].Text) || (settingsGui["trafficConsideredEdit"].Text < 1) || (settingsGui["trafficConsideredEdit"].Text > 100))) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}

@@ -160,9 +160,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 			local result, password, firstPassword, secondPassword
 
 			errorMessage(message) {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, message, translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 			}
 
 			if this.Token {
@@ -211,11 +209,8 @@ class TeamManagementPanel extends ConfiguratorPanel {
 					errorMessage(translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 				}
 			}
-			else {
-				OnMessage(0x44, translateOkButton)
+			else
 				withBlockedWindows(MsgDlg, translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 
 		teamServerLogin(*) {
@@ -241,11 +236,12 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		renewDataToken(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to renew the data token? The current token will become invalid for all users."), translate("Renew"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to renew the data token? The current token will become invalid for all users.")
+												  , translate("Renew")
+												  , {Options: 262436, Mode: "Warning"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				this.renewDataToken()
 		}
 
@@ -269,11 +265,12 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		deleteTeam(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected team?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected team?")
+												  , translate("Delete")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				this.withExceptionHandler(ObjBindMethod(this, "deleteTeam"), this.SelectedTeam)
 		}
 
@@ -304,11 +301,12 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		deleteDriver(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected driver?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected driver?")
+												  , translate("Delete")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				this.withExceptionHandler(ObjBindMethod(this, "deleteDriver"), this.SelectedDriver)
 		}
 
@@ -346,11 +344,12 @@ class TeamManagementPanel extends ConfiguratorPanel {
 		deleteSession(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected session?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected session?")
+												  , translate("Delete")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				this.withExceptionHandler(ObjBindMethod(this, "deleteSession"), this.SelectedSession)
 		}
 
@@ -627,11 +626,8 @@ class TeamManagementPanel extends ConfiguratorPanel {
 				this.Control["teamServerTimeText"].Opt("+c" . this.Window.Theme.TextColor["Disabled"])
 				this.Control["teamServerTimeText"].Text := translate("Please Login for actual data...")
 
-				if message {
-					OnMessage(0x44, translateOkButton)
+				if message
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 
 				this.iToken := false
 			}
@@ -1069,9 +1065,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 			if message.HasProp("Message")
 				message := message.Message
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 }

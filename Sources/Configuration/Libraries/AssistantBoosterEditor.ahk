@@ -152,15 +152,13 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		chooseModelPath(field, *) {
-			local fileName, translator
+			local fileName
 
 			editorGui.Opt("+OwnDialogs")
 
-			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
-
-			OnMessage(0x44, translator)
+			OnMessage(0x44, translateSelectCancelButtons)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "")
 				editorGui[field].Text := fileName
@@ -1280,18 +1278,15 @@ class CallbacksEditor {
 		}
 
 		Close(*) {
-			local translator
-
 			if this.Closeable {
-				translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?")
+													  , translate("Close")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?"), translate("Close"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					this.CallbacksEditor.iResult := kOk
-				else if (msgResult = "No")
+				else if (msgResult = translate("No"))
 					this.CallbacksEditor.iResult := kCancel
 
 				return true
@@ -1997,7 +1992,7 @@ class CallbacksEditor {
 				SplitPath(fileName, , , , &name)
 
 				FileCopy(fileName, kTempDirectory . name . ".zip", 1)
-										
+
 				expand(kTempDirectory . name . ".zip", directory)
 
 				loop Files, directory . "\*" . extension {
@@ -2359,9 +2354,7 @@ class CallbacksEditor {
 			if (StrLen(errorMessage) > 0)
 				errorMessage := ("`n" . errorMessage)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 
 		return valid
@@ -2444,9 +2437,7 @@ class CallbacksEditor {
 			if (StrLen(errorMessage) > 0)
 				errorMessage := ("`n" . errorMessage)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 
 		return valid
@@ -2531,9 +2522,7 @@ class CallbacksEditor {
 							RuleCompiler().compileRules(theCallback.Script, &ignore := false, &ignore := false)
 						}
 						catch Any as exception {
-							OnMessage(0x44, translateOkButton)
 							withBlockedWindows(MsgDlg, "Error in builtin rule " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
 						}
 
 					theCallback.Definition := ""
@@ -2556,9 +2545,7 @@ class CallbacksEditor {
 							}
 						}
 						catch Any as exception {
-							OnMessage(0x44, translateOkButton)
 							withBlockedWindows(MsgDlg, "Error in builtin script " . theCallback.Name . ":`n`n" . (isObject(exception) ? exception.Message : exception), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
 						}
 
 					theCallback.Definition := ""

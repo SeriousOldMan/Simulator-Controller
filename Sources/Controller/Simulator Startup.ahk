@@ -255,9 +255,7 @@ class SimulatorStartup extends ConfigurationItem {
 				return false
 			}
 			else if (noConfiguration && (readMultiMap(kSimulatorConfigurationFile).Count == 0)) {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, translate("Cannot initiate startup sequence, please check the configuration..."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 
 				exitStartup(true)
 
@@ -905,11 +903,12 @@ launchPad(command := false, arguments*) {
 	closeAll(*) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to close all currently running applications? Unsaved data might be lost."), translate("Modular Simulator Controller System"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
+											  , translate("Modular Simulator Controller System")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes")
+		if (msgResult = translate("Yes"))
 			launchPad("Close All", GetKeyState("Ctrl"))
 	}
 
@@ -1630,11 +1629,12 @@ closeLaunchPad(*) {
 	local msgResult
 
 	if GetKeyState("Ctrl") {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to close all currently running applications? Unsaved data might be lost."), translate("Modular Simulator Controller System"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
+											  , translate("Modular Simulator Controller System")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes")
+		if (msgResult = translate("Yes"))
 			launchPad(kClose, true)
 	}
 	else
@@ -2018,7 +2018,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 	local checkedRows, checked, settingsTab, first, configuration
 	local profile, plugin, pluginConfiguration, ignore, lastModified
 	local dllFile, connection
-	local names, exception, chosen, fileName, selected, translator, msgResult
+	local names, exception, chosen, fileName, selected, msgResult
 
 	static done := false
 
@@ -2367,9 +2367,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		local ignore, plugin, function, index
 
 		if (Trim(profilesEditorGui["profileNameEdit"].Text) = "") {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
@@ -2530,19 +2528,18 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			if (fileName != "")
 				if (profiles.Length > 0) {
-					translator := translateMsgDlgButtons.Bind(["Insert", "Replace", "Cancel"])
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?")
+														  , translate("Import")
+														  , {Options: 262179, Mode: "Question"
+														   , Buttons: collect(["Insert", "Replace", "Cancel"], translate)})
 
-					OnMessage(0x44, translator)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to replace all current entries or do you want to add the imported entries to the list?"), translate("Import"), 262179)
-					OnMessage(0x44, translator, 0)
-
-					if (msgResult = "Cancel")
+					if (msgResult = translate("Cancel"))
 						return
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Insert"))
 						loadProfiles(fileName, false)
 
-					if (msgResult = "No")
+					if (msgResult = translate("Replace"))
 						loadProfiles(fileName, true)
 				}
 				else
@@ -2685,9 +2682,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 				catch Any as exception {
 					logError(exception, true)
 
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 				}
 				finally {
 					profilesEditorGui.Unblock()
@@ -2703,9 +2698,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			catch Any as exception {
 				logError(exception, true)
 
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: kBinariesDirectory . "Race Settings.exe"}), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 			}
 			finally {
 				profilesEditorGui.Unblock()
@@ -2910,9 +2903,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 						throw "Invalid or missing token..."
 				}
 				catch Any as exception {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 				}
 			}
 		}
@@ -3379,9 +3370,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 					return connectorOrCommand.GetSessionToken()
 				}
 				catch Any as exception {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					return false
 				}
@@ -3449,9 +3438,7 @@ startSimulator() {
 
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 
 				ExitApp(0)
 			}
@@ -3573,9 +3560,7 @@ startSimulator() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Startup"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}
@@ -3595,11 +3580,12 @@ cancelStartup(*) {
 			startupManager.hideSplashScreen()
 
 			if !startupManager.Finished {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Cancel Startup?"), translate("Startup"), 262180)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Cancel Startup?")
+													  , translate("Startup")
+													  , {Options: 262180, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes") {
+				if (msgResult = translate("Yes")) {
 					if (startupManager.ControllerPID != 0)
 						messageSend(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
 

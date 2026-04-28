@@ -240,9 +240,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				password := result.Value
 
 				if (teamServerPasswordEdit != password) {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, translate("Invalid password."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					return
 				}
@@ -258,9 +256,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 						secondPassword := result.Value
 
 						if (firstPassword != secondPassword) {
-							OnMessage(0x44, translateOkButton)
 							withBlockedWindows(MsgDlg, translate("The passwords do not match."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
 
 							return
 						}
@@ -270,11 +266,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				}
 			}
 		}
-		else {
-			OnMessage(0x44, translateOkButton)
+		else
 			withBlockedWindows(MsgDlg, translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 	}
 
 	selectAccount(listView, line, selected) {
@@ -292,11 +285,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 	deleteAccount(*) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected account?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected account?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes")
+		if (msgResult = translate("Yes"))
 			administrationEditor(kEvent, "AccountDelete")
 	}
 
@@ -366,9 +360,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			administrationEditor(kEvent, "TasksReset")
 			administrationEditor(kEvent, "AccountClear")
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 	else if (configurationOrCommand = kToken)
@@ -533,11 +525,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "UpdateState")
 			}
 			else if (arguments[1] = "UpdateAvailableMinutes") {
-				if (account == true) {
-					OnMessage(0x44, translateOkButton)
+				if (account == true)
 					withBlockedWindows(MsgDlg, translate("You must save the account before you can change the number of available minutes."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 				else {
 					administrationGui.Opt("+OwnDialogs")
 
@@ -655,11 +644,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "LoadObjects")
 				loadObjects(connector, objectsListView)
 			else if (arguments[1] = "CompactDatabase") {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted..."), translate("Compact"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to compact the database? This can take quite a while and cannot be interrupted...")
+													  , translate("Compact")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					withBlockedWindows(() {
 						withTask(ProgressTask(translate("Compacting Database")), () {
 							try {
@@ -684,9 +674,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 	else {
@@ -896,9 +884,7 @@ startupServerAdministration() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Server Administration"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

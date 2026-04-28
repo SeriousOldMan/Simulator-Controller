@@ -421,9 +421,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 		catch Any as exception {
 			logError(exception, true)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 		}
 		finally {
 			settingsEditorGui.Unblock()

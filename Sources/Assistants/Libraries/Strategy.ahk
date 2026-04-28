@@ -148,10 +148,8 @@ class StrategySimulation {
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 	}
@@ -189,10 +187,8 @@ class StrategySimulation {
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
 
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return false
 		}
 	}
@@ -346,10 +342,8 @@ class StrategySimulation {
 					scriptSetGlobal(scriptEngine, "extern")
 
 					if !scriptExecute(scriptEngine, &message) {
-						OnMessage(0x44, translateOkButton)
 						withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-
+						
 						return false
 					}
 					else

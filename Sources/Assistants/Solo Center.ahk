@@ -256,7 +256,7 @@ class SoloCenter extends ConfigurationItem {
 		}
 
 		Close(*) {
-			local save, translator
+			local save, msgResult
 
 			if this.Closeable {
 				save := (this.SoloCenter.AutoSave && this.SoloCenter.SessionActive)
@@ -266,16 +266,15 @@ class SoloCenter extends ConfigurationItem {
 						if this.SoloCenter.AutoExport
 							this.SoloCenter.exportSession(true)
 						else {
-							translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer your data to the session database before closing?")
+																  , translate("Export")
+																  , {Options: 262179, Mode: "Question"
+																   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 
-							OnMessage(0x44, translator)
-							msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer your data to the session database before closing?"), translate("Export"), 262179)
-							OnMessage(0x44, translator, 0)
-
-							if (msgResult = "Yes")
+							if (msgResult = translate("Yes"))
 								this.SoloCenter.exportSession(true)
 
-							if (msgResult = "Cancel") {
+							if (msgResult = translate("Cancel")) {
 								save := false
 
 								return true
@@ -1493,11 +1492,8 @@ class SoloCenter extends ConfigurationItem {
 		importPressures(*) {
 			if center.Simulator
 				center.withExceptionhandler(ObjBindMethod(center, "importFromSimulation", center.Simulator))
-			else {
-				OnMessage(0x44, translateOkButton)
+			else
 				withBlockedWindows(MsgDlg, translate("You must first select a simulation."), translate("Information"), 262192)
-				OnMessage(0x44, translateOkButton, 0)
-			}
 		}
 
 		selectTyreCompound(listView, line, selected) {
@@ -1981,11 +1977,8 @@ class SoloCenter extends ConfigurationItem {
 
 			this.TelemetryViewer.show()
 		}
-		else if verbose {
-			OnMessage(0x44, translateOkButton)
+		else if verbose
 			withBlockedWindows(MsgDlg, translate("You are not connected to an active session."), translate("Information"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 
 		this.updateSessionMenu()
 	}
@@ -2041,11 +2034,12 @@ class SoloCenter extends ConfigurationItem {
 				if this.AutoClear
 					this.clearSession(true)
 				else {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?")
+														  , translate("Information")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "No") {
+					if (msgResult = translate("No")) {
 						this.Control["simulatorDropDown"].Choose(inList(this.getAvailableSimulators(), this.Simulator))
 
 						return false
@@ -2091,11 +2085,12 @@ class SoloCenter extends ConfigurationItem {
 				if this.AutoClear
 					this.clearSession(true)
 				else {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?")
+														  , translate("Information")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "No") {
+					if (msgResult = translate("No")) {
 						this.Control["carDropDown"].Choose(inList(this.getAvailableCars(this.Simulator), this.Car))
 
 						return false
@@ -2144,11 +2139,12 @@ class SoloCenter extends ConfigurationItem {
 				if this.AutoClear
 					this.clearSession(true)
 				else {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?"), translate("Information"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you really want to continue?")
+														  , translate("Information")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "No") {
+					if (msgResult = translate("No")) {
 						this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), this.Track))
 
 						return false
@@ -2303,9 +2299,7 @@ class SoloCenter extends ConfigurationItem {
 		local mixedCompounds, index, tyre, axle
 
 		if !prefix {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("This is not supported for the selected simulator..."), translate("Warning"), 262192)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return
 		}
@@ -2731,11 +2725,12 @@ class SoloCenter extends ConfigurationItem {
 				updateSetting("AutoTelemetry", this.AutoTelemetry)
 			case 8: ; Clear...
 				if this.SessionActive {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all data from the currently active session? This cannot be undone."), translate("Delete"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete all data from the currently active session? This cannot be undone.")
+														  , translate("Delete")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Yes"))
 						this.clearSession()
 				}
 				else
@@ -2745,11 +2740,8 @@ class SoloCenter extends ConfigurationItem {
 			case 11: ; Save Session...
 				if this.HasData
 					this.saveSession(true)
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no session data to be saved."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 			case 13: ; Telemetry Viewer
 				if GetKeyState("Ctrl") {
 					if isInstance(this.TelemetryCollector, TelemetryCollector) {
@@ -2774,18 +2766,16 @@ class SoloCenter extends ConfigurationItem {
 				this.showSessionSummary(GetKeyState("Ctrl"))
 			case 19: ; Export data
 				if (this.HasData && !this.SessionExported) {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer the selected data to the session database? This is only possible once."), translate("Delete"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer the selected data to the session database? This is only possible once.")
+														  , translate("Delete")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes")
+					if (msgResult = translate("Yes"))
 						this.exportSession()
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 
 		this.updateSessionMenu()
@@ -2855,11 +2845,8 @@ class SoloCenter extends ConfigurationItem {
 
 						this.withExceptionhandler(ObjBindMethod(this, "newRun", lastLap ? (lastLap.Nr + 1) : 1))
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("You must have manual stint mode enabled to create a new stint manually."), translate("Information"), 262192)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				case 5:
 					this.showRunsSummary(GetKeyState("Ctrl"))
 			}
@@ -2880,9 +2867,7 @@ class SoloCenter extends ConfigurationItem {
 			catch Any as exception {
 				logError(exception, true)
 
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 			}
 	}
 
@@ -5509,11 +5494,8 @@ class SoloCenter extends ConfigurationItem {
 
 						info := readMultiMap(folder . "Practice.info")
 
-						if (info.Count == 0) {
-							OnMessage(0x44, translateOkButton)
+						if (info.Count == 0)
 							withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
-						}
 						else {
 							this.UsedTyreSetsListView.Opt("-Redraw")
 							this.RunsListView.Opt("-Redraw")
@@ -8116,7 +8098,7 @@ class SoloCenter extends ConfigurationItem {
 	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local save, translator, msgResult, track, trackLength
+			local save, msgResult, track, trackLength
 
 			if fileName
 				data := readMultiMap(fileName)
@@ -8136,23 +8118,21 @@ class SoloCenter extends ConfigurationItem {
 							this.saveSession(true, false, false, false)
 					}
 					else {
-						if !this.SessionExported {
-							translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
-
-							OnMessage(0x44, translator)
-							msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?"), translate("Export"), 262179)
-							OnMessage(0x44, translator, 0)
-						}
+						if !this.SessionExported
+							msgResult := withBlockedWindows(MsgDlg, translate("You have unsaved data. Do you want to transfer it to the session database before starting a new session?")
+																  , translate("Export")
+																  , {Options: 262179, Mode: "Question"
+																   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 						else
-							msgResult := "No"
+							msgResult := translate("No")
 
-						if (msgResult = "Yes")
+						if (msgResult = translate("Yes"))
 							this.exportSession(true)
 
 						if save
 							this.saveSession(true, false, false)
 
-						if (msgResult = "Cancel") {
+						if (msgResult = translate("Cancel")) {
 							this.iSessionMode := "Finished"
 
 							return
@@ -8653,9 +8633,7 @@ startupSoloCenter() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Solo Center"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

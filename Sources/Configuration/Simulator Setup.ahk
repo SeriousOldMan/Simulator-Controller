@@ -533,11 +533,12 @@ class SetupWizard extends ConfiguratorPanel {
 		this.iCount := count
 
 		if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to start with a fresh configuration?"), translate("Setup "), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to start with a fresh configuration?")
+												  , translate("Setup ")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				initialize := true
 			else
 				initialize := false
@@ -679,11 +680,12 @@ class SetupWizard extends ConfiguratorPanel {
 			else {
 				this.WizardWindow.Show()
 
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder.")), translate("Setup "), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, (translate("Do you want to generate the new configuration?") . "`n`n" . translate("Backup files will be saved for your current configuration in the `"Simulator Controller\Config`" folder in your user `"Documents`" folder."))
+													  , translate("Setup ")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					save := true
 				else
 					save := false
@@ -2838,9 +2840,7 @@ class StartStepWizard extends StepWizard {
 		elevateAndRestart(*) {
 			if !A_IsAdmin {
 				if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, translate("Simulator Controller cannot request Admin privileges. Please enable User Account Control."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					ExitApp(0)
 				}
@@ -3273,9 +3273,7 @@ initializeSimulatorSetup() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}
@@ -3374,9 +3372,7 @@ startupSimulatorSetup() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Simulator Setup"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

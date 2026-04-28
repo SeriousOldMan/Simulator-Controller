@@ -770,11 +770,12 @@ class RaceReports extends ConfigurationItem {
 	deleteRace() {
 		local raceDirectory, simulators, window, prefix, simulator, car, track, msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected report?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected report?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
 			car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
 			track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
@@ -951,11 +952,12 @@ startupRaceReports() {
 		}
 
 		if !reportsDirectory {
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?")
+												  , translate("Configuration")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				Run(kBinariesDirectory . "Simulator Configuration.exe")
 
 			ExitApp(0)
@@ -1002,9 +1004,7 @@ startupRaceReports() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Race Reports"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

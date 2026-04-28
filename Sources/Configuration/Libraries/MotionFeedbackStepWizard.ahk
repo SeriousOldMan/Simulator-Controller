@@ -293,23 +293,24 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		if super.savePage(page) {
 			if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
-				OnMessage(0x44, translateYesNoButtons)
 				msgResult := withBlockedWindows(MsgDlg, translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
-								  , translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+													  , translate("Warning")
+													  , {Options: 262436, Mode: "Warning"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					return false
 			}
 
 			function := this.getActionFunction(false, "Motion")
 
 			if !function {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?")
+													  , translate("Warning")
+													  , {Options: 262436, Mode: "Warning"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					return false
 			}
 
@@ -318,11 +319,12 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			effectIntensityField := this.Control["effectIntensityField"].Text
 
 			if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?")
+													  , translate("Warning")
+													  , {Options: 262436, Mode: "Warning"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "No")
+				if (msgResult = translate("No"))
 					return false
 			}
 
@@ -761,9 +763,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			if !valid {
 				message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
 
-				OnMessage(0x44, translateOkButton)
 				withBlockedWindows(MsgDlg, translate(message), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
 
 				return
 			}

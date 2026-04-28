@@ -18,6 +18,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUProvider extends Sector397Provider {
+	static kLMUSHMVersion := "RF2"
+
 	iTeamData := false
 	iTrackData := false
 	iDriversData := false
@@ -32,6 +34,19 @@ class LMUProvider extends Sector397Provider {
 	static Simulator {
 		Get {
 			return "Le Mans Ultimate"
+		}
+	}
+
+	static Protocols {
+		Get {
+			local protocols := super.Protocols
+			local ignore, protocol
+
+			if (LMUProvider.kLMUSHMVersion = "RF2")
+				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
+					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
+
+			return protocols
 		}
 	}
 

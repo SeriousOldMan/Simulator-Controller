@@ -500,7 +500,7 @@ class Theme {
 			result := StrReplace(textOrCommand, kResult, "")
 		else {
 			if !isObject(options) {
-				newOptions := {Mode: "Info"}
+				newOptions := {}
 
 				if RegExMatch(options, "Owner([0-9]+)", &result) {
 					newOptions.Owner := result[1]

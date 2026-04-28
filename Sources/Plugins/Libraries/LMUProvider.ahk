@@ -44,7 +44,7 @@ class LMUProvider extends Sector397Provider {
 
 			if (LMUProvider.kLMUSHMVersion = "RF2")
 				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
-					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
+					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
 
 			return protocols
 		}

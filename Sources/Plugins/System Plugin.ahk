@@ -1071,11 +1071,12 @@ stopSimulation() {
 shutdownSystem() {
 	local msgResult
 
-	OnMessage(0x44, translateYesNoButtons)
-	msgResult := withBlockedWindows(MsgDlg, translate("Shutdown Simulator?"), translate("Shutdown"), 262436)
-	OnMessage(0x44, translateYesNoButtons, 0)
+	msgResult := withBlockedWindows(MsgDlg, translate("Shutdown Simulator?")
+										  , translate("Shutdown")
+										  , {Options: 262436, Mode: "Question"
+										   , Buttons: collect(["Yes", "No"], translate)})
 
-	if (msgResult = "Yes")
+	if (msgResult = translate("Yes"))
 		Shutdown(1)
 }
 

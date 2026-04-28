@@ -2778,7 +2778,7 @@ class SoloCenter extends ConfigurationItem {
 					withBlockedWindows(MsgDlg, translate("There is no session data to be exported or the session already been exported."), translate("Information"), 262192)
 		}
 
-		this.updateSessionMenu()/
+		this.updateSessionMenu()
 	}
 
 	chooseDataMenu(line) {

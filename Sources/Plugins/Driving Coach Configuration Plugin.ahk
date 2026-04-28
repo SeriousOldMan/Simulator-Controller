@@ -122,15 +122,13 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 
 		chooseModelPath(*) {
-			local fileName, translator
+			local fileName
 
 			window.Opt("+OwnDialogs")
 
-			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
-
-			OnMessage(0x44, translator)
+			OnMessage(0x44, translateSelectCancelButtons)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "")
 				window["dcLLMRTModelEdit"].Text := fileName

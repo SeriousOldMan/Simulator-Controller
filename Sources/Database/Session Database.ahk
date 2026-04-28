@@ -1231,11 +1231,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					if action {
 						if GetKeyState("Ctrl") {
-							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
-							OnMessage(0x44, translateYesNoButtons, 0)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected action?")
+																  , translate("Delete")
+																  , {Options: 262436, Mode: "Question"
+																   , Buttons: collect(["Yes", "No"], translate)})
 
-							if (msgResult = "Yes")
+							if (msgResult = translate("Yes"))
 								editor.deleteTrackAction(action)
 						}
 						else {
@@ -1284,11 +1285,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					if section {
 						if (false && GetKeyState("Ctrl")) {
-							OnMessage(0x44, translateYesNoButtons)
-							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?"), translate("Delete"), 262436)
-							OnMessage(0x44, translateYesNoButtons, 0)
+							msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected section?")
+																  , translate("Delete")
+																  , {Options: 262436, Mode: "Question"
+																   , Buttons: collect(["Yes", "No"], translate)})
 
-							if (msgResult = "Yes")
+							if (msgResult = translate("Yes"))
 								editor.deleteTrackSection(section)
 						}
 						else {
@@ -1416,11 +1418,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		deleteTrackAutomation(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected automation?")
+												  , translate("Delete")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				editor.deleteTrackAutomation()
 		}
 
@@ -1490,11 +1493,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							folder := temporaryFileName("Data", "export")
 
 							DirCreate(folder)
-								
+
 							FileCopy(fileName, fileName . ".zip", 1)
-							
+
 							expand(fileName . ".zip", folder)
-						
+
 							deleteFile(fileName . ".zip")
 						}
 						catch Any {
@@ -1521,23 +1524,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								editorGui.Unblock()
 							}
 						}
-						else {
-							OnMessage(0x44, translateOkButton)
+						else
 							withBlockedWindows(MsgDlg, translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
-						}
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("This is not a valid folder with exported data."), translate("Error"), 262160)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("This is not a valid folder with exported data."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 
 		exportSettings(*) {
@@ -1572,11 +1566,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					withTask(ProgressTask(translate("Importing settings")), () {
 						try {
 							folder := temporaryFileName("Settings", "export")
-							
+
 							DirCreate(folder)
 
 							FileCopy(fileName, fileName . ".zip", 1)
-							
+
 							expand(fileName . ".zip", folder)
 						}
 						catch Any {
@@ -1603,23 +1597,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								editorGui.Unblock()
 							}
 						}
-						else {
-							OnMessage(0x44, translateOkButton)
+						else
 							withBlockedWindows(MsgDlg, translate("The settings has not been exported for the currently selected simulator."), translate("Error"), 262160)
-							OnMessage(0x44, translateOkButton, 0)
-						}
 					}
-					else {
-						OnMessage(0x44, translateOkButton)
+					else
 						withBlockedWindows(MsgDlg, translate("This is not a valid folder with exported settings."), translate("Error"), 262160)
-						OnMessage(0x44, translateOkButton, 0)
-					}
 				}
-				else {
-					OnMessage(0x44, translateOkButton)
+				else
 					withBlockedWindows(MsgDlg, translate("This is not a valid folder with exported settings."), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
-				}
 		}
 
 		editData(listView, line, *) {
@@ -1730,11 +1715,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		deleteData(*) {
 			local msgResult
 
-			OnMessage(0x44, translateYesNoButtons)
-			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-			OnMessage(0x44, translateYesNoButtons, 0)
+			msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?")
+												  , translate("Delete")
+												  , {Options: 262436, Mode: "Question"
+												   , Buttons: collect(["Yes", "No"], translate)})
 
-			if (msgResult = "Yes")
+			if (msgResult = translate("Yes"))
 				editor.deleteData()
 		}
 
@@ -1751,11 +1737,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			persistent := false
 
 			if GetKeyState("Ctrl") {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to change the scope for all applications?")
+													  , translate("Modular Simulator Controller System")
+													  , {Options: 262436, Mode: "Question"
+													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					persistent := true
 			}
 
@@ -3515,7 +3502,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			writeMultiMap(directory . "\Export.info", info)
 
 			writeMultiMap(directory . "\Export.settings", settings)
-			
+
 			compress(directory, "*.*", fileName . ".zip")
 
 			FileMove(fileName . ".zip", fileName, 1)
@@ -4945,7 +4932,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				setMultiMapValue(info, "Schema", schema, values2String(",", fields*))
 
 			writeMultiMap(directory . "\Export.info", info)
-			
+
 			compress(directory, "*.*", targetFileName . ".zip")
 
 			FileMove(targetFileName . ".zip", targetFileName, 1)
@@ -6564,11 +6551,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteSession(category, sessionName) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected session?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected session?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			this.SessionDatabase.removeSession(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
 											 , category, sessionName)
 
@@ -6747,11 +6735,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteTelemetry(telemetryName) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected lap telemetry?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected lap telemetry?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			this.SessionDatabase.removeTelemetry(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, telemetryName)
 
 			this.loadTelemetries()
@@ -6835,11 +6824,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteStrategy(strategyName) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected strategy?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected strategy?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			this.SessionDatabase.removeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName)
 
 			this.loadStrategies()
@@ -6940,11 +6930,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteSetup(setupType, setupName) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected setup?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected setup?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			this.SessionDatabase.removeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName)
 
 			this.loadSetups(this.SelectedSetupType, true)
@@ -7864,12 +7855,12 @@ editLaps(editorOrCommand, arguments*) {
 			tyresListView.ModifyCol(A_Index, "AutoHdr")
 	}
 	else if (editorOrCommand = "CleanupElectronics") {
-		OnMessage(0x44, translateYesNoButtons)
 		msgResult := withBlockedWindows(MsgDlg, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
-											  , translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			lapsGui.Block()
 
 			try {
@@ -7887,12 +7878,12 @@ editLaps(editorOrCommand, arguments*) {
 		}
 	}
 	else if (editorOrCommand = "CleanupTyres") {
-		OnMessage(0x44, translateYesNoButtons)
 		msgResult := withBlockedWindows(MsgDlg, translate("Entries with lap times or fuel consumption outside the standard deviation will be deleted. Do you want to proceed?")
-											  , translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			lapsGui.Block()
 
 			try {
@@ -7910,11 +7901,12 @@ editLaps(editorOrCommand, arguments*) {
 		}
 	}
 	else if (editorOrCommand = "DeleteElectronics") {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			deleteData("Electronics", "Electronics", (entry) {
 				local index := 0
 				local match, data
@@ -7942,11 +7934,12 @@ editLaps(editorOrCommand, arguments*) {
 		}
 	}
 	else if (editorOrCommand = "DeleteTyres") {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete the selected data?")
+											  , translate("Delete")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes") {
+		if (msgResult = translate("Yes")) {
 			deleteData("Tyres", "Tyres", (entry) {
 				local index := 0
 				local match, data
@@ -8067,7 +8060,7 @@ editSettings(editorOrCommand, arguments*) {
 	local directory, empty, original, changed, restart, groups, replication
 	local oldConnections, ignore, group, enabled, values
 	local identifier, serverURL, serverToken, serverURLs, serverTokens
-	local availableServerURLs, settings, chosen, translator, msgResult, consent
+	local availableServerURLs, settings, chosen, msgResult, consent
 
 	static result := false
 	static sessionDB := false
@@ -8107,11 +8100,12 @@ editSettings(editorOrCommand, arguments*) {
 	rebuildDatabase(*) {
 		local msgResult
 
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to rebuild the local database?"), translate("Team Server"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to rebuild the local database?")
+											  , translate("Team Server")
+											  , {Options: 262436, Mode: "Question"
+											   , Buttons: collect(["Yes", "No"], translate)})
 
-		if (msgResult = "Yes")
+		if (msgResult = translate("Yes"))
 			editSettings("Rebuild")
 	}
 
@@ -8129,11 +8123,8 @@ editSettings(editorOrCommand, arguments*) {
 			groups[connection[1]] := values2String(",", connection[4]*)
 		}
 
-		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length)) {
-			OnMessage(0x44, translateOkButton)
+		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length))
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-		}
 		else
 			result := kOk
 	}
@@ -8308,9 +8299,7 @@ editSettings(editorOrCommand, arguments*) {
 			}
 		}
 		catch Any as exception {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
@@ -8636,9 +8625,7 @@ editSettings(editorOrCommand, arguments*) {
 					restart := false
 
 					if (databaseLocationEdit.Text = "") {
-						OnMessage(0x44, translateOkButton)
 						withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
-						OnMessage(0x44, translateOkButton, 0)
 
 						continue
 					}
@@ -8648,24 +8635,20 @@ editSettings(editorOrCommand, arguments*) {
 								DirCreate(databaseLocationEdit.Text)
 							}
 							catch Any as exception {
-								OnMessage(0x44, translateOkButton)
 								withBlockedWindows(MsgDlg, translate("You must enter a valid directory."), translate("Error"), 262160)
-								OnMessage(0x44, translateOkButton, 0)
 
 								continue
 							}
 
-						translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
-
-						OnMessage(0x44, translator)
 						msgResult := withBlockedWindows(MsgDlg, translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
-										  , translate("Session Database"), 262179)
-						OnMessage(0x44, translator, 0)
+															  , translate("Session Database")
+															  , {Options: 262179, Mode: "Question"
+															   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 
-						if (msgResult = "Cancel")
+						if (msgResult = translate("Cancel"))
 							continue
 
-						if (msgResult = "Yes") {
+						if (msgResult = translate("Yes")) {
 							empty := true
 
 							loop Files, databaseLocationEdit.Text . "\*.*", "FD" {
@@ -8675,9 +8658,7 @@ editSettings(editorOrCommand, arguments*) {
 							}
 
 							if !empty {
-								OnMessage(0x44, translateOkButton)
 								withBlockedWindows(MsgDlg, translate("The new database folder must be empty."), translate("Error"), 262160)
-								OnMessage(0x44, translateOkButton, 0)
 
 								continue
 							}
@@ -8764,10 +8745,8 @@ editSettings(editorOrCommand, arguments*) {
 						writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 						if restart {
-							OnMessage(0x44, translateOkButton)
 							withBlockedWindows(MsgDlg, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
 								 , translate("Information"), 262192)
-							OnMessage(0x44, translateOkButton, 0)
 
 							broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitProcess")
 						}
@@ -8844,9 +8823,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 					return connectorOrCommand.GetDataToken()
 				}
 				catch Any as exception {
-					OnMessage(0x44, translateOkButton)
 					withBlockedWindows(MsgDlg, (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
-					OnMessage(0x44, translateOkButton, 0)
 
 					return false
 				}
@@ -8933,9 +8910,9 @@ startupSessionDatabase() {
 
 				SplitPath(import, &fileName)
 				FileCopy(import, kTempDirectory . fileName . ".zip", 1)
-				
+
 				expand(kTempDirectory . fileName . ".zip", folder)
-							
+
 				import := (folder . "\")
 			}
 
@@ -8971,9 +8948,7 @@ startupSessionDatabase() {
 	catch Any as exception {
 		logError(exception, true)
 
-		OnMessage(0x44, translateOkButton)
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Session Database"}), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
 
 		ExitApp(1)
 	}

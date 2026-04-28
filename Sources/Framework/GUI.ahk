@@ -97,19 +97,19 @@ class Theme {
 				iconFile := params.Pop()
 
 			if (!iconFile && InStr(_this.Name, "MsgBox") && params.Has(3))
-				if (params[3] & 16) {
+				if ((params[3] & 16) == 16) {
 					iconNumber := 1
 					iconFile := (kIconsDirectory . "Dlg Error.ico")
 				}
-				else if (params[3] & 32) {
+				else if ((params[3] & 32) == 32) {
 					iconNumber := 2
 					iconFile := (kIconsDirectory . "Dlg Question.ico")
 				}
-				else if (params[3] & 48) {
+				else if ((params[3] & 48) == 48) {
 					iconNumber := 3
 					iconFile := (kIconsDirectory . "Dlg Warning.ico")
 				}
-				else if (params[3] & 64) {
+				else if ((params[3] & 64) == 64) {
 					iconNumber := 4
 					iconFile := (kIconsDirectory . "Dlg Info.ico")
 				}
@@ -2867,9 +2867,6 @@ translateMsgDlgButtons(buttonLabels, *) {
 	}
 }
 
-translateYesNoButtons := translateMsgDlgButtons.Bind(["Yes", "No"])
-translateOkButton := translateMsgDlgButtons.Bind(["Ok"])
-translateOkCancelButtons := translateMsgDlgButtons.Bind(["Ok", "Cancel"])
 translateLoadCancelButtons := translateMsgDlgButtons.Bind(["Load", "Cancel"])
 translateSaveCancelButtons := translateMsgDlgButtons.Bind(["Save", "Cancel"])
 translateSelectCancelButtons := translateMsgDlgButtons.Bind(["Select", "Cancel"])
@@ -3035,19 +3032,15 @@ messageDialog(textOrCommand := "", title := "", options := {}, iconPath := false
 		h := (options.HasProp("Height") ? options.Height : h)
 
 		if options.HasProp("Options") {
-			if !options.HasProp("Mode") {
+			if !options.HasProp("Mode")
 				if ((options.Options & 16) == 16)
 					options.Mode := "Error"
-
-				if ((options.Options & 32) == 32)
+				else if ((options.Options & 32) == 32)
 					options.Mode := "Question"
-
-				if ((options.Options & 48) == 48)
+				else if ((options.Options & 48) == 48)
 					options.Mode := "Warning"
-
-				if ((options.Options & 64) == 64)
+				else if ((options.Options & 64) == 64)
 					options.Mode := "Info"
-			}
 
 			if !options.HasProp("Buttons") {
 				buttons := (options.Options & 15)

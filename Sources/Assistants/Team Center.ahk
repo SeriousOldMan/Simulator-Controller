@@ -5530,9 +5530,9 @@ class TeamCenter extends ConfigurationItem {
 				if this.Strategy {
 					this.Window.Opt("+OwnDialogs")
 
-					OnMessage(0x44, translateYesNoButtons)
+					OnMessage(0x44, translateSaveCancelButtons)
 					fileName := withBlockedWindows(FileSelect, "S17", dirName . "\" . this.Strategy.Name . ".strategy", translate("Save Race Strategy..."), "Strategy (*.strategy)")
-					OnMessage(0x44, translateYesNoButtons, 0)
+					OnMessage(0x44, translateSaveCancelButtons, 0)
 
 					if (fileName != "") {
 						if !InStr(fileName, ".")

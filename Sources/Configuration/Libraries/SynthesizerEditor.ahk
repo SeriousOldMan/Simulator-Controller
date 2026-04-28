@@ -137,15 +137,13 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		}
 
 		chooseAPIKeyFilePath(*) {
-			local file, translator
+			local file
 
 			this.Window.Opt("+OwnDialogs")
 
-			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
-
-			OnMessage(0x44, translator)
+			OnMessage(0x44, translateSelectCancelButtons)
 			file := withBlockedWindows(FileSelect, 1, this.Control["basicGoogleAPIKeyFileEdit"].Text, translate("Select Google Credentials File..."), "JSON (*.json)")
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (file != "") {
 				this.Control["basicGoogleAPIKeyFileEdit"].Text := file

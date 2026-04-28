@@ -309,11 +309,12 @@ checkForUpdates() {
 				current := values2String("", current*)
 
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
-					OnMessage(0x44, translateYesNoButtons)
-					msgResult := withBlockedWindows(MsgDlg, translate("A newer version of Simulator Controller is available. Do you want to download it now?"), translate("Update"), 262436)
-					OnMessage(0x44, translateYesNoButtons, 0)
+					msgResult := withBlockedWindows(MsgDlg, translate("A newer version of Simulator Controller is available. Do you want to download it now?")
+														  , translate("Update")
+														  , {Options: 262436, Mode: "Question"
+														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = "Yes") {
+					if (msgResult = translate("Yes")) {
 						automaticUpdates := getMultiMapValue(readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
@@ -395,9 +396,7 @@ startupApplication() {
 			return false
 
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl")) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
-			OnMessage(0x44, translateOkButton, 0)
 
 			return true
 		}

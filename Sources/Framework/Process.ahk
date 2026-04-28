@@ -44,10 +44,8 @@ startupProcess() {
 			return false
 
 		if (isCritical() && kGuardExit && !GetKeyState("Ctrl")) {
-			OnMessage(0x44, translateOkButton)
 			withBlockedWindows(MsgDlg, translate("Please wait until all tasks have been finished."), StrSplit(A_ScriptName, ".")[1], 262192)
-			OnMessage(0x44, translateOkButton, 0)
-
+			
 			return true
 		}
 		else

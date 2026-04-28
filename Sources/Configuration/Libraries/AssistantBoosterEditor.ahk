@@ -152,15 +152,13 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		chooseModelPath(field, *) {
-			local fileName, translator
+			local fileName
 
 			editorGui.Opt("+OwnDialogs")
 
-			translator := translateMsgDlgButtons.Bind(["Select", "Cancel"])
-
-			OnMessage(0x44, translator)
+			OnMessage(0x44, translateSelectCancelButtons)
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
-			OnMessage(0x44, translator, 0)
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (fileName != "")
 				editorGui[field].Text := fileName
@@ -1280,18 +1278,15 @@ class CallbacksEditor {
 		}
 
 		Close(*) {
-			local translator
-
 			if this.Closeable {
-				translator := translateMsgDlgButtons.Bind(["Yes", "No", "Cancel"])
+				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?")
+													  , translate("Close")
+													  , {Options: 262179, Mode: "Question"
+													   , Buttons: collect(["Yes", "No", "Cancel"], translate)})
 
-				OnMessage(0x44, translator)
-				msgResult := withBlockedWindows(MsgDlg, translate("Do you want to save your changes?"), translate("Close"), 262179)
-				OnMessage(0x44, translator, 0)
-
-				if (msgResult = "Yes")
+				if (msgResult = translate("Yes"))
 					this.CallbacksEditor.iResult := kOk
-				else if (msgResult = "No")
+				else if (msgResult = translate("No"))
 					this.CallbacksEditor.iResult := kCancel
 
 				return true
@@ -1997,7 +1992,7 @@ class CallbacksEditor {
 				SplitPath(fileName, , , , &name)
 
 				FileCopy(fileName, kTempDirectory . name . ".zip", 1)
-										
+
 				expand(kTempDirectory . name . ".zip", directory)
 
 				loop Files, directory . "\*" . extension {

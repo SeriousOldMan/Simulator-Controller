@@ -541,7 +541,7 @@ exitProcess(urgent := false) {
 exitProcesses(title, message, silent := false, force := false, excludes := [], urgent := false) {
 	local foregroundApps := kForegroundApps
 	local backgroundApps := kBackgroundApps
-	local pid, hasFGProcesses, hasBGProcesses, ignore, app, translator, msgResult, processes
+	local pid, hasFGProcesses, hasBGProcesses, ignore, app, msgResult, processes
 
 	computeTargets(targets) {
 		local ignore, exclude
@@ -578,13 +578,11 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 			}
 
 		if (hasFGProcesses && !silent) {
-			translator := translateMsgDlgButtons.Bind(["Continue", "Cancel"])
+			msgResult := withBlockedWindows(MsgDlg, translate(message), translate(title)
+												  , {Options: 8500, Mode: "Question"
+												   , Buttons: collect(["Continue", "Cancel"], translate)})
 
-			OnMessage(0x44, translator)
-			msgResult := withBlockedWindows(MsgDlg, translate(message), translate(title), 8500)
-			OnMessage(0x44, translator, 0)
-
-			if (msgResult = "Yes") {
+			if (msgResult = translate("Continue")) {
 				if (GetKeyState("Ctrl") && (force = "CANCEL"))
 					return true
 				else if !force

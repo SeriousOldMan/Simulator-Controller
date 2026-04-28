@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.4.0-dev]() (Early build for 6.9.4. Changes: Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28.)
+[6.9.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BKXsZjR7/Releases/Simulator%20Controller%206.9.4.0-dev.zip) (Early build for 6.9.4. Changes: Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28, Full rework of themed dialog boxes.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6940) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-694) of this version and all the versions you might have skipped, before installing and using this version.
 

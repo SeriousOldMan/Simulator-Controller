@@ -282,7 +282,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		}
 		catch Any as exception {
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			
+
 			return false
 		}
 	}
@@ -550,8 +550,3 @@ initializePluginsConfigurator() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializePluginsConfigurator()
-
-
-
-
-

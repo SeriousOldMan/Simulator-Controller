@@ -30,7 +30,24 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.9.4.0
+
+#### Date: 05/01/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug in the handling issue analyzer (used by the Driving Coach and the "Setup Workbench"), which caused a crash, when custom sound files have been created by the user.
+  - Fixed on-track and brake coaching for *Assetto Corsa* which had been broken since two releases.
+  
+#### Changes
+
+  - The meta data for *RaceRoom Racing Experience* has been updated to the latest version.
+  - The tyre decision of the Race Engineer has been optimized for the last pitstop in a multi-stint race.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684).
+  - [Internal] All modal dialogs (alert boxes, question dialogs, input boxes and so on) have been re-implemented for better theming support. There are hundreds of them. If you find a problem, let us know immediately.
+  - [Internal] Migrated to AHK 2.1-alpha.28.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-694), if you are using the local LLM Runtime.
 
 # Release history
 

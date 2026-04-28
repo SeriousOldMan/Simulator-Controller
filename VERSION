@@ -3,7 +3,7 @@ Version=6.9.4.0-dev
 Target=6.9.4.0-release
 Date=04/27/2026
 Download=
-Changes=Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E
+Changes=Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.3.1-release

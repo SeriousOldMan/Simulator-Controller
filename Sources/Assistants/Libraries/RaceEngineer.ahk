@@ -4189,7 +4189,7 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase(!tyreSet ? "TyreChangeNoSet" : "TyreChange", {compound: compoundName, set: tyreSet})
 					}
 					else {
-						if (forceTyreChange || (knowledgeBase.getValue("Lap.Remaining.Stint", 0)
+						if (forceTyreChange || (knowledgeBase.getValue("Lap.Remaining.Session", 0)
 											  > knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5)))
 							speaker.speakPhrase("NoTyreChange")
 						else

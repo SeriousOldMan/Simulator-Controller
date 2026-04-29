@@ -168,6 +168,40 @@ class SimulatorProvider {
 		return (protocols.HasProp(protocol) ? protocols.%protocol% : false)
 	}
 
+	static getArguments(type, protocol, arguments := false) {
+		if protocol.HasProp("Arguments") {
+			if arguments
+				return concatenate(protocol.Arguments, arguments)
+			else
+				return protocol.Arguments
+		}
+		else if arguments
+			return arguments
+		else
+			return []
+	}
+
+	static computeArguments(simulator, type, protocol, arguments := false) {
+		return %simulator . "Provider"%.getArguments(type, protocol, arguments)
+	}
+
+	static getOptions(type, protocol, options := false) {
+		if protocol.HasProp("Options") {
+			if options
+				return (values2String(A_Space, protocol.Options) . A_Space . options)
+			else
+				return values2String(A_Space, protocol.Options)
+		}
+		else if options
+			return options
+		else
+			return ""
+	}
+
+	static computeOptions(simulator, type, protocol, options := false) {
+		return %simulator . "Provider"%.getOptions(type, protocol, options)
+	}
+
 	static createSimulatorProvider(simulator, car, track) {
 		try {
 			return %SessionDatabase.getSimulatorCode(simulator)%Provider(car, track)
@@ -372,7 +406,7 @@ class SimulatorProvider {
 
 callSimulator(simulator, options := "", protocol?) {
 	local exePath, dataFile, data
-	local connector, curWorkingDir, buf, arguments, theProtocols
+	local connector, curWorkingDir, buf, arguments, callOptions, theProtocols
 
 	static defaultProtocol := false
 	static protocols := CaseInsenseMap()
@@ -450,8 +484,10 @@ callSimulator(simulator, options := "", protocol?) {
 							try
 								DLLCall(protocol.Library . "\setLogFile", "Str", kLogsDirectory . simulator . " Connector.log")
 
-						if protocol.HasProp("Arguments")
-							DLLCall(protocol.Library . "\open", "Str", values2String(",", protocol.Arguments*))
+						arguments := SimulatorProvider.computeArguments(simulator, "Connector", protocol)
+
+						if (arguments && (arguments.Length > 0))
+							DLLCall(protocol.Library . "\open", "Str", values2String(",", arguments*))
 						else
 							DLLCall(protocol.Library . "\open")
 
@@ -468,7 +504,9 @@ callSimulator(simulator, options := "", protocol?) {
 
 				buf := Buffer(1024 * 1024)
 
-				DllCall(protocol.Library . "\call", "AStr", options, "Ptr", buf, "Int", buf.Size)
+				DllCall(protocol.Library . "\call"
+					  , "AStr", SimulatorProvider.computeOptions(simulator, "Connector", protocol, options)
+					  , "Ptr", buf, "Int", buf.Size)
 
 				data := parseMultiMap(StrGet(buf, "UTF-8"))
 
@@ -488,14 +526,13 @@ callSimulator(simulator, options := "", protocol?) {
 						try
 							connector.SetLogFile(kLogsDirectory . simulator . " Connector.log")
 
-					if protocol.HasProp("Arguments") {
-						if (!connector.Open(protocol.Arguments*) && !isDebug())
-							throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
-					}
-					else {
-						if (!connector.Open() && !isDebug())
-							throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
-					}
+					arguments := SimulatorProvider.computeArguments(simulator, "Connector", protocol)
+
+					if !arguments
+						arguments := []
+
+					if (!connector.Open(arguments*) && !isDebug())
+						throw "Cannot startup `"" . protocol.File . "`" in callSimulator..."
 
 					connectors[simulator . ".CLR"] := connector
 
@@ -504,7 +541,8 @@ callSimulator(simulator, options := "", protocol?) {
 					})
 				}
 
-				data := parseMultiMap(connector.Call(options))
+				data := parseMultiMap(connector.Call(SimulatorProvider.computeOptions(simulator, "Connector"
+																					, protocol, options)))
 
 				if (data.Count = 0)
 					throw ("DLL returned empty data for " . simulator . " in callSimulator...")
@@ -517,12 +555,17 @@ callSimulator(simulator, options := "", protocol?) {
 
 				dataFile := temporaryFileName(simulator . " Data\Provider", "data")
 
-				if protocol.HasProp("Arguments")
-					arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+				arguments := SimulatorProvider.computeArguments(simulator, "Connector", protocol)
+
+				if (arguments && (arguments.Length > 0))
+					arguments := values2String(A_Space, collect(arguments, (a) => ("`"" . a . "`""))*)
 				else
 					arguments := ""
 
-				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" " . arguments . " `"" . options . "`" > `"" . dataFile . "`"`"", , "Hide")
+				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" " . arguments . " `""
+											   . SimulatorProvider.computeOptions(simulator, "Provider"
+																				, protocol, options)
+											   . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 				data := readMultiMap(dataFile)
 

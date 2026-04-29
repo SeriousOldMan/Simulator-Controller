@@ -110,7 +110,7 @@ class LMUProvider extends Sector397Provider {
 		options := super.getOptions(type, protocol, options)
 
 		if (LMUProvider.kLMUAPIType = "LMU") {
-			options := Trim("LMU=" . Application(this.Simulator).getProcessID() . A_Space . options)
+			options.InsertAt(1, "LMU=" . Application(this.Simulator).getProcessID())
 
 		return options
 	}

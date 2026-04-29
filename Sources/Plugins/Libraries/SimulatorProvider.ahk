@@ -168,34 +168,33 @@ class SimulatorProvider {
 		return (protocols.HasProp(protocol) ? protocols.%protocol% : false)
 	}
 
-	static getArguments(type, protocol, arguments := false) {
+	static getArguments(type, protocol, arguments := []) {
 		if protocol.HasProp("Arguments") {
 			if arguments
 				return concatenate(protocol.Arguments, arguments)
 			else
 				return protocol.Arguments
 		}
-		else if arguments
-			return arguments
 		else
-			return []
+			return arguments
 	}
 
-	static computeArguments(simulator, type, protocol, arguments := false) {
+	static computeArguments(simulator, type, protocol, arguments := []) {
 		return %simulator . "Provider"%.getArguments(type, protocol, arguments)
 	}
 
-	static getOptions(type, protocol, options := false) {
+	static getOptions(type, protocol, options := []) {
+		if !isObject(options)
+			options := string2Values(InStr(options, ",") ? "," : A_Space, options)
+
 		if protocol.HasProp("Options") {
 			if options
-				return (values2String(A_Space, protocol.Options) . A_Space . options)
+				return concatenate(protocol.Options, options)
 			else
-				return values2String(A_Space, protocol.Options)
+				return protocol.Options
 		}
-		else if options
-			return options
 		else
-			return ""
+			return options
 	}
 
 	static computeOptions(simulator, type, protocol, options := false) {
@@ -504,9 +503,10 @@ callSimulator(simulator, options := "", protocol?) {
 
 				buf := Buffer(1024 * 1024)
 
-				DllCall(protocol.Library . "\call"
-					  , "AStr", SimulatorProvider.computeOptions(simulator, "Connector", protocol, options)
-					  , "Ptr", buf, "Int", buf.Size)
+				callOptions := values2String(",", SimulatorProvider.computeOptions(simulator, "Connector"
+																				 , protocol, options)*)
+
+				DllCall(protocol.Library . "\call", "AStr", callOptions, "Ptr", buf, "Int", buf.Size)
 
 				data := parseMultiMap(StrGet(buf, "UTF-8"))
 
@@ -541,8 +541,10 @@ callSimulator(simulator, options := "", protocol?) {
 					})
 				}
 
-				data := parseMultiMap(connector.Call(SimulatorProvider.computeOptions(simulator, "Connector"
-																					, protocol, options)))
+				callOptions := values2String(",", SimulatorProvider.computeOptions(simulator, "Connector"
+																				 , protocol, options)*)
+
+				data := parseMultiMap(connector.Call(callOptions))
 
 				if (data.Count = 0)
 					throw ("DLL returned empty data for " . simulator . " in callSimulator...")
@@ -562,10 +564,11 @@ callSimulator(simulator, options := "", protocol?) {
 				else
 					arguments := ""
 
-				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" " . arguments . " `""
-											   . SimulatorProvider.computeOptions(simulator, "Provider"
-																				, protocol, options)
-											   . "`" > `"" . dataFile . "`"`"", , "Hide")
+				callOptions := values2String(",", SimulatorProvider.computeOptions(simulator, "Provider"
+																				 , protocol, options)*)
+
+				RunWait(A_ComSpec . " /c `"`"" . protocol.File . "`" " . arguments
+											   . " `"" . callOptions . "`" > `"" . dataFile . "`"`"", , "Hide")
 
 				data := readMultiMap(dataFile)
 

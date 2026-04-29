@@ -45,6 +45,9 @@ class LMUProvider extends Sector397Provider {
 			if (LMUProvider.kLMUSHMVersion = "RF2")
 				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
 					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
+			else if (LMUProvider.kLMUSHMVersion = "LMU")
+				for ignore, protocol in ["Provider", "Spotter", "Coach"]
+					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
 
 			return protocols
 		}
@@ -100,6 +103,13 @@ class LMUProvider extends Sector397Provider {
 
 	static __New(arguments*) {
 		SimulatorProvider.registerSimulatorProvider("LMU", LMUProvider)
+	}
+
+	static getOptions(type, protocol, options := false) {
+		if options
+			return ("LMU=" . Application(this.Simulator).getProcessID() . A_Space . options)
+		else
+			return ("LMU=" . Application(this.Simulator).getProcessID())
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

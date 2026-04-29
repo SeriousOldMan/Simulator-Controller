@@ -2767,7 +2767,7 @@ class SoloCenter extends ConfigurationItem {
 			case 19: ; Export data
 				if (this.HasData && !this.SessionExported) {
 					msgResult := withBlockedWindows(MsgDlg, translate("Do you want to transfer the selected data to the session database? This is only possible once.")
-														  , translate("Delete")
+														  , translate("Export")
 														  , {Options: 262436, Mode: "Question"
 														   , Buttons: collect(["Yes", "No"], translate)})
 

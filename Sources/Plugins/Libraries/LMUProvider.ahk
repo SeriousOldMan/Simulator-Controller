@@ -18,7 +18,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUProvider extends Sector397Provider {
-	static kLMUSHMVersion := "RF2"
+	static kLMUAPIType := "RF2"
 
 	iTeamData := false
 	iTrackData := false
@@ -42,12 +42,13 @@ class LMUProvider extends Sector397Provider {
 			local protocols := super.Protocols
 			local ignore, protocol
 
-			if (LMUProvider.kLMUSHMVersion = "RF2")
+			if (LMUProvider.kLMUAPIType = "RF2") {
 				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
-					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
-			else if (LMUProvider.kLMUSHMVersion = "LMU")
+					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
+			}
+			else if (LMUProvider.kLMUAPIType = "LMU")
 				for ignore, protocol in ["Provider", "Spotter", "Coach"]
-					protocols.%protocol%.File := substituteVariables(protocols.%protocol%.File, {simulator: "RF2"})
+					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
 
 			return protocols
 		}
@@ -106,10 +107,12 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	static getOptions(type, protocol, options := false) {
-		if options
-			return ("LMU=" . Application(this.Simulator).getProcessID() . A_Space . options)
-		else
-			return ("LMU=" . Application(this.Simulator).getProcessID())
+		options := super.getOptions(type, protocol, options)
+
+		if (LMUProvider.kLMUAPIType = "LMU") {
+			options := Trim("LMU=" . Application(this.Simulator).getProcessID() . A_Space . options)
+
+		return options
 	}
 
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {

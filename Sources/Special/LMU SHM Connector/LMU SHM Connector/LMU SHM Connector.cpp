@@ -31,7 +31,9 @@ void dismiss() {
 	}
 }
 
-SharedMemoryObjectOut* require(DWORD parentPid) {
+DWORD lastParentPID = 0;
+
+SharedMemoryObjectOut* require(DWORD parentPID) {
 	bool retVal = true;
 
 	static SharedMemoryObjectOut copiedMem;
@@ -41,12 +43,17 @@ SharedMemoryObjectOut* require(DWORD parentPid) {
 
 		// Try to open a handle to the parent process with SYNCHRONIZE right.
 		// SYNCHRONIZE is enough to wait on the process handle for exit.
-		dismiss();
 
-		hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
-		hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
-		hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
-		
+		if (parentPID != lastParentPID) {
+			dismiss();
+
+			hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPID);
+			hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
+			hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
+
+			lastParentPID = parentPID;
+		}
+
 		if (hParent && hEvent && hMapFile) {
 			if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
 				HANDLE objectHandlesArray[2] = { hParent, hEvent };

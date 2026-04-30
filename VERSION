@@ -1,15 +1,15 @@
 [Development]
-Version=6.9.4.0-dev
+Version=6.9.4.0-release
 Target=6.9.4.0-release
-Date=04/28/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BKXsZjR7/Releases/Simulator%20Controller%206.9.4.0-dev.zip
+Date=05/01/2026
+Download=https://cutt.ly/UtLByoa5;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0Jd9TC6s/Releases/Simulator%20Controller%206.9.4.0-release.zip;https://www.dropbox.com/scl/fi/u70t1gz7he55r3n29ym08/Simulator-Controller-6.9.4.0-release.zip?rlkey=b8zgqj7cm8xjxrbo9rmr1sz93&st=nsl2rox0&dl=1;https://cutt.ly/5tKOovjz;http://%master%/Releases/Simulator Controller 6.9.4.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.4.0-release.zip
 Changes=Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28, Full rework of themed dialog boxes
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
-Version=6.9.3.1-release
-Date=04/26/2026
-Download=https://cutt.ly/5tKOovjz;http://%master%/Releases/Simulator Controller 6.9.3.1-release.zip;https://www.dropbox.com/scl/fi/hggovdxkgp0vbqjd87czq/Simulator-Controller-6.9.3.1-release.zip?rlkey=s3eckem5y8p1kyens8netfkvu&st=9vbcrjw8&dl=1;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.3.1-release.zip
-Changes=Fixed telemetry analyzer time calculations, Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars
+Version=6.9.4.0-release
+Date=05/01/2026
+Download=https://cutt.ly/UtLByoa5;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/0Jd9TC6s/Releases/Simulator%20Controller%206.9.4.0-release.zip;https://www.dropbox.com/scl/fi/u70t1gz7he55r3n29ym08/Simulator-Controller-6.9.4.0-release.zip?rlkey=b8zgqj7cm8xjxrbo9rmr1sz93&st=nsl2rox0&dl=1;https://cutt.ly/5tKOovjz;http://%master%/Releases/Simulator Controller 6.9.4.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.4.0-release.zip
+Changes=Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28, Full rework of themed dialog boxes
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Components]
 Media.6.9.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.9.2.Path=.
 Utilities.6.9.2.Content=Utilities
 Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vSM_QhzO/Components/Utilities%206.9.2.zip;https://www.dropbox.com/scl/fi/780ucr9jfstiy9umhi5nz/Utilities-6.9.2.zip?rlkey=rbw1b5i3dlbc9f63o05722set&st=1mkiahg4&dl=1;http://%master%/Components/Utilities 6.9.2.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.9.2.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.9.4.0-dev
-Release=6.9.3.1-release
+Development=6.9.4.0-release
+Release=6.9.4.0-release

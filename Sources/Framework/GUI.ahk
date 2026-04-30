@@ -544,6 +544,16 @@ class Theme {
 			h := (options.HasProp("Height") ? options.Height : h)
 
 			if options.HasProp("Options") {
+				if !options.HasProp("Default")
+					if ((options.Options & 256) == 256)
+						options.Default := 2
+					else if ((options.Options & 512) == 512)
+						options.Default := 3
+					else if ((options.Options & 768) == 768)
+						options.Default := 4
+					else
+						options.Default := 1
+
 				if !options.HasProp("Mode")
 					if ((options.Options & 16) == 16)
 						options.Mode := "Error"
@@ -573,6 +583,9 @@ class Theme {
 						options.Buttons := ["Cancel", "Try Again", "Continue"]
 				}
 			}
+
+			if !options.HasProp("Default")
+				options.Default := 1
 
 			if !options.HasProp("Mode")
 				options.Mode := "Info"
@@ -612,7 +625,8 @@ class Theme {
 				button := (options.Buttons.Length - A_Index + 1)
 				handler := ((button, *) => Theme.MessageDialog(kResult . button)).Bind(button)
 
-				messageGui.Add("Button", "x" . (w - 88 - offset) . " w80 h23 Default" . ((A_Index > 1) ? " YP" : "")
+				messageGui.Add("Button", "x" . (w - 88 - offset)  . ((A_Index > 1) ? " YP" : "") . " w80 h23"
+									   . ((options.Default = A_Index) ? " Default" : "")
 									   , options.Buttons[button]).OnEvent("Click", handler)
 
 				offset += 90

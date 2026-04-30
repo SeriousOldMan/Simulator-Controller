@@ -57,30 +57,22 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 		if (hParent && hEvent && hMapFile) {
 			if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
 				HANDLE objectHandlesArray[2] = { hParent, hEvent };
-				for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE)) {
+				for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500)) {
 					if (waitObject == WAIT_OBJECT_0 + 1) {
 						smLock.Lock();
 						CopySharedMemoryObj(copiedMem, pBuf->data);
 						smLock.Unlock();
-						
-						// >>>>> ProcessSharedMemory(copiedMem); <<<<<<
 					}
-					else {
-						std::cerr << "Wait failed: " << GetLastError() << "\n";
+					else
 						break;
-					}
 				}
 				UnmapViewOfFile(pBuf);
 			}
-			else {
-				std::cerr << "Could not map view of file. Error: " << GetLastError() << std::endl;
+			else
 				retVal = false;
-			}
 		}
-		else {
-			std::cerr << "Something went wrong durin initialization. Error: " << GetLastError() << std::endl;
+		else
 			retVal = false;
-		}
 	}
 	catch (...) {
 		retVal = false;
@@ -404,6 +396,8 @@ std::string getArgument(std::string request, std::string key) {
 
 		if (option.rfind(key + "=") == 0)
 			return option.substr(key.length() + 1, option.length() - (key.length() + 1)).c_str();
+
+		index++;
 	}
 
 	return "";
@@ -454,12 +448,12 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "Active", (data->scoring.scoringInfo.mGamePhase != 0) ? "true" : "false");
 
 		if (!data->telemetry.playerHasVehicle)
-			printData(&output, "Paused", "true");
+			output << "Paused=true" << endl;
 		else if (getString(playerTelemetry.mTrackName) == "")
-			printData(&output, "Paused", "true");
+			output << "Paused=true" << endl;
 		else
-			printData(&output, "Paused", (data->scoring.scoringInfo.mGamePhase <= 2 || data->scoring.scoringInfo.mGamePhase == 9) ? "true" : "false");
-		
+			output << "Paused=" << ((data->scoring.scoringInfo.mGamePhase <= 2 || data->scoring.scoringInfo.mGamePhase == 9) ? "true" : "false") << endl;
+
 		string session;
 		int sessionType = data->scoring.scoringInfo.mSession;
 
@@ -479,9 +473,9 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "Session", session);
 		
 		printData(&output, "ID", playerTelemetry.mID + 1);
-		printData(&output, "Car", playerTelemetry.mVehicleModel);
-		printData(&output, "CarClass", playerScoring.mVehicleClass);
-		printData(&output, "Track", data->scoring.scoringInfo.mTrackName);
+		printData(&output, "Car", getString(playerTelemetry.mVehicleModel));
+		printData(&output, "CarClass", getString(playerScoring.mVehicleClass));
+		printData(&output, "Track", getString(data->scoring.scoringInfo.mTrackName));
 		printData(&output, "SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
 		printData(&output, "FuelAmount", round(playerTelemetry.mFuelCapacity));
 

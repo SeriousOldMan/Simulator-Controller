@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <stdio.h>
 #include <string.h>
 #include <vector>
@@ -31,9 +32,7 @@ void dismiss() {
 	}
 }
 
-DWORD lastParentPID = 0;
-
-SharedMemoryObjectOut* require(DWORD parentPID) {
+SharedMemoryObjectOut* require(DWORD parentPid) {
 	bool retVal = true;
 
 	static SharedMemoryObjectOut copiedMem;
@@ -43,16 +42,11 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 
 		// Try to open a handle to the parent process with SYNCHRONIZE right.
 		// SYNCHRONIZE is enough to wait on the process handle for exit.
+		dismiss();
 
-		if (parentPID != lastParentPID) {
-			dismiss();
-
-			hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPID);
-			hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
-			hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
-
-			lastParentPID = parentPID;
-		}
+		hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
+		hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
+		hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
 
 		if (hParent && hEvent && hMapFile) {
 			if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
@@ -62,7 +56,7 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 						smLock.Lock();
 						CopySharedMemoryObj(copiedMem, pBuf->data);
 						smLock.Unlock();
-						
+
 						// >>>>> ProcessSharedMemory(copiedMem); <<<<<<
 					}
 					else {
@@ -109,7 +103,7 @@ std::vector<std::string> splitString(const std::string& str, const std::string& 
 	}
 
 	tokens.push_back(str.substr(start)); // Letzter Teil hinzufügen
-	
+
 	return tokens;
 }
 
@@ -122,77 +116,77 @@ inline void trimString(std::string& s) {
 		[](unsigned char ch) { return isspace(ch); }).base(), s.end());
 }
 
-void printNAData(ostringstream* output, string name, long value)
+void printNAData(string name, long value)
 {
 	if (value == -1)
-		(*output) << name.c_str() << "=" << "n/a" << endl;
+		wcout << name.c_str() << "=" << "n/a" << endl;
 	else {
-		(*output) << name.c_str() << "=" << fixed << value << endl;
+		wcout << name.c_str() << "=" << fixed << value << endl;
 
-		(*output).setf(0, ios::floatfield);
+		wcout.setf(0, ios::floatfield);
 	}
 }
 
-void printData(ostringstream* output, string name, float value)
+void printData(string name, float value)
 {
 	if (round(value) == value) {
-		int old_precision = (*output).precision();
+		int old_precision = wcout.precision();
+		
+		wcout.precision(0);
 
-		(*output).precision(0);
+		wcout << name.c_str() << "=" << fixed << value << endl;
 
-		(*output) << name.c_str() << "=" << fixed << value << endl;
+		wcout.setf(0, ios::floatfield);
 
-		(*output).setf(0, ios::floatfield);
-
-		(*output).precision(old_precision);
+		wcout.precision(old_precision);
 	}
 	else
-		(*output) << name.c_str() << "=" << value << endl;
+		wcout << name.c_str() << "=" << value << endl;
 }
 
-void printData(ostringstream* output, string name, string value)
+void printData(string name, string value)
 {
-	(*output) << name.c_str() << "=" << value.c_str() << endl;
+	wcout << name.c_str() << "=" << value.c_str() << endl;
 }
 
 template <typename T, unsigned S>
-inline void printData(ostringstream* output, const string name, const T(&v)[S])
+inline void printData(const string name, const T(&v)[S])
 {
-	(*output) << name.c_str() << "=";
+	wcout << name.c_str() << "=";
+    
+    for (int i = 0; i < S; i++)
+    {
+        wcout << v[i];
 
-	for (int i = 0; i < S; i++)
-	{
-		(*output) << v[i];
+        if (i < S - 1)
+			wcout << ", ";
+    }
 
-		if (i < S - 1)
-			(*output) << ", ";
-	}
-
-	(*output) << endl;
+	wcout << endl;
 }
 
 template <typename T, unsigned S, unsigned S2>
-inline void printData2(ostringstream* output, const string name, const T(&v)[S][S2])
+inline void printData2(const string name, const T(&v)[S][S2])
 {
-	(*output) << name.c_str() << "=";
+    wcout << name.c_str() << "=";
 
-	for (int i = 0; i < S; i++)
-	{
-		(*output) << i << ": ";
-
+    for (int i = 0; i < S; i++)
+    {
+        wcout << i << ": ";
+    
 		for (int j = 0; j < S2; j++) {
-			(*output) << v[i][j];
-
+            wcout << v[i][j];
+        
 			if (j < S2 - 1)
-				(*output) << ", ";
-		}
+                wcout << ", ";
+        }
 
 		if (i < (S - 1))
-			(*output) << "; ";
+			wcout << "; ";
+       
+    }
 
-	}
-
-	(*output) << endl;
+	wcout << endl;
 }
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
@@ -352,7 +346,7 @@ string GetCarNr(int id, string carClass, string carName)
 				vector<string> parts = splitString(carName, " ", 2);
 
 				string nr = splitString(parts[0], "#")[1];
-				
+
 				trimString(nr);
 
 				return nr;
@@ -413,30 +407,16 @@ std::string getArgument(char* request, std::string key) {
 	return getArgument(std::string(request), key);
 }
 
-extern "C" __declspec(dllexport) int __stdcall open() {
-	return 0;
-}
-
-extern "C" __declspec(dllexport) int __stdcall close() {
-	dismiss();
-	
-	return 0;
-}
-
-DWORD lmuPID = 0;
-
-extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result, int size)
+int main(int argc, char* argv[])
 {
+	char* request = (argc == 1) ? "" : argv[1];
+
 	SharedMemoryObjectOut* data = require(atoi(getArgument(request, "LMU").c_str()));
 
-	ostringstream output;
-	
 	if (data == NULL) {
-		output << "[Session Data]" << endl << "Active=false" << endl;
-		output << "[Position Data]" << endl << "Active=false" << endl;
-			
-		strcpy_s(result, size, output.str().c_str());
-			
+		wcout << "[Session Data]" << endl << "Active=false" << endl;
+		wcout << "[Position Data]" << endl << "Active=false" << endl;
+
 		return -1;
 	}
 
@@ -449,17 +429,17 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 	if (!setup && !standings)
 	{
-		output << "[Session Data]" << endl;
+		wcout << "[Session Data]" << endl;
 
-		printData(&output, "Active", (data->scoring.scoringInfo.mGamePhase != 0) ? "true" : "false");
+		printData("Active", (data->scoring.scoringInfo.mGamePhase != 0) ? "true" : "false");
 
 		if (!data->telemetry.playerHasVehicle)
-			printData(&output, "Paused", "true");
+			printData("Paused", "true");
 		else if (getString(playerTelemetry.mTrackName) == "")
-			printData(&output, "Paused", "true");
+			printData("Paused", "true");
 		else
-			printData(&output, "Paused", (data->scoring.scoringInfo.mGamePhase <= 2 || data->scoring.scoringInfo.mGamePhase == 9) ? "true" : "false");
-		
+			printData("Paused", (data->scoring.scoringInfo.mGamePhase <= 2 || data->scoring.scoringInfo.mGamePhase == 9) ? "true" : "false");
+
 		string session;
 		int sessionType = data->scoring.scoringInfo.mSession;
 
@@ -476,115 +456,115 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		else
 			session = "Other";
 
-		printData(&output, "Session", session);
-		
-		printData(&output, "ID", playerTelemetry.mID + 1);
-		printData(&output, "Car", playerTelemetry.mVehicleModel);
-		printData(&output, "CarClass", playerScoring.mVehicleClass);
-		printData(&output, "Track", data->scoring.scoringInfo.mTrackName);
-		printData(&output, "SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
-		printData(&output, "FuelAmount", round(playerTelemetry.mFuelCapacity));
+		printData("Session", session);
+
+		printData("ID", playerTelemetry.mID + 1);
+		printData("Car", playerTelemetry.mVehicleModel);
+		printData("CarClass", playerScoring.mVehicleClass);
+		printData("Track", data->scoring.scoringInfo.mTrackName);
+		printData("SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
+		printData("FuelAmount", round(playerTelemetry.mFuelCapacity));
 
 		long time = GetRemainingTime(&data->scoring, &playerScoring);
 
-		printData(&output, "SessionTimeRemaining", time);
-		printData(&output, "SessionLapsRemaining", GetRemainingLaps(&data->scoring, &playerScoring));
-		
-		output << "[Car Data]" << endl;
+		printData("SessionTimeRemaining", time);
+		printData("SessionLapsRemaining", GetRemainingLaps(&data->scoring, &playerScoring));
 
-		printNAData(&output, "MAP", playerTelemetry.mMotorMap + 1);
-		printNAData(&output, "TC", playerTelemetry.mTC);
-		printNAData(&output, "TCSlip", playerTelemetry.mTCSlip);
-		printNAData(&output, "TCCut", playerTelemetry.mTCCut);
-		printNAData(&output, "ABS", playerTelemetry.mABS);
-		printNAData(&output, "BB", (1 - round(playerTelemetry.mRearBrakeBias * 10000) / 10000) * 100);
+		wcout << "[Car Data]" << endl;
 
-		printNAData(&output, "FuelRemaining", playerTelemetry.mFuel);
+		printNAData("MAP", playerTelemetry.mMotorMap + 1);
+		printNAData("TC", playerTelemetry.mTC);
+		printNAData("TCSlip", playerTelemetry.mTCSlip);
+		printNAData("TCCut", playerTelemetry.mTCCut);
+		printNAData("ABS", playerTelemetry.mABS);
+		printNAData("BB", (1 - round(playerTelemetry.mRearBrakeBias * 10000) / 10000) * 100);
 
-		printData(&output, "TyreTemperature", to_string(GetCelcius(playerTelemetry.mWheel[0].mTireCarcassTemperature)) + "," +
+		printNAData("FuelRemaining", playerTelemetry.mFuel);
+
+		printData("TyreTemperature", to_string(GetCelcius(playerTelemetry.mWheel[0].mTireCarcassTemperature)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[1].mTireCarcassTemperature)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[2].mTireCarcassTemperature)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[3].mTireCarcassTemperature)));
-		printData(&output, "TyrePressure", to_string(GetPsi(playerTelemetry.mWheel[0].mPressure)) + "," +
+		printData("TyrePressure", to_string(GetPsi(playerTelemetry.mWheel[0].mPressure)) + "," +
 			to_string(GetPsi(playerTelemetry.mWheel[1].mPressure)) + "," +
 			to_string(GetPsi(playerTelemetry.mWheel[2].mPressure)) + "," +
 			to_string(GetPsi(playerTelemetry.mWheel[3].mPressure)));
-		printData(&output, "TyreWear", to_string(playerTelemetry.mWheel[0].mWear) + "," +
+		printData("TyreWear", to_string(playerTelemetry.mWheel[0].mWear) + "," +
 			to_string(playerTelemetry.mWheel[1].mWear) + "," +
 			to_string(playerTelemetry.mWheel[2].mWear) + "," +
 			to_string(playerTelemetry.mWheel[3].mWear));
-		printData(&output, "BrakeTemperature", to_string(GetCelcius(playerTelemetry.mWheel[0].mBrakeTemp)) + "," +
+		printData("BrakeTemperature", to_string(GetCelcius(playerTelemetry.mWheel[0].mBrakeTemp)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[1].mBrakeTemp)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[2].mBrakeTemp)) + "," +
 			to_string(GetCelcius(playerTelemetry.mWheel[3].mBrakeTemp)));
 
 		int compound = playerTelemetry.mWheel[0].mCompoundIndex;
 
-		printData(&output, "TyreCompoundRaw", compound);
-		printData(&output, "TyreCompoundRawFrontLeft", compound);
-		printData(&output, "TyreCompoundRawFrontRight", playerTelemetry.mWheel[1].mCompoundIndex);
-		printData(&output, "TyreCompoundRawRearLeft", playerTelemetry.mWheel[2].mCompoundIndex);
-		printData(&output, "TyreCompoundRawRearRight", playerTelemetry.mWheel[3].mCompoundIndex);
-		printData(&output, "TyreTypeRawFrontLeft", playerTelemetry.mWheel[0].mCompoundType);
-		printData(&output, "TyreTypeRawFrontRight", playerTelemetry.mWheel[1].mCompoundType);
-		printData(&output, "TyreTypeRawRearLeft", playerTelemetry.mWheel[2].mCompoundType);
-		printData(&output, "TyreTypeRawRearRight", playerTelemetry.mWheel[3].mCompoundType);
+		printData("TyreCompoundRaw", compound);
+		printData("TyreCompoundRawFrontLeft", compound);
+		printData("TyreCompoundRawFrontRight", playerTelemetry.mWheel[1].mCompoundIndex);
+		printData("TyreCompoundRawRearLeft", playerTelemetry.mWheel[2].mCompoundIndex);
+		printData("TyreCompoundRawRearRight", playerTelemetry.mWheel[3].mCompoundIndex);
+		printData("TyreTypeRawFrontLeft", playerTelemetry.mWheel[0].mCompoundType);
+		printData("TyreTypeRawFrontRight", playerTelemetry.mWheel[1].mCompoundType);
+		printData("TyreTypeRawRearLeft", playerTelemetry.mWheel[2].mCompoundType);
+		printData("TyreTypeRawRearRight", playerTelemetry.mWheel[3].mCompoundType);
 
 		int damage = 0;
 
-		for (int i = 0; i < 8; i++)	
+		for (int i = 0; i < 8; i++)
 			damage += playerTelemetry.mDentSeverity[i];
 
-		output << "BodyworkDamage=0, 0, 0, 0, " << damage / 16 << endl;
-		output << "SuspensionDamage=0, 0, 0, 0" << endl;
-		printData(&output, "EngineDamage", playerTelemetry.mOverheating ? 1 : 0);
+		wcout << "BodyworkDamage=0, 0, 0, 0, " << damage / 16 << endl;
+		wcout << "SuspensionDamage=0, 0, 0, 0" << endl;
+		printData("EngineDamage", playerTelemetry.mOverheating ? 1 : 0);
 
 		if (playerTelemetry.mEngineWaterTemp > 0)
-			printData(&output, "WaterTemperature", playerTelemetry.mEngineWaterTemp);
+			printData("WaterTemperature", playerTelemetry.mEngineWaterTemp);
 
 		if (playerTelemetry.mEngineOilTemp > 0)
-			printData(&output, "OilTemperature", playerTelemetry.mEngineOilTemp);
-	
-		output << "[Stint Data]" << endl;
+			printData("OilTemperature", playerTelemetry.mEngineOilTemp);
 
-		printData(&output, "DriverForname", GetForname(data->scoring.scoringInfo.mPlayerName));
-		printData(&output, "DriverSurname", GetSurname(data->scoring.scoringInfo.mPlayerName));
-		printData(&output, "DriverNickname", GetNickname(data->scoring.scoringInfo.mPlayerName));
+		wcout << "[Stint Data]" << endl;
 
-		printData(&output, "Position", playerScoring.mPlace);
+		printData("DriverForname", GetForname(data->scoring.scoringInfo.mPlayerName));
+		printData("DriverSurname", GetSurname(data->scoring.scoringInfo.mPlayerName));
+		printData("DriverNickname", GetNickname(data->scoring.scoringInfo.mPlayerName));
 
-		printData(&output, "LapValid", playerTelemetry.mLapInvalidated ? "false" : "true");
+		printData("Position", playerScoring.mPlace);
 
-		printData(&output, "LapLastTime", round(Normalize((playerScoring.mLastLapTime > 0) ? playerScoring.mLastLapTime
-																						   : playerScoring.mBestLapTime) * 1000));
-		printData(&output, "LapBestTime", round(Normalize(playerScoring.mBestLapTime) * 1000));
+		printData("LapValid", playerTelemetry.mLapInvalidated ? "false" : "true");
+
+		printData("LapLastTime", round(Normalize((playerScoring.mLastLapTime > 0) ? playerScoring.mLastLapTime
+			: playerScoring.mBestLapTime) * 1000));
+		printData("LapBestTime", round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 		if (playerScoring.mNumPenalties > 0)
-			output << "Penalty=true" << endl;
+			wcout << "Penalty=true" << endl;
 
-		printData(&output, "Sector", (playerScoring.mSector == 0) ? 3 : playerScoring.mSector);
+		printData("Sector", (playerScoring.mSector == 0) ? 3 : playerScoring.mSector);
 
-		printData(&output, "Running", playerScoring.mLapDist / data->scoring.scoringInfo.mLapDist);
+		printData("Running", playerScoring.mLapDist / data->scoring.scoringInfo.mLapDist);
 
-		printData(&output, "Laps", playerScoring.mTotalLaps);
+		printData("Laps", playerScoring.mTotalLaps);
 
-		printData(&output, "StintTimeRemaining", time);
-		printData(&output, "DriverTimeRemaining", time);
+		printData("StintTimeRemaining", time);
+		printData("DriverTimeRemaining", time);
 
-		printData(&output, "InPitLane", (playerScoring.mInPits) != 0 ? "true" : "false");
+		printData("InPitLane", (playerScoring.mInPits) != 0 ? "true" : "false");
 
 		if (playerScoring.mInPits != 0) {
 			double speed = VehicleSpeed(&playerScoring);
 
 			if (speed < 5 || playerScoring.mPitState == 3)
-				output << "InPit=true" << endl;
+				wcout << "InPit=true" << endl;
 			else
-				output << "InPit=false" << endl;
+				wcout << "InPit=false" << endl;
 		}
-	
-		output << "[Track Data]" << endl;
 
-		printData(&output, "Length", data->scoring.scoringInfo.mLapDist);
+		wcout << "[Track Data]" << endl;
+
+		printData("Length", data->scoring.scoringInfo.mLapDist);
 
 		string grip = "Optimum";
 		float pathWetness = data->scoring.scoringInfo.mAvgPathWetness;
@@ -602,8 +582,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		else
 			grip = "Fast";
 
-		printData(&output, "Grip", grip);
-		printData(&output, "Temperature", data->scoring.scoringInfo.mTrackTemp);
+		printData("Grip", grip);
+		printData("Temperature", data->scoring.scoringInfo.mTrackTemp);
 
 		int index = 0;
 
@@ -612,22 +592,22 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 			index += 1;
 
-			printData(&output, "Car." + to_string(index) + ".Position", to_string(vehicle->mPos.x) + "," + to_string(-vehicle->mPos.z));
+			printData("Car." + to_string(index) + ".Position", to_string(vehicle->mPos.x) + "," + to_string(-vehicle->mPos.z));
 		}
-	
-		output << "[Weather Data]" << endl;
 
-		printData(&output, "Temperature", data->scoring.scoringInfo.mAmbientTemp);
+		wcout << "[Weather Data]" << endl;
+
+		printData("Temperature", data->scoring.scoringInfo.mAmbientTemp);
 
 		string theWeather = GetWeather(data->scoring.scoringInfo.mDarkCloud, data->scoring.scoringInfo.mRaining);
 
-		printData(&output, "Weather", theWeather);
-		printData(&output, "Weather10Min", theWeather);
-		printData(&output, "Weather30Min", theWeather);
+		printData("Weather", theWeather);
+		printData("Weather10Min", theWeather);
+		printData("Weather30Min", theWeather);
 	}
 
 	if (standings) {
-		output << "[Position Data]" << endl;
+		wcout << "[Position Data]" << endl;
 
 		int index = 0;
 
@@ -640,13 +620,13 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 			TelemInfoV01* telemetry = GetVehicleTelemetry(vehicle->mID, &data->scoring, &data->telemetry);
 
-			printData(&output, "Car." + to_string(index) + ".ID", vehicle->mID + 1);
-			printData(&output, "Car." + to_string(index) + ".Position", vehicle->mPlace);
+			printData("Car." + to_string(index) + ".ID", vehicle->mID + 1);
+			printData("Car." + to_string(index) + ".Position", vehicle->mPlace);
 
-			printData(&output, "Car." + to_string(index) + ".Laps", vehicle->mTotalLaps);
-			printData(&output, "Car." + to_string(index) + ".Lap.Running", vehicle->mLapDist / data->scoring.scoringInfo.mLapDist);
-			printData(&output, "Car." + to_string(index) + ".Lap.Running.Valid", telemetry->mLapInvalidated ? "false" : "true");
-			printData(&output, "Car." + to_string(index) + ".Lap.Running.Time", (long)((telemetry->mElapsedTime - telemetry->mLapStartET) * 1000));
+			printData("Car." + to_string(index) + ".Laps", vehicle->mTotalLaps);
+			printData("Car." + to_string(index) + ".Lap.Running", vehicle->mLapDist / data->scoring.scoringInfo.mLapDist);
+			printData("Car." + to_string(index) + ".Lap.Running.Valid", telemetry->mLapInvalidated ? "false" : "true");
+			printData("Car." + to_string(index) + ".Lap.Running.Time", (long)((telemetry->mElapsedTime - telemetry->mLapStartET) * 1000));
 
 			int lapTime = (int)round(Normalize(vehicle->mLastLapTime) * 1000);
 
@@ -657,64 +637,48 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			int sector2Time = (int)round(Normalize(vehicle->mLastSector2) * 1000) - sector1Time;
 			int sector3Time = lapTime - sector1Time - sector2Time;
 
-			printData(&output, "Car." + to_string(index) + ".Time", lapTime);
-			printData(&output, "Car." + to_string(index) + ".Time.Sectors", to_string(sector1Time) + "," + to_string(sector2Time) + "," + to_string(sector3Time));
+			printData("Car." + to_string(index) + ".Time", lapTime);
+			printData("Car." + to_string(index) + ".Time.Sectors", to_string(sector1Time) + "," + to_string(sector2Time) + "," + to_string(sector3Time));
 
 			string carClass = getString(vehicle->mVehicleClass);
 			string carName = getString(vehicle->mVehicleName);
 
-			printData(&output, "Car." + to_string(index) + ".Nr", GetCarNr(vehicle->mID, carClass, carName));
-			printData(&output, "Car." + to_string(index) + ".Class", carClass);
-			printData(&output, "Car." + to_string(index) + ".Car", telemetry->mVehicleModel);
+			printData("Car." + to_string(index) + ".Nr", GetCarNr(vehicle->mID, carClass, carName));
+			printData("Car." + to_string(index) + ".Class", carClass);
+			printData("Car." + to_string(index) + ".Car", telemetry->mVehicleModel);
 
-			printData(&output, "Car." + to_string(index) + ".Driver.Forname", GetForname(vehicle->mDriverName));
-			printData(&output, "Car." + to_string(index) + ".Driver.Surname", GetSurname(vehicle->mDriverName));
-			printData(&output, "Car." + to_string(index) + ".Driver.Nickname", GetNickname(vehicle->mDriverName));
+			printData("Car." + to_string(index) + ".Driver.Forname", GetForname(vehicle->mDriverName));
+			printData("Car." + to_string(index) + ".Driver.Surname", GetSurname(vehicle->mDriverName));
+			printData("Car." + to_string(index) + ".Driver.Nickname", GetNickname(vehicle->mDriverName));
 
-			printData(&output, "Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? "true" : "false");
+			printData("Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? "true" : "false");
 
 			if (vehicle->mInPits != 0) {
 				double speed = VehicleSpeed(vehicle);
 
 				if (speed < 5 || vehicle->mPitState == 3)
-					printData(&output, "Car." + to_string(index) + ".InPit", "true");
+					printData("Car." + to_string(index) + ".InPit", "true");
 				else
-					printData(&output, "Car." + to_string(index) + ".InPit", "false");
+					printData("Car." + to_string(index) + ".InPit", "false");
 			}
 			else
-				printData(&output, "Car." + to_string(index) + ".InPit", "false");
+				printData("Car." + to_string(index) + ".InPit", "false");
 
 			if (vehicle->mIsPlayer == 1)
-				printData(&output, "Driver.Car", index);
+				printData("Driver.Car", index);
 		}
 
-		printData(&output, "Car.Count", index);
+		printData("Car.Count", index);
 	}
-	
+
 	if (setup)
 	{
-		output << "[Setup Data]" << endl;
+		wcout << "[Setup Data]" << endl;
 
-		printData(&output, "FuelRemaining", playerTelemetry.mFuel);
+		printData("FuelRemaining", playerTelemetry.mFuel);
 	}
 
-	strcpy_s(result, size, output.str().c_str());
-	
+	dismiss();
+
 	return 0;
-}
-
-BOOL APIENTRY DllMain(HMODULE hModule,
-	DWORD  ul_reason_for_call,
-	LPVOID lpReserved
-)
-{
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-	return TRUE;
 }

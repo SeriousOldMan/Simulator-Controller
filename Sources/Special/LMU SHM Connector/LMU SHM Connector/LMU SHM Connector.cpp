@@ -39,7 +39,7 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 	static SharedMemoryObjectOut copiedMem;
 
 	try {
-		SharedMemoryLock smLock = SharedMemoryLock::MakeSharedMemoryLock();
+		std::optional<SharedMemoryLock> smLock = SharedMemoryLock::MakeSharedMemoryLock();
 
 		// Try to open a handle to the parent process with SYNCHRONIZE right.
 		// SYNCHRONIZE is enough to wait on the process handle for exit.
@@ -59,9 +59,9 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 				HANDLE objectHandlesArray[2] = { hParent, hEvent };
 				for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500)) {
 					if (waitObject == WAIT_OBJECT_0 + 1) {
-						smLock.Lock();
+						smLock->Lock();
 						CopySharedMemoryObj(copiedMem, pBuf->data);
-						smLock.Unlock();
+						smLock->Unlock();
 					}
 					else
 						break;

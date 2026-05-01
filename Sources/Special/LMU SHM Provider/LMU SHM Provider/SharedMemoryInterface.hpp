@@ -106,13 +106,12 @@ enum SharedMemoryEvent : uint32_t {
 
 class SharedMemoryLock {
 public:
-    static SharedMemoryLock MakeSharedMemoryLock() {
+    static std::optional<SharedMemoryLock> MakeSharedMemoryLock() {
         SharedMemoryLock memoryLock;
-
-        if (!memoryLock.Init())
-            throw std::runtime_error("Failed to initialize SharedMemoryLock. Error code: " + std::to_string(GetLastError()));
-
-        return std::move(memoryLock);
+        if (memoryLock.Init()) {
+            return std::move(memoryLock);
+        }
+        return std::nullopt;
     }
     bool Lock(DWORD dwMilliseconds = INFINITE) {
         int MAX_SPINS = 4000;
@@ -149,7 +148,8 @@ public:
             UnmapViewOfFile(mDataPtr);
     }
     SharedMemoryLock(SharedMemoryLock&& other) : mMapHandle(std::exchange(other.mMapHandle, nullptr)), mWaitEventHandle(std::exchange(other.mWaitEventHandle, nullptr)),
-        mDataPtr(std::exchange(other.mDataPtr, nullptr)) {}
+        mDataPtr(std::exchange(other.mDataPtr, nullptr)) {
+    }
     SharedMemoryLock& operator=(SharedMemoryLock&& other) {
         std::swap(mMapHandle, other.mMapHandle);
         std::swap(mWaitEventHandle, other.mWaitEventHandle);

@@ -14,73 +14,73 @@
 #pragma once
 #include "InternalsPlugin.hpp"
 
-/*
-* Usage example:
+ /*
+ * Usage example:
 
-int main(int argc, char* argv[])
-{
-    int retVal = 0;
-    if (argc < 2) {
-        std::cerr << "Usage: child.exe <LMU-pid>\n";
-        return 1;
-    }
-    // Get the LMU Handle
-    DWORD parentPid = 0;
-    try {
-        parentPid = static_cast<DWORD>(std::stoul(argv[1]));
-    }
-    catch (...) {
-        std::cerr << "Invalid parent PID argument.\n";
-        return 1;
-    }
-    auto smLock = SharedMemoryLock::MakeSharedMemoryLock();
-    if (!smLock.has_value()) {
-        std::cerr << "Cannot initialize SharedMemoryLock.\n";
-        return 1;
-    }
-    static SharedMemoryObjectOut copiedMem;
-    // Try to open a handle to the parent process with SYNCHRONIZE right.
-    // SYNCHRONIZE is enough to wait on the process handle for exit.
-    HANDLE hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
-    HANDLE hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
-    HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
-    if (hParent && hEvent && hMapFile) {
-        if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
-            HANDLE objectHandlesArray[2] = { hParent, hEvent };
-            for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE)) {
-                if (waitObject == WAIT_OBJECT_0 + 1) {
-                    smLock->Lock();
-                    CopySharedMemoryObj(copiedMem, pBuf->data);
-                    smLock->Unlock();
-                    // >>>>> ProcessSharedMemory(copiedMem); <<<<<<
-                }
-                else {
-                    std::cerr << "Wait failed: " << GetLastError() << "\n";
-                    break;
-                }
-            }
-            UnmapViewOfFile(pBuf);
-        }
-        else {
-            std::cerr << "Could not map view of file. Error: " << GetLastError() << std::endl;
-            retVal = 1;
-        }
-    }
-    else {
-        std::cerr << "Something went wrong durin initialization. Error: " << GetLastError() << std::endl;
-        retVal = 1;
-    }
-    if (hMapFile)
-        CloseHandle(hMapFile);
-    if (hEvent)
-        CloseHandle(hEvent);
-    if (hParent)
-        CloseHandle(hParent);
+ int main(int argc, char* argv[])
+ {
+     int retVal = 0;
+     if (argc < 2) {
+         std::cerr << "Usage: child.exe <LMU-pid>\n";
+         return 1;
+     }
+     // Get the LMU Handle
+     DWORD parentPid = 0;
+     try {
+         parentPid = static_cast<DWORD>(std::stoul(argv[1]));
+     }
+     catch (...) {
+         std::cerr << "Invalid parent PID argument.\n";
+         return 1;
+     }
+     auto smLock = SharedMemoryLock::MakeSharedMemoryLock();
+     if (!smLock.has_value()) {
+         std::cerr << "Cannot initialize SharedMemoryLock.\n";
+         return 1;
+     }
+     static SharedMemoryObjectOut copiedMem;
+     // Try to open a handle to the parent process with SYNCHRONIZE right.
+     // SYNCHRONIZE is enough to wait on the process handle for exit.
+     HANDLE hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
+     HANDLE hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
+     HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
+     if (hParent && hEvent && hMapFile) {
+         if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
+             HANDLE objectHandlesArray[2] = { hParent, hEvent };
+             for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, INFINITE)) {
+                 if (waitObject == WAIT_OBJECT_0 + 1) {
+                     smLock->Lock();
+                     CopySharedMemoryObj(copiedMem, pBuf->data);
+                     smLock->Unlock();
+                     // >>>>> ProcessSharedMemory(copiedMem); <<<<<<
+                 }
+                 else {
+                     std::cerr << "Wait failed: " << GetLastError() << "\n";
+                     break;
+                 }
+             }
+             UnmapViewOfFile(pBuf);
+         }
+         else {
+             std::cerr << "Could not map view of file. Error: " << GetLastError() << std::endl;
+             retVal = 1;
+         }
+     }
+     else {
+         std::cerr << "Something went wrong durin initialization. Error: " << GetLastError() << std::endl;
+         retVal = 1;
+     }
+     if (hMapFile)
+         CloseHandle(hMapFile);
+     if (hEvent)
+         CloseHandle(hEvent);
+     if (hParent)
+         CloseHandle(hParent);
 
-    return retVal;
-}
+     return retVal;
+ }
 
-*/
+ */
 
 #define LMU_SHARED_MEMORY_FILE "LMU_Data"
 #define LMU_SHARED_MEMORY_EVENT "LMU_Data_Event"
@@ -106,13 +106,12 @@ enum SharedMemoryEvent : uint32_t {
 
 class SharedMemoryLock {
 public:
-    static SharedMemoryLock MakeSharedMemoryLock() {
+    static std::optional<SharedMemoryLock> MakeSharedMemoryLock() {
         SharedMemoryLock memoryLock;
-        
-        if (!memoryLock.Init())
-            throw std::runtime_error("Failed to initialize SharedMemoryLock. Error code: " + std::to_string(GetLastError()));
-        
-        return std::move(memoryLock);
+        if (memoryLock.Init()) {
+            return std::move(memoryLock);
+        }
+        return std::nullopt;
     }
     bool Lock(DWORD dwMilliseconds = INFINITE) {
         int MAX_SPINS = 4000;
@@ -148,8 +147,9 @@ public:
         if (mDataPtr)
             UnmapViewOfFile(mDataPtr);
     }
-    SharedMemoryLock(SharedMemoryLock&& other) : mMapHandle(std::exchange(other.mMapHandle, nullptr)), mWaitEventHandle(std::exchange(other.mWaitEventHandle, nullptr)) ,
-        mDataPtr(std::exchange(other.mDataPtr, nullptr)) {}
+    SharedMemoryLock(SharedMemoryLock&& other) : mMapHandle(std::exchange(other.mMapHandle, nullptr)), mWaitEventHandle(std::exchange(other.mWaitEventHandle, nullptr)),
+        mDataPtr(std::exchange(other.mDataPtr, nullptr)) {
+    }
     SharedMemoryLock& operator=(SharedMemoryLock&& other) {
         std::swap(mMapHandle, other.mMapHandle);
         std::swap(mWaitEventHandle, other.mWaitEventHandle);

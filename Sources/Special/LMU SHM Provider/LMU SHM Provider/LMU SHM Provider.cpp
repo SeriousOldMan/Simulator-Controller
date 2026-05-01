@@ -425,7 +425,7 @@ int main(int argc, char* argv[])
 	{
 		wcout << "[Session Data]" << endl;
 
-		printData("Active", (data->scoring.scoringInfo.mGamePhase != 0) ? "true" : "false");
+		printData("Active", (data->scoring.scoringInfo.mGamePhase != 0) ? string("true") : string("false"));
 
 		if (!data->telemetry.playerHasVehicle)
 			wcout << "Paused=true" << endl;
@@ -456,7 +456,7 @@ int main(int argc, char* argv[])
 		printData("Car", getString(playerTelemetry.mVehicleModel));
 		printData("CarClass", getString(playerScoring.mVehicleClass));
 		printData("Track", getString(data->scoring.scoringInfo.mTrackName));
-		printData("SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
+		printData("SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? string("Laps") : string("Time"));
 		printData("FuelAmount", round(playerTelemetry.mFuelCapacity));
 
 		long time = GetRemainingTime(&data->scoring, &playerScoring);
@@ -527,7 +527,7 @@ int main(int argc, char* argv[])
 
 		printData("Position", playerScoring.mPlace);
 
-		printData("LapValid", playerTelemetry.mLapInvalidated ? "false" : "true");
+		printData("LapValid", playerTelemetry.mLapInvalidated ? string("false") : string("true"));
 
 		printData("LapLastTime", round(Normalize((playerScoring.mLastLapTime > 0) ? playerScoring.mLastLapTime
 			: playerScoring.mBestLapTime) * 1000));
@@ -545,7 +545,7 @@ int main(int argc, char* argv[])
 		printData("StintTimeRemaining", time);
 		printData("DriverTimeRemaining", time);
 
-		printData("InPitLane", (playerScoring.mInPits) != 0 ? "true" : "false");
+		printData("InPitLane", (playerScoring.mInPits) != 0 ? string("true") : string("false"));
 
 		if (playerScoring.mInPits != 0) {
 			double speed = VehicleSpeed(&playerScoring);
@@ -619,7 +619,7 @@ int main(int argc, char* argv[])
 
 			printData("Car." + to_string(index) + ".Laps", vehicle->mTotalLaps);
 			printData("Car." + to_string(index) + ".Lap.Running", vehicle->mLapDist / data->scoring.scoringInfo.mLapDist);
-			printData("Car." + to_string(index) + ".Lap.Running.Valid", telemetry->mLapInvalidated ? "false" : "true");
+			printData("Car." + to_string(index) + ".Lap.Running.Valid", telemetry->mLapInvalidated ? string("false") : string("true"));
 			printData("Car." + to_string(index) + ".Lap.Running.Time", (long)((telemetry->mElapsedTime - telemetry->mLapStartET) * 1000));
 
 			int lapTime = (int)round(Normalize(vehicle->mLastLapTime) * 1000);
@@ -645,7 +645,7 @@ int main(int argc, char* argv[])
 			printData("Car." + to_string(index) + ".Driver.Surname", GetSurname(vehicle->mDriverName));
 			printData("Car." + to_string(index) + ".Driver.Nickname", GetNickname(vehicle->mDriverName));
 
-			printData("Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? "true" : "false");
+			printData("Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? string("true") : string("false"));
 
 			if (vehicle->mInPits != 0) {
 				double speed = VehicleSpeed(vehicle);

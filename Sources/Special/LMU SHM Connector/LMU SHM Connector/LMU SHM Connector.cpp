@@ -445,7 +445,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 	{
 		output << "[Session Data]" << endl;
 
-		printData(&output, "Active", (data->scoring.scoringInfo.mGamePhase != 0) ? "true" : "false");
+		printData(&output, "Active", (data->scoring.scoringInfo.mGamePhase != 0) ? string("true") : string("false"));
 
 		if (!data->telemetry.playerHasVehicle)
 			output << "Paused=true" << endl;
@@ -476,7 +476,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "Car", getString(playerTelemetry.mVehicleModel));
 		printData(&output, "CarClass", getString(playerScoring.mVehicleClass));
 		printData(&output, "Track", getString(data->scoring.scoringInfo.mTrackName));
-		printData(&output, "SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? "Laps" : "Time");
+		printData(&output, "SessionFormat", (data->scoring.scoringInfo.mEndET <= 0.0) ? string("Laps") : string("Time"));
 		printData(&output, "FuelAmount", round(playerTelemetry.mFuelCapacity));
 
 		long time = GetRemainingTime(&data->scoring, &playerScoring);
@@ -547,7 +547,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 
 		printData(&output, "Position", playerScoring.mPlace);
 
-		printData(&output, "LapValid", playerTelemetry.mLapInvalidated ? "false" : "true");
+		printData(&output, "LapValid", playerTelemetry.mLapInvalidated ? string("false") : string("true"));
 
 		printData(&output, "LapLastTime", round(Normalize((playerScoring.mLastLapTime > 0) ? playerScoring.mLastLapTime
 																						   : playerScoring.mBestLapTime) * 1000));
@@ -565,7 +565,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		printData(&output, "StintTimeRemaining", time);
 		printData(&output, "DriverTimeRemaining", time);
 
-		printData(&output, "InPitLane", (playerScoring.mInPits) != 0 ? "true" : "false");
+		printData(&output, "InPitLane", (playerScoring.mInPits) != 0 ? string("true") : string("false"));
 
 		if (playerScoring.mInPits != 0) {
 			double speed = VehicleSpeed(&playerScoring);
@@ -665,7 +665,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printData(&output, "Car." + to_string(index) + ".Driver.Surname", GetSurname(vehicle->mDriverName));
 			printData(&output, "Car." + to_string(index) + ".Driver.Nickname", GetNickname(vehicle->mDriverName));
 
-			printData(&output, "Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? "true" : "false");
+			printData(&output, "Car." + to_string(index) + ".InPitLane", (vehicle->mInPits) != 0 ? string("true") : string("false"));
 
 			if (vehicle->mInPits != 0) {
 				double speed = VehicleSpeed(vehicle);

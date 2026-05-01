@@ -13,40 +13,20 @@
 #pragma optimize("",off)
 using namespace std;
 
-HANDLE hParent = NULL;
-HANDLE hEvent = NULL;
-HANDLE hMapFile = NULL;
+SharedMemoryObjectOut copiedMem;
 
-void dismiss() {
-	if (hMapFile) {
-		CloseHandle(hMapFile);
-		hMapFile = NULL;
-	}
-	if (hEvent) {
-		CloseHandle(hEvent);
-		hEvent = NULL;
-	}
-	if (hParent) {
-		CloseHandle(hParent);
-		hParent = NULL;
-	}
-}
-
-SharedMemoryObjectOut* require(DWORD parentPid) {
-	bool retVal = true;
-
-	static SharedMemoryObjectOut copiedMem;
+SharedMemoryObjectOut* require(DWORD parentPID) {
+	SharedMemoryObjectOut* retVal = NULL;
 
 	try {
 		std::optional<SharedMemoryLock> smLock = SharedMemoryLock::MakeSharedMemoryLock();
-
-		// Try to open a handle to the parent process with SYNCHRONIZE right.
-		// SYNCHRONIZE is enough to wait on the process handle for exit.
-		dismiss();
-
-		hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPid);
-		hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
-		hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
+		
+		if (!smLock.has_value())
+			return NULL;
+		
+		HANDLE hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPID);
+		HANDLE hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
+		HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
 
 		if (hParent && hEvent && hMapFile) {
 			if (SharedMemoryLayout* pBuf = (SharedMemoryLayout*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedMemoryLayout))) {
@@ -56,23 +36,27 @@ SharedMemoryObjectOut* require(DWORD parentPid) {
 						smLock->Lock();
 						CopySharedMemoryObj(copiedMem, pBuf->data);
 						smLock->Unlock();
+						
+						retval = &copiedMen;
 					}
 					else
 						break;
 				}
 				UnmapViewOfFile(pBuf);
 			}
-			else
-				retVal = false;
 		}
-		else
-			retVal = false;
+		
+		if (hMapFile)
+			CloseHandle(hMapFile);
+		if (hEvent)
+			CloseHandle(hEvent);
+		if (hParent)
+			CloseHandle(hParent);
 	}
 	catch (...) {
-		retVal = false;
 	}
 
-	return retVal ? &copiedMem : NULL;
+	return retVal;
 }
 
 inline string getString(char* str) {
@@ -671,8 +655,6 @@ int main(int argc, char* argv[])
 
 		printData("FuelRemaining", playerTelemetry.mFuel);
 	}
-
-	dismiss();
 
 	return 0;
 }

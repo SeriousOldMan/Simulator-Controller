@@ -777,7 +777,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	acquireTelemetryData() {
-		return this.Provider.readTelemetryData()
+		return this.Provider.acquireTelemetryData()
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {

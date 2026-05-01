@@ -32,6 +32,15 @@ global kSessionNames := ["Other", "Practice", "Qualification", "Race", "Time Tri
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kLogSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																, kUserConfigDirectory, kConfigDirectory))
+									   , "Debug", "LogSimulator", false)
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -289,6 +298,9 @@ class SimulatorProvider {
 
 		static sessionDB := false
 
+		if kLogSimulator
+			logMessage(kLogDebug, "Read telemetry data for simulator " . this.Simulator)
+
 		if !sessionDB
 			sessionDB := SessionDatabase()
 
@@ -299,6 +311,9 @@ class SimulatorProvider {
 
 	readStandingsData(telemetryData, correct := false) {
 		local standingsData
+
+		if kLogSimulator
+			logMessage(kLogDebug, "Read standings data for simulator " . this.Simulator)
 
 		if telemetryData.Has("Position Data") {
 			standingsData := newMultiMap()
@@ -319,15 +334,24 @@ class SimulatorProvider {
 	}
 
 	acquireTelemetryData() {
+		if kLogSimulator
+			logMessage(kLogDebug, "Acquire telemetry data for simulator " . this.Simulator)
+
 		return this.readTelemetryData()
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
+		if kLogSimulator
+			logMessage(kLogDebug, "Acquire standings data for simulator " . this.Simulator)
+
 		return this.readStandingsData(telemetryData, !finished)
 	}
 
 	acquireSessionData(&telemetryData, &standingsData, finished := false) {
 		local count, driver, carNr
+
+		if kLogSimulator
+			logMessage(kLogDebug, "Acquire session data for simulator " . this.Simulator)
 
 		telemetryData := this.acquireTelemetryData()
 
@@ -365,6 +389,10 @@ class SimulatorProvider {
 		local track := this.Track
 		local data := callSimulator(SessionDatabase.getSimulatorCode(simulator), options, protocol?)
 		local tyreCompound, tyreCompoundColor, ignore, section
+
+		if kLogSimulator
+			logMessage(kLogDebug, "Read session data for simulator " . simulator . " for "
+																	 . ((options = "") ? "Telemetry=true" : options))
 
 		if !car
 			car := getMultiMapValue(data, "Session Data", "Car", false)
@@ -404,7 +432,7 @@ class SimulatorProvider {
 ;;;-------------------------------------------------------------------------;;;
 
 callSimulator(simulator, options := "", protocol?) {
-	local exePath, dataFile, data
+	local exePath, dataFile, data, settings
 	local connector, curWorkingDir, buf, arguments, callOptions, theProtocols
 
 	static defaultProtocol := false
@@ -412,9 +440,9 @@ callSimulator(simulator, options := "", protocol?) {
 	static connectors := CaseInsenseMap()
 
 	if !defaultProtocol {
-		defaultProtocol := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
-																   , kUserConfigDirectory, kConfigDirectory))
-										  , "Simulator", "Data Provider", "Connector")
+		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+
+		defaultProtocol := getMultiMapValue(settings, "Simulator", "Data Provider", "Connector")
 
 		if ((defaultProtocol = "Connector") || (defaultProtocol = "DLL"))
 			defaultProtocol := "Connector"
@@ -436,6 +464,20 @@ callSimulator(simulator, options := "", protocol?) {
 		catch Any {
 			throw "Unsupported simulator detected in callSimulator..."
 		}
+
+	if kLogSimulator {
+		logMessage(kLogDebug, "Calling simulator " . SessionDatabase.getSimulatorName(simulator)
+												   . " for " . ((options = "") ? "Telemetry=true" : options)
+												   . " by " . (isSet(protocol) ? protocol : defaultProtocol))
+
+		try {
+			throw Error("Caller stack")
+		}
+		catch (Any as exception) {
+			if exception.HasProp("Stack")
+				logMessage(kLogDebug, "Stack:`n`n" . exception.Stack, false, false, false)
+		}
+	}
 
 	if ((defaultProtocol = "Provider") && protocols[simulator].HasProp("Provider"))
 		protocol := protocols[simulator].Provider
@@ -631,8 +673,16 @@ readSimulator(simulator, car, track, topics := {}, format := "Object") {
 		provider.acquireSessionData(&telemetryData, &standingsData)
 	}
 
-	if (!topics.HasProp("Setup") || topics.Setup)
-		data := provider.readSessionData("Setup=true")
+	if (!topics.HasProp("Setup") || topics.Setup) {
+		if (getMultiMapValues(telemetryData, "Setup Data").Count = 0)
+			data := provider.readSessionData("Setup=true")
+		else {
+			data := newMultiMap()
+
+			if (topics.HasProp("Telemetry") && !topics.Telemetry)
+				setMultiMapValues(data, "Setup Data", getMultiMapValues(telemetryData, "Setup Data").Clone())
+		}
+	}
 	else
 		data := newMultiMap()
 

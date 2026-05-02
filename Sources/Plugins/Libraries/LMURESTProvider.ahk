@@ -1466,9 +1466,11 @@ class LMURESTProvider {
 		}
 
 		reload() {
+			/*
 			LMURestProvider.DriversData.sCachedData := false
 
 			this.iCachedCars := CaseInsenseMap()
+			*/
 
 			super.reload()
 		}

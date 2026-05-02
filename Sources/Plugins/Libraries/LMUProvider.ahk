@@ -20,9 +20,10 @@
 class LMUProvider extends Sector397Provider {
 	static kLMUAPIType := "RF2"
 
+	static sDriversData := false
+
 	iTeamData := false
 	iTrackData := false
-	iDriversData := false
 	iGridData := false
 
 	iLastDriver := false
@@ -71,10 +72,10 @@ class LMUProvider extends Sector397Provider {
 
 	DriversData {
 		Get {
-			if !this.iDriversData
-				this.iDriversData := LMURESTProvider.DriversData()
+			if !LMUProvider.sDriversData
+				LMUProvider.sDriversData := LMURESTProvider.DriversData()
 
-			return this.iDriversData
+			return LMUProvider.sDriversData
 		}
 	}
 
@@ -139,6 +140,7 @@ class LMUProvider extends Sector397Provider {
 		ignore := this.TeamData.Data
 		ignore := this.TrackData.Data
 		ignore := this.GridData.Data
+		ignore := this.GridData.CarData.Data
 		ignore := this.DriversData.Data
 	}
 

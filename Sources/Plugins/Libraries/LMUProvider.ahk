@@ -289,11 +289,14 @@ class LMUProvider extends Sector397Provider {
 		local carData := false
 		local splitTime := A_TickCount
 		local startTime := splitTime
-		local logTimes := isDebug()
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
 		local sessionData, paused, fuelAmount
+
+		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	  , kUserConfigDirectory, kConfigDirectory))
+											 , "Debug", "LogSimulator", false)
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -321,7 +324,7 @@ class LMUProvider extends Sector397Provider {
 
 			setupData := LMURESTProvider.PitstopData(simulator, car, track)
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (Setup=true->Pitstop):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -329,7 +332,7 @@ class LMUProvider extends Sector397Provider {
 
 			data := super.readSessionData(options, protocol?)
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (Setup=true->SHM):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -382,7 +385,7 @@ class LMUProvider extends Sector397Provider {
 
 			setMultiMapValue(data, "Setup Data", "ServiceTime", LMURESTProvider.ServiceData().ServiceTime)
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (Setup=true->Tyres):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -391,7 +394,7 @@ class LMUProvider extends Sector397Provider {
 		else {
 			data := super.readSessionData(options, protocol?)
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->SHM):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -403,7 +406,7 @@ class LMUProvider extends Sector397Provider {
 
 			sessionData := LMURESTProvider.SessionData()
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Session):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -412,7 +415,7 @@ class LMUProvider extends Sector397Provider {
 			car := (this.Car || this.TeamData.Car)
 			track := (this.Track || this.TrackData.Track)
 
-			if logTimes {
+			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -463,7 +466,7 @@ class LMUProvider extends Sector397Provider {
 					if weather
 						lastWeather30Min := weather
 
-					if logTimes {
+					if logRequests {
 						logMessage(kLogInfo, "Read LMU session data (" . options . "->Weather):" . (A_TickCount - splitTime) . " ms...")
 
 						splitTime := A_TickCount
@@ -511,7 +514,7 @@ class LMUProvider extends Sector397Provider {
 					if data.Has("Car Data") {
 						energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
-						if logTimes {
+						if logRequests {
 							logMessage(kLogInfo, "Read LMU session data (" . options . "->Energy):" . (A_TickCount - splitTime) . " ms...")
 
 							splitTime := A_TickCount
@@ -540,7 +543,7 @@ class LMUProvider extends Sector397Provider {
 						if virtualEnergy
 							setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)
 
-						if logTimes {
+						if logRequests {
 							logMessage(kLogInfo, "Read LMU session data (" . options . "->Fuel):" . (A_TickCount - splitTime) . " ms...")
 
 							splitTime := A_TickCount
@@ -560,7 +563,7 @@ class LMUProvider extends Sector397Provider {
 						lastBrakeWear := carData.BrakePadWear["All"]
 					}
 
-					if logTimes {
+					if logRequests {
 						logMessage(kLogInfo, "Read LMU session data (" . options . "->Wheels):" . (A_TickCount - splitTime) . " ms...")
 
 						splitTime := A_TickCount
@@ -589,7 +592,7 @@ class LMUProvider extends Sector397Provider {
 					if (isObject(suspensionDamage) && exist(suspensionDamage, (d) => (d != false)))
 						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
 
-					if logTimes {
+					if logRequests {
 						logMessage(kLogInfo, "Read LMU session data (" . options . "->Damage):" . (A_TickCount - splitTime) . " ms...")
 
 						splitTime := A_TickCount
@@ -598,7 +601,7 @@ class LMUProvider extends Sector397Provider {
 			}
 		}
 
-		if logTimes
+		if logRequests
 			logMessage(kLogInfo, "Read LMU session data (Overall):" . (A_TickCount - startTime) . " ms...")
 
 		return data

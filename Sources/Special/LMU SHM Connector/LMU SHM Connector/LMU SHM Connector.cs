@@ -332,8 +332,8 @@ namespace SHMConnector {
 		{
 			StringWriter strWriter = new StringWriter();
 
-			ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
-			ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+			ref LMUVehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+			ref LMUVehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
 			string session = "";
 			bool running = (connected && (extended.mSimulationThreadStarted != 0));
@@ -498,7 +498,7 @@ namespace SHMConnector {
 				int index = 0;
 
 				for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)	{
-					ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+					ref LMUVehicleScoring vehicle = ref scoring.mVehicles[i];
 
 					/*
                     double speed = VehicleSpeed(ref vehicle);
@@ -545,14 +545,14 @@ namespace SHMConnector {
 			return (value < 0) ? 0 : value;
 		}
 
-        double VehicleSpeed(ref rF2VehicleScoring vehicle)
+        double VehicleSpeed(ref LMUVehicleScoring vehicle)
         {
-            rF2Vec3 localVel = vehicle.mLocalVel;
+            LMUVec3 localVel = vehicle.mLocalVel;
 
             return Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
         }
 
-		private long GetRemainingLaps(ref rF2VehicleScoring playerScoring) {
+		private long GetRemainingLaps(ref LMUVehicleScoring playerScoring) {
 			if (playerScoring.mTotalLaps < 1)
 				return 0;
 
@@ -569,7 +569,7 @@ namespace SHMConnector {
 			}
 		}
 
-		private long GetRemainingTime(ref rF2VehicleScoring playerScoring) {
+		private long GetRemainingTime(ref LMUVehicleScoring playerScoring) {
 			if (playerScoring.mTotalLaps < 1)
 				return 0;
 
@@ -645,9 +645,9 @@ namespace SHMConnector {
 			return nullIdx >= 0 ? Encoding.UTF8.GetString(bytes, 0, nullIdx) : Encoding.UTF8.GetString(bytes);
 		}
 
-        static rF2VehicleScoring noPlayer = new rF2VehicleScoring();
+        static LMUVehicleScoring noPlayer = new LMUVehicleScoring();
 
-        public static ref rF2VehicleScoring GetPlayerScoring(ref rF2Scoring scoring) {
+        public static ref LMUVehicleScoring GetPlayerScoring(ref LMUScoring scoring) {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i) {
 				if (scoring.mVehicles[i].mIsPlayer == 1)
                     return ref scoring.mVehicles[i];
@@ -656,9 +656,9 @@ namespace SHMConnector {
 			return ref noPlayer;
 		}
 
-        static rF2VehicleTelemetry noTelemetry = new rF2VehicleTelemetry();
+        static LMUVehicleTelemetry noTelemetry = new LMUVehicleTelemetry();
 
-        public static ref rF2VehicleTelemetry GetPlayerTelemetry(int id, ref rF2Telemetry telemetry)
+        public static ref LMUVehicleTelemetry GetPlayerTelemetry(int id, ref LMUTelemetry telemetry)
         {
             for (int i = 0; i < telemetry.mNumVehicles; ++i)
             {
@@ -672,7 +672,7 @@ namespace SHMConnector {
         private void Connect() {
 			if (!this.connected) {
 				try {
-					// Extended buffer is the last one constructed, so it is an indicator RF2SM is ready.
+					// Extended buffer is the last one constructed, so it is an indicator LMUSM is ready.
 					this.extendedBuffer.Connect();
 
 					this.telemetryBuffer.Connect();
@@ -1144,8 +1144,8 @@ namespace SHMConnector {
 		public string ReadSetup() {
             StringWriter strWriter = new StringWriter();
 
-            ref rF2VehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
-            ref rF2VehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
+            ref LMUVehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
+            ref LMUVehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
 
             strWriter.WriteLine("[Setup Data]");
 

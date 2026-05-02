@@ -7,8 +7,8 @@
     <ProjectGuid>{17FC2626-EA21-43ED-BC84-BE0B8545FC2D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RF2 SHM Provider</RootNamespace>
-    <AssemblyName>RF2 SHM Provider</AssemblyName>
+    <RootNamespace>LMUSHMProvider</RootNamespace>
+    <AssemblyName>LMU SHM Provider</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -50,14 +50,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\RF2 SHM Provider\Program.cs" />
-    <Compile Include="..\RF2 SHM Provider\Properties\AssemblyInfo.cs" />
-    <Compile Include="..\RF2 SHM Provider\rF2Data.cs" />
-    <Compile Include="..\RF2 SHM Provider\MappedBuffer.cs" />
-    <Compile Include="RF2 SHM Provider.cs" />
+    <Compile Include="..\LMU SHM Provider\Program.cs" />
+    <Compile Include="..\LMU SHM Provider\Properties\AssemblyInfo.cs" />
+    <Compile Include="..\LMU SHM Provider\LMUData.cs" />
+    <Compile Include="..\LMU SHM Provider\MappedBuffer.cs" />
+    <Compile Include="LMU SHM Provider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\RF2 SHM Provider\App.config" />
+    <None Include="..\LMU SHM Provider\App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Engine.ico" />

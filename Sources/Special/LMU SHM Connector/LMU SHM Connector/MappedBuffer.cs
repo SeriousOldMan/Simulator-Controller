@@ -7,7 +7,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Threading;
-using SHMConnector.rFactor2Data;
+using SHMConnector.LeMansUltimateData;
 
 namespace SHMConnector
 {

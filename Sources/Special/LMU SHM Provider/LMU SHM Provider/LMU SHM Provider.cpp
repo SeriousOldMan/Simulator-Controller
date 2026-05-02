@@ -33,11 +33,18 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 				HANDLE objectHandlesArray[2] = { hParent, hEvent };
 				for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500)) {
 					if (waitObject == WAIT_OBJECT_0 + 1) {
-						smLock->Lock();
-						CopySharedMemoryObj(copiedMem, pBuf->data);
-						smLock->Unlock();
-						
-						retval = &copiedMen;
+						if (smLock->Lock()) {
+							try {
+								CopySharedMemoryObj(copiedMem, pBuf->data);
+
+								retVal = &copiedMem;
+							}
+							catch (...) {
+								retVal = NULL;
+							}
+
+							smLock->Unlock();
+						}
 					}
 					else
 						break;

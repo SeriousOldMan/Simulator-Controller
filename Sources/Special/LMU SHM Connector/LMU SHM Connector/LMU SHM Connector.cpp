@@ -12,17 +12,17 @@
 #pragma optimize("",off)
 using namespace std;
 
-static SharedMemoryObjectOut;
+SharedMemoryObjectOut copiedMem;
 
 SharedMemoryObjectOut* require(DWORD parentPID) {
 	SharedMemoryObjectOut* retVal = NULL;
 
 	try {
 		std::optional<SharedMemoryLock> smLock = SharedMemoryLock::MakeSharedMemoryLock();
-		
+
 		if (!smLock.has_value())
 			return NULL;
-		
+
 		HANDLE hParent = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, parentPID);
 		HANDLE hEvent = OpenEventA(SYNCHRONIZE, FALSE, "LMU_Data_Event");
 		HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"LMU_Data");
@@ -32,11 +32,18 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 				HANDLE objectHandlesArray[2] = { hParent, hEvent };
 				for (DWORD waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500); waitObject != WAIT_OBJECT_0; waitObject = WaitForMultipleObjects(2, objectHandlesArray, FALSE, 500)) {
 					if (waitObject == WAIT_OBJECT_0 + 1) {
-						smLock->Lock();
-						CopySharedMemoryObj(copiedMem, pBuf->data);
-						smLock->Unlock();
-						
-						retval = &copiedMen;
+						if (smLock->Lock()) {
+							try {
+								CopySharedMemoryObj(copiedMem, pBuf->data);
+
+								retVal = &copiedMem;
+							}
+							catch (...) {
+								retVal = NULL;
+							}
+
+							smLock->Unlock();
+						}
 					}
 					else
 						break;
@@ -44,7 +51,7 @@ SharedMemoryObjectOut* require(DWORD parentPID) {
 				UnmapViewOfFile(pBuf);
 			}
 		}
-		
+
 		if (hMapFile)
 			CloseHandle(hMapFile);
 		if (hEvent)

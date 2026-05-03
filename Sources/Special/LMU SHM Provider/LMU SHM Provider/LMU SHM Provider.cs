@@ -235,6 +235,7 @@ namespace LMUSHMProvider {
 
             Console.Write("Car.Count="); Console.WriteLine(index);
         }		
+		
 		public void ReadData() {
 			ref LMUVehicleScoring playerScoring = ref GetPlayerScoring(ref scoring);
 			ref LMUVehicleTelemetry playerTelemetry = ref GetPlayerTelemetry(playerScoring.mID, ref telemetry);
@@ -403,20 +404,14 @@ namespace LMUSHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
-                byte compoundIdx = playerTelemetry.mWheels[0].mCompoundIndex;
                 byte compoundType = playerTelemetry.mWheels[0].mCompoundType;
 
-                Console.Write("TyreCompoundRaw="); Console.WriteLine(compoundIdx);
-                Console.Write("TyreCompoundTypeRaw="); Console.WriteLine(compoundType);
+                Console.Write("TyreCompoundRaw="); Console.WriteLine(compoundType);
 
-                Console.Write("TyreCompoundRawFrontLeft="); Console.WriteLine(compoundIdx);
-                Console.Write("TyreCompoundTypeRawFrontLeft="); Console.WriteLine(compoundType);
-				Console.Write("TyreCompoundRawFrontRight="); Console.WriteLine(playerTelemetry.mWheels[1].mCompoundIndex);
-                Console.Write("TyreCompoundTypeRawFrontRight="); Console.WriteLine(playerTelemetry.mWheels[1].mCompoundType);
-                Console.Write("TyreCompoundRawRearLeft="); Console.WriteLine(playerTelemetry.mWheels[2].mCompoundIndex);
-                Console.Write("TyreCompoundTypeRawRearLeft="); Console.WriteLine(playerTelemetry.mWheels[2].mCompoundType);
-                Console.Write("TyreCompoundRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundIndex);
-                Console.Write("TyreCompoundTypeRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
+                Console.Write("TyreCompoundRawFrontLeft="); Console.WriteLine(compoundType);
+				Console.Write("TyreCompoundRawFrontRight="); Console.WriteLine(playerTelemetry.mWheels[1].mCompoundType);
+                Console.Write("TyreCompoundRawRearLeft="); Console.WriteLine(playerTelemetry.mWheels[2].mCompoundType);
+                Console.Write("TyreCompoundRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
 
                 Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");

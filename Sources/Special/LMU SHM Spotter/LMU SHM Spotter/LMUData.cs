@@ -5,7 +5,7 @@ Website: thecrewchief.org
 using System;
 using System.Runtime.InteropServices;
 
-namespace SHMConnector
+namespace LMUSHMSpotter
 {
     // Marshalled types:
     // C++                 C#

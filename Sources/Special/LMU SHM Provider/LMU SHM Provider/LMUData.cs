@@ -52,6 +52,27 @@ namespace LMUSHMProvider
     public const byte RowY = 1;
     public const byte RowZ = 2;
 
+	public enum LMUVehicleClass {
+		Hypercar = 0x00,
+		LMP2_ELMS = 0x02,
+		LMP2,
+		LMP3,
+		GTE,
+		GT3,
+		PaceCar = 0x08,
+		Unknown = 0xFF
+	}
+
+	public enum LMUVehicleChampionship {
+		WEC_2023 = 0x00,
+		WEC_2024,
+		WEC_2025,
+		WEC_2026,
+		ELMS_2025 = 0x10,
+		ELMS_2026,
+		Unknown = 0xFF
+	}
+	
     // 0 Before session has begun
     // 1 Reconnaissance laps (race only)
     // 2 Grid walk-through (race only)
@@ -236,8 +257,13 @@ namespace LMUSHMProvider
       public double mTireCarcassTemperature;       // rough average of temperature samples from carcass (Kelvin)
       [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
       public double[] mTireInnerLayerTemperature;  // rough average of temperature samples from innermost layer of rubber (before carcass) (Kelvin)
+	  
+	  /* LMU Extension */
+	  public float mOptimalTemp;
+	  public byte mCompoundIndex;
+	  public byte mCompoundType;
 
-      [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 24)]
+      [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
       byte[] mExpansion;                    // for future use
     }
 
@@ -343,8 +369,55 @@ namespace LMUSHMProvider
       public float[] mPhysicsToGraphicsOffset;       // offset from static CG to graphical center
       public float mPhysicalSteeringWheelRange;       // the *physical* steering wheel range
 
+      /* LMU Extension */
+	  // deltabest
+	  public double mDeltaBest;
+
+	  public double mBatteryChargeFraction; // Battery charge as fraction [0.0-1.0]
+
+	  // electric boost motor
+	  public double mElectricBoostMotorTorque; // current torque of boost motor (can be negative when in regenerating mode)
+	  public double mElectricBoostMotorRPM; // current rpm of boost motor
+	  public double mElectricBoostMotorTemperature; // current temperature of boost motor
+	  public double mElectricBoostWaterTemperature; // current water temperature of boost motor cooler if present (0 otherwise)
+	  public byte mElectricBoostMotorState; // 0=unavailable 1=inactive, 2=propulsion, 3=regeneration
+	  public bool mLapInvalidated;
+	  public bool mABSActive;
+	  public bool mTCActive;
+	  public bool mSpeedLimiterActive;
+	  public byte mWiperState;
+	  public byte mTC;
+	  public byte mTCMax;
+	  public byte mTCSlip;
+	  public byte mTCSlipMax;
+	  public byte mTCCut;
+	  public byte mTCCutMax;
+	  public byte mABS;
+	  public byte mABSMax;
+	  public byte mMotorMap;
+	  public byte mMotorMapMax;
+	  public byte mMigration;
+	  public byte mMigrationMax;
+	  public byte mFrontAntiSway;
+	  public byte mFrontAntiSwayMax;
+	  public byte mRearAntiSway;
+	  public byte mRearAntiSwayMax;
+	  public byte mLiftAndCoastProgress;
+	  public byte mTrackLimitsSteps; // Normalized track limits points (TrackLimitPoints * TrackLimitStepsPerPoint)
+	  public float mRegen; //kW
+	  public float mSoC;
+	  public float mVirtualEnergy;
+	  public float mTimeGapCarAhead;
+	  public float mTimeGapCarBehind;
+	  public float mTimeGapPlaceAhead;
+	  public float mTimeGapPlaceBehind;
+	  [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 30)]
+      public char[] mVehicleModel;
+	  public byte mVehicleClass;		// see LMUVhicleClass
+	  public byte mVehicleChampionship;	// see LMUVehicleChampionship
+
       // Future use
-      [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 152)]
+      [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 20)]
       public byte[] mExpansion;           // for future use (note that the slot ID has been moved to mID above)
 
       // keeping this at the end of the structure to make it easier to replace in future versions

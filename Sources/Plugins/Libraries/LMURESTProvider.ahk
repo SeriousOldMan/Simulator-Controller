@@ -20,6 +20,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMURESTProvider {
+	static kLogRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																   , kUserConfigDirectory, kConfigDirectory))
+										  , "Debug", "LogSimulator", false)
+
 	static sWheelTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									   , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
 	static sBrakeTypes := CaseInsenseMap("FL", "frontLeft", "FR", "frontRight", "RL", "rearLeft", "RR", "rearRight"
@@ -89,7 +93,7 @@ class LMURESTProvider {
 
 					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
-					if isDebug()
+					if LMURestProvider.kLogRequests
 						logMessage(kLogDebug, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 
 					if !isObject(data)
@@ -126,7 +130,7 @@ class LMURESTProvider {
 
 					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 
-					if isDebug()
+					if LMURestProvider.kLogRequests
 						logMessage(kLogDebug, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 				}
 				catch Any as exception {
@@ -1462,9 +1466,11 @@ class LMURESTProvider {
 		}
 
 		reload() {
+			/*
 			LMURestProvider.DriversData.sCachedData := false
 
 			this.iCachedCars := CaseInsenseMap()
+			*/
 
 			super.reload()
 		}

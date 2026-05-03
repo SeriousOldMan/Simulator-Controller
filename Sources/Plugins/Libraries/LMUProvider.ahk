@@ -106,8 +106,10 @@ class LMUProvider extends Sector397Provider {
 	static getOptions(type, protocol, options := false) {
 		options := super.getOptions(type, protocol, options)
 
+		/*
 		if (LMUProvider.kLMUAPIType = "LMU")
 			options := concatenate(["LMU=" . Application(this.Simulator).getProcessID()], options)
+		*/
 
 		return options
 	}
@@ -153,7 +155,7 @@ class LMUProvider extends Sector397Provider {
 		return false
 	}
 
-	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
 		local gridData
 
 		static nextReload := 0
@@ -181,22 +183,22 @@ class LMUProvider extends Sector397Provider {
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 				nr := this.parseNr(carName, &carName)
 
-				super.parseCarName(carID, carName, , , &category)
+				super.parseCarName(carID, carModel, carName, , , &category)
 			}
 			else
-				super.parseCarName(carID, carName, , &nr, &category)
+				super.parseCarName(carID, carModel, carName, , &nr, &category)
 		}
 		else {
-			model := ""
+			model := carModel
 			team := ""
 
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 				nr := this.parseNr(carName, &carName)
 
-				super.parseCarName(carID, carName, , , &category)
+				super.parseCarName(carID, carModel, carName, , , &category)
 			}
 			else
-				super.parseCarName(carID, carName, , &nr, &category)
+				super.parseCarName(carID, carModel, carName, , &nr, &category)
 		}
 	}
 
@@ -439,8 +441,14 @@ class LMUProvider extends Sector397Provider {
 				splitTime := A_TickCount
 			}
 
-			car := (this.Car || this.TeamData.Car)
-			track := (this.Track || this.TrackData.Track)
+			if lmuAPIType {
+				car := getMultiMapValue(data, "Session Data", "Car")
+				track := getMultiMapValue(data, "Session Data", "Track")
+			}
+			else {
+				car := (this.Car || this.TeamData.Car)
+				track := (this.Track || this.TrackData.Track)
+			}
 
 			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")
@@ -601,7 +609,7 @@ class LMUProvider extends Sector397Provider {
 						if (LMUProvider.kLMUAPIType = "RF2")
 							tyreCompound := lastWheelData.TyreCompound[key]
 						else
-							tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, 2)]
+							tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, 1) + 1]
 
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 

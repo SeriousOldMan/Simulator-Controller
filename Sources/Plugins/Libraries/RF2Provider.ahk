@@ -89,7 +89,7 @@ class Sector397Provider extends SimulatorProvider {
 		return ((temp != "") ? temp : false)
 	}
 
-	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
+	parseCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
 		local index
 
 		model := false
@@ -164,6 +164,7 @@ class Sector397Provider extends SimulatorProvider {
 
 			if (carRaw != kUndefined) {
 				this.parseCarName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+								, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "")
 								, carRaw, &model, &nr, &carCategory, &team)
 
 				if model
@@ -281,7 +282,8 @@ class Sector397Provider extends SimulatorProvider {
 														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}
 
-		this.parseCarName(false, getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+		this.parseCarName(false, getMultiMapValue(telemetryData, "Session Data", "Car", "")
+							   , getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)

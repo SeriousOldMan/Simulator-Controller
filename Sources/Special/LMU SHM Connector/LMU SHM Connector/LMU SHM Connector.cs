@@ -261,7 +261,7 @@ namespace SHMConnector {
 
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Nr="); strWriter.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Class="); strWriter.WriteLine(carClass);
-					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Car="); strWriter.WriteLine(GetCarName(carClass, carName));
+					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Car="); strWriter.WriteLine(GetStringFromBytes(telemetry.mVehicleModel));
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".CarRaw="); strWriter.WriteLine(carName);
 
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Driver.Forname="); strWriter.WriteLine(GetForname(vehicle.mDriverName));
@@ -291,14 +291,6 @@ namespace SHMConnector {
 						strWriter.Write("Driver.Car=");
 						strWriter.WriteLine(index);
 					}
-
-					string compound = GetStringFromBytes(telemetry.mFrontTireCompoundName);
-
-					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".TyreCompoundRaw="); strWriter.WriteLine(compound);
-					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".TyreCompoundRawFront="); strWriter.WriteLine(compound);
-
-					compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
-					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".TyreCompoundRawRear="); strWriter.WriteLine(compound);
 				}
 
                 strWriter.Write("Car.Count="); strWriter.WriteLine(index);
@@ -366,7 +358,7 @@ namespace SHMConnector {
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-				strWriter.Write("Car="); strWriter.WriteLine(GetCarName(vehicleClass, vehicleName));
+				strWriter.Write("Car="); strWriter.WriteLine(GetStringFromBytes(playerTelemetry.mVehicleModel));
 				strWriter.Write("CarRaw="); strWriter.WriteLine(vehicleName);
 				strWriter.Write("CarName="); strWriter.WriteLine(vehicleName);
 				strWriter.Write("CarClass="); strWriter.WriteLine(vehicleClass);
@@ -424,8 +416,8 @@ namespace SHMConnector {
 			strWriter.WriteLine("[Car Data]");
 			if (connected && (playerTelemetry.mWheels != null)) {
 				strWriter.WriteLine("MAP=n/a");
-				strWriter.Write("TC="); strWriter.WriteLine(extended.mPhysics.mTractionControl);
-				strWriter.Write("ABS="); strWriter.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				strWriter.Write("TC="); strWriter.WriteLine(playerTelemetry.mTC);
+				strWriter.Write("ABS="); strWriter.WriteLine(playerTelemetry.mABS);
 				strWriter.Write("BB="); strWriter.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 4) * 100);
 
 				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
@@ -453,15 +445,16 @@ namespace SHMConnector {
 									GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
 									GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
-				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
+                byte compoundType = playerTelemetry.mWheels[0].mCompoundType;
 
-				strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compound);
-				strWriter.Write("TyreCompoundRawFront="); strWriter.WriteLine(compound);
+                strWriter.Write("TyreCompoundRaw="); strWriter.WriteLine(compoundType);
 
-				compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
-				strWriter.Write("TyreCompoundRawRear="); strWriter.WriteLine(compound);
+                strWriter.Write("TyreCompoundRawFrontLeft="); strWriter.WriteLine(compoundType);
+                strWriter.Write("TyreCompoundRawFrontRight="); strWriter.WriteLine(playerTelemetry.mWheels[1].mCompoundType);
+                strWriter.Write("TyreCompoundRawRearLeft="); strWriter.WriteLine(playerTelemetry.mWheels[2].mCompoundType);
+                strWriter.Write("TyreCompoundRawRearRight="); strWriter.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
 
-				strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
+                strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
 				strWriter.WriteLine("EngineDamage=0");
 

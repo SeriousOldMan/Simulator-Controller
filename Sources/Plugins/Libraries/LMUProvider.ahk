@@ -18,7 +18,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUProvider extends Sector397Provider {
-	static kLMUAPIType := "RF2"
+	static kLMUAPIType := "LMU"
 
 	static sDriversData := false
 
@@ -43,12 +43,8 @@ class LMUProvider extends Sector397Provider {
 			local protocols := super.Protocols
 			local ignore, protocol
 
-			if (LMUProvider.kLMUAPIType = "RF2") {
+			if (LMUProvider.kLMUAPIType = "RF2")
 				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
-					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
-			}
-			else if (LMUProvider.kLMUAPIType = "LMU")
-				for ignore, protocol in ["Provider", "Spotter", "Coach"]
 					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
 
 			return protocols
@@ -139,9 +135,12 @@ class LMUProvider extends Sector397Provider {
 
 		ignore := this.TeamData.Data
 		ignore := this.TrackData.Data
-		ignore := this.GridData.Data
-		ignore := this.GridData.CarData.Data
-		ignore := this.DriversData.Data
+
+		if (LMUProvider.kLMUAPIType = "RF2") {
+			ignore := this.DriversData.Data
+			ignore := this.GridData.Data
+			ignore := this.GridData.CarData.Data
+		}
 	}
 
 	getRefuelAmount(setupData) {
@@ -155,34 +154,50 @@ class LMUProvider extends Sector397Provider {
 	}
 
 	parseCarName(carID, carName, &model?, &nr?, &category?, &team?) {
-		local gridData := this.GridData
+		local gridData
 
 		static nextReload := 0
 
-		model := gridData.Car[carName]
-		team := gridData.Team[carName]
+		if (LMUProvider.kLMUAPIType = "RF2") {
+			gridData := this.GridData
 
-		if !model {
-			if isDebug()
-				logMessage(kLogDebug, "Car model not found for car " . carName . "...")
+			model := gridData.Car[carName]
+			team := gridData.Team[carName]
 
-			if (A_TickCount > nextReload) {
-				nextReload := (A_TickCount + 10000)
+			if !model {
+				if isDebug()
+					logMessage(kLogDebug, "Car model not found for car " . carName . "...")
 
-				gridData.reload()
+				if (A_TickCount > nextReload) {
+					nextReload := (A_TickCount + 10000)
 
-				model := gridData.Car[carName]
-				team := gridData.Team[carName]
+					gridData.reload()
+
+					model := gridData.Car[carName]
+					team := gridData.Team[carName]
+				}
 			}
-		}
 
-		if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
-			nr := this.parseNr(carName, &carName)
+			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
+				nr := this.parseNr(carName, &carName)
 
-			super.parseCarName(carID, carName, , , &category)
+				super.parseCarName(carID, carName, , , &category)
+			}
+			else
+				super.parseCarName(carID, carName, , &nr, &category)
 		}
-		else
-			super.parseCarName(carID, carName, , &nr, &category)
+		else {
+			model := ""
+			team := ""
+
+			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
+				nr := this.parseNr(carName, &carName)
+
+				super.parseCarName(carID, carName, , , &category)
+			}
+			else
+				super.parseCarName(carID, carName, , &nr, &category)
+		}
 	}
 
 	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
@@ -198,7 +213,7 @@ class LMUProvider extends Sector397Provider {
 			return false
 		}
 
-		if isSet(category)
+		if ((LMUProvider.kLMUAPIType = "RF2") && isSet(category)) {
 			try {
 				drivers := this.DriversData.Drivers[carName]
 				standingsData := (carID ? this.StandingsData : false)
@@ -208,15 +223,20 @@ class LMUProvider extends Sector397Provider {
 			catch Any {
 				category := false
 			}
+		}
+		else
+			category := false
 
 		return super.parseDriverName(carID, carName, forname, surname, nickname)
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
+		local rf2APIType := (LMUProvider.kLMUAPIType = "RF2")
 		local standingsData, forname, surname, nickname, id, teamID
 
-		this.iStandingsData := LMURESTProvider.StandingsData()
+		if (rf2APIType || teamSession)
+			this.iStandingsData := LMURESTProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
 
@@ -242,17 +262,19 @@ class LMUProvider extends Sector397Provider {
 				}
 			}
 
-			if !isDebug() {
+			if (rf2APIType && !isDebug()) {
 				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompound")
 				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundFront")
 				removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".TyreCompoundRear")
 			}
 
-			parseDriverName(this.StandingsData.Driver[id], &forname, &surname, &nickname)
+			if (rf2APIType || teamSession) {
+				parseDriverName(this.StandingsData.Driver[id], &forname, &surname, &nickname)
 
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surname)
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickname)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", surname)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", nickname)
+			}
 		}
 
 		return standingsData
@@ -291,6 +313,7 @@ class LMUProvider extends Sector397Provider {
 		local carData := false
 		local splitTime := A_TickCount
 		local startTime := splitTime
+		local lmuAPIType := (LMUProvider.kLMUAPIType = "LMU")
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
@@ -305,6 +328,8 @@ class LMUProvider extends Sector397Provider {
 
 		static wheels := Map("Front Left", "FrontLeft", "Front Right", "FrontRight"
 						   , "Rear Left", "RearLeft", "Rear Right", "RearRight")
+
+		static tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
 
 		static lastPositions := false
 
@@ -559,7 +584,8 @@ class LMUProvider extends Sector397Provider {
 					if (A_TickCount > nextUpdate) {
 						nextUpdate := (A_TickCount + 60000)
 
-						lastWheelData := LMURestProvider.WheelData()
+						if !lmuAPIType
+							lastWheelData := LMURestProvider.WheelData()
 
 						lastTyreWear := carData.TyreWear["All"]
 						lastBrakeWear := carData.BrakePadWear["All"]
@@ -572,7 +598,11 @@ class LMUProvider extends Sector397Provider {
 					}
 
 					for key, postFix in wheels {
-						tyreCompound := lastWheelData.TyreCompound[key]
+						if (LMUProvider.kLMUAPIType = "RF2")
+							tyreCompound := lastWheelData.TyreCompound[key]
+						else
+							tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, 2)]
+
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
 						if tyreCompound {

@@ -201,7 +201,7 @@ namespace LMUSHMProvider {
 
 				Console.Write("Car."); Console.Write(index); Console.Write(".Nr="); Console.WriteLine(GetCarNr(vehicle.mID, carClass, carName));
 				Console.Write("Car."); Console.Write(index); Console.Write(".Class="); Console.WriteLine(carClass);
-				Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(GetCarName(carClass, carName));
+				Console.Write("Car."); Console.Write(index); Console.Write(".Car="); Console.WriteLine(GetStringFromBytes(telemetry.mVehicleModel));
 				Console.Write("Car."); Console.Write(index); Console.Write(".CarRaw="); Console.WriteLine(carName);
 
 				Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
@@ -231,13 +231,6 @@ namespace LMUSHMProvider {
 					Console.Write("Driver.Car=");
 					Console.WriteLine(index);
 				}
-
-				string compound = GetStringFromBytes(telemetry.mFrontTireCompoundName);
-				Console.Write("Car."); Console.Write(index); Console.Write(".TyreCompoundRaw="); Console.WriteLine(compound);
-				Console.Write("Car."); Console.Write(index); Console.Write(".TyreCompoundRawFront="); Console.WriteLine(compound);
-
-				compound = GetStringFromBytes(telemetry.mRearTireCompoundName);
-				Console.Write("Car."); Console.Write(index); Console.Write(".TyreCompoundRawRear="); Console.WriteLine(compound);
 			}
 
             Console.Write("Car.Count="); Console.WriteLine(index);
@@ -280,7 +273,7 @@ namespace LMUSHMProvider {
 				string vehicleClass = GetStringFromBytes(playerScoring.mVehicleClass);
 				string vehicleName = GetStringFromBytes(playerScoring.mVehicleName);
 
-				Console.Write("Car="); Console.WriteLine(GetCarName(vehicleClass, vehicleName));
+				Console.Write("Car="); Console.WriteLine(GetStringFromBytes(playerTelemetry.mVehicleModel));
                 Console.Write("CarRaw="); Console.WriteLine(vehicleName);
                 Console.Write("CarName="); Console.WriteLine(vehicleName);
 				Console.Write("CarClass="); Console.WriteLine(vehicleClass);
@@ -361,10 +354,10 @@ namespace LMUSHMProvider {
 			Console.WriteLine("[Car Data]");
 			if (connected && (playerTelemetry.mWheels != null)) {
 				Console.WriteLine("MAP=n/a");
-				Console.Write("TC="); Console.WriteLine(extended.mPhysics.mTractionControl);
-				Console.Write("ABS="); Console.WriteLine(extended.mPhysics.mAntiLockBrakes);
+				Console.Write("TC="); Console.WriteLine(playerTelemetry.mTC);
+				Console.Write("ABS="); Console.WriteLine(playerTelemetry.mABS);
 				Console.Write("BB="); Console.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 4) * 100);
-				
+
 				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
 				Console.Write("TyreTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
@@ -372,26 +365,26 @@ namespace LMUSHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
 
-                Console.Write("TyreInnerTemperature=");
+				Console.Write("TyreInnerTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[2]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[0]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[2]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[0]));
+								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[0]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[2]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[0]));
 
-                Console.Write("TyreMiddleTemperature=");
-                Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[1]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[1]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[1]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[1]));
+				Console.Write("TyreMiddleTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[1]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[1]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[1]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[1]));
 
-                Console.Write("TyreOuterTemperature=");
-                Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[0]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[1].mTemperature[2]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[2].mTemperature[0]) + "," +
-                                  GetCelcius(playerTelemetry.mWheels[3].mTemperature[2]));
+				Console.Write("TyreOuterTemperature=");
+				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[0]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[2]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[0]) + "," +
+								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[2]));
 
 
-                Console.Write("TyrePressure=");
+				Console.Write("TyrePressure=");
 				Console.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
@@ -410,13 +403,20 @@ namespace LMUSHMProvider {
 								  GetCelcius(playerTelemetry.mWheels[2].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mBrakeTemp));
 
-				string compound = GetStringFromBytes(playerTelemetry.mFrontTireCompoundName);
+                byte compoundIdx = playerTelemetry.mWheels[0].mCompoundIndex;
+                byte compoundType = playerTelemetry.mWheels[0].mCompoundType;
 
-                Console.Write("TyreCompoundRaw="); Console.WriteLine(compound);
-                Console.Write("TyreCompoundRawFront="); Console.WriteLine(compound);
+                Console.Write("TyreCompoundRaw="); Console.WriteLine(compoundIdx);
+                Console.Write("TyreCompoundTypeRaw="); Console.WriteLine(compoundType);
 
-                compound = GetStringFromBytes(playerTelemetry.mRearTireCompoundName);
-                Console.Write("TyreCompoundRawRear="); Console.WriteLine(compound);
+                Console.Write("TyreCompoundRawFrontLeft="); Console.WriteLine(compoundIdx);
+                Console.Write("TyreCompoundTypeRawFrontLeft="); Console.WriteLine(compoundType);
+				Console.Write("TyreCompoundRawFrontRight="); Console.WriteLine(playerTelemetry.mWheels[1].mCompoundIndex);
+                Console.Write("TyreCompoundTypeRawFrontRight="); Console.WriteLine(playerTelemetry.mWheels[1].mCompoundType);
+                Console.Write("TyreCompoundRawRearLeft="); Console.WriteLine(playerTelemetry.mWheels[2].mCompoundIndex);
+                Console.Write("TyreCompoundTypeRawRearLeft="); Console.WriteLine(playerTelemetry.mWheels[2].mCompoundType);
+                Console.Write("TyreCompoundRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundIndex);
+                Console.Write("TyreCompoundTypeRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
 
                 Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
 				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");

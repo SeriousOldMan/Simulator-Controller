@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{17FC2626-EA21-43ED-BC84-BE0B8545FC2D}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LMUSHMProvider</RootNamespace>
     <AssemblyName>LMU SHM Provider</AssemblyName>
@@ -35,6 +35,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Engine.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -381,10 +381,10 @@ namespace LMUSHMProvider
 	  public double mElectricBoostMotorTemperature; // current temperature of boost motor
 	  public double mElectricBoostWaterTemperature; // current water temperature of boost motor cooler if present (0 otherwise)
 	  public byte mElectricBoostMotorState; // 0=unavailable 1=inactive, 2=propulsion, 3=regeneration
-	  public bool mLapInvalidated;
-	  public bool mABSActive;
-	  public bool mTCActive;
-	  public bool mSpeedLimiterActive;
+	  public byte mLapInvalidated;
+	  public byte mABSActive;
+	  public byte mTCActive;
+	  public byte mSpeedLimiterActive;
 	  public byte mWiperState;
 	  public byte mTC;
 	  public byte mTCMax;
@@ -412,7 +412,7 @@ namespace LMUSHMProvider
 	  public float mTimeGapPlaceAhead;
 	  public float mTimeGapPlaceBehind;
 	  [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 30)]
-      public char[] mVehicleModel;
+      public byte[] mVehicleModel;
 	  public byte mVehicleClass;		// see LMUVhicleClass
 	  public byte mVehicleChampionship;	// see LMUVehicleChampionship
 

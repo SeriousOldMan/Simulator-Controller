@@ -360,45 +360,37 @@ namespace LMUSHMProvider {
 				Console.Write("BB="); Console.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 4) * 100);
 
 				Console.Write("FuelRemaining="); Console.WriteLine(playerTelemetry.mFuel);
-				Console.Write("EnergyRemaining="); Console.WriteLine(playerTelemetry.mVirtualEnergy);
+				Console.Write("EnergyRemaining="); Console.WriteLine(playerTelemetry.mVirtualEnergy * 100);
 				Console.Write("TyreTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTireCarcassTemperature) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTireCarcassTemperature));
-
 				Console.Write("TyreInnerTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[2]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[0]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[2]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[0]));
-
 				Console.Write("TyreMiddleTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[1]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[1]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[1]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[1]));
-
 				Console.Write("TyreOuterTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTemperature[0]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mTemperature[2]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[2].mTemperature[0]) + "," +
 								  GetCelcius(playerTelemetry.mWheels[3].mTemperature[2]));
-
-
 				Console.Write("TyrePressure=");
 				Console.WriteLine(GetPsi(playerTelemetry.mWheels[0].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[1].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 								  GetPsi(playerTelemetry.mWheels[3].mPressure));
 				Console.Write("TyreWear=");
-				if (extended.mPhysics.mTireMult > 0)
-					Console.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
-									  (100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
-									  (100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
-									  (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
-				else
-					Console.WriteLine("0,0,0,0");
+				Console.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
+								  (100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
+								  (100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
+								  (100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				Console.Write("BrakeTemperature=");
 				Console.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
 								  GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
@@ -415,10 +407,10 @@ namespace LMUSHMProvider {
                 Console.Write("TyreCompoundRawRearRight="); Console.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
 
                 Console.Write("BodyworkDamage=0, 0, 0, 0, "); Console.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
-				Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
-				Console.WriteLine("EngineDamage=0");
+                // Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
+                // Console.WriteLine("EngineDamage=0");
 
-				if (playerTelemetry.mEngineWaterTemp > 0)
+                if (playerTelemetry.mEngineWaterTemp > 0)
 					Console.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);
 
 				if (playerTelemetry.mEngineOilTemp > 0)

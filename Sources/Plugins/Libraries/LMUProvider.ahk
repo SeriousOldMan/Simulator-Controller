@@ -607,7 +607,7 @@ class LMUProvider extends Sector397Provider {
 						nextUpdate := (A_TickCount + 60000)
 
 						tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", kUndefined)
-						brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", kUndefined)
+						brakeWear := false ; getMultiMapValue(data, "Car Data", "BrakeWear", kUndefined)
 
 						if ((tyreWear == kUndefined) || (brakeWear == kUndefined)) {
 							if !carData

@@ -421,7 +421,7 @@ namespace SHMConnector {
 				strWriter.Write("BB="); strWriter.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 4) * 100);
 
 				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
-				strWriter.Write("EnergyRemaining="); strWriter.WriteLine(playerTelemetry.mVirtualEnergy);
+				strWriter.Write("EnergyRemaining="); strWriter.WriteLine(playerTelemetry.mVirtualEnergy * 100);
 				strWriter.Write("TyreTemperature=");
 				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
 									GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +
@@ -433,13 +433,10 @@ namespace SHMConnector {
 									GetPsi(playerTelemetry.mWheels[2].mPressure) + "," +
 									GetPsi(playerTelemetry.mWheels[3].mPressure));
 				strWriter.Write("TyreWear=");
-				if (extended.mPhysics.mTireMult > 0)
-					strWriter.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
-										(100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
-										(100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
-										(100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
-				else
-					strWriter.WriteLine("0,0,0,0");
+				strWriter.WriteLine((100 - Math.Round(playerTelemetry.mWheels[0].mWear * 100)) + "," +
+									(100 - Math.Round(playerTelemetry.mWheels[1].mWear * 100)) + "," +
+									(100 - Math.Round(playerTelemetry.mWheels[2].mWear * 100)) + "," +
+									(100 - Math.Round(playerTelemetry.mWheels[3].mWear * 100)));
 				strWriter.Write("BrakeTemperature=");
 				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mBrakeTemp) + "," +
 									GetCelcius(playerTelemetry.mWheels[1].mBrakeTemp) + "," +
@@ -456,8 +453,8 @@ namespace SHMConnector {
                 strWriter.Write("TyreCompoundRawRearRight="); strWriter.WriteLine(playerTelemetry.mWheels[3].mCompoundType);
 
                 strWriter.Write("BodyworkDamage=0, 0, 0, 0, "); strWriter.WriteLine(extended.mTrackedDamages[playerTelemetry.mID].mAccumulatedImpactMagnitude / 1000);
-				strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
-				strWriter.WriteLine("EngineDamage=0");
+				// strWriter.WriteLine("SuspensionDamage=0, 0, 0, 0");
+				// strWriter.WriteLine("EngineDamage=0");
 
 				if (playerTelemetry.mEngineWaterTemp > 0)
 					strWriter.WriteLine("WaterTemperature=" + playerTelemetry.mEngineWaterTemp);

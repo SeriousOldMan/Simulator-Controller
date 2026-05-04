@@ -107,6 +107,16 @@ Using these settings, you can control how ZIP archives will be compressed and ex
 | Archive       | Compressor     | Tar     | Supported values are *PowerShell* and *Tar*. Specifies which Windows command will be used to create ZIP archives. *Tar* is much faster, but depending on Windows security settings, *PowerShell* may be used as well. |
 |               | Expander       | Tar     | Supported values are also *PowerShell* and *Tar*. Specifies which Windows command will be used to extract ZIP archives. *Tar* is much faster, but it cannot handle archives with symbolic links in it. Therefore, if you have moved your user *Documents* folder to a different drive, *Powershell* must be used instead. |
 
+### Simulator Settings
+
+The settings in this section let you control, how the all the data is acquired from the simulator.
+
+| Category  | Setting        | Default      | Description |
+|-----------|----------------|--------------|-------------|
+| Simulator | Data Provider  | Connector    | This defines the integration method used to acquire data from the different simulators. "Provider" (or "EXE") is more reliable, but somewhat slower than "Connector" (or "DLL"), which is the default. If you encounter obviously wrong or missing data in race reports, for example, you can use the other method. |
+| Simulator.[simulator] | API Type | *depending on simulator* | *simulator* must be the name of the simulator. Currently only supported for *Le Mans Ultimate*. Let's you choose between the *old* *rFactor2* style API (value: "RF2") and the *newer* *Le Mans Ultimate* style API (value: "LMU"). Default is "LMU". |
+
+
 ### Miscellaneous Settings
 
 And finally a couple of other settings which configure low level components of Simulator Controller:
@@ -114,7 +124,6 @@ And finally a couple of other settings which configure low level components of S
 | Category | Setting | Default | Description |
 |----------|---------|---------|-------------|
 | Controller  | External Dispatch | 100   | Specifies how long the central event loop waits in milliseconds before it checks again for external controller commands as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands). |
-| Simulator | Data Provider  | Connector    | This defines the integration method used to acquire data from the different simulators. "Provider" (or "EXE") is more reliable, but somewhat slower than "Connector" (or "DLL"), which is the default. If you encounter obviously wrong or missing data in race reports, for example, you can use the other method. |
 | Stream Deck     | Protocol  | Message    | Specifies the communication method between Stream Deck and Simulator Controller. "Message", the default uses traditional message-based inter-process communication, whereas "File" writes the messages to a shared file. Use "File" only, if you encounter stability issues with message-based communication. |
 | Team Server | Update Frequency  | 10    | Specifies the minimum number of seconds to wait between each update of the data acquired from the currently running simulator, when running a team session. This value (which you should only change by being told so), restricts the value set in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool for the Data Update Frequency, so that the update frequency cannot get smaller in team sessions to protect the Team Server from update stalling. |
 | Windows    | ConstrainWindow  | True    | If *True*, windows will be constrained to a minimum size. If *False*, windows can be made smaller, but it may be possible that content may be made invisible in this case. |

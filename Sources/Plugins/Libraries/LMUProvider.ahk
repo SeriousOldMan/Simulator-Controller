@@ -18,7 +18,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUProvider extends Sector397Provider {
-	static kLMUAPIType := "LMU"
+	static kLMUAPIType := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																  , kUserConfigDirectory, kConfigDirectory))
+										 , "Simulator.Le Mans Ultimate", "API Type", "LMU")
 
 	static sDriversData := false
 

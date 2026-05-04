@@ -3,7 +3,7 @@ Version=6.9.5.0-dev
 Target=6.9.5.0-release
 Date=05/03/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QkwsOHqB/Releases/Simulator%20Controller%206.9.5.0-dev.zip
-Changes=Logging for simulator data acquisition, Support for new LMU API
+Changes=Logging for simulator data acquisition, Support for new LMU API, New core settings for LMU API, Performance optimizations for LMU API
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.4.0-release

@@ -34,6 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Support for the new shared memory API of *Le Mans Ultimate* has been added.
     - No more short stutter at the start of a session, because the data which was acquired using several HTTP requests against the REST/JSON API of *Le Mans Ultimate* is now available in the shared memory.
 	- More important, information about TC and ABS activations is now available in the telemetry data, thereby enabling the Driving Coach to give you more precise hints for cornering and car handling.
+  - Many performance optimizations in the handling of the data API of *Le Mans Ultimate*.
   - [Developer] A new [core setting "LogSimulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you track down performance issues in the simulator API control flow.
 
 # Release history

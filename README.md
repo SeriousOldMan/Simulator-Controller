@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[6.9.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QkwsOHqB/Releases/Simulator%20Controller%206.9.5.0-dev.zip) (Early build for 6.9.5. Changes: Logging for simulator data acquisition, Support for the new LMU API.)
+[6.9.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QkwsOHqB/Releases/Simulator%20Controller%206.9.5.0-dev.zip) (Early build for 6.9.5. Changes: Logging for simulator data acquisition, Support for the new LMU API, New core settings for LMU API, Performance optimizations for LMU API.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6950) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-695) of this version and all the versions you might have skipped, before installing and using this version.
 

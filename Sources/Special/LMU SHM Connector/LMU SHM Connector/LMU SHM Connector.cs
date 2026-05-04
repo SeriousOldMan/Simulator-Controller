@@ -421,6 +421,7 @@ namespace SHMConnector {
 				strWriter.Write("BB="); strWriter.WriteLine(Math.Round(1 - playerTelemetry.mRearBrakeBias, 4) * 100);
 
 				strWriter.Write("FuelRemaining="); strWriter.WriteLine(playerTelemetry.mFuel);
+				strWriter.Write("EnergyRemaining="); strWriter.WriteLine(playerTelemetry.mVirtualEnergy);
 				strWriter.Write("TyreTemperature=");
 				strWriter.WriteLine(GetCelcius(playerTelemetry.mWheels[0].mTireCarcassTemperature) + "," +
 									GetCelcius(playerTelemetry.mWheels[1].mTireCarcassTemperature) + "," +

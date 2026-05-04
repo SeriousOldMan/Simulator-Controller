@@ -315,13 +315,14 @@ class LMUProvider extends Sector397Provider {
 		local standings := InStr(options, "Standings=true")
 		local simulator := this.Simulator
 		local carData := false
+		local energyData := false
 		local splitTime := A_TickCount
 		local startTime := splitTime
 		local lmuAPIType := (LMUProvider.kLMUAPIType = "LMU")
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
-		local newPositions, position, energyData, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, paused, fuelAmount
+		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
+		local sessionData, paused, fuelAmount, tyreWear, brakeWear
 
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))
@@ -333,7 +334,7 @@ class LMUProvider extends Sector397Provider {
 		static wheels := Map("Front Left", "FrontLeft", "Front Right", "FrontRight"
 						   , "Rear Left", "RearLeft", "Rear Right", "RearRight")
 
-		static tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
+		static tyreTypes := false
 
 		static lastPositions := false
 
@@ -348,6 +349,12 @@ class LMUProvider extends Sector397Provider {
 
 		static nextUpdate := 0
 		static lastFuelAmount := 0
+
+		if !tyreTypes {
+			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
+
+			tyreTypes.Default := "Medium"
+		}
 
 		if InStr(options, "Setup=true") {
 			car := this.Car
@@ -549,8 +556,6 @@ class LMUProvider extends Sector397Provider {
 
 				if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false)) {
 					if data.Has("Car Data") {
-						energyData := LMURESTProvider.EnergyData(simulator, car, track)
-
 						if logRequests {
 							logMessage(kLogInfo, "Read LMU session data (" . options . "->Energy):" . (A_TickCount - splitTime) . " ms...")
 
@@ -565,8 +570,12 @@ class LMUProvider extends Sector397Provider {
 
 							fuelAmount := carData.FuelAmount
 
-							if !fuelAmount
+							if !fuelAmount {
+								if !energyData
+									energyData := LMURESTProvider.EnergyData(simulator, car, track)
+
 								fuelAmount := energyData.MaxFuelAmount
+							}
 
 							if fuelAmount
 								setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
@@ -575,30 +584,44 @@ class LMUProvider extends Sector397Provider {
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
 
-						virtualEnergy := energyData.RemainingVirtualEnergy
+						virtualEnergy := getMultiMapValue(data, "Car Data", "EnergyRemaining", kUndefined)
 
-						if virtualEnergy
-							setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)
+						if (virtualEnergy == kUndefined) {
+							if !energyData
+								energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
-						if logRequests {
+							virtualEnergy := energyData.RemainingVirtualEnergy
+
+							if virtualEnergy
+								setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)
+						}
+
+						if (logRequests && energyData) {
 							logMessage(kLogInfo, "Read LMU session data (" . options . "->Fuel):" . (A_TickCount - splitTime) . " ms...")
 
 							splitTime := A_TickCount
 						}
-
 					}
-
-					if !carData
-						carData := LMURestProvider.CarData()
 
 					if (A_TickCount > nextUpdate) {
 						nextUpdate := (A_TickCount + 60000)
 
-						if !lmuAPIType
-							lastWheelData := LMURestProvider.WheelData()
+						tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", kUndefined)
+						brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", kUndefined)
 
-						lastTyreWear := carData.TyreWear["All"]
-						lastBrakeWear := carData.BrakePadWear["All"]
+						if ((tyreWear == kUndefined) || (brakeWear == kUndefined)) {
+							if !carData
+								carData := LMURestProvider.CarData()
+
+							if !lmuAPIType
+								lastWheelData := LMURestProvider.WheelData()
+
+							if (tyreWear == kUndefined)
+								lastTyreWear := carData.TyreWear["All"]
+
+							if (brakeWear == kUndefined)
+								lastBrakeWear := carData.BrakePadWear["All"]
+						}
 					}
 
 					if logRequests {
@@ -607,7 +630,7 @@ class LMUProvider extends Sector397Provider {
 						splitTime := A_TickCount
 					}
 
-					if (LMUProvider.kLMUAPIType = "LMU") {
+					if lmuAPIType {
 						tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw", 1) + 1]
 
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
@@ -621,10 +644,10 @@ class LMUProvider extends Sector397Provider {
 					}
 
 					for key, postFix in wheels {
-						if (LMUProvider.kLMUAPIType = "RF2")
-							tyreCompound := lastWheelData.TyreCompound[key]
-						else
+						if lmuAPIType
 							tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw" . postFix, 1) + 1]
+						else
+							tyreCompound := lastWheelData.TyreCompound[key]
 
 						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
 
@@ -642,15 +665,20 @@ class LMUProvider extends Sector397Provider {
 					if (isObject(lastBrakeWear) && exist(lastBrakeWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", lastBrakeWear*))
 
-					suspensionDamage := carData.SuspensionDamage["All"]
+					if (getMultiMapValue(data, "Car Data", "SuspensionDamage", kUndefined) == kUndefined) {
+						if !carData
+							carData := LMURestProvider.CarData()
 
-					if (isObject(suspensionDamage) && exist(suspensionDamage, (d) => (d != false)))
-						setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
+						suspensionDamage := carData.SuspensionDamage["All"]
 
-					if logRequests {
-						logMessage(kLogInfo, "Read LMU session data (" . options . "->Damage):" . (A_TickCount - splitTime) . " ms...")
+						if (isObject(suspensionDamage) && exist(suspensionDamage, (d) => (d != false)))
+							setMultiMapValue(data, "Car Data", "SuspensionDamage", values2String(",", suspensionDamage*))
 
-						splitTime := A_TickCount
+						if logRequests {
+							logMessage(kLogInfo, "Read LMU session data (" . options . "->Damage):" . (A_TickCount - splitTime) . " ms...")
+
+							splitTime := A_TickCount
+						}
 					}
 				}
 			}

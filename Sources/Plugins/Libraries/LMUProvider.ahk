@@ -605,6 +605,19 @@ class LMUProvider extends Sector397Provider {
 						splitTime := A_TickCount
 					}
 
+					if (LMUProvider.kLMUAPIType = "LMU") {
+						tyreCompound := tyreTypes[getMultiMapValue(data, "Car Data", "TyreCompoundRaw", 1) + 1]
+
+						tyreCompound := SessionDatabase.getTyreCompoundName(simulator, car, track, tyreCompound, false)
+
+						if tyreCompound {
+							splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
+
+							setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+							setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
+						}
+					}
+
 					for key, postFix in wheels {
 						if (LMUProvider.kLMUAPIType = "RF2")
 							tyreCompound := lastWheelData.TyreCompound[key]

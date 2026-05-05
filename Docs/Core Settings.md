@@ -115,6 +115,7 @@ The settings in this section let you control, how the all the data is acquired f
 |-----------|----------------|--------------|-------------|
 | Simulator | Data Provider  | Connector    | This defines the integration method used to acquire data from the different simulators. "Provider" (or "EXE") is more reliable, but somewhat slower than "Connector" (or "DLL"), which is the default. If you encounter obviously wrong or missing data in race reports, for example, you can use the other method. |
 | Simulator.[simulator] | API Type | *depending on simulator* | *simulator* must be the name of the simulator. Currently only supported for *Le Mans Ultimate*. Let's you choose between the *old* *rFactor2* style API (value: "RF2") and the *newer* *Le Mans Ultimate* style API (value: "LMU"). Default is "LMU". |
+| Simulator.Le Mans Ultimate | REST API | True | If *True*, which is the default, data which is been missing in the shared memory API is acquired using the REST/JSON API of *Le Mans Ultimate*. The requests against this API can impose a performance penalty on slower PCs. It therefore can be disabled. Please note, that this setting is only useful, when the setting "Simulator.Le Mans Ultimate" / "API Type" is set to "LMU". In "RF2" mode, the REST/JSON API is required for crucial data and the value of the setting "Simulator.Le Mans Ultimate" / "REST API" should be set to *True*. |
 
 
 ### Miscellaneous Settings

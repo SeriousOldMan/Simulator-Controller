@@ -18,9 +18,12 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class LMUProvider extends Sector397Provider {
-	static kLMUAPIType := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
-																  , kUserConfigDirectory, kConfigDirectory))
-										 , "Simulator.Le Mans Ultimate", "API Type", "LMU")
+	static kAPIType := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+															   , kUserConfigDirectory, kConfigDirectory))
+									  , "Simulator.Le Mans Ultimate", "API Type", "LMU")
+	static kRESTAPI := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+															   , kUserConfigDirectory, kConfigDirectory))
+									  , "Simulator.Le Mans Ultimate", "REST API", true)
 
 	static sDriversData := false
 
@@ -45,7 +48,7 @@ class LMUProvider extends Sector397Provider {
 			local protocols := super.Protocols
 			local ignore, protocol
 
-			if (LMUProvider.kLMUAPIType = "RF2")
+			if (LMUProvider.kAPIType = "RF2")
 				for ignore, protocol in ["Connector", "Provider", "Spotter", "Coach"]
 					protocols.%protocol%.File := StrReplace(protocols.%protocol%.File, "%simulator%", "RF2")
 
@@ -109,7 +112,7 @@ class LMUProvider extends Sector397Provider {
 		options := super.getOptions(type, protocol, options)
 
 		/*
-		if (LMUProvider.kLMUAPIType = "LMU")
+		if (LMUProvider.kAPIType = "LMU")
 			options := concatenate(["LMU=" . Application(this.Simulator).getProcessID()], options)
 		*/
 
@@ -140,7 +143,7 @@ class LMUProvider extends Sector397Provider {
 		ignore := this.TeamData.Data
 		ignore := this.TrackData.Data
 
-		if (LMUProvider.kLMUAPIType = "RF2") {
+		if (LMUProvider.kAPIType = "RF2") {
 			ignore := this.DriversData.Data
 			ignore := this.GridData.Data
 			ignore := this.GridData.CarData.Data
@@ -162,7 +165,7 @@ class LMUProvider extends Sector397Provider {
 
 		static nextReload := 0
 
-		if (LMUProvider.kLMUAPIType = "RF2") {
+		if (LMUProvider.kAPIType = "RF2") {
 			gridData := this.GridData
 
 			model := gridData.Car[carName]
@@ -217,7 +220,7 @@ class LMUProvider extends Sector397Provider {
 			return false
 		}
 
-		if ((LMUProvider.kLMUAPIType = "RF2") && isSet(category)) {
+		if ((LMUProvider.kAPIType = "RF2") && isSet(category)) {
 			try {
 				drivers := this.DriversData.Drivers[carName]
 				standingsData := (carID ? this.StandingsData : false)
@@ -236,10 +239,10 @@ class LMUProvider extends Sector397Provider {
 
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
-		local rf2APIType := (LMUProvider.kLMUAPIType = "RF2")
+		local rf2APIType := (LMUProvider.kAPIType = "RF2")
 		local standingsData, forname, surname, nickname, id, teamID
 
-		if (rf2APIType || teamSession)
+		if ((rf2APIType || teamSession) && LMUProvider.kRESTAPI)
 			this.iStandingsData := LMURESTProvider.StandingsData()
 
 		standingsData := super.acquireStandingsData(telemetryData, finished)
@@ -318,7 +321,8 @@ class LMUProvider extends Sector397Provider {
 		local energyData := false
 		local splitTime := A_TickCount
 		local startTime := splitTime
-		local lmuAPIType := (LMUProvider.kLMUAPIType = "LMU")
+		local lmuAPIType := (LMUProvider.kAPIType = "LMU")
+		local lmuRESTAPI := LMUProvider.kRESTAPI
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
@@ -486,34 +490,37 @@ class LMUProvider extends Sector397Provider {
 
 					session := getMultiMapValue(data, "Session Data", "Session", "Race")
 					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
-					weatherData := LMURestProvider.WeatherData()
 
-					if false
-						weather := weatherData.Weather["Now"]
-					else {
-						time := ((duration > 0) ? Round(100 - (Max(0, remainingTime) / duration * 100)) : 0)
+					if lmuRESTAPI {
+						weatherData := LMURestProvider.WeatherData()
+
+						if false
+							weather := weatherData.Weather["Now"]
+						else {
+							time := ((duration > 0) ? Round(100 - (Max(0, remainingTime) / duration * 100)) : 0)
+							weather := weatherData.Weather[session, time]
+						}
+
+						if weather
+							lastWeather := weather
+
+						time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 600000) / duration * 100)) : 0)
 						weather := weatherData.Weather[session, time]
-					}
 
-					if weather
-						lastWeather := weather
+						if weather
+							lastWeather10Min := weather
 
-					time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 600000) / duration * 100)) : 0)
-					weather := weatherData.Weather[session, time]
+						time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 1800000) / duration * 100)) : 0)
+						weather := weatherData.Weather[session, time]
 
-					if weather
-						lastWeather10Min := weather
+						if weather
+							lastWeather30Min := weather
 
-					time := ((duration > 0) ? Round(100 - (Max(0, remainingTime - 1800000) / duration * 100)) : 0)
-					weather := weatherData.Weather[session, time]
+						if logRequests {
+							logMessage(kLogInfo, "Read LMU session data (" . options . "->Weather):" . (A_TickCount - splitTime) . " ms...")
 
-					if weather
-						lastWeather30Min := weather
-
-					if logRequests {
-						logMessage(kLogInfo, "Read LMU session data (" . options . "->Weather):" . (A_TickCount - splitTime) . " ms...")
-
-						splitTime := A_TickCount
+							splitTime := A_TickCount
+						}
 					}
 				}
 			}
@@ -564,7 +571,7 @@ class LMUProvider extends Sector397Provider {
 
 						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
-						if !fuelAmount {
+						if (!fuelAmount && lmuRESTAPI) {
 							if !carData
 								carData := LMURestProvider.CarData()
 
@@ -586,7 +593,7 @@ class LMUProvider extends Sector397Provider {
 
 						virtualEnergy := getMultiMapValue(data, "Car Data", "EnergyRemaining", kUndefined)
 
-						if (virtualEnergy == kUndefined) {
+						if ((virtualEnergy == kUndefined) && lmuRESTAPI) {
 							if !energyData
 								energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
@@ -609,7 +616,7 @@ class LMUProvider extends Sector397Provider {
 						tyreWear := getMultiMapValue(data, "Car Data", "TyreWear", kUndefined)
 						brakeWear := false ; getMultiMapValue(data, "Car Data", "BrakeWear", kUndefined)
 
-						if ((tyreWear == kUndefined) || (brakeWear == kUndefined)) {
+						if (((tyreWear == kUndefined) || (brakeWear == kUndefined)) && lmuRESTAPI) {
 							if !carData
 								carData := LMURestProvider.CarData()
 
@@ -665,7 +672,7 @@ class LMUProvider extends Sector397Provider {
 					if (isObject(lastBrakeWear) && exist(lastBrakeWear, (w) => (w != false)))
 						setMultiMapValue(data, "Car Data", "BrakeWear", values2String(",", lastBrakeWear*))
 
-					if (getMultiMapValue(data, "Car Data", "SuspensionDamage", kUndefined) == kUndefined) {
+					if ((getMultiMapValue(data, "Car Data", "SuspensionDamage", kUndefined) == kUndefined) && lmuRESTAPI) {
 						if !carData
 							carData := LMURestProvider.CarData()
 

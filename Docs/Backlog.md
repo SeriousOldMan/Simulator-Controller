@@ -15,6 +15,7 @@
   2. Shift beeps by the Coach
   3. Configurable priority for voice output between Spotter and other Assistants
   4. Include lap time meadian value in the lap time information given by the Strategist and others
+  5. Driver Input overlay (brake / throttle) by the Driving Coach
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations

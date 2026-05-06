@@ -3,7 +3,7 @@ Version=6.9.5.0-beta
 Target=6.9.5.0-release
 Date=05/06/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/12sYIXZL/Releases/Simulator%20Controller%206.9.5.0-beta.zip
-Changes=Logging for simulator data acquisition, Support for new LMU API, New core settings for LMU API, Performance optimizations for LMU API
+Changes=Logging for simulator data acquisition, Support for new LMU API, New core settings for LMU API, Performance optimizations for LMU API, Updated ACE API version
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.4.0-release

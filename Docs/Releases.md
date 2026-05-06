@@ -27,7 +27,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed a bug for *Le Mans Ultimate* in mixed weather conditions, which caused the Spotter to announce the wrong weather at the sessions start when the last weather node of the session had a different weather than the second to last weather node.
   
 #### Changes
 
@@ -38,6 +38,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- A few data points are still acquired using the REST/JSON API, for example information about any suspension damage. It is possible to disable this API using a core setting [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), if it becomes necessary due to performance issues.
     - For safety reasons, the old style API can be reactivated using new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings).
   - Many performance optimizations in the handling of the data API of *Le Mans Ultimate*.
+  - The API for *Assetto Corsa EVO* has been updated to the latest game version.
   - [Developer] A new [core setting "LogSimulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you track down performance issues in the simulator API control flow.
 
 # Release history

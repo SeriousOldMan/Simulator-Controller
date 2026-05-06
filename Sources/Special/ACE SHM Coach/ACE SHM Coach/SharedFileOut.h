@@ -278,7 +278,7 @@ struct SMEvoSessionState {
 static_assert(sizeof(SMEvoSessionState) == 256, "SMEvoSessionState must be 256 bytes");
 
 struct SMEvoTimingState {
-	char current_laptime[15];	 // formatted text
+	char current_laptime[15];			 // formatted text
 	char delta_current[15];		 // formatted text
 	int32_t delta_current_p = 0; // 1 positive, -1 negative, 0 don't display
 	char last_laptime[15];		 // formatted text
@@ -286,6 +286,8 @@ struct SMEvoTimingState {
 	int32_t delta_last_p = 0;	 // 1 positive, -1 negative, 0 don't display
 	char best_laptime[15];		 // formatted text
 	char ideal_laptime[15];		 // formatted text
+	// repeated string splits = 9;	  // formatted text
+	// repeated int32 splits_p = 10; // 1 positive, -1 negative, 0 don't display
 	char total_time[15]; // formatted text
 	bool is_invalid = false;
 
@@ -474,14 +476,14 @@ struct SPageFileGraphicEvo {
 
 	bool is_in_pit_box = 0;
 	bool is_in_pit_lane = 0;
-	bool is_valid_lap = false;
+	bool is_valid_lap = false;	
 
 	float car_coordinates[60][3];
 
 	float gap_ahead = 0;
 	float gap_behind = 0;
 
-	uint8_t active_cars = 0;
+	uint8_t active_cars = 0;	
 	float fuel_per_lap = 0;
 	float fuel_estimated_laps = 0;
 
@@ -490,6 +492,7 @@ struct SPageFileGraphicEvo {
 	float max_fuel = 0;
 	float max_turbo_boost = 0;
 	bool use_single_compound = false;
+	uint64_t car_ids[60][2];
 };
 
 struct SPageFileStaticEvo {

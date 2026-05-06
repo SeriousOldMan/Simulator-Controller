@@ -141,9 +141,9 @@ class LMUProvider extends Sector397Provider {
 		super.prepareProvider()
 
 		ignore := this.TeamData.Data
-		ignore := this.TrackData.Data
 
 		if (LMUProvider.kAPIType = "RF2") {
+			ignore := this.TrackData.Data
 			ignore := this.DriversData.Data
 			ignore := this.GridData.Data
 			ignore := this.GridData.CarData.Data

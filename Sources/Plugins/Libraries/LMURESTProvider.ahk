@@ -1403,6 +1403,7 @@ class LMURESTProvider {
 		reload() {
 			this.iCachedCar := false
 			this.iCachedTeam := false
+			this.iTeamData := false
 
 			super.reload()
 		}

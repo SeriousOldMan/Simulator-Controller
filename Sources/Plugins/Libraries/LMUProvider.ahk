@@ -488,10 +488,13 @@ class LMUProvider extends Sector397Provider {
 
 					nextUpdate := (A_TickCount - 1)
 
-					session := getMultiMapValue(data, "Session Data", "Session", "Race")
-					remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
-
 					if lmuRESTAPI {
+						session := getMultiMapValue(data, "Session Data", "Session", "Race")
+						remainingTime := getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0)
+
+						if ((remainingTime = 0) && (lap < 3))
+							remainingTime := duration
+
 						weatherData := LMURestProvider.WeatherData()
 
 						if false

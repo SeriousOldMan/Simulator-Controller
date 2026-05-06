@@ -325,18 +325,14 @@ bool checkPositions() {
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		float angle = vectorAngle(velocityX, velocityY);
 
-		int carID = 0; // FIX gf->player_car_id_a;
-
-		/* FIX
-		int index = 0;
+		int carID = 0;
 
 		for (int i = 0; i < gf->active_cars; i++)
-			if (gf->carID[i] == carID) {
+			if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 				carID = i;
 
 				break;
 			}
-		*/
 
 		float coordinateX = gf->car_coordinates[carID][0];
 		float coordinateY = gf->car_coordinates[carID][2];
@@ -603,14 +599,15 @@ public:
 		posY(y) {}
 };
 
-std::unordered_map<int, CarPosition> lastcar_coordinates;
+std::unordered_map<string, CarPosition> lastcar_coordinates;
 
 long lastcar_coordinatesCount = 0;
 long lastcar_coordinatesUpdate = 0;
 
 inline bool getLastcar_coordinates(int carIndex, float* posX, float* posY) {
-	int carID = carIndex; // FIX ((SPageFileGraphicEvo*)m_graphics.mapFileBuffer)->carID[carIndex];
-
+	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
+	string carID = to_string(gf->car_ids[carIndex][0]) + to_string(gf->car_ids[carIndex][1]);
+	
 	if (lastcar_coordinates.contains(carID) && (lastcar_coordinates[carID].lastUpdate == lastcar_coordinatesCount)) {
 		(*posX) = lastcar_coordinates[carID].posX;
 		(*posY) = lastcar_coordinates[carID].posY;
@@ -651,7 +648,7 @@ void updateLastcar_coordinates(bool init) {
 		lastcar_coordinatesCount += 1;
 
 		for (int i = 0; i < gf->active_cars; i++) {
-			int carID = i; // FIX gf->carID[i];
+			string carID = to_string(gf->car_ids[i][0]) + to_string(gf->car_ids[i][1]);
 
 			if (lastcar_coordinates.contains(carID)) {
 				lastcar_coordinates[carID].lastUpdate = lastcar_coordinatesCount;
@@ -904,16 +901,19 @@ inline float getSpeed(int carIdx, long milliSeconds) {
 class SlowCarInfo
 {
 public:
-	int vehicle;
+	uint64_t vehicle_a;
+	uint64_t vehicle_b;
 	long distance;
 
 public:
 	SlowCarInfo() :
-		vehicle(0),
+		vehicle_a(0),
+		vehicle_b(0),
 		distance(0) {}
 
-	SlowCarInfo(int v, long d) :
-		vehicle(v),
+	SlowCarInfo(uint64_t v_a, uint64_t v_b, long d) :
+		vehicle_a(v_a),
+		vehicle_b(v_b),
 		distance(d) {}
 };
 
@@ -989,16 +989,14 @@ bool checkAccident() {
 		numAccidents = 0;
 	}
 
-	int carID = 0; // FIX gf->playerCarID;
+	int carID = 0;
 
-	/*
 	for (int i = 0; i < gf->active_cars; i++)
-		if (gf->carID[i] == carID) {
+		if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 			carID = i;
 
 			break;
 		}
-	*/
 
 	if (idealLine.size() == 0) {
 		idealLine.reserve(trackLength / 4);
@@ -1085,7 +1083,7 @@ bool checkAccident() {
 								if (speed < (avgSpeed / 5))
 								{
 									if (distanceAhead < aheadAccidentDistance) {
-										accidentsAhead.push_back(SlowCarInfo(i, distanceAhead)); // FIX gf->carID[i], distanceAhead));
+										accidentsAhead.push_back(SlowCarInfo(gf->car_ids[i][0], gf->car_ids[i][1], distanceAhead));
 
 										if (traceFileName != "") {
 											std::ofstream output;
@@ -1101,7 +1099,7 @@ bool checkAccident() {
 									long distanceBehind = (long)(((distance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - distance);
 
 									if (distanceBehind < behindAccidentDistance) {
-										accidentsBehind.push_back(SlowCarInfo(i, distanceBehind)); // FIX gf->carID[i], distanceBehind));
+										accidentsBehind.push_back(SlowCarInfo(gf->car_ids[i][0], gf->car_ids[i][1], distanceBehind));
 
 										if (traceFileName != "") {
 											std::ofstream output;
@@ -1115,7 +1113,7 @@ bool checkAccident() {
 									}
 								}
 								else if (distanceAhead < slowCarDistance) {
-									slowCarsAhead.push_back(SlowCarInfo(i, distanceAhead)); // FIX gf->carID[i], distanceAhead));
+									slowCarsAhead.push_back(SlowCarInfo(gf->car_ids[i][0], gf->car_ids[i][1], distanceAhead));
 
 									if (traceFileName != "") {
 										std::ofstream output;
@@ -1190,26 +1188,31 @@ bool checkAccident() {
 			if (cycle > nextAccidentAhead)
 			{
 				long distance = LONG_MAX;
-				int vehicle = INT_MAX;
+				uint64_t vehicle_a = INT_MAX;
+				uint64_t vehicle_b = INT_MAX;
+				bool found = false;
 
 				for (int i = 0; i < accidentsAhead.size(); i++)
 					if (distance > accidentsAhead[i].distance) {
 						distance = accidentsAhead[i].distance;
-						vehicle = accidentsAhead[i].vehicle;
+						vehicle_a = accidentsAhead[i].vehicle_a;
+						vehicle_b = accidentsAhead[i].vehicle_b;
+						
+						found = true;
 					}
 
-				if ((distance > 50) && (vehicle < INT_MAX)) {
+				if ((distance > 50) && found) {
 					nextAccidentAhead = cycle + 400;
 					nextAccidentBehind = cycle + 200;
 					nextSlowCarAhead = cycle + 200;
 
 					char message[80] = "accidentAlert:Ahead;";
-					char numBuffer[20];
+					char numBuffer[40];
 
 					sprintf_s(numBuffer, "%d", distance);
 					strcat_s(message, numBuffer);
 					strcat_s(message, ";");
-					sprintf_s(numBuffer, "%d", vehicle);
+					sprintf_s(numBuffer, "%d", vehicle_a); sprintf_s(numBuffer, "%d", vehicle_b);
 					strcat_s(message, numBuffer);
 					
 					sendSpotterMessage(message);
@@ -1254,24 +1257,28 @@ bool checkAccident() {
 			if (cycle > nextAccidentBehind)
 			{
 				long distance = LONG_MAX;
-				int vehicle = INT_MAX;
+				uint64_t vehicle_a = INT_MAX;
+				uint64_t vehicle_b = INT_MAX;
+				bool found = false;
 
 				for (int i = 0; i < accidentsBehind.size(); i++)
 					if (distance > accidentsBehind[i].distance) {
 						distance = accidentsBehind[i].distance;
-						vehicle = accidentsBehind[i].vehicle;
+						vehicle_a = accidentsBehind[i].vehicle_a;
+						vehicle_b = accidentsBehind[i].vehicle_b;
+						found = true;
 					}
 
-				if ((distance > 50) && (vehicle < INT_MAX)) {
+				if ((distance > 50) && found) {
 					nextAccidentBehind = cycle + 400;
 
 					char message[80] = "accidentAlert:Behind;";
-					char numBuffer[20];
+					char numBuffer[40];
 
 					sprintf_s(numBuffer, "%d", distance);
 					strcat_s(message, numBuffer);
 					strcat_s(message, ";");
-					sprintf_s(numBuffer, "%d", vehicle);
+					sprintf_s(numBuffer, "%d", vehicle_a); sprintf_s(numBuffer, "%d", vehicle_b);
 					strcat_s(message, numBuffer);
 
 					sendSpotterMessage(message);
@@ -1431,18 +1438,16 @@ bool writeCoordinates() {
 			return true;
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-		int carID = 0; // FIX gf->playerCarID;
+		int carID = 0;
 
 		mapStarted = true;
 
-		/*
 		for (int i = 0; i < gf->active_cars; i++)
-			if (gf->carID[i] == carID) {
+			if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 				carID = i;
 
 				break;
 			}
-		*/
 
 		float coordinateX = gf->car_coordinates[carID][0];
 		float coordinateY = gf->car_coordinates[carID][2];
@@ -1480,16 +1485,14 @@ void checkCoordinates() {
 		float velocityZ = pf->velocity[1];
 
 		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-			int carID = 0; // FIX gf->playerCarID;
+			int carID = 0;
 
-			/*
 			for (int i = 0; i < gf->active_cars; i++)
-				if (gf->carID[i] == carID) {
+				if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 					carID = i;
 
 					break;
 				}
-			*/
 
 			float coordinateX = gf->car_coordinates[carID][0];
 			float coordinateY = gf->car_coordinates[carID][2];
@@ -1529,20 +1532,18 @@ float lastRunning = -1;
 
 void collectCarTelemetry() {
 	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
-	int carID = 0; // FIX gf->playerCarID;
+	int carID = 0;
 
 	if (gf->total_lap_count < startTelemetryLap)
 		return;
 	
-	/*
 	for (int i = 0; i < gf->active_cars; i++)
-		if (gf->carID[i] == carID) {
+		if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 			carID = i;
 
 			break;
 		}
-	*/
-
+	
 	if (true || trackSplineReady) {
 		float driverRunning = gf->npos; // getRunning(carID);
 

@@ -653,16 +653,14 @@ void checkCoordinates() {
 		float velocityZ = pf->velocity[1];
 
 		if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
-			int carID = 0; // FIX gf->playerCarID;
+			int carID = 0;
 
-			/*
-			for (int i = 0; i < gf->activeCars; i++)
-				if (gf->carID[i] == carID) {
+			for (int i = 0; i < gf->active_cars; i++)
+				if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
 					carID = i;
 
 					break;
 				}
-			*/
 
 			float coordinateX = gf->car_coordinates[carID][0];
 			float coordinateY = gf->car_coordinates[carID][2];

@@ -349,7 +349,7 @@ int main(int argc, char* argv[])
 		wcout << "Grip=" << getGrip(sf->starting_grip).c_str() << endl;
 
 		for (int id = 0; id < gf->active_cars; id++) {
-			// wcout << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			wcout << "Car." << id + 1 << ".ID=" << gf->car_ids[id][0] << gf->car_ids[id][1] << endl;
 			wcout << "Car." << id + 1 << ".Position=" << gf->car_coordinates[id][0] << "," << gf->car_coordinates[id][2] << endl;
 		}
 
@@ -365,7 +365,7 @@ int main(int argc, char* argv[])
 		wcout << "Active=" << (((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
 		wcout << "Paused=" << (((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
 		wcout << "Session=" << getSession(sf->session, gf->session_state.phase_name).c_str() << endl;
-		wcout << "ID=" << gf->player_car_id_a << endl;
+		wcout << "ID=" << gf->player_car_id_a << gf->player_car_id_b << endl;
 		wcout << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		wcout << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		wcout << "Layout=" << normalizeName(getString(sf->track_configuration)).c_str() << endl;

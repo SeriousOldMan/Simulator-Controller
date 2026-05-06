@@ -400,7 +400,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		output << "Grip=" << getGrip(sf->starting_grip).c_str() << endl;
 
 		for (int id = 0; id < gf->active_cars; id++) {
-			// output << "Car." << id + 1 << ".ID=" << gf->carID[id] << endl;
+			output << "Car." << id + 1 << ".ID=" << gf->car_ids[id][0] << gf->car_ids[id][1] << endl;
 			output << "Car." << id + 1 << ".Position=" << gf->car_coordinates[id][0] << "," << gf->car_coordinates[id][2] << endl;
 		}
 
@@ -416,7 +416,7 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 		output << "Active=" << (((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
 		output << "Paused=" << (((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false") << endl;
 		output << "Session=" << getSession(sf->session, gf->session_state.phase_name).c_str() << endl;
-		output << "ID=" << gf->player_car_id_a << endl;
+		output << "ID=" << gf->player_car_id_a << gf->player_car_id_b << endl;
 		output << "Car=" << normalizeName(getString(gf->car_model)).c_str() << endl;
 		output << "Track=" << normalizeName(getString(sf->track)).c_str() << endl;
 		output << "Layout=" << normalizeName(getString(sf->track_configuration)).c_str() << endl;

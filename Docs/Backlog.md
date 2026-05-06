@@ -1,6 +1,7 @@
 #### General
   1. Support for unit conversions per simulator
   2. Support for tool calling in the local LLM Runtime
+  3. Option to cancel installation of speech recognition libraries
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

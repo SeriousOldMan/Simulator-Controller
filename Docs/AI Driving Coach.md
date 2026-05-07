@@ -417,6 +417,10 @@ If this mode is active, Aiden will not only give you instructions for the corner
    
      If the percentage of TC activations at corner exit is **above** this threshold, it will be considered by the Coach during telemetry evaluation.
 	 
+   - *Threshold for ABS activations*
+   
+     If the percentage of ABS activations during corner entry is **above** this threshold, it will be considered by the Coach during telemetry evaluation.
+	 
    - *Threshold for steering smoothness*
    
      If (100 - percentage of steering corrections) around a corner is **below** this threshold, it will be considered by the Coach during telemetry evaluation.

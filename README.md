@@ -44,7 +44,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 [6.9.2.0-release](https://cutt.ly/qtG2N620) (Changes: Fixed session end detection when in LMU main screen, New Lua 5.5 runtime, Added native Anthropic support for LLM integration.)
 
-#### Latest development build
+#### Current development build
 
 [6.9.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/12sYIXZL/Releases/Simulator%20Controller%206.9.5.0-beta.zip) (Test build for 6.9.5. Changes: Logging for simulator data acquisition, Support for the new LMU API, New core settings for LMU API, Performance optimizations for LMU API, Updated ACE API version.)
 

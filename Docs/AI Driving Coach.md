@@ -382,6 +382,55 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
+##### Notes
+
+1. On-track coaching will also work in restricted mode, i.e. without a GPT connection (see below), but the instructions given to the driver will be quite simple.
+2. You can either use corner by corner coaching or brake point coaching (see below).
+3. On-track coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control many details of this coaching mode.
+
+   - *Distance before Corner*
+     
+	 The distance to an upcoming corner in meters, where the Coach will give some instructions or hints to the driver.
+   
+   - *Time between Instructions*
+   
+     The time in seoonds the Coach waits after the last instructions before starting the next instructions.
+   
+   - *Reference lap*
+   
+     Declares which past lap telemetry will be used as a reference when evaluating the current lap telemetry.
+   
+   - *Load reference lap from Database*
+   
+     Specifies, whether the Coach will load the telemetry for a potential reference lap from the database. It can be the telemetry data for the fastest lap in the database or a specific one (see next setting).
+   
+   - *Name of reference lap from Database*
+   
+     If loading of a reference lap from the database is enabled, the Driving Coach will normally look for the fastest lap in the database. Using this setting you can specify the name of the reference lap to use and since settings can be weather specific, it is possible to specify different reference laps for different conditions. If you want to use a reference lap from the community database, this must also be defined explicitely by name.
+
+   - *Save fastest lap to Database*
+   
+     Use this setting, if you want the Coach to automatically save the telemetry data for your fastest lap to the session database at the end of a session, of course, unless there is already telemetry data for a faster lap available in the database.
+	 
+   - *Threshold for TC activations*
+   
+     If the percentage of TC activations at corner exit is **above** this threshold, it will be considered by the Coach during telemetry evaluation.
+	 
+   - *Threshold for steering smoothness*
+   
+     If (100 - percentage of steering corrections) around a corner is **below** this threshold, it will be considered by the Coach during telemetry evaluation.
+	 
+   - *Threshold for throttle smoothness*
+   
+     If (100 - percentage of throttle changes) at corner exit is **below** this threshold, it will be considered by the Coach during telemetry evaluation.
+	 
+   - *Threshold for brake smoothness*
+   
+     If (100 - percentage of brake pressure changes) during corner entry is **below** this threshold, it will be considered by the Coach during telemetry evaluation.
+	 
+   Please note, that all these settings can be defined per car and even per track or weather conditions.
+
 ### Practicing braking points
 
 Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:

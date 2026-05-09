@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Yellow.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Engineer.ico
 ;@Ahk2Exe-ExeName Race Engineer.exe
 ;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
 ;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
@@ -83,7 +83,7 @@ checkRemoteProcessAlive(pid) {
 }
 
 startupRaceEngineer() {
-	local icon := kIconsDirectory . "Artificial Intelligence Yellow.ico"
+	local icon := kIconsDirectory . "Engineer.ico"
 	local remotePID := false
 	local engineerName := "Jona"
 	local engineerLogo := false

@@ -17,7 +17,7 @@
 ;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
-;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence Green.ico
+;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Strategist.ico
 ;@Ahk2Exe-ExeName Race Strategist.exe
 ;@Ahk2Exe-SetCompanyName Oliver Juwig (TheBigO)
 ;@Ahk2Exe-SetCopyright TheBigO - Creative Commons - BY-NC-SA
@@ -83,7 +83,7 @@ checkRemoteProcessAlive(pid) {
 }
 
 startupRaceStrategist() {
-	local icon := kIconsDirectory . "Artificial Intelligence Green.ico"
+	local icon := kIconsDirectory . "Strategist.ico"
 	local remotePID := false
 	local strategistName := "Cato"
 	local strategistLogo := false

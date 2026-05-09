@@ -1615,20 +1615,25 @@ class SetupWizard extends ConfiguratorPanel {
 		return (this.KnowledgeBase.getValue("Software." . software . ".Requested", "OPTIONAL") = "OPTIONAL")
 	}
 
-	isSoftwareInstalled(software) {
-		return this.KnowledgeBase.getValue("Software." . software . ".Installed", false)
+	isSoftwareInstalled(software, installed := true) {
+		local isInstalled := this.KnowledgeBase.getValue("Software." . software . ".Installed", false)
+
+		if (installed && (isInstalled = "FAILED"))
+			isInstalled := false
+
+		return isInstalled
 	}
 
 	locateSoftware(software, executable := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local installed := this.isSoftwareInstalled(software)
+		local installed := this.isSoftwareInstalled(software, false)
 		local check := (executable = "CHECK")
 
 		if check
 			executable := false
 
-		if (check || !installed) {
-			if (check && installed && FileExist(this.softwarePath(software)))
+		if (check || (installed == false)) {
+			if (check && (installed == true) && FileExist(this.softwarePath(software)))
 				return true
 
 			if !executable {
@@ -1638,7 +1643,10 @@ class SetupWizard extends ConfiguratorPanel {
 					executable := false
 			}
 
-			knowledgeBase.setFact("Software." . software . ".Installed", executable != false)
+			if executable
+				knowledgeBase.setFact("Software." . software . ".Installed", true)
+			else if (installed == false)
+				knowledgeBase.setFact("Software." . software . ".Installed", false)
 
 			if (executable == true)
 				knowledgeBase.removeFact("Software." . software . ".Path")
@@ -1825,7 +1833,7 @@ class SetupWizard extends ConfiguratorPanel {
 			local runtime, definition
 
 			for runtime, definition in getMultiMapValues(this.Definition, "Software.Runtimes")
-				if !this.isSoftwareInstalled(runtime)
+				if !this.isSoftwareInstalled(runtime, false)
 					try {
 						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . runtime . translate("...")})
 
@@ -1833,7 +1841,8 @@ class SetupWizard extends ConfiguratorPanel {
 
 						RunWait(kHomeDirectory . definition[2])
 
-						this.locateSoftware(runtime, true)
+						if !this.locateSoftware(runtime, true)
+							this.KnowledgeBase.setFact("Software." . runtime . ".Installed", "FAILED")
 					}
 					catch Any as exception {
 						showProgress({color: "Red", message: translate("Error while installing ") . runtime . translate("...")})
@@ -1848,13 +1857,14 @@ class SetupWizard extends ConfiguratorPanel {
 			local software, definition
 
 			for software, definition in getMultiMapValues(this.Definition, "Applications.Special")
-				if !this.isSoftwareInstalled(software)
+				if !this.isSoftwareInstalled(software, false)
 					try {
 						showProgress({progress: progressCount++, color: "Green", message: translate("Installing ") . software . translate("...")})
 
 						definition := string2Values(":", string2Values("|", definition)[4])
 
-						this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*))
+						if !this.locateSoftware(software, %definition[1]%.Call(string2Values(";", definition[2])*))
+							this.KnowledgeBase.setFact("Software." . software . ".Installed", "FAILED")
 					}
 					catch Any as exception {
 						showProgress({color: "Red", message: translate("Error while installing ") . software . translate("...")})
@@ -1869,7 +1879,7 @@ class SetupWizard extends ConfiguratorPanel {
 			local plugin, definition, ignore, target, root, path, skip, source
 
 			for plugin, definition in getMultiMapValues(this.Definition, "Software.Plugins")
-				if !this.isSoftwareInstalled(plugin)
+				if !this.isSoftwareInstalled(plugin, false)
 					try {
 						definition := string2Values("|", definition)
 						skip := false

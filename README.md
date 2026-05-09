@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[6.9.6.0-dev]() (Early build for 6.9.6. Changes: Rejectable installation of runtimes in "Simulator Setup".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6960) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-696) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

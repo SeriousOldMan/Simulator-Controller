@@ -45,6 +45,22 @@ Not yet planned...
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-694), if you are using the local LLM Runtime.
 
+# Upcoming release
+
+## 6.9.6.0
+
+#### Date: 05/15/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
+
+# Release history
+
 ## 6.9.3.1
 
 #### Date: 04/26/26

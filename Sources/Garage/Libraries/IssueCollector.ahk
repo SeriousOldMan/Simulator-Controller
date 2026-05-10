@@ -397,6 +397,8 @@ class IssueCollector {
 		local handling := CaseInsenseMap()
 		local ignore, type, speed, severity, where, frequency, key
 
+		handling.Default := []
+
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
 				for ignore, where in ["Entry", "Apex", "Exit"] {
@@ -420,8 +422,6 @@ class IssueCollector {
 		local dataFile := this.iDataFile
 		local handling, tries, data, ignore, type, speed, where, value
 
-		handling.Default := (this.iCalibrate ? false : [])
-
 		if dataFile {
 			tries := 10
 
@@ -430,6 +430,10 @@ class IssueCollector {
 
 				if (data.Count > 0) {
 					if this.iCalibrate {
+						handling := CaseInsenseMap()
+
+						handling.Default := false
+
 						for ignore, type in ["Oversteer", "Understeer"]
 							for ignore, speed in ["Slow", "Fast"]
 								for ignore, where in ["Entry", "Apex", "Exit"] {

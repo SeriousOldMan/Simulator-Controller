@@ -1780,8 +1780,18 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			else
 				analyzerGui.Show("AutoSize Center")
 
-			while !result
+			while !result {
 				Sleep(100)
+
+				if (GetKeyState("Ctrl") && (state = "Prepare"))
+					activateButton.Text := translate("&Load...")
+				else if (state = "Prepare")
+					activateButton.Text := translate("Start")
+				else if (state = "Run")
+					activateButton.Text := translate("Stop")
+				else if (state = "Analyze")
+					activateButton.Text := translate("Apply")
+			}
 		}
 		finally {
 			if updateTask

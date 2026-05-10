@@ -393,10 +393,32 @@ class IssueCollector {
 		playSound("SWSoundPlayer.exe", soundFile, IssueCollector.AudioSettings, "echos 1 1 1 1")
 	}
 
+	static createHandling(issues) {
+		local handling := CaseInsenseMap()
+		local ignore, type, speed, severity, where, frequency, key
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, where in ["Entry", "Apex", "Exit"] {
+					key := (type . ".Corner." . where . "." . speed)
+
+					for ignore, severity in ["Light", "Medium", "Heavy"] {
+						frequency := getMultiMapValue(issues, type . "." . speed . "." . severity, where, false)
+
+						if frequency
+							if handling.Has(key)
+								handling[key].Push({Severity: severity, Frequency: frequency})
+							else
+								handling[key] := [{Severity: severity, Frequency: frequency}]
+					}
+				}
+
+		return handling
+	}
+
 	getHandling() {
 		local dataFile := this.iDataFile
-		local handling := CaseInsenseMap()
-		local handling, tries, data, ignore, type, speed, severity, where, frequency, key, value
+		local handling, tries, data, ignore, type, speed, where, value
 
 		handling.Default := (this.iCalibrate ? false : [])
 
@@ -417,23 +439,8 @@ class IssueCollector {
 										handling[type . ".Corner." . where . "." . speed] := value
 								}
 					}
-					else {
-						for ignore, type in ["Oversteer", "Understeer"]
-							for ignore, speed in ["Slow", "Fast"]
-								for ignore, where in ["Entry", "Apex", "Exit"] {
-									key := (type . ".Corner." . where . "." . speed)
-
-									for ignore, severity in ["Light", "Medium", "Heavy"] {
-										frequency := getMultiMapValue(data, type . "." . speed . "." . severity, where, false)
-
-										if frequency
-											if handling.Has(key)
-												handling[key].Push({Severity: severity, Frequency: frequency})
-											else
-												handling[key] := [{Severity: severity, Frequency: frequency}]
-									}
-								}
-					}
+					else
+						handling := IssueCollector.createHandling(data)
 
 					break
 				}

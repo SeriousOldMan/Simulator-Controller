@@ -1765,7 +1765,7 @@ class TelemetryAnalyzer {
 		local type, speed, severity, where, count, phase, key
 		local yawRate, steerAngle, speed, acceleration, gLongAverage, gLongsCount, slip
 		local steerAngleRadians, steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
-		local ignore, telemetry, corner
+		local ignore, theTelemetry, corner
 
 		pushValue(values, value) {
 			values.Push(value)
@@ -1794,13 +1794,13 @@ class TelemetryAnalyzer {
 		if isInstance(telemetries, Telemetry)
 			telemetries := [telemetries]
 
-		for ignore, telemetry in telemetries
-			loop telemetry.Data.Length {
-				yawRate := telemetry.getValue(A_Index, "YawRate")
+		for ignore, theTelemetry in telemetries
+			loop theTelemetry.Data.Length {
+				yawRate := theTelemetry.getValue(A_Index, "YawRate")
 
 				if (yawRate != kNull) {
-					steerAngle := telemetry.getValue(A_Index, "Steering")
-					speed := telemetry.getValue(A_Index, "Speed")
+					steerAngle := theTelemetry.getValue(A_Index, "Steering")
+					speed := theTelemetry.getValue(A_Index, "Speed")
 					acceleration := ((lastSpeed == kUndefined) ? 0 : (speed - lastSpeed))
 
 					lastSpeed := speed
@@ -1850,7 +1850,7 @@ class TelemetryAnalyzer {
 		for ignore, corner in cornerDynamics {
 			phase := corner.Phase
 
-			if (corner.Speed < lowspeedThreshold) {
+			if (corner.Speed < thresholds.LowSpeed) {
 				slowCount += 1
 
 				if (corner.UsOs < thresholds.HeavyOversteer)

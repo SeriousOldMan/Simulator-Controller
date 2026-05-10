@@ -13,6 +13,7 @@
 #Include "..\..\Framework\Extensions\Messages.ahk"
 #Include "..\..\Framework\Extensions\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\TelemetryAnalyzer.ahk"
 #Include "IssueCollector.ahk"
 
 
@@ -926,7 +927,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local issues, filteredHandling, issue, temperatures, type, speed, severity, where, value, newValue, frequency
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
-	local category, temperature, position, key
+	local category, temperature, position, key, info, simulator, car, track, fileName
+	local telemetries, theAnalyzer, thresholds
 
 	static analyzerGui
 
@@ -1113,23 +1115,81 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
-		for ignore, widget in prepareWidgets {
-			widget.Enabled := false
-			widget.Visible := false
+		if (GetKeyState("Ctrl") && analyzer.Track) {
+			simulator := analyzer.Simulator
+			track := analyzer.Track
+			car := (analyzer.Car ? analyzer.Car : "Unknown")
+
+			analyzerGui.Opt("+OwnDialogs")
+
+			analyzerGui.Block()
+
+			try {
+				fileName := browseLapTelemetries(analyzerGui, &simulator, &car, &track, &info)
+			}
+			finally {
+				analyzerGui.Unblock()
+			}
+
+			if (fileName && (fileName != "")) {
+				theAnalyzer := TelemetryAnalyzer(simulator, track)
+				telemetries := []
+
+				if isObject(fileName) {
+					loop fileName.Length
+						telemetries.Push(theAnalyzer.createTelemetry(A_Index, fileName[A_Index]))
+				}
+				else
+					telemetries.Push(theAnalyzer.createTelemetry(1, fileName))
+
+				thresholds := {LowSpeed: analyzer.LowspeedThreshold
+							 , LightOversteer: analyzer.OversteerThresholds[1]
+							 , MediumOversteer: analyzer.OversteerThresholds[2]
+							 , HeavyOversteer: analyzer.OversteerThresholds[3]
+							 , LightUndersteer: analyzer.UndersteerThresholds[1]
+							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
+							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
+
+				issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
+																 , analyzer.WheelBase, analyzer.TrackWidth
+																 , thresholds)
+
+				issues := IssueCollector.createHandling(issues)
+
+				for ignore, widget in prepareWidgets {
+					widget.Enabled := false
+					widget.Visible := false
+				}
+
+				for ignore, widget in analyzeWidgets
+					widget.Visible := true
+
+				activateButton.Text := translate("Apply")
+
+				state := "Analyze"
+
+				runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling", false, issues))
+			}
 		}
+		else {
+			for ignore, widget in prepareWidgets {
+				widget.Enabled := false
+				widget.Visible := false
+			}
 
-		for ignore, widget in runWidgets
-			widget.Visible := true
+			for ignore, widget in runWidgets
+				widget.Visible := true
 
-		activateButton.Text := translate("Stop")
+			activateButton.Text := translate("Stop")
 
-		state := "Run"
+			state := "Run"
 
-		analyzer.startIssueAnalyzer()
+			analyzer.startIssueAnalyzer()
 
-		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateSamples"), 5000)
+			updateTask := PeriodicTask(runAnalyzer.Bind("UpdateSamples"), 5000)
 
-		updateTask.start()
+			updateTask.start()
+		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Run")) {
 		updateTask.stop()
@@ -1161,7 +1221,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		issues := analyzer.Handling.Clone()
+		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Handling.Clone())
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
@@ -1169,36 +1229,38 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					where := (type . ".Corner." . where . "." . speed)
 					filteredHandling := []
 
-					for ignore, issue in issues[where] {
-						severity := issue.Severity
+					if issues.Has(where) {
+						for ignore, issue in issues[where] {
+							severity := issue.Severity
 
-						include := (issue.Frequency >= applyThresholdSlider.Value)
+							include := (issue.Frequency >= applyThresholdSlider.Value)
 
-						if (include && final) {
-							include := false
+							if (include && final) {
+								include := false
 
-							characteristic := characteristicLabels[where]
+								characteristic := characteristicLabels[where]
 
-							row := resultListView.GetNext(0, "C")
+								row := resultListView.GetNext(0, "C")
 
-							while row {
-								value := resultListView.GetText(row)
+								while row {
+									value := resultListView.GetText(row)
 
-								if (value = characteristic) {
-									include := true
+									if (value = characteristic) {
+										include := true
 
-									break
+										break
+									}
+									else
+										row := resultListView.GetNext(row, "C")
 								}
-								else
-									row := resultListView.GetNext(row, "C")
 							}
+
+							if include
+								filteredHandling.Push(issue)
 						}
 
-						if include
-							filteredHandling.Push(issue)
+						issues[where] := filteredHandling
 					}
-
-					issues[where] := filteredHandling
 				}
 
 		return issues
@@ -1330,50 +1392,57 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	else if (commandOrAnalyzer == "UpdateTelemetry") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
-		handling := arguments[1]
-		temperatures := arguments[2]
+		handling := ((arguments.Length > 0) ? arguments[1] : false)
+		temperatures := ((arguments.Length > 1) ? arguments[2] : false)
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)
 
 		theListView.Delete()
 
-		for ignore, type in ["Oversteer", "Understeer"]
-			for ignore, speed in ["Slow", "Fast"]
-				for ignore, where in ["Entry", "Apex", "Exit"] {
-					characteristic := (type . ".Corner." . where . "." . speed)
+		if handling
+			for ignore, type in ["Oversteer", "Understeer"]
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, where in ["Entry", "Apex", "Exit"] {
+						characteristic := (type . ".Corner." . where . "." . speed)
 
-					for ignore, issue in handling[characteristic]
-						theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																		  , translate(issue.Severity), issue.Frequency)
+						if handling.Has(characteristic)
+							for ignore, issue in handling[characteristic]
+								theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																				  , translate(issue.Severity), issue.Frequency)
+					}
+
+		if temperatures {
+			for ignore, category in ["Around", "Inner", "Outer"]
+				for ignore, temperature in ["Cold", "Hot"]
+					for ignore, position in ["Front", "Rear"] {
+						characteristic := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+
+						if temperatures.Has(characteristic)
+							for ignore, issue in temperatures[characteristic]
+								theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																				  , translate(issue.Severity), issue.Frequency)
+					}
+
+			for ignore, category in ["Front", "Rear"]
+				for ignore, temperature in ["Cold", "Hot"] {
+					characteristic := ("Brake.Temperatures." . temperature . "." . category)
+
+					if temperatures.Has(characteristic)
+						for ignore, issue in temperatures[characteristic]
+							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																			  , translate(issue.Severity), issue.Frequency)
 				}
 
-		for ignore, category in ["Around", "Inner", "Outer"]
-			for ignore, temperature in ["Cold", "Hot"]
-				for ignore, position in ["Front", "Rear"] {
-					characteristic := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+			for ignore, category in ["Water", "Oil"]
+				for ignore, temperature in ["Cold", "Hot"] {
+					characteristic := ("Engine.Temperatures." . temperature . "." . category)
 
-					for ignore, issue in temperatures[characteristic]
-						theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																		  , translate(issue.Severity), issue.Frequency)
+					if temperatures.Has(characteristic)
+						for ignore, issue in temperatures[characteristic]
+							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																			  , translate(issue.Severity), issue.Frequency)
 				}
-
-		for ignore, category in ["Front", "Rear"]
-			for ignore, temperature in ["Cold", "Hot"] {
-				characteristic := ("Brake.Temperatures." . temperature . "." . category)
-
-				for ignore, issue in temperatures[characteristic]
-					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																	  , translate(issue.Severity), issue.Frequency)
-			}
-
-		for ignore, category in ["Water", "Oil"]
-			for ignore, temperature in ["Cold", "Hot"] {
-				characteristic := ("Engine.Temperatures." . temperature . "." . category)
-
-				for ignore, issue in temperatures[characteristic]
-					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
-																	  , translate(issue.Severity), issue.Frequency)
-			}
+		}
 
 		theListView.ModifyCol()
 

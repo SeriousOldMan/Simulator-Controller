@@ -1748,6 +1748,104 @@ class TelemetryAnalyzer {
 	createTelemetry(lap, fileName, driver := false, lapTime := false, sectorTimes := false) {
 		return Telemetry(this, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
 	}
+
+	analyzeHandling(telemetries, steerLock, steerRatio, wheelBase, trackWidth) {
+		local MAXVALUES := 6
+		local PI := 3.14159265
+		local wheelBaseMeter := (wheelbase / 100)
+		local accelerations := []
+		local yawRates := []
+		local idealYawRates := []
+		local gLongs := []
+		local cornerDynamics := []
+		local lastSpeed := kUndefined
+		local lap, yawRate, steerAngle, speed, acceleration, gLongAverage, gLongsCount, slip
+		local steerAngleRadians, steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
+		local ignore, telemetry, completedLaps
+
+		pushValue(values, value) {
+			values.Push(value)
+
+            if (values.Length > MAXVALUES)
+                values.RemoveAt(1)
+		}
+
+		averageValue(values, &count) {
+            local summary := sum(values)
+
+            count := values.Length
+
+            return ((count > 0) ? (summary / count) : 0)
+        }
+
+        smoothValue(values, value) {
+            return value
+        }
+
+		if isInstance(telemetries, Telemetry)
+			telemetries := [telemetries]
+
+		for ignore, telemetry in telemetries {
+			lap := A_Index
+
+			loop telemetry.Data.Length {
+				yawRate := telemetry.getValue(A_Index, "YawRate")
+
+				if (yawRate != kNull) {
+					steerAngle := telemetry.getValue(A_Index, "Steering")
+					speed := telemetry.getValue(A_Index, "Speed")
+					acceleration := ((lastSpeed == kUndefined) ? 0 : (speed - lastSpeed))
+
+					lastSpeed := speed
+
+					pushValue(accelerations, acceleration)
+
+					yawRate := smoothValue(yawRates, yawRate)
+					steerAngleRadians := (- (steerAngle * steerLock / 2 / steerRatio) / 57.2958)
+					radius := (wheelBaseMeter / steerAngleRadians)
+					perimeter := (radius * PI * 2)
+					perimeterSpeed := (lastSpeed / 3.6)
+					idealYawRate := smoothValue(idealYawRates, perimeterSpeed / perimeter * 2 * PI)
+
+					if ((Abs(steerAngle) > 0.1) && (speed > 60)) {
+						gLongAverage := averageValue(gLongs, &gLongsCount)
+						phase := "Coast"
+
+						if (gLongsCount > 0)
+							if (glongAverage < -0.2)
+								phase := "Braking"
+							else if (glongAverage > 0.1)
+								phase := "Accelerating"
+
+							cd := {Speed: speed, UsOs: 0, Lap: lap, Phase: phase}
+
+						if (Abs(yawRate * 57.2958) > 0.1) {
+							slip := Abs(idealYawRate - yawRate)
+
+							if (steerAngle > 0) {
+								if (yawRate > 0)
+									slip *= -1
+								else if (yawRate < idealYawRate)
+									slip *= -1
+							}
+							else {
+								if (yawRate < 0)
+									slip *= -1
+								else if (yawRate > idealYawRate)
+									slip *= -1
+							}
+
+							if (slip != 0)
+								cornerDynamics.Push({Speed: speed, UsOs: (slip * 57.2989 * 1)
+												   , Lap: lap, Phase: phase})
+						}
+					}
+				}
+			}
+		}
+
+		return cornerDynamics
+	}
 }
 
 

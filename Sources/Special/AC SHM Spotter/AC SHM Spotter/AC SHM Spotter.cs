@@ -1246,7 +1246,10 @@ namespace ACSHMSpotter {
 
 						telemetryFile.Write(cars.cars[carID].worldPosition.x + ";");
                         telemetryFile.Write(cars.cars[carID].worldPosition.z + ";");
-                        telemetryFile.WriteLine(graphics.iCurrentTime);
+						
+                        telemetryFile.Write(graphics.iCurrentTime + ";");
+						
+						telemetryFile.WriteLine(physics.LocalAngularVelocity[1]);
 
 						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
@@ -1267,7 +1270,10 @@ namespace ACSHMSpotter {
 
 								file.Write(cars.cars[carID].worldPosition.x + ";");
 								file.Write(cars.cars[carID].worldPosition.z + ";");
-								file.WriteLine(graphics.iCurrentTime);
+								
+								file.Write(graphics.iCurrentTime + ";");
+						
+								file.WriteLine(physics.LocalAngularVelocity[1]);
 
 								file.Close();
                             }

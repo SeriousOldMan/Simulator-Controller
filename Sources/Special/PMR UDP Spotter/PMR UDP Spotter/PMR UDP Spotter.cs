@@ -1112,8 +1112,10 @@ namespace PMRUDPSpotter {
 
 					TimeSpan difference = DateTime.Now.Subtract(startTime);
 
-                    telemetryFile.WriteLine(difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+                    telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
 
+					telemetryFile.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);
+					
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
                         {
@@ -1136,7 +1138,9 @@ namespace PMRUDPSpotter {
                             file.Write(playerTelemetry.Chassis.PosWS[0] + ";");
                             file.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-                            file.WriteLine(playerVehicle.CurrentLapTime * 1000);
+                            file.Write((playerVehicle.CurrentLapTime * 1000) + ";");
+
+							file.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);
 
                             file.Close();
                         }

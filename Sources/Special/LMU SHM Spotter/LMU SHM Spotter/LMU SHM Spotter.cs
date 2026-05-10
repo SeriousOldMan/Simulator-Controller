@@ -1280,7 +1280,9 @@ namespace LMUSHMSpotter {
 					telemetryFile.Write(playerScoring.mPos.x + ";");
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
-					telemetryFile.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
+							
+					telemetryFile.WriteLine(vehicle.mLocalRot.z);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1304,7 +1306,9 @@ namespace LMUSHMSpotter {
                             file.Write(playerScoring.mPos.x + ";");
                             file.Write(-playerScoring.mPos.z + ";");
 
-                            file.WriteLine((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000);
+                            file.WriteLine(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
+							
+							file.WriteLine(vehicle.mLocalRot.z);
 
                             file.Close();
                         }

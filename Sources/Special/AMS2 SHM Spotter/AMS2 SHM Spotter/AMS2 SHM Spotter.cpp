@@ -1054,7 +1054,8 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						  << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
 						  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
 						  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
-						  << round(sharedData->mCurrentTime * 1000) << std::endl;
+						  << round(sharedData->mCurrentTime * 1000) << ";"
+						  << sharedData->mAngularVelocity[VEC_Y] << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1075,7 +1076,8 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						 << sharedData->mLocalAcceleration[VEC_X] / 9.807f << ";"
 						 << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
 						 << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
-						 << round(sharedData->mCurrentTime * 1000) << std::endl;
+						 << round(sharedData->mCurrentTime * 1000) << ";"
+						 << sharedData->mAngularVelocity[VEC_Y] << std::endl;
 
 					file.close();
 				}

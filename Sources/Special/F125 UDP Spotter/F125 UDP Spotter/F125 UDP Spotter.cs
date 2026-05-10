@@ -1148,6 +1148,7 @@ namespace F125UDPSpotter {
         {
 			var session = receiver.GetSessionData();
 			var motion = receiver.GetMotionData();
+			var motionEx = receiver.GetMotionExData();
 			var lapData = receiver.GetLapData();
 			var telemetry = receiver.GetCarTelemetryData();
 			
@@ -1229,7 +1230,9 @@ namespace F125UDPSpotter {
 
 					TimeSpan difference = DateTime.Now.Subtract(startTime);
 
-                    telemetryFile.WriteLine(difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+                    telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
+					
+					telemetryFile.WriteLine(motionEx.AngularVelocityY);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1253,7 +1256,9 @@ namespace F125UDPSpotter {
                             file.Write(playerMotion.WorldPositionX + ";");
                             file.Write(playerMotion.WorldPositionZ + ";");
 
-                            file.WriteLine(playerLap.CurrentLapTimeInMS);
+                            file.Write(playerLap.CurrentLapTimeInMS + ";");
+					
+							file.WriteLine(motionEx.AngularVelocityY);
 
                             file.Close();
                         }

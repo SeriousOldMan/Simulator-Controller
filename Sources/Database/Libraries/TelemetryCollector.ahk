@@ -35,7 +35,8 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
 							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [normalizeTime]}
 							, {Name: "PosX", Indices: [12], Channels: []}
-							, {Name: "PosY", Indices: [13], Channels: []}]
+							, {Name: "PosY", Indices: [13], Channels: []}
+							, {Name: "YawRate", Indices: [15], Channels: ["YawRate"]}]
 
 
 ;;;-------------------------------------------------------------------------;;;

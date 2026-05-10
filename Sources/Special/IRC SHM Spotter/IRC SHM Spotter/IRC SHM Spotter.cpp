@@ -1503,12 +1503,16 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 				<< speed << ";"
 				<< "n/a" << ";"
 				<< "n/a" << ";"
-				<< longG << ";" << -latG;
+				<< longG << ";" << -latG << ";";
 
 			if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-				telemetryFile << ";" << coordinateX << ";" << coordinateY <<  ";" << time << std::endl;
+				telemetryFile << coordinateX << ";" << coordinateY <<  ";" << time << ";";
 			else
-				telemetryFile << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
+				telemetryFile << "n/a;n/a;" << time << ";";
+
+			getRawDataValue(rawValue, header, data, "YawRate");
+
+			telemetryFile << *((float*)rawValue) << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1525,13 +1529,17 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 						 << speed << ";"
 						 << "n/a" << ";"
 						 << "n/a" << ";"
-						 << longG << ";" << -latG;
+						 << longG << ";" << -latG << ";";
 
 					if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
-						file << ";" << coordinateX << ";" << coordinateY << ";" << time << std::endl;
+						file << coordinateX << ";" << coordinateY << ";" << time << ";";
 					else
-						file << ";" << "n/a" << ";" << "n/a" ";" << time << std::endl;
+						file << "n/a;n/a;" << time << ";";
 
+					getRawDataValue(rawValue, header, data, "YawRate");
+
+					file << *((float*)rawValue) << std::endl;
+	
 					file.close();
 				}
 				catch (...) {}

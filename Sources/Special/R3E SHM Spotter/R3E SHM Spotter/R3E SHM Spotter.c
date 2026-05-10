@@ -1252,7 +1252,8 @@ void collectCarTelemetry(int playerID) {
 																 map_buffer->all_drivers_data_1[index].position.x,
 																 -map_buffer->all_drivers_data_1[index].position.z);
 
-		fprintf(telemetryFile, "%d\n", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000));
+		fprintf(telemetryFile, "%d;%f\n", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000),
+										  (float)map_buffer->player.local_angular_velocity.y);
 		
 		int offset = strlen(telemetryDirectory);
 
@@ -1278,9 +1279,11 @@ void collectCarTelemetry(int playerID) {
 																-map_buffer->all_drivers_data_1[index].position.z);
 
 				if (map_buffer->lap_time_current_self != -1)
-					fprintf(file, "%d\n", (long)round(map_buffer->lap_time_current_self * 1000));
+					fprintf(file, "%d;", (long)round(map_buffer->lap_time_current_self * 1000));
 				else
-					fprintf(file, "n/a\n");
+					fprintf(file, "n/a;");
+				
+				fprintf(file, "%f\n", (float)map_buffer->player.local_angular_velocity.y);
 
 				fclose(file);
 			}

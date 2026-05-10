@@ -1691,7 +1691,8 @@ void collectCarTelemetry() {
 							<< pf->abs << ";"
 							<< longG << ";" << latG << ";"
 							<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
-							<< gf->iCurrentTime << endl;
+							<< gf->iCurrentTime << ";"
+							<< pf->localAngularVel[1] << endl;
 
 						if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
@@ -1710,7 +1711,8 @@ void collectCarTelemetry() {
 									<< pf->abs << ";"
 									<< longG << ";" << latG << ";"
 									<< gf->carCoordinates[carID][0] << ";" << gf->carCoordinates[carID][2] << ";"
-									<< gf->iCurrentTime << endl;
+									<< gf->iCurrentTime << ";"
+									<< pf->localAngularVel[1] << endl;
 
 								file.close();
 							}

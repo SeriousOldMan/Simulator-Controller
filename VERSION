@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.6.0-dev
 Target=6.9.6.0-release
-Date=05/09/2026
+Date=05/10/2026
 Download=
-Changes=Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons
+Changes=Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons, Telemetry-based Issue Analyzer
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.5.0-release

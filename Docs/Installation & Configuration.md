@@ -382,7 +382,7 @@ If you choose "Google Speech Services", one additional field will appear. Here y
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Google%20Service.JPG)
 
-To use the Google speech service, you must have been registered for the Google cloud (see https://console.cloud.google.com for more details). After you have created your cloud project and registered your credit card for billing services, you have to enable the text to speech in the cloud shell using the following command: "gcloud services enable texttospeech.googleapis.com". Then generate an API key in the "APIs and Services" submenu of the main menu and copy the new key to the above configuration.
+To use the Google speech service, you must have been registered for the Google cloud (see https://console.cloud.google.com for more details). After you have created your cloud project and registered your credit card for billing services, you have to enable the text to speech in the cloud shell using the following command: "gcloud services enable texttospeech.googleapis.com". Then generate an API key in the "APIs and Services" submenu of the main menu, allow all APIs for this key and copy the new key to the above configuration.
 
 Please note, that although you must supply a credit card when registering, you won't be charged a single cent, since according to Google the first million characters are free of charge. I am quite sure, that you will never reach this limit, unless you are doing 24 h races seven times a week for the whole month, so give it a try...
 

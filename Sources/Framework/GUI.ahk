@@ -485,6 +485,7 @@ class Theme {
 	}
 
 	static MessageDialog(textOrCommand := "", title := "", options := {}, iconPath := false) {
+		local result := false
 		local owner := false
 		local x := "Center"
 		local y := "Center"
@@ -492,163 +493,156 @@ class Theme {
 		local h := 100
 		local messageGui, newOptions, iconFile, buttons, offset, button, handler
 
-		static kResult := "__Result"
+		if !isObject(options) {
+			newOptions := {}
 
-		static result := false
+			if RegExMatch(options, "Owner([0-9]+)", &result) {
+				newOptions.Owner := result[1]
 
-		if (InStr(textOrCommand, kResult) == 1)
-			result := StrReplace(textOrCommand, kResult, "")
-		else {
-			if !isObject(options) {
-				newOptions := {}
-
-				if RegExMatch(options, "Owner([0-9]+)", &result) {
-					newOptions.Owner := result[1]
-
-					options := RegExReplace(options, "Owner(0-9+)")
-				}
-
-				if RegExMatch(options, "x([0-9]+)", &result) {
-					newOptions.X := result[1]
-
-					options := RegExReplace(options, "x(0-9+)")
-				}
-
-				if RegExMatch(options, "y([0-9]+)", &result) {
-					newOptions.Y := result[1]
-
-					options := RegExReplace(options, "y(0-9+)")
-				}
-
-				if RegExMatch(options, "w([0-9]+)", &result) {
-					newOptions.Width := result[1]
-
-					options := RegExReplace(options, "w(0-9+)")
-				}
-
-				if RegExMatch(options, "h([0-9]+)", &result) {
-					newOptions.Height := result[1]
-
-					options := RegExReplace(options, "h(0-9+)")
-				}
-
-				if isNumber(Trim(options))
-					newOptions.Options := Trim(options)
-
-				options := newOptions
+				options := RegExReplace(options, "Owner(0-9+)")
 			}
 
-			x := (options.HasProp("X") ? options.X : x)
-			y := (options.HasProp("Y") ? options.Y : y)
-			w := (options.HasProp("Width") ? options.Width : w)
-			h := (options.HasProp("Height") ? options.Height : h)
+			if RegExMatch(options, "x([0-9]+)", &result) {
+				newOptions.X := result[1]
 
-			if options.HasProp("Options") {
-				if !options.HasProp("Default")
-					if ((options.Options & 256) == 256)
-						options.Default := 2
-					else if ((options.Options & 512) == 512)
-						options.Default := 3
-					else if ((options.Options & 768) == 768)
-						options.Default := 4
-					else
-						options.Default := 1
-
-				if !options.HasProp("Mode")
-					if ((options.Options & 16) == 16)
-						options.Mode := "Error"
-					else if ((options.Options & 32) == 32)
-						options.Mode := "Question"
-					else if ((options.Options & 48) == 48)
-						options.Mode := "Warning"
-					else if ((options.Options & 64) == 64)
-						options.Mode := "Info"
-
-				if !options.HasProp("Buttons") {
-					buttons := (options.Options & 15)
-
-					if (buttons == 0)
-						options.Buttons := ["Ok"]
-					else if (buttons == 1)
-						options.Buttons := ["Ok", "Cancel"]
-					else if (buttons == 2)
-						options.Buttons := ["Abort", "Retry", "Ignore"]
-					else if (buttons == 3)
-						options.Buttons := ["Yes", "No", "Cancel"]
-					else if (buttons == 4)
-						options.Buttons := ["Yes", "No"]
-					else if (buttons == 5)
-						options.Buttons := ["Retry", "Cancel"]
-					else if (buttons == 6)
-						options.Buttons := ["Cancel", "Try Again", "Continue"]
-				}
+				options := RegExReplace(options, "x(0-9+)")
 			}
 
+			if RegExMatch(options, "y([0-9]+)", &result) {
+				newOptions.Y := result[1]
+
+				options := RegExReplace(options, "y(0-9+)")
+			}
+
+			if RegExMatch(options, "w([0-9]+)", &result) {
+				newOptions.Width := result[1]
+
+				options := RegExReplace(options, "w(0-9+)")
+			}
+
+			if RegExMatch(options, "h([0-9]+)", &result) {
+				newOptions.Height := result[1]
+
+				options := RegExReplace(options, "h(0-9+)")
+			}
+
+			if isNumber(Trim(options))
+				newOptions.Options := Trim(options)
+
+			options := newOptions
+		}
+
+		x := (options.HasProp("X") ? options.X : x)
+		y := (options.HasProp("Y") ? options.Y : y)
+		w := (options.HasProp("Width") ? options.Width : w)
+		h := (options.HasProp("Height") ? options.Height : h)
+
+		if options.HasProp("Options") {
 			if !options.HasProp("Default")
-				options.Default := 1
+				if ((options.Options & 256) == 256)
+					options.Default := 2
+				else if ((options.Options & 512) == 512)
+					options.Default := 3
+				else if ((options.Options & 768) == 768)
+					options.Default := 4
+				else
+					options.Default := 1
 
 			if !options.HasProp("Mode")
-				options.Mode := "Info"
+				if ((options.Options & 16) == 16)
+					options.Mode := "Error"
+				else if ((options.Options & 32) == 32)
+					options.Mode := "Question"
+				else if ((options.Options & 48) == 48)
+					options.Mode := "Warning"
+				else if ((options.Options & 64) == 64)
+					options.Mode := "Info"
 
-			if !options.HasProp("Buttons")
-				options.Buttons := [translate("Ok")]
+			if !options.HasProp("Buttons") {
+				buttons := (options.Options & 15)
 
-			w := Max((options.Buttons.Length * 80) + ((options.Buttons.Length - 1) * 10), w)
-
-			result := false
-
-			switch options.Mode, false {
-				case "Error":
-					iconFile := (kIconsDirectory . "Dlg Error.ico")
-				case "Question":
-					iconFile := (kIconsDirectory . "Dlg Question.ico")
-				case "Warning":
-					iconFile := (kIconsDirectory . "Dlg Warning.ico")
-				case "Info":
-					iconFile := (kIconsDirectory . "Dlg Info.ico")
+				if (buttons == 0)
+					options.Buttons := ["Ok"]
+				else if (buttons == 1)
+					options.Buttons := ["Ok", "Cancel"]
+				else if (buttons == 2)
+					options.Buttons := ["Abort", "Retry", "Ignore"]
+				else if (buttons == 3)
+					options.Buttons := ["Yes", "No", "Cancel"]
+				else if (buttons == 4)
+					options.Buttons := ["Yes", "No"]
+				else if (buttons == 5)
+					options.Buttons := ["Retry", "Cancel"]
+				else if (buttons == 6)
+					options.Buttons := ["Cancel", "Try Again", "Continue"]
 			}
+		}
 
-			messageGui := Window({Options: "0x400000"}, title)
+		if !options.HasProp("Default")
+			options.Default := 1
 
-			messageGui.Opt("+AlwaysOnTop")
+		if !options.HasProp("Mode")
+			options.Mode := "Info"
 
-			messageGui.SetFont("Norm", "Arial")
+		if !options.HasProp("Buttons")
+			options.Buttons := [translate("Ok")]
 
-			messageGui.Add("Picture", "x8 y8 w32 h32", iconFile)
-			messageGui.Add("Text", "x48 y8 w" . (w - 48 - 8), textOrCommand)
+		w := Max((options.Buttons.Length * 80) + ((options.Buttons.Length - 1) * 10), w)
 
-			messageGui.Add("Text", "x0 w" . w . " 0x10")
+		result := false
 
-			offset := 0
+		switch options.Mode, false {
+			case "Error":
+				iconFile := (kIconsDirectory . "Dlg Error.ico")
+			case "Question":
+				iconFile := (kIconsDirectory . "Dlg Question.ico")
+			case "Warning":
+				iconFile := (kIconsDirectory . "Dlg Warning.ico")
+			case "Info":
+				iconFile := (kIconsDirectory . "Dlg Info.ico")
+		}
 
-			loop options.Buttons.Length {
-				button := (options.Buttons.Length - A_Index + 1)
-				handler := ((button, *) => Theme.MessageDialog(kResult . button)).Bind(button)
+		messageGui := Window({Options: "0x400000"}, title)
 
-				messageGui.Add("Button", "x" . (w - 88 - offset)  . ((A_Index > 1) ? " YP" : "") . " w80 h23"
-									   . ((options.Default = A_Index) ? " Default" : "")
-									   , options.Buttons[button]).OnEvent("Click", handler)
+		messageGui.Opt("+AlwaysOnTop")
 
-				offset += 90
-			}
+		messageGui.SetFont("Norm", "Arial")
 
-			messageGui.MarginX := 0
+		messageGui.Add("Picture", "x8 y8 w32 h32", iconFile)
+		messageGui.Add("Text", "x48 y8 w" . (w - 48 - 8), textOrCommand)
 
-			messageGui.Show("AutoSize x" . x . " y" . y)
+		messageGui.Add("Text", "x0 w" . w . " 0x10")
 
-			while !result
-				Sleep(100)
+		offset := 0
 
-			try {
-				return options.Buttons[result]
-			}
-			finally {
-				messageGui.Destroy()
-			}
+		loop options.Buttons.Length {
+			button := (options.Buttons.Length - A_Index + 1)
+			handler := ((button, *) => (result := button)).Bind(button)
+
+			messageGui.Add("Button", "x" . (w - 88 - offset)  . ((A_Index > 1) ? " YP" : "") . " w80 h23"
+								   . ((options.Default = A_Index) ? " Default" : "")
+								   , options.Buttons[button]).OnEvent("Click", handler)
+
+			offset += 90
+		}
+
+		messageGui.MarginX := 0
+
+		messageGui.Show("AutoSize x" . x . " y" . y)
+
+		while !result
+			Sleep(100)
+
+		try {
+			return options.Buttons[result]
+		}
+		finally {
+			messageGui.Destroy()
 		}
 	}
 
 	static InputDialog(messageOrCommand := "", title := "", options := {}, value := "") {
+		local result := false
 		local x := "Center"
 		local y := "Center"
 		local w := 400
@@ -658,53 +652,45 @@ class Theme {
 		static kOk := "Ok"
 		static kCancel := "Cancel"
 
-		static result := false
+		if !isObject(options) {
+			newOptions := {Password: InStr(options, "Password")}
 
-		if (messageOrCommand == kOk)
-			result := kOk
-		else if (messageOrCommand == kCancel)
-			result := kCancel
-		else {
-			if !isObject(options) {
-				newOptions := {Password: InStr(options, "Password")}
+			newOptions.X := (RegExMatch(options, "x([0-9]+)", &result) ? result[1] : x)
+			newOptions.Y := (RegExMatch(options, "y([0-9]+)", &result) ? result[1] : y)
+			newOptions.Width := (RegExMatch(options, "w([0-9]+)", &result) ? result[1] : w)
+			newOptions.Height := (RegExMatch(options, "h([0-9]+)", &result) ? result[1] : h)
 
-				newOptions.X := (RegExMatch(options, "x([0-9]+)", &result) ? result[1] : x)
-				newOptions.Y := (RegExMatch(options, "y([0-9]+)", &result) ? result[1] : y)
-				newOptions.Width := (RegExMatch(options, "w([0-9]+)", &result) ? result[1] : w)
-				newOptions.Height := (RegExMatch(options, "h([0-9]+)", &result) ? result[1] : h)
+			options := newOptions
+		}
 
-				options := newOptions
-			}
+		x := (options.HasProp("X") ? options.X : x)
+		y := (options.HasProp("Y") ? options.Y : y)
+		w := Max(200, options.HasProp("Width") ? options.Width : w)
+		h := Max(100, options.HasProp("Height") ? options.Height : h)
 
-			x := (options.HasProp("X") ? options.X : x)
-			y := (options.HasProp("Y") ? options.Y : y)
-			w := Max(200, options.HasProp("Width") ? options.Width : w)
-			h := Max(100, options.HasProp("Height") ? options.Height : h)
+		result := false
 
-			result := false
+		inputGui := Window({Options: "0x400000"}, title)
 
-			inputGui := Window({Options: "0x400000"}, title)
+		inputGui.SetFont("Norm", "Arial")
 
-			inputGui.SetFont("Norm", "Arial")
+		inputGui.Add("Text", "x8 y8 w" . (w - 16) . " h" . (h - 70), messageOrCommand)
 
-			inputGui.Add("Text", "x8 y8 w" . (w - 16) . " h" . (h - 70), messageOrCommand)
+		inputEdit := inputGui.Add("Edit", "x8 yp+" . (h - 65) . " w" . (w - 16) . ((options.HasProp("Password") && options.Password) ? " Password" : ""), value)
 
-			inputEdit := inputGui.Add("Edit", "x8 yp+" . (h - 65) . " w" . (w - 16) . ((options.HasProp("Password") && options.Password) ? " Password" : ""), value)
+		inputGui.Add("Button", "x" . (w - 193) . " yp+30 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => (result := kOk))
+		inputGui.Add("Button", "x" . (w - 88) . " yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => (result := kCancel))
 
-			inputGui.Add("Button", "x" . (w - 193) . " yp+30 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => Theme.InputDialog(kOk))
-			inputGui.Add("Button", "x" . (w - 88) . " yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => Theme.InputDialog(kCancel))
+		inputGui.Show("AutoSize x" . x . " y" . y)
 
-			inputGui.Show("AutoSize x" . x . " y" . y)
+		while !result
+			Sleep(100)
 
-			while !result
-				Sleep(100)
-
-			try {
-				return {Result: result, Value: inputEdit.Text}
-			}
-			finally {
-				inputGui.Destroy()
-			}
+		try {
+			return {Result: result, Value: inputEdit.Text}
+		}
+		finally {
+			inputGui.Destroy()
 		}
 	}
 }

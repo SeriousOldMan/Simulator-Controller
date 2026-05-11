@@ -342,14 +342,10 @@ namespace PMRUDPCoach {
 					if (steerAngle > 0) {
 						if (angularVelocity > 0)
                         {
-							/*
 							if (calibrate)
 								slip *= -1;
 							else
 								slip = (oversteerHeavyThreshold - 1) / 57.2989;
-							*/
-
-							slip *= -1;
                         }
                         else if (angularVelocity < idealAngularVelocity)
 							slip *= -1;
@@ -357,14 +353,10 @@ namespace PMRUDPCoach {
 					else {
 						if (angularVelocity < 0)
                         {
-							/*
 							if (calibrate)
 								slip *= -1;
                             else
 								slip = (oversteerHeavyThreshold - 1) / 57.2989;
-							*/
-							
-							slip *= -1;
                         }
                         else if (angularVelocity > idealAngularVelocity)
 							slip *= -1;

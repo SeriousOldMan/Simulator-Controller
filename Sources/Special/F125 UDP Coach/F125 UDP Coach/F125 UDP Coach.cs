@@ -382,7 +382,10 @@ namespace F125UDPCoach {
                         // Right turn
                         if (angularVelocity > 0)
                         {
-                            slip *= -1;
+							if (calibrate)
+								slip *= -1;
+							else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
                         }
                         else if (angularVelocity < idealAngularVelocity)
                             slip *= -1;
@@ -391,7 +394,10 @@ namespace F125UDPCoach {
                         // Left turn
                         if (angularVelocity < 0)
                         {
-                            slip *= -1;
+                            if (calibrate)
+								slip *= -1;
+                            else
+								slip = (oversteerHeavyThreshold - 1) / 57.2989;
                         }
                         else if (angularVelocity > idealAngularVelocity)
                             slip *= -1;

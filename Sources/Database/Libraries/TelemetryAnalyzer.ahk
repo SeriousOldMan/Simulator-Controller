@@ -1829,13 +1829,13 @@ class TelemetryAnalyzer {
 
 							if (steerAngle > 0) {
 								if (yawRate > 0)
-									slip *= -1
+									slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
 								else if (yawRate < idealYawRate)
 									slip *= -1
 							}
 							else {
 								if (yawRate < 0)
-									slip *= -1
+									slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
 								else if (yawRate > idealYawRate)
 									slip *= -1
 							}

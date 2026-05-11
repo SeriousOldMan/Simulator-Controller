@@ -1855,44 +1855,44 @@ class TelemetryAnalyzer {
 
 				if (corner.UsOs < thresholds.HeavyOversteer)
 					setMultiMapValue(issues, "Oversteer.Slow.Heavy", phase
-										   , getMultiMapValue(issues, "Oversteer.Slow.Heavy", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Slow.Heavy", phase, 0) + 1)
 				else if (corner.UsOs < thresholds.MediumOversteer)
 					setMultiMapValue(issues, "Oversteer.Slow.Medium", phase
-										   , getMultiMapValue(issues, "Oversteer.Slow.Medium", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Slow.Medium", phase, 0) + 1)
 				else if (corner.UsOs < thresholds.LightOversteer)
 					setMultiMapValue(issues, "Oversteer.Slow.Light", phase
-										   , getMultiMapValue(issues, "Oversteer.Slow.Light", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Slow.Light", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.HeavyUndersteer)
 					setMultiMapValue(issues, "Understeer.Slow.Heavy", phase
-										   , getMultiMapValue(issues, "Understeer.Slow.Heavy", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Slow.Heavy", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.MediumUndersteer)
 					setMultiMapValue(issues, "Understeer.Slow.Medium", phase
-										   , getMultiMapValue(issues, "Understeer.Slow.Medium", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Slow.Medium", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.LightUndersteer)
 					setMultiMapValue(issues, "Understeer.Slow.Light", phase
-										   , getMultiMapValue(issues, "Understeer.Slow.Light", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Slow.Light", phase, 0) + 1)
 			}
 			else {
 				fastCount += 1
 
 				if (corner.UsOs < thresholds.HeavyOversteer)
 					setMultiMapValue(issues, "Oversteer.Fast.Heavy", phase
-										   , getMultiMapValue(issues, "Oversteer.Fast.Heavy", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Fast.Heavy", phase, 0) + 1)
 				else if (corner.UsOs < thresholds.MediumOversteer)
 					setMultiMapValue(issues, "Oversteer.Fast.Medium", phase
-										   , getMultiMapValue(issues, "Oversteer.Fast.Medium", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Fast.Medium", phase, 0) + 1)
 				else if (corner.UsOs < thresholds.LightOversteer)
 					setMultiMapValue(issues, "Oversteer.Fast.Light", phase
-										   , getMultiMapValue(issues, "Oversteer.Fast.Light", phase, 0))
+										   , getMultiMapValue(issues, "Oversteer.Fast.Light", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.HeavyUndersteer)
 					setMultiMapValue(issues, "Understeer.Fast.Heavy", phase
-										   , getMultiMapValue(issues, "Understeer.Fast.Heavy", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Fast.Heavy", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.MediumUndersteer)
 					setMultiMapValue(issues, "Understeer.Fast.Medium", phase
-										   , getMultiMapValue(issues, "Understeer.Fast.Medium", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Fast.Medium", phase, 0) + 1)
 				else if (corner.UsOs > thresholds.LightUndersteer)
 					setMultiMapValue(issues, "Understeer.Fast.Light", phase
-										   , getMultiMapValue(issues, "Understeer.Fast.Light", phase, 0))
+										   , getMultiMapValue(issues, "Understeer.Fast.Light", phase, 0) + 1)
 			}
 		}
 

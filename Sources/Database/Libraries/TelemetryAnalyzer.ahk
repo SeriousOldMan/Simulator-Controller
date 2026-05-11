@@ -1749,7 +1749,7 @@ class TelemetryAnalyzer {
 		return Telemetry(this, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
 	}
 
-	analyzeHandling(telemetries, steerLock, steerRatio, wheelBase, trackWidth) {
+	analyzeHandling(telemetries, steerLock, steerRatio, wheelBase, trackWidth, thresholds := false) {
 		local MAXVALUES := 6
 		local PI := 3.14159265
 		local wheelBaseMeter := (wheelbase / 100)
@@ -1758,10 +1758,14 @@ class TelemetryAnalyzer {
 		local idealYawRates := []
 		local gLongs := []
 		local cornerDynamics := []
+		local issues := newMultiMap()
 		local lastSpeed := kUndefined
-		local lap, yawRate, steerAngle, speed, acceleration, gLongAverage, gLongsCount, slip
+		local slowCount := 0
+		local fastCount := 0
+		local type, speed, severity, where, count, phase, key
+		local yawRate, steerAngle, speed, acceleration, gLongAverage, gLongsCount, slip
 		local steerAngleRadians, steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
-		local ignore, telemetry, completedLaps
+		local ignore, theTelemetry, corner
 
 		pushValue(values, value) {
 			values.Push(value)
@@ -1782,18 +1786,21 @@ class TelemetryAnalyzer {
             return value
         }
 
+		if !thresholds
+			thresholds := {LowSpeed: 120
+						 , HeavyOversteer: -100, MediumOversteer: -70, LightOversteer: -40
+						 , HeavyUndersteer: 100, MediumUndersteer: 70, LightUndersteer: 40}
+
 		if isInstance(telemetries, Telemetry)
 			telemetries := [telemetries]
 
-		for ignore, telemetry in telemetries {
-			lap := A_Index
-
-			loop telemetry.Data.Length {
-				yawRate := telemetry.getValue(A_Index, "YawRate")
+		for ignore, theTelemetry in telemetries
+			loop theTelemetry.Data.Length {
+				yawRate := theTelemetry.getValue(A_Index, "YawRate")
 
 				if (yawRate != kNull) {
-					steerAngle := telemetry.getValue(A_Index, "Steering")
-					speed := telemetry.getValue(A_Index, "Speed")
+					steerAngle := theTelemetry.getValue(A_Index, "Steering")
+					speed := theTelemetry.getValue(A_Index, "Speed")
 					acceleration := ((lastSpeed == kUndefined) ? 0 : (speed - lastSpeed))
 
 					lastSpeed := speed
@@ -1809,15 +1816,13 @@ class TelemetryAnalyzer {
 
 					if ((Abs(steerAngle) > 0.1) && (speed > 60)) {
 						gLongAverage := averageValue(gLongs, &gLongsCount)
-						phase := "Coast"
+						phase := "Apex"
 
 						if (gLongsCount > 0)
 							if (glongAverage < -0.2)
-								phase := "Braking"
+								phase := "Entry"
 							else if (glongAverage > 0.1)
-								phase := "Accelerating"
-
-							cd := {Speed: speed, UsOs: 0, Lap: lap, Phase: phase}
+								phase := "Exit"
 
 						if (Abs(yawRate * 57.2958) > 0.1) {
 							slip := Abs(idealYawRate - yawRate)
@@ -1836,15 +1841,76 @@ class TelemetryAnalyzer {
 							}
 
 							if (slip != 0)
-								cornerDynamics.Push({Speed: speed, UsOs: (slip * 57.2989 * 1)
-												   , Lap: lap, Phase: phase})
+								cornerDynamics.Push({Speed: speed, UsOs: (slip * 57.2989 * 1), Phase: phase})
 						}
 					}
 				}
 			}
+
+		for ignore, corner in cornerDynamics {
+			phase := corner.Phase
+
+			if (corner.Speed < thresholds.LowSpeed) {
+				slowCount += 1
+
+				if (corner.UsOs < thresholds.HeavyOversteer)
+					setMultiMapValue(issues, "Oversteer.Slow.Heavy", phase
+										   , getMultiMapValue(issues, "Oversteer.Slow.Heavy", phase, 0))
+				else if (corner.UsOs < thresholds.MediumOversteer)
+					setMultiMapValue(issues, "Oversteer.Slow.Medium", phase
+										   , getMultiMapValue(issues, "Oversteer.Slow.Medium", phase, 0))
+				else if (corner.UsOs < thresholds.LightOversteer)
+					setMultiMapValue(issues, "Oversteer.Slow.Light", phase
+										   , getMultiMapValue(issues, "Oversteer.Slow.Light", phase, 0))
+				else if (corner.UsOs > thresholds.HeavyUndersteer)
+					setMultiMapValue(issues, "Understeer.Slow.Heavy", phase
+										   , getMultiMapValue(issues, "Understeer.Slow.Heavy", phase, 0))
+				else if (corner.UsOs > thresholds.MediumUndersteer)
+					setMultiMapValue(issues, "Understeer.Slow.Medium", phase
+										   , getMultiMapValue(issues, "Understeer.Slow.Medium", phase, 0))
+				else if (corner.UsOs > thresholds.LightUndersteer)
+					setMultiMapValue(issues, "Understeer.Slow.Light", phase
+										   , getMultiMapValue(issues, "Understeer.Slow.Light", phase, 0))
+			}
+			else {
+				fastCount += 1
+
+				if (corner.UsOs < thresholds.HeavyOversteer)
+					setMultiMapValue(issues, "Oversteer.Fast.Heavy", phase
+										   , getMultiMapValue(issues, "Oversteer.Fast.Heavy", phase, 0))
+				else if (corner.UsOs < thresholds.MediumOversteer)
+					setMultiMapValue(issues, "Oversteer.Fast.Medium", phase
+										   , getMultiMapValue(issues, "Oversteer.Fast.Medium", phase, 0))
+				else if (corner.UsOs < thresholds.LightOversteer)
+					setMultiMapValue(issues, "Oversteer.Fast.Light", phase
+										   , getMultiMapValue(issues, "Oversteer.Fast.Light", phase, 0))
+				else if (corner.UsOs > thresholds.HeavyUndersteer)
+					setMultiMapValue(issues, "Understeer.Fast.Heavy", phase
+										   , getMultiMapValue(issues, "Understeer.Fast.Heavy", phase, 0))
+				else if (corner.UsOs > thresholds.MediumUndersteer)
+					setMultiMapValue(issues, "Understeer.Fast.Medium", phase
+										   , getMultiMapValue(issues, "Understeer.Fast.Medium", phase, 0))
+				else if (corner.UsOs > thresholds.LightUndersteer)
+					setMultiMapValue(issues, "Understeer.Fast.Light", phase
+										   , getMultiMapValue(issues, "Understeer.Fast.Light", phase, 0))
+			}
 		}
 
-		return cornerDynamics
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"] {
+				count := ((speed = "Slow") ? slowCount : fastCount)
+
+				if (count > 0)
+					for ignore, severity in ["Heavy", "Medium", "Light"] {
+						key := (type . "." . speed . "." . severity)
+
+						for ignore, where in ["Entry", "Apex", "Exit"]
+							setMultiMapValue(issues, key, where
+										   , Round(100 * getMultiMapValue(issues, key, where, 0) / count))
+					}
+			}
+
+		return issues
 	}
 }
 

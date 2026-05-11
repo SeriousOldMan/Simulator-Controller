@@ -204,17 +204,20 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | G_LON          | No            | The longitudinal accelaration in multiples of G (9.81 m/s*2).    |
   | POS_X (3)      | Yes           | The horizontal location of the car on the track map in internal coordinates of the current simulator. |
   | POS_Y (3)      | Yes           | The vertical location of the car on the track map in internal coordinates of the current simulator. |
+  | YAWRATE (4)    | No            | The car rotation in radians / sec. |
   
   Notes:
   
   (1) The sequence of the columns in the CSV file is not important.<br>
   (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.<br>
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
+  (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
 
 Good to know:
 
 1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
-2. When importing lap telemetry data directly in the "Laps" tab of "Session Database", everything said above applies as well.
+2. The yaw rate information is only used, when using telemetry data to create handling issues in the "Setup Workbench". Not all importer can extract this information from the available data. Currently, the *iRacing* IBT importer and also the CSV file importer support importing the yaw rate.
+3. When importing lap telemetry data directly in the "Telemetries" tab of "Session Database", everything said above applies as well.
 
 ###### Special notes for *Assetto Corsa Competizione*
 

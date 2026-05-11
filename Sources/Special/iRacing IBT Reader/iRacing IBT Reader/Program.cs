@@ -45,6 +45,8 @@ namespace iRacingIBTReader
             int latGIdx = 0;
 			
 			int lapTimeIdx = 0;
+			
+			int yawRateIdx = 0;
 
             for (int i = 0; i < ibtFile.getNumVars(); i++)
             {
@@ -76,6 +78,8 @@ namespace iRacingIBTReader
                     latGIdx = i;
                 else if (name == "LapLastLapTime")
 					lapTimeIdx = i;
+                else if (name == "YawRate")
+					yawRateIdx = i;
             }
 
             while (true)
@@ -121,6 +125,7 @@ namespace iRacingIBTReader
                         float longG = (float)ibtFile.getVarValue(longGIdx) / 9.807f;
                         float latG = (float)ibtFile.getVarValue(latGIdx) / 9.807f;
                         float playerRunningPct = (float)ibtFile.getVarValue(lapDistPctIdx);
+						float yawRate = (float)ibtFile.getVarValue(yawRateIdx);
 
                         csvFile.Write(playerRunning + ";");
                         csvFile.Write(throttle + ";");
@@ -133,7 +138,8 @@ namespace iRacingIBTReader
                         csvFile.Write("N/A" + ";");
                         csvFile.Write(longG + ";");
                         csvFile.Write(-latG + ";");
-                        csvFile.WriteLine(playerRunningPct);
+                        csvFile.Write(playerRunningPct + ";");
+                        csvFile.WriteLine(yawRate);
                     }
                 }
                 else

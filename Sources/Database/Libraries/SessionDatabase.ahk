@@ -1997,7 +1997,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
 								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
-								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME"]
+								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME", "YAWRATE"]
 
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
@@ -2099,7 +2099,7 @@ class SessionDatabase extends ConfigurationItem {
 		importFromIRacing(&info) {
 			local trackData := []
 			local trackFile := this.getTrackData(simulator, track)
-			local directory, name, importFileName, infoFileName, index
+			local directory, name, importFileName, infoFileName, index, yawRate
 
 			if trackFile {
 				loop Read, trackFile
@@ -2123,11 +2123,16 @@ class SessionDatabase extends ConfigurationItem {
 							line := string2Values(";", A_LoopReadLine)
 
 							index := Max(1, Min(1000, Round(line[12] * 1000)))
+							yawRate := line[13]
+
+							line.RemoveAt(13)
 
 							running := (index / 1000)
 
 							line[12] := trackData[index][1]
 							line.Push(trackData[index][2])
+							line.Push(kNull) 					; Time into current lap not available in IBT file
+							line.Push(yawRate)
 
 							FileAppend(values2String(";", line*) . "`n", importFileName)
 						}

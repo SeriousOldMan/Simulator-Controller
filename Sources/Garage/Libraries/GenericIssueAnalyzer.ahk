@@ -331,6 +331,10 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 			return this.iLastHandling
 		}
+
+		Set {
+			return (this.iLastHandling := value)
+		}
 	}
 
 	Temperatures {
@@ -932,6 +936,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static analyzerGui
 
+	static telemetryButton
 	static activateButton
 	static calibrateButton
 
@@ -1089,7 +1094,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzerGui.Unblock()
 		}
 	}
-	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
+	else if (((commandOrAnalyzer == "Activate") || (commandOrAnalyzer == "Telemetry")) && (state = "Prepare")) {
 		calibrateButton.Enabled := false
 
 		if analyzer.settingAvailable("SteerLock")
@@ -1115,7 +1120,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
-		if (GetKeyState("Ctrl") && analyzer.Track) {
+		if ((commandOrAnalyzer == "Telemetry") && analyzer.Car && analyzer.Track) {
 			simulator := analyzer.Simulator
 			track := analyzer.Track
 			car := (analyzer.Car ? analyzer.Car : "Unknown")
@@ -1150,11 +1155,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
 							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
 
-				issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
-																 , analyzer.WheelBase, analyzer.TrackWidth
-																 , thresholds)
+				withTask(ProgressTask(translate("Analyzing Data")), () {
+					issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
+																	 , analyzer.WheelBase, analyzer.TrackWidth
+																	 , thresholds)
 
-				issues := IssueCollector.createHandling(issues)
+					issues := IssueCollector.createHandling(issues)
+				})
 
 				for ignore, widget in prepareWidgets {
 					widget.Enabled := false
@@ -1168,7 +1175,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 				state := "Analyze"
 
-				runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling", false, issues))
+				analyzer.Handling := issues
+
+				runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"))
 			}
 		}
 		else {
@@ -1766,8 +1775,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		tabView.UseTab(0)
 
-		; calibrateButton := analyzerGui.Add("Button", "x16 ys+366 w80 h23 ", translate("Calibrate..."))
-		; calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
+		telemetryButton := analyzerGui.Add("Button", "x16 ys+406 w80 h23 ", translate("Telemetry..."))
+		telemetryButton.OnEvent("Click", runAnalyzer.Bind("Telemetry"))
+
+		telemetryButton.Enabled := (analyzer.Simulator && analyzer.Car && analyzer.Track)
+
+		prepareWidgets.Push(telemetryButton)
+
 		activateButton := analyzerGui.Add("Button", "x176 ys+406 w80 h23 Default", translate("Start"))
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
@@ -1780,18 +1794,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			else
 				analyzerGui.Show("AutoSize Center")
 
-			while !result {
+			while !result
 				Sleep(100)
-
-				if (GetKeyState("Ctrl") && (state = "Prepare"))
-					activateButton.Text := translate("&Load...")
-				else if (state = "Prepare")
-					activateButton.Text := translate("Start")
-				else if (state = "Run")
-					activateButton.Text := translate("Stop")
-				else if (state = "Analyze")
-					activateButton.Text := translate("Apply")
-			}
 		}
 		finally {
 			if updateTask

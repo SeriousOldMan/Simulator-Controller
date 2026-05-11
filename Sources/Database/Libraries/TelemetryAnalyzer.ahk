@@ -1576,14 +1576,14 @@ class TelemetryAnalyzer {
 		return false
 	}
 
-	static getValue(data, name, default := kUndefined) {
+	static getValue(data, name, default?) {
 		local channel := TelemetryAnalyzer.Schema[name]
 		local index, value
 
 		if channel.HasProp("Function") {
 			value := channel.Function.Call(data)
 
-			if ((value = kNull) && (default != kUndefined))
+			if ((value = kNull) && isSet(default))
 				return default
 			else
 				return value
@@ -1600,7 +1600,7 @@ class TelemetryAnalyzer {
 				return value
 			}
 
-			return ((default != kUndefined) ? default : kNull)
+			return (isSet(default) ? default : kNull)
 		}
 	}
 

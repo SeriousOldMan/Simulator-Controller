@@ -1,8 +1,8 @@
 [Development]
 Version=6.9.6.0-dev
 Target=6.9.6.0-release
-Date=05/10/2026
-Download=
+Date=05/11/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vsx6uFMd/Releases/Simulator%20Controller%206.9.6.0-dev.zip
 Changes=Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons, Telemetry-based Issue Analyzer
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]

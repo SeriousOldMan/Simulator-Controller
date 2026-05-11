@@ -86,7 +86,6 @@ Many applications of Simulator Controller provide a couple of modifier keys for 
 | Function | Modifier | Description |
 |----------|----------|-------------|
 | Loading problems and issues | Control | Holding down the Control key while loading problem descriptions from a file, will **not** clear the current issue list but will add to it instead. |
-| Running the Issue Analyzer | Control | Holding down the Control key when clicking on "Start" in the Issue Analyzer will give you the opportunity to load any available lap telemetry instead of starting the Issue Analyzer. If the telemetry file has been created with Release 6.9.6 or later, issues will be generated based on the telemetry data. |
 | Starting and Exiting | Control | Holding down the Control when exiting will save the current issue list to a temporary file and holding down the Control key when starting "Setup Workbench" will load those saved issues, so that you can continue your work. |
 | Deleting lap telemetry | Control | When holding down the Control key while deleting the selected lap telemetry, **all** telemetry laps will be removed from the Telemetry Viewer. |
 | Shifting telemetry graph | Control / Control + Shift | When shifting the reference telemetry graph to the left or to the right, it will be shifted by 10 meters, if the Control key is held down, or if the Shift key is held down additionally, by 50 meters. |

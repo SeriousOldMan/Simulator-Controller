@@ -87,6 +87,10 @@ Please be aware that not every handling issue is related to problems with the ca
 
 Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the handling part of the analyzer.
 
+#### Analyzing handling issues based on saved lep telemetry files
+
+Instead of analyzing telemetry data live while on the track, you can also analyze data from a recent session as long as the telemetry files are still available, because they either have been saved to the session database or they are still available in the *Simulator Controller\Temp\Sessions* folder in your user *Documents* folder. To analyze telemetry data, click on "Telemetry..." on the first page instead of clicking on "Start". Then locate and load the telemetry file(s) you want to use using the file browser and inspect the detected issues, which had been generated based on the telemetry data.
+
 #### Installation of Telemetry Providers
 
 The analyzer acquires telemetry data from the different simulation games using so called telemetry providers, which in most cases read the required data from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa*, *rFactor 2* and *Le Mans Ultimate*, you need to install and activate a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.

@@ -270,9 +270,9 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 		browserGui.Show("AutoSize Center")
 
-		browseLapTelemetries("ChooseSimulator", %arguments[1]%, true)
-		browseLapTelemetries("ChooseCar", %arguments[2]%, true)
-		browseLapTelemetries("ChooseTrack", %arguments[3]%, true)
+		browseLapTelemetries("ChooseSimulator", SessionDatabase.getSimulatorCode(%arguments[1]%), true)
+		browseLapTelemetries("ChooseCar", SessionDatabase.getCarCode(%arguments[1]%, %arguments[2]%), true)
+		browseLapTelemetries("ChooseTrack", SessionDatabase.getTrackCode(%arguments[1]%, %arguments[3]%), true)
 
 		if getWindowPosition("Lap Telemetry Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -542,9 +542,9 @@ browseSoloSessions(ownerOrCommand := false, arguments*) {
 
 		browserGui.Show("AutoSize Center")
 
-		browseSoloSessions("ChooseSimulator", %arguments[1]%, true)
-		browseSoloSessions("ChooseCar", %arguments[2]%, true)
-		browseSoloSessions("ChooseTrack", %arguments[3]%, true)
+		browseSoloSessions("ChooseSimulator", SessionDatabase.getSimulatorCode(%arguments[1]%), true)
+		browseSoloSessions("ChooseCar", SessionDatabase.getCarCode(%arguments[1]%, %arguments[2]%), true)
+		browseSoloSessions("ChooseTrack", SessionDatabase.getTrackCode(%arguments[1]%, %arguments[3]%), true)
 
 		if getWindowPosition("Practice Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -773,9 +773,9 @@ browseTeamSessions(ownerOrCommand := false, arguments*) {
 
 		browserGui.Show("AutoSize Center")
 
-		browseTeamSessions("ChooseSimulator", %arguments[1]%, true)
-		browseTeamSessions("ChooseCar", %arguments[2]%, true)
-		browseTeamSessions("ChooseTrack", %arguments[3]%, true)
+		browseTeamSessions("ChooseSimulator", SessionDatabase.getSimulatorCode(%arguments[1]%), true)
+		browseTeamSessions("ChooseCar", SessionDatabase.getCarCode(%arguments[1]%, %arguments[2]%), true)
+		browseTeamSessions("ChooseTrack", SessionDatabase.getTrackCode(%arguments[1]%, %arguments[3]%), true)
 
 		if getWindowPosition("Race Session Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)
@@ -1041,9 +1041,9 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 
 		browserGui.Show("AutoSize Center")
 
-		browseStrategies("ChooseSimulator", %arguments[1]%, true)
-		browseStrategies("ChooseCar", %arguments[2]%, true)
-		browseStrategies("ChooseTrack", %arguments[3]%, true)
+		browseStrategies("ChooseSimulator", SessionDatabase.getSimulatorCode(%arguments[1]%), true)
+		browseStrategies("ChooseCar", SessionDatabase.getCarCode(%arguments[1]%, %arguments[2]%), true)
+		browseStrategies("ChooseTrack", SessionDatabase.getTrackCode(%arguments[1]%, %arguments[3]%), true)
 
 		if getWindowPosition("Strategy Browser", &x, &y)
 			browserGui.Show("x" . x . " y" . y)

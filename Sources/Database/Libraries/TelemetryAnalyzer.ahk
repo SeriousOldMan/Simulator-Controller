@@ -1756,14 +1756,14 @@ class TelemetryAnalyzer {
 		local accelerations := []
 		local yawRates := []
 		local idealYawRates := []
-		local gLongs := []
 		local cornerDynamics := []
 		local issues := newMultiMap()
 		local lastSpeed := kUndefined
 		local slowCount := 0
 		local fastCount := 0
+		local injectOversteer := !inList(["RF2", "LMU"], SessionDatabase.getSimulatorCode(this.Simulator))
 		local type, speed, severity, where, count, phase, key
-		local yawRate, steerAngle, speed, acceleration, gLongAverage, gLongsCount, slip
+		local yawRate, steerAngle, speed, acceleration, accAverage, accCount, slip
 		local steerAngleRadians, steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
 		local ignore, theTelemetry, corner
 
@@ -1815,27 +1815,35 @@ class TelemetryAnalyzer {
 					idealYawRate := smoothValue(idealYawRates, perimeterSpeed / perimeter * 2 * PI)
 
 					if ((Abs(steerAngle) > 0.1) && (speed > 60)) {
-						gLongAverage := averageValue(gLongs, &gLongsCount)
+						accAverage := averageValue(accelerations, &accCount)
 						phase := "Apex"
 
-						if (gLongsCount > 0)
-							if (glongAverage < -0.2)
+						if (accCount > 0)
+							if (accAverage < -0.2)
 								phase := "Entry"
-							else if (glongAverage > 0.1)
+							else if (accAverage > 0.1)
 								phase := "Exit"
 
 						if (Abs(yawRate * 57.2958) > 0.1) {
 							slip := Abs(idealYawRate - yawRate)
 
 							if (steerAngle > 0) {
-								if (yawRate > 0)
-									slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
+								if (yawRate > 0) {
+									if injectOversteer
+										slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
+									else
+										slip *= -1
+								}
 								else if (yawRate < idealYawRate)
 									slip *= -1
 							}
 							else {
-								if (yawRate < 0)
-									slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
+								if (yawRate < 0) {
+									if injectOversteer
+										slip := ((thresholds.HeavyOversteer - 1) / 57.2989)
+									else
+										slip *= -1
+								}
 								else if (yawRate > idealYawRate)
 									slip *= -1
 							}

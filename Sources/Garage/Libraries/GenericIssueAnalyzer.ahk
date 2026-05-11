@@ -1137,7 +1137,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 
 			if (fileName && (fileName != "")) {
-				theAnalyzer := TelemetryAnalyzer(simulator, track)
+				theAnalyzer := TelemetryAnalyzer(analyzer.Simulator, analyzer.Track)
 				telemetries := []
 
 				if isObject(fileName) {

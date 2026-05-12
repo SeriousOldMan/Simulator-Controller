@@ -53,7 +53,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed a bug in the new themed dialog boxes, which caused a crash when a message box overlays another message box.
   
 #### Changes
 

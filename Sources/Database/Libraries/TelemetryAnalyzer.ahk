@@ -1814,7 +1814,7 @@ class TelemetryAnalyzer {
 					perimeterSpeed := (lastSpeed / 3.6)
 					idealYawRate := smoothValue(idealYawRates, perimeterSpeed / perimeter * 2 * PI)
 
-					if ((Abs(steerAngle) > 0.1) && (speed > 60)) {
+					if ((Abs(steerAngle) > 0.2) && (speed > 60)) {
 						gLongAverage := averageValue(gLongs, &gLongsCount)
 						phase := "Apex"
 

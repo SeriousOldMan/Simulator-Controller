@@ -1121,23 +1121,22 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
 		if ((commandOrAnalyzer == "Telemetry") && analyzer.Car && analyzer.Track) {
-			simulator := analyzer.Simulator
-			track := analyzer.Track
-			car := (analyzer.Car ? analyzer.Car : "Unknown")
-
 			analyzerGui.Opt("+OwnDialogs")
 
 			analyzerGui.Block()
 
 			try {
-				fileName := browseLapTelemetries(analyzerGui, &simulator, &car, &track, &info)
+				fileName := browseLapTelemetries(analyzerGui, &simulator := analyzer.Simulator
+															, &car := analyzer.Car
+															, &track := analyzer.Track
+															, &info)
 			}
 			finally {
 				analyzerGui.Unblock()
 			}
 
 			if (fileName && (fileName != "")) {
-				theAnalyzer := TelemetryAnalyzer(simulator, track)
+				theAnalyzer := TelemetryAnalyzer(analyzer.Simulator, analyzer.Track)
 				telemetries := []
 
 				if isObject(fileName) {

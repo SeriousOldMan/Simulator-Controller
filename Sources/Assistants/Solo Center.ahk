@@ -1219,10 +1219,10 @@ class SoloCenter extends ConfigurationItem {
 			sessionsDirectory := (kTempDirectory . "Sessions")
 
 		this.iSessionDirectory := (normalizeDirectoryPath(getMultiMapValue(configuration, "Solo Center", "Session.Folder"
-																						, sessionsDirectory . "\Practice")) . "\")
+																						, sessionsDirectory . "\Solo")) . "\")
 
 		if (!this.iSessionDirectory || (this.iSessionDirectory = "") || !FileExist(this.iSessionDirectory))
-			this.iSessionDirectory := (kTempDirectory . "Sessions\Practice\")
+			this.iSessionDirectory := (kTempDirectory . "Sessions\Solo\")
 
 		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
 		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
@@ -4463,11 +4463,17 @@ class SoloCenter extends ConfigurationItem {
 			this.iSessionExported := true
 
 			if (this.SessionMode = "Loaded") {
-				info := readMultiMap(this.SessionLoaded . "Practice.info")
+				if FileExist(this.SessionLoaded . "Practice.info")
+					info := readMultiMap(this.SessionLoaded . "Practice.info")
+				else
+					info := readMultiMap(this.SessionLoaded . "Solo.info")
 
 				setMultiMapValue(info, "Session", "Exported", true)
 
-				writeMultiMap(this.SessionLoaded . "Practice.info", info)
+				if FileExist(this.SessionLoaded . "Practice.info")
+					writeMultiMap(this.SessionLoaded . "Practice.info", info)
+				else
+					writeMultiMap(this.SessionLoaded . "Solo.info", info)
 			}
 
 			loop this.RunsListView.GetCount()
@@ -4932,11 +4938,17 @@ class SoloCenter extends ConfigurationItem {
 
 					SplitPath(fileName, , &folder, , &fileName)
 
-					info := readMultiMap(directory . "Practice.info")
+					if FileExist(directory . "Practice.info")
+						info := readMultiMap(directory . "Practice.info")
+					else
+						info := readMultiMap(directory . "Solo.info")
 
 					setMultiMapValue(info, "Session", "Exported", true)
 
-					writeMultiMap(directory . "Practice.info", info)
+					if FileExist(directory . "Practice.info")
+						writeMultiMap(directory . "Practice.info", info)
+					else
+						writeMultiMap(directory . "Solo.info", info)
 
 					if (getMultiMapValue(info, "Creator", "ID", kUndefined) = kUndefined) {
 						setMultiMapValue(info, "Creator", "ID", SessionDatabase.ID)
@@ -4945,9 +4957,8 @@ class SoloCenter extends ConfigurationItem {
 
 					setMultiMapValue(info, "Session", "Exported", true)
 
-
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getSessionDirectory(simulator, car, track, "Solo"))) {
-						dataFile := temporaryFileName("Practice", "zip")
+						dataFile := temporaryFileName("Solo", "zip")
 
 						try {
 							compress(directory, "*.*", dataFile)
@@ -4979,7 +4990,7 @@ class SoloCenter extends ConfigurationItem {
 					DirCreate(folder)
 					deleteFile(folder . "\" . fileName . ".data")
 
-					dataFile := temporaryFileName("Practice", "zip")
+					dataFile := temporaryFileName("Solo", "zip")
 
 					compress(directory, "*.*", dataFile)
 
@@ -5020,7 +5031,7 @@ class SoloCenter extends ConfigurationItem {
 				setMultiMapValue(info, "Weather", "AirTemperature", this.AirTemperature)
 				setMultiMapValue(info, "Weather", "TrackTemperature", this.TrackTemperature)
 
-				writeMultiMap(this.SessionDirectory . "Practice.info", info)
+				writeMultiMap(this.SessionDirectory . "Solo.info", info)
 			}
 			else
 				this.SessionStore.flush()
@@ -5434,7 +5445,7 @@ class SoloCenter extends ConfigurationItem {
 						else if (fileName && (fileName != "")) {
 							SplitPath(fileName, , &directory, , &fileName)
 
-							folder := (kTempDirectory . "Sessions\Practice_" . Round(Random(1, 100000)))
+							folder := (kTempDirectory . "Sessions\Solo_" . Round(Random(1, 100000)))
 
 							DirCreate(folder)
 
@@ -5453,8 +5464,8 @@ class SoloCenter extends ConfigurationItem {
 
 										expand(dataFile, folder)
 
-										if !FileExist(folder . "\Practice.info")
-											FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+										if !FileExist(folder . "\Solo.info")
+											FileCopy(directory . "\" . fileName . ".solo", folder . "\Solo.info")
 									}
 									else
 										folder := ""
@@ -5469,14 +5480,14 @@ class SoloCenter extends ConfigurationItem {
 								}
 							}
 							else {
-								dataFile := temporaryFileName("Practice", "zip")
+								dataFile := temporaryFileName("Solo", "zip")
 
 								FileCopy(directory . "\" . fileName . ".data", dataFile, 1)
 
 								expand(dataFile, folder)
 
-								if !FileExist(folder . "\Practice.info")
-									FileCopy(directory . "\" . fileName . ".solo", folder . "\Practice.info")
+								if !FileExist(folder . "\Solo.info")
+									FileCopy(directory . "\" . fileName . ".solo", folder . "\Solo.info")
 
 								deleteFile(dataFile)
 							}
@@ -5492,7 +5503,10 @@ class SoloCenter extends ConfigurationItem {
 					withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
 						folder := (folder . "\")
 
-						info := readMultiMap(folder . "Practice.info")
+						if FileExist(folder . "Practice.info")
+							info := readMultiMap(folder . "Practice.info")
+						else
+							info := readMultiMap(folder . "Solo.info")
 
 						if (info.Count == 0)
 							withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)

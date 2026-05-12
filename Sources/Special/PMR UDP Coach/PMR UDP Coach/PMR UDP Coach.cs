@@ -314,7 +314,7 @@ namespace PMRUDPCoach {
             double perimeterSpeed = lastSpeed / 3.6;
             double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
             
-			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+			if (Math.Abs(steerAngle) > 0.2 && lastSpeed > 60)
 			{
                 // Get the average recent GLong
                 int numGLong = 0;

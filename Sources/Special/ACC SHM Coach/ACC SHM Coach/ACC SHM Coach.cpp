@@ -326,7 +326,7 @@ bool collectTelemetry(string soundsDirectory, string audioDevice, bool calibrate
 	double perimeterSpeed = lastSpeed / 3.6;
 	float idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
-	if (fabs(steerAngle) > 0.1 && pf->speedKmh > 60) {
+	if (fabs(steerAngle) > 0.2 && pf->speedKmh > 60) {
 		// Get the average recent GLong
 		int numGLong = 0;
 		float glongAverage = averageValue(recentGLongs, numGLong);

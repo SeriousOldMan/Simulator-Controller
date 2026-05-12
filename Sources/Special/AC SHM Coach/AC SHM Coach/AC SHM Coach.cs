@@ -418,7 +418,7 @@ namespace ACSHMCoach {
             float perimeterSpeed = lastSpeed / 3.6f;
             double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * (float)PI);
 
-            if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+            if (Math.Abs(steerAngle) > 0.2 && lastSpeed > 60)
 			{
                 // Get the average recent GLong
                 int numGLong = 0;

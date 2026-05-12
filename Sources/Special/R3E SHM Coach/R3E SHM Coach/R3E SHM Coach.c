@@ -402,7 +402,7 @@ BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
 	r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
 												   (float)(perimeterSpeed / perimeter * 2 * PI));
 
-	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+	if (fabs(steerAngle) > 0.2 && lastSpeed > 60) {
 		// Get the average recent GLong
 		float glongAverage = averageValue(recentGLongs, recentGLongsCount);
 

@@ -344,7 +344,7 @@ namespace F125UDPCoach {
             // FrontWheelsAngle: positive = left turn, negative = right turn
             // AngularVelocityY: positive = CCW (left), negative = CW (right)
             // Minimum steering threshold: ~0.01 rad ≈ 0.6 degrees
-            if (Math.Abs(frontWheelAngle) > 0.01 && lastSpeed > 60)
+            if (Math.Abs(frontWheelAngle) > 0.1 && lastSpeed > 60)
             {
                 // Get the average recent GLong
                 int numGLong = 0;

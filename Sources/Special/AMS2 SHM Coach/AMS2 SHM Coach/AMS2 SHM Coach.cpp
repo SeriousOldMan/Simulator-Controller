@@ -264,7 +264,7 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 	double perimeterSpeed = lastSpeed / 3.6;
 	double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
-	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+	if (fabs(steerAngle) > 0.2 && lastSpeed > 60) {
 		// Get the average recent GLong
 		int numGLong = 0;
 		float glongAverage = averageValue(recentGLongs, numGLong);

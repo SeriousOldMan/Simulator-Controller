@@ -486,7 +486,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 	float perimeter = radius * PI * 2;
 	float perimeterSpeed = lastSpeed / 3.6;
 
-	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+	if (fabs(steerAngle) > 0.2 && lastSpeed > 60) {
 		// Get the average recent GLong
 		int numGLong = 0;
 		float glongAverage = averageValue(recentGLongs, numGLong);

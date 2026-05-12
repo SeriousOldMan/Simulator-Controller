@@ -122,10 +122,17 @@ normalizeDirectoryPath(path) {
 }
 
 temporaryFileName(name, extension := "") {
+	local fileName
+
 	if extension != ""
 		extension := ("." . extension)
 
-	return (kTempDirectory . name . "_" . Round(Random(1, 100000)) . extension)
+	loop {
+		fileName := (kTempDirectory . name . "_" . Round(Random(1, 100000)) . extension)
+
+		if !FileExist(fileName)
+			return fileName
+	}
 }
 
 deleteFile(fileName, backup := false) {

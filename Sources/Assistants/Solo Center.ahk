@@ -5445,7 +5445,13 @@ class SoloCenter extends ConfigurationItem {
 						else if (fileName && (fileName != "")) {
 							SplitPath(fileName, , &directory, , &fileName)
 
-							folder := (kTempDirectory . "Sessions\Solo_" . Round(Random(1, 100000)))
+							if FileExist(kTempDirectory . "Sessions\" . fileName)
+								deleteDirectory(kTempDirectory . "Sessions\" . fileName)
+
+							if FileExist(kTempDirectory . "Sessions\" . fileName)
+								folder := (kTempDirectory . "Sessions\Solo_" . Round(Random(1, 100000)))
+							else
+								folder := (kTempDirectory . "Sessions\" . fileName)
 
 							DirCreate(folder)
 

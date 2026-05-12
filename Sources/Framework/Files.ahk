@@ -124,7 +124,7 @@ normalizeDirectoryPath(path) {
 temporaryFileName(name, extension := "") {
 	local fileName
 
-	if extension != ""
+	if (extension != "")
 		extension := ("." . extension)
 
 	loop {

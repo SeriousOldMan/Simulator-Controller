@@ -14,7 +14,7 @@
     - No more short stutter at the start of a session, because the data which was acquired using several HTTP requests against the REST/JSON API of *Le Mans Ultimate* is now available in the shared memory.
 	- More important, information about TC and ABS activations is now available in the telemetry data, thereby enabling the Driving Coach to give you more precise hints for cornering and ca handling.
 	- Please note, that the information about brake wear has been removed for the time being, because this information is for the brake disc and not for the brake pads anyway.
-	- A few data points are still acquired using the REST/JSON API, for example information about any suspension damage. It is possible to disable this API using a core setting [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), if it becomes necessary due to performance issues.
+	- A few data items are still acquired using the REST/JSON API, for example information about any suspension damage. It is possible to disable this API using a core setting [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), if it becomes necessary due to performance issues.
     - For safety reasons, the old style API can be reactivated using new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings).
   - Many performance optimizations in the handling of the data API of *Le Mans Ultimate*.
   - The API for *Assetto Corsa EVO* has been updated to the latest game version.

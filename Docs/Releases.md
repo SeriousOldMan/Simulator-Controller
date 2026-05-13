@@ -297,7 +297,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Technical informations like steer lock and steer ratio have been added by @inthebagbud UK for all *Automobilista 2* cars. This information is used by the "Setup Workbench".
   - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-684).
   - [Experts] A new fact "Session.Settings.Assistant.Language" in the rule engine knowledge base specifies the configured language of the current Race Assistant, so that your own scripts can use this knowledge when using "Assistant.Speak", for example.
-  - [Experts] When running a *Lua* script for an Assistant, for example in a *Reasoning* booster, you can now use the special function *Rules.Produce()* to run a full cycle of the Rule Engine.
+  - [Experts] When running a *Lua* script for an Assistant, for example in a *Reasoning* booster, you can now use the special function *Rules.Produce()* to run a full cycle of the rule engine.
   - [Experts] The *Lua* script function "Assistant.Call" now returns the result of the method call to the caller.
   - [Experts] New *Lua* script function "Assistant.Property" allows you to access any property of the current Race Assistant instance.
 

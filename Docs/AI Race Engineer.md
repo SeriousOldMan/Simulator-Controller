@@ -651,7 +651,7 @@ This section will give you some background information about the inner workings 
 
 The most important part of Jona, beside the natural language interface, which has been described above, is the [Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) and the knowledge base, the rules work with. The major part of the knowledge base consists of a history of past events, which is used by the rules to give Jona a kind of memory and allows the bot to interact in a context-sensitive manner. The history is also used by the rules to infere future trends, for example, a projection of target tyre pressures for long stints in an evening session, when the air and track temperatures are falling. Past and future weather trend information will be integrated as well, when they are available. Jona is able to recommend whether a repair of a damage be worth of for the next pitstop by calculating the historic impact of the damage on your lap time, and so on. Not all of this has been implemented completely in the alpha version of Jona, but the genetics are all there.
 
-Below you will find a short intrduction to the rule engine and the knowledge base for a general understanding. For a complete documentation targeted at developers, see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
+Below you will find a short introduction to the rule engine and the knowledge base for a general understanding. For a complete documentation targeted at developers, see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
 ### The Rule Engine
 
@@ -667,16 +667,26 @@ This rule, for example, is triggered, when a new pitstop plan had been requested
 
 A backward chaining rule (aka Reduction) is typically used for calculations and looks like this:
 
-	updateRemainingLaps(?lap) <=
-		remainingStintLaps(?lap, ?stintLaps), remainingRaceLaps(?lap, ?raceLaps),
-		?stintLaps < ?raceLaps, Set(Lap.Remaining, ?stintLaps)
+	priority: 20, [?Lap] => (ProveAll: updateRemainingLaps(?Lap))
 
-	lowFuelWarning(?lap, ?remainingLaps) <= pitstopLap(?lap), !, fail
-	lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
+	updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Fuel, ?fuelLaps), Set(Lap.Remaining.Fuel, ?fuelLaps)
+	updateRemainingLaps(?lap) <= remainingStintLaps(?lap, Driver, ?driverLaps), Set(Lap.Remaining.Stint, ?driverLaps)
+	updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Fuel, Set(Lap.Remaining.Stint, !Lap.Remaining.Fuel)
+	updateRemainingLaps(?lap) <= !Lap.Remaining.Stint > !Lap.Remaining.Session, Set(Lap.Remaining.Stint, !Lap.Remaining.Session)
+
+	priority: -50, {All: [?Lap.Remaining.Fuel < ?Lap.Remaining.Session],
+						 [?Lap.Remaining.Fuel <= ?Session.Settings.Lap.PitstopWarning],
+						 [?Lap.Remaining.Session > 0]} =>
+			(Prove: lowFuelWarning(!Lap))
+
+	lowFuelWarning(?lap) <= recentPitstopLap(?lap), !, fail
+	lowFuelWarning(?lap) <= floor(!Lap.Remaining.Fuel, ?remainingLaps), lowFuelWarning(!Lap, ?remainingLaps)
+
+	lowFuelWarning(?lap, ?remainingLaps) <= lapRemainingFuel(?lap, ?remainingFuel), Call(lowFuelWarning, ?remainingFuel, ?remainingLaps)
 	
-In this example, the rule *updateRemainingLaps* calculates the number of laps, which remains with the current amount of fuel. Or, as an alternative route, it might consider the remaining stint time of the current driver. The result is then updated in the memory as the *Lap.Remaining* fact, which might trigger other rules. One of these rules might then invoke *lowFuelWarning*, the second part of the example above. This rule calls the external function *lowFuelWarning*, which in the end let Jona call you and tell you, that you are running out of fuel. As you can see by the first instance of the rule *lowFuelWarning*, this call is only issued, when the current lap (*?lap*) is not a lap, where the driver has pitted.
+In this quite complex example, the rule *updateRemainingLaps* calculates the number of laps, which remains with the current amount of fuel. Or, as an alternative route, it might consider the remaining stint time of the current driver or the remaining time of the session. The result is then updated in the memory as the different *Lap.Remaining....* facts, which might trigger other rules. One of these rules might then invoke *lowFuelWarning*, the second part of the example above. This rule calls the external function *lowFuelWarning*, if necessary, which in the end let Jona call you and tell you, that you are running out of fuel. As you can see by the first instance of the rule *lowFuelWarning*, this call is only issued, when the current lap (*?lap*) is not a lap, where the driver has pitted.
 
-You can find the rules of Jona in the file *Race Engineer.rules* which resides in the *Resources\Rules* folder in the installation folder of Simulator Controller. As always, you are able to overwrite this file by placing a (modified) copy in the *Simulator Controller\Rules* folder in your user *Documents* folder. This might be or might not be a good idea, depending on your programming skills in logical languages.
+You can find the rules of Jona in the file *Race Engineer.rules* which resides in the *Resources\Rules* folder in the installation folder of Simulator Controller. As always, you are able to overwrite this file by placing a (modified) copy in the *Simulator Controller\Rules* folder in your user *Documents* folder. This might be or might not be a good idea, depending on your programming skills in logical languages. As said, there is a complete developer reference available for the integrated rule engine in a [separate chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine).
 
 ### Interaction States
 

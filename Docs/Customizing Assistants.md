@@ -588,7 +588,7 @@ Additionally you can export and import actions here to build a library for you a
 	 
    - Assistant.Ask(question :: \<string\> [, command :: \<boolean\>])
    
-     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. If the optional argument command is supplied and not false, full command processing is carried out, otherwise the question is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening.
+     Asks the given Race Assistant a question or give a command. The result will be the same, as if the question or the command has been given by voice input. If the optional argument command is supplied and not *false*, full command processing is carried out, otherwise the question is passed directly to the *Conversation* booster. This function will have no effect, if the Assistant is not configured for listening.
 	 
    - Assistant.Command(grammar :: \<string\> [, command :: \<string\>])
    

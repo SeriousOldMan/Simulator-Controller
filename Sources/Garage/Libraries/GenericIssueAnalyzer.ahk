@@ -1764,7 +1764,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		resultListView := widget1
 
 		widget2 := analyzerGui.Add("Text", "x16 yp+262 w130 h23 +0x200 Hidden", translate("Threshold"))
-		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp w60 0x10 Range0-25 ToolTip Hidden", 0)
+		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp w60 Thick15 0x10 Range0-25 ToolTip Hidden", 0)
 		applyThresholdSlider.OnEvent("Change", runAnalyzer.Bind("Threshold"))
 		widget3 := applyThresholdSlider
 		widget4 := analyzerGui.Add("Text", "x220 yp+3 Hidden", translate("%"))

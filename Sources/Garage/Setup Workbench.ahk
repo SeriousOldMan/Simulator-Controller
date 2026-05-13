@@ -2673,7 +2673,7 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Button", "x380 yp+29 w80 Y:Move X:Move(0.5)", translate("Compare...")).OnEvent("Click", compareSetup)
 
 		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
-		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
+		editorGui.Add("Slider", "x100 ys+422 w60 Thick15 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
 		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
 
 		editorGui.Add("Button", "x380 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
@@ -3386,7 +3386,7 @@ class SetupComparator extends ConfigurationItem {
 		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled Y:Move vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
 		comparatorGui.Add("Button", "x720 yp w80 Disabled X:Move Y:Move vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
 
-		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 Y:Move X:Move(0.5) ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
+		comparatorGui.Add("Slider", "x316 yp w200 0x10 Thick15 Range-100-100 Y:Move X:Move(0.5) ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
 		comparatorGui.Add("Text", "x201 yp+3 w100 Y:Move X:Move(0.5) Right", translate("Setup A"))
 		comparatorGui.Add("Text", "x529 yp w100 X:Move(0.5) Y:Move", translate("Setup B"))
 
@@ -3958,7 +3958,7 @@ startupSetupWorkbench() {
 		logError(exception, true)
 
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Setup Workbench"}), translate("Error"), 262160)
-		
+
 		ExitApp(1)
 	}
 }

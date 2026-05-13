@@ -166,6 +166,8 @@ While you are in an active session, lap telemetry data will be collected lap by 
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 
+Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Team\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+
 #### Choosing the telemetry provider
 
 The telemetry system supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You have to choose, which telemetry provider to use when enabling the "Telemetry" option in the "Session" menu. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.

@@ -113,6 +113,8 @@ While you are in an active session and the Telemetry Viewer is open, car telemet
 
 Note: You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
 
+Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Solo\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+
 #### Choosing the telemetry provider
 
 The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.

@@ -322,6 +322,8 @@ Here is a recording of a training session, since no words can really adequately 
 
 [![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
 
+Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Driving Coach\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4.1, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4.1 mini, the most cost-efficient model of OpenAI, or the Gemini 2 Flash models from Google and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
 #### Choosing the telemetry provider

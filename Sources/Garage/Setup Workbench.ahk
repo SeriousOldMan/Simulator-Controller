@@ -1531,9 +1531,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 					if (lastSimulator || lastTrack) {
 						if ((lastActiveSimulator != simulator) || (lastActiveTrack != track))
-							deleteDirectory(kTempDirectory . "Garage\Telemetry", false)
+							deleteDirectory(kTempDirectory . "Setup Workbench\Telemetry", false)
 
-						this.TelemetryViewer.restart(kTempDirectory . "Garage\Telemetry")
+						this.TelemetryViewer.restart(kTempDirectory . "Setup Workbench\Telemetry")
 					}
 
 					trackLength := getMultiMapValue(readSimulator(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
@@ -1584,14 +1584,14 @@ class SetupWorkbench extends ConfigurationItem {
 			activateWindow(this.TelemetryViewer.Window)
 		else {
 			if ((lastActiveSimulator != this.SelectedSimulator[false]) || (lastActiveTrack != this.SelectedTrack[false])) {
-				DirCreate(kTempDirectory . "Garage")
+				DirCreate(kTempDirectory . "Setup Workbench")
 
-				deleteDirectory(kTempDirectory . "Garage\Telemetry")
+				deleteDirectory(kTempDirectory . "Setup Workbench\Telemetry")
 
-				DirCreate(kTempDirectory . "Garage\Telemetry")
+				DirCreate(kTempDirectory . "Setup Workbench\Telemetry")
 			}
 
-			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Garage\Telemetry")
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Setup Workbench\Telemetry")
 
 			this.TelemetryViewer.show()
 

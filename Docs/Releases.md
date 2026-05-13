@@ -15,7 +15,7 @@
 	- More important, information about TC and ABS activations is now available in the telemetry data, thereby enabling the Driving Coach to give you more precise hints for cornering and ca handling.
 	- Please note, that the information about brake wear has been removed for the time being, because this information is for the brake disc and not for the brake pads anyway.
 	- A few data items are still acquired using the REST/JSON API, for example information about any suspension damage. It is possible to disable this API using a core setting [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), if it becomes necessary due to performance issues.
-    - For safety reasons, the old style API can be reactivated using new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings).
+    - For safety reasons, the old style API can be reactivated using a new [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings).
   - Many performance optimizations in the handling of the data API of *Le Mans Ultimate*.
   - The API for *Assetto Corsa EVO* has been updated to the latest game version.
   - [Developer] A new [core setting "LogSimulator"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings) let you track down performance issues in the simulator API control flow.
@@ -33,9 +33,10 @@
 #### Changes
 
   - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
+  - Standardized folder paths for stored telemetry data for Driving Coach, "Solo Center", "Team Center" and "Setup Workbench". Documentation updated accordingly.
   - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
   - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
-  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons.
+  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows. The old colors have been preserved for a better differentiation.
 
 # Release history
 

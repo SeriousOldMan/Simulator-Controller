@@ -1843,16 +1843,14 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (!this.TelemetryCollector && this.Simulator && this.Track && ((this.TrackLength > 0) || isDebug())) {
 			DirCreate(kTempDirectory . "Driving Coach")
-			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
-			DirCreate(kTempDirectory . "Driving Coach\Conversations")
 
 			deleteDirectory(kTempDirectory . "Driving Coach\Conversations")
 
-			if !isDebug() {
+			if !isDebug()
 				deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
 
-				DirCreate(kTempDirectory . "Driving Coach\Telemetry")
-			}
+			DirCreate(kTempDirectory . "Driving Coach\Telemetry")
+			DirCreate(kTempDirectory . "Driving Coach\Conversations")
 
 			provider := getMultiMapValue(this.Settings, "Assistant.Coach", "Telemetry.Provider", "Internal")
 
@@ -2492,7 +2490,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 			this.shutdownTelemetryCoaching(false)
 
-			deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
+			; deleteDirectory(kTempDirectory . "Driving Coach\Telemetry")
 		}
 
 		this.stopIssueAnalyzer()

@@ -22,7 +22,20 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.9.6.0
+
+#### Date: 05/15/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug in the new themed dialog boxes, which caused a crash when a message box overlays another message box.
+  
+#### Changes
+
+  - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
+  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
+  - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
+  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons.
 
 # Release history
 
@@ -44,25 +57,6 @@ Not yet planned...
   - [Internal] Migrated to AHK 2.1-alpha.28.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-694), if you are using the local LLM Runtime.
-
-# Upcoming release
-
-## 6.9.6.0
-
-#### Date: 05/15/26 (planned)
-
-#### Fixes
-
-  - Fixed a bug in the new themed dialog boxes, which caused a crash when a message box overlays another message box.
-  
-#### Changes
-
-  - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
-  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
-  - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
-  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons.
-
-# Release history
 
 ## 6.9.3.1
 

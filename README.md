@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.9.5.0-release](https://cutt.ly/EtXPb7nu) (Changes: Logging for simulator data acquisition, Support for the new LMU API, New core settings for LMU API, Performance optimizations for LMU API, Updated ACE API version.)
+[6.9.6.0-release](https://cutt.ly/ItVdLMVP) (Changes: Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons, Telemetry-based Issue Analyzer, Optimized naming of Session folders.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6950) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-695) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6960) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-696) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.9.4.0-release](https://cutt.ly/UtLByoa5) (Changes: Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28, Full rework of themed dialog boxes.)
+[6.9.5.0-release](https://cutt.ly/EtXPb7nu) (Changes: Logging for simulator data acquisition, Support for the new LMU API, New core settings for LMU API, Performance optimizations for LMU API, Updated ACE API version.)
 
-[6.9.3.1-release](https://cutt.ly/5tKOovjz) (Changes: Fixed timing calculations for coaching, Fixed uninstall when special user folder location is active, Fixed coaching instrutions in "Session State.json", Full integration of ACE, Fixed Portuguese grammars.)
+[6.9.4.0-release](https://cutt.ly/UtLByoa5) (Changes: Fixed handling of custom sound files in the Issue Analyzer, New car meta data for R3E, Fixed coaching for AC, Optimized tyre change decision for last pitstop, Updated LLM Runtime, Migrated to AHK 2.1 Alpha 28, Full rework of themed dialog boxes.)
 
 #### Current development build
 
-[6.9.6.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/m6rgxYsE/Releases/Simulator%20Controller%206.9.6.0-beta.zip) (Test build for 6.9.6. Changes: Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons, Telemetry-based Issue Analyzer, Optimized naming of Session folders.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6960) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-696) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

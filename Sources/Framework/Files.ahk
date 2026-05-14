@@ -20,10 +20,6 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-normalizeFileName(fileName) {
-	return RegExReplace(fileName, "[/\\:\*?<>|]", "")
-}
-
 getFileName(fileName, directories*) {
 	local driveName, ignore, directory
 
@@ -59,6 +55,10 @@ getFileNames(filePattern, directories*) {
 	return result
 }
 
+normalizeFileName(fileName) {
+	return RegExReplace(fileName, "[/\\:\*?<>|]", "")
+}
+
 normalizeFilePath(filePath) {
 	local position, index
 
@@ -83,6 +83,13 @@ normalizeFilePath(filePath) {
 		else
 			return filePath
 	}
+}
+
+normalizeDirectoryPath(path) {
+	while (SubStr(path, StrLen(path)) = "\")
+		path := SubStr(path, 1, StrLen(path) - 1)
+
+	return path
 }
 
 directoryContains(directory, fileOrDirectory) {
@@ -112,13 +119,6 @@ directoryContains(directory, fileOrDirectory) {
 	finally {
 		SetWorkingDir(curWorkingDir)
 	}
-}
-
-normalizeDirectoryPath(path) {
-	while (SubStr(path, StrLen(path)) = "\")
-		path := SubStr(path, 1, StrLen(path) - 1)
-
-	return path
 }
 
 temporaryFileName(name, extension := "") {
@@ -160,9 +160,7 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 
 	if includeDirectory {
 		try {
-			recurse := (recurse != false)
-
-			DirDelete(directoryName, recurse)
+			DirDelete(directoryName, recurse != false)
 
 			return true
 		}

@@ -14,7 +14,7 @@
   - Standardized folder paths for stored telemetry data for Driving Coach, "Solo Center", "Team Center" and "Setup Workbench". Documentation updated accordingly.
   - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
   - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
-  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows.
+  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows. The old colors have been preserved for a recognition effect.
   
 # Upcoming release
 

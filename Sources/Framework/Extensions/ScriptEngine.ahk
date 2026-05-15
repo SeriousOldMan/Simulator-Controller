@@ -215,7 +215,10 @@ array2Table(context, array) {
 	loop array.Length {
 		lua_pushinteger(context, Integer(A_Index))
 
-		scriptPushValue(context, array[A_Index])
+		if arry.Has(A_index)
+			scriptPushValue(context, array[A_Index])
+		else
+			scriptPushValue(context)
 
 		lua_settable(context, -3)
 	}
@@ -240,26 +243,37 @@ scriptExternHandler(context) {
 	local value := %scriptGetString(context, 1)%
 	local ignore, theValue
 
-	if isInstance(value, Func)
-		scriptPushValue(context, (c) {
-			local result := value(scriptGetArguments(c)*)
+	if isSet(value) {
+		if isInstance(value, Func)
+			scriptPushValue(context, (c) {
+				local result := value(scriptGetArguments(c)*)
 
-			if isInstance(result, Values) {
-				for ignore, theValue in result
-					scriptPushValue(context, theValue)
+				if isSet(result) {
+					if isInstance(result, Values) {
+						for ignore, theValue in result
+							scriptPushValue(context, theValue)
 
-				result := result.Length
-			}
-			else {
-				scriptPushValue(c, result)
+						result := result.Length
+					}
+					else {
+						scriptPushValue(c, result)
 
-				result := 1
-			}
+						result := 1
+					}
+				}
+				else {
+					scriptPushValue(c)
 
-			return Integer(result)
-		})
+					result := 1
+				}
+
+				return Integer(result)
+			})
+		else
+			scriptPushValue(context, value)
+	}
 	else
-		scriptPushValue(context, value)
+		scriptPushValue(context)
 
 	return Integer(1)
 }
@@ -386,8 +400,8 @@ scriptPushArray(context, array) {
 	array2Table(context, array)
 }
 
-scriptPushValue(context, value) {
-	if !isSet(value)
+scriptPushValue(context, value?) {
+	if (!isSet(value) || (value = kNull) || (value = kUndefined))
 		lua_pushnil(context)
 	else if isInteger(value)
 		lua_pushinteger(context, Integer(value))
@@ -395,8 +409,6 @@ scriptPushValue(context, value) {
 		lua_pushnumber(context, Number(value))
 	else if (isInstance(value, Func) || isInstance(value, Closure))
 		lua_pushcclosure(context, CallbackCreate(value, , 1), 0)
-	else if ((value = kNull) || (value = kUndefined))
-		lua_pushnil(context)
 	else if (value = kTrue)
 		lua_pushinteger(context, Integer(1))
 	else if (value = kFalse)

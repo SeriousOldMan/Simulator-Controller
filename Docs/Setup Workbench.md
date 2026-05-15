@@ -119,7 +119,9 @@ Please, note that all of this also applies to the AI Race Assistants, but you ha
 
   4. *F1 25*
   
-     You have to enable the UDP access in the settings. The first time any application of Simulator Controller will access the API, the Windows Firewall will ask for permission. Best to do this while running a local session.
+     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode). Unfortunately, Simulator Controller cannot be used on the same machine as *F1 25* at the time of this writing, because it is flagged by Javelin as cheating software. However, there are solutions to this problem. See the [special notes for *F1 25*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25) for more information.
+
+If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 
 ### Telemetry Viewer
 

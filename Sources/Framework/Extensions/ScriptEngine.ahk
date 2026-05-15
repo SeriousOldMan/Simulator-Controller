@@ -121,8 +121,8 @@ lua_tolstring(L, index, len) {
 }
 
 lua_tonumberx(L, index, &isnum?) => DllCall(kLUALibrary . "\lua_tonumberx", "ptr", L, "int", Integer(index)
-																		  , !IsSet(isnum) ? "int" : "int*"
-																		  , !IsSet(isnum) ? 0 : &isnum, "double")
+																		  , !isSet(isnum) ? "int" : "int*"
+																		  , !isSet(isnum) ? 0 : &isnum, "double")
 lua_topointer(L, index) => Format("<pointer: {:#x}>", DllCall(kLUALibrary . "\lua_topointer", "ptr", L, "int", Integer(index)))
 lua_type(L, index) => DllCall(kLUALibrary . "\lua_type", "ptr", L, "int", Integer(index))
 lua_typename(L, tp) => StrGet(DllCall(kLUALibrary . "\lua_typename", "ptr", L, "int", Integer(tp)), "UTF-8")
@@ -246,12 +246,12 @@ scriptExternHandler(context) {
 	if isSet(value) {
 		if isInstance(value, Func)
 			scriptPushValue(context, (c) {
-				local result := value(scriptGetArguments(c)*)
+				local result := value(scriptGetArguments(c)*)?
 
 				if isSet(result) {
 					if isInstance(result, Values) {
 						for ignore, theValue in result
-							scriptPushValue(context, theValue)
+							scriptPushValue(context, theValue?)
 
 						result := result.Length
 					}

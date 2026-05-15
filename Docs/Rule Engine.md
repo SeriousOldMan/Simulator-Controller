@@ -305,7 +305,7 @@ Although reduction rules can be seen as and even be used like functions in tradi
 
 And now comes the fancy part:
 
-  5. If more than one rule is available which matches a given goal, the rule engine will follow all alternative paths until the orignal goal has been proven, or no more alternative paths are available. If an alternative path is needed, the rule engine will go *back* in execution upt to the point, where an alternative is available. This is called backtracking.
+  5. If more than one rule is available which matches a given goal, the rule engine will follow all alternative paths until the orignal goal has been proven, or no more alternative paths are available. If an alternative path is needed, the rule engine will go *back* in execution up to the point, where an alternative is available. This is called backtracking.
   6. While following the path of alternatives the rule engine will create bindings for variables used in a *call*. This is called **unification** and is discussed in more detail below. On the other hand, if the rule execution has reached a dead end, but there are more alternatives available higher in the chain of execution, all variable bindings up to this point are undone and the execution continues with the alternative. Backtracking therefore does not only follow alternative path but also reverts all sideeffects created during execution of the first path.
 
 I promised, it is weird. Let's have a look at a concrete implementation of the grandfather *problem*. Let's assume, we have the following rules: 
@@ -320,7 +320,7 @@ I promised, it is weird. Let's have a look at a concrete implementation of the g
 	grandfather(?A, ?B) <= father(?A, ?C), father(?C, ?B)
 	grandfather(?A, ?B) <= mother(?A, ?C), father(?C, ?B)
 
-The *father* clauses define child / father relationships and the *mother* clauses do the same for mother relationships. So far so easy. The *grandfather* rule is equally easy. A person is the grandfather of another person, if he/she is the father of the mother or the father of that other person. SOund straight-forward, right. And logic programming is like that, but finding the right way to break down complex questions into a set of more simple ones is not always as obvious as in this case.
+The *father* clauses define child / father relationships and the *mother* clauses do the same for mother relationships. So far so easy. The *grandfather* rule is equally easy. A person is the grandfather of another person, if he/she is the father of the mother or the father of that other person. Sounds straight-forward, right. And logic programming is like that, but finding the right way to break down complex questions into a set of more simple ones is not always as obvious as in this case.
 
 If you now *call* "grandfather(Peter, Paul)", the rule engine will tell you that this is *true*. Same will be for "grandfather(Peter, Willy)" and "grandfather(Peter, Frank)" will be considered *false*. But you can also ask "grandfather(?grandchild, ?grandfather)" which will give you all valid alternatives.
 
@@ -580,11 +580,11 @@ When this script is executed, the following global variables and functions are a
 
    - Assistant.Call(method, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The function will return *nil*, if the method invocation throws an error.
    
    - Assistant.Property(property, p1, p2, ...)
    
-     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The function returns *nil*, if the property access throws an error.
 	 
    - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    

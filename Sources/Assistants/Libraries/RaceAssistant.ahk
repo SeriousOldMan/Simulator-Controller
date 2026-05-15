@@ -5250,7 +5250,7 @@ callAssistant(context, method, arguments*) {
 	catch Any as exception {
 		logError(exception, true)
 
-		return false
+		return (script ? kUndefined : false)
 	}
 }
 
@@ -5269,7 +5269,7 @@ propertyAssistant(context, property, arguments*) {
 	catch Any as exception {
 		logError(exception, true)
 
-		return false
+		return (script ? kUndefined : false)
 	}
 }
 

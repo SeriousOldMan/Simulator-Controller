@@ -576,11 +576,11 @@ Additionally you can export and import actions here to build a library for you a
    
    - Assistant.Call(method :: \<string\>, p1, p2, ...)
    
-     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The value returned by *method* will be returnd by *Assistant.Call*.
+     Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The value returned by *method* will be returnd by *Assistant.Call*. If the method invocation throws an error, *nil* is returned.
    
    - Assistant.Property(property :: \<string\>, p1, p2, ...)
    
-     Accesses the *property* of the instance of the Race Assistant instance, optionally with a variable number of arguments. The value of the *property* will be returnd by *Assistant.Property*.
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with a variable number of arguments. The value of the *property* will be returnd by *Assistant.Property*. If the property access throws an error, *nil* is returned.
 	 
    - Assistant.Speak(phrase :: \<string\> [, force :: \<booelan\>])
    

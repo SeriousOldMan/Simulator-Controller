@@ -42,7 +42,7 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
      
 	 Therefore, if you have this value and not the other ones, you can derive them by using the above simple relationship. For example, it can be found in the extended setup screen of *Automobilista 2*.
 
-  2. The second line of entry fields allow you to enter the wheel base and the track width of the car you want to analyze. Although the underlying computation using the Ackermann steering equations require those values to get a precise result, it will be absolutely okay to use the defaults of 270 cm wheelbase and 150 cm track width for GT-like cars. You might not get the exact slip angles, but you can compensate for that using the threshold sliders anyway.
+  2. The second line of entry fields allow you to enter the wheel base and the track width of the car you want to analyze. Although the underlying computation using the [Ackermann steering equations](https://www.racecar-engineering.com/articles/tech-explained-ackermann-steering-geometry/) require those values to get a precise result, it will be absolutely okay to use the defaults of 270 cm wheelbase and 150 cm track width for GT-like cars. You might not get the exact slip angles, but you can compensate for that using the threshold sliders anyway.
 
   3. Since the "Setup Workbench" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field.
 

@@ -1,8 +1,8 @@
 ## Introduction
 
-Several applications of Simulator Controller, most notably the AI Race Assistants, exhibit a kind of *intelligence* in the sense, that they are able to understand a given situation or a set of information provided by the user and then they use a reasoning process to recommend an appropriate action or at least recommend a reasonable action. All applications have access to a custom build Hybrid Rule Engine to implement these capabilities. This rule engine supplies forward chaining capabilities similar to the famous OPS5 as well as a first-order logic programming language very similar to Prolog. Both have acces to a shared knowledge base and can work together on a given goal or task.
+Several applications of Simulator Controller, most notably the AI Race Assistants, exhibit a kind of *intelligence* in the sense, that they are able to understand a given situation or a set of information provided by the user and then they use a reasoning process to recommend an appropriate action or at least recommend a reasonable action. All applications have access to a custom build Hybrid Rule Engine to implement these capabilities. This rule engine supplies forward chaining capabilities similar to the famous OPS5 as well as a first-order logic programming language very similar to Prolog. Both have access to a shared knowledge base and can work together on a given goal or task.
 
-The rule engine can handle thousands of rules and execute them efficiently. Forward chaining rules (also named productions) are arranged in a so called [Rete network](https://en.wikipedia.org/wiki/Rete_algorithm) so that only rules are considered for execution, for which the incoming facts in the condition part has been changed since the last execution. Efficient execution of the backward chaining rules (also called reductions) is secured by a compiler which create an execution pseudo code which then can be efficiently execute incl. proper tail-recursion optimization.
+The rule engine can handle thousands of rules and execute them efficiently. Forward chaining rules (also named productions) are arranged in a so called [Rete network](https://en.wikipedia.org/wiki/Rete_algorithm) so that only rules are considered for execution, for which the incoming facts in the condition part has been changed since the last execution. Efficient execution of the backward chaining rules (also called reductions) is secured by a compiler which creates a type of pseudo code which then can be efficiently executed incl. proper tail-recursion optimization.
 
 Okay, enough tech babble. Before going more into the details, let's take a look at a concrete example.
 
@@ -519,7 +519,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 
   - call
   
-	Syntax: call(function, arg1, ..., argN) or **:**function(arg1, ..., argN)
+	Syntax: call(function, arg1, ..., argN) or :function(arg1, ..., argN)
   
     Using *call* (or the shortcut syntax shown above), you can invoke functions in the global name space of the host programming language. Beside all arguments, an implicit first argument is passed to the function. This is an instance of the *ChoicePoint* class of the rule engine. This object also contains the following two properties to make is symetrical to the *Call* action in production rules:
 	
@@ -532,7 +532,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 
   - call?
   
-	Syntax: call?(function, arg1, ..., argN) or **:**function**?**(arg1, ..., argN)
+	Syntax: call?(function, arg1, ..., argN) or :function?(arg1, ..., argN)
 	
 	Similar to *call*, but the last argument will be unified with the result value of the function call. In this case, the predicate always succeeds, even if the result value is *false*, unless the function call throws an error. In that case, the predicate fails and the next alternative will be processed by the rule engine.
 

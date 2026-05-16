@@ -4795,13 +4795,21 @@ class ActionParser extends Parser {
 
 class StructParser extends Parser {
 	parse(terms) {
-		local function
+		local function, handler
 
 		if (InStr(terms[1], ":") = 1) {
 			function := SubStr(terms[1], 2)
 
-			return Struct("call", concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
-											, this.parseArguments(terms, 2)))
+			if ((StrLen(function) > 0) && (SubStr(function, StrLen(function)) = "?")) {
+				function := SubStr(function, 1, StrLen(function) - 1)
+
+				handler := "call?"
+			}
+			else
+				handler := "call"
+
+			return Struct(handler, concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
+											 , this.parseArguments(terms, 2)))
 		}
 		else
 			return Struct(terms[1], this.parseArguments(terms, 2))

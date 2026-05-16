@@ -114,7 +114,9 @@ global kExecutionTestRules := "
 				transposeRow([[?rFirst | ?oFirst] | ?rest], [?rFirst | ?rRest], [?oFirst | ?oRest]) <=
 						transposeRow(?rest, ?rRest, ?oRest)
 
-				testFunctionCall(?input, ?result) <= call?(testFunctionCall, ?input, ?result)
+				testFunctionCall(?input, ?result) <= :testFunctionCall?(?input, ?result)
+
+				{All: [?Test], {Is: :testFunctionCall?(Foo, ?Result)}} => (Set: FuncResult = ?Result)
 )"
 
 
@@ -278,7 +280,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(5, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(6, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(35, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -627,6 +629,24 @@ class HybridEngine extends Assert {
 		kb.produce()
 
 		this.AssertEqual(7, kb.getValue("CalcResult"), "Unexpected calculation results...")
+	}
+
+	Function_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+		kb.setFact("Test", true)
+		kb.produce()
+
+		this.AssertEqual("Foo_Bar", kb.getValue("FuncResult"), "Unexpected function call results...")
 	}
 }
 

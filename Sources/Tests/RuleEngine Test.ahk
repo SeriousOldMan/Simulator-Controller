@@ -114,7 +114,7 @@ global kExecutionTestRules := "
 				transposeRow([[?rFirst | ?oFirst] | ?rest], [?rFirst | ?rRest], [?oFirst | ?oRest]) <=
 						transposeRow(?rest, ?rRest, ?oRest)
 
-				testEmptyString(?input, "")
+				testFunctionCall(?input, ?result) <= call?(testFunctionCall, ?input, ?result)
 )"
 
 
@@ -486,6 +486,12 @@ class Unification extends Assert {
 
 		this.executeTests(tests)
 	}
+
+	Call_Test() {
+		tests := [["testFunctionCall(Foo, ?)", ["testFunctionCall(Foo, Foo_Bar)"]]]
+
+		this.executeTests(tests)
+	}
 }
 
 class HybridEngine extends Assert {
@@ -622,6 +628,10 @@ class HybridEngine extends Assert {
 
 		this.AssertEqual(7, kb.getValue("CalcResult"), "Unexpected calculation results...")
 	}
+}
+
+testFunctionCall(resultSet, value) {
+	return (value . "_Bar")
 }
 
 celebrate(knowledgeBase) {

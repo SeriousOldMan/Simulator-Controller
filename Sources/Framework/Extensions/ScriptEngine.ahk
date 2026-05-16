@@ -215,7 +215,7 @@ array2Table(context, array) {
 	loop array.Length {
 		lua_pushinteger(context, Integer(A_Index))
 
-		if arry.Has(A_index)
+		if array.Has(A_index)
 			scriptPushValue(context, array[A_Index])
 		else
 			scriptPushValue(context)

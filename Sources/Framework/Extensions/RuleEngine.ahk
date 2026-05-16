@@ -2712,7 +2712,7 @@ class CallChoicePoint extends ChoicePoint {
 	__New(ruleSet, goal, environment, valued := false) {
 		super.__New(ruleSet, goal, environment)
 
-		this.iBuiltin := (goal.Functor != "call")
+		this.iBuiltin := (InStr(goal.Functor, "call") != 1)
 		this.iValued := valued
 	}
 

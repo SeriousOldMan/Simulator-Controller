@@ -2118,8 +2118,10 @@ class ResultSet {
 	}
 
 	resetVariable(choicePoint, var, oldValue) {
-		if (oldValue = kNotInitialized)
-			this.iBindings.Delete(var)
+		if (oldValue = kNotInitialized) {
+			if this.iBindings.Has(var)
+				this.iBindings.Delete(var)
+		}
 		else
 			this.iBindings[var] := oldValue
 
@@ -2264,6 +2266,8 @@ class ResultSet {
 				return ProduceChoicePoint(this, goal, environment)
 			case "call":
 				return CallChoicePoint(this, goal, environment)
+			case "call?":
+				return CallChoicePoint(this, goal, environment, true)
 			case "set":
 				return SetFactChoicePoint(this, goal, environment)
 			case "clear":
@@ -2703,14 +2707,17 @@ class CallChoicePoint extends ChoicePoint {
 	iBuiltin := false
 	iFirst := true
 
-	__New(ruleSet, goal, environment) {
+	iValued := false
+
+	__New(ruleSet, goal, environment, valued := false) {
 		super.__New(ruleSet, goal, environment)
 
 		this.iBuiltin := (goal.Functor != "call")
+		this.iValued := valued
 	}
 
 	nextChoice() {
-		local result
+		local result, resultSet, operand
 
 		if this.iFirst {
 			this.iFirst := false
@@ -2719,6 +2726,13 @@ class CallChoicePoint extends ChoicePoint {
 				result := this.builtinCall()
 			else
 				result := this.foreignCall()
+
+			if this.iValued {
+				resultSet := this.ResultSet
+				operand := this.Goal.Arguments[this.Goal.Arguments.Length]
+
+				result := resultSet.unify(this, Literal(result), operand.getValue(resultSet, operand))
+			}
 
 			if !result
 				this.reset()
@@ -2740,25 +2754,27 @@ class CallChoicePoint extends ChoicePoint {
 
 	foreignCall() {
 		local resultSet := this.ResultSet
+		local visArgs := (this.iValued ? (this.Goal.Arguments.Length - 1) : this.Goal.Arguments.Length)
 		local function, values, builtin, index, theTerm, value, newValues, callable
 
 		values := []
 		builtin := false
 
 		for index, theTerm in this.Goal.Arguments
-			if (index == 1) {
-				function := theTerm.getValue(resultSet, theTerm).toString(resultSet)
+			if (index <= visArgs)
+				if (index == 1) {
+					function := theTerm.getValue(resultSet, theTerm).toString(resultSet)
 
-				builtin := inList(kBuiltinFunctors, function)
-			}
-			else {
-				value := theTerm.getValue(resultSet, theTerm)
+					builtin := inList(kBuiltinFunctors, function)
+				}
+				else {
+					value := theTerm.getValue(resultSet, theTerm)
 
-				if !builtin
-					value := value.toString(resultSet)
+					if !builtin
+						value := value.toString(resultSet)
 
-				values.Push(value)
-			}
+					values.Push(value)
+				}
 
 		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium) {
 			if builtin {
@@ -2792,12 +2808,14 @@ class CallChoicePoint extends ChoicePoint {
 
 	builtinCall() {
 		local resultSet := this.ResultSet
+		local visArgs := (this.iValued ? (this.Goal.Arguments.Length - 1) : this.Goal.Arguments.Length)
 		local function := this.Goal.Functor
 		local values := []
 		local index, theTerm, newValues, value
 
 		for index, theTerm in this.Goal.Arguments
-			values.Push(theTerm.getValue(resultSet, theTerm))
+			if (index <= visArgs)
+				values.Push(theTerm.getValue(resultSet, theTerm))
 
 		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium) {
 			newValues := []
@@ -3259,7 +3277,8 @@ class Facts {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Deleting fact " . fact)
 
-			this.Facts.Delete(fact)
+			if this.Facts.Has(fact)
+				this.Facts.Delete(fact)
 
 			this.iGeneration += 1
 

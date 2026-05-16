@@ -530,6 +530,12 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	*function* must return true, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 
+  - call?
+  
+	Syntax: call?(function, arg1, ..., argN) or **:**function**?**(arg1, ..., argN)
+	
+	Similar to *call*, but the last argument will be unified with the result value of the function call. In this case, the predicate always succeeds, even if the result value is *false*, unless the function call throws an error. In that case, the predicate fails and the next alternative will be processed by the rule engine.
+
   - produce
   
     Syntax: produce()

@@ -532,9 +532,17 @@ Additionally you can export and import actions here to build a library for you a
    
      Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error.
    
+   - Assistant.Call?(method, p1, p2, ...)
+   
+     Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error.
+   
    - Assistant.Property(property, p1, p2, ...)
    
      Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
+   
+   - Assistant.Property?(method, p1, p2, ...)
+   
+     Similar to *Assistant.Property*, but the last argument will be unified with the value of the property. The predicate will fail, if the method invocation throws an error.
 	 
    - Assistant.Speak(phrase [, force])
    
@@ -610,7 +618,7 @@ Additionally you can export and import actions here to build a library for you a
 
    - Rules.GetValue(fact :: \<string\> [, default)
    
-     Returns the value for the given fact in the knowledge base of the Assistant. If there is no such value, the default will be returned if supplied, or nil.
+     Returns the value for the given fact in the knowledge base of the Assistant. If there is no such value, the default will be returned if supplied, or *nil*.
 
    - Rules.Execute() or Rules.Produce()
    

@@ -2156,12 +2156,13 @@ class SessionDatabase extends ConfigurationItem {
 		SplitPath(fileName, , , , &name)
 
 		if InStr(fileName, ".json") {
-			if verbose
+			if verbose {
 				withBlockedWindows(() {
 					withTask(ProgressTask(translate("Extracting ") . name), () {
 						fileName := importFromSecondMonitor(&info)
 					})
 				})
+			}
 			else
 				fileName := importFromSecondMonitor(&info)
 
@@ -2177,24 +2178,26 @@ class SessionDatabase extends ConfigurationItem {
 				break
 			}
 
-			if verbose
+			if verbose {
 				withBlockedWindows(() {
 					withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
 						fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
 					})
 				})
+			}
 			else
 				fileName := (motecFile ? importFromMoTec(&info) : importFromCSV(&info))
 
 			return fileName
 		}
 		else if InStr(fileName, ".irc") {
-			if verbose
+			if verbose {
 				withBlockedWindows(() {
 					withTask(SessionDatabase.TrackScanningImportTask(translate("Extracting ") . name, scanningProgress), () {
 						fileName := importFromIRacing(&info)
 					})
 				})
+			}
 			else
 				fileName := importFromIRacing(&info)
 

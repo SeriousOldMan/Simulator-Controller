@@ -649,7 +649,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 													  , {Options: 262436, Mode: "Question"
 													   , Buttons: collect(["Yes", "No"], translate)})
 
-				if (msgResult = translate("Yes"))
+				if (msgResult = translate("Yes")) {
 					withBlockedWindows(() {
 						withTask(ProgressTask(translate("Compacting Database")), () {
 							try {
@@ -669,6 +669,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 							loadObjects(connector, objectsListView)
 						})
 					})
+				}
 			}
 		}
 		catch Any as exception {

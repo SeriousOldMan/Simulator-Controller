@@ -2326,11 +2326,12 @@ class DrivingCoach extends GridRaceAssistant {
 				}
 				until clean
 
-				if isDebug()
+				if isDebug() {
 					do(brakeSections, (section) {
 						logMessage(kLogDebug, "Corner: " . section.Corner . "; Start: " . section.Start
 																		  . "; End: " . section.End . "; Speed (m/s): " . section.Speed)
 					})
+				}
 
 				FileAppend(triggers, triggerFile)
 
@@ -2786,7 +2787,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					instructionCount += 1
 
-					if (instructionHints.Length > 0)
+					if (instructionHints.Length > 0) {
 						Task.startTask(() {
 							local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 							local speaker := (this.Speaker[false] && this.getSpeaker())
@@ -2816,6 +2817,7 @@ class DrivingCoach extends GridRaceAssistant {
 								}
 							}, wait * 2, kLowPriority)
 						})
+					}
 				}
 			}
 		}

@@ -149,7 +149,7 @@ class StrategySimulation {
 			message := (isObject(exception) ? exception.Message : exception)
 
 			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
-			
+
 			return false
 		}
 	}
@@ -188,7 +188,7 @@ class StrategySimulation {
 			message := (isObject(exception) ? exception.Message : exception)
 
 			withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
-			
+
 			return false
 		}
 	}
@@ -343,7 +343,7 @@ class StrategySimulation {
 
 					if !scriptExecute(scriptEngine, &message) {
 						withBlockedWindows(MsgDlg, translate("Cannot load the custom validation script.") . "`n`n" . message, translate("Error"), 262192)
-						
+
 						return false
 					}
 					else
@@ -2945,11 +2945,12 @@ class Strategy extends ConfigurationItem {
 		this.iAirTemperature := StrReplace(descriptor["StartStint"]["AirTemperature"], " C", "")
 		this.iTrackTemperature := StrReplace(descriptor["StartStint"]["TrackTemperature"], " C", "")
 
-		if descriptor.Has("WeatherForecast")
+		if descriptor.Has("WeatherForecast") {
 			this.iWeatherForecast := collect(descriptor["WeatherForecast"], (fc) {
 										 return [fc["Minute"], fc["Weather"]
 											   , fc["AirTemperature"], fc["TrackTemperature"]]
 									 })
+		}
 
 		this.iFuelCapacity := StrReplace(descriptor["Car"]["FuelCapacity"], " Liters", "")
 		this.iSafetyFuel := StrReplace(descriptor["Settings"]["SafetyFuel"], " Liters", "")

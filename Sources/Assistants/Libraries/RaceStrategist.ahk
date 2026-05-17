@@ -1473,7 +1473,7 @@ class RaceStrategist extends GridRaceAssistant {
 					try {
 						pitstops := collect(this.PitstopHistory, getPastPitstop)
 
-						if (this.UsedTyreSets && (this.UsedTyreSets.Length > 0))
+						if (this.UsedTyreSets && (this.UsedTyreSets.Length > 0)) {
 							knowledge["TyreSets"] := collect(this.UsedTyreSets, (ts) {
 														 local tyreSet := Map("Laps", ts.Laps
 																			, "TyreCompound", compound(ts.Compound, ts.CompoundColor))
@@ -1483,6 +1483,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 														 return tyreSet
 													 })
+						}
 					}
 					catch Any as exception {
 						logError(exception, true)

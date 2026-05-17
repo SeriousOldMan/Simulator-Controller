@@ -74,7 +74,7 @@ class Theme {
 
 	class ThemedDialog {
 		struct RECT {
-			left: i32, top: i32, right: i32, bottom: i32
+			left: Int32, top: Int32, right: Int32, bottom: Int32
 		}
 
 		static Call(_this, params*) {
@@ -1039,29 +1039,29 @@ class DarkTheme extends Theme {
 
 	class DarkListView extends Gui.ListView {
 		struct RECT {
-			left: i32, top: i32, right: i32, bottom: i32
+			left: Int32, top: Int32, right: Int32, bottom: Int32
 		}
 
 		struct NMHDR {
-			hwndFrom: uptr
-			idFrom  : uptr
-			code    : i32
+			hwndFrom: IntPtr
+			idFrom  : IntPtr
+			code    : Int32
 		}
 
 		struct NMCUSTOMDRAW {
 			hdr        : DarkTheme.DarkListView.NMHDR
-			dwDrawStage: u32
-			hdc        : uptr
+			dwDrawStage: UInt32
+			hdc        : IntPtr
 			rc         : DarkTheme.DarkListView.RECT
 			/*
-			rc1		   : i32
-			rc2		   : i32
-			rc3		   : i32
-			rc4		   : i32
+			rc1		   : Int32
+			rc2		   : Int32
+			rc3		   : Int32
+			rc4		   : Int32
 			*/
-			dwItemSpec : uptr
-			uItemState : u32
-			lItemlParam: iptr
+			dwItemSpec : IntPtr
+			uItemState : UInt32
+			lItemlParam: IntPtr
 		}
 
 		static __New() {
@@ -1319,7 +1319,7 @@ class DarkTheme extends Theme {
 						: -1)
 		}
 
-		A_TrayMenu.base.defineProp("Show", {call: (x?, y?, args*) => (prevMenuTheme := SetMenuTheme("ForceDark")
+		A_TrayMenu.base.DefineProp("Show", {call: (x?, y?, args*) => (prevMenuTheme := SetMenuTheme("ForceDark")
 																	, _trayMenuBaseShow(x?, y?, args*)
 																	, SetMenuTheme(prevMenuTheme), "")})
 

@@ -116,7 +116,7 @@ global kExecutionTestRules := "
 
 				testFunctionCall(?input, ?result) <= :testFunctionCall?(?input, ?result)
 
-				{All: [?Test], {Is: :testFunctionCall?(Foo, ?Result)}} => (Set: FuncResult = ?Result)
+				{All: [?Test], {Is: :testFunctionCall?(Foo, ?Result)}} => (Set: CallResult = ?Result)
 )"
 
 
@@ -484,7 +484,7 @@ class Unification extends Assert {
 	}
 
 	Complex_Clause_Test() {
-		tests := [["complexClause(?x, ?y)", ["complexClause([1, 2, 3], complex(A, foo([1, 2])))"]]]
+		tests := [["complexClause([1, ?x, 3], complex(?y, ?z))", ["complexClause([1, 2, 3], complex(A, foo([1, 2])))"]]]
 
 		this.executeTests(tests)
 	}
@@ -646,7 +646,7 @@ class HybridEngine extends Assert {
 		kb.setFact("Test", true)
 		kb.produce()
 
-		this.AssertEqual("Foo_Bar", kb.getValue("FuncResult"), "Unexpected function call results...")
+		this.AssertEqual("Foo_Bar", kb.getValue("CallResult"), "Unexpected function call result...")
 	}
 }
 

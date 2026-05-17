@@ -18,7 +18,22 @@
   
 # Upcoming release
 
-Not yet planned...
+## 6.9.7.0
+
+#### Date: 05/22/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - [Experts] Clarified the behavior of *Assistant.Property* in the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions) for rules and scripts running in Assistant process.
+  - [Experts] Added support for foreign functions called by the rule engine to return a value, which then is unified with the last argument to the function call. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
+    - Added new predicates *Assistant.Call?* and *Assistant.Property?* for the rule engine as well as the equally named functions for the Lua script engine.
+	- Added support for using foreign function aliases (with or without return values) in the production rule actions. Example:
+	
+			{All: [?Test], {Is: :foreignCall?(Foo, ?Result)}} => (Set: CallResult = ?Result)
 
 # Release history
 

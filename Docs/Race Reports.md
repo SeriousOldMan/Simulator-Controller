@@ -4,6 +4,8 @@ Cato, the AI Race Strategist, allows you to save most of the data that is acquir
 
 Important: "Race Reports" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corrsponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Race Reports" once using administrator privileges.
 
+Good to know: All the reports available in "Race Reports" are also embedded in "Solo Center" and "Team Center". In this case, the reports are updated live while you are in a session.
+
 ## Available Reports
 
 After a given race has been selected, the "Race Reports" tool offers you several different views, which you can use to analyze the data.

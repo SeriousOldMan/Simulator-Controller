@@ -693,7 +693,7 @@ initializeStreamDeckPlugin() {
 		registerMessageHandler("Stream Deck", handleStreamDeckMessage)
 
 		Task.startTask(() {
-			if StreamDeck.isRunning()
+			if StreamDeck.isRunning() {
 				PeriodicTask(() {
 					local ignore, fnController
 
@@ -703,6 +703,7 @@ initializeStreamDeckPlugin() {
 
 					Task.CurrentTask.Sleep := 10000
 				}, 0, kLowPriority).start()
+			}
 			else
 				return Task.CurrentTask
 		}, 1000, kLowPriority)

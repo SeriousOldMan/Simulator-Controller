@@ -1486,7 +1486,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import") . translate("..."), "Data (*.export)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
-			if (fileName != "")
+			if (fileName != "") {
 				withBlockedWindows(() {
 					withTask(ProgressTask(translate("Importing data")), () {
 						try {
@@ -1505,6 +1505,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						}
 					})
 				})
+			}
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {
@@ -1561,7 +1562,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			fileName := withBlockedWindows(FileSelect, 1, "", translate("Import") . translate("..."), "Settings (*.export)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
-			if (fileName != "")
+			if (fileName != "") {
 				withBlockedWindows(() {
 					withTask(ProgressTask(translate("Importing settings")), () {
 						try {
@@ -1578,6 +1579,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						}
 					})
 				})
+			}
 
 			if (folder != "")
 				if FileExist(folder . "\Export.info") {

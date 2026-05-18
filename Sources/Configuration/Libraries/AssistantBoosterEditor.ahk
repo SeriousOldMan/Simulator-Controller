@@ -2087,7 +2087,7 @@ class CallbacksEditor {
 		fileName := withBlockedWindows(FileSelect, "M1", , translate("Load ") . translate(type) . translate("..."), type . " (*" . extension . ")")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
-		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0)))
+		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
 			withBlockedWindows(() {
 				withTask(ProgressTask(translate("Import")), () {
 					local ignore
@@ -2096,6 +2096,7 @@ class CallbacksEditor {
 						importCallback(fileName)
 				})
 			})
+		}
 	}
 
 	exportCallback() {
@@ -2124,7 +2125,7 @@ class CallbacksEditor {
 		fileName := withBlockedWindows(FileSelect, "S17", fileName, translate("Save ") . translate(type) . translate("..."), type . " (*" . extension . ")")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
-		if (fileName != "")
+		if (fileName != "") {
 			withBlockedWindows(() {
 				withTask(ProgressTask(translate("Export")), () {
 					deleteDirectory(directory)
@@ -2175,6 +2176,7 @@ class CallbacksEditor {
 					FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
 				})
 			})
+		}
 	}
 
 	loadCallback(callback) {

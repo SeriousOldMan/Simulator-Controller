@@ -244,7 +244,7 @@ scriptExternHandler(context) {
 	local ignore, theValue
 
 	if isSet(value) {
-		if isInstance(value, Func)
+		if isInstance(value, Func) {
 			scriptPushValue(context, (c) {
 				local result := value(scriptGetArguments(c)*)?
 
@@ -269,6 +269,7 @@ scriptExternHandler(context) {
 
 				return Integer(result)
 			})
+		}
 		else
 			scriptPushValue(context, value)
 	}

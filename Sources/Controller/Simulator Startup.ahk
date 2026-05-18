@@ -665,12 +665,13 @@ showNews() {
 	local name, urls
 
 	showNews(nr, title, urls, *) {
-		if loadNews(urls)
+		if loadNews(urls) {
 			viewNews(kTempDirectory . "News\News.htm", title, true, (showAgain) {
 				setMultiMapValue(news, "Visited", nr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 				updateNews(false, news)
 			})
+		}
 	}
 
 	newsMenu.Add(translate("News, tips and tricks"), (*) => {})
@@ -839,13 +840,14 @@ checkForNews() {
 			}
 
 			if (newsNr && !SimulatorStartup.Instance)
-				if loadNews(newsUrls)
+				if loadNews(newsUrls) {
 					viewNews(kTempDirectory . "News\News.htm", getMultiMapValue(availableNews, "Names", newsNr), !welcome
 						   , (showAgain) {
 								 setMultiMapValue(news, "Visited", newsNr, showAgain ? A_Now : DateAdd(A_Now, 99999, "Days"))
 
 								 updateNews(availableNews, news)
 							 })
+				}
 				else
 					updateNews(availableNews, news)
 		}, 10000)

@@ -410,7 +410,7 @@ class LMUPlugin extends Sector397Plugin {
 		}
 
 		if (this.iAdjustRefuelAmount && !getMultiMapValue(data, "Stint Data", "InPitLane", false)
-									 && !getMultiMapValue(data, "Stint Data", "InPit", false))
+									 && !getMultiMapValue(data, "Stint Data", "InPit", false)) {
 			Task.startTask(() {
 				local handler := this.getOptionHandler("Refuel")
 				local ignore, fuelConsumption
@@ -419,6 +419,7 @@ class LMUPlugin extends Sector397Plugin {
 
 				handler.Call("Set", handler.Call("Get") - fuelConsumption, false, false)
 			}, 1000, kLowPriority)
+		}
 
 		if getMultiMapValue(this.Settings, "Simulator.Le Mans Ultimate", "Pitstop.Fuel.Ratio", false)
 			Task.startTask(ObjBindMethod(this, "optimizeFuelRatio"), 2000, kLowPriority)

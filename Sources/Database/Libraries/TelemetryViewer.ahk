@@ -1786,7 +1786,7 @@ class TelemetryViewer {
 
 			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 
-			if (analyzer.TrackSections.Length = 0)
+			if (analyzer.TrackSections.Length = 0) {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						analyzer.requireTrackSections(telemetry)
@@ -1794,6 +1794,7 @@ class TelemetryViewer {
 						telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
 					})
 				})
+			}
 
 			referenceLap := this.SelectedReferenceLap
 

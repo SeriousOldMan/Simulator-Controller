@@ -10010,7 +10010,7 @@ class TeamCenter extends ConfigurationItem {
 					OnMessage(0x44, translateSaveCancelButtons, 0)
 				}
 
-				if (fileName != "")
+				if (fileName != "") {
 					withBlockedWindows(() {
 						withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), () {
 							try {
@@ -10071,6 +10071,7 @@ class TeamCenter extends ConfigurationItem {
 							}
 						})
 					})
+				}
 			}
 
 			this.showMessage(false)
@@ -10643,7 +10644,7 @@ class TeamCenter extends ConfigurationItem {
 
 				if (info.Count == 0)
 					withBlockedWindows(MsgDlg, translate("This is not a valid folder with a saved session."), translate("Error"), 262160)
-				else
+				else {
 					withBlockedWindows(() {
 						withTask(ProgressTask(StrReplace(translate("Load Session..."), "...", "")), () {
 							this.iSyncTask.pause()
@@ -10742,6 +10743,7 @@ class TeamCenter extends ConfigurationItem {
 							this.updateState()
 						})
 					})
+				}
 			}
 		}
 

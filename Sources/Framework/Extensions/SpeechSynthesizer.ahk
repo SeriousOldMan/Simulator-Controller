@@ -91,19 +91,19 @@ class SpeechSynthesizer {
 	iGoogleMode := "HTTP"
 
 	class WAVHeader {
-		riff		: u32
-		fLength		: i32
-		wave    	: u32
-		fmt			: u32
-		fSize		: i32
-		fTag		: i16
-		nChans		: i16
-		sRate		: i32
-		bytesPerSec	: i32
-		bytesPerSmp	: i16
-		bitsPerSmp	: i16
-		data		: u32
-		dLength		: i32
+		riff		: UInt32
+		fLength		: Int32
+		wave    	: UInt32
+		fmt			: UInt32
+		fSize		: Int32
+		fTag		: Int16
+		nChans		: Int16
+		sRate		: Int32
+		bytesPerSec	: Int32
+		bytesPerSmp	: Int16
+		bitsPerSmp	: Int16
+		data		: UInt32
+		dLength		: Int32
 
 		__New(rate := 16000, bits := 16, channels := 1) {
 			this.initialize(rate, bits, channels)

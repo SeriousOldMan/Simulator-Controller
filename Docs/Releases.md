@@ -34,7 +34,7 @@
 	- Added support for using foreign function aliases (with or without return values) in the production rule actions. Example:
 	
 			{Is: :foreignCall?(Foo, ?Result)} => (Set: CallResult = ?Result)
-  - [Internal] Migrated to AHK 2.1-alpha.29.
+  - [Internal] Migrated to AHK 2.1-alpha.30.
 
 # Release history
 

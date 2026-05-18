@@ -448,7 +448,7 @@ class StrategyWorkbench extends ConfigurationItem {
 														  , {Options: 262436, Mode: "Question"
 														   , Buttons: collect(["Yes", "No"], translate)})
 
-					if (msgResult = translate("Yes"))
+					if (msgResult = translate("Yes")) {
 						withBlockedWindows(() {
 							withTask(ProgressTask(translate("Cleaning ") . translate("Data")), () {
 								LapsDatabase(workbench.SelectedSimulator, workbench.SelectedCar, workbench.SelectedTrack
@@ -460,6 +460,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								workbench.loadCompound(workbench.AvailableCompounds[workbenchGui["compoundDropDown"].Value], true)
 							})
 						})
+					}
 				}
 
 				workbenchGui["dataTypeDropDown"].Choose(inList(["Electronics", "Tyres"], workbench.SelectedDataType))

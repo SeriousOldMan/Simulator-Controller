@@ -532,7 +532,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 
   - call=
   
-	Syntax: call=(function, arg1, ..., argN) or :function?(arg1, ..., argN)
+	Syntax: call=(function, arg1, ..., argN, result) or :function=(arg1, ..., argN, result)
 	
 	Similar to *call*, but the last argument will be unified with the result value of the function call. In this case, the predicate always succeeds, even if the result value is *false*, unless the function call throws an error. In that case, the predicate fails and the next alternative will be processed by the rule engine.
 
@@ -584,11 +584,11 @@ When this script is executed, the following global variables and functions are a
    
      This table represents an array with all arguments passed to the script.
 
-   - Assistant.Call(method, p1, p2, ...)
+   - Assistant.Call(method, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The function will return *nil*, if the method invocation throws an error.
    
-   - Assistant.Property(property, p1, p2, ...)
+   - Assistant.Property(property, arg1, arg2, ...)
    
      Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The function returns *nil*, if the property access throws an error.
 	 
@@ -606,11 +606,11 @@ When this script is executed, the following global variables and functions are a
 	 
 	 If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
-   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   - Controller.Call(method :: \<string\>, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 	 
-   - Function.Call(function :: \<string\>, p1, p2, ...)
+   - Function.Call(function :: \<string\>, arg1, arg2, ...)
    
      Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 

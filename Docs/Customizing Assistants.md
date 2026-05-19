@@ -528,19 +528,19 @@ Additionally you can export and import actions here to build a library for you a
 
    When defining the rules for a custom action, you can use the following predicates and functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
-   - Assistant.Call(method, p1, p2, ...)
+   - Assistant.Call(method, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error. The value of the method call is not used in this case (see below).
    
-   - Assistant.Call=(method, p1, p2, ...)
+   - Assistant.Call=(method, arg1, arg2, ..., result)
    
      Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error. The value of the property is not used in this case (see below).
    
-   - Assistant.Property(property, p1, p2, ...)
+   - Assistant.Property(property, arg1, arg2, ...)
    
      Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
    
-   - Assistant.Property=(method, p1, p2, ...)
+   - Assistant.Property=(method, arg1, arg2, ..., result)
    
      Similar to *Assistant.Property*, but the last argument will be unified with the value of the property. The predicate will fail, if the method invocation throws an error.
 	 
@@ -558,11 +558,11 @@ Additionally you can export and import actions here to build a library for you a
 	 
 	 If the grammar reacts to variable parts in the command text, this text can be passed as the optional second argument.
 	 
-   - Controller.Call(method, p1, p2, ...)
+   - Controller.Call(method, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 	 
-   - Function.Call(function, p1, p2, ...)
+   - Function.Call(function, arg1, arg2, ...)
    
      Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 
@@ -570,23 +570,23 @@ Additionally you can export and import actions here to build a library for you a
    
 	   estimateTrackWetness() <= calculateTrackWetness(), Assistant.Speak("It will be too wet. I will come up with a new strategy."), Assistant.Call(planPitstop)
 
-   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, function, p1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
+   Up to 6 arguments are supported for predicates with a variable number of arguments. If you need to pass more arguments, use the syntax Call(*Assistant.Call*, function, arg1, ..., pn) for backward chaining rules. Same applies to any other of the above *calls*.
 	   
    In forward chaining rules, the syntax is a bit different:
    
 	   [?Track.Grip = Wet] => (Call: Assistant.Speak("It will be too wet. I will come up with a new strategy.")), (Call: Assistant.Call(planPitstop))
 
-   Here you can use (Call: *Assistant.Call*(function, p1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
+   Here you can use (Call: *Assistant.Call*(function, arg1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
    
    Good to know: During the execution of a rule you can use the *execute* action / predicate not only to call batch files and executable, but you can also run any script defined in the *Lua* scripting language. The arguments passed to the script will be available in the global array *Arguments*. Since the script is run in the host process it will have access to the same global functions as defined for "Assistant Script" *Action Type* below.
 
 4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
-   - Assistant.Call(method :: \<string\>, p1, p2, ...)
+   - Assistant.Call(method :: \<string\>, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The value returned by *method* will be returnd by *Assistant.Call*. If the method invocation throws an error, *nil* is returned.
    
-   - Assistant.Property(property :: \<string\>, p1, p2, ...)
+   - Assistant.Property(property :: \<string\>, arg1, arg2, ...)
    
      Accesses the *property* of the instance of the Race Assistant instance, optionally with a variable number of arguments. The value of the *property* will be returnd by *Assistant.Property*. If the property access throws an error, *nil* is returned.
 	 
@@ -604,11 +604,11 @@ Additionally you can export and import actions here to build a library for you a
 	 
 	 If the grammar reacts to variable parts in the command text, this text can be given as the optional second argument.
 	 
-   - Controller.Call(method :: \<string\>, p1, p2, ...)
+   - Controller.Call(method :: \<string\>, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the *SimulatorController* class in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 	 
-   - Function.Call(function :: \<string\>, p1, p2, ...)
+   - Function.Call(function :: \<string\>, arg1, arg2, ...)
    
      Invokes the global *function* in the process "Simulator Controller.exe". with some arguments. A variable number of arguments are supported.
 
@@ -668,21 +668,21 @@ As you can see, this editor looks very similar to the actions editor discussed a
 
 3. When defining the rules for a custom event, you can use all the predicates and functions introduced above for actions. Additionally, you can use:
    
-   - Assistant.Raise(signal, p1, p2, ...)
+   - Assistant.Raise(signal, arg1, arg2, ...)
    
      Raises the given *signal*, thereby identifying the event to be processed by the LLM.
 	 
-   - Assistant.Trigger(action, p1, p2, ...)
+   - Assistant.Trigger(action, arg1, arg2, ...)
    
      Activates a defined action without going through the LLM processing. The action is located by its name and is invoked directly with the supplied arguments.
 	 
    *Assistant.Raise* and *Assistant.Trigger* also come in a different flavour. When the first argument is the type of an Assistant (like "Race Engineer", "Race Strategist" and so on), the second argument must be the signal and this signal is raised for the supplied Assistant. This can be used for communication between the different Assistants.
    
-   - Assistant.Raise(assistant, signal, p1, p2, ...)
+   - Assistant.Raise(assistant, signal, arg1, arg2, ...)
    
      Raises the given *signal* for the given *assistant*, thereby identifying the event to be processed by the LLM.
 	 
-   - Assistant.Trigger(assistant, action, p1, p2, ...)
+   - Assistant.Trigger(assistant, action, arg1, arg2, ...)
    
      Activates a defined *action* for the given *assistant*. The action is located by its name and is invoked directly with the supplied arguments.
 

@@ -41,9 +41,9 @@ global kSet := "Set:"
 global kClear := "Clear:"
 global kExecute := "Execute:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute"]
-global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute", "parse", "print"]
+global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute, parse, print]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -3991,6 +3991,16 @@ class RuleCompiler {
 		return this.createStructParser(goal).parse(goal)
 	}
 
+	compileTerm(text) {
+		local one := 1
+		local theTerm := this.readTailTerm(&text, &one)
+
+		if (theTerm != kNotFound)
+			return this.createTermParser(theTerm).parse(theTerm)
+		else
+			return false
+	}
+
 	readReduction(text) {
 		local nextCharIndex := 1
 		local head := this.readHead(&text, &nextCharIndex)
@@ -5528,6 +5538,28 @@ execute(choicePoint, arguments*) {
 
 		return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
 											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
+	}
+}
+
+parse(choicePoint, text, term) {
+	local resultSet := choicePoint.ResultSet
+
+	try {
+		return resultSet.unify(choicePoint, RuleCompiler().compileTerm(text.toString(resultSet)), term)
+	}
+	catch Any {
+		return false
+	}
+}
+
+print(choicePoint, term, text) {
+	local resultSet := choicePoint.ResultSet
+
+	try {
+		return resultSet.unify(choicePoint, Literal(term.toString(resultSet)), text)
+	}
+	catch Any {
+		return false
 	}
 }
 

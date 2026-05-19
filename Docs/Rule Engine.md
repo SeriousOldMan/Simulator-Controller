@@ -484,6 +484,18 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	Compares two terms according to the operator. Because the rule engine does not support constrain based unification (yet), both terms must be bound to comparable literals at the moment of execution.
 	
+  - parse
+  
+	Syntax: parse(text, term)
+	
+	Parses the text contained in *text*, which should represent a valid expression, which is also accepted in the tail of a reduction rule (except *Cut* and *Fail*), and unifies the resulting term with the second argument *term*.
+	
+  - print
+  
+	Syntax: print(term, text)
+	
+	Creates a textual representation of the term bound to the first argument *term* (with all variables substituted with their current values) and unifies the string with the second argument *text*.
+	
   - append
   
     Syntax: append(term1, ..., termN, result)

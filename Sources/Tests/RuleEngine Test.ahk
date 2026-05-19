@@ -119,8 +119,10 @@ global kExecutionTestRules := "
 				{All: [?Test], {Is: :testFunctionCall=(Foo, ?Result)}} => (Set: CallResult = ?Result)
 
 				[?Test] => (Let: ?var = father(Peter, Paul)), (Prove: printFather(?var))
+				[?Test] => (Prove: parse("son(Paul, Peter)", ?term)), (Prove: print(?term, ?text)),
+						   (Call: showArgs(?text)), (Set: ParseResult = ?text)
 
-				printFather(?v) <= :messageShow(?v)
+				printFather(?v) <= :showArgs(?v), Set(FatherResult, ?v)
 )"
 
 
@@ -284,7 +286,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(7, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(8, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(36, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -651,6 +653,8 @@ class HybridEngine extends Assert {
 		kb.produce()
 
 		this.AssertEqual("Foo_Bar", kb.getValue("CallResult"), "Unexpected function call result...")
+		this.AssertEqual("father(Peter, Paul)", kb.getValue("FatherResult"), "Unexpected function call result...")
+		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult"), "Unexpected function call result...")
 	}
 }
 
@@ -670,18 +674,31 @@ celebrate(knowledgeBase) {
 	}
 }
 
+showArgs(choicePoint, arguments*) {
+	local kb := isInstance(choicePoint, KnowledgeBase) ? choicePoint
+													   : choicePoint.ResultSet.KnowledgeBase
+
+	if (kb.RuleEngine.TraceLevel < kTraceOff) {
+		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, values2String(" ", arguments*)), SplashTextGui.Show("w200 h60")
+		Sleep(1000)
+		SplashTextGui.Destroy()
+	}
+
+	return true
+}
+
 showRelationship(choicePoint, grandchild, grandfather) {
 	local fact := "Related." . grandchild . "." . grandfather
 	local knowledgeBase := choicePoint.ResultSet.KnowledgeBase
 
-	if true || (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
+	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, grandchild " is grandchild of " grandfather), SplashTextGui.Show("w200 h60")
 		Sleep(1000)
 		SplashTextGui.Destroy()
 	}
 
 	if !knowledgeBase.hasFact(fact)
-		knowledgeBase.addFact(fact , true)
+		knowledgeBase.addFact(fact, true)
 
 	return true
 }

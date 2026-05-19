@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[6.9.7.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/eujEkLgL/Releases/Simulator%20Controller%206.9.7.0-dev.zip) (Early build for 6.9.7. Changes: Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30.)
+[6.9.7.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/eujEkLgL/Releases/Simulator%20Controller%206.9.7.0-dev.zip) (Early build for 6.9.7. Changes: Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30, New builtin predicates for reductions, Support for general terms in Let actions.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6970) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-697) of this version and all the versions you might have skipped, before installing and using this version.
 

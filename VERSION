@@ -3,7 +3,7 @@ Version=6.9.7.0-dev
 Target=6.9.7.0-release
 Date=05/19/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/eujEkLgL/Releases/Simulator%20Controller%206.9.7.0-dev.zip
-Changes=Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30, New builtin predicates for reductions, Support for general terms in Let actions
+Changes=Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30, New builtin predicates for reductions, Support for general terms in Let actions, Fixed FCY simulation
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.6.0-release

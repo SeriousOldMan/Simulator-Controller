@@ -1847,7 +1847,8 @@ class RaceStrategist extends GridRaceAssistant {
 		local pitstopWindow := (this.Settings ? getMultiMapValue(this.Settings, "Strategy Settings", "Strategy.Window.Considered", 3) : 3)
 		local fullCourseYellow, forcedPitstop, pitstop, count, ignore, pitstopLap, pitstopMaxLap, rootStrategy, pitstopDeviation, skip
 
-		facts.Delete("Strategy.Pitstop.Next")
+		if facts.Has("Strategy.Pitstop.Next")
+			facts.Delete("Strategy.Pitstop.Next")
 
 		if !strategy.HasProp("RunningPitstops")
 			strategy.RunningPitstops := 0

@@ -24,7 +24,7 @@
 
 #### Fixes
 
-  - None this time...
+  - Fixed a rare race condition, which caused the FCY simulation by the Race Strategist to fail.
   
 #### Changes
 

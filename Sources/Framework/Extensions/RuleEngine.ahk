@@ -1065,8 +1065,10 @@ class ProveAction extends CallAction {
 
 		for ignore, argument in this.Arguments
 			if isInstance(argument, Variable) {
-				if (argument.getValue(variables) != kNotInitialized)
-					arguments.Push(Literal(argument.toString(variables)))
+				value := argument.getValue(variables)
+
+				if (value != kNotInitialized)
+					arguments.Push(isInstance(value, Term) ? value : Literal(value))
 				else
 					arguments.Push(argument)
 			}
@@ -1138,7 +1140,12 @@ class LetAction extends Action {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				if isInstance(value.getValue(resultSet), Literal)
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteVariables(resultSet))
+			})
 
 			resultSet.dispose()
 		}

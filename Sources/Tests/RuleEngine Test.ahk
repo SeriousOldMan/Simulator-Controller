@@ -117,6 +117,10 @@ global kExecutionTestRules := "
 				testFunctionCall(?input, ?result) <= :testFunctionCall=(?input, ?result)
 
 				{All: [?Test], {Is: :testFunctionCall=(Foo, ?Result)}} => (Set: CallResult = ?Result)
+
+				[?Test] => (Let: ?var = father(Peter, Paul)), (Prove: printFather(?var))
+
+				printFather(?v) <= :messageShow(?v)
 )"
 
 
@@ -280,8 +284,8 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(6, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(35, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(7, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(36, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 

@@ -114,9 +114,9 @@ global kExecutionTestRules := "
 				transposeRow([[?rFirst | ?oFirst] | ?rest], [?rFirst | ?rRest], [?oFirst | ?oRest]) <=
 						transposeRow(?rest, ?rRest, ?oRest)
 
-				testFunctionCall(?input, ?result) <= :testFunctionCall?(?input, ?result)
+				testFunctionCall(?input, ?result) <= :testFunctionCall=(?input, ?result)
 
-				{All: [?Test], {Is: :testFunctionCall?(Foo, ?Result)}} => (Set: CallResult = ?Result)
+				{All: [?Test], {Is: :testFunctionCall=(Foo, ?Result)}} => (Set: CallResult = ?Result)
 )"
 
 

@@ -2266,7 +2266,7 @@ class ResultSet {
 				return ProduceChoicePoint(this, goal, environment)
 			case "call":
 				return CallChoicePoint(this, goal, environment)
-			case "call?":
+			case "call=":
 				return CallChoicePoint(this, goal, environment, true)
 			case "set":
 				return SetFactChoicePoint(this, goal, environment)
@@ -4800,10 +4800,10 @@ class StructParser extends Parser {
 		if (InStr(terms[1], ":") = 1) {
 			function := SubStr(terms[1], 2)
 
-			if ((StrLen(function) > 0) && (SubStr(function, StrLen(function)) = "?")) {
+			if ((StrLen(function) > 0) && (SubStr(function, StrLen(function)) = "=")) {
 				function := SubStr(function, 1, StrLen(function) - 1)
 
-				handler := "call?"
+				handler := "call="
 			}
 			else
 				handler := "call"

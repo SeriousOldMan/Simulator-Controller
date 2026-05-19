@@ -120,7 +120,11 @@ global kExecutionTestRules := "
 
 				[?Test] => (Let: ?var = father(Peter, Paul)), (Prove: printFather(?var))
 				[?Test] => (Prove: parse("son(Paul, Peter)", ?term)), (Prove: print(?term, ?text)),
-						   (Call: showArgs(?text)), (Set: ParseResult = ?text)
+						   (Call: showArgs(?text)), (Set: ParseResult1 = ?text)
+				[?Test] => (Prove: parse("47.11", ?term)), (Prove: print(?term, ?text)),
+						   (Call: showArgs(?text)), (Set: ParseResult2 = ?text)
+				[?Test] => (Prove: parse("Hugo", ?term)), (Prove: print(?term, ?text)),
+						   (Call: showArgs(?text)), (Set: ParseResult3 = ?text)
 
 				printFather(?v) <= :showArgs(?v), Set(FatherResult, ?v)
 )"
@@ -286,7 +290,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(8, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(10, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(36, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -654,7 +658,9 @@ class HybridEngine extends Assert {
 
 		this.AssertEqual("Foo_Bar", kb.getValue("CallResult"), "Unexpected function call result...")
 		this.AssertEqual("father(Peter, Paul)", kb.getValue("FatherResult"), "Unexpected function call result...")
-		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult"), "Unexpected function call result...")
+		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult1"), "Unexpected function call result...")
+		this.AssertEqual("47.11", kb.getValue("ParseResult2"), "Unexpected function call result...")
+		this.AssertEqual("Hugo", kb.getValue("ParseResult3"), "Unexpected function call result...")
 	}
 }
 

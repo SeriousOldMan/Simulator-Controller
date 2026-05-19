@@ -350,7 +350,7 @@ By the way, reversing lists with the rules used above is not very efficient, but
 
 #### Goals
 
-As introduced above, a goal in a reduction is a compound like "grandfather(?a, Paul)". When a goal is to be proved by the rule engine, all reduction rules with the same functor (i.e. same name) and the same arity (i.e. same number of arguments) are selected and then tested in the order of their definition. A rule is considered to be applicable when its head can be unified with the goal (see below). If this is the case, the rule engine will now try to prove all goals from the tail of the selected rule, in order to prove the original goal.
+As introduced above, a goal in a reduction is a compound like "grandfather(?a, Paul)". When a goal is to be proven by the rule engine, all reduction rules with the same functor (i.e. same name) and the same arity (i.e. same number of arguments) are selected and then tested in the order of their definition. A rule is considered to be applicable when its head can be unified with the goal (see below). If this is the case, the rule engine will now try to prove all goals from the tail of the selected rule, in order to prove the original goal.
 
 A goal can be as simple as
 
@@ -558,11 +558,9 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Syntax: execute(executable, arg1, ..., argN)
   
-    Executes the executable or script identified by the first argument, which must be file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
+    Executes the executable or script identified by the first argument, which must be a file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
 	
-	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
-	
-	Note: If the 
+	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking. 
   
 ### Event-based programming
 

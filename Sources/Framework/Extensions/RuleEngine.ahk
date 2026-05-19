@@ -3993,7 +3993,7 @@ class RuleCompiler {
 
 	compileTerm(text) {
 		local one := 1
-		local theTerm := this.readTailTerm(&text, &one)
+		local theTerm := this.readTerm(&text, &one)
 
 		if (theTerm != kNotFound)
 			return this.createTermParser(theTerm).parse(theTerm)
@@ -4064,9 +4064,8 @@ class RuleCompiler {
 			return kNotFound
 	}
 
-	readTailTerm(&text, &nextCharIndex, skip := false) {
-		local literal
-		local struct
+	readTerm(&text, &nextCharIndex, skip := false) {
+		local literal, struct
 
 		if skip
 			if !this.skipDelimiter(skip, &text, &nextCharIndex, false)
@@ -4074,18 +4073,41 @@ class RuleCompiler {
 
 		literal := this.readLiteral(&text, &nextCharIndex)
 
-		if (literal == kNotFound)
-			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
-		else if ((literal == "!") || (literal = "fail"))
+		if ((literal == "!") || (literal = "fail"))
 			return literal
-		else {
+		else if (literal != kNotFound) {
 			struct := this.readStruct(&text, &nextCharIndex, literal)
 
-			if (struct = kNotFound)
-				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
-
-			return struct
+			if (struct == kNotFound) {
+				if (Trim(SubStr(text, nextCharIndex)) = "")
+					return literal
+			}
+			else
+				return struct
 		}
+
+		throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTerm..."
+	}
+
+	readTailTerm(&text, &nextCharIndex, skip := false) {
+		local literal, struct
+
+		if skip
+			if !this.skipDelimiter(skip, &text, &nextCharIndex, false)
+				return kNotFound
+
+		literal := this.readLiteral(&text, &nextCharIndex)
+
+		if ((literal == "!") || (literal = "fail"))
+			return literal
+		else if (literal != kNotFound) {
+			struct := this.readStruct(&text, &nextCharIndex, literal)
+
+			if (struct != kNotFound)
+				return struct
+		}
+
+		throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTailTerm..."
 	}
 
 	readStruct(&text, &nextCharIndex, functor := false) {
@@ -4488,7 +4510,7 @@ class RuleCompiler {
 			return PrimaryParser(this, variables)
 		else if complex {
 			if ((term[1] == "[") && forArguments)
-				return ListParser(this, variables)
+				return this.createListParser(this, variables)
 			else
 				return this.createStructParser(this, variables)
 		}
@@ -4498,6 +4520,10 @@ class RuleCompiler {
 
 	createStructParser(term, variables := kNotInitialized) {
 		return StructParser(this, variables)
+	}
+
+	createListParser(term, variables := kNotInitialized) {
+		return ListParser(this, variables)
 	}
 
 	createProductionRule(conditions, actions, priority) {

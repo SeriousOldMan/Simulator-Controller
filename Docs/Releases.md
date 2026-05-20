@@ -38,8 +38,8 @@
     - Compound terms are now supported in *Let* actions in production rules. Example:
 	
 			[?FuelSavingLaps > 0] => (Let: ?target = Laps(?FuelSavingLaps)), (Prove: calculateSaveAmount(?target))
-
     - Added two new [builtin predicates "parse" and "print"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for reduction rules.
+	- Added two new [builtin predicates "addRule" and "removeRule"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for the rule engine. Using these predicates, the rule engine is now capable of adding and removing rules during runtime, thereby supporting learning through feedback loops.
   - [Internal] Migrated to AHK 2.1-alpha.30.
 
 # Release history

@@ -41,9 +41,9 @@ global kSet := "Set:"
 global kClear := "Clear:"
 global kExecute := "Execute:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute", "parse", "print"]
-global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute, parse, print]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute", "parse", "print", "addRule", "removeRule"]
+global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute, parse, print, addRule, removeRule]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2, 2, 1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -1841,11 +1841,25 @@ class Variables {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Rule {
+	static sNextID := 1
+
+	iID := false
+
+	ID  {
+        Get {
+            return this.iID
+        }
+    }
+
 	Type {
         Get {
             throw "Virtual property Rule.Type must be implemented in a subclass..."
         }
     }
+
+	__New() {
+		this.iID := ++Rule.sNextID
+	}
 
 	toObject(facts := kNotInitialized) {
 		throw "Rules cannot be converted to objects in Rule.toObject..."
@@ -1886,6 +1900,8 @@ class ProductionRule extends Rule {
 	}
 
 	__New(conditions, actions, priority := 0) {
+		super.__New()
+
 		this.iConditions := conditions
 		this.iActions := actions
 		this.iPriority := priority
@@ -1983,6 +1999,8 @@ class ReductionRule extends Rule {
 	}
 
 	__New(head, tail) {
+		super.__New()
+
 		this.iHead := head
 		this.iTail := tail
 		this.iHasVariables := this.hasVariables()
@@ -3668,12 +3686,29 @@ class Rules {
 			this.Reductions[rule.Head.Functor, rule.Head.Arity, true].Push(rule)
 
 		this.iGeneration += 1
+
+		return true
 	}
 
 	removeRule(rule) {
 		local rules, production, index, candidate
 
-		if (rule.Type == kProduction) {
+		if isInteger(rule) {
+			production := this.Productions[false]
+
+			while production {
+				if (production.Rule.ID == rule)
+					return this.removeRule(production.Rule)
+
+				production := production.Next[false]
+			}
+
+			for ignore, rules in this.Reductions
+				for index, candidate in rules
+					if (candidate.ID == rule)
+						return this.removeRule(candidate)
+		}
+		else if (rule.Type == kProduction) {
 			production := this.Productions[false]
 
 			while production {
@@ -3682,24 +3717,24 @@ class Rules {
 
 					this.iGeneration += 1
 
-					break
+					return true
 				}
 
 				production := production.Next[false]
 			}
 		}
 		else {
-			rules := this.Reductions[rule.Head.Functor, rule.Head.Arity]
-
-			for index, candidate in rules
+			for index, candidate in this.Reductions[rule.Head.Functor, rule.Head.Arity]
 				if (rule == candidate) {
 					rules.RemoveAt(index)
 
 					this.iGeneration += 1
 
-					break
+					return true
 				}
 		}
+
+		return false
 	}
 
 	registerIncludes(includes) {
@@ -4065,7 +4100,7 @@ class RuleCompiler {
 	}
 
 	readTerm(&text, &nextCharIndex, skip := false) {
-		local literal, struct
+		local literal, struct, list
 
 		if skip
 			if !this.skipDelimiter(skip, &text, &nextCharIndex, false)
@@ -4084,6 +4119,12 @@ class RuleCompiler {
 			}
 			else
 				return struct
+		}
+		else if this.skipDelimiter("[", &text, &nextCharIndex, false) {
+			list := this.readList(&text, &nextCharIndex, false)
+
+			if (list != kNotFound)
+				return list
 		}
 
 		throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readTerm..."
@@ -5583,6 +5624,38 @@ print(choicePoint, term, text) {
 
 	try {
 		return resultSet.unify(choicePoint, Literal(term.toString(resultSet)), text)
+	}
+	catch Any {
+		return false
+	}
+}
+
+addRule(choicePoint, text, id) {
+	local resultSet := choicePoint.ResultSet
+
+	try {
+		rule := RuleCompiler().compileRule(text.toString(resultSet))
+
+		if (rule && resultSet.unify(choicePoint, Literal(rule.ID), id))
+			return resultSet.Rules.addRule(rule)
+		else
+			return false
+	}
+	catch Any {
+		return false
+	}
+}
+
+removeRule(id) {
+	local resultSet := choicePoint.ResultSet
+
+	try {
+		id := id.toString(resultSet)
+
+		if isInteger(id)
+			return resultSet.Rules.removeRule(id)
+		else
+			return false
 	}
 	catch Any {
 		return false

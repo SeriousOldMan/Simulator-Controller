@@ -560,15 +560,27 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Executes the executable or script identified by the first argument, which must be a file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
 	
-	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking. 
+	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
+	
+  - addRule
+  
+    Syntax: addRule(rule, id)
+  
+    Compiles a rule from the given textual rule definition supplied in *rule* and adds it to the active rule set. The internal ID of the rule is unified with the second argument *id*, which can be used to remove the rule later on using the *removeRule* predicate. *addRule* will fail, when a syntax error is detected. Please note, that the side effect of adding the rule is not undone, when backtracking is performed.
+	
+  - removeRule
+  
+    Syntax: removeRule(id)
+  
+    Removes the rule with supplied *id* from the active rule set. *removeRule* will fail, if *id* is not a vaild rule ID or if a rule with such an ID does not exist. Please note, that the side effect of removing the rule is not undone, when backtracking is performed.
   
 ### Event-based programming
 
-The combination of the facts in the knowledge base with both type of rules, allows you to build event-based systems very easily. Let's discuss that with regards to the Race Assistants.
+The combination of the facts in the knowledge base with both types of rules, allows you to build event-based systems very easily. Let's discuss that with regards to the Race Assistants.
 
-  1. The current state of the session, the state of the car like important telemetry values and also information about all opponente are stored as facts in the knowledge base.
+  1. The current state of the session, the state of the car like important telemetry values and also information about all opponents are stored as facts in the knowledge base.
   2. A set of production rules constantly check whether a specific condition exists, for example that fuel will be depleted in about 3 laps.
-  3. If one of this conditions is detected, the production rule can start complex calculations using reduction rules as a resulting action.
+  3. If such a condition is detected, the production rule can then start complex calculations using reduction rules as a resulting action.
 
 This is exactly the approach, how the rule sets for the Race Assistants has been built.
 
@@ -582,7 +594,7 @@ If you only want to add some rules, there is a much better way. You can create a
 	
 You can place any number of "*.rules" files in this folder and they will be loaded typically in alphapbetical order.
 
-Last but not lest, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
+Last but not least, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model, which will open up endless new possibilities. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
 ## Execution of Scripts by the Rule Engine
 

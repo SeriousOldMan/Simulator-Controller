@@ -724,8 +724,7 @@ celebrate(knowledgeBase) {
 }
 
 showArgs(choicePoint, arguments*) {
-	local kb := isInstance(choicePoint, KnowledgeBase) ? choicePoint
-													   : choicePoint.ResultSet.KnowledgeBase
+	local kb := choicePoint.KnowledgeBase
 
 	if (kb.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, values2String(" ", arguments*)), SplashTextGui.Show("w200 h60")
@@ -737,8 +736,8 @@ showArgs(choicePoint, arguments*) {
 }
 
 showRelationship(choicePoint, grandchild, grandfather) {
+	local knowledgeBase := choicePoint.KnowledgeBase
 	local fact := "Related." . grandchild . "." . grandfather
-	local knowledgeBase := choicePoint.ResultSet.KnowledgeBase
 
 	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, grandchild " is grandchild of " grandfather), SplashTextGui.Show("w200 h60")
@@ -852,7 +851,7 @@ else {
 		reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
 													 Call(messageBox, ?delta)
 
-		{All: [?Input], {Calc: ?Result = ?Input + 1}} => (Call: messageBox(?Result))
+		{All: [?Input], {Is: ?Result = ?Input + 1}} => (Call: messageBox(?Result))
 	)"
 
 	productions := false

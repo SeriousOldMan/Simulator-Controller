@@ -1,15 +1,15 @@
 [Development]
-Version=6.9.7.0-beta
+Version=6.9.7.0-release
 Target=6.9.7.0-release
-Date=05/21/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/L48kFQ46/Releases/Simulator%20Controller%206.9.7.0-beta.zip
+Date=05/22/2026
+Download=https://cutt.ly/mtNuATIf;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KFpDz-ql/Releases/Simulator%20Controller%206.9.7.0-release.zip;https://www.dropbox.com/scl/fi/eqeveu0cd3tiiyxudts1r/Simulator-Controller-6.9.7.0-release.zip?rlkey=6d7sss5aa7h4u7fz2mudg88vc&st=dhq5qvcp&dl=1;http://%master%/Releases/Simulator Controller 6.9.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.7.0-release.zip
 Changes=Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30, New builtin predicates for reductions, Support for general terms in Let actions, Fixed FCY simulation
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
-Version=6.9.6.0-release
-Date=05/15/2026
-Download=https://cutt.ly/ItVdLMVP;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/aK9BKZlN/Releases/Simulator%20Controller%206.9.6.0-release.zip;https://www.dropbox.com/scl/fi/e4mp8dshsvjr7s5583kfp/Simulator-Controller-6.9.6.0-release.zip?rlkey=tkntvf6f0qn02ed3km3pux47c&st=jrf1gaiq&dl=1;http://%master%/Releases/Simulator Controller 6.9.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.6.0-release.zip
-Changes=Rejectable installation of runtimes in "Simulator Setup", New Assistant Icons, Telemetry-based Issue Analyzer, Optimized naming of Session folders
+Version=6.9.7.0-release
+Date=05/22/2026
+Download=https://cutt.ly/mtNuATIf;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/KFpDz-ql/Releases/Simulator%20Controller%206.9.7.0-release.zip;https://www.dropbox.com/scl/fi/eqeveu0cd3tiiyxudts1r/Simulator-Controller-6.9.7.0-release.zip?rlkey=6d7sss5aa7h4u7fz2mudg88vc&st=dhq5qvcp&dl=1;http://%master%/Releases/Simulator Controller 6.9.7.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.7.0-release.zip
+Changes=Clarified behavior of *Assistant.Property*, Support for function return results in call= predicates, Added Assistant.Call= and Assistant.Property= in Assistant action rules, Migrated to AHK 2.1-alpha.30, New builtin predicates for reductions, Support for general terms in Let actions, Fixed FCY simulation
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Components]
 Media.6.9.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.9.2.Path=.
 Utilities.6.9.2.Content=Utilities
 Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vSM_QhzO/Components/Utilities%206.9.2.zip;https://www.dropbox.com/scl/fi/780ucr9jfstiy9umhi5nz/Utilities-6.9.2.zip?rlkey=rbw1b5i3dlbc9f63o05722set&st=1mkiahg4&dl=1;http://%master%/Components/Utilities 6.9.2.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.9.2.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=6.9.7.0-beta
-Release=6.9.6.0-release
+Development=6.9.7.0-release
+Release=6.9.7.0-release

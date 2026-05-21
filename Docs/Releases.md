@@ -1,26 +1,8 @@
 # Latest stable release
 
-## 6.9.6.0
-
-#### Date: 05/15/26
-
-#### Fixes
-
-  - Fixed a bug in the new themed dialog boxes, which caused a crash when a message box overlays another message box.
-  
-#### Changes
-
-  - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
-  - Standardized folder paths for stored telemetry data for Driving Coach, "Solo Center", "Team Center" and "Setup Workbench". Documentation updated accordingly.
-  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
-  - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
-  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows. The old colors have been preserved for a recognition effect.
-  
-# Upcoming release
-
 ## 6.9.7.0
 
-#### Date: 05/22/26 (planned)
+#### Date: 05/22/26
 
 #### Fixes
 
@@ -45,8 +27,28 @@
 	- Added two new [builtin predicates "addRule" and "removeRule"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for the rule engine. Using these predicates, the rule engine is now capable of adding and removing rules during runtime, thereby supporting learning through feedback loops.
   - [Internal] Migrated to AHK 2.1-alpha.30.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
 
+## 6.9.6.0
+
+#### Date: 05/15/26
+
+#### Fixes
+
+  - Fixed a bug in the new themed dialog boxes, which caused a crash when a message box overlays another message box.
+  
+#### Changes
+
+  - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
+  - Standardized folder paths for stored telemetry data for Driving Coach, "Solo Center", "Team Center" and "Setup Workbench". Documentation updated accordingly.
+  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
+  - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
+  - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows. The old colors have been preserved for a recognition effect.
+  
 ## 6.9.5.0
 
 #### Date: 05/08/26

@@ -246,7 +246,7 @@ Once the condition of a production rule is matched, all actions on the right-han
   
     Syntax / Example: (Let: !Increment = !Increment + 1)
 	
-	This action allows general expressions to be used as an action. Variables can be used in these expressions and can be altered as a side effect.
+	This action allows general expressions to be used as an action. Variables can be used in these expressions and can be altered as a side effect. Please note, that the expression does not have access to other rules, but can read from the knowledgebase.
 	
   - Execute
   

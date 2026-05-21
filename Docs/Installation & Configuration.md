@@ -31,7 +31,7 @@ After you have installed Simulator Controller for the first time, the system wil
 After you have succesfully installed Simulator Controller for the first time, you will have to build a configuration for your simulation setup. There are two applications available to do this:
 
   - The first, ["Simulator Setup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool), which was introduced with Release 3.5, is an intelligent *Setup Wizard*, which guides you through the initial installation & configuration process. Many of the tasks described in the remaining chapters of the current document will be handled automatically by this tool. After you have succesfully completed the process using this tool, you will have a running installation of Simulator Controller completely customized to your environment. Please note, that "Simulator Setup" is automatically started after the initial installation, if you ticked the corresponding check box.
-  - After you have finished the initial installation & configuration process and created your first running configuration using *Simulator Setup*, you can additionally use ["Simulator Configuration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-configuration-tool) for further configuration tasks. This tool requires a much deeper knowledge about the inner workings of Simulator Controller, but will give you access to even more functionality compared to the more simple *Simulator Setup* tool. However, as long as you are happy with the options provided by *Simulator Setup*, I recommend to stick to this tool, since it is much easier to use and more fail-safe.
+  - After you have finished the initial installation & configuration process and created your first running configuration using "Simulator Setup", you can additionally use ["Simulator Configuration"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-configuration-tool) for further configuration tasks. This tool requires a much deeper knowledge about the inner workings of Simulator Controller, but will give you access to even more functionality compared to the more simple "Simulator Setup" tool. However, as long as you are happy with the options provided by "Simulator Setup", I recommend to stick to this tool, since it is much easier to use and more fail-safe.
 
 Before starting the configuration process, I would like to cover a few more details to help you understand the concepts and aspects of configuration. On the other hand, you can skip these for the time being and go straight to the instructions for the [*Setup Wizard*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
 
@@ -124,9 +124,8 @@ The Assistants acquire telemetry data from the different simulation games using 
 	 
   5. *F1 25*
   
-     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode). Unfortunately, Simulator Controller cannot be used on the same machine as *F1 25* at the time of this writing, because it is flagged by Javelin as cheating software. However, there are solutions to this problem. See the [special notes for *F1 25*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25) for more information.
-
-If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
+     
+	 
 
 ### Using your own pictures, videos and sounds for all the splash screens
 
@@ -152,11 +151,11 @@ The different components of Simulator Controller can be customized to a large ex
 
 ### Running the Setup tool
 
-The initial configuration after the first installation is handled by the tool *Simulator Setup*.
+The initial configuration after the first installation is handled by the tool "Simulator Setup".
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%201.PNG)
 
-This tool is self-explanatory to a great extent, so you don't have to read the remaining documentation, before you start your initial installation & configuration process. And you can repeat the installation & configuration process with *Simulator Setup* as many times as you want, since the tool will retain your work between sessions. The current state of the installation & configuration process is stored in the folder *Simulator Controller\Setup* in your *Documents* folder, if you want to make a backup of your currently chosen settings and options.
+This tool is self-explanatory to a great extent, so you don't have to read the remaining documentation, before you start your initial installation & configuration process. And you can repeat the installation & configuration process with "Simulator Setup" as many times as you want, since the tool will retain your work between sessions. The current state of the installation & configuration process is stored in the folder *Simulator Controller\Setup* in your *Documents* folder, if you want to make a backup of your currently chosen settings and options.
 
 When you start "Simulator Setup" for the first time, you may create a so called basic configuration, which gives you the opportunity to create a simple, but working configuration with just a few choices. This configuration will support the installed simulators and will activate at least one Race Assistant together with voice control. No configuration support is given for your Button Boxes and Stream Decks, but you can add them anytime later.
 
@@ -166,13 +165,13 @@ The details of this basic configuration are discussed in the [quick start guide]
 
 Please note, that all required software will be installed automatically when visiting the basic configuration page. However, "Simulator Setup" also provides installers for useful additional and 3rd party software and there are additional configuration pages available which will allow you to detect any simulators, which haven't been found automatically or you make additional 3rd party software known to Simulator Controller, so that it can be controlled by a Button Box, for example. To access these additional pages, select *Extended* in the "Mode" drop down menu in the lower left corner of the main window of "Simulator Setup".
 
-If you ever have the need to start with an empty, fresh configuration, you can do this either by deleting the *Simulator Controller\Setup* folder or you can hold the Shift and Control key down, while starting *Simulator Setup*. You will be asked, if you want to ignore all the saved settings and options.
+If you ever have the need to start with an empty, fresh configuration, you can do this either by deleting the *Simulator Controller\Setup* folder or you can hold the Shift and Control key down, while starting "Simulator Setup". You will be asked, if you want to ignore all the saved settings and options.
 
 Additionally, since the configuration files will only be created in the last step the process, you can experiment with the settings & options until you are satisfied with your choices. Doing this, you will learn a lot about the functionalities of Simulator Controller. If you decide to generate a new configuration in the last step of the installation & configuration step, backup files of all changed configurartion files (named *.bak) will be created automatically, so you can always rescue your current configuration, if something goes wrong.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%202.JPG)
 
-Three files will be created by the *Simulator Setup* tool at the end of the installation & configuration process, all of which are stored in the *Simulator Controller\Config* folder in your *Documents* folder:
+Three files will be created by the "Simulator Setup" tool at the end of the installation & configuration process, all of which are stored in the *Simulator Controller\Config* folder in your *Documents* folder:
 
   - *Simulator Configuration.ini*
     This is the main configuration file of Simulator Controller. You can customize every aspect of this file using the "Simulator Configuration" application after the initial installation & configuration process. See the remaining documentation for more information.
@@ -257,18 +256,18 @@ It is possible to patch the generated configuration and/or settings files create
 
 The following rules apply:
 
-  1. If you name a section, for example "[Plugins]", similar to the section label in the configuration file generated by *Simulator Setup*, the key / value pairs will simply overwrite everything with a similar key in this section. Missing keys in the generated configuration file will be created.
+  1. If you name a section, for example "[Plugins]", similar to the section label in the configuration file generated by "Simulator Setup", the key / value pairs will simply overwrite everything with a similar key in this section. Missing keys in the generated configuration file will be created.
   
-  2. If you prefix the section name with "Add: " like in "[Add: Plugins]", every value for a given key will be added to the current value of this key in the configuration file generated by *Simulator Setup*, unless it is already a part of the current value.
+  2. If you prefix the section name with "Add: " like in "[Add: Plugins]", every value for a given key will be added to the current value of this key in the configuration file generated by "Simulator Setup", unless it is already a part of the current value.
   
     Example:
   
     [Add: Plugins]
 	Race Spotter=; synthesizer: dotNET
 	
-  3. If you prefix the section name with "Delete: " like in "[Delete: Plugins]", every value for a given key will be deleted from the current value of this key in the configuration file generated by *Simulator Setup*.
+  3. If you prefix the section name with "Delete: " like in "[Delete: Plugins]", every value for a given key will be deleted from the current value of this key in the configuration file generated by "Simulator Setup".
   
-  4. Last, but least, you can replace parts of the current value for a given key in the configuration file generated by *Simulator Setup* by declaring a "[Replace: xxx]" section in the patch file with *xxx* as the name of the original section. The value for a key in the patch file must look like this:
+  4. Last, but least, you can replace parts of the current value for a given key in the configuration file generated by "Simulator Setup" by declaring a "[Replace: xxx]" section in the patch file with *xxx* as the name of the original section. The value for a key in the patch file must look like this:
   
     *original value 1*->*new value 1* [ | *original value 2*->*new value 2* | ... ]
 

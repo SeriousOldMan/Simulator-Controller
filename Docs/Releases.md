@@ -17,7 +17,7 @@
 	- Added support for using foreign function aliases (with or without return values) in production rule actions. Example:
 	
 			{Is: :foreignCall=(Foo, ?Result)} => (Set: CallResult = ?Result)
-    - Compound terms are now supported in *Let* actions in production rules. Example:
+    - General terms (compounds, lists and so on) are now supported in *Let* actions in production rules. Example:
 	
 			[?FuelSavingLaps > 0] => (Let: ?target = Laps(?FuelSavingLaps)), (Prove: calculateSaveAmount(?target))
 			[?FuelSavingPct > 0]  => (Let: ?target = Pct(?FuelSavingPct)), (Prove: calculateSaveAmount(?target))

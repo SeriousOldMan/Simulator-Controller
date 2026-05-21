@@ -455,7 +455,8 @@ class Unification extends Assert {
 			else
 				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
 
-			resultSet.dispose()
+			if resultSet
+				resultSet.dispose()
 		}
 	}
 

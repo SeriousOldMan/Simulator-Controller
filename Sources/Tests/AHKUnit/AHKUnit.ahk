@@ -452,11 +452,10 @@ class AhkUnit_Runner {
 			}
 		}
 		for key, testInstance in testInstances {
-			; try {
+			try {
 				testInstance.AuInit(key)
 				method := GetMethod(testInstance, key)
 				method.Call(testInstance)
-			/*
 			} catch Any as e {
 				thrownClass := (!isObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]
@@ -469,7 +468,6 @@ class AhkUnit_Runner {
 					continue
 				}
 			}
-			*/
 			assertionCount := testInstance.AuGetAssertionCount()
 			this.count.assertion += assertionCount
 			if (assertionCount == 0) {

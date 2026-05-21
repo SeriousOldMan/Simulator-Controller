@@ -1,6 +1,6 @@
 ## Introduction
 
-Several applications of Simulator Controller, most notably the AI Race Assistants, exhibit a kind of *intelligence* in the sense, that they are able to understand a given situation or a set of information provided by the user and then they use a reasoning process to recommend an appropriate action or at least recommend a reasonable action. All applications have access to a custom build Hybrid Rule Engine to implement these capabilities. This rule engine supplies forward chaining capabilities similar to the famous OPS5 as well as a first-order logic programming language very similar to Prolog. Both have access to a shared knowledge base and can work together on a given goal or task.
+Several applications of Simulator Controller, most notably the AI Race Assistants, exhibit a kind of *intelligence* in the sense, that they are able to understand a given situation or a set of information provided by the user and then they use a reasoning process to recommend an appropriate action or at least recommend a reasonable action. All applications have access to a custom build hybrid rule engine to implement these capabilities. This rule engine supplies forward chaining capabilities similar to the famous OPS5 as well as a first-order logic programming language very similar to Prolog. Both have access to a shared knowledge base and can work together on a given goal or task.
 
 The rule engine can handle thousands of rules and execute them efficiently. Forward chaining rules (also named productions) are arranged in a so called [Rete network](https://en.wikipedia.org/wiki/Rete_algorithm) so that only rules are considered for execution, for which the incoming facts in the condition part has been changed since the last execution. Efficient execution of the backward chaining rules (also called reductions) is secured by a compiler which creates a type of pseudo code which then can be efficiently executed incl. proper tail-recursion optimization.
 
@@ -143,7 +143,7 @@ A production rule is a triggered by a specific situation in the knowledge base a
 
 Syntax: condition **=>** action1, ..., actionN
 	
-The left hand side of the rule therefore is an expression which repreusents a condition, followed by a "=>" and the a comma-seperated list of actions. Example:
+The left hand side of the rule therefore is an expression which represents a condition, followed by a "=>" and the a comma-seperated list of actions. Example:
 
 	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap)), (Set: Pitstop.Ready = true)
 
@@ -664,7 +664,7 @@ When this script is executed, the following global variables and functions are a
 
    - Rules.Execute() or Rules.Produce()
    
-     Runs a full production cycle of the Rule Engine of the Assistant.
+     Runs a full production cycle of the rule engine of the Assistant.
 
 Additionally, the script can load any number of additional modules by using the builtin "require" function, either from external sources like the [LuaRocks](https://luarocks.org/) package maneger, or by using one of the predefined modules of Simulator Controller, that allow you to interface with the currently running simulation. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for an introduction and reference for these modules.
 

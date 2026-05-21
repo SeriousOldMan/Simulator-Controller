@@ -387,9 +387,9 @@ class FCYHandling extends Assert {
 			}
 
 			if (A_Index = 4) {
-				Sleep(2000)
-
 				Task.yield()
+
+				Sleep(4000)
 
 				pitstop := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next")
 				lap := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap")
@@ -398,9 +398,9 @@ class FCYHandling extends Assert {
 				this.AssertEqual(28, lap, "Unexpected pitstop lap detected in lap 2...")
 			}
 			else if (A_Index = 10) {
-				Sleep(2000)
-
 				Task.yield()
+
+				Sleep(4000)
 
 				pitstop := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Next")
 				lap := strategist.KnowledgeBase.getValue("Strategy.Pitstop.Lap")

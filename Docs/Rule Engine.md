@@ -34,7 +34,7 @@ The first rule is a forward chaining rule. It takes information from the current
 	{Any: [?Lap], {None: [?Fuel.Amount.Target]}} =>
 			(Prove: updateFuelTarget(?Lap))
 
-In this case, the condition first checks whether **Lap** fact has been changed in the knowledge base, which happens aall the time, when the driver crosses the start/finish line. Alternativly, the condition is also met, if there is no fact named **Fuel.Amount.Target** known in the knowledgebase. The only action fired by this production rule is to *call* the backward chaining engine to compute and update the fuel target. This is achieved by the action "(Prove: updateFuelTarget(?Lap))".
+In this case, the condition first checks whether **Lap** fact has been changed in the knowledge base, which happens every time, when the driver crosses the start/finish line. Alternativly, the condition is also met, if there is no fact named **Fuel.Amount.Target** known in the knowledgebase. The only action fired by this production rule is to *call* the backward chaining engine to compute and update the fuel target. This is achieved by the action "(Prove: updateFuelTarget(?Lap))".
 
 The *updateFuelTarget* reduction rule actually consists of two rules. The first rule looks at the average consumption, the fuel capacity of the car, the number of remaining laps in the session, and so on, to decide whether refueling is necessary. If this is the case (checked by "?neededFuel > ?remainingFuel") the fact **Fuel.Amount.Target** is created in the knowledge base with the calculated refuel amount as value. The second rule is called, when the first does not succceed, which is the case, if the remaining fuel is enough for the remaining session, or if no average consumption is known, and so on. The fact **Fuel.Amount.Target** is removed from the knowledge base, thereby indicating that refueling is not necessary or not possible at the moment.
 
@@ -56,7 +56,7 @@ A fact in the knowledgebase is identified by a name, which has the format of a s
 	Tyre.Pressure.Hot.Front.Left
 	Tyre.Pressure.Hot.Front.Right
 
-A fact always has a value, but a special value is used internally to represent an unbound fact. A special predicate **unbound?**, which can be used in conditions of production rules and also in reduction rules to test against unbound facts.
+A fact always has a value, but a special value is used internally to represent an unbound fact. A special predicate **unbound?** can be used in conditions of production rules and also in reduction rules to test against unbound facts.
 
 WHen you are running one of the applications, which is using the rule engine, you can always take a look at the knowledge base, by choosing "Debug Knowledgebase" from the "Support" menu in the tray icon of that application. This will create a file named like the application process but with an extension ".knowledge", for example "Race Engineer.knowledge". This file contains a textual representation of the knowledge base and will be constantly update. This will slow down everything, of course.
 
@@ -259,12 +259,18 @@ Once the condition of a production rule is matched, all actions on the right-han
     Syntax / Example: (Set: Session.Laps, ?Lap) or (Set: Session.Laps = ?Lap)
 	
 	Using this action, you can create a fact in the knowledge base or alter the value of an existing one. If you omit the value, the fact is set to *true*.
+	
+	Similar to the *set* predicate of reduction rules, the fact can be expressed in multiple parts to compose the fact name in pseudo object notation. Example:
+	
+		(Set: Tyre.Pressure, ?Position, ?Pressure)
+		
+	With the variable ?Position bound to "Front.Left" and *?Pressure* be equal to *27.1*, this will result the fact "Tyre.Pressure.Front.Left" to be set to **27.1** in the knowledgebase.
   
   - Clear
   
     Syntax / Example: (Clear: Session.Laps)
 	
-	As the name of the action suggests, the fact is clear and effectivly removed from the knowledge base.
+	As the name of the action suggests, the fact is clear and effectivly removed from the knowledge base. The *Clear* action also supports composing pseudo object fat names from multiple parts similar to the *Set* action.
 
 #### Order of execution
 
@@ -540,7 +546,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the function.
 	
-	*function* must return true, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
+	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 
   - call=
   
@@ -552,7 +558,7 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Syntax: produce()
 	
-	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments.
+	This is a very special predicate. It interrupts the reduction rule execution and allows the rule engine to run all pending production rules. Since these can *call* reduction rules in their actions and also in their conditions, this results in a stack of active execution environments. When all applicable rules have been executed, the current rule continues with the next subgoal.
 	
   - execute
   
@@ -561,6 +567,18 @@ The rule engine has some builtin predicates which can be used when formulating r
     Executes the executable or script identified by the first argument, which must be a file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
 	
 	The executable must return an exit code. **0** will be interpreted as success and everything else will indicate a failure and trigger backtracking.
+
+  - productions
+  
+    Syntax: productions(list)
+	
+	Generates a list of all production rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
+
+  - reductions
+  
+    Syntax: reductions(list)
+	
+	Generates a list of all reduction rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
 	
   - addRule
   

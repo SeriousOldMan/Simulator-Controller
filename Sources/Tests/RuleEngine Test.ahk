@@ -38,7 +38,7 @@ global kCompilerCompliantTestRules
 				  , "reverse([1,2,3,4], ?L)"
 				  , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
 				  , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
-				  , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"
+				  , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter = happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"
 				  , "fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)"]
 
 global kCompilerNonCompliantTestRules
@@ -46,7 +46,7 @@ global kCompilerNonCompliantTestRules
 				  , "reverse([1,2,3,4]], ?L)"
 				  , "foo(?A, bar(?B)) => baz(?, foo([?A], !), !, fail"
 				  , "reverse([ ?H | ], ?REV )<= reverse(?T,,?RT), concat ?RT,[?H],?REV)"
-				  , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"]
+				  , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter = happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"]
 
 global kExecutionTestRules := "
 (
@@ -129,8 +129,22 @@ global kExecutionTestRules := "
 						   (Call: showArgs(?text)), (Set: ParseResult3 = ?text)
 				[?Test] => (Prove: parse("[1,2|3]", ?term)), (Prove: print(?term, ?text)),
 						   (Call: showArgs(?text)), (Set: ParseResult4 = ?text)
+				[?Test] => (Set: TestFact = "Hello"),
+						   (Prove: parse("!TestFact", ?term)), (Prove: print(?term, ?text)),
+						   (Call: showArgs(?text)), (Set: ParseResult5 = ?text)
+				[?Test] => (Let: ?Var = "There"),
+						   (Prove: parse("?Var", ?term)), (Prove: print(?term, ?text)),
+						   (Call: showArgs(?text)), (Set: ParseResult6 = ?text)
 
 				printFather(?v) <= fail
+
+				[?Compose] => (Let: ?Var = "Foo"), (Set: ?Var, Bar, ?Var = "Baz")
+
+				[?Rules] => (Prove: productions(?productions)), (Prove: reductions(?reductions)),
+							(Prove: printRules(?productions)), (Prove: printRules(?reductions))
+
+				printRules([])
+				printRules([[?id | ?rule] | ?rules]) <= :showArgs(?id, ": ", ?rule), printRules(?rules)
 )"
 
 
@@ -294,8 +308,8 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(11, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(36, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(15, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(38, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
@@ -666,6 +680,29 @@ class HybridEngine extends Assert {
 		this.AssertEqual("47.11", kb.getValue("ParseResult2"), "Unexpected function call result...")
 		this.AssertEqual("Hugo", kb.getValue("ParseResult3"), "Unexpected function call result...")
 		this.AssertEqual("[1, 2 | 3]", kb.getValue("ParseResult4"), "Unexpected function call result...")
+		this.AssertEqual("Hello", kb.getValue("ParseResult5"), "Unexpected function call result...")
+		this.AssertEqual("There", kb.getValue("ParseResult6"), "Unexpected function call result...")
+	}
+
+	Compose_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+		kb.setFact("Compose", true)
+		kb.produce()
+
+		this.AssertEqual("Baz", kb.getValue("Foo.Bar.Foo"), "Unexpected function call result...")
+
+		kb.setFact("Rules", true)
+		kb.produce()
 	}
 }
 

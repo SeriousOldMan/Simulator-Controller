@@ -41,9 +41,22 @@ global kSet := "Set:"
 global kClear := "Clear:"
 global kExecute := "Execute:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get", "execute", "parse", "print", "addRule", "removeRule"]
-global kBuiltinFunctions := [option, squareRoot, plus, minus, multiply, divide, greater, less, lessEqual, greaterEqual, equal, unequal, builtin0, builtin1, unbound, append, get, execute, parse, print, addRule, removeRule]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2, 2, 1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!="
+						  , "builtin0", "builtin1", "unbound?", "append", "get", "execute"
+						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"]
+global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squareRoot
+						   , RuleEngine.Builtins.plus, RuleEngine.Builtins.minus
+						   , RuleEngine.Builtins.multiply, RuleEngine.Builtins.divide
+						   , RuleEngine.Builtins.greater, RuleEngine.Builtins.less
+						   , RuleEngine.Builtins.lessEqual, RuleEngine.Builtins.greaterEqual
+						   , RuleEngine.Builtins.equal, RuleEngine.Builtins.unequal
+						   , RuleEngine.Builtins.builtin0, RuleEngine.Builtins.builtin1
+						   , RuleEngine.Builtins.unbound, RuleEngine.Builtins.append
+						   , RuleEngine.Builtins.get, RuleEngine.Builtins.execute
+						   , RuleEngine.Builtins.parse, RuleEngine.Builtins.print
+						   , RuleEngine.Builtins.addRule, RuleEngine.Builtins.removeRule
+						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -1083,14 +1096,23 @@ class ProveAction extends CallAction {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+			loop {
+				goal.doVariables(resultSet, (var, value) {
+					value := value.getValue(resultSet)
 
-			if this.iProveAll
-				loop
+					if isInstance(value, Term)
+						variables.setValue(var, value.substituteVariables(resultSet))
+					else
+						variables.setValue(var, value)
+				})
+
+				if this.iProveAll {
 					if !resultSet.nextResult()
 						break
-					else
-						goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+				}
+				else
+					break
+			}
 
 			resultSet.dispose()
 		}
@@ -1208,15 +1230,19 @@ class SetFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
+		local value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 
-		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
+		if isInstance(value, Term)
+			value := value.toString(variables)
+
+		facts.setFact(fact, value)
 	}
 
 	toString(facts := kNotInitialized) {
 		if (this.Value == this.Fact)
 			return ("(Set: " . this.Fact.toString(facts) . ")")
 		else
-			return ("(Set: " . this.Fact.toString(facts) . ", " . this.Value.toString(facts) . ")")
+			return ("(Set: " . this.Fact.toString(facts) . " = " . this.Value.toString(facts) . ")")
 	}
 
 	toObject(facts := kNotInitialized) {
@@ -1300,7 +1326,7 @@ class SetComposedFactAction extends Action {
 			fact .= component.toString(facts)
 		}
 
-		return ("(Set: " . fact . ", " . this.Value.toString(facts) . ")")
+		return ("(Set: " . fact . " = " . this.Value.toString(facts) . ")")
 	}
 
 	toObject(facts := kNotInitialized) {
@@ -3826,6 +3852,703 @@ class RuleEngine {
 	iInitialIncludes := []
 	iTraceLevel := kTraceLevel
 
+	class Builtins {
+		static option := (choicePoint, option, value) {
+			if isInstance(option, Term)
+				option := option.toString(resultSet)
+
+			if isInstance(value, Term)
+				value := value.toString(resultSet)
+
+			if (option = "Trace") {
+				value := inList(["Full", "Medium", "Light", "Off"], value)
+
+				if value
+					choicePoint.ResultSet.KnowledgeBase.RuleEngine.setTraceLevel(value)
+				else
+					return false
+			}
+			else if (option = "OccurCheck") {
+				if ((value = false) || (value = kFalse))
+					choicePoint.ResultSet.KnowledgeBase.disableOccurCheck()
+				else if ((value = true) || (value = kTrue))
+					choicePoint.ResultSet.KnowledgeBase.enableOccurCheck()
+				else
+					return false
+			}
+			else if (option = "DeterministicFacts") {
+				if ((value = false) || (value = kFalse))
+					choicePoint.ResultSet.KnowledgeBase.disableDeterministicFacts()
+				else if ((value = true) || (value = kTrue))
+					choicePoint.ResultSet.KnowledgeBase.enableDeterministicFacts()
+				else
+					return false
+			}
+
+			return true
+		}
+
+		static squareRoot := (choicePoint, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if isInstance(operand1, Variable) {
+				if isInstance(operand2, Variable)
+					return false
+				else
+					return resultSet.unify(choicePoint, operand1, Literal(operand2.toString(resultSet) * operand2.toString(resultSet)))
+			}
+			else if isInstance(operand2, Variable) {
+				if isInstance(operand1, Variable)
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					return resultSet.unify(choicePoint, operand2, Literal(Sqrt(value1)))
+				}
+			}
+			else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				return (Sqrt(value1) = value2)
+			}
+		}
+
+		static plus := (choicePoint, operand1, operand2, operand3) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2, value3
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+			operand3 := operand3.getValue(resultSet, operand3)
+
+			if isInstance(operand1, Variable) {
+				if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value2 := operand2.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value2)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand1, Literal(value2 + value3))
+				}
+			}
+			else if isInstance(operand2, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand2, Literal(value1 - value3))
+				}
+			}
+			else if isInstance(operand3, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value2 := operand2.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value2)
+						return false
+
+					return resultSet.unify(choicePoint, operand3, Literal(value1 - value2))
+				}
+			}
+			else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+				value3 := operand3.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				if !isNumber(value3)
+					return false
+
+				return (value1 = (value2 + value3))
+			}
+		}
+
+		static minus := (choicePoint, operand1, operand2, operand3) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2, value3
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+			operand3 := operand3.getValue(resultSet, operand3)
+
+			if isInstance(operand1, Variable) {
+				if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value2 := operand2.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value2)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand1, Literal(value2 - value3))
+				}
+			}
+			else if isInstance(operand2, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand2, Literal(value1 + value3))
+				}
+			}
+			else if isInstance(operand3, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value2 := operand2.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value2)
+						return false
+
+					return resultSet.unify(choicePoint, operand3, Literal(value1 + value2))
+				}
+			}
+			else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+				value3 := operand3.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				if !isNumber(value3)
+					return false
+
+				return (value1 = (value2 - value3))
+			}
+		}
+
+		static multiply := (choicePoint, operand1, operand2, operand3) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2, value3
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+			operand3 := operand3.getValue(resultSet, operand3)
+
+			if isInstance(operand1, Variable) {
+				if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value2 := operand2.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value2)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand1, Literal(value2 * value3))
+				}
+			}
+			else if isInstance(operand2, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if (!isNumber(value3) || (value3 = 0))
+						return false
+
+					return resultSet.unify(choicePoint, operand2, Literal(value1 / value3))
+				}
+			}
+			else if isInstance(operand3, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value2 := operand2.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if (!isNumber(value2) || (value2 = 0))
+						return false
+
+					return resultSet.unify(choicePoint, operand3, Literal(value1 / value2))
+				}
+			}
+			else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+				value3 := operand3.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				if !isNumber(value3)
+					return false
+
+				return (value1 = (value2 * value3))
+			}
+		}
+
+		static divide := (choicePoint, operand1, operand2, operand3) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2, value3
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+			operand3 := operand3.getValue(resultSet, operand3)
+
+			if isInstance(operand1, Variable) {
+				if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value2 := operand2.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value2)
+						return false
+
+					if (!isNumber(value3) || (value3 = 0))
+						return false
+
+					return resultSet.unify(choicePoint, operand1, Literal(value2 / value3))
+				}
+			}
+			else if isInstance(operand2, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value3 := operand3.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value3)
+						return false
+
+					return resultSet.unify(choicePoint, operand2, Literal(value1 * value3))
+				}
+			}
+			else if isInstance(operand3, Variable) {
+				if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+					return false
+				else {
+					value1 := operand1.toString(resultSet)
+					value2 := operand2.toString(resultSet)
+
+					if !isNumber(value1)
+						return false
+
+					if !isNumber(value2)
+						return false
+
+					return resultSet.unify(choicePoint, operand3, Literal(value1 * value2))
+				}
+			}
+			else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+				value3 := operand3.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				if (!isNumber(value3) || (value3 = 0))
+					return false
+
+				return (value1 = (value2 / value3))
+			}
+		}
+
+		static greater := (choicePoint, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				return (value1 > value2)
+			}
+		}
+
+		static less := (choicePoint, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				return (value1 < value2)
+			}
+		}
+
+		static lessEqual := (choicePoint, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				return (value1 <= value2)
+			}
+		}
+
+		static greaterEqual := (choicePoint, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+			local value1, value2
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+				return false
+			else {
+				value1 := operand1.toString(resultSet)
+				value2 := operand2.toString(resultSet)
+
+				if !isNumber(value1)
+					return false
+
+				if !isNumber(value2)
+					return false
+
+				return (value1 >= value2)
+			}
+		}
+
+		static equal := (choicePoint, operand1, operand2) {
+			return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+		}
+
+		static unequal := (choicePoint, operand1, operand2) {
+			return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
+		}
+
+		static builtin0 := (choicePoint, function, operand1) {
+			local resultSet := choicePoint.ResultSet
+
+			if isInstance(function, Term)
+				function := function.toString(resultSet)
+
+			try {
+				return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
+			}
+			catch Any as exception {
+				logMessage(kLogCritical, "Error while calling function " . function . "...")
+
+				logError(exception, true)
+
+				return false
+			}
+		}
+
+		static builtin1 := (choicePoint, function, operand1, operand2) {
+			local resultSet := choicePoint.ResultSet
+
+			operand1 := operand1.getValue(resultSet, operand1)
+			operand2 := operand2.getValue(resultSet, operand2)
+
+			if isInstance(function, Term)
+				function := function.toString(resultSet)
+
+			if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
+				return false
+			else
+				try {
+					return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
+				}
+				catch Any as exception {
+					logMessage(kLogCritical, "Error while calling function " . function . "...")
+
+					logError(exception, true)
+
+					return false
+				}
+		}
+
+		static unbound := (choicePoint, operand1) {
+			local value := operand1.getValue(choicePoint.ResultSet, operand1)
+
+			if (value.toString(choicePoint.ResultSet) = kNotInitialized)
+				return true
+			else if isInstance(operand1, Variable)
+				return ((value = operand1) || (value = operand1.RootVariable))
+			else if isInstance(operand1, Fact)
+				return (operand1.getValue(choicePoint.ResultSet.KnowledgeBase.Facts) = kNotInitialized)
+		}
+
+		static append := (choicePoint, arguments*) {
+			local resultSet, operand1, string, ignore, argument
+
+			if (arguments.Length <= 1)
+				return false
+			else {
+				resultSet := choicePoint.ResultSet
+
+				operand1 := arguments.Pop()
+				operand1 := operand1.getValue(resultSet, operand1)
+
+				string := ""
+
+				for ignore, argument in arguments
+					string .= argument.getValue(resultSet, argument).toString(resultSet)
+
+				if isInstance(operand1, Variable)
+					return resultSet.unify(choicePoint, operand1, Literal(string))
+				else
+					return (operand1.toString(resultSet) = string)
+			}
+		}
+
+		static get := (choicePoint, arguments*) {
+			local resultSet, operand1, operand2, result, index, argument
+
+			if (arguments.Length <= 1)
+				return false
+			else {
+				resultSet := choicePoint.ResultSet
+
+				if (arguments.Length = 2) {
+					operand1 := arguments[1]
+					operand2 := arguments[2]
+
+					operand1 := Literal(resultSet.KnowledgeBase.Facts.getValue(operand1.getValue(resultSet, operand1).toString(resultSet)))
+					operand2 := operand2.getValue(resultSet, operand2)
+				}
+				else {
+					operand2 := arguments.Pop()
+					operand2 := operand2.getValue(resultSet, operand2)
+
+					result := ""
+
+					for index, argument in arguments {
+						if (index > 1)
+							result .= "."
+
+						result .= argument.getValue(resultSet, argument).toString(resultSet)
+					}
+
+					operand1 := Literal(resultSet.KnowledgeBase.Facts.getValue(result))
+				}
+
+				if (isInstance(operand2, Variable) && !operand1.isUnbound(resultSet))
+					return resultSet.unify(choicePoint, operand1, operand2)
+				else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+					return false
+				else
+					return (operand1.toString(resultSet) = operand2.toString(resultSet))
+			}
+		}
+
+		static execute := (choicePoint, arguments*) {
+			local resultSet, executable
+
+			if (arguments.Length <= 1)
+				return false
+			else {
+				resultSet := choicePoint.ResultSet
+
+				operand1 := arguments.RemoveAt(1)
+				operand1 := operand1.getValue(resultSet, operand1)
+
+				return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
+													 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
+			}
+		}
+
+		static parse := (choicePoint, text, term) {
+			local resultSet := choicePoint.ResultSet
+
+			try {
+				return resultSet.unify(choicePoint, RuleCompiler().compileTerm(text.toString(resultSet)), term)
+			}
+			catch Any {
+				return false
+			}
+		}
+
+		static print := (choicePoint, term, text) {
+			local resultSet := choicePoint.ResultSet
+
+			try {
+				return resultSet.unify(choicePoint, Literal(term.toString(resultSet)), text)
+			}
+			catch Any {
+				return false
+			}
+		}
+
+		static addRule := (choicePoint, text, id) {
+			local resultSet := choicePoint.ResultSet
+
+			try {
+				rule := RuleCompiler().compileRule(text.toString(resultSet))
+
+				if (rule && resultSet.unify(choicePoint, Literal(rule.ID), id))
+					return resultSet.Rules.addRule(rule)
+				else
+					return false
+			}
+			catch Any {
+				return false
+			}
+		}
+
+		static removeRule := (choicePoint, id) {
+			local resultSet := choicePoint.ResultSet
+
+			try {
+				id := id.toString(resultSet)
+
+				if isInteger(id)
+					return resultSet.Rules.removeRule(id)
+				else
+					return false
+			}
+			catch Any {
+				return false
+			}
+		}
+
+		static productions := (choicePoint, list) {
+			local resultSet := choicePoint.ResultSet
+			local production := resultSet.Rules.Productions[false]
+			local productions := Nil()
+
+			loop {
+				if !production
+					break
+
+				productions := Pair(Pair(Literal(production.Rule.ID), Literal(production.Rule.toString())), productions)
+
+				production := production.Next[false]
+			}
+
+			return resultSet.unify(choicePoint, productions, list)
+		}
+
+		static reductions := (choicePoint, list) {
+			local resultSet := choicePoint.ResultSet
+			local reductions := Nil()
+			local ignore, rules, rule
+
+			for ignore, rules in resultSet.Rules.Reductions
+				for ignore, rule in rules
+					reductions := Pair(Pair(Literal(rule.ID), Literal(rule.toString())), reductions)
+
+			return resultSet.unify(choicePoint, reductions, list)
+		}
+	}
+
 	InitialFacts {
 		Get {
 			return this.iInitialFacts
@@ -4994,672 +5717,6 @@ messageShow(ignore, args*) {
 	showMessage(values2String(A_Space, args*))
 
 	return true
-}
-
-option(choicePoint, option, value) {
-	if isInstance(option, Term)
-		option := option.toString(resultSet)
-
-	if isInstance(value, Term)
-		value := value.toString(resultSet)
-
-	if (option = "Trace") {
-		value := inList(["Full", "Medium", "Light", "Off"], value)
-
-		if value
-			choicePoint.ResultSet.KnowledgeBase.RuleEngine.setTraceLevel(value)
-		else
-			return false
-	}
-	else if (option = "OccurCheck") {
-		if ((value = false) || (value = kFalse))
-			choicePoint.ResultSet.KnowledgeBase.disableOccurCheck()
-		else if ((value = true) || (value = kTrue))
-			choicePoint.ResultSet.KnowledgeBase.enableOccurCheck()
-		else
-			return false
-	}
-	else if (option = "DeterministicFacts") {
-		if ((value = false) || (value = kFalse))
-			choicePoint.ResultSet.KnowledgeBase.disableDeterministicFacts()
-		else if ((value = true) || (value = kTrue))
-			choicePoint.ResultSet.KnowledgeBase.enableDeterministicFacts()
-		else
-			return false
-	}
-
-	return true
-}
-
-squareRoot(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if isInstance(operand1, Variable) {
-		if isInstance(operand2, Variable)
-			return false
-		else
-			return resultSet.unify(choicePoint, operand1, Literal(operand2.toString(resultSet) * operand2.toString(resultSet)))
-	}
-	else if isInstance(operand2, Variable) {
-		if isInstance(operand1, Variable)
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			return resultSet.unify(choicePoint, operand2, Literal(Sqrt(value1)))
-		}
-	}
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		return (Sqrt(value1) = value2)
-	}
-}
-
-plus(choicePoint, operand1, operand2, operand3) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2, value3
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-	operand3 := operand3.getValue(resultSet, operand3)
-
-	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value2 := operand2.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value2)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand1, Literal(value2 + value3))
-		}
-	}
-	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand2, Literal(value1 - value3))
-		}
-	}
-	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value2 := operand2.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value2)
-				return false
-
-			return resultSet.unify(choicePoint, operand3, Literal(value1 - value2))
-		}
-	}
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-		value3 := operand3.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		if !isNumber(value3)
-			return false
-
-		return (value1 = (value2 + value3))
-	}
-}
-
-minus(choicePoint, operand1, operand2, operand3) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2, value3
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-	operand3 := operand3.getValue(resultSet, operand3)
-
-	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value2 := operand2.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value2)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand1, Literal(value2 - value3))
-		}
-	}
-	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand2, Literal(value1 + value3))
-		}
-	}
-	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value2 := operand2.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value2)
-				return false
-
-			return resultSet.unify(choicePoint, operand3, Literal(value1 + value2))
-		}
-	}
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-		value3 := operand3.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		if !isNumber(value3)
-			return false
-
-		return (value1 = (value2 - value3))
-	}
-}
-
-multiply(choicePoint, operand1, operand2, operand3) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2, value3
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-	operand3 := operand3.getValue(resultSet, operand3)
-
-	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value2 := operand2.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value2)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand1, Literal(value2 * value3))
-		}
-	}
-	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if (!isNumber(value3) || (value3 = 0))
-				return false
-
-			return resultSet.unify(choicePoint, operand2, Literal(value1 / value3))
-		}
-	}
-	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value2 := operand2.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if (!isNumber(value2) || (value2 = 0))
-				return false
-
-			return resultSet.unify(choicePoint, operand3, Literal(value1 / value2))
-		}
-	}
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-		value3 := operand3.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		if !isNumber(value3)
-			return false
-
-		return (value1 = (value2 * value3))
-	}
-}
-
-divide(choicePoint, operand1, operand2, operand3) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2, value3
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-	operand3 := operand3.getValue(resultSet, operand3)
-
-	if isInstance(operand1, Variable) {
-		if (isInstance(operand2, Variable) || isInstance(operand3, Variable) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value2 := operand2.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value2)
-				return false
-
-			if (!isNumber(value3) || (value3 = 0))
-				return false
-
-			return resultSet.unify(choicePoint, operand1, Literal(value2 / value3))
-		}
-	}
-	else if isInstance(operand2, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand3, Variable) || (operand1.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value3 := operand3.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value3)
-				return false
-
-			return resultSet.unify(choicePoint, operand2, Literal(value1 * value3))
-		}
-	}
-	else if isInstance(operand3, Variable) {
-		if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-			return false
-		else {
-			value1 := operand1.toString(resultSet)
-			value2 := operand2.toString(resultSet)
-
-			if !isNumber(value1)
-				return false
-
-			if !isNumber(value2)
-				return false
-
-			return resultSet.unify(choicePoint, operand3, Literal(value1 * value2))
-		}
-	}
-	else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)) || (operand3.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-		value3 := operand3.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		if (!isNumber(value3) || (value3 = 0))
-			return false
-
-		return (value1 = (value2 / value3))
-	}
-}
-
-greater(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		return (value1 > value2)
-	}
-}
-
-less(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		return (value1 < value2)
-	}
-}
-
-lessEqual(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		return (value1 <= value2)
-	}
-}
-
-greaterEqual(choicePoint, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-	local value1, value2
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-		return false
-	else {
-		value1 := operand1.toString(resultSet)
-		value2 := operand2.toString(resultSet)
-
-		if !isNumber(value1)
-			return false
-
-		if !isNumber(value2)
-			return false
-
-		return (value1 >= value2)
-	}
-}
-
-equal(choicePoint, operand1, operand2) {
-	return choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
-}
-
-unequal(choicePoint, operand1, operand2) {
-	return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
-}
-
-builtin0(choicePoint, function, operand1) {
-	local resultSet := choicePoint.ResultSet
-
-	if isInstance(function, Term)
-		function := function.toString(resultSet)
-
-	try {
-		return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, "Error while calling function " . function . "...")
-
-		logError(exception, true)
-
-		return false
-	}
-}
-
-builtin1(choicePoint, function, operand1, operand2) {
-	local resultSet := choicePoint.ResultSet
-
-	operand1 := operand1.getValue(resultSet, operand1)
-	operand2 := operand2.getValue(resultSet, operand2)
-
-	if isInstance(function, Term)
-		function := function.toString(resultSet)
-
-	if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
-		return false
-	else
-		try {
-			return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
-		}
-		catch Any as exception {
-			logMessage(kLogCritical, "Error while calling function " . function . "...")
-
-			logError(exception, true)
-
-			return false
-		}
-}
-
-unbound(choicePoint, operand1) {
-	local value := operand1.getValue(choicePoint.ResultSet, operand1)
-
-	if (value.toString(choicePoint.ResultSet) = kNotInitialized)
-		return true
-	else if isInstance(operand1, Variable)
-		return ((value = operand1) || (value = operand1.RootVariable))
-	else if isInstance(operand1, Fact)
-		return (operand1.getValue(choicePoint.ResultSet.KnowledgeBase.Facts) = kNotInitialized)
-}
-
-append(choicePoint, arguments*) {
-	local resultSet, operand1, string, ignore, argument
-
-	if (arguments.Length <= 1)
-		return false
-	else {
-		resultSet := choicePoint.ResultSet
-
-		operand1 := arguments.Pop()
-		operand1 := operand1.getValue(resultSet, operand1)
-
-		string := ""
-
-		for ignore, argument in arguments
-			string .= argument.getValue(resultSet, argument).toString(resultSet)
-
-		if isInstance(operand1, Variable)
-			return resultSet.unify(choicePoint, operand1, Literal(string))
-		else
-			return (operand1.toString(resultSet) = string)
-	}
-}
-
-get(choicePoint, arguments*) {
-	local resultSet, operand1, operand2, result, index, argument
-
-	if (arguments.Length <= 1)
-		return false
-	else {
-		resultSet := choicePoint.ResultSet
-
-		if (arguments.Length = 2) {
-			operand1 := arguments[1]
-			operand2 := arguments[2]
-
-			operand1 := Literal(resultSet.KnowledgeBase.Facts.getValue(operand1.getValue(resultSet, operand1).toString(resultSet)))
-			operand2 := operand2.getValue(resultSet, operand2)
-		}
-		else {
-			operand2 := arguments.Pop()
-			operand2 := operand2.getValue(resultSet, operand2)
-
-			result := ""
-
-			for index, argument in arguments {
-				if (index > 1)
-					result .= "."
-
-				result .= argument.getValue(resultSet, argument).toString(resultSet)
-			}
-
-			operand1 := Literal(resultSet.KnowledgeBase.Facts.getValue(result))
-		}
-
-		if (isInstance(operand2, Variable) && !operand1.isUnbound(resultSet))
-			return resultSet.unify(choicePoint, operand1, operand2)
-		else if ((operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
-			return false
-		else
-			return (operand1.toString(resultSet) = operand2.toString(resultSet))
-	}
-}
-
-execute(choicePoint, arguments*) {
-	local resultSet, executable
-
-	if (arguments.Length <= 1)
-		return false
-	else {
-		resultSet := choicePoint.ResultSet
-
-		operand1 := arguments.RemoveAt(1)
-		operand1 := operand1.getValue(resultSet, operand1)
-
-		return resultSet.KnowledgeBase.execute(operand1.toString(resultSet)
-											 , collect(arguments, (a) => a.getValue(resultSet, a).toString(resultSet)))
-	}
-}
-
-parse(choicePoint, text, term) {
-	local resultSet := choicePoint.ResultSet
-
-	try {
-		return resultSet.unify(choicePoint, RuleCompiler().compileTerm(text.toString(resultSet)), term)
-	}
-	catch Any {
-		return false
-	}
-}
-
-print(choicePoint, term, text) {
-	local resultSet := choicePoint.ResultSet
-
-	try {
-		return resultSet.unify(choicePoint, Literal(term.toString(resultSet)), text)
-	}
-	catch Any {
-		return false
-	}
-}
-
-addRule(choicePoint, text, id) {
-	local resultSet := choicePoint.ResultSet
-
-	try {
-		rule := RuleCompiler().compileRule(text.toString(resultSet))
-
-		if (rule && resultSet.unify(choicePoint, Literal(rule.ID), id))
-			return resultSet.Rules.addRule(rule)
-		else
-			return false
-	}
-	catch Any {
-		return false
-	}
-}
-
-removeRule(id) {
-	local resultSet := choicePoint.ResultSet
-
-	try {
-		id := id.toString(resultSet)
-
-		if isInteger(id)
-			return resultSet.Rules.removeRule(id)
-		else
-			return false
-	}
-	catch Any {
-		return false
-	}
 }
 
 initializeRuleEngine() {

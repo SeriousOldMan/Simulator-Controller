@@ -572,13 +572,13 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Syntax: productions(list)
 	
-	Generates a list of all production rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
+	Generates a list of all production rules. Each entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
 
   - reductions
   
     Syntax: reductions(list)
 	
-	Generates a list of all reduction rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
+	Generates a list of all reduction rules. Each entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
 	
   - addRule
   

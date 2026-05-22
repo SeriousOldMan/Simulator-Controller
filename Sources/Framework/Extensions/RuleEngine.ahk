@@ -360,13 +360,25 @@ class Predicate extends Condition {
 					case kIdentical:
 						result := (leftPrimary == rightPrimary)
 					case kLess:
-						result := (leftPrimary < rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary < rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) < 0)
 					case kLessOrEqual:
-						result := (leftPrimary <= rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary <= rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) <= 0)
 					case kGreater:
-						result := (leftPrimary > rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary > rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) > 0)
 					case kGreaterOrEqual:
-						result := (leftPrimary >= rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary >= rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) >= 0)
 					case kContains:
 						if isInstance(leftPrimary, Pair)
 							result := inList(lefTPrimary.toObject(variables), rightPrimary)

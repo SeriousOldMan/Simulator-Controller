@@ -1013,93 +1013,88 @@ class PitstopHandling extends Assert {
 	PitstopMultipleTest() {
 		global vSuspensionDamage, vBodyworkDamage, vEngineDamage, vDamageRepair, vDamageLapDelta, vDamageStintLaps
 
-		try {
-			engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false, false)
 
-			loop {
-				vSuspensionDamage := kNotInitialized
-				vBodyworkDamage := kNotInitialized
-				vEngineDamage := kNotInitialized
+		loop {
+			vSuspensionDamage := kNotInitialized
+			vBodyworkDamage := kNotInitialized
+			vEngineDamage := kNotInitialized
 
-				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
-				if (data.Count == 0)
-					break
-				else {
-					engineer.addLap(A_Index, &data)
+			if (data.Count == 0)
+				break
+			else {
+				engineer.addLap(A_Index, &data)
 
-					if (A_Index = 3) {
-						engineer.planPitstop()
+				if (A_Index = 3) {
+					engineer.planPitstop()
 
-						; if engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					; if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
-						engineer.preparePitstop()
+					engineer.preparePitstop()
 
-						; if engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
-					}
-
-					if (A_Index = 4) {
-						if engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
-
-						engineer.performPitstop()
-
-						if engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
-
-						this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
-						this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
-						this.AssertEqual(false, vBodyworkDamage, "Expected no bodywork damage to be reported...")
-					}
-
-					if (A_Index = 5) {
-						this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
-						this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
-					}
-
-					if (A_Index = 7) {
-						engineer.planPitstop()
-
-						if engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
-
-						this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
-						this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
-						this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
-
-						engineer.preparePitstop()
-						engineer.performPitstop()
-
-						if true || engineer.Debug[kDebugKnowledgeBase]
-							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
-
-						this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
-						this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
-
-						this.AssertEqual(-1, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", -1), "Pitstop number increment failed...")
-						this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
-						this.AssertEqual(7, engineer.KnowledgeBase.getValue("Pitstop.2.Lap", 0), "Wrong lap recorded Pitstop...")
-						this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
-						this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
-						this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
-						this.AssertEqual(27.1, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
-						this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
-						this.AssertEqual(27.0, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
-						this.AssertEqual(27.2, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
-					}
+					; if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
-				if engineer.Debug[kDebugKnowledgeBase]
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+				if (A_Index = 4) {
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					engineer.performPitstop()
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					this.AssertEqual(1, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
+					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+					this.AssertEqual(false, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+				}
+
+				if (A_Index = 5) {
+					this.AssertEqual(true, vSuspensionDamage, "Expected suspension damage to be reported...")
+					this.AssertEqual(true, vBodyworkDamage, "Expected bodywork damage to be reported...")
+				}
+
+				if (A_Index = 7) {
+					engineer.planPitstop()
+
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", 0), "Pitstop number increment failed...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
+
+					engineer.preparePitstop()
+					engineer.performPitstop()
+
+					if true || engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+
+					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")
+					this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
+
+					this.AssertEqual(-1, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr", -1), "Pitstop number increment failed...")
+					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Last", 0), "Last Pitstop not in history memory...")
+					this.AssertEqual(7, engineer.KnowledgeBase.getValue("Pitstop.2.Lap", 0), "Wrong lap recorded Pitstop...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.2.Repair.Bodywork"), "Expected bodywork repair...")
+					this.AssertEqual(9, engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Set"), "Expected new tyres...")
+					this.AssertEqual(27.1, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
+					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
+					this.AssertEqual(27.0, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
+					this.AssertEqual(27.2, Round(engineer.KnowledgeBase.getValue("Pitstop.2.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
+				}
 			}
 
-			engineer.finishSession(false)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
-		catch Any as exception {
-			logError(exception)
-		}
+
+		engineer.finishSession(false)
 	}
 }
 
@@ -1156,9 +1151,9 @@ setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(FuelReporting)
-	;~ AHKUnit.AddTestClass(DamageReporting)
-	;~ AHKUnit.AddTestClass(DamageAnalysis)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 	AHKUnit.AddTestClass(PitstopHistory)
 

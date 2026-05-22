@@ -308,11 +308,11 @@ class Predicate extends Condition {
 		local left := this.iLeftPrimary
 		local right := this.iRightPrimary
 
-		if ((left != kNotInitialized) && isInstance(left, Variable))
-			facts.Push(left.Variable[true])
+		if (left != kNotInitialized)
+			left.getFacts(facts)
 
-		if ((right != kNotInitialized) && isInstance(right, Variable))
-			facts.Push(right.Variable[true])
+		if (right != kNotInitialized)
+			right.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -437,10 +437,7 @@ class Goal extends Condition {
 		local ignore, term
 
 		for ignore, term in this.Goal.Arguments
-			if isInstance(term, Variable)
-				facts.Push(term.Variable[true])
-			else if isInstance(term, Fact)
-				facts.Push(term.Fact)
+			term.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -465,7 +462,10 @@ class Goal extends Condition {
 			goal.doVariables(resultSet, (var, value) {
 				value := value.getValue(resultSet)
 
-				variables.setValue(var, value.substituteVariables(resultSet))
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -515,11 +515,7 @@ class Expression extends Condition {
 	getFacts(facts) {
 		local ignore, term
 
-		for ignore, term in this.Rule.Head.Arguments
-			if isInstance(term, Variable)
-				facts.Push(term.Variable[true])
-			else if isInstance(term, Fact)
-				facts.Push(term.Fact)
+		this.Rule.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -545,7 +541,10 @@ class Expression extends Condition {
 			goal.doVariables(resultSet, (var, value) {
 				value := value.getValue(resultSet)
 
-				variables.setValue(var, value.substituteVariables(resultSet))
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -629,6 +628,10 @@ class Variable extends Primary {
 			throw "Subclassing of Variable is not allowed..."
 	}
 
+	getFacts(facts) {
+		facts.Push(this.Variable[true])
+	}
+
 	getValue(variablesFactsOrResultSet, default := kNotInitialized) {
 		local value, nextValue
 
@@ -685,6 +688,10 @@ class Variable extends Primary {
 
 			return newVariable
 		}
+	}
+
+	substituteValues(variables) {
+		return this.getValue(variables)
 	}
 
 	toString(variablesFactsOrResultSet := kNotInitialized) {
@@ -744,6 +751,10 @@ class Fact extends Primary {
 
 		if (this.base != Fact.Prototype)
 			throw "Subclassing of Fact is not allowed..."
+	}
+
+	getFacts(facts) {
+		facts.Push(this.Fact)
 	}
 
 	getValue(factsOrResultSet, default := kNotInitialized) {
@@ -1114,10 +1125,10 @@ class ProveAction extends CallAction {
 				goal.doVariables(resultSet, (var, value) {
 					value := value.getValue(resultSet)
 
-					if isInstance(value, Term)
-						variables.setValue(var, value.substituteVariables(resultSet))
+					if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+						variables.setValue(var, value.toString(resultSet))
 					else
-						variables.setValue(var, value)
+						variables.setValue(var, value.substituteValues(resultSet))
 				})
 
 				if this.iProveAll {
@@ -1179,7 +1190,10 @@ class LetAction extends Action {
 			goal.doVariables(resultSet, (var, value) {
 				value := value.getValue(resultSet)
 
-				variables.setValue(var, value.substituteVariables(resultSet))
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -1570,6 +1584,13 @@ class Term {
 				throw "Subclassing of Term.Complex is not allowed..."
 		}
 
+		getFacts(facts) {
+			local ignore, argument
+
+			for ignore, argument in this.Arguments
+				argument.getFacts(facts)
+		}
+
 		toObject(resultSet := kNotInitialized) {
 			local term := Map()
 			local arguments := []
@@ -1625,6 +1646,21 @@ class Term {
 				return this
 		}
 
+		substituteValues(variables) {
+			local arguments, ignore, argument
+
+			if this.iHasVariables {
+				arguments := []
+
+				for ignore, argument in this.Arguments
+					arguments.Push(argument.substituteValues(variables))
+
+				return Struct(this.Functor, arguments)
+			}
+			else
+				return this
+		}
+
 		unify(choicePoint, term) {
 			local termArguments, index, argument
 
@@ -1656,6 +1692,9 @@ class Term {
 		}
 	}
 
+	getFacts(facts) {
+	}
+
 	getValue(factsOrResultSet, default := kNotInitialized) {
 		return this
 	}
@@ -1684,6 +1723,10 @@ class Term {
 	}
 
 	substituteVariables(variables) {
+		return this
+	}
+
+	substituteValues(variables) {
 		return this
 	}
 
@@ -1788,6 +1831,11 @@ class Pair extends Term {
 			throw "Subclassing of Pair is not allowed..."
 	}
 
+	getFacts(facts) {
+		this.LeftTerm.getFacts(facts)
+		this.RightTerm.getFacts(facts)
+	}
+
 	toString(resultSet := kNotInitialized) {
 		local result := "["
 		local next := this
@@ -1851,6 +1899,13 @@ class Pair extends Term {
 	substituteVariables(variables) {
 		if this.iHasVariables
 			return Pair(this.LeftTerm.substituteVariables(variables), this.RightTerm.substituteVariables(variables))
+		else
+			return this
+	}
+
+	substituteValues(variables) {
+		if this.iHasVariables
+			return Pair(this.LeftTerm.substituteValues(variables), this.RightTerm.substituteValues(variables))
 		else
 			return this
 	}
@@ -1998,10 +2053,10 @@ class ProductionRule extends Rule {
 
 	getFacts() {
 		local facts := []
-		local ignore, theCondition
+		local ignore, condition
 
-		for ignore, theCondition in this.Conditions
-			theCondition.getFacts(facts)
+		for ignore, condition in this.Conditions
+			condition.getFacts(facts)
 
 		return facts
 	}
@@ -2095,6 +2150,10 @@ class ReductionRule extends Rule {
 		this.iHasVariables := this.hasVariables()
 	}
 
+	getFacts(facts) {
+		this.Head.getFacts(facts)
+	}
+
 	toString(resultSet := kNotInitialized) {
 		local tail := this.Tail
 		local terms, ignore, theTerm
@@ -2136,6 +2195,23 @@ class ReductionRule extends Rule {
 				terms.Push(theTerm.substituteVariables(variables))
 
 			return ReductionRule(this.Head.substituteVariables(variables), terms)
+		}
+		else
+			return this
+	}
+
+	substituteValues() {
+		local variables, terms
+		local ignore, theTerm
+
+		if this.iHasVariables {
+			variables := CaseInsenseMap()
+			terms := []
+
+			for ignore, theTerm in this.Tail
+				terms.Push(theTerm.substituteValues(variables))
+
+			return ReductionRule(this.Head.substituteValues(variables), terms)
 		}
 		else
 			return this

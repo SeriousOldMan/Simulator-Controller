@@ -158,7 +158,7 @@ class Quantor extends CompositeCondition {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local quantor := Object()
+		local quantor := Map()
 
 		quantor[this.Type] := super.toObject(facts)
 
@@ -308,11 +308,11 @@ class Predicate extends Condition {
 		local left := this.iLeftPrimary
 		local right := this.iRightPrimary
 
-		if ((left != kNotInitialized) && isInstance(left, Variable))
-			facts.Push(left.Variable[true])
+		if (left != kNotInitialized)
+			left.getFacts(facts)
 
-		if ((right != kNotInitialized) && isInstance(right, Variable))
-			facts.Push(right.Variable[true])
+		if (right != kNotInitialized)
+			right.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -324,10 +324,16 @@ class Predicate extends Condition {
 		if (leftPrimary = kNotInitialized)
 			return false
 		else {
+			if isInstance(leftPrimary, Term)
+				leftPrimary := leftPrimary.toString(variables)
+
 			rightPrimary := this.RightPrimary[facts]
 
 			if ((this.Operator != kNotInitialized) && (rightPrimary = kNotInitialized))
 				return false
+
+			if isInstance(rightPrimary, Term)
+				rightPrimary := rightPrimary.toString(variables)
 
 			result := false
 
@@ -393,7 +399,7 @@ class Predicate extends Condition {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local predicate := Object()
+		local predicate := Map()
 
 		if (this.Operator = kNotInitialized)
 			predicate[kPredicate] := [this.LeftPrimary.toObject(facts)]
@@ -431,10 +437,7 @@ class Goal extends Condition {
 		local ignore, term
 
 		for ignore, term in this.Goal.Arguments
-			if isInstance(term, Variable)
-				facts.Push(term.Variable[true])
-			else if isInstance(term, Fact)
-				facts.Push(term.Fact)
+			term.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -456,7 +459,14 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				value := value.getValue(resultSet)
+
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
+			})
 
 			resultSet.dispose()
 
@@ -471,7 +481,7 @@ class Goal extends Condition {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local predicate := Object()
+		local predicate := Map()
 
 		predicate[kProve] := [this.Goal.toObject(facts)]
 
@@ -505,11 +515,7 @@ class Expression extends Condition {
 	getFacts(facts) {
 		local ignore, term
 
-		for ignore, term in this.Rule.Head.Arguments
-			if isInstance(term, Variable)
-				facts.Push(term.Variable[true])
-			else if isInstance(term, Fact)
-				facts.Push(term.Fact)
+		this.Rule.getFacts(facts)
 	}
 
 	match(knowledgeBase, variables) {
@@ -532,7 +538,14 @@ class Expression extends Condition {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.toString(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				value := value.getValue(resultSet)
+
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+					variables.setValue(var, value.toString(resultSet))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
+			})
 
 			resultSet.dispose()
 
@@ -547,7 +560,7 @@ class Expression extends Condition {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local predicate := Object()
+		local predicate := Map()
 
 		predicate[kExpression] := [this.Rule.Tail[1].toObject(facts)]
 
@@ -615,6 +628,10 @@ class Variable extends Primary {
 			throw "Subclassing of Variable is not allowed..."
 	}
 
+	getFacts(facts) {
+		facts.Push(this.Variable[true])
+	}
+
 	getValue(variablesFactsOrResultSet, default := kNotInitialized) {
 		local value, nextValue
 
@@ -671,6 +688,10 @@ class Variable extends Primary {
 
 			return newVariable
 		}
+	}
+
+	substituteValues(variables) {
+		return this.getValue(variables)
 	}
 
 	toString(variablesFactsOrResultSet := kNotInitialized) {
@@ -730,6 +751,10 @@ class Fact extends Primary {
 
 		if (this.base != Fact.Prototype)
 			throw "Subclassing of Fact is not allowed..."
+	}
+
+	getFacts(facts) {
+		facts.Push(this.Fact)
 	}
 
 	getValue(factsOrResultSet, default := kNotInitialized) {
@@ -927,7 +952,7 @@ class CallAction extends Action {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 		local arguments := []
 		local ignore, argument
 
@@ -1032,7 +1057,7 @@ class ExecuteAction extends Action {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 		local arguments := []
 		local ignore, argument
 
@@ -1100,10 +1125,10 @@ class ProveAction extends CallAction {
 				goal.doVariables(resultSet, (var, value) {
 					value := value.getValue(resultSet)
 
-					if isInstance(value, Term)
-						variables.setValue(var, value.substituteVariables(resultSet))
+					if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
+						variables.setValue(var, value.toString(resultSet))
 					else
-						variables.setValue(var, value)
+						variables.setValue(var, value.substituteValues(resultSet))
 				})
 
 				if this.iProveAll {
@@ -1163,10 +1188,12 @@ class LetAction extends Action {
 
 		if resultSet {
 			goal.doVariables(resultSet, (var, value) {
-				if isInstance(value.getValue(resultSet), Literal)
+				value := value.getValue(resultSet)
+
+				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
 					variables.setValue(var, value.toString(resultSet))
 				else
-					variables.setValue(var, value.substituteVariables(resultSet))
+					variables.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -1188,7 +1215,7 @@ class LetAction extends Action {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 
 		action[kLet] := [this.Rule.Tail[1].toObject(facts)]
 
@@ -1206,10 +1233,20 @@ class SetFactAction extends Action {
 
 	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
+			local fact
+
 			if (variablesOrFacts = kNotInitialized)
-				return this.iFact
+				fact := this.iFact
 			else
-				return this.iFact.getValue(variablesOrFacts)
+				fact := this.iFact.getValue(variablesOrFacts)
+
+			if isInstance(fact, Term)
+				if (variablesOrFacts = kNotInitialized)
+					fact := fact.toString()
+				else
+					fact := fact.toString(variablesOrFacts)
+
+			return fact
 		}
 	}
 
@@ -1240,18 +1277,18 @@ class SetFactAction extends Action {
 
 	toString(facts := kNotInitialized) {
 		if (this.Value == this.Fact)
-			return ("(Set: " . this.Fact.toString(facts) . ")")
+			return ("(Set: " . this.Fact[facts] . ")")
 		else
-			return ("(Set: " . this.Fact.toString(facts) . " = " . this.Value.toString(facts) . ")")
+			return ("(Set: " . this.Fact[facts] . " = " . this.Value.toString(facts) . ")")
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 
 		if (this.Value == this.Fact)
-			action[this.Action] := [this.Fact.toObject(facts)]
+			action[this.Action] := [this.Fact[facts]]
 		else
-			action[this.Action] := [this.Fact.toObject(facts), this.Value.toObject(facts)]
+			action[this.Action] := [this.Fact[facts], this.Value.toObject(facts)]
 
 		return action
 	}
@@ -1267,7 +1304,7 @@ class SetComposedFactAction extends Action {
 
 	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
-			local result, index, component
+			local result, index, component, value
 
 			if (variablesOrFacts = kNotInitialized)
 				return this.iFact
@@ -1278,7 +1315,12 @@ class SetComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					result .= component.getValue(variablesOrFacts)
+					value := component.getValue(variablesOrFacts)
+
+					if isInstance(value, Term)
+						value := value.toString(variablesOrFacts)
+
+					result .= value
 				}
 
 				return result
@@ -1303,13 +1345,18 @@ class SetComposedFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
-		local index, component
+		local index, component, value
 
 		for index, component in this.Fact {
 			if (index > 1)
 				fact .= "."
 
-			fact .= (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+
+			if isInstance(value, Term)
+				value := value.toString(isInstance(component, Variable) ? variables : facts)
+
+			fact .= value
 		}
 
 		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
@@ -1330,15 +1377,20 @@ class SetComposedFactAction extends Action {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 		local fact := ""
-		local index, component
+		local index, component, value
 
 		for index, component in this.Fact {
 			if (index > 1)
 				fact .= "."
 
-			fact .= component.toString(facts)
+			value := component.getValue(facts)
+
+			if isInstance(value, Term)
+				value := value.toString(facts)
+
+			fact .= value
 		}
 
 		action[this.Action] := [fact, this.Value.toObject(facts)]
@@ -1356,10 +1408,20 @@ class ClearFactAction extends Action {
 
 	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
+			local fact
+
 			if (variablesOrFacts = kNotInitialized)
-				return this.iFact
+				fact := this.iFact
 			else
-				return this.iFact.getValue(variablesOrFacts)
+				fact := this.iFact.getValue(variablesOrFacts)
+
+			if isInstance(fact, Term)
+				if (variablesOrFacts = kNotInitialized)
+					fact := fact.toString()
+				else
+					fact := fact.toString(variablesOrFacts)
+
+			return fact
 		}
 	}
 
@@ -1374,13 +1436,13 @@ class ClearFactAction extends Action {
 	}
 
 	toString(facts := kNotInitialized) {
-		return ("(Clear: " . this.Fact.toString(facts) . ")")
+		return ("(Clear: " . this.Fact[facts] . ")")
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 
-		action[kClear] := this.Fact.toObject(facts)
+		action[kClear] := this.Fact[facts]
 
 		return action
 	}
@@ -1395,7 +1457,7 @@ class ClearComposedFactAction extends Action {
 
 	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
-			local result, index, component
+			local result, index, component, value
 
 			if (variablesOrFacts = kNotInitialized)
 				return this.iFact
@@ -1406,7 +1468,12 @@ class ClearComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					result .= component.getValue(variablesOrFacts)
+					value := component.getValue(variablesOrFacts)
+
+					if isInstance(value, Term)
+						value := value.toString(variablesOrFacts)
+
+					result .= value
 				}
 
 				return result
@@ -1421,13 +1488,18 @@ class ClearComposedFactAction extends Action {
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
-		local index, component
+		local index, component, value
 
 		for index, component in this.Fact {
 			if (index > 1)
 				fact .= "."
 
-			fact .= (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+
+			if isInstance(value, Term)
+				value := value.toString(isInstance(component, Variable) ? variables : facts)
+
+			fact .= value
 		}
 
 		facts.clearFact(fact)
@@ -1448,15 +1520,20 @@ class ClearComposedFactAction extends Action {
 	}
 
 	toObject(facts := kNotInitialized) {
-		local action := Object()
+		local action := Map()
 		local fact := ""
-		local index, component
+		local index, component, value
 
 		for index, component in this.Fact {
 			if (index > 1)
 				fact .= "."
 
-			fact .= component.toString(facts)
+			value := component.getValue(facts)
+
+			if isInstance(value, Term)
+				value := value.toString(facts)
+
+			fact .= value
 		}
 
 		action[kClear] := fact
@@ -1505,6 +1582,13 @@ class Term {
 
 			if ((this.base != Struct.Prototype) && (this.base != Cut.Prototype) && (this.base != Fail.Prototype))
 				throw "Subclassing of Term.Complex is not allowed..."
+		}
+
+		getFacts(facts) {
+			local ignore, argument
+
+			for ignore, argument in this.Arguments
+				argument.getFacts(facts)
 		}
 
 		toObject(resultSet := kNotInitialized) {
@@ -1562,6 +1646,21 @@ class Term {
 				return this
 		}
 
+		substituteValues(variables) {
+			local arguments, ignore, argument
+
+			if this.iHasVariables {
+				arguments := []
+
+				for ignore, argument in this.Arguments
+					arguments.Push(argument.substituteValues(variables))
+
+				return Struct(this.Functor, arguments)
+			}
+			else
+				return this
+		}
+
 		unify(choicePoint, term) {
 			local termArguments, index, argument
 
@@ -1593,6 +1692,9 @@ class Term {
 		}
 	}
 
+	getFacts(facts) {
+	}
+
 	getValue(factsOrResultSet, default := kNotInitialized) {
 		return this
 	}
@@ -1621,6 +1723,10 @@ class Term {
 	}
 
 	substituteVariables(variables) {
+		return this
+	}
+
+	substituteValues(variables) {
 		return this
 	}
 
@@ -1725,6 +1831,11 @@ class Pair extends Term {
 			throw "Subclassing of Pair is not allowed..."
 	}
 
+	getFacts(facts) {
+		this.LeftTerm.getFacts(facts)
+		this.RightTerm.getFacts(facts)
+	}
+
 	toString(resultSet := kNotInitialized) {
 		local result := "["
 		local next := this
@@ -1788,6 +1899,13 @@ class Pair extends Term {
 	substituteVariables(variables) {
 		if this.iHasVariables
 			return Pair(this.LeftTerm.substituteVariables(variables), this.RightTerm.substituteVariables(variables))
+		else
+			return this
+	}
+
+	substituteValues(variables) {
+		if this.iHasVariables
+			return Pair(this.LeftTerm.substituteValues(variables), this.RightTerm.substituteValues(variables))
 		else
 			return this
 	}
@@ -1935,10 +2053,10 @@ class ProductionRule extends Rule {
 
 	getFacts() {
 		local facts := []
-		local ignore, theCondition
+		local ignore, condition
 
-		for ignore, theCondition in this.Conditions
-			theCondition.getFacts(facts)
+		for ignore, condition in this.Conditions
+			condition.getFacts(facts)
 
 		return facts
 	}
@@ -2032,6 +2150,10 @@ class ReductionRule extends Rule {
 		this.iHasVariables := this.hasVariables()
 	}
 
+	getFacts(facts) {
+		this.Head.getFacts(facts)
+	}
+
 	toString(resultSet := kNotInitialized) {
 		local tail := this.Tail
 		local terms, ignore, theTerm
@@ -2073,6 +2195,23 @@ class ReductionRule extends Rule {
 				terms.Push(theTerm.substituteVariables(variables))
 
 			return ReductionRule(this.Head.substituteVariables(variables), terms)
+		}
+		else
+			return this
+	}
+
+	substituteValues() {
+		local variables, terms
+		local ignore, theTerm
+
+		if this.iHasVariables {
+			variables := CaseInsenseMap()
+			terms := []
+
+			for ignore, theTerm in this.Tail
+				terms.Push(theTerm.substituteValues(variables))
+
+			return ReductionRule(this.Head.substituteValues(variables), terms)
 		}
 		else
 			return this

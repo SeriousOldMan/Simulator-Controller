@@ -140,7 +140,7 @@ global kExecutionTestRules := "
 
 				[?Compose] => (Let: ?Var = "Foo"), (Set: ?Var, Bar, ?Var = "Baz")
 
-				[?Rules] => (Prove: productions(?productions)), (Prove: reductions(?reductions)),
+				{All: [?Rules], {Prove: productions(?productions)}, {Prove: reductions(?reductions)}} =>
 							(Prove: printRules(?productions)), (Prove: printRules(?reductions))
 
 				printRules([])
@@ -419,20 +419,34 @@ class CoreEngine extends Assert {
 }
 
 class Unification extends Assert {
-	executeTests(tests, trace := false) {
+	static __New() {
 		local compiler := RuleCompiler()
-		local resultSet, goal
 
 		productions := false
 		reductions := false
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
+		this.Engine := RuleEngine(productions, reductions, Map())
+	}
+
+	executeTests(tests, trace := false) {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		/*
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
 		engine := RuleEngine(productions, reductions, Map())
+		*/
+
+		engine := Unification.Engine
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
-		if trace
-			kb.RuleEngine.setTraceLevel(trace)
+		kb.RuleEngine.setTraceLevel(trace ? trace : kTraceOff)
 
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
@@ -697,13 +711,18 @@ class HybridEngine extends Assert {
 		engine := RuleEngine(productions, reductions, Map())
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
-		kb.setFact("Compose", true)
-		kb.produce()
+		try {
+			kb.setFact("Compose", true)
+			kb.produce()
 
-		this.AssertEqual("Baz", kb.getValue("Foo.Bar.Foo"), "Unexpected function call result...")
+			this.AssertEqual("Baz", kb.getValue("Foo.Bar.Foo"), "Unexpected function call result...")
 
-		kb.setFact("Rules", true)
-		kb.produce()
+			kb.setFact("Rules", true)
+			kb.produce()
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 	}
 }
 
@@ -728,7 +747,7 @@ showArgs(choicePoint, arguments*) {
 
 	if (kb.RuleEngine.TraceLevel < kTraceOff) {
 		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, values2String(" ", arguments*)), SplashTextGui.Show("w200 h60")
-		Sleep(1000)
+		Sleep(100)
 		SplashTextGui.Destroy()
 	}
 

@@ -145,6 +145,9 @@ global kExecutionTestRules := "
 
 				printRules([])
 				printRules([[?id | ?rule] | ?rules]) <= :showArgs(?id, ": ", ?rule), printRules(?rules)
+
+				{All: [?List], {Is: ?three = 3}, [[1,2,?three] contains 3]} => (Call: showArgs("Yes")), (Set: ThreeFound)
+				{All: [?List], {Is: ?L = [1, 2, 3]}, {None: [?L contains 4]}} => (Call: showArgs("No")), (Set: FourNotFound)
 )"
 
 
@@ -308,7 +311,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(15, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(17, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(38, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -719,6 +722,30 @@ class HybridEngine extends Assert {
 
 			kb.setFact("Rules", true)
 			kb.produce()
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	Contains_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+		try {
+			kb.setFact("List", true)
+			kb.produce()
+
+			this.AssertTrue(kb.getValue("ThreeFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.getValue("FourNotFound"), "Unexpected list contains result...")
 		}
 		catch Any as exception {
 			logError(exception)

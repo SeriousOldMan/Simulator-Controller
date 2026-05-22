@@ -179,7 +179,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
     Notes:
       - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
-      - The operator **contains** requires a string literal value for the left side of the comparison. This string is then split by "," and then is checked whether the right side value is contained in the resulting list.
+      - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
 
   - Exists Quantor
 

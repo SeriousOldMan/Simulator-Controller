@@ -322,12 +322,18 @@ class Predicate extends Condition {
 		local rightPrimary, result
 
 		if (leftPrimary = kNotInitialized)
+			leftPrimary := this.LeftPrimary[variables]
+
+		if (leftPrimary = kNotInitialized)
 			return false
 		else {
-			if isInstance(leftPrimary, Term)
+			if (isInstance(leftPrimary, Term) && (this.Operator != kContains))
 				leftPrimary := leftPrimary.toString(variables)
 
 			rightPrimary := this.RightPrimary[facts]
+
+			if (rightPrimary = kNotInitialized)
+				rightPrimary := this.RightPrimary[variables]
 
 			if ((this.Operator != kNotInitialized) && (rightPrimary = kNotInitialized))
 				return false
@@ -354,13 +360,25 @@ class Predicate extends Condition {
 					case kIdentical:
 						result := (leftPrimary == rightPrimary)
 					case kLess:
-						result := (leftPrimary < rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary < rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) < 0)
 					case kLessOrEqual:
-						result := (leftPrimary <= rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary <= rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) <= 0)
 					case kGreater:
-						result := (leftPrimary > rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary > rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) > 0)
 					case kGreaterOrEqual:
-						result := (leftPrimary >= rightPrimary)
+						if (isNumber(leftPrimary) && isNumber(rightPrimary))
+							result := (leftPrimary >= rightPrimary)
+						else
+							result := (StrCompare(leftPrimary, rightPrimary) >= 0)
 					case kContains:
 						if isInstance(leftPrimary, Pair)
 							result := inList(leftPrimary.toObject(variables), rightPrimary)
@@ -5133,7 +5151,7 @@ class RuleCompiler {
 
 	readConditions(&text, &nextCharIndex, &priority := false) {
 		local conditions := []
-		local keyword, leftLiteral, operator, rightLiteral
+		local keyword, leftLiteral, operator, rightLiteral, list
 
 		loop {
 			if this.skipDelimiter("{", &text, &nextCharIndex, false) {
@@ -5149,11 +5167,29 @@ class RuleCompiler {
 				this.skipDelimiter("}", &text, &nextCharIndex)
 			}
 			else if this.skipDelimiter("[", &text, &nextCharIndex, false) {
-				leftLiteral := this.readLiteral(&text, &nextCharIndex)
+				if this.skipDelimiter("[", &text, &nextCharIndex, false) {
+					list := this.readList(&text, &nextCharIndex, false)
+
+					if (list != kNotFound)
+						leftLiteral := list
+					else
+						throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readConditions..."
+				}
+				else
+					leftLiteral := this.readLiteral(&text, &nextCharIndex)
 
 				if (leftLiteral != kNotFound) {
 					if (leftLiteral = kPredicate)
-						leftLiteral := this.readLiteral(&text, &nextCharIndex)
+						if this.skipDelimiter("[", &text, &nextCharIndex, false) {
+							list := this.readList(&text, &nextCharIndex, false)
+
+							if (list != kNotFound)
+								leftLiteral := list
+							else
+								throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in RuleCompiler.readConditions..."
+						}
+						else
+							leftLiteral := this.readLiteral(&text, &nextCharIndex)
 
 					if this.skipDelimiter("]", &text, &nextCharIndex, false)
 						conditions.Push(Array(leftLiteral))
@@ -5568,22 +5604,25 @@ class ReductionRuleParser extends RuleParser {
 
 class ConditionParser extends Parser {
 	parse(expressions) {
-		switch expressions[1], false {
-			case kAll:
-				return AllQuantor(this.parseArguments(expressions, 2))
-			case kOne:
-				return OneQuantor(this.parseArguments(expressions, 2))
-			case kAny:
-				return ExistQuantor(this.parseArguments(expressions, 2))
-			case kNone:
-				return NotExistQuantor(this.parseArguments(expressions, 2))
-			case kProve:
-				return Goal(this.parseStruct(expressions, 2))
-			case kExpression:
-				return Expression(this.parseExpressionRule(expressions, 2))
-			default:
-				return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
-		}
+		if isObject(expressions[1])
+			return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
+		else
+			switch expressions[1], false {
+				case kAll:
+					return AllQuantor(this.parseArguments(expressions, 2))
+				case kOne:
+					return OneQuantor(this.parseArguments(expressions, 2))
+				case kAny:
+					return ExistQuantor(this.parseArguments(expressions, 2))
+				case kNone:
+					return NotExistQuantor(this.parseArguments(expressions, 2))
+				case kProve:
+					return Goal(this.parseStruct(expressions, 2))
+				case kExpression:
+					return Expression(this.parseExpressionRule(expressions, 2))
+				default:
+					return this.Compiler.createPredicateParser(expressions, this.Variables).parse(expressions)
+			}
 	}
 
 	parseArguments(conditions, start) {
@@ -5615,14 +5654,19 @@ class ConditionParser extends Parser {
 
 class PredicateParser extends Parser {
 	parse(expressions) {
-		if (expressions.Length == 3)
-			return Predicate(this.Compiler.createPrimaryParser(expressions[1]
-															 , this.Variables).parse(expressions[1])
-																				   , expressions[2]
-																				   , this.Compiler.createPrimaryParser(expressions[3]
-																													 , this.Variables).parse(expressions[3]))
+		local leftExpr := expressions[1]
+
+		if isObject(leftExpr)
+			leftExpr := this.Compiler.createListParser(leftExpr, this.Variables).parse(leftExpr)
 		else
-			return Predicate(this.Compiler.createPrimaryParser(expressions[1], this.Variables).parse(expressions[1]))
+			leftExpr := this.Compiler.createPrimaryParser(leftExpr, this.Variables).parse(leftExpr)
+
+		if (expressions.Length == 3)
+			return Predicate(leftExpr, expressions[2]
+						   , this.Compiler.createPrimaryParser(expressions[3]
+															 , this.Variables).parse(expressions[3]))
+		else
+			return Predicate(leftExpr)
 	}
 }
 

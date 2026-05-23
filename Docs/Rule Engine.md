@@ -179,7 +179,7 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
     Notes:
       - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
-      - The operator **contains** requires a string literal value for the left side of the comparison. This string is then split by "," and then is checked whether the right side value is contained in the resulting list.
+      - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
 
   - Exists Quantor
 
@@ -572,13 +572,13 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Syntax: productions(list)
 	
-	Generates a list of all production rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
+	Generates a list of all production rules. Each entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
 
   - reductions
   
     Syntax: reductions(list)
 	
-	Generates a list of all reduction rules. Ench entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
+	Generates a list of all reduction rules. Each entry is a pair of the rule ID and the textual representation of the rule. The list of rules is unified with the supplied argument *list*.
 	
   - addRule
   

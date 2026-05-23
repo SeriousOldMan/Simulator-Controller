@@ -313,7 +313,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(15, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(18, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(38, reductions.Length, "Not all reduction rules compiled...")
 	}
 }

@@ -23,7 +23,7 @@
 			[?FuelSavingPct > 0]  => (Let: ?target = Pct(?FuelSavingPct)), (Prove: calculateSaveAmount(?target))
     - The [*Set* and *Clear* actions of production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) now accept pseudo object notation to compose fact names dynamically during runtime.
     - Added two new [builtin predicates "parse" and "print"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for reduction rules.
-	- Added two new [builtin predicates "productions" and "reductions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), which generate a list of all rules in the corresponding category.
+	- Added two new [builtin predicates "productions" and "reductions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), which generate a list of all rules for the corresponding category.
 	- Added two new [builtin predicates "addRule" and "removeRule"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for the rule engine. Using these predicates, the rule engine is now capable of adding and removing rules during runtime, thereby supporting learning through feedback loops.
   - [Internal] Migrated to AHK 2.1-alpha.30.
 

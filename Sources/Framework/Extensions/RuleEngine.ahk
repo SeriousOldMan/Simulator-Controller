@@ -592,11 +592,11 @@ class Expression extends Condition {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Primary extends Term {
-	getValue(factsOrResultSet, default := kNotInitialized) {
+	getValue(bindings, default := kNotInitialized) {
 		return this
 	}
 
-	toString(factsOrResultSet := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		throw "Virtual method Primary.toString must be implemented in a subclass..."
 	}
 }
@@ -651,19 +651,19 @@ class Variable extends Primary {
 		facts.Push(this.Variable[true])
 	}
 
-	getValue(variablesFactsOrResultSet, default := kNotInitialized) {
+	getValue(bindings, default := kNotInitialized) {
 		local value, nextValue
 
-		if (variablesFactsOrResultSet = kNotInitialized)
+		if (bindings = kNotInitialized)
 			return this
 		else {
-			value := variablesFactsOrResultSet.getValue((isInstance(variablesFactsOrResultSet, Facts) || (isInstance(variablesFactsOrResultSet, Variables))) ? this : this.RootVariable)
+			value := bindings.getValue((isInstance(bindings, Facts) || (isInstance(bindings, Variables))) ? this : this.RootVariable)
 
-			if (isObject(value) && (isInstance(value, Variable) || isInstance(value, Literal) || isInstance(value, Fact))) {
-				value := value.getValue(variablesFactsOrResultSet, value)
+			if isInstance(value, Primary) {
+				value := value.getValue(bindings, value)
 
 				while (isInstance(value, Variable) || isInstance(value, Fact)) {
-					nextValue := value.getValue(variablesFactsOrResultSet, value)
+					nextValue := value.getValue(bindings, value)
 
 					if (nextValue = value)
 						break
@@ -713,7 +713,7 @@ class Variable extends Primary {
 		return this.getValue(variables).substituteValues(variables)
 	}
 
-	toString(variablesFactsOrResultSet := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local property := this.Property
 		local name := this.Variable
 		local root, value
@@ -721,16 +721,16 @@ class Variable extends Primary {
 		if InStr(name, "__Unnamed")
 			name := ""
 
-		if (variablesFactsOrResultSet = kNotInitialized)
+		if (bindings = kNotInitialized)
 			return ("?" . name . ((property != "") ? ("." . property) : ""))
 		else {
 			root := this.RootVariable
-			value := (isInstance(variablesFactsOrResultSet, Variables) ? this.getValue(variablesFactsOrResultSet) : root.getValue(variablesFactsOrResultSet))
+			value := (isInstance(bindings, Variables) ? this.getValue(bindings) : root.getValue(bindings))
 
 			if (value = kNotInitialized)
 				return "?" . name . ((property != "") ? ("." . property) : "") ; . " (" . &root . ")"
 			else if isInstance(value, Term)
-				return value.toString(variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
+				return value.toString(bindings) . ((property != "") ? ("." . property) : "")
 			else
 				return value
 		}
@@ -776,31 +776,31 @@ class Fact extends Primary {
 		facts.Push(this.Fact)
 	}
 
-	getValue(factsOrResultSet, default := kNotInitialized) {
-		if isInstance(factsOrResultSet, Facts)
-			return factsOrResultSet.getValue(this.Fact, default)
+	getValue(bindings, default := kNotInitialized) {
+		if isInstance(bindings, Facts)
+			return bindings.getValue(this.Fact, default)
 		else if (default != kNotInitialized)
 			return default
 		else
 			return this
 	}
 
-	isUnbound(factsOrResultSet) {
-		if isInstance(factsOrResultSet, Facts)
-			return (this.getValue(factsOrResultSet) = kNotInitialized)
-		else if isInstance(factsOrResultSet, ResultSet)
-			return (factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact, kNotInitialized) = kNotInitialized)
+	isUnbound(bindings) {
+		if isInstance(bindings, Facts)
+			return (this.getValue(bindings) = kNotInitialized)
+		else if isInstance(bindings, ResultSet)
+			return (bindings.KnowledgeBase.Facts.getValue(this.Fact, kNotInitialized) = kNotInitialized)
 		else
 			return false
 	}
 
-	toString(factsOrResultSet := kNotInitialized) {
-		if (factsOrResultSet = kNotInitialized)
+	toString(bindings := kNotInitialized) {
+		if (bindings = kNotInitialized)
 			return ("!" . this.Fact)
-		else if isInstance(factsOrResultSet, Facts)
-			return factsOrResultSet.getValue(this.Fact)
-		else if isInstance(factsOrResultSet, ResultSet)
-			return factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact)
+		else if isInstance(bindings, Facts)
+			return bindings.getValue(this.Fact)
+		else if isInstance(bindings, ResultSet)
+			return bindings.KnowledgeBase.Facts.getValue(this.Fact)
 		else
 			return false
 	}
@@ -843,18 +843,18 @@ class Literal extends Primary {
 			throw "Subclassing of Literal is not allowed..."
 	}
 
-	getValue(factsOrResultSet := kNotInitialized, *) {
-		if (factsOrResultSet && (factsOrResultSet != kNotInitialized) && isInstance(factsOrResultSet, Facts))
+	getValue(bindings := kNotInitialized, *) {
+		if isInstance(bindings, Facts)
 			return this.Literal
 		else
 			return this
 	}
 
-	isUnbound(resultSetOrFacts) {
+	isUnbound(bindings) {
 		return (this.iLiteral = kNotInitialized)
 	}
 
-	toString(factsOrResultSet := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		; return RegExReplace(this.Literal, "([^\\]) ", "$1\ ")
 		return this.Literal
 	}
@@ -897,23 +897,23 @@ class CallAction extends Action {
 		}
 	}
 
-	Function[variablesOrFacts := kNotInitialized] {
+	Function[bindings := kNotInitialized] {
 		Get {
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iFunction
 			else
-				return this.iFunction.getValue(variablesOrFacts)
+				return this.iFunction.getValue(bindings)
 		}
 	}
 
-	Arguments[variablesOrFacts := kNotInitialized] {
+	Arguments[bindings := kNotInitialized] {
 		Get {
-			if isNumber(variablesOrFacts)
-				return this.iArguments[variablesOrFacts]
-			else if (variablesOrFacts = kNotInitialized)
+			if isNumber(bindings)
+				return this.iArguments[bindings]
+			else if (bindings = kNotInitialized)
 				return this.iArguments
 			else
-				this.getValues(variablesOrFacts)
+				this.getValues(bindings)
 		}
 	}
 
@@ -1001,23 +1001,23 @@ class ExecuteAction extends Action {
 		}
 	}
 
-	Executable[variablesOrFacts := kNotInitialized] {
+	Executable[bindings := kNotInitialized] {
 		Get {
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iExecutable
 			else
-				return this.iExecutable.getValue(variablesOrFacts)
+				return this.iExecutable.getValue(bindings)
 		}
 	}
 
-	Arguments[variablesOrFacts := kNotInitialized] {
+	Arguments[bindings := kNotInitialized] {
 		Get {
-			if isNumber(variablesOrFacts)
-				return this.iArguments[variablesOrFacts]
-			else if (variablesOrFacts = kNotInitialized)
+			if isNumber(bindings)
+				return this.iArguments[bindings]
+			else if (bindings = kNotInitialized)
 				return this.iArguments
 			else
-				this.getValues(variablesOrFacts)
+				this.getValues(bindings)
 		}
 	}
 
@@ -1105,9 +1105,9 @@ class ProveAction extends CallAction {
 		}
 	}
 
-	Functor[variablesOrFacts := kNotInitialized] {
+	Functor[bindings := kNotInitialized] {
 		Get {
-			return this.Function[variablesOrFacts]
+			return this.Function[bindings]
 		}
 	}
 
@@ -1251,31 +1251,31 @@ class SetFactAction extends Action {
 	iFact := kNotInitialized
 	iValue := kNotInitialized
 
-	Fact[variablesOrFacts := kNotInitialized] {
+	Fact[bindings := kNotInitialized] {
 		Get {
 			local fact
 
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				fact := this.iFact
 			else
-				fact := this.iFact.getValue(variablesOrFacts)
+				fact := this.iFact.getValue(bindings)
 
 			if isInstance(fact, Term)
-				if (variablesOrFacts = kNotInitialized)
+				if (bindings = kNotInitialized)
 					fact := fact.toString()
 				else
-					fact := fact.toString(variablesOrFacts)
+					fact := fact.toString(bindings)
 
 			return fact
 		}
 	}
 
-	Value[variablesOrFacts := kNotInitialized] {
+	Value[bindings := kNotInitialized] {
 		Get {
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iValue
 			else
-				return this.iValue.getValue(variablesOrFacts)
+				return this.iValue.getValue(bindings)
 		}
 	}
 
@@ -1322,11 +1322,11 @@ class SetComposedFactAction extends Action {
 	iFact := kNotInitialized
 	iValue := kNotInitialized
 
-	Fact[variablesOrFacts := kNotInitialized] {
+	Fact[bindings := kNotInitialized] {
 		Get {
 			local result, index, component, value
 
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iFact
 			else {
 				result := ""
@@ -1335,10 +1335,10 @@ class SetComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					value := component.getValue(variablesOrFacts)
+					value := component.getValue(bindings)
 
 					if isInstance(value, Term)
-						value := value.toString(variablesOrFacts)
+						value := value.toString(bindings)
 
 					result .= value
 				}
@@ -1348,12 +1348,12 @@ class SetComposedFactAction extends Action {
 		}
 	}
 
-	Value[variablesOrFacts := kNotInitialized] {
+	Value[bindings := kNotInitialized] {
 		Get {
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iValue
 			else
-				return this.iValue.getValue(variablesOrFacts)
+				return this.iValue.getValue(bindings)
 		}
 	}
 
@@ -1426,20 +1426,20 @@ class SetComposedFactAction extends Action {
 class ClearFactAction extends Action {
 	iFact := kNotInitialized
 
-	Fact[variablesOrFacts := kNotInitialized] {
+	Fact[bindings := kNotInitialized] {
 		Get {
 			local fact
 
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				fact := this.iFact
 			else
-				fact := this.iFact.getValue(variablesOrFacts)
+				fact := this.iFact.getValue(bindings)
 
 			if isInstance(fact, Term)
-				if (variablesOrFacts = kNotInitialized)
+				if (bindings = kNotInitialized)
 					fact := fact.toString()
 				else
-					fact := fact.toString(variablesOrFacts)
+					fact := fact.toString(bindings)
 
 			return fact
 		}
@@ -1475,11 +1475,11 @@ class ClearFactAction extends Action {
 class ClearComposedFactAction extends Action {
 	iFact := kNotInitialized
 
-	Fact[variablesOrFacts := kNotInitialized] {
+	Fact[bindings := kNotInitialized] {
 		Get {
 			local result, index, component, value
 
-			if (variablesOrFacts = kNotInitialized)
+			if (bindings = kNotInitialized)
 				return this.iFact
 			else {
 				result := ""
@@ -1488,10 +1488,10 @@ class ClearComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					value := component.getValue(variablesOrFacts)
+					value := component.getValue(bindings)
 
 					if isInstance(value, Term)
-						value := value.toString(variablesOrFacts)
+						value := value.toString(bindings)
 
 					result .= value
 				}
@@ -1715,16 +1715,16 @@ class Term {
 	getFacts(facts) {
 	}
 
-	getValue(factsOrResultSet, default := kNotInitialized) {
+	getValue(bindings, default := kNotInitialized) {
 		return this
 	}
 
-	toString(factsOrResultSet := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 
-	toObject(factsOrResultSet := kNotInitialized) {
-		return this.toString(factsOrResultSet)
+	toObject(bindings := kNotInitialized) {
+		return this.toString(bindings)
 	}
 
 	doVariables(resultSet, function) {
@@ -1734,8 +1734,8 @@ class Term {
 		return this
 	}
 
-	isUnbound(resultSetOrFacts) {
-		return (this.getValue(resultSetOrFacts) = kNotInitialized)
+	isUnbound(bindings) {
+		return (this.getValue(bindings) = kNotInitialized)
 	}
 
 	hasVariables() {

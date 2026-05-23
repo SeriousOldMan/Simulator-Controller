@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[6.9.8.0-release]() (Early build for 6.9.8. Changes: Support for general expressions in list predicates.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6980) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-698) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

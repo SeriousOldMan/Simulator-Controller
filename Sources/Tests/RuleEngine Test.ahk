@@ -141,7 +141,7 @@ global kExecutionTestRules := "
 				[?Compose] => (Let: ?Var = "Foo"), (Set: ?Var, Bar, ?Var = "Baz")
 
 				{All: [?Rules], {Prove: productions(?productions)}, {Prove: reductions(?reductions)}} =>
-							(Prove: printRules(?productions)), (Prove: printRules(?reductions))
+						(Prove: printRules(?productions)), (Prove: printRules(?reductions))
 
 				printRules([])
 				printRules([[?id | ?rule] | ?rules]) <= :showArgs(?id, ": ", ?rule), printRules(?rules)
@@ -149,8 +149,7 @@ global kExecutionTestRules := "
 				{All: [?List], {Is: ?temp = 3}, {Is: ?temp = ?three}, [[1,2,?three] contains 3]} => (Call: showArgs("Yes")), (Set: ThreeFound)
 				{All: [?List], {Is: ?three = 3}, {Is: ?three = 4}, [[1,2,?three] contains 3]} => (Call: showArgs("Oops")), (Set: SecondThreeFound)
 				{All: [?List], {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
-							   {Prove: option(TRACE, FULL)}, {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}, {Prove: option(TRACE, Off)}} =>
-						(Call: showArgs("No")), (Set: FourNotFound)
+						{Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: FourNotFound)
 )"
 
 
@@ -747,9 +746,9 @@ class HybridEngine extends Assert {
 			kb.setFact("List", true)
 			kb.produce()
 
-			this.AssertTrue(kb.getValue("ThreeFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.getValue("ThreeFound", kUndefined) != kUndefined, "Unexpected list contains result...")
 			this.AssertTrue(kb.getValue("SecondThreeFound", kUndefined) == kUndefined, "Unexpected list contains result...")
-			this.AssertTrue(kb.getValue("FourNotFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.getValue("FourNotFound", kUndefined) != kUndefined, "Unexpected list contains result...")
 		}
 		catch Any as exception {
 			logError(exception)

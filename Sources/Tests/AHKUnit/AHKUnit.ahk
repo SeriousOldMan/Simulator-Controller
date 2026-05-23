@@ -458,13 +458,15 @@ class AhkUnit_Runner {
 				method.Call(testInstance)
 			} catch Any as e {
 				thrownClass := (!isObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
-				expectedClass := testInstance[key . "_throws"]
+				expectedClass := testInstance.HasProp(key . "_throws") ? testInstance.%key . "_throws"% : ""
 				if (expectedClass != "") {
 					assertion := AhkUnit.Assert.Equals("throw " . expectedClass, "throw " . thrownClass)
 					caller := isObject(e) ? e : Object()
 					testInstance.Assert_(assertion, "", caller)
 				} else {
 					this._AddFailure("Exception thrown in " . key)
+					try
+						this._AddFailure("Message: " . e.Message)
 					continue
 				}
 			}

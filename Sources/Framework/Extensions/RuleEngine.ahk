@@ -362,14 +362,15 @@ class Predicate extends Condition {
 					case kGreaterOrEqual:
 						result := (leftPrimary >= rightPrimary)
 					case kContains:
-						if isObject(leftPrimary)
-							result := inList(leftPrimary, rightPrimary)
+						if isInstance(leftPrimary, Pair)
+							result := inList(leftPrimary.toObject(variables), rightPrimary)
+						else if isObject(leftPrimary) {
+							try
+								result := inList(leftPrimary, rightPrimary)
+						}
 						else
-							try {
+							try
 								result := inList(string2Values(",", leftPrimary), rightPrimary)
-							}
-							catch Any {
-							}
 					default:
 						unknown := true
 				}
@@ -442,12 +443,14 @@ class Goal extends Condition {
 
 	match(knowledgeBase, variables) {
 		local arguments := []
-		local resultSet, arguments, ignore, argument, goal
+		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Goal.Arguments
 			if isInstance(argument, Variable) {
-				if (argument.getValue(variables) != kNotInitialized)
-					arguments.Push(Literal(argument.toString(variables)))
+				value := argument.getValue(variables)
+
+				if (value != kNotInitialized)
+					arguments.Push(value)
 				else
 					arguments.Push(argument)
 			}
@@ -459,14 +462,7 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				value := value.getValue(resultSet)
-
-				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
-					variables.setValue(var, value.toString(resultSet))
-				else
-					variables.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 
@@ -521,12 +517,14 @@ class Expression extends Condition {
 	match(knowledgeBase, variables) {
 		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
-		local resultSet, arguments, ignore, argument, goal
+		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Rule.Head.Arguments
 			if isInstance(argument, Variable) {
-				if (argument.getValue(variables) != kNotInitialized)
-					arguments.Push(Literal(argument.toString(variables)))
+				value := argument.getValue(variables)
+
+				if (value != kNotInitialized)
+					arguments.Push(value)
 				else
 					arguments.Push(argument)
 			}
@@ -538,14 +536,7 @@ class Expression extends Condition {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				value := value.getValue(resultSet)
-
-				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
-					variables.setValue(var, value.toString(resultSet))
-				else
-					variables.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 
@@ -691,7 +682,7 @@ class Variable extends Primary {
 	}
 
 	substituteValues(variables) {
-		return this.getValue(variables)
+		return this.getValue(variables).substituteValues(variables)
 	}
 
 	toString(variablesFactsOrResultSet := kNotInitialized) {
@@ -913,10 +904,10 @@ class CallAction extends Action {
 		arguments := []
 
 		for ignore, argument in this.Arguments
-			if isInstance(argument, Variable)
-				arguments.Push(argument.toString(variables))
-			else
+			if isInstance(argument, Fact)
 				arguments.Push(argument.toString(facts))
+			else
+				arguments.Push(argument.toString(variables))
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
@@ -1097,7 +1088,7 @@ class ProveAction extends CallAction {
 
 	execute(knowledgeBase, variables) {
 		local facts := knowledgeBase.Facts
-		local resultSet, arguments, ignore, argument, goal
+		local resultSet, arguments, ignore, argument, goal, value
 
 		arguments := []
 
@@ -1106,7 +1097,7 @@ class ProveAction extends CallAction {
 				value := argument.getValue(variables)
 
 				if (value != kNotInitialized)
-					arguments.Push(isInstance(value, Term) ? value : Literal(value))
+					arguments.Push(value)
 				else
 					arguments.Push(argument)
 			}
@@ -1122,14 +1113,7 @@ class ProveAction extends CallAction {
 
 		if resultSet {
 			loop {
-				goal.doVariables(resultSet, (var, value) {
-					value := value.getValue(resultSet)
-
-					if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
-						variables.setValue(var, value.toString(resultSet))
-					else
-						variables.setValue(var, value.substituteValues(resultSet))
-				})
+				goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
 
 				if this.iProveAll {
 					if !resultSet.nextResult()
@@ -1170,12 +1154,14 @@ class LetAction extends Action {
 	execute(knowledgeBase, variables) {
 		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
-		local resultSet, arguments, ignore, argument, goal
+		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Rule.Head.Arguments
 			if isInstance(argument, Variable) {
-				if (argument.getValue(variables) != kNotInitialized)
-					arguments.Push(Literal(argument.toString(variables)))
+				value := argument.getValue(variables)
+
+				if (value != kNotInitialized)
+					arguments.Push(value)
 				else
 					arguments.Push(argument)
 			}
@@ -1187,14 +1173,7 @@ class LetAction extends Action {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				value := value.getValue(resultSet)
-
-				if (isInstance(value, Literal) || isInstance(value, Fact) || isInstance(value, Variable))
-					variables.setValue(var, value.toString(resultSet))
-				else
-					variables.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 		}
@@ -1967,6 +1946,9 @@ class Variables {
 	iVariables := CaseInsenseMap()
 
 	setValue(variable, value) {
+		if !isInstance(value, Term)
+			value := Literal(value)
+
 		this.iVariables[variable.Variable[true]] := value
 	}
 
@@ -2200,12 +2182,10 @@ class ReductionRule extends Rule {
 			return this
 	}
 
-	substituteValues() {
-		local variables, terms
-		local ignore, theTerm
+	substituteValues(variables) {
+		local terms, ignore, theTerm
 
 		if this.iHasVariables {
-			variables := CaseInsenseMap()
 			terms := []
 
 			for ignore, theTerm in this.Tail

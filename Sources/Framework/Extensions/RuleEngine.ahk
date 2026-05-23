@@ -480,7 +480,12 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				if isInstance(value, Primary)
+					variables.setValue(var, Literal(value.toString(resultSet)))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
+			})
 
 			resultSet.dispose()
 
@@ -554,7 +559,12 @@ class Expression extends Condition {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				if isInstance(value, Primary)
+					variables.setValue(var, Literal(value.toString(resultSet)))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
+			})
 
 			resultSet.dispose()
 
@@ -720,7 +730,7 @@ class Variable extends Primary {
 			if (value = kNotInitialized)
 				return "?" . name . ((property != "") ? ("." . property) : "") ; . " (" . &root . ")"
 			else if isInstance(value, Term)
-				return value.toString(isInstance(variablesFactsOrResultSet, Variables) ? kNotInitialized : variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
+				return value.toString(variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
 			else
 				return value
 		}
@@ -824,6 +834,9 @@ class Literal extends Primary {
 	}
 
 	__New(value) {
+		if isInstance(value, Term)
+			throw "Literals must not be terms..."
+
 		this.iLiteral := value
 
 		if (this.base != Literal.Prototype)
@@ -1131,7 +1144,12 @@ class ProveAction extends CallAction {
 
 		if resultSet {
 			loop {
-				goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
+				goal.doVariables(resultSet, (var, value) {
+					if isInstance(value, Primary)
+						variables.setValue(var, Literal(value.toString(resultSet)))
+					else
+						variables.setValue(var, value.substituteValues(resultSet))
+				})
 
 				if this.iProveAll {
 					if !resultSet.nextResult()
@@ -1191,7 +1209,12 @@ class LetAction extends Action {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => variables.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) {
+				if isInstance(value, Primary)
+					variables.setValue(var, Literal(value.toString(resultSet)))
+				else
+					variables.setValue(var, value.substituteValues(resultSet))
+			})
 
 			resultSet.dispose()
 		}
@@ -3422,6 +3445,9 @@ class Facts {
 	}
 
 	setValue(fact, value, propagate := false) {
+		if isInstance(value, Literal)
+			value := value.Literal
+
 		if (value = kNotInitialized)
 			this.clearFact(fact)
 		else
@@ -3454,6 +3480,9 @@ class Facts {
 	}
 
 	setFact(fact, value, propagate := false) {
+		if isInstance(value, Literal)
+			value := value.Literal
+
 		if this.hasFact(fact)
 			this.setValue(fact, value, propagate)
 		else

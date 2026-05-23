@@ -29,7 +29,23 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.9.7.0
+
+#### Date: 05/22/26
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - [Developer] General expressions can now be used in the production rule predicate for list containment. Example:
+  
+		{All: {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
+			  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: Success = true)
+			  
+		concat([], ?L, ?L)
+		concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
 
 # Release history
 

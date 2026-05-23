@@ -148,7 +148,8 @@ global kExecutionTestRules := "
 
 				{All: [?List], {Is: ?temp = 3}, {Is: ?temp = ?three}, [[1,2,?three] contains 3]} => (Call: showArgs("Yes")), (Set: ThreeFound)
 				{All: [?List], {Is: ?three = 3}, {Is: ?three = 4}, [[1,2,?three] contains 3]} => (Call: showArgs("Oops")), (Set: SecondThreeFound)
-				{All: [?List], {Is: ?L = [1, 2, 3]}, {None: [?L contains 4]}} => (Call: showArgs("No")), (Set: FourNotFound)
+				{All: [?List], {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
+					  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: FourNotFound)
 )"
 
 
@@ -745,9 +746,9 @@ class HybridEngine extends Assert {
 			kb.setFact("List", true)
 			kb.produce()
 
-			this.AssertTrue(kb.getValue("ThreeFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.getValue("ThreeFound", kUndefined) != kUndefined, "Unexpected list contains result...")
 			this.AssertTrue(kb.getValue("SecondThreeFound", kUndefined) == kUndefined, "Unexpected list contains result...")
-			this.AssertTrue(kb.getValue("FourNotFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.getValue("FourNotFound", kUndefined) != kUndefined, "Unexpected list contains result...")
 		}
 		catch Any as exception {
 			logError(exception)

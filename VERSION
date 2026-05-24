@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.8.0-dev
 Target=6.9.8.0-release
-Date=05/23/2026
+Date=05/24/2026
 Download=
-Changes=Support for general expressions in list predicates
+Changes=Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.7.0-release

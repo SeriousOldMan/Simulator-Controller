@@ -135,6 +135,14 @@ global kExecutionTestRules := "
 				[?Test] => (Let: ?Var = "There"),
 						   (Prove: parse("?Var", ?term)), (Prove: print(?term, ?text)),
 						   (Call: showArgs(?text)), (Set: ParseResult6 = ?text)
+				{All: [?Test], {Is: ?var = answer(?x)}, {Prove: checkStruct(live(?var))}} =>
+							(Let: ?x = 42), (Set: ParseResult7 = ?var)
+				{All: [?Test], {Is: #answerTerm=(?var)}, {Prove: checkStruct(live(?var))}} =>
+				 			(Let: ?x = 42), (Set: ParseResult8 = ?var)
+				{All: [?Test], {Is: #answerString=(?var)}, {Prove: checkStruct(live(?var))}} =>
+				 			(Let: ?x = 42), (Set: ParseResult9 = ?var)
+
+				checkStruct(live(answer(42)))
 
 				printFather(?v) <= fail
 
@@ -313,8 +321,8 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(18, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(38, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(21, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(39, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
@@ -702,6 +710,9 @@ class HybridEngine extends Assert {
 		this.AssertEqual("[1, 2 | 3]", kb.getValue("ParseResult4"), "Unexpected function call result...")
 		this.AssertEqual("Hello", kb.getValue("ParseResult5"), "Unexpected function call result...")
 		this.AssertEqual("There", kb.getValue("ParseResult6"), "Unexpected function call result...")
+		this.AssertEqual("answer(42)", kb.getValue("ParseResult7"), "Unexpected function call result...")
+		this.AssertEqual("answer(42)", kb.getValue("ParseResult8"), "Unexpected function call result...")
+		this.AssertEqual("answer(42)", kb.getValue("ParseResult9"), "Unexpected function call result...")
 	}
 
 	Compose_Test() {
@@ -754,6 +765,14 @@ class HybridEngine extends Assert {
 			logError(exception)
 		}
 	}
+}
+
+answerTerm() {
+	return Struct("answer", [Variable("x")])
+}
+
+answerString() {
+	return "answer(?x)"
 }
 
 testFunctionCall(resultSet, value) {

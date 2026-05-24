@@ -39,13 +39,16 @@
   
 #### Changes
 
-  - [Developer] General expressions can now be used in the production rule predicate for list containment. Example:
+  - [Developer] More useful extensions to the rule engine.
+    - General expressions can now be used in the production rule predicate for list containment. Example:
   
-		{All: {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
-			  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: Success = true)
-			  
-		concat([], ?L, ?L)
-		concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
+			{All: {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
+				  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: Success = true)
+				  
+			concat([], ?L, ?L)
+			concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
+    - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method named *Func* which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
+	- External functions called by the rule engine can now return values of any type supported by the rule engine. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
 
 # Release history
 

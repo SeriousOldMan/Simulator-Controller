@@ -232,6 +232,12 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
+  - Func
+  
+    Syntax / Example: (Func: MsgDlg("Hello ", !Driver.Name))
+	
+	Similar to *Call*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
+	
   - Prove
   
     Syntax / Example: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
@@ -547,12 +553,30 @@ The rule engine has some builtin predicates which can be used when formulating r
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the function.
 	
 	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
+	
+  - func
+  
+	Syntax: func(function, arg1, ..., argN) or #function(arg1, ..., argN)
+  
+	Similar to *call*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
 
   - call=
   
 	Syntax: call=(function, arg1, ..., argN, result) or :function=(arg1, ..., argN, result)
 	
 	Similar to *call*, but the last argument will be unified with the result value of the function call. In this case, the predicate always succeeds, even if the result value is *false*, unless the function call throws an error. In that case, the predicate fails and the next alternative will be processed by the rule engine.
+	
+	Several formats are supported for the *result*:
+	
+	- An instance of a subclass of *Term* of the rule engine class library
+	- A string that can be parsed into an instance of a subclass of *Term*. Example: "father(Mary, Paul)"
+	- A simple literal value (number, string or boolean)
+	
+  - func=
+  
+	Syntax: func=(function, arg1, ..., argN) or #function=(arg1, ..., argN)
+  
+	Similar to *call=*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
 
   - produce
   

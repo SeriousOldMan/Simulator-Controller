@@ -35,6 +35,7 @@ global kGreaterOrEqual := ">="
 global kContains := "contains"
 
 global kCall := "Call:"
+global kFunc := "Func:"
 global kProve := "Prove:"
 global kProveAll := "ProveAll:"
 global kSet := "Set:"
@@ -42,7 +43,7 @@ global kClear := "Clear:"
 global kExecute := "Execute:"
 
 global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!="
-						  , "builtin0", "builtin1", "unbound?", "append", "get", "execute"
+						  , "unbound?", "append", "get", "execute"
 						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"]
 global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squareRoot
 						   , RuleEngine.Builtins.plus, RuleEngine.Builtins.minus
@@ -50,13 +51,12 @@ global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squ
 						   , RuleEngine.Builtins.greater, RuleEngine.Builtins.less
 						   , RuleEngine.Builtins.lessEqual, RuleEngine.Builtins.greaterEqual
 						   , RuleEngine.Builtins.equal, RuleEngine.Builtins.unequal
-						   , RuleEngine.Builtins.builtin0, RuleEngine.Builtins.builtin1
 						   , RuleEngine.Builtins.unbound, RuleEngine.Builtins.append
 						   , RuleEngine.Builtins.get, RuleEngine.Builtins.execute
 						   , RuleEngine.Builtins.parse, RuleEngine.Builtins.print
 						   , RuleEngine.Builtins.addRule, RuleEngine.Builtins.removeRule
 						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -90,7 +90,7 @@ class Condition {
 	getFacts(facts) {
 	}
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 
@@ -177,11 +177,11 @@ class ExistQuantor extends Quantor {
         }
     }
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(knowledgeBase, variables)
+			if theCondition.match(knowledgeBase, bindings)
 				return true
 
 		return false
@@ -199,11 +199,11 @@ class NotExistQuantor extends Quantor {
         }
     }
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(knowledgeBase, variables)
+			if theCondition.match(knowledgeBase, bindings)
 				return false
 
 		return true
@@ -221,12 +221,12 @@ class OneQuantor extends Quantor {
         }
     }
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local matched := 0
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(knowledgeBase, variables)
+			if theCondition.match(knowledgeBase, bindings)
 				matched += 1
 
 		return (matched == 1)
@@ -244,12 +244,12 @@ class AllQuantor extends Quantor {
         }
     }
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local matched := 0
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(knowledgeBase, variables)
+			if theCondition.match(knowledgeBase, bindings)
 				matched += 1
 
 		return (matched == this.Conditions.Length)
@@ -315,31 +315,31 @@ class Predicate extends Condition {
 			right.getFacts(facts)
 	}
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
 		local leftPrimary := this.LeftPrimary[facts]
 		local unknown := false
 		local rightPrimary, result
 
 		if (leftPrimary = kNotInitialized)
-			leftPrimary := this.LeftPrimary[variables]
+			leftPrimary := this.LeftPrimary[bindings]
 
 		if (leftPrimary = kNotInitialized)
 			return false
 		else {
 			if (isInstance(leftPrimary, Term) && (this.Operator != kContains))
-				leftPrimary := leftPrimary.toString(variables)
+				leftPrimary := leftPrimary.toString(bindings)
 
 			rightPrimary := this.RightPrimary[facts]
 
 			if (rightPrimary = kNotInitialized)
-				rightPrimary := this.RightPrimary[variables]
+				rightPrimary := this.RightPrimary[bindings]
 
 			if ((this.Operator != kNotInitialized) && (rightPrimary = kNotInitialized))
 				return false
 
 			if isInstance(rightPrimary, Term)
-				rightPrimary := rightPrimary.toString(variables)
+				rightPrimary := rightPrimary.toString(bindings)
 
 			result := false
 
@@ -381,7 +381,7 @@ class Predicate extends Condition {
 							result := (StrCompare(leftPrimary, rightPrimary) >= 0)
 					case kContains:
 						if isInstance(leftPrimary, Pair)
-							result := inList(leftPrimary.toObject(variables), rightPrimary)
+							result := inList(leftPrimary.toObject(bindings), rightPrimary)
 						else if isObject(leftPrimary) {
 							try
 								result := inList(leftPrimary, rightPrimary)
@@ -401,10 +401,10 @@ class Predicate extends Condition {
 				throw "Unsupported comparison operator `"" . this.Operator . "`" detected in Predicate.match..."
 
 			if isInstance(this.LeftPrimary, Variable)
-				variables.setValue(this.LeftPrimary, leftPrimary)
+				bindings.setValue(this.LeftPrimary, leftPrimary)
 
 			if ((this.RightPrimary != kNotInitialized) && isInstance(this.RightPrimary, Variable))
-				variables.setValue(this.RightPrimary, rightPrimary)
+				bindings.setValue(this.RightPrimary, rightPrimary)
 
 			return result
 		}
@@ -459,13 +459,13 @@ class Goal extends Condition {
 			term.getFacts(facts)
 	}
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local arguments := []
 		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Goal.Arguments
 			if isInstance(argument, Variable) {
-				value := argument.getValue(variables)
+				value := argument.getValue(bindings)
 
 				if (value != kNotInitialized)
 					arguments.Push(value)
@@ -473,7 +473,7 @@ class Goal extends Condition {
 					arguments.Push(argument)
 			}
 			else
-				arguments.Push(argument.substituteVariables(variables))
+				arguments.Push(argument.substituteVariables(bindings))
 
 		goal := Struct(this.Goal.Functor, arguments)
 
@@ -482,9 +482,9 @@ class Goal extends Condition {
 		if resultSet {
 			goal.doVariables(resultSet, (var, value) {
 				if isInstance(value, Primary)
-					variables.setValue(var, Literal(value.toString(resultSet)))
+					bindings.setValue(var, Literal(value.toString(resultSet)))
 				else
-					variables.setValue(var, value.substituteValues(resultSet))
+					bindings.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -537,14 +537,14 @@ class Expression extends Condition {
 		this.Rule.getFacts(facts)
 	}
 
-	match(knowledgeBase, variables) {
+	match(knowledgeBase, bindings) {
 		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
 		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Rule.Head.Arguments
 			if isInstance(argument, Variable) {
-				value := argument.getValue(variables)
+				value := argument.getValue(bindings)
 
 				if (value != kNotInitialized)
 					arguments.Push(value)
@@ -552,7 +552,7 @@ class Expression extends Condition {
 					arguments.Push(argument)
 			}
 			else
-				arguments.Push(argument.substituteVariables(variables))
+				arguments.Push(argument.substituteVariables(bindings))
 
 		goal := Struct(this.Rule.Head.Functor, arguments)
 
@@ -561,9 +561,9 @@ class Expression extends Condition {
 		if resultSet {
 			goal.doVariables(resultSet, (var, value) {
 				if isInstance(value, Primary)
-					variables.setValue(var, Literal(value.toString(resultSet)))
+					bindings.setValue(var, Literal(value.toString(resultSet)))
 				else
-					variables.setValue(var, value.substituteValues(resultSet))
+					bindings.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -691,26 +691,31 @@ class Variable extends Primary {
 		return true
 	}
 
-	substituteVariables(variables) {
+	substituteVariables(bindings) {
 		local name := this.Variable[true]
 		local newVariable
 
-		if variables.Has(name)
-			return variables[name]
+		if bindings.Has(name)
+			return bindings[name]
 		else {
 			if !this.iProperty
 				newVariable := Variable(name)
 			else
-				newVariable := Variable(this.Variable, this.Property, this.RootVariable.substituteVariables(variables))
+				newVariable := Variable(this.Variable, this.Property, this.RootVariable.substituteVariables(bindings))
 
-			variables[name] := newVariable
+			bindings[name] := newVariable
 
 			return newVariable
 		}
 	}
 
-	substituteValues(variables) {
-		return this.getValue(variables).substituteValues(variables)
+	substituteValues(bindings) {
+		local value := this.getValue(bindings)
+
+		if (value != kNotInitialized)
+			return value.substituteValues(bindings)
+		else
+			return this
 	}
 
 	toString(bindings := kNotInitialized) {
@@ -874,7 +879,7 @@ class Literal extends Primary {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Action {
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
 
@@ -888,12 +893,13 @@ class Action {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CallAction extends Action {
+	iAction := false
 	iFunction := kNotInitialized
 	iArguments := []
 
 	Action {
 		Get {
-			return kCall
+			return this.iAction
 		}
 	}
 
@@ -917,18 +923,19 @@ class CallAction extends Action {
 		}
 	}
 
-	__New(function, arguments) {
+	__New(function, mode, arguments) {
 		this.iFunction := function
+		this.iAction := mode
 		this.iArguments := arguments
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local function
 		local facts := knowledgeBase.Facts
 		local arguments, argument, ignore
 
 		if isInstance(this.Function, Variable)
-			function := this.Function[variables]
+			function := this.Function[bindings]
 		else
 			function := this.Function[facts]
 
@@ -938,13 +945,16 @@ class CallAction extends Action {
 			if isInstance(argument, Fact)
 				arguments.Push(argument.toString(facts))
 			else
-				arguments.Push(argument.toString(variables))
+				arguments.Push(argument.toString(bindings))
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
 
 		try {
-			%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
+			if (this.iAction == kCall)
+				%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
+			else
+				%StrReplace(function, ".", "_")%(arguments*)
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, "Error while calling function " . function . "...")
@@ -1026,13 +1036,13 @@ class ExecuteAction extends Action {
 		this.iArguments := arguments
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local executable
 		local facts := knowledgeBase.Facts
 		local arguments, argument, ignore
 
 		if isInstance(this.Executable, Variable)
-			executable := this.Executable[variables]
+			executable := this.Executable[bindings]
 		else
 			executable := this.Executable[facts]
 
@@ -1040,7 +1050,7 @@ class ExecuteAction extends Action {
 
 		for ignore, argument in this.Arguments
 			if isInstance(argument, Variable)
-				arguments.Push(argument.toString(variables))
+				arguments.Push(argument.toString(bindings))
 			else
 				arguments.Push(argument.toString(facts))
 
@@ -1114,10 +1124,10 @@ class ProveAction extends CallAction {
 	__New(function, arguments, proveAll := false) {
 		this.iProveAll := proveAll
 
-		super.__New(function, arguments)
+		super.__New(function, proveAll ? kProveAll : kProve, arguments)
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
 		local resultSet, arguments, ignore, argument, goal, value
 
@@ -1125,7 +1135,7 @@ class ProveAction extends CallAction {
 
 		for ignore, argument in this.Arguments
 			if isInstance(argument, Variable) {
-				value := argument.getValue(variables)
+				value := argument.getValue(bindings)
 
 				if (value != kNotInitialized)
 					arguments.Push(value)
@@ -1133,9 +1143,9 @@ class ProveAction extends CallAction {
 					arguments.Push(argument)
 			}
 			else
-				arguments.Push(argument.substituteVariables(variables))
+				arguments.Push(argument.substituteVariables(bindings))
 
-		goal := Struct(isInstance(this.Functor, Variable) ? this.Functor[variables] : this.Functor[facts], arguments)
+		goal := Struct(isInstance(this.Functor, Variable) ? this.Functor[bindings] : this.Functor[facts], arguments)
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Activate reduction rules with goal " . goal.toString())
@@ -1146,9 +1156,9 @@ class ProveAction extends CallAction {
 			loop {
 				goal.doVariables(resultSet, (var, value) {
 					if isInstance(value, Primary)
-						variables.setValue(var, Literal(value.toString(resultSet)))
+						bindings.setValue(var, Literal(value.toString(resultSet)))
 					else
-						variables.setValue(var, value.substituteValues(resultSet))
+						bindings.setValue(var, value.substituteValues(resultSet))
 				})
 
 				if this.iProveAll {
@@ -1187,14 +1197,14 @@ class LetAction extends Action {
 		this.iRule := rule
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
 		local resultSet, arguments, ignore, argument, goal, value
 
 		for ignore, argument in this.Rule.Head.Arguments
 			if isInstance(argument, Variable) {
-				value := argument.getValue(variables)
+				value := argument.getValue(bindings)
 
 				if (value != kNotInitialized)
 					arguments.Push(value)
@@ -1202,7 +1212,7 @@ class LetAction extends Action {
 					arguments.Push(argument)
 			}
 			else
-				arguments.Push(argument.substituteVariables(variables))
+				arguments.Push(argument.substituteVariables(bindings))
 
 		goal := Struct(this.Rule.Head.Functor, arguments)
 
@@ -1211,9 +1221,9 @@ class LetAction extends Action {
 		if resultSet {
 			goal.doVariables(resultSet, (var, value) {
 				if isInstance(value, Primary)
-					variables.setValue(var, Literal(value.toString(resultSet)))
+					bindings.setValue(var, Literal(value.toString(resultSet)))
 				else
-					variables.setValue(var, value.substituteValues(resultSet))
+					bindings.setValue(var, value.substituteValues(resultSet))
 			})
 
 			resultSet.dispose()
@@ -1284,13 +1294,13 @@ class SetFactAction extends Action {
 		this.iValue := ((value = kNotInitialized) ? Literal(true) : value)
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
-		local fact := (isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
-		local value := (isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
+		local fact := (isInstance(this.Fact, Variable) ? this.Fact[bindings] : this.Fact[facts])
+		local value := (isInstance(this.Value, Variable) ? this.Value[bindings] : this.Value[facts])
 
 		if isInstance(value, Term)
-			value := value.toString(variables)
+			value := value.toString(bindings)
 
 		facts.setFact(fact, value)
 	}
@@ -1362,7 +1372,7 @@ class SetComposedFactAction extends Action {
 		this.iFact := arguments
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
 		local index, component, value
@@ -1371,15 +1381,15 @@ class SetComposedFactAction extends Action {
 			if (index > 1)
 				fact .= "."
 
-			value := (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.getValue(bindings) : component.getValue(facts))
 
 			if isInstance(value, Term)
-				value := value.toString(isInstance(component, Variable) ? variables : facts)
+				value := value.toString(isInstance(component, Variable) ? bindings : facts)
 
 			fact .= value
 		}
 
-		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
+		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[bindings] : this.Value[facts])
 	}
 
 	toString(facts := kNotInitialized) {
@@ -1449,10 +1459,10 @@ class ClearFactAction extends Action {
 		this.iFact := fact
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
 
-		facts.clearFact(isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
+		facts.clearFact(isInstance(this.Fact, Variable) ? this.Fact[bindings] : this.Fact[facts])
 	}
 
 	toString(facts := kNotInitialized) {
@@ -1505,7 +1515,7 @@ class ClearComposedFactAction extends Action {
 		this.iFact := arguments
 	}
 
-	execute(knowledgeBase, variables) {
+	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
 		local fact := ""
 		local index, component, value
@@ -1514,10 +1524,10 @@ class ClearComposedFactAction extends Action {
 			if (index > 1)
 				fact .= "."
 
-			value := (isInstance(component, Variable) ? component.getValue(variables) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.getValue(bindings) : component.getValue(facts))
 
 			if isInstance(value, Term)
-				value := value.toString(isInstance(component, Variable) ? variables : facts)
+				value := value.toString(isInstance(component, Variable) ? bindings : facts)
 
 			fact .= value
 		}
@@ -1651,14 +1661,14 @@ class Term {
 			return false
 		}
 
-		substituteVariables(variables) {
+		substituteVariables(bindings) {
 			local arguments, ignore, argument
 
 			if this.iHasVariables {
 				arguments := []
 
 				for ignore, argument in this.Arguments
-					arguments.Push(argument.substituteVariables(variables))
+					arguments.Push(argument.substituteVariables(bindings))
 
 				return Struct(this.Functor, arguments)
 			}
@@ -1666,14 +1676,14 @@ class Term {
 				return this
 		}
 
-		substituteValues(variables) {
+		substituteValues(bindings) {
 			local arguments, ignore, argument
 
 			if this.iHasVariables {
 				arguments := []
 
 				for ignore, argument in this.Arguments
-					arguments.Push(argument.substituteValues(variables))
+					arguments.Push(argument.substituteValues(bindings))
 
 				return Struct(this.Functor, arguments)
 			}
@@ -1727,6 +1737,10 @@ class Term {
 		return this.toString(bindings)
 	}
 
+	fromObject(object, bindings := kNotInitialized) {
+		return false
+	}
+
 	doVariables(resultSet, function) {
 	}
 
@@ -1742,11 +1756,11 @@ class Term {
 		return false
 	}
 
-	substituteVariables(variables) {
+	substituteVariables(bindings) {
 		return this
 	}
 
-	substituteValues(variables) {
+	substituteValues(bindings) {
 		return this
 	}
 
@@ -1916,16 +1930,16 @@ class Pair extends Term {
 		return (this.LeftTerm.hasVariables() || this.iRightTerm.hasVariables())
 	}
 
-	substituteVariables(variables) {
+	substituteVariables(bindings) {
 		if this.iHasVariables
-			return Pair(this.LeftTerm.substituteVariables(variables), this.RightTerm.substituteVariables(variables))
+			return Pair(this.LeftTerm.substituteVariables(bindings), this.RightTerm.substituteVariables(bindings))
 		else
 			return this
 	}
 
-	substituteValues(variables) {
+	substituteValues(bindings) {
 		if this.iHasVariables
-			return Pair(this.LeftTerm.substituteValues(variables), this.RightTerm.substituteValues(variables))
+			return Pair(this.LeftTerm.substituteValues(bindings), this.RightTerm.substituteValues(bindings))
 		else
 			return this
 	}
@@ -1983,21 +1997,19 @@ class Nil extends Term {
 ;;; Class                    Variables                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class Variables {
-	iVariables := CaseInsenseMap()
-
+class Variables extends CaseInsenseMap {
 	setValue(variable, value) {
 		if !isInstance(value, Term)
 			value := Literal(value)
 
-		this.iVariables[variable.Variable[true]] := value
+		this[variable.Variable[true]] := value
 	}
 
 	getValue(variable, default := kNotInitialized) {
 		local fullName := variable.Variable[true]
 
-		if this.iVariables.Has(fullName)
-			return this.iVariables[fullName]
+		if this.Has(fullName)
+			return this[fullName]
 		else
 			return default
 	}
@@ -2095,26 +2107,26 @@ class ProductionRule extends Rule {
 		return vars
 	}
 
-	fire(knowledgeBase, variables) {
+	fire(knowledgeBase, bindings) {
 		local ignore, theAction
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLite)
 			knowledgeBase.RuleEngine.trace(kTraceLite, "Firing rule " . this.toString())
 
 		for ignore, theAction in this.Actions
-			theAction.execute(knowledgeBase, variables)
+			theAction.execute(knowledgeBase, bindings)
 	}
 
 	produce(knowledgeBase) {
-		local variables
+		local bindings
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLite)
 			knowledgeBase.RuleEngine.trace(kTraceLite, "Trying rule " . this.toString())
 
-		variables := this.match(knowledgeBase)
+		bindings := this.match(knowledgeBase)
 
-		if variables {
-			this.fire(knowledgeBase, variables)
+		if bindings {
+			this.fire(knowledgeBase, bindings)
 
 			return true
 		}
@@ -2207,7 +2219,7 @@ class ReductionRule extends Rule {
 	}
 
 	substituteVariables() {
-		local variables, terms
+		local bindings, terms
 		local ignore, theTerm
 
 		if this.iHasVariables {
@@ -2223,16 +2235,16 @@ class ReductionRule extends Rule {
 			return this
 	}
 
-	substituteValues(variables) {
+	substituteValues(bindings) {
 		local terms, ignore, theTerm
 
 		if this.iHasVariables {
 			terms := []
 
 			for ignore, theTerm in this.Tail
-				terms.Push(theTerm.substituteValues(variables))
+				terms.Push(theTerm.substituteValues(bindings))
 
-			return ReductionRule(this.Head.substituteValues(variables), terms)
+			return ReductionRule(this.Head.substituteValues(bindings), terms)
 		}
 		else
 			return this
@@ -2475,10 +2487,10 @@ class ResultSet {
 		switch functor, false {
 			case "produce":
 				return ProduceChoicePoint(this, goal, environment)
-			case "call":
-				return CallChoicePoint(this, goal, environment)
-			case "call=":
-				return CallChoicePoint(this, goal, environment, true)
+			case "call", "call=":
+				return CallChoicePoint(this, goal, environment, "Extension", InStr(functor, "="))
+			case "func", "func=":
+				return CallChoicePoint(this, goal, environment, "Function", InStr(functor, "="))
 			case "set":
 				return SetFactChoicePoint(this, goal, environment)
 			case "clear":
@@ -2915,15 +2927,16 @@ class ClearFactChoicePoint extends FactChoicePoint {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CallChoicePoint extends ChoicePoint {
-	iBuiltin := false
-	iFirst := true
-
+	iMode := false
+	iAware := true
 	iValued := false
 
-	__New(ruleSet, goal, environment, valued := false) {
+	iFirst := true
+
+	__New(ruleSet, goal, environment, mode := "Builtin", valued := false) {
 		super.__New(ruleSet, goal, environment)
 
-		this.iBuiltin := (InStr(goal.Functor, "call") != 1)
+		this.iMode := mode
 		this.iValued := valued
 	}
 
@@ -2933,7 +2946,7 @@ class CallChoicePoint extends ChoicePoint {
 		if this.iFirst {
 			this.iFirst := false
 
-			if this.iBuiltin
+			if (this.iMode = "Builtin")
 				result := this.builtinCall()
 			else
 				result := this.foreignCall()
@@ -2942,7 +2955,25 @@ class CallChoicePoint extends ChoicePoint {
 				resultSet := this.ResultSet
 				operand := this.Goal.Arguments[this.Goal.Arguments.Length]
 
-				result := resultSet.unify(this, Literal(result), operand.getValue(resultSet, operand))
+				if isInstance(result, Term)
+					result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
+				else if isObject(result) {
+					result := Term.fromObject(result)
+
+					if result
+						result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
+				}
+				else
+					try {
+						result := RuleCompiler().compileTerm(result)
+
+						result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
+					}
+					catch Any as exception {
+						logError(exception)
+
+						result := resultSet.unify(this, Literal(result), operand.getValue(resultSet, operand))
+					}
 			}
 
 			if !result
@@ -3002,11 +3033,15 @@ class CallChoicePoint extends ChoicePoint {
 
 		try {
 			if builtin
-				callable := kBuiltinFunctions[inList(kBuiltinFunctors, function)]
-			else
+				return kBuiltinFunctions[inList(kBuiltinFunctors, function)].Call(this, values*)
+			else {
 				callable := %StrReplace(function, ".", "_")%
 
-			return callable.Call(this, values*)
+				if (this.iMode = "Extension")
+					return callable.Call(this, values*)
+				else
+					return callable.Call(values*)
+			}
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, "Error while calling function " . function . "...")
@@ -4499,48 +4534,6 @@ class RuleEngine {
 			return !choicePoint.ResultSet.unify(choicePoint, operand1, operand2)
 		}
 
-		static builtin0 := (choicePoint, function, operand1) {
-			local resultSet := choicePoint.ResultSet
-
-			if isInstance(function, Term)
-				function := function.toString(resultSet)
-
-			try {
-				return resultSet.unify(choicePoint, Literal(%function%()), operand1.getValue(resultSet, operand1))
-			}
-			catch Any as exception {
-				logMessage(kLogCritical, "Error while calling function " . function . "...")
-
-				logError(exception, true)
-
-				return false
-			}
-		}
-
-		static builtin1 := (choicePoint, function, operand1, operand2) {
-			local resultSet := choicePoint.ResultSet
-
-			operand1 := operand1.getValue(resultSet, operand1)
-			operand2 := operand2.getValue(resultSet, operand2)
-
-			if isInstance(function, Term)
-				function := function.toString(resultSet)
-
-			if (isInstance(operand1, Variable) || operand1.isUnbound(resultSet))
-				return false
-			else
-				try {
-					return resultSet.unify(choicePoint, Literal(%function%(operand1.toString(resultSet))), operand2)
-				}
-				catch Any as exception {
-					logMessage(kLogCritical, "Error while calling function " . function . "...")
-
-					logError(exception, true)
-
-					return false
-				}
-		}
-
 		static unbound := (choicePoint, operand1) {
 			local value := operand1.getValue(choicePoint.ResultSet, operand1)
 
@@ -5253,7 +5246,7 @@ class RuleCompiler {
 
 			action := this.readLiteral(&text, &nextCharIndex)
 
-			if inList([kCall, kProve, kProveAll], action)
+			if inList([kCall, kFunc, kProve, kProveAll], action)
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
 			else if (action = kLet)
 				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
@@ -5724,10 +5717,10 @@ class ActionParser extends Parser {
 		local struct, argument, arguments
 
 		switch action, false {
-			case kCall:
+			case kCall, kFunc:
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
-				return CallAction(Literal(struct.Functor), struct.Arguments)
+				return CallAction(Literal(struct.Functor), action, struct.Arguments)
 			case kProve:
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
@@ -5806,6 +5799,20 @@ class StructParser extends Parser {
 			}
 			else
 				handler := "call"
+
+			return Struct(handler, concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
+											 , this.parseArguments(terms, 2)))
+		}
+		else if (InStr(terms[1], "#") = 1) {
+			function := SubStr(terms[1], 2)
+
+			if ((StrLen(function) > 0) && (SubStr(function, StrLen(function)) = "=")) {
+				function := SubStr(function, 1, StrLen(function) - 1)
+
+				handler := "func="
+			}
+			else
+				handler := "func"
 
 			return Struct(handler, concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
 											 , this.parseArguments(terms, 2)))

@@ -6,7 +6,7 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
+Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not available, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
 
 ***
 
@@ -14,7 +14,7 @@ As said above, Jona is a voice chat bot and therefore you can control Jona compl
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Jona.
 
-Important: If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
+Important: If you have multiple *dialog partners* active, for example Jona and Cato, it will be necessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
 
 ### A typical dialog
 

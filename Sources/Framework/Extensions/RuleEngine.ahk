@@ -775,23 +775,22 @@ class Fact extends Primary {
 		local value
 
 		if isInstance(bindings, Facts)
-			return bindings.getValue(this.Fact, default)
+			value := bindings.getValue(this.Fact, default)
 		else if isInstance(bindings, Variables)
-			return bindings.Facts.getValue(this.Fact, default)
-		else if isInstance(bindings, ResultSet) {
+			value := bindings.Facts.getValue(this.Fact, default)
+		else if isInstance(bindings, ResultSet)
 			value := bindings.KnowledgeBase.Facts.getValue(this.Fact, default)
-
-			if (value = kNotInitialized)
-				return this
-			else if isInstance(value, Term)
-				return value
-			else
-				return Literal(value)
-		}
 		else if (default != kNotInitialized)
-			return default
+			value := default
 		else
+			value := this
+
+		if (value = kNotInitialized)
 			return this
+		else if isInstance(value, Term)
+			return value
+		else
+			return Literal(value)
 	}
 
 	isUnbound(bindings) {
@@ -1298,7 +1297,7 @@ class SetFactAction extends Action {
 		local value := (isInstance(this.Value, Variable) ? this.Value[bindings] : this.Value[facts])
 
 		if isInstance(value, Term)
-			value := value.toString(bindings)
+			value := value.substituteValues(bindings).toString(bindings)
 
 		facts.setFact(fact, value)
 	}
@@ -2873,7 +2872,7 @@ class FactChoicePoint extends ChoicePoint {
 					}
 				}
 
-				value := ((length >= 2) ? arguments[length].toString(resultSet) : true)
+				value := ((length >= 2) ? arguments[length].substituteValues(resultSet).toString(resultSet) : true)
 
 				this.iFact := fact
 				this.iOldValue := facts.getValue(fact)

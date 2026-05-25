@@ -141,7 +141,7 @@ global kExecutionTestRules := "
 				 			(Let: ?x = 42), (Set: ParseResult8 = ?var)
 				{All: [?Test], {Is: #answerString=(?var)}, {Prove: checkStruct(live(?var))}} =>
 				 			(Let: ?x = 13), (Set: ParseResult9 = ?var)
-				[?Test] => (Set: Answer = 42), (Let: ?var = answer(!Answer)), (Set: ParseResult10 = ?var)
+				[?Test] => (Let: ?var = answer(!Answer)), (Set: Answer = 42), (Set: ParseResult10 = ?var)
 
 				checkStruct(live(answer(?x)))
 

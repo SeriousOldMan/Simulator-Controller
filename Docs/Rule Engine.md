@@ -232,11 +232,9 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
-  - Func
+	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
-    Syntax / Example: (Func: MsgDlg("Hello ", !Driver.Name))
-	
-	Similar to *Call*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
+    Syntax / Example: (Call: %MsgBox%("Hello"))
 	
   - Prove / ProveAll
   
@@ -556,12 +554,10 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 	
-  - func
+	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
-	Syntax: func(function, arg1, ..., argN) or #function(arg1, ..., argN)
+	Syntax: call(%function%, arg1, ..., argN) or :%function%(arg1, ..., argN)
   
-	Similar to *call*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
-
   - call=
   
 	Syntax: call=(function, arg1, ..., argN, result) or :function=(arg1, ..., argN, result)
@@ -574,11 +570,9 @@ The rule engine has some builtin predicates which can be used when formulating r
 	- A string that can be parsed into an instance of a subclass of *Term*. Example: "father(Mary, Paul)"
 	- A simple literal value (number, string or boolean)
 	
-  - func=
+	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
-	Syntax: func=(function, arg1, ..., argN) or #function=(arg1, ..., argN)
-  
-	Similar to *call=*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
+	Syntax: call=(%function%, arg1, ..., argN, result) or :%function%=(arg1, ..., argN, result)
 
   - produce
   

@@ -35,7 +35,6 @@ global kGreaterOrEqual := ">="
 global kContains := "contains"
 
 global kCall := "Call:"
-global kFunc := "Func:"
 global kProve := "Prove:"
 global kProveAll := "ProveAll:"
 global kSet := "Set:"
@@ -904,13 +903,13 @@ class Action {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CallAction extends Action {
-	iAction := false
+	iExternal := false
 	iFunction := kNotInitialized
 	iArguments := []
 
 	Action {
 		Get {
-			return this.iAction
+			return kCall
 		}
 	}
 
@@ -934,9 +933,9 @@ class CallAction extends Action {
 		}
 	}
 
-	__New(function, mode, arguments) {
+	__New(function, external, arguments) {
 		this.iFunction := function
-		this.iAction := mode
+		this.iExternal := external
 		this.iArguments := arguments
 	}
 
@@ -962,10 +961,11 @@ class CallAction extends Action {
 			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
 
 		try {
-			if (this.iAction == kCall)
-				%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
-			else
+			if this.iExternal
 				%StrReplace(function, ".", "_")%(arguments*)
+			else
+				%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
+
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, "Error while calling function " . function . "...")
@@ -988,12 +988,20 @@ class CallAction extends Action {
 
 	toString(facts := kNotInitialized) {
 		local arguments := []
-		local ignore, argument
+		local ignore, argument, prefix, postfix
 
 		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 
-		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+		prefix := ""
+		postfix := ""
+
+		if this.iExternal {
+			prefix := "%"
+			postfix := "%"
+		}
+
+		return ("(" . this.Action . A_Space . prefix . this.Function.toString(facts) . postfix . "(" . values2String(", ", arguments*) . "))")
 	}
 
 	toObject(facts := kNotInitialized) {
@@ -1139,7 +1147,7 @@ class ProveAction extends CallAction {
 	__New(function, arguments, proveAll := false) {
 		this.iProveAll := proveAll
 
-		super.__New(function, proveAll ? kProveAll : kProve, arguments)
+		super.__New(function, false, arguments)
 	}
 
 	execute(knowledgeBase, bindings) {
@@ -2550,10 +2558,10 @@ class ResultSet {
 		switch functor, false {
 			case "produce":
 				return ProduceChoicePoint(this, goal, environment)
-			case "call", "call=":
-				return CallChoicePoint(this, goal, environment, "Extension", InStr(functor, "="))
-			case "func", "func=":
-				return CallChoicePoint(this, goal, environment, "Function", InStr(functor, "="))
+			case "call":
+				return CallChoicePoint(this, goal, environment, false)
+			case "call=":
+				return CallChoicePoint(this, goal, environment, false, true)
 			case "set":
 				return SetFactChoicePoint(this, goal, environment)
 			case "clear":
@@ -2566,7 +2574,7 @@ class ResultSet {
 				builtin := inList(kBuiltinFunctors, functor)
 
 				if (builtin && ((kBuiltinAritys[builtin] == goal.Arity) || (kBuiltinAritys[builtin] == -1)))
-					return CallChoicePoint(this, goal, environment)
+					return CallChoicePoint(this, goal, environment, true)
 				else
 					return RulesChoicePoint(this, goal, environment)
 		}
@@ -2990,16 +2998,15 @@ class ClearFactChoicePoint extends FactChoicePoint {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CallChoicePoint extends ChoicePoint {
-	iMode := false
-	iAware := true
+	iBuiltin := false
 	iValued := false
 
 	iFirst := true
 
-	__New(ruleSet, goal, environment, mode := "Builtin", valued := false) {
+	__New(ruleSet, goal, environment, builtin, valued := false) {
 		super.__New(ruleSet, goal, environment)
 
-		this.iMode := mode
+		this.iBuiltin := builtin
 		this.iValued := valued
 	}
 
@@ -3009,7 +3016,7 @@ class CallChoicePoint extends ChoicePoint {
 		if this.iFirst {
 			this.iFirst := false
 
-			if (this.iMode = "Builtin")
+			if this.iBuiltin
 				result := this.builtinCall()
 			else
 				result := this.foreignCall()
@@ -3059,8 +3066,10 @@ class CallChoicePoint extends ChoicePoint {
 
 	foreignCall() {
 		local resultSet := this.ResultSet
+		local builtin := false
+		local external := false
 		local visArgs := (this.iValued ? (this.Goal.Arguments.Length - 1) : this.Goal.Arguments.Length)
-		local function, values, builtin, index, theTerm, value, newValues, callable
+		local function, values, builtin, index, theTerm, value, newValues, callable, call, prefix, postfix
 
 		values := []
 		builtin := false
@@ -3070,7 +3079,13 @@ class CallChoicePoint extends ChoicePoint {
 				if (index == 1) {
 					function := theTerm.getValue(resultSet, theTerm).toString(resultSet)
 
-					builtin := inList(kBuiltinFunctors, function)
+					if (InStr(function, "%") == 1)
+						external := (SubStr(function, StrLen(function)) = "%")
+					else
+						builtin := inList(kBuiltinFunctors, function)
+
+					if external
+						function := SubStr(function, 2, StrLen(function) - 2)
 				}
 				else {
 					value := theTerm.getValue(resultSet, theTerm)
@@ -3088,7 +3103,14 @@ class CallChoicePoint extends ChoicePoint {
 				for index, value in values
 					newValues.Push(value.toString(resultSet))
 
-				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", newValues*) . ")")
+				if external {
+					prefix := "%"
+					postfix := "%"
+				}
+
+				call := (this.iValued ? "Call=" : "Call ")
+
+				resultSet.RuleEngine.trace(kTraceMedium, call . prefix . function . postfix . "(" . values2String(", ", newValues*) . ")")
 			}
 			else
 				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
@@ -3100,10 +3122,10 @@ class CallChoicePoint extends ChoicePoint {
 			else {
 				callable := %StrReplace(function, ".", "_")%
 
-				if (this.iMode = "Extension")
-					return callable.Call(this, values*)
-				else
+				if external
 					return callable.Call(values*)
+				else
+					return callable.Call(this, values*)
 			}
 		}
 		catch Any as exception {
@@ -5309,7 +5331,7 @@ class RuleCompiler {
 
 			action := this.readLiteral(&text, &nextCharIndex)
 
-			if inList([kCall, kFunc, kProve, kProveAll], action)
+			if inList([kCall, kProve, kProveAll], action)
 				actions.Push(Array(action, this.readStruct(&text, &nextCharIndex)))
 			else if (action = kLet)
 				actions.Push(Array(action, this.readTailTerm(&text, &nextCharIndex)))
@@ -5777,13 +5799,22 @@ class PrimaryParser extends Parser {
 class ActionParser extends Parser {
 	parse(expressions) {
 		local action := expressions[1]
-		local struct, argument, arguments
+		local struct, function, argument, arguments
 
 		switch action, false {
-			case kCall, kFunc:
+			case kCall:
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
+				function := struct.Functor
 
-				return CallAction(Literal(struct.Functor), action, struct.Arguments)
+				if (InStr(function, "%") == 1)
+					external := (SubStr(function, StrLen(function)) = "%")
+				else
+					external := false
+
+				if external
+					function := SubStr(function, 2, StrLen(function) - 2)
+
+				return CallAction(Literal(function), external, struct.Arguments)
 			case kProve:
 				struct := this.Compiler.createStructParser(expressions[2]).parse(expressions[2])
 
@@ -5862,20 +5893,6 @@ class StructParser extends Parser {
 			}
 			else
 				handler := "call"
-
-			return Struct(handler, concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
-											 , this.parseArguments(terms, 2)))
-		}
-		else if (InStr(terms[1], "#") = 1) {
-			function := SubStr(terms[1], 2)
-
-			if ((StrLen(function) > 0) && (SubStr(function, StrLen(function)) = "=")) {
-				function := SubStr(function, 1, StrLen(function) - 1)
-
-				handler := "func="
-			}
-			else
-				handler := "func"
 
 			return Struct(handler, concatenate([this.Compiler.createTermParser(function, this.Variables).parse(function)]
 											 , this.parseArguments(terms, 2)))

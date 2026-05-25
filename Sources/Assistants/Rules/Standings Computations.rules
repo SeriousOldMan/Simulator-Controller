@@ -37,7 +37,7 @@ priority: 5, {Any: [?Lap], [?Sector], [?Standings]} =>
 priority: -5, [?Standings] => (Clear: Standings)
 
 updateGrid(?lap) <= Set(Standings.Lap, ?lap, Weather, !Weather.Weather.Now),
-					#getTime=(?time), Set(Standings.Lap, ?lap, Time, ?time),
+					:%getTime%=(?time), Set(Standings.Lap, ?lap, Time, ?time),
 					Set(Standings.Lap, ?lap, Car.Count, !Car.Count), updateGrid(?lap, !Car.Count)
 
 updateGrid(?, ?car) <= ?car =< 0, !

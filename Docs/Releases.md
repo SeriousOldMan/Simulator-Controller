@@ -47,7 +47,7 @@
 				  
 			concat([], ?L, ?L)
 			concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
-    - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method named *Func* which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
+    - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
 	- External functions called by the rule engine can now return values of any type supported by the rule engine. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
 	- [Important] The bahvior of the *ProveAll* action has changed in a way, which can brake current production rules that use the *ProveAll* action. You can now use *ProveAll* to create powerful loops in the action part of a reduction rule. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) for more information.
 

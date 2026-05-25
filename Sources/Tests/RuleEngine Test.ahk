@@ -137,9 +137,9 @@ global kExecutionTestRules := "
 						   (Call: showArgs(?text)), (Set: ParseResult6 = ?text)
 				{All: [?Test], {Is: ?var = answer(?x)}, {Prove: checkStruct(live(?var))}} =>
 							(Let: ?x = 42), (Set: ParseResult7 = ?var)
-				{All: [?Test], {Is: #answerTerm=(?var)}, {Prove: checkStruct(live(?var))}} =>
+				{All: [?Test], {Is: :%answerTerm%=(?var)}, {Prove: checkStruct(live(?var))}} =>
 				 			(Let: ?x = 42), (Set: ParseResult8 = ?var)
-				{All: [?Test], {Is: #answerString=(?var)}, {Prove: checkStruct(live(?var))}} =>
+				{All: [?Test], {Is: :%answerString%=(?var)}, {Prove: checkStruct(live(?var))}} =>
 				 			(Let: ?x = 13), (Set: ParseResult9 = ?var)
 				[?Test] => (Let: ?var = answer(!Answer)), (Set: Answer = 42), (Set: ParseResult10 = ?var)
 

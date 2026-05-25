@@ -305,7 +305,7 @@ class AhkUnit_Assert {
 
 		GetMesssage() {
 			message := "Expected: " this.expected "`n"
-			message .= "Actual  : " this.actual
+			message .= "Actual: " this.actual
 			return message
 		}
 	}

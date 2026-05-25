@@ -942,7 +942,7 @@ class CallAction extends Action {
 	execute(knowledgeBase, bindings) {
 		local function
 		local facts := knowledgeBase.Facts
-		local arguments, argument, ignore
+		local arguments, argument, ignore, prefix, postfix
 
 		if isInstance(this.Function, Variable)
 			function := this.Function[bindings]
@@ -957,8 +957,18 @@ class CallAction extends Action {
 			else
 				arguments.Push(argument.toString(bindings))
 
-		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
-			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", arguments*) . ")")
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium) {
+			if this.iExternal {
+				prefix := "%"
+				postfix := "%"
+			}
+			else {
+				prefix := ""
+				postfix := ""
+			}
+
+			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call " . prefix . function . postfix . "(" . values2String(", ", arguments*) . ")")
+		}
 
 		try {
 			if this.iExternal
@@ -993,12 +1003,13 @@ class CallAction extends Action {
 		for ignore, argument in this.Arguments
 			arguments.Push(argument.toString(facts))
 
-		prefix := ""
-		postfix := ""
-
 		if this.iExternal {
 			prefix := "%"
 			postfix := "%"
+		}
+		else {
+			prefix := ""
+			postfix := ""
 		}
 
 		return ("(" . this.Action . A_Space . prefix . this.Function.toString(facts) . postfix . "(" . values2String(", ", arguments*) . "))")
@@ -3096,7 +3107,7 @@ class CallChoicePoint extends ChoicePoint {
 					values.Push(value)
 				}
 
-		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium) {
+		if (resultSet.RuleEngine.TraceLevel <= kTraceMedium)
 			if builtin {
 				newValues := []
 
@@ -3107,6 +3118,10 @@ class CallChoicePoint extends ChoicePoint {
 					prefix := "%"
 					postfix := "%"
 				}
+				else {
+					prefix := ""
+					postfix := ""
+				}
 
 				call := (this.iValued ? "Call=" : "Call ")
 
@@ -3114,7 +3129,6 @@ class CallChoicePoint extends ChoicePoint {
 			}
 			else
 				resultSet.RuleEngine.trace(kTraceMedium, "Call " . function . "(" . values2String(", ", values*) . ")")
-		}
 
 		try {
 			if builtin

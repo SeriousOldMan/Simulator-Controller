@@ -140,9 +140,10 @@ global kExecutionTestRules := "
 				{All: [?Test], {Is: #answerTerm=(?var)}, {Prove: checkStruct(live(?var))}} =>
 				 			(Let: ?x = 42), (Set: ParseResult8 = ?var)
 				{All: [?Test], {Is: #answerString=(?var)}, {Prove: checkStruct(live(?var))}} =>
-				 			(Let: ?x = 42), (Set: ParseResult9 = ?var)
+				 			(Let: ?x = 13), (Set: ParseResult9 = ?var)
+				[?Test] => (Set: Answer = 42), (Let: ?var = answer(!Answer)), (Set: ParseResult10 = ?var)
 
-				checkStruct(live(answer(42)))
+				checkStruct(live(answer(?x)))
 
 				printFather(?v) <= fail
 
@@ -321,7 +322,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(21, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(22, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(39, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
@@ -712,7 +713,8 @@ class HybridEngine extends Assert {
 		this.AssertEqual("There", kb.getValue("ParseResult6"), "Unexpected function call result...")
 		this.AssertEqual("answer(42)", kb.getValue("ParseResult7"), "Unexpected function call result...")
 		this.AssertEqual("answer(42)", kb.getValue("ParseResult8"), "Unexpected function call result...")
-		this.AssertEqual("answer(42)", kb.getValue("ParseResult9"), "Unexpected function call result...")
+		this.AssertEqual("answer(13)", kb.getValue("ParseResult9"), "Unexpected function call result...")
+		this.AssertEqual("answer(42)", kb.getValue("ParseResult10"), "Unexpected function call result...")
 	}
 
 	Compose_Test() {

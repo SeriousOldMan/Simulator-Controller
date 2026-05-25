@@ -480,12 +480,7 @@ class Goal extends Condition {
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				if isInstance(value, Primary)
-					bindings.setValue(var, Literal(value.toString(resultSet)))
-				else
-					bindings.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 
@@ -559,12 +554,7 @@ class Expression extends Condition {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				if isInstance(value, Primary)
-					bindings.setValue(var, Literal(value.toString(resultSet)))
-				else
-					bindings.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 
@@ -659,7 +649,7 @@ class Variable extends Primary {
 		else {
 			value := bindings.getValue((isInstance(bindings, Facts) || (isInstance(bindings, Variables))) ? this : this.RootVariable)
 
-			if isInstance(value, Primary) {
+			if (isInstance(value, Primary) && (value != this)) {
 				value := value.getValue(bindings, value)
 
 				while (isInstance(value, Variable) || isInstance(value, Fact)) {
@@ -782,8 +772,22 @@ class Fact extends Primary {
 	}
 
 	getValue(bindings, default := kNotInitialized) {
+		local value
+
 		if isInstance(bindings, Facts)
 			return bindings.getValue(this.Fact, default)
+		else if isInstance(bindings, Variables)
+			return bindings.Facts.getValue(this.Fact, default)
+		else if isInstance(bindings, ResultSet) {
+			value := bindings.KnowledgeBase.Facts.getValue(this.Fact, default)
+
+			if (value = kNotInitialized)
+				return this
+			else if isInstance(value, Term)
+				return value
+			else
+				return Literal(value)
+		}
 		else if (default != kNotInitialized)
 			return default
 		else
@@ -791,7 +795,7 @@ class Fact extends Primary {
 	}
 
 	isUnbound(bindings) {
-		if isInstance(bindings, Facts)
+		if (isInstance(bindings, Facts) || isInstance(bindings, Variables))
 			return (this.getValue(bindings) = kNotInitialized)
 		else if isInstance(bindings, ResultSet)
 			return (bindings.KnowledgeBase.Facts.getValue(this.Fact, kNotInitialized) = kNotInitialized)
@@ -799,10 +803,14 @@ class Fact extends Primary {
 			return false
 	}
 
+	substituteValues(bindings) {
+		return this.getValue(bindings)
+	}
+
 	toString(bindings := kNotInitialized) {
 		if (bindings = kNotInitialized)
 			return ("!" . this.Fact)
-		else if isInstance(bindings, Facts)
+		else if (isInstance(bindings, Facts) || isInstance(bindings, Variables))
 			return bindings.getValue(this.Fact)
 		else if isInstance(bindings, ResultSet)
 			return bindings.KnowledgeBase.Facts.getValue(this.Fact)
@@ -1154,12 +1162,7 @@ class ProveAction extends CallAction {
 
 		if resultSet {
 			loop {
-				goal.doVariables(resultSet, (var, value) {
-					if isInstance(value, Primary)
-						bindings.setValue(var, Literal(value.toString(resultSet)))
-					else
-						bindings.setValue(var, value.substituteValues(resultSet))
-				})
+				goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
 
 				if this.iProveAll {
 					if !resultSet.nextResult()
@@ -1219,12 +1222,7 @@ class LetAction extends Action {
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) {
-				if isInstance(value, Primary)
-					bindings.setValue(var, Literal(value.toString(resultSet)))
-				else
-					bindings.setValue(var, value.substituteValues(resultSet))
-			})
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
 
 			resultSet.dispose()
 		}
@@ -1679,16 +1677,12 @@ class Term {
 		substituteValues(bindings) {
 			local arguments, ignore, argument
 
-			if this.iHasVariables {
-				arguments := []
+			arguments := []
 
-				for ignore, argument in this.Arguments
-					arguments.Push(argument.substituteValues(bindings))
+			for ignore, argument in this.Arguments
+				arguments.Push(argument.substituteValues(bindings))
 
-				return Struct(this.Functor, arguments)
-			}
-			else
-				return this
+			return Struct(this.Functor, arguments)
 		}
 
 		unify(choicePoint, term) {
@@ -1938,10 +1932,7 @@ class Pair extends Term {
 	}
 
 	substituteValues(bindings) {
-		if this.iHasVariables
-			return Pair(this.LeftTerm.substituteValues(bindings), this.RightTerm.substituteValues(bindings))
-		else
-			return this
+		return Pair(this.LeftTerm.substituteValues(bindings), this.RightTerm.substituteValues(bindings))
 	}
 
 	unify(choicePoint, term) {
@@ -1998,6 +1989,20 @@ class Nil extends Term {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Variables extends CaseInsenseMap {
+	iKnowledgeBase := false
+
+	KnowledgeBase {
+		Get {
+			return this.iKnowledgeBase
+		}
+	}
+
+	Facts {
+		Get {
+			return this.KnowledgeBase.Facts
+		}
+	}
+
 	setValue(variable, value) {
 		if !isInstance(value, Term)
 			value := Literal(value)
@@ -2005,13 +2010,19 @@ class Variables extends CaseInsenseMap {
 		this[variable.Variable[true]] := value
 	}
 
-	getValue(variable, default := kNotInitialized) {
-		local fullName := variable.Variable[true]
+	getValue(var, default := kNotInitialized) {
+		local fullName := (isInstance(var, Variable) ? var.Variable[true] : var)
 
 		if this.Has(fullName)
 			return this[fullName]
 		else
 			return default
+	}
+
+	__New(knowledgeBase) {
+		super.__New()
+
+		this.iKnowledgeBase := knowledgeBase
 	}
 }
 
@@ -2097,7 +2108,7 @@ class ProductionRule extends Rule {
 	}
 
 	match(knowledgeBase) {
-		local vars := Variables()
+		local vars := Variables(knowledgeBase)
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
@@ -2238,16 +2249,12 @@ class ReductionRule extends Rule {
 	substituteValues(bindings) {
 		local terms, ignore, theTerm
 
-		if this.iHasVariables {
-			terms := []
+		terms := []
 
-			for ignore, theTerm in this.Tail
-				terms.Push(theTerm.substituteValues(bindings))
+		for ignore, theTerm in this.Tail
+			terms.Push(theTerm.substituteValues(bindings))
 
-			return ReductionRule(this.Head.substituteValues(bindings), terms)
-		}
-		else
-			return this
+		return ReductionRule(this.Head.substituteValues(bindings), terms)
 	}
 }
 

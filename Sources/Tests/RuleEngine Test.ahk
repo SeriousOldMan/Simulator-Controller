@@ -159,6 +159,13 @@ global kExecutionTestRules := "
 				{All: [?List], {Is: ?three = 3}, {Is: ?three = 4}, [[1,2,?three] contains 3]} => (Call: showArgs("Oops")), (Set: SecondThreeFound)
 				{All: [?List], {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
 						{Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: FourNotFound)
+
+				[?Backtrack] => (ProveAll: getValue(?value)), (Call: showArgs(?value)), (Set: Result = ?value)
+				[?Backtrack] => (ProveAll: getValue(?value)), (Set: Result, ?value = ?value)
+
+				getValue(1)
+				getValue(2)
+				getValue(3)
 )"
 
 
@@ -322,8 +329,8 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(22, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(39, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(24, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(42, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
@@ -766,6 +773,27 @@ class HybridEngine extends Assert {
 		catch Any as exception {
 			logError(exception)
 		}
+	}
+
+	Backtrack_Test() {
+		local compiler := RuleCompiler()
+		local resultSet, goal
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		engine := RuleEngine(productions, reductions, Map())
+		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
+
+		kb.setFact("Backtrack", true)
+		kb.produce()
+
+		this.AssertEqual(3, kb.getValue("Result"), "Unexpected backtrack result...")
+		this.AssertEqual(1, kb.getValue("Result.1"), "Unexpected backtrack result...")
+		this.AssertEqual(2, kb.getValue("Result.2"), "Unexpected backtrack result...")
+		this.AssertEqual(3, kb.getValue("Result.3"), "Unexpected backtrack result...")
 	}
 }
 

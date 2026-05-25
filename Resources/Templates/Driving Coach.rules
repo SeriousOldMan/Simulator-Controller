@@ -285,8 +285,8 @@ priority: 5, {All: [?Performance], {Prove: driverInput(UnderAccelerating, ?count
 		(Call: callAssistant(addInstructionHint, AccelerateHarder))
 
 priority: -20,
-[?Performance.Clear] => (ProveAll: clearTelemetry()), (ProveAll: clearPerformance()), (Prove: clearDriverInputs()),
-						(Clear: Performance.Analyze), (Clear: Performance.Clear)
+[?Performance.Clear] => (ProveAll: clearTelemetry()), (Prove: clearDriverInputs()),
+						(Clear: Performance.Analyze), (Clear: Performance.Clear), (ProveAll: clearPerformance())
 
 clearDriverInputs() <= clearDriverInputs(!DriverInputs.Count), Set(DriverInputs.Count, 0)
 

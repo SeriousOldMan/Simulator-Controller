@@ -238,7 +238,7 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	Similar to *Call*, but the first special argument is not passed to the function. Thereby any normal function of the host language can be used here.
 	
-  - Prove
+  - Prove / ProveAll
   
     Syntax / Example: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
 	
@@ -247,6 +247,8 @@ Once the condition of a production rule is matched, all actions on the right-han
 	Normally, only the first alternative is calculated (see the documentation for reduction rules below for more information on that). If you need to follow all paths of the reduction, you can use the following action syntax.
 	
 	Syntax / Example: (ProveAll: preparePitstop(?Lap))
+	
+	Please note, that in this case all actions following the *ProveAll* action will be executed for each alternative result of the reduction. Using this, powerful loops can be executed.
 	
   - Let
   

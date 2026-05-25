@@ -890,6 +890,10 @@ class Action {
 		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
 
+	next(continuation) {
+		return false
+	}
+
 	toString(facts := kNotInitialized) {
 		throw "Virtual method Action.toString must be implemented in a subclass..."
 	}
@@ -968,6 +972,8 @@ class CallAction extends Action {
 
 			logError(exception, true)
 		}
+
+		return false
 	}
 
 	getValues(facts) {
@@ -1073,6 +1079,8 @@ class ExecuteAction extends Action {
 
 			logError(exception, true)
 		}
+
+		return false
 	}
 
 	getValues(facts) {
@@ -1163,16 +1171,33 @@ class ProveAction extends CallAction {
 			loop {
 				goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
 
-				if this.iProveAll {
-					if !resultSet.nextResult()
-						break
-				}
+				if this.iProveAll
+					return {KnowledgeBase: knowledgeBase, Bindings: bindings
+						  , Goal: goal, ResultSet: resultSet}
 				else
 					break
 			}
 
 			resultSet.dispose()
 		}
+
+		return false
+	}
+
+	next(continuation) {
+		local resultSet := continuation.ResultSet
+		local bindings
+
+		if resultSet.nextResult() {
+			bindings := continuation.Bindings
+
+			continuation.Goal.doVariables(resultSet
+										, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+
+			return continuation
+		}
+		else
+			return false
 	}
 }
 
@@ -1225,6 +1250,8 @@ class LetAction extends Action {
 
 			resultSet.dispose()
 		}
+
+		return false
 	}
 
 	getValues(facts) {
@@ -1300,6 +1327,8 @@ class SetFactAction extends Action {
 			value := value.substituteValues(bindings).toString(bindings)
 
 		facts.setFact(fact, value)
+
+		return false
 	}
 
 	toString(facts := kNotInitialized) {
@@ -1345,7 +1374,7 @@ class SetComposedFactAction extends Action {
 					value := component.getValue(bindings)
 
 					if isInstance(value, Term)
-						value := value.toString(bindings)
+						value := value.substituteValues(bindings).toString(bindings)
 
 					result .= value
 				}
@@ -1381,12 +1410,14 @@ class SetComposedFactAction extends Action {
 			value := (isInstance(component, Variable) ? component.getValue(bindings) : component.getValue(facts))
 
 			if isInstance(value, Term)
-				value := value.toString(isInstance(component, Variable) ? bindings : facts)
+				value := value.substituteValues(bindings).toString(bindings)
 
 			fact .= value
 		}
 
 		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[bindings] : this.Value[facts])
+
+		return false
 	}
 
 	toString(facts := kNotInitialized) {
@@ -1460,6 +1491,8 @@ class ClearFactAction extends Action {
 		local facts := knowledgeBase.Facts
 
 		facts.clearFact(isInstance(this.Fact, Variable) ? this.Fact[bindings] : this.Fact[facts])
+
+		return false
 	}
 
 	toString(facts := kNotInitialized) {
@@ -1498,7 +1531,7 @@ class ClearComposedFactAction extends Action {
 					value := component.getValue(bindings)
 
 					if isInstance(value, Term)
-						value := value.toString(bindings)
+						value := value.substituteValues(bindings).toString(bindings)
 
 					result .= value
 				}
@@ -1530,6 +1563,8 @@ class ClearComposedFactAction extends Action {
 		}
 
 		facts.clearFact(fact)
+
+		return false
 	}
 
 	toString(facts := kNotInitialized) {
@@ -2118,13 +2153,35 @@ class ProductionRule extends Rule {
 	}
 
 	fire(knowledgeBase, bindings) {
-		local ignore, theAction
+		local actions := this.Actions
+		local lastAction := actions.Length
+
+		executeAction(index) {
+			local action, continuation
+
+			if index <= lastAction {
+				action := actions[index]
+
+				continuation := action.execute(knowledgeBase, bindings)
+
+				executeAction(index + 1)
+
+				if continuation
+					loop {
+						continuation := action.next(continuation)
+
+						if continuation
+							executeAction(index + 1)
+						else
+							break
+					}
+			}
+		}
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceLite)
 			knowledgeBase.RuleEngine.trace(kTraceLite, "Firing rule " . this.toString())
 
-		for ignore, theAction in this.Actions
-			theAction.execute(knowledgeBase, bindings)
+		executeAction(1)
 	}
 
 	produce(knowledgeBase) {

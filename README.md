@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[6.9.8.0-release]() (Early build for 6.9.8. Changes: Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine.)
+[6.9.8.0-release]() (Early build for 6.9.8. Changes: Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6980) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-698) of this version and all the versions you might have skipped, before installing and using this version.
 

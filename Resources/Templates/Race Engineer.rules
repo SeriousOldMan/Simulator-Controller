@@ -102,7 +102,7 @@ updateFuelTarget(?lap) <= Clear(Fuel.Amount.Target)
 ;;; trend influence.                                                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 20, [?Lap] => (ProveAll: currentTyreCompound()), (Prove: currentTyreSet())
+priority: 20, [?Lap] => (Prove: currentTyreSet()), (ProveAll: currentTyreCompound())
 
 currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compound, ?compound), Set(Tyre.Compound.Color, ?color)
 currentTyreCompound() <= !Session.Settings.Tyre.Management = Wheel,
@@ -1474,7 +1474,7 @@ priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned, !Lap),
 {All: [?Pitstop.Planned], [?Pitstop.Planned.Lap > 0], [?Pitstop.Planned.Lap <= ?Lap]} => (Set: Pitstop.Prepare)
 
 {All: [?Pitstop.Planned], [?Pitstop.Prepare],
-	  {None: [?InPitlane = true], [?InPit = true]}} => (ProveAll: preparePitstop(!Pitstop.Planned.Nr)), (Set: Pitstop.Set)
+	  {None: [?InPitlane = true], [?InPit = true]}} => (Set: Pitstop.Set), (ProveAll: preparePitstop(!Pitstop.Planned.Nr))
 priority: -20, [?Pitstop.Set] => (Clear: Pitstop.Planned), (Clear: Pitstop.Planned.Adjusted),
 								 (Clear: Pitstop.Prepare), (Clear: Pitstop.Set), (Set: Pitstop.Prepared, !Lap)
 

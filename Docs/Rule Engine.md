@@ -232,7 +232,7 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
-	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
+	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
     Syntax / Example: (Call: %MsgBox%("Hello"))
 	
@@ -240,13 +240,13 @@ Once the condition of a production rule is matched, all actions on the right-han
   
     Syntax / Example: (Prove: updateAverageLapTime(?Lap, [?lastLapTime, ?previousLapTime, testLapTime]))
 	
-	Very similar to the call action above, but this calls a reduction rule. The passed arguments (either variables or direct references to facts) must be bound at the time of the invocation, but you can also supply aaitional unbound variables which then can be computed by the reduction rule.
+	Very similar to the call action above, but this one *calls* a reduction rule. The passed arguments (either variables or direct references to facts) must be bound at the time of the invocation, but you can also supply additional unbound variables which then can be computed by the reduction rule.
 	
 	Normally, only the first alternative is calculated (see the documentation for reduction rules below for more information on that). If you need to follow all paths of the reduction, you can use the following action syntax.
 	
 	Syntax / Example: (ProveAll: preparePitstop(?Lap))
 	
-	Please note, that in this case all actions following the *ProveAll* action will be executed for each alternative result of the reduction. Using this, powerful loops can be executed.
+	Please note, that in this case all actions following the *ProveAll* action will be executed for each alternative result of the reduction. Using this, powerful loops can be created and executed.
 	
   - Let
   
@@ -258,7 +258,7 @@ Once the condition of a production rule is matched, all actions on the right-han
   
     Syntax / Example: (Execute: "C:\Users\Cheater\Documents\Scripts\StartMyGripCheat.cmd", "/Grip", "Max", "/TyreWear", "0")
 	
-	Executes the executable or script identified by the first argument, which must be the a file name. Additional arguments will be passed to the executable enclosed by paranthesis and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
+	Executes the executable or script identified by the first argument, which must be the a file name. Additional arguments will be passed to the executable enclosed by parantheses and seperated by spaces. The default implementation supports the typical executable files, like EXE, CMD or BAT files, which can be run by Windows. Please note, that the working directory will be set to the directory of the executable for the time of execution.
   
   - Set
   
@@ -554,7 +554,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 	
-	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
+	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
 	Syntax: call(%function%, arg1, ..., argN) or :%function%(arg1, ..., argN)
   
@@ -570,7 +570,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	- A string that can be parsed into an instance of a subclass of *Term*. Example: "father(Mary, Paul)"
 	- A simple literal value (number, string or boolean)
 	
-	If the name of the function is enclosed in parenthesis, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
+	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
 	Syntax: call=(%function%, arg1, ..., argN, result) or :%function%=(arg1, ..., argN, result)
 

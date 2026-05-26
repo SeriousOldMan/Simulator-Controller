@@ -13,6 +13,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "JSON.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -83,6 +90,12 @@ class Condition {
 	Descriptor {
         Get {
             return this.toDescriptor()
+        }
+    }
+
+	JSON {
+        Get {
+            return JSON.print(this.Descriptor, isDebug() ? "  " : "")
         }
     }
 
@@ -1032,6 +1045,12 @@ class Action {
         }
     }
 
+	JSON {
+        Get {
+            return JSON.print(this.Descriptor, isDebug() ? "  " : "")
+        }
+    }
+
 	execute(knowledgeBase, bindings) {
 		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
@@ -1972,6 +1991,12 @@ class Term {
         }
     }
 
+	JSON {
+        Get {
+            return JSON.print(this.Descriptor, isDebug() ? "  " : "")
+        }
+    }
+
 	getFacts(facts) {
 	}
 
@@ -2356,6 +2381,12 @@ class Rule {
 	Descriptor {
         Get {
             return this.toDescriptor()
+        }
+    }
+
+	JSON {
+        Get {
+            return JSON.print(this.Descriptor, isDebug() ? "  " : "")
         }
     }
 
@@ -5345,6 +5376,14 @@ class RuleCompiler {
 
 	fromDescriptor(descriptor) {
 		return RuleCompiler.fromDescriptor(descriptor)
+	}
+
+	static fromJSON(text) {
+		return this.fromDescriptor(JSON.parse(text))
+	}
+
+	fromJSON(text) {
+		return RuleCompiler.fromJSON(text)
 	}
 
 	readReduction(text) {

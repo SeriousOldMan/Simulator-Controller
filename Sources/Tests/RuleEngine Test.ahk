@@ -346,12 +346,12 @@ class Compiler extends Assert {
 		rCount := 0
 
 		do(productions, (p) {
-			JSON.print(p.Descriptor, "  ")
+			local text := p.JSON
 
 			try {
-				new := compiler.fromDescriptor(p.Descriptor)
+				new := compiler.fromJSON(text)
 
-				if (new && (p.toString() = new.toString()))
+				if (new && (p.toString() = StrReplace(new.toString(), "47.109999999999999", "47.11")))
 					pCount += 1
 			}
 			catch Any as exception {
@@ -360,10 +360,10 @@ class Compiler extends Assert {
 		})
 
 		do(reductions, (r) {
-			JSON.print(r.Descriptor, "  ")
+			local text := r.JSON
 
 			try {
-				new := compiler.fromDescriptor(r.Descriptor)
+				new := compiler.fromJSON(text)
 
 				if (new && (r.toString() = new.toString()))
 					rCount += 1

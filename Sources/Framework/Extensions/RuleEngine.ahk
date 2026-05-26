@@ -93,12 +93,12 @@ class Condition {
 		throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		throw "Virtual method Condition.toString must be implemented in a subclass..."
 	}
 
-	toObject(facts := kNotInitialized) {
-		return this.toString(facts)
+	toObject(bindings := kNotInitialized) {
+		return {Type: this.Type}
 	}
 }
 
@@ -126,24 +126,22 @@ class CompositeCondition extends Condition {
 			theCondition.getFacts(facts)
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local conditions := []
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			conditions.Push(theCondition.toString(facts))
+			conditions.Push(theCondition.toString(bindings))
 
 		return values2String(", ", conditions*)
 	}
 
-	toObject(facts := kNotInitialized) {
-		local conditions := []
-		local ignore, theCondition
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		for ignore, theCondition in this.Conditions
-			conditions.Push(theCondition.toObject(facts))
+		object.Conditions := collect(this.Conditions, (c) => c.toObject(bindings))
 
-		return conditions
+		return object
 	}
 }
 
@@ -152,16 +150,8 @@ class CompositeCondition extends Condition {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Quantor extends CompositeCondition {
-	toString(facts := kNotInitialized) {
-		return "{" . this.Type . A_Space . super.toString(facts) . "}"
-	}
-
-	toObject(facts := kNotInitialized) {
-		local quantor := Map()
-
-		quantor[this.Type] := super.toObject(facts)
-
-		return quantor
+	toString(bindings := kNotInitialized) {
+		return "{" . this.Type . A_Space . super.toString(bindings) . "}"
 	}
 }
 
@@ -185,6 +175,14 @@ class ExistQuantor extends Quantor {
 
 		return false
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "ExistQuantor"
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -206,6 +204,14 @@ class NotExistQuantor extends Quantor {
 				return false
 
 		return true
+	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "NotExistQuantor"
+
+		return object
 	}
 }
 
@@ -230,6 +236,14 @@ class OneQuantor extends Quantor {
 
 		return (matched == 1)
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "OneQuantor"
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -253,6 +267,14 @@ class AllQuantor extends Quantor {
 
 		return (matched == this.Conditions.Length)
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "AllQuantor"
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -270,10 +292,10 @@ class Predicate extends Condition {
 		}
 	}
 
-	LeftPrimary[facts := kNotInitialized] {
+	LeftPrimary[bindings := kNotInitialized] {
 		Get {
-			if (facts != kNotInitialized)
-				return this.iLeftPrimary.getValue(facts)
+			if (bindings != kNotInitialized)
+				return this.iLeftPrimary.getValue(bindings)
 			else
 				return this.iLeftPrimary
 		}
@@ -285,10 +307,10 @@ class Predicate extends Condition {
 		}
 	}
 
-	RightPrimary[facts := kNotInitialized] {
+	RightPrimary[bindings := kNotInitialized] {
 		Get {
-			if ((facts != kNotInitialized) && (this.iRightPrimary != kNotInitialized))
-				return this.iRightPrimary.getValue(facts)
+			if ((bindings != kNotInitialized) && (this.iRightPrimary != kNotInitialized))
+				return this.iRightPrimary.getValue(bindings)
 			else
 				return this.iRightPrimary
 		}
@@ -380,7 +402,7 @@ class Predicate extends Condition {
 							result := (StrCompare(leftPrimary, rightPrimary) >= 0)
 					case kContains:
 						if isInstance(leftPrimary, Pair)
-							result := inList(leftPrimary.toObject(bindings), rightPrimary)
+							result := inList(leftPrimary.toList(bindings), rightPrimary)
 						else if isObject(leftPrimary) {
 							try
 								result := inList(leftPrimary, rightPrimary)
@@ -409,22 +431,29 @@ class Predicate extends Condition {
 		}
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		if (this.Operator = kNotInitialized)
-			return ("[" . this.LeftPrimary.toString(facts) . "]")
+			return ("[" . this.LeftPrimary.toString(bindings) . "]")
 		else
-			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
+			return ("[" . this.LeftPrimary.toString(bindings) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(bindings) "]")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local predicate := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		if (this.Operator = kNotInitialized)
-			predicate[kPredicate] := [this.LeftPrimary.toObject(facts)]
-		else
-			predicate[kPredicate] := [this.LeftPrimary.toObject(facts), this.Operator, this.RightPrimary.toObject(facts)]
+		object.Class := "Predicate"
+		object.LeftPrimary := this.LeftPrimary.toObject(bindings)
 
-		return predicate
+		if (this.Operator != kNotInitialized) {
+			object.Operator := this.Operator
+			object.RightPrimary := this.RightPrimary.toObject(bindings)
+		}
+		else {
+			object.Operator := false
+			object.RightPrimary := false
+		}
+
+		return object
 	}
 }
 
@@ -489,16 +518,17 @@ class Goal extends Condition {
 			return false
 	}
 
-	toString(facts := kNotInitialized) {
-		return ("{" . kProve . A_Space . this.Goal.toString(facts) . "}")
+	toString(bindings := kNotInitialized) {
+		return ("{" . kProve . A_Space . this.Goal.toString(bindings) . "}")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local predicate := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		predicate[kProve] := [this.Goal.toObject(facts)]
+		object.Class := "Goal"
+		object.Goal := this.Goal.toObject(bindings)
 
-		return predicate
+		return object
 	}
 }
 
@@ -563,16 +593,17 @@ class Expression extends Condition {
 			return false
 	}
 
-	toString(facts := kNotInitialized) {
-		return ("{" . kExpression . A_Space . this.Rule.Tail[1].toString(facts) . "}")
+	toString(bindings := kNotInitialized) {
+		return ("{" . kExpression . A_Space . this.Rule.Tail[1].toString(bindings) . "}")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local predicate := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		predicate[kExpression] := [this.Rule.Tail[1].toObject(facts)]
+		object.Class := "Expression"
+		object.Expression := this.Rule.Tail[1].toObject(bindings)
 
-		return predicate
+		return object
 	}
 }
 
@@ -587,6 +618,10 @@ class Primary extends Term {
 
 	toString(bindings := kNotInitialized) {
 		throw "Virtual method Primary.toString must be implemented in a subclass..."
+	}
+
+	toObject(bindings := kNotInitialized) {
+		return {Class: "Primary"}
 	}
 }
 
@@ -730,6 +765,22 @@ class Variable extends Primary {
 		}
 	}
 
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Variable"
+		object.Variable := this.Variable
+
+		if (this.RootVariable == this)
+			object.Root := true
+		else
+			object.Root := this.RootVariable.toObject(bindings)
+
+		object.Property := this.Property
+
+		return object
+	}
+
 	occurs(resultSet, var) {
 		local ruleEngine := resultSet.KnowledgeBase.RuleEngine
 		local cyclic
@@ -816,6 +867,15 @@ class Fact extends Primary {
 			return false
 	}
 
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Fact"
+		object.Fact := this.Fact
+
+		return object
+	}
+
 	unify(choicePoint, term) {
 		local facts
 
@@ -870,6 +930,15 @@ class Literal extends Primary {
 		return this.Literal
 	}
 
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Literal"
+		object.Literal := this.Literal
+
+		return object
+	}
+
 	unify(choicePoint, term) {
 		if isInstance(term, Literal)
 			return (this.Literal = term.Literal)
@@ -893,8 +962,12 @@ class Action {
 		return false
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		throw "Virtual method Action.toString must be implemented in a subclass..."
+	}
+
+	toObject(bindings := kNotInitialized) {
+		return {Class: "Action"}
 	}
 }
 
@@ -986,22 +1059,22 @@ class CallAction extends Action {
 		return false
 	}
 
-	getValues(facts) {
+	getValues(bindings) {
 		local values := []
 		local ignore, argument
 
 		for ignore, argument in this.Arguments
-			values.Push(argument.getValue(facts, argument))
+			values.Push(argument.getValue(bindings, argument))
 
 		return values
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local arguments := []
 		local ignore, argument, prefix, postfix
 
 		for ignore, argument in this.Arguments
-			arguments.Push(argument.toString(facts))
+			arguments.Push(argument.toString(bindings))
 
 		if this.iExternal {
 			prefix := "%"
@@ -1012,20 +1085,18 @@ class CallAction extends Action {
 			postfix := ""
 		}
 
-		return ("(" . this.Action . A_Space . prefix . this.Function.toString(facts) . postfix . "(" . values2String(", ", arguments*) . "))")
+		return ("(" . this.Action . A_Space . prefix . this.Function.toString(bindings) . postfix . "(" . values2String(", ", arguments*) . "))")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
-		local arguments := []
-		local ignore, argument
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		for ignore, argument in this.Arguments
-			arguments.Push(argument.toObject(facts))
+		object.Class := "CallAction"
+		object.External := this.iExternal
+		object.Function := this.Function.toObject(bindings)
+		object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
 
-		action[this.Action] := Array(this.Function.toObject(facts), arguments*)
-
-		return action
+		return object
 	}
 }
 
@@ -1102,37 +1173,34 @@ class ExecuteAction extends Action {
 		return false
 	}
 
-	getValues(facts) {
+	getValues(bindings) {
 		local values := []
 		local ignore, argument
 
 		for ignore, argument in this.Arguments
-			values.Push(argument.getValue(facts, argument))
+			values.Push(argument.getValue(bindings, argument))
 
 		return values
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local arguments := []
 		local ignore, argument
 
 		for ignore, argument in this.Arguments
-			arguments.Push(argument.toString(facts))
+			arguments.Push(argument.toString(bindings))
 
-		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
+		return ("(" . this.Action . A_Space .  this.Function.toString(bindings) . "(" . values2String(", ", arguments*) . "))")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
-		local arguments := []
-		local ignore, argument
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		for ignore, argument in this.Arguments
-			arguments.Push(argument.toObject(facts))
+		object.Class := "ExecuteAction"
+		object.Executable := this.Function.toObject(bindings)
+		object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
 
-		action[this.Action] := Array(this.Function.toObject(facts), arguments*)
-
-		return action
+		return object
 	}
 }
 
@@ -1218,6 +1286,16 @@ class ProveAction extends CallAction {
 		else
 			return false
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "ProveAction"
+		object.Goal := object.Function
+		object.ProveAll := this.iProveAll
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1273,26 +1351,27 @@ class LetAction extends Action {
 		return false
 	}
 
-	getValues(facts) {
+	getValues(bindings) {
 		local values := []
 		local ignore, argument
 
 		for ignore, argument in this.Rule.Head.Arguments
-			values.Push(argument.getValue(facts, argument))
+			values.Push(argument.getValue(bindings, argument))
 
 		return values
 	}
 
-	toString(facts := kNotInitialized) {
-		return ("(" . kLet . A_Space . this.Rule.Tail[1].toString(facts) . ")")
+	toString(bindings := kNotInitialized) {
+		return ("(" . kLet . A_Space . this.Rule.Tail[1].toString(bindings) . ")")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		action[kLet] := [this.Rule.Tail[1].toObject(facts)]
+		object.Class := "LetAction"
+		object.Expression := this.Rule.Tail[1].toObject(bindings)
 
-		return action
+		return object
 	}
 }
 
@@ -1350,22 +1429,21 @@ class SetFactAction extends Action {
 		return false
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		if (this.Value == this.Fact)
-			return ("(Set: " . this.Fact[facts] . ")")
+			return ("(Set: " . this.Fact[bindings] . ")")
 		else
-			return ("(Set: " . this.Fact[facts] . " = " . this.Value.toString(facts) . ")")
+			return ("(Set: " . this.Fact[bindings] . " = " . this.Value.toString(bindings) . ")")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		if (this.Value == this.Fact)
-			action[this.Action] := [this.Fact[facts]]
-		else
-			action[this.Action] := [this.Fact[facts], this.Value.toObject(facts)]
+		object.Class := "SetFactAction"
+		object.Fact := this.Fact[bindings]
+		object.Value := this.Value.toObject(bindings)
 
-		return action
+		return object
 	}
 }
 
@@ -1439,7 +1517,7 @@ class SetComposedFactAction extends Action {
 		return false
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local fact := ""
 		local index, component
 
@@ -1447,32 +1525,20 @@ class SetComposedFactAction extends Action {
 			if (index > 1)
 				fact .= "."
 
-			fact .= component.toString(facts)
+			fact .= component.toString(bindings)
 		}
 
-		return ("(Set: " . fact . " = " . this.Value.toString(facts) . ")")
+		return ("(Set: " . fact . " = " . this.Value.toString(bindings) . ")")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
-		local fact := ""
-		local index, component, value
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		for index, component in this.Fact {
-			if (index > 1)
-				fact .= "."
+		object.Class := "SetComposedFactAction"
+		object.Fact := collect(this.Fact, (c) => c.toObject(bindings))
+		object.Value := this.Value.toObject(bindings)
 
-			value := component.getValue(facts)
-
-			if isInstance(value, Term)
-				value := value.toString(facts)
-
-			fact .= value
-		}
-
-		action[this.Action] := [fact, this.Value.toObject(facts)]
-
-		return action
+		return object
 	}
 }
 
@@ -1514,16 +1580,17 @@ class ClearFactAction extends Action {
 		return false
 	}
 
-	toString(facts := kNotInitialized) {
-		return ("(Clear: " . this.Fact[facts] . ")")
+	toString(bindings := kNotInitialized) {
+		return ("(Clear: " . this.Fact[bindings] . ")")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		action[kClear] := this.Fact[facts]
+		object.Class := "ClearFactAction"
+		object.Fact := this.Fact[bindings]
 
-		return action
+		return object
 	}
 }
 
@@ -1586,7 +1653,7 @@ class ClearComposedFactAction extends Action {
 		return false
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local fact := ""
 		local index, component
 
@@ -1594,32 +1661,19 @@ class ClearComposedFactAction extends Action {
 			if (index > 1)
 				fact .= "."
 
-			fact .= component.toString(facts)
+			fact .= component.toString(bindings)
 		}
 
 		return ("(Clear: " . fact . ")")
 	}
 
-	toObject(facts := kNotInitialized) {
-		local action := Map()
-		local fact := ""
-		local index, component, value
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
 
-		for index, component in this.Fact {
-			if (index > 1)
-				fact .= "."
+		object.Class := "ClearComposedFactAction"
+		object.Fact := collect(this.Fact, (c) => c.toObject(bindings))
 
-			value := component.getValue(facts)
-
-			if isInstance(value, Term)
-				value := value.toString(facts)
-
-			fact .= value
-		}
-
-		action[kClear] := fact
-
-		return action
+		return object
 	}
 }
 
@@ -1672,17 +1726,15 @@ class Term {
 				argument.getFacts(facts)
 		}
 
-		toObject(resultSet := kNotInitialized) {
-			local term := Map()
-			local arguments := []
-			local ignore, argument
+		toObject(bindings := kNotInitialized) {
+			local object := super.toObject(bindings)
 
-			for ignore, argument in this.Arguments
-				arguments.Push(argument.toObject(resultSet))
+			object.Class := "Complex"
+			object.Functor := this.Functor
+			object.Arity := this.Arity
+			object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
 
-			term[this.Functor] := arguments
-
-			return term
+			return object
 		}
 
 		getValues(resultSet) {
@@ -1781,7 +1833,7 @@ class Term {
 	}
 
 	toObject(bindings := kNotInitialized) {
-		return this.toString(bindings)
+		return {}
 	}
 
 	fromObject(object, bindings := kNotInitialized) {
@@ -1846,6 +1898,14 @@ class Struct extends Term.Complex {
 
 		return (this.Functor . "(" . values2String(", ", arguments*) . ")")
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Struct"
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1863,6 +1923,14 @@ class Cut extends Term.Complex {
 	toString(resultSet := kNotInitialized) {
 		return "!"
 	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Cut"
+
+		return object
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1879,6 +1947,14 @@ class Fail extends Term.Complex {
 
 	toString(resultSet := kNotInitialized) {
 		return "fail"
+	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Fail"
+
+		return object
 	}
 }
 
@@ -1943,19 +2019,29 @@ class Pair extends Term {
 		return (result . "]")
 	}
 
-	toObject(resultSet := kNotInitialized) {
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Pair"
+		object.LeftTerm := this.LeftTerm.toObject(bindings)
+		object.RightTerm := this.RightTerm.toObject(bindings)
+
+		return object
+	}
+
+	toList(bindings := kNotInitialized) {
 		local list := []
 		local next := this
 
 		loop {
-			list.Push(next.LeftTerm.toObject(resultSet))
+			list.Push(next.LeftTerm.toString(bindings))
 
 			if isInstance(next.RightTerm, Pair)
 				next := next.RightTerm
 			else if isInstance(next.RightTerm, Nil)
 				break
 			else {
-				list.Push(next.RightTerm.toObject(resultSet))
+				list.Push(next.RightTerm.toString(bindings))
 
 				break
 			}
@@ -2028,8 +2114,12 @@ class Nil extends Term {
 		return "[]"
 	}
 
-	toObject(resultSet := kNotInitialized) {
-		return []
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "Nil"
+
+		return object
 	}
 
 	unify(choicePoint, term) {
@@ -2104,8 +2194,8 @@ class Rule {
 		this.iID := ++Rule.sNextID
 	}
 
-	toObject(facts := kNotInitialized) {
-		throw "Rules cannot be converted to objects in Rule.toObject..."
+	toObject(bindings := kNotInitialized) {
+		return {Class: "Rule", ID: this.ID, Type: this.Type}
 	}
 }
 
@@ -2220,19 +2310,30 @@ class ProductionRule extends Rule {
 			return false
 	}
 
-	toString(facts := kNotInitialized) {
+	toString(bindings := kNotInitialized) {
 		local priority := this.Priority
 		local conditions := ((priority != 0) ? ["Priority: " . priority] : [])
 		local actions := []
 		local ignore, theCondition, theAction
 
 		for ignore, theCondition in this.Conditions
-			conditions.Push(theCondition.toString(facts))
+			conditions.Push(theCondition.toString(bindings))
 
 		for ignore, theAction in this.Actions
-			actions.Push(theAction.toString(facts))
+			actions.Push(theAction.toString(bindings))
 
 		return values2String(", ", conditions*) . " => " . values2String(", ", actions*)
+	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "ProductionRule"
+		object.Priority := this.Priority
+		object.Conditions := collect(this.Conditions, (c) => c.toObject(bindings))
+		object.Actions := collect(this.Actions, (a) => a.toObject(bindings))
+
+		return object
 	}
 }
 
@@ -2289,6 +2390,16 @@ class ReductionRule extends Rule {
 		}
 		else
 			return this.Head.toString(resultSet)
+	}
+
+	toObject(bindings := kNotInitialized) {
+		local object := super.toObject(bindings)
+
+		object.Class := "ReductionRule"
+		object.Head := this.Head.toObject(bindings)
+		object.Tail := collect(this.Tail, (t) => t.toObject(bindings))
+
+		return object
 	}
 
 	hasVariables() {

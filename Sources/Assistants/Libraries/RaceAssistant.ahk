@@ -5203,7 +5203,7 @@ parseList(list) {
 	local nextCharIndex := 1
 	local term := compiler.readList(&list, &nextCharIndex)
 
-	return compiler.createTermParser(term).parse(term).toObject()
+	return compiler.createTermParser(term).parse(term).toList()
 }
 
 getDeprecatedValue(data, newSection, oldSection, key, default := false) {

@@ -26,6 +26,7 @@ global kBuildConfiguration := "Production"
 
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\Framework\Extensions\JSON.ahk"
 #Include "AHKUnit\AHKUnit.ahk"
 
 
@@ -331,6 +332,23 @@ class Compiler extends Assert {
 
 		this.AssertEqual(24, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(42, reductions.Length, "Not all reduction rules compiled...")
+	}
+
+	Compiler_Converter_Test() {
+		local compiler := RuleCompiler()
+
+		productions := false
+		reductions := false
+
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
+
+		pCount := 0
+		rCount := 0
+
+		do(productions, (p) => JSON.print(p.toObject(), "  "))
+		do(reductions, (r) => JSON.print(r.toObject(), "  "))
+
+		this.AssertTrue(true, "Not all rules converted...")
 	}
 }
 

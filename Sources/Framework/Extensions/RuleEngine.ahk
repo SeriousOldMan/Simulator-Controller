@@ -80,6 +80,12 @@ global kTraceLevel := kTraceOff
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Condition {
+	Descriptor {
+        Get {
+            return this.toDescriptor()
+        }
+    }
+
 	Type {
         Get {
             throw "Virtual property Condition.Type must be implemented in a subclass..."
@@ -97,8 +103,12 @@ class Condition {
 		throw "Virtual method Condition.toString must be implemented in a subclass..."
 	}
 
-	toObject(bindings := kNotInitialized) {
+	toDescriptor(bindings := kNotInitialized) {
 		return {Type: this.Type}
+	}
+
+	static fromDescriptor(descriptor) {
+		throw "Virtual class method Condition.fromDescriptor must be implemented in a subclass..."
 	}
 }
 
@@ -136,12 +146,18 @@ class CompositeCondition extends Condition {
 		return values2String(", ", conditions*)
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
-		object.Conditions := collect(this.Conditions, (c) => c.toObject(bindings))
+		object.Conditions := collect(this.Conditions, (c) => c.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return %descriptor["Class"]%(collect(descriptor["Conditions"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 }
 
@@ -176,8 +192,8 @@ class ExistQuantor extends Quantor {
 		return false
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ExistQuantor"
 
@@ -206,8 +222,8 @@ class NotExistQuantor extends Quantor {
 		return true
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "NotExistQuantor"
 
@@ -237,8 +253,8 @@ class OneQuantor extends Quantor {
 		return (matched == 1)
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "OneQuantor"
 
@@ -268,8 +284,8 @@ class AllQuantor extends Quantor {
 		return (matched == this.Conditions.Length)
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "AllQuantor"
 
@@ -438,22 +454,32 @@ class Predicate extends Condition {
 			return ("[" . this.LeftPrimary.toString(bindings) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(bindings) "]")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Predicate"
-		object.LeftPrimary := this.LeftPrimary.toObject(bindings)
+		object.LeftTerm := this.LeftPrimary.toDescriptor(bindings)
 
 		if (this.Operator != kNotInitialized) {
 			object.Operator := this.Operator
-			object.RightPrimary := this.RightPrimary.toObject(bindings)
+			object.RightTerm := this.RightPrimary.toDescriptor(bindings)
 		}
 		else {
 			object.Operator := false
-			object.RightPrimary := false
+			object.RightTerm := false
 		}
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		if descriptor["Operator"]
+			return Predicate(RuleCompiler.fromDescriptor(descriptor["LeftTerm"]), descriptor["Operator"]
+						   , RuleCompiler.fromDescriptor(descriptor["RightTerm"]))
+		else
+			return Predicate(RuleCompiler.fromDescriptor(descriptor["LeftTerm"]))
 	}
 }
 
@@ -522,13 +548,17 @@ class Goal extends Condition {
 		return ("{" . kProve . A_Space . this.Goal.toString(bindings) . "}")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Goal"
-		object.Goal := this.Goal.toObject(bindings)
+		object.Goal := this.Goal.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Goal(RuleCompiler.fromDescriptor(toMap(descriptor)["Goal"]))
 	}
 }
 
@@ -597,13 +627,17 @@ class Expression extends Condition {
 		return ("{" . kExpression . A_Space . this.Rule.Tail[1].toString(bindings) . "}")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Expression"
-		object.Expression := this.Rule.Tail[1].toObject(bindings)
+		object.Rule := this.Rule.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Expression(RuleCompiler.fromDescriptor(toMap(descriptor)["Rule"]))
 	}
 }
 
@@ -620,8 +654,12 @@ class Primary extends Term {
 		throw "Virtual method Primary.toString must be implemented in a subclass..."
 	}
 
-	toObject(bindings := kNotInitialized) {
+	toDescriptor(bindings := kNotInitialized) {
 		return {Class: "Primary"}
+	}
+
+	static fromDescriptor(descriptor) {
+		throw "Virtual class method Primary.fromDescriptor must be implemented in a subclass..."
 	}
 }
 
@@ -743,8 +781,8 @@ class Variable extends Primary {
 	}
 
 	toString(bindings := kNotInitialized) {
-		local property := this.Property
 		local name := this.Variable
+		local property := this.Property
 		local root, value
 
 		if InStr(name, "__Unnamed")
@@ -765,20 +803,37 @@ class Variable extends Primary {
 		}
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
+		local value
 
 		object.Class := "Variable"
 		object.Variable := this.Variable
 
-		if (this.RootVariable == this)
-			object.Root := true
-		else
-			object.Root := this.RootVariable.toObject(bindings)
+		value := this.getValue(bindings)
 
-		object.Property := this.Property
+		if ((value != kNotInitialized) && (value != this))
+			if isInstance(value, Term)
+				object.Value := value.toDescriptor(bindings)
+			else
+				object.Value := value
+
+		if (this.RootVariable && (this.RootVariable != this)) {
+			object.Root := this.RootVariable.toDescriptor(bindings)
+
+			object.Property := this.Property
+		}
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		if descriptor.Has("Root")
+			return Variable(descriptor["Variable"], descriptor["Property"], descriptor["Root"])
+		else
+			return Variable(descriptor["Variable"])
 	}
 
 	occurs(resultSet, var) {
@@ -867,13 +922,26 @@ class Fact extends Primary {
 			return false
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
+		local value
 
 		object.Class := "Fact"
 		object.Fact := this.Fact
 
+		value := this.getValue(bindings)
+
+		if ((value != kNotInitialized) && (value != this))
+			if isInstance(value, Term)
+				object.Value := value.toDescriptor(bindings)
+			else
+				object.Value := value
+
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Fact(toMap(descriptor)["Fact"])
 	}
 
 	unify(choicePoint, term) {
@@ -930,13 +998,17 @@ class Literal extends Primary {
 		return this.Literal
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Literal"
-		object.Literal := this.Literal
+		object.Value := this.Literal
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Literal(toMap(descriptor)["Value"])
 	}
 
 	unify(choicePoint, term) {
@@ -954,6 +1026,12 @@ class Literal extends Primary {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Action {
+	Descriptor {
+        Get {
+            return this.toDescriptor()
+        }
+    }
+
 	execute(knowledgeBase, bindings) {
 		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
@@ -966,8 +1044,12 @@ class Action {
 		throw "Virtual method Action.toString must be implemented in a subclass..."
 	}
 
-	toObject(bindings := kNotInitialized) {
+	toDescriptor(bindings := kNotInitialized) {
 		return {Class: "Action"}
+	}
+
+	static fromDescriptor(descriptor) {
+		throw "Virtual class method Action.fromDescriptor must be implemented in a subclass..."
 	}
 }
 
@@ -1088,15 +1170,22 @@ class CallAction extends Action {
 		return ("(" . this.Action . A_Space . prefix . this.Function.toString(bindings) . postfix . "(" . values2String(", ", arguments*) . "))")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "CallAction"
 		object.External := this.iExternal
-		object.Function := this.Function.toObject(bindings)
-		object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
+		object.Function := this.Function.toDescriptor(bindings)
+		object.Arguments := collect(this.Arguments, (a) => a.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return CallAction(RuleCompiler.fromDescriptor(descriptor["Function"]), descriptor["External"]
+						, collect(descriptor["Arguments"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 }
 
@@ -1193,14 +1282,21 @@ class ExecuteAction extends Action {
 		return ("(" . this.Action . A_Space .  this.Function.toString(bindings) . "(" . values2String(", ", arguments*) . "))")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ExecuteAction"
-		object.Executable := this.Function.toObject(bindings)
-		object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
+		object.Executable := this.Function.toDescriptor(bindings)
+		object.Arguments := collect(this.Arguments, (a) => a.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ExecuteAction(RuleCompiler.fromDescriptor(descriptor["Executable"])
+						   , collect(descriptor["Arguments"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 }
 
@@ -1287,14 +1383,22 @@ class ProveAction extends CallAction {
 			return false
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ProveAction"
-		object.Goal := object.Function
+		object.Functor := this.Functor[bindings].toDescriptor(bindings)
 		object.ProveAll := this.iProveAll
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ProveAction(RuleCompiler.fromDescriptor(descriptor["Functor"])
+						 , collect(descriptor["Arguments"], (d) => RuleCompiler.fromDescriptor(d))
+						 , descriptor["ProveAll"])
 	}
 }
 
@@ -1365,13 +1469,17 @@ class LetAction extends Action {
 		return ("(" . kLet . A_Space . this.Rule.Tail[1].toString(bindings) . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "LetAction"
-		object.Expression := this.Rule.Tail[1].toObject(bindings)
+		object.Rule := this.Rule.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return LetAction(RuleCompiler.fromDescriptor(toMap(descriptor)["Rule"]))
 	}
 }
 
@@ -1430,20 +1538,36 @@ class SetFactAction extends Action {
 	}
 
 	toString(bindings := kNotInitialized) {
-		if (this.Value == this.Fact)
+		if (isInstance(this.Value, Literal) && (this.Value.Literal == true))
 			return ("(Set: " . this.Fact[bindings] . ")")
 		else
 			return ("(Set: " . this.Fact[bindings] . " = " . this.Value.toString(bindings) . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "SetFactAction"
-		object.Fact := this.Fact[bindings]
-		object.Value := this.Value.toObject(bindings)
+
+		if isInstance(this.iFact, Term)
+			object.Fact := this.iFact.toDescriptor(bindings)
+		else
+			object.Fact := this.iFact
+
+		object.Value := this.iValue.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		fact := descriptor["Fact"]
+
+		if isObject(fact)
+			fact := RuleCompiler.fromDescriptor(fact)
+
+		return SetFactAction(fact, RuleCompiler.fromDescriptor(descriptor["Value"]))
 	}
 }
 
@@ -1492,6 +1616,10 @@ class SetComposedFactAction extends Action {
 
 	__New(arguments*) {
 		this.iValue := arguments.Pop()
+
+		if isInstance(this.iValue, Array)
+			MsgBox "Oops"
+
 		this.iFact := arguments
 	}
 
@@ -1531,14 +1659,20 @@ class SetComposedFactAction extends Action {
 		return ("(Set: " . fact . " = " . this.Value.toString(bindings) . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "SetComposedFactAction"
-		object.Fact := collect(this.Fact, (c) => c.toObject(bindings))
-		object.Value := this.Value.toObject(bindings)
+		object.Fact := collect(this.Fact, (c) => c.toDescriptor(bindings))
+		object.Value := this.Value.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return SetComposedFactAction(concatenate(collect(descriptor["Fact"], (d) => RuleCompiler.fromDescriptor(d)), [RuleCompiler.fromDescriptor(descriptor["Value"])])*)
 	}
 }
 
@@ -1584,13 +1718,19 @@ class ClearFactAction extends Action {
 		return ("(Clear: " . this.Fact[bindings] . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ClearFactAction"
-		object.Fact := this.Fact[bindings]
+		object.Fact := this.Fact.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ClearFactAction(RuleCompiler.fromDescriptor(descriptor["Fact"]))
 	}
 }
 
@@ -1667,13 +1807,19 @@ class ClearComposedFactAction extends Action {
 		return ("(Clear: " . fact . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ClearComposedFactAction"
-		object.Fact := collect(this.Fact, (c) => c.toObject(bindings))
+		object.Fact := collect(this.Fact, (c) => c.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ClearComposedFactAction(collect(descriptor["Fact"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 }
 
@@ -1726,13 +1872,12 @@ class Term {
 				argument.getFacts(facts)
 		}
 
-		toObject(bindings := kNotInitialized) {
-			local object := super.toObject(bindings)
+		toDescriptor(bindings := kNotInitialized) {
+			local object := super.toDescriptor(bindings)
 
 			object.Class := "Complex"
 			object.Functor := this.Functor
-			object.Arity := this.Arity
-			object.Arguments := collect(this.Arguments, (a) => a.toObject(bindings))
+			object.Arguments := collect(this.Arguments, (a) => a.toDescriptor(bindings))
 
 			return object
 		}
@@ -1821,6 +1966,12 @@ class Term {
 		}
 	}
 
+	Descriptor {
+        Get {
+            return this.toDescriptor()
+        }
+    }
+
 	getFacts(facts) {
 	}
 
@@ -1832,12 +1983,12 @@ class Term {
 		throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 
-	toObject(bindings := kNotInitialized) {
-		return {}
+	toDescriptor(bindings := kNotInitialized) {
+		return {Class: "Term"}
 	}
 
-	fromObject(object, bindings := kNotInitialized) {
-		return false
+	static fromDescriptor(descriptor) {
+		throw "Virtual class method Term.fromDescriptor must be implemented in a subclass..."
 	}
 
 	doVariables(resultSet, function) {
@@ -1899,12 +2050,18 @@ class Struct extends Term.Complex {
 		return (this.Functor . "(" . values2String(", ", arguments*) . ")")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Struct"
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return Struct(descriptor["Functor"], collect(descriptor["Arguments"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 }
 
@@ -1924,12 +2081,16 @@ class Cut extends Term.Complex {
 		return "!"
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Cut"
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Cut()
 	}
 }
 
@@ -1949,12 +2110,16 @@ class Fail extends Term.Complex {
 		return "fail"
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Fail"
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Fail()
 	}
 }
 
@@ -2019,14 +2184,20 @@ class Pair extends Term {
 		return (result . "]")
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Pair"
-		object.LeftTerm := this.LeftTerm.toObject(bindings)
-		object.RightTerm := this.RightTerm.toObject(bindings)
+		object.LeftTerm := this.LeftTerm.toDescriptor(bindings)
+		object.RightTerm := this.RightTerm.toDescriptor(bindings)
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return Pair(RuleCompiler.fromDescriptor(descriptor["LeftTerm"]), RuleCompiler.fromDescriptor(descriptor["RightTerm"]))
 	}
 
 	toList(bindings := kNotInitialized) {
@@ -2114,12 +2285,16 @@ class Nil extends Term {
 		return "[]"
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "Nil"
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return Nil()
 	}
 
 	unify(choicePoint, term) {
@@ -2178,6 +2353,12 @@ class Rule {
 
 	iID := false
 
+	Descriptor {
+        Get {
+            return this.toDescriptor()
+        }
+    }
+
 	ID  {
         Get {
             return this.iID
@@ -2194,8 +2375,12 @@ class Rule {
 		this.iID := ++Rule.sNextID
 	}
 
-	toObject(bindings := kNotInitialized) {
+	toDescriptor(bindings := kNotInitialized) {
 		return {Class: "Rule", ID: this.ID, Type: this.Type}
+	}
+
+	static fromDescriptor(descriptor) {
+		throw "Virtual class method Rule.fromDescriptor must be implemented in a subclass..."
 	}
 }
 
@@ -2325,15 +2510,23 @@ class ProductionRule extends Rule {
 		return values2String(", ", conditions*) . " => " . values2String(", ", actions*)
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ProductionRule"
 		object.Priority := this.Priority
-		object.Conditions := collect(this.Conditions, (c) => c.toObject(bindings))
-		object.Actions := collect(this.Actions, (a) => a.toObject(bindings))
+		object.Conditions := collect(this.Conditions, (c) => c.toDescriptor(bindings))
+		object.Actions := collect(this.Actions, (a) => a.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ProductionRule(collect(descriptor["Conditions"], (d) => RuleCompiler.fromDescriptor(d))
+							, collect(descriptor["Actions"], (d) => RuleCompiler.fromDescriptor(d))
+							, descriptor["Priority"])
 	}
 }
 
@@ -2392,14 +2585,21 @@ class ReductionRule extends Rule {
 			return this.Head.toString(resultSet)
 	}
 
-	toObject(bindings := kNotInitialized) {
-		local object := super.toObject(bindings)
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
 
 		object.Class := "ReductionRule"
-		object.Head := this.Head.toObject(bindings)
-		object.Tail := collect(this.Tail, (t) => t.toObject(bindings))
+		object.Head := this.Head.toDescriptor(bindings)
+		object.Tail := collect(this.Tail, (t) => t.toDescriptor(bindings))
 
 		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		descriptor := toMap(descriptor)
+
+		return ReductionRule(RuleCompiler.fromDescriptor(descriptor["Head"])
+						   , collect(descriptor["Tail"], (d) => RuleCompiler.fromDescriptor(d)))
 	}
 
 	hasVariables() {
@@ -3149,23 +3349,27 @@ class CallChoicePoint extends ChoicePoint {
 
 				if isInstance(result, Term)
 					result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
-				else if isObject(result) {
-					result := Term.fromObject(result)
+				else {
+					if isObject(result) {
+						try {
+							result := resultSet.unify(this, Term.fromDescriptor(result)
+														  , operand.getValue(resultSet, operand))
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					}
+					else
+						try {
+							result := resultSet.unify(this, RuleCompiler().compileTerm(result)
+														  , operand.getValue(resultSet, operand))
+						}
+						catch Any as exception {
+							logError(exception)
 
-					if result
-						result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
+							result := resultSet.unify(this, Literal(result), operand.getValue(resultSet, operand))
+						}
 				}
-				else
-					try {
-						result := RuleCompiler().compileTerm(result)
-
-						result := resultSet.unify(this, result, operand.getValue(resultSet, operand))
-					}
-					catch Any as exception {
-						logError(exception)
-
-						result := resultSet.unify(this, Literal(result), operand.getValue(resultSet, operand))
-					}
 			}
 
 			if !result
@@ -5126,6 +5330,21 @@ class RuleCompiler {
 			return this.createTermParser(theTerm).parse(theTerm)
 		else
 			return false
+	}
+
+	static fromDescriptor(descriptor) {
+		try {
+			return %toMap(descriptor)["Class"]%.fromDescriptor(descriptor)
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
+	}
+
+	fromDescriptor(descriptor) {
+		return RuleCompiler.fromDescriptor(descriptor)
 	}
 
 	readReduction(text) {

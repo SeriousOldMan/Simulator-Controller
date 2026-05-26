@@ -5201,9 +5201,10 @@ class GridRaceAssistant extends RaceAssistant {
 parseList(list) {
 	local compiler := RuleCompiler()
 	local nextCharIndex := 1
-	local term := compiler.readList(&list, &nextCharIndex)
 
-	return compiler.createTermParser(term).parse(term).toList()
+	list := compiler.readList(&list, &nextCharIndex)
+
+	return compiler.createTermParser(list).parse(list).toList()
 }
 
 getDeprecatedValue(data, newSection, oldSection, key, default := false) {

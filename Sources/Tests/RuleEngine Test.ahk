@@ -345,10 +345,36 @@ class Compiler extends Assert {
 		pCount := 0
 		rCount := 0
 
-		do(productions, (p) => JSON.print(p.toObject(), "  "))
-		do(reductions, (r) => JSON.print(r.toObject(), "  "))
+		do(productions, (p) {
+			JSON.print(p.Descriptor, "  ")
 
-		this.AssertTrue(true, "Not all rules converted...")
+			try {
+				new := compiler.fromDescriptor(p.Descriptor)
+
+				if (new && (p.toString() = new.toString()))
+					pCount += 1
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		})
+
+		do(reductions, (r) {
+			JSON.print(r.Descriptor, "  ")
+
+			try {
+				new := compiler.fromDescriptor(r.Descriptor)
+
+				if (new && (r.toString() = new.toString()))
+					rCount += 1
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		})
+
+		this.AssertEqual(24, pCount, "Not all production rules converted...")
+		this.AssertEqual(42, rCount, "Not all reduction rules compiled...")
 	}
 }
 

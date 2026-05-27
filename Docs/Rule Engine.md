@@ -244,7 +244,9 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
-	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
+	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method on that last object. Example: *Singleton.Instance.myMethod*
+	
+	If the name of the function or the method descriptor is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
     Syntax / Example: (Call: %MsgBox%("Hello"))
 	
@@ -566,7 +568,9 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 	
-	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
+	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method on that last object. Example: *Singleton.Instance.myMethod*
+	
+	If the name of the function or the method descriptor is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
 	Syntax: call(%function%, arg1, ..., argN) or :%function%(arg1, ..., argN)
   

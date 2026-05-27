@@ -118,8 +118,11 @@ global kExecutionTestRules := "
 				testFunctionCall(?input, ?result) <= :testFunctionCall=(?input, ?result)
 
 				{All: [?Test], {Is: :testFunctionCall=(Foo, ?Result)}} =>
-						(Set: CallResult = ?Result),
+						(Set: CallResult1 = ?Result),
 						(Prove: addRule("printFather(?v) <= :showArgs(?v), Set(FatherResult, ?v)", ?))
+
+				{All: [?Test], {Is: :%Singleton.Instance.testMethodCall1%=("Foo", ?Result)}} =>
+						(Call: Singleton.Instance.testMethodCall2("Baz")), (Set: CallResult2 = ?Result)
 
 				[?Test] => (Let: ?var = father(Peter, Paul)), (Prove: printFather(?var))
 				[?Test] => (Prove: parse("son(Paul, Peter)", ?term)), (Prove: print(?term, ?text)),
@@ -173,6 +176,20 @@ global kExecutionTestRules := "
 ;;;-------------------------------------------------------------------------;;;
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class Singleton {
+	__New() {
+		Singleton.Instance := this
+	}
+
+	testMethodCall1(first) {
+		return (first . "_Bar")
+	}
+
+	testMethodCall2(knowledgeBase, first) {
+		knowledgeBase.setFact("CallResult3", first . "_Bar")
+	}
+}
 
 class ScriptKnowledgeBase extends KnowledgeBase {
 	execute(executable, arguments) {
@@ -330,7 +347,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(24, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(25, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(42, reductions.Length, "Not all reduction rules compiled...")
 	}
 
@@ -373,7 +390,7 @@ class Compiler extends Assert {
 			}
 		})
 
-		this.AssertEqual(24, pCount, "Not all production rules converted...")
+		this.AssertEqual(25, pCount, "Not all production rules converted...")
 		this.AssertEqual(42, rCount, "Not all reduction rules compiled...")
 	}
 }
@@ -754,7 +771,9 @@ class HybridEngine extends Assert {
 		kb.setFact("Test", true)
 		kb.produce()
 
-		this.AssertEqual("Foo_Bar", kb.getValue("CallResult"), "Unexpected function call result...")
+		this.AssertEqual("Foo_Bar", kb.getValue("CallResult1"), "Unexpected function call result...")
+		this.AssertEqual("Foo_Bar", kb.getValue("CallResult2"), "Unexpected function call result...")
+		this.AssertEqual("Baz_Bar", kb.getValue("CallResult3"), "Unexpected function call result...")
 		this.AssertEqual("father(Peter, Paul)", kb.getValue("FatherResult"), "Unexpected function call result...")
 		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult1"), "Unexpected function call result...")
 		this.AssertEqual("47.11", kb.getValue("ParseResult2"), "Unexpected function call result...")
@@ -916,6 +935,8 @@ if true {
 	AHKUnit.AddTestClass(CoreEngine)
 	AHKUnit.AddTestClass(Unification)
 	AHKUnit.AddTestClass(HybridEngine)
+
+	Singleton()
 
 	AHKUnit.Run()
 }

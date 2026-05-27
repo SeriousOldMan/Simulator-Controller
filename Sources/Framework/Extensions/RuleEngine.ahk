@@ -1116,13 +1116,15 @@ class CallAction extends Action {
 	execute(knowledgeBase, bindings) {
 		local function
 		local facts := knowledgeBase.Facts
-		local arguments, argument, ignore, prefix, postfix
+		local arguments, argument, ignore, prefix, postfix, callable, object
 
 		if isInstance(this.Function, Variable)
 			function := this.Function[bindings]
 		else
 			function := this.Function[facts]
 
+		if InStr(function, "Singleton")
+			MsgBox "Here"
 		arguments := []
 
 		for ignore, argument in this.Arguments
@@ -1145,11 +1147,37 @@ class CallAction extends Action {
 		}
 
 		try {
-			if this.iExternal
-				%StrReplace(function, ".", "_")%(arguments*)
-			else
-				%StrReplace(function, ".", "_")%(knowledgeBase, arguments*)
+			if InStr(function, ".") {
+				try {
+					callable := %StrReplace(function, ".", "_")%
+				}
+				catch Any {
+					callable := string2Values(".", function)
 
+					loop callable.Length
+						if (A_Index = callable.Length) {
+							if this.iExternal
+								return object.%callable[A_Index]%(arguments*)
+							else
+								return object.%callable[A_Index]%(knowledgeBase, arguments*)
+						}
+						else if (A_Index = 1)
+							object := %callable[A_Index]%
+						else
+							object := object.%callable[A_Index]%
+				}
+
+				if this.iExternal
+					callable.Call(arguments*)
+				else
+					callable.Call(knowledgeBase, arguments*)
+			}
+			else {
+				if this.iExternal
+					%function%.Call(arguments*)
+				else
+					%function%.Call(knowledgeBase, arguments*)
+			}
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, "Error while calling function " . function . "...")
@@ -3426,7 +3454,7 @@ class CallChoicePoint extends ChoicePoint {
 		local builtin := false
 		local external := false
 		local visArgs := (this.iValued ? (this.Goal.Arguments.Length - 1) : this.Goal.Arguments.Length)
-		local function, values, builtin, index, theTerm, value, newValues, callable, call, prefix, postfix
+		local function, values, builtin, index, theTerm, value, newValues, callable, call, prefix, postfix, object
 
 		values := []
 		builtin := false
@@ -3480,12 +3508,37 @@ class CallChoicePoint extends ChoicePoint {
 			if builtin
 				return kBuiltinFunctions[inList(kBuiltinFunctors, function)].Call(this, values*)
 			else {
-				callable := %StrReplace(function, ".", "_")%
+				if InStr(function, ".") {
+					try {
+						callable := %StrReplace(function, ".", "_")%
+					}
+					catch Any {
+						callable := string2Values(".", function)
 
-				if external
-					return callable.Call(values*)
-				else
-					return callable.Call(this, values*)
+						loop callable.Length
+							if (A_Index = callable.Length) {
+								if external
+									return object.%callable[A_Index]%(values*)
+								else
+									return object.%callable[A_Index]%(this, values*)
+							}
+							else if (A_Index = 1)
+								object := %callable[A_Index]%
+							else
+								object := object.%callable[A_Index]%
+					}
+
+					if external
+						return callable.Call(values*)
+					else
+						return callable.Call(this, values*)
+				}
+				else {
+					if external
+						return %function%.Call(values*)
+					else
+						return %function%.Call(this, values*)
+				}
 			}
 		}
 		catch Any as exception {

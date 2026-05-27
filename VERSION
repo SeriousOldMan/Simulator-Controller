@@ -2,7 +2,7 @@
 Version=6.9.8.0-beta
 Target=6.9.8.0-release
 Date=05/27/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4cmBMwcL/Releases/Simulator%20Controller%206.9.8.0-dev.zip
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/G9BveGlt/Releases/Simulator%20Controller%206.9.8.0-beta.zip
 Changes=Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine, Fixed build rule for ACE SHM Spotter, Support for JSON serialization in rule engine, Support for method calls in rule engine
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]

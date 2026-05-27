@@ -80,15 +80,27 @@ Literals are represented as a sequence of characters. They can contain almost an
 
       Literals that represent numbers are all literals which start with a number and adhere to the typical format of a number. Examples: 5, 5.1, 5.47e+2
 
-   2. Variables
+   2. Facts
+
+      Facts are identified by special literals that start with an exclamation mark. Example: !Tyre.Compound.Target
+
+   3. Variables
 
       Variables are special literals that start with a question mark. Example: ?CurrentLap
    
       Although it is possible to create a variable which starts with a number like *?42*, this is not recommended.
-
-   3. Facts
-
-      Facts are identified by special literals that start with an exclamation mark. Example: !Tyre.Compound.Target
+	  
+	  Important: The names of variables can contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
+	  
+	  - In production rules the variables *?a.b* and *?a.c* represent two different entities as expected. They will be bound to the current value of the facts **!a.b** and **!a.c** respectively. Purpose of doing this is to support a pseudo object structure for *Facts*.
+	  - In reduction rules only the part of the name before the first dot defines the identity of the variable, which means that in the same lexical scope (normally the head and tail of one rule) the variables *?a.b*, *?a.c* and actually *?a* as well represent the same entity.
+	  
+	  When mixing rule types like in
+	  
+			{All: [?List], {Is: ?L.First = [1, 2]}, {Is: ?L.Second = [3]},
+				  {Prove: concat(?L.First, ?L.Second, ?L)}, {None: [?L contains 4]}} => (Set: NoSuccess)
+				  
+      this can get very confusing. This example will actually not work as expected. Therefore it is recommended to **not** use dotted names for free variables in reduction rules.
    
    4. Strings
 
@@ -450,7 +462,7 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
     - Trace
   
-	  Not really a change in behavior, but very helpful. Values can be "Full", "Medium", "Light", "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalty, of course.
+	  Not really a change in behavior, but very helpful. Values can be "Full", "Medium", "Lite" (or "Light", which is still supported, but deprecated) and "Off". If the *Trace* is not "Off", which is the default, a lot of information is written to the log file during rule execution, not only for reduction rules, but also for production rules. This has a high performance penalty, of course.
     
 	option always succeeds, even if called with an unknown setting.
 

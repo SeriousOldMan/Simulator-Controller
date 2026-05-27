@@ -4507,7 +4507,10 @@ class RuleEngine {
 				value := value.toString(resultSet)
 
 			if (option = "Trace") {
-				value := inList(["Full", "Medium", "Light", "Off"], value)
+				if (value = "Light")
+					value := "Lite"
+
+				value := inList(["Full", "Medium", "Lite", "Off"], value)
 
 				if value
 					choicePoint.ResultSet.KnowledgeBase.RuleEngine.setTraceLevel(value)

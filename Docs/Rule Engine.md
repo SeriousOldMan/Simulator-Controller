@@ -100,13 +100,13 @@ Literals are represented as a sequence of characters. They can contain almost an
 			{All: [?List], {Is: ?L.First = [1, 2]}, {Is: ?L.Second = [3]},
 				  {Prove: concat(?L.First, ?L.Second, ?L)}, {None: [?L contains 4]}} => (Set: NoSuccess)
 				  
-      this can get very confusing. This rule will actually not work as expected. However, when using it for pseudo objects, the dotted notation is useful in reduction rules. Example:
+      this can get very confusing. This rule will actually not work as expected. However, when using it to generate a name for pseudo object properties, the dotted notation is very useful in reduction rules. Example:
 	  
 			setGrandfather(?grandChild, ?grandfather) <= Set(?grandfather.grandchild, ?grandChild)
 			
 	  This rule, when *called* like "setGrandfather(Peter, Frank)" will create the fact "Frank.grandchild" with the value "Peter" in the knowledgebase.
 	  
-	  Long story short: Do not mix dotted variables that represent dotted facts with dotted variables where the first part is a variable which already has a value (which normally represents a kind of object).
+	  Long story short: Dotted variables are interpreted differently in the two different rule types. Do not mix dotted variables that represent dotted facts with dotted variables where the first part is a variable which already has a value (which normally represents a kind of object).
    
    4. Strings
 

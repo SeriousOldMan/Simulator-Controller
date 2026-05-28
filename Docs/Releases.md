@@ -10,7 +10,7 @@
   
 #### Changes
 
-  - Significant performance improvements of the rule engine, which will reduce the CPU load of all Assistants a bit.
+  - Around 10 % performance improvement of the rule engine, which will reduce the CPU load of all Assistants a bit.
   - [Developer] More useful extensions to the rule engine.
     - General expressions can now be used in the production rule predicate for list containment. Example:
   

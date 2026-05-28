@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[6.9.8.0-release]() (Changes: Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine, Fixed build rule for ACE SHM Spotter, Support for JSON serialization in rule engine, Support for method calls in rule engine.)
+[6.9.8.0-release](https://cutt.ly/xt1q8pjZ) (Changes: Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine, Fixed build rule for ACE SHM Spotter, Support for JSON serialization in rule engine, Support for method calls in rule engine.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6980) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-698) of this version and all the versions you might have skipped, before installing and using this version.
 

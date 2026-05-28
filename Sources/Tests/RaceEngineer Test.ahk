@@ -1030,12 +1030,12 @@ class PitstopHandling extends Assert {
 				if (A_Index = 3) {
 					engineer.planPitstop()
 
-					; if engineer.Debug[kDebugKnowledgeBase]
+					if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					engineer.preparePitstop()
 
-					; if engineer.Debug[kDebugKnowledgeBase]
+					if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
@@ -1071,7 +1071,7 @@ class PitstopHandling extends Assert {
 					engineer.preparePitstop()
 					engineer.performPitstop()
 
-					if true || engineer.Debug[kDebugKnowledgeBase]
+					if engineer.Debug[kDebugKnowledgeBase]
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Expected no suspension damage to be reported...")

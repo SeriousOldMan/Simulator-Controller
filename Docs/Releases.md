@@ -1,5 +1,36 @@
 # Latest stable release
 
+## 6.9.8.0
+
+#### Date: 05/29/26
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - [Developer] More useful extensions to the rule engine.
+    - General expressions can now be used in the production rule predicate for list containment. Example:
+  
+			{All: {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
+				  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: Success = true)
+				  
+			concat([], ?L, ?L)
+			concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
+    - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
+	- External functions called by the rule engine can now return values of any type supported by the rule engine. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
+	- External functions called by the rule engiene can now actually be methods identified by a qualified name like *Singleton.Instance.myMethod*, as long as the name before the first dot identifies a valid object or class in the global name space.
+	- [Important] The behavior of the *ProveAll* action has changed in a way, which can brake current production rules that use the *ProveAll* action. You can now use *ProveAll* to create powerful loops in the action part of a reduction rule. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) for more information.
+	- *Rules* and *Terms* can now be serialized to and from JSON on the implementation level of the rule engine.
+	- The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#literals) on using dotted names for *Variables* and *Facts* has been extended and clarified.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.9.7.0
 
 #### Date: 05/22/26
@@ -26,35 +57,6 @@
 	- Added two new [builtin predicates "productions" and "reductions"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), which generate a list of all rules for the corresponding category.
 	- Added two new [builtin predicates "addRule" and "removeRule"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for the rule engine. Using these predicates, the rule engine is now capable of adding and removing rules during runtime, thereby supporting learning through feedback loops.
   - [Internal] Migrated to AHK 2.1-alpha.30.
-
-# Upcoming release
-
-## 6.9.8.0
-
-#### Date: 05/29/26 (planned)
-
-#### Fixes
-
-  - None this time...
-  
-#### Changes
-
-  - [Developer] More useful extensions to the rule engine.
-    - General expressions can now be used in the production rule predicate for list containment. Example:
-  
-			{All: {Is: ?L1 = [1, 2]}, {Is: ?L2 = [3]},
-				  {Prove: concat(?L1, ?L2, ?L)}, {None: [?L contains 4]}} => (Set: Success = true)
-				  
-			concat([], ?L, ?L)
-			concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
-    - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
-	- External functions called by the rule engine can now return values of any type supported by the rule engine. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
-	- External functions called by the rule engiene can now actually be methods identified by a qualified name like *Singleton.Instance.myMethod*, as long as the name before the first dot identifies a valid object or class in the global name space.
-	- [Important] The behavior of the *ProveAll* action has changed in a way, which can brake current production rules that use the *ProveAll* action. You can now use *ProveAll* to create powerful loops in the action part of a reduction rule. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) for more information.
-	- *Rules* and *Terms* can now be serialized to and from JSON on the implementation level of the rule engine.
-	- The [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#literals) on using dotted names for *Variables* and *Facts* has been extended and clarified.
-
-# Release history
 
 ## 6.9.6.0
 

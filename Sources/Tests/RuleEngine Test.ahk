@@ -683,7 +683,7 @@ class HybridEngine extends Assert {
 
 		resultSet := this.executeTests(tests)
 
-		resultSet.KnowledgeBase.produce()
+		; resultSet.KnowledgeBase.produce()
 
 		showFacts(resultSet.KnowledgeBase)
 

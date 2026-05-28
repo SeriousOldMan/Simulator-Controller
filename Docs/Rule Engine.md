@@ -82,7 +82,7 @@ Literals are represented as a sequence of characters. They can contain almost an
 
    2. Facts
 
-      Facts are identified by special literals that start with an exclamation mark. Example: !Tyre.Compound.Target
+      Facts are identified by special literals that start with an exclamation mark. Example: !Tyre.Compound.Target. As you can see, the name of a fact can contain dots, which is very useful to create pseudo object structures.
 
    3. Variables
 
@@ -90,21 +90,27 @@ Literals are represented as a sequence of characters. They can contain almost an
    
       Although it is possible to create a variable which starts with a number like *?42*, this is not recommended.
 	  
-	  Important: The names of variables can contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
+	  Important: The names of variables can also contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *dotted Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
 	  
-	  - In production rules the variables *?a.b* and *?a.c* represent two different entities as expected. They will be bound to the current value of the facts **!a.b** and **!a.c** respectively. Purpose of doing this is to support a pseudo object structure for *Facts*.
-	  - In reduction rules only the part of the name before the first dot defines the identity of the variable, which means that in the same lexical scope (normally the head and tail of one rule) the variables *?a.b*, *?a.c* and actually *?a* as well represent the same entity.
+	  - When used in production rules the variables *?a.b* and *?a.c* will match to different facts as expected, i.e. they will be bound to the current value of the facts **!a.b** and **!a.c** respectively. Purpose of doing this is to support a pseudo object structure for *Facts*, as mentioned above.
+	  - In reduction rules only the part of the name before the first dot is used to identify a variable, which means that in the same lexical scope (normally the head and tail of one rule) the variables *?a.b*, *?a.c* and actually *?a* as well represent the same entity. But here dotted variables can be used as a part of a composite variable. Example: If the variable *?Person* is already bound to "Peter", the variables *?Person.Mother* and *?Person.Father* will represent the values "Peter.Mother" and "Peter.Father" respectively.
 	  
-	  When mixing rule types like in
+	  Let's take a look at some examples. When mixing rule types like in
 	  
 			{All: [?List], {Is: ?L.First = [1, 2]}, {Is: ?L.Second = [3]},
 				  {Prove: concat(?L.First, ?L.Second, ?L)}, {None: [?L contains 4]}} => (Set: NoSuccess)
 				  
-      this can get very confusing. This example will actually not work as expected. Therefore it is recommended to **not** use dotted names for free variables in reduction rules.
+      this can get very confusing. This rule will actually not work as expected. However, when using it for pseudo objects, the dotted notation is useful in reduction rules. Example:
+	  
+			setGrandfather(?grandChild, ?grandfather) <= Set(?grandfather.grandchild, ?grandChild)
+			
+	  This rule, when *called* like "setGrandfather(Peter, Frank)" will create the fact "Frank.grandchild" with the value "Peter" in the knowledgebase.
+	  
+	  Long story short: Do not mix dotted variables that represent dotted facts with dotted variables where the first part is a variable which already has a value (which normally represents a kind of object).
    
    4. Strings
 
-      Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain spaces or other characters with a role in the syntax.
+      Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain spaces or other reserved characters like parantheses.
 
 #### Expressions
 

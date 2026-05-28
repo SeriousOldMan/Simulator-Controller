@@ -261,9 +261,10 @@ class OneQuantor extends Quantor {
 
 		for ignore, theCondition in this.Conditions
 			if theCondition.match(knowledgeBase, bindings)
-				matched += 1
+				if (++match > 1)
+					return false
 
-		return (matched == 1)
+		return true
 	}
 
 	toDescriptor(bindings := kNotInitialized) {
@@ -291,10 +292,10 @@ class AllQuantor extends Quantor {
 		local ignore, theCondition
 
 		for ignore, theCondition in this.Conditions
-			if theCondition.match(knowledgeBase, bindings)
-				matched += 1
+			if !theCondition.match(knowledgeBase, bindings)
+				return false
 
-		return (matched == this.Conditions.Length)
+		return true
 	}
 
 	toDescriptor(bindings := kNotInitialized) {
@@ -1123,8 +1124,6 @@ class CallAction extends Action {
 		else
 			function := this.Function[facts]
 
-		if InStr(function, "Singleton")
-			MsgBox "Here"
 		arguments := []
 
 		for ignore, argument in this.Arguments
@@ -3844,12 +3843,14 @@ class KnowledgeBase {
 		local facts := this.Facts
 		local rules := this.Rules
 		local result := false
-		local ruleEntry, tickCount, generation, produced, matched
+		local ruleEntry, tickCount, fGeneration, rGeneration, produced, matched
 
 		tickCount := A_TickCount
 
+		rGeneration := rules.Generation
+
 		loop {
-			generation := facts.Generation
+			fGeneration := facts.Generation
 			produced := false
 
 			ruleEntry := rules.Productions
@@ -3868,7 +3869,7 @@ class KnowledgeBase {
 				if matched {
 					result := true
 
-					if (generation != facts.Generation) {
+					if (fGeneration != facts.Generation) {
 						produced := true
 
 						break
@@ -3881,6 +3882,9 @@ class KnowledgeBase {
 			if !produced
 				break
 		}
+
+		if (rGeneration != rules.Generation)
+			facts.resetObservers()
 
 		if (this.RuleEngine.TraceLevel <= kTraceMedium)
 			this.RuleEngine.trace(kTraceMedium, "Produce took " . (A_TickCount - tickCount) . " milliseconds...")
@@ -4093,6 +4097,13 @@ class Facts {
 		local observers := this.iObservers
 
 		return (observers.Has(fact) ? observers[fact] : false)
+	}
+
+	resetObservers() {
+		local ignore, observer
+
+		for ignore, observer in this.iObservers
+			observer.factChanged()
 	}
 
 	dumpFacts(name := false) {

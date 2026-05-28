@@ -622,11 +622,15 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Compiles a rule from the given textual rule definition supplied in *rule* and adds it to the active rule set. The internal ID of the rule is unified with the second argument *id*, which can be used to remove the rule later on using the *removeRule* predicate. *addRule* will fail, when a syntax error is detected. Please note, that the side effect of adding the rule is not undone, when backtracking is performed.
 	
+	Important: When a rule is added to the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
+	
   - removeRule
   
     Syntax: removeRule(id)
   
     Removes the rule with supplied *id* from the active rule set. *removeRule* will fail, if *id* is not a vaild rule ID or if a rule with such an ID does not exist. Please note, that the side effect of removing the rule is not undone, when backtracking is performed.
+	
+	Important: When a rule is removed from the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
   
 ### Event-based programming
 

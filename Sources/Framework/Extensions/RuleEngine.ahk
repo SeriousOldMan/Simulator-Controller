@@ -528,27 +528,14 @@ class Goal extends Condition {
 	}
 
 	match(knowledgeBase, bindings) {
-		local arguments := []
-		local resultSet, arguments, ignore, argument, goal, value
+		local resultSet, ignore, argument, goal, value
 
-		for ignore, argument in this.Goal.Arguments
-			if isInstance(argument, Variable) {
-				value := argument.getValue(bindings)
-
-				if (value != kNotInitialized)
-					arguments.Push(value)
-				else
-					arguments.Push(argument)
-			}
-			else
-				arguments.Push(argument.substituteVariables(bindings))
-
-		goal := Struct(this.Goal.Functor, arguments)
+		goal := this.Goal.substituteValues(bindings)
 
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, (value != kNotInitialized) ? value.substituteValues(resultSet) : kNotInitialized))
 
 			resultSet.dispose()
 
@@ -606,28 +593,15 @@ class Expression extends Condition {
 	}
 
 	match(knowledgeBase, bindings) {
-		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
-		local resultSet, arguments, ignore, argument, goal, value
+		local resultSet, ignore, argument, goal, value
 
-		for ignore, argument in this.Rule.Head.Arguments
-			if isInstance(argument, Variable) {
-				value := argument.getValue(bindings)
-
-				if (value != kNotInitialized)
-					arguments.Push(value)
-				else
-					arguments.Push(argument)
-			}
-			else
-				arguments.Push(argument.substituteVariables(bindings))
-
-		goal := Struct(this.Rule.Head.Functor, arguments)
+		goal := this.Rule.Head.substituteValues(bindings)
 
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, (value != kNotInitialized) ? value.substituteValues(resultSet) : kNotInitialized))
 
 			resultSet.dispose()
 
@@ -786,9 +760,18 @@ class Variable extends Primary {
 	}
 
 	substituteValues(bindings) {
-		local value := this.getValue(bindings)
+		local value
 
-		if (value != kNotInitialized)
+		if this.Property {
+			value := this.RootVariable.getValue(bindings)
+
+			if isInstance(value, Literal)
+				return Literal(value.Literal . "." . this.Property)
+		}
+
+		value := this.getValue(bindings)
+
+		if ((value != kNotInitialized) && (value != this))
 			return value.substituteValues(bindings)
 		else
 			return this
@@ -1397,30 +1380,16 @@ class ProveAction extends CallAction {
 		local facts := knowledgeBase.Facts
 		local resultSet, arguments, ignore, argument, goal, value
 
-		arguments := []
-
-		for ignore, argument in this.Arguments
-			if isInstance(argument, Variable) {
-				value := argument.getValue(bindings)
-
-				if (value != kNotInitialized)
-					arguments.Push(value)
-				else
-					arguments.Push(argument)
-			}
-			else
-				arguments.Push(argument.substituteVariables(bindings))
-
-		goal := Struct(isInstance(this.Functor, Variable) ? this.Functor[bindings] : this.Functor[facts], arguments)
+		goal := Struct(isInstance(this.Functor, Variable) ? this.Functor[bindings] : this.Functor[facts], this.Arguments).substituteValues(bindings)
 
 		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
-			knowledgeBase.RuleEngine.trace(kTraceMedium, "Activate reduction rules with goal " . goal.toString())
+			knowledgeBase.RuleEngine.trace(kTraceMedium, "Call reduction rules with goal " . goal.toString())
 
 		resultSet := knowledgeBase.prove(goal)
 
 		if resultSet {
 			loop {
-				goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+				goal.doVariables(resultSet, (var, value) => bindings.setValue(var, (value != kNotInitialized) ? value.substituteValues(resultSet) : kNotInitialized))
 
 				if this.iProveAll
 					return {KnowledgeBase: knowledgeBase, Bindings: bindings
@@ -1443,7 +1412,7 @@ class ProveAction extends CallAction {
 			bindings := continuation.Bindings
 
 			continuation.Goal.doVariables(resultSet
-										, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+										, (var, value) => bindings.setValue(var, (value != kNotInitialized) ? value.substituteValues(resultSet) : kNotInitialized))
 
 			return continuation
 		}
@@ -1494,28 +1463,18 @@ class LetAction extends Action {
 	}
 
 	execute(knowledgeBase, bindings) {
-		local arguments := []
 		local engine := RuleEngine([], [this.Rule], Map())
-		local resultSet, arguments, ignore, argument, goal, value
+		local resultSet, ignore, argument, goal, value
 
-		for ignore, argument in this.Rule.Head.Arguments
-			if isInstance(argument, Variable) {
-				value := argument.getValue(bindings)
+		goal := this.Rule.Head.substituteValues(bindings)
 
-				if (value != kNotInitialized)
-					arguments.Push(value)
-				else
-					arguments.Push(argument)
-			}
-			else
-				arguments.Push(argument.substituteVariables(bindings))
-
-		goal := Struct(this.Rule.Head.Functor, arguments)
+		if (knowledgeBase.RuleEngine.TraceLevel <= kTraceMedium)
+			knowledgeBase.RuleEngine.trace(kTraceMedium, "Evaluate expression with goal " . goal.toString())
 
 		resultSet := engine.createKnowledgeBase(knowledgeBase.Facts, engine.createRules()).prove(goal)
 
 		if resultSet {
-			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, value.substituteValues(resultSet)))
+			goal.doVariables(resultSet, (var, value) => bindings.setValue(var, (value != kNotInitialized) ? value.substituteValues(resultSet) : kNotInitialized))
 
 			resultSet.dispose()
 		}

@@ -155,6 +155,10 @@ global kExecutionTestRules := "
 
 				[?Compose] => (Set: L = Object)
 				{All: [?Compose], [?L]} => (Set: ?L.prop = Yes)
+				{All: [?Compose], [?L]} => (Prove: setMethod(?L, No))
+				{All: [?Compose], [?L]} => (Prove: Set(?L.func, Maybe))
+
+				setMethod(?object, ?value) <= Set(?object.meth, ?value)
 
 				{All: [?Rules], {Prove: productions(?productions)}, {Prove: reductions(?reductions)}} =>
 						(Prove: printRules(?productions)), (Prove: printRules(?reductions))
@@ -350,8 +354,8 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(27, productions.Length, "Not all production rules compiled...")
-		this.AssertEqual(42, reductions.Length, "Not all reduction rules compiled...")
+		this.AssertEqual(29, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(43, reductions.Length, "Not all reduction rules compiled...")
 	}
 
 	Compiler_Converter_Test() {
@@ -393,8 +397,8 @@ class Compiler extends Assert {
 			}
 		})
 
-		this.AssertEqual(27, pCount, "Not all production rules converted...")
-		this.AssertEqual(42, rCount, "Not all reduction rules compiled...")
+		this.AssertEqual(29, pCount, "Not all production rules converted...")
+		this.AssertEqual(43, rCount, "Not all reduction rules compiled...")
 	}
 }
 
@@ -808,6 +812,8 @@ class HybridEngine extends Assert {
 
 			this.AssertEqual("Baz", kb.getValue("Foo.Bar.Foo"), "Unexpected function call result...")
 			this.AssertEqual("Yes", kb.getValue("Object.prop"), "Unexpected function call result...")
+			this.AssertEqual("No", kb.getValue("Object.meth"), "Unexpected function call result...")
+			this.AssertEqual("Maybe", kb.getValue("Object.func"), "Unexpected function call result...")
 
 			kb.setFact("Rules", true)
 			kb.produce()

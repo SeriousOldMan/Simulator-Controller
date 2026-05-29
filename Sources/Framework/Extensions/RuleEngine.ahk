@@ -817,6 +817,28 @@ class Variable extends Primary {
 		}
 	}
 
+	toFact(bindings) {
+		local name := this.Variable
+		local property := this.Property
+		local root := this.RootVariable
+		local value
+
+		if property
+			value := root.getValue(bindings)
+		else
+			value := (isInstance(bindings, Variables) ? this.getValue(bindings) : root.getValue(bindings))
+
+		if InStr(name, "__Unnamed")
+			name := ""
+
+		if (value = kNotInitialized)
+			return this
+		else if isInstance(value, Term)
+			return value.toString(bindings) . ((property != "") ? ("." . property) : "")
+		else
+			return value
+	}
+
 	toDescriptor(bindings := kNotInitialized) {
 		local object := super.toDescriptor(bindings)
 		local value
@@ -1539,12 +1561,15 @@ class SetFactAction extends Action {
 
 	Fact[bindings := kNotInitialized] {
 		Get {
-			local fact
+			local fact := this.iFact
 
-			if (bindings = kNotInitialized)
-				fact := this.iFact
-			else
-				fact := this.iFact.getValue(bindings)
+			if (bindings = "Raw")
+				return fact
+			else if (bindings != kNotInitialized)
+				if isInstance(fact, Variable)
+					fact := fact.toFact(bindings)
+				else
+					fact := this.iFact.getValue(bindings)
 
 			if isInstance(fact, Term)
 				if (bindings = kNotInitialized)
@@ -1558,7 +1583,7 @@ class SetFactAction extends Action {
 
 	Value[bindings := kNotInitialized] {
 		Get {
-			if (bindings = kNotInitialized)
+			if ((bindings = kNotInitialized) || (bindings = "Raw"))
 				return this.iValue
 			else
 				return this.iValue.getValue(bindings)
@@ -1572,8 +1597,8 @@ class SetFactAction extends Action {
 
 	execute(knowledgeBase, bindings) {
 		local facts := knowledgeBase.Facts
-		local fact := (isInstance(this.Fact, Variable) ? this.Fact[bindings] : this.Fact[facts])
-		local value := (isInstance(this.Value, Variable) ? this.Value[bindings] : this.Value[facts])
+		local fact := (isInstance(this.Fact["Raw"], Variable) ? this.Fact[bindings] : this.Fact[facts])
+		local value := (isInstance(this.Value["Raw"], Variable) ? this.Value[bindings] : this.Value[facts])
 
 		if isInstance(value, Term)
 			value := value.substituteValues(bindings).toString(bindings)
@@ -1627,10 +1652,13 @@ class SetComposedFactAction extends Action {
 
 	Fact[bindings := kNotInitialized] {
 		Get {
+			local fact := this.iFact
 			local result, index, component, value
 
-			if (bindings = kNotInitialized)
-				return this.iFact
+			if (bindings = "Raw")
+				return fact
+			else if (bindings = kNotInitialized)
+				result := fact
 			else {
 				result := ""
 
@@ -1638,16 +1666,17 @@ class SetComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					value := component.getValue(bindings)
+					value := (isInstance(component, Variable) ? component.toString(bindings)
+															  : component.getValue(bindings))
 
 					if isInstance(value, Term)
 						value := value.substituteValues(bindings).toString(bindings)
 
 					result .= value
 				}
-
-				return result
 			}
+
+			return result
 		}
 	}
 
@@ -1674,11 +1703,11 @@ class SetComposedFactAction extends Action {
 		local fact := ""
 		local index, component, value
 
-		for index, component in this.Fact {
+		for index, component in this.Fact["Raw"] {
 			if (index > 1)
 				fact .= "."
 
-			value := (isInstance(component, Variable) ? component.getValue(bindings) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.toFact(bindings) : component.getValue(facts))
 
 			if isInstance(value, Term)
 				value := value.substituteValues(bindings).toString(bindings)
@@ -1731,12 +1760,13 @@ class ClearFactAction extends Action {
 
 	Fact[bindings := kNotInitialized] {
 		Get {
-			local fact
+			local fact := this.iFact
 
-			if (bindings = kNotInitialized)
-				fact := this.iFact
-			else
-				fact := this.iFact.getValue(bindings)
+			if (bindings != kNotInitialized)
+				if isInstance(fact, Variable)
+					fact := fact.toFact(bindings)
+				else
+					fact := fact.getValue(bindings)
 
 			if isInstance(fact, Term)
 				if (bindings = kNotInitialized)
@@ -1789,10 +1819,13 @@ class ClearComposedFactAction extends Action {
 
 	Fact[bindings := kNotInitialized] {
 		Get {
+			local fact := this.iFact
 			local result, index, component, value
 
-			if (bindings = kNotInitialized)
-				return this.iFact
+			if (bindings = "Raw")
+				return fact
+			else if (bindings = kNotInitialized)
+				result := fact
 			else {
 				result := ""
 
@@ -1800,16 +1833,17 @@ class ClearComposedFactAction extends Action {
 					if (index > 1)
 						result .= "."
 
-					value := component.getValue(bindings)
+					value := (isInstance(component, Variable) ? component.toString(bindings)
+															  : component.getValue(bindings))
 
 					if isInstance(value, Term)
 						value := value.substituteValues(bindings).toString(bindings)
 
 					result .= value
 				}
-
-				return result
 			}
+
+			return result
 		}
 	}
 
@@ -1822,11 +1856,11 @@ class ClearComposedFactAction extends Action {
 		local fact := ""
 		local index, component, value
 
-		for index, component in this.Fact {
+		for index, component in this.Fact["Raw"] {
 			if (index > 1)
 				fact .= "."
 
-			value := (isInstance(component, Variable) ? component.getValue(bindings) : component.getValue(facts))
+			value := (isInstance(component, Variable) ? component.toFact(bindings) : component.getValue(facts))
 
 			if isInstance(value, Term)
 				value := value.toString(isInstance(component, Variable) ? bindings : facts)

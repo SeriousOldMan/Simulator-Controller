@@ -19,6 +19,7 @@
 				  
 			concat([], ?L, ?L)
 			concat([?H | ?T], ?L, [?H | ?R]) <= concat(?T, ?L, ?R)
+	- Fact names in *Set* and *Clear* actions of production rules can now also be represented by dotted variables.
     - The rule engine supports a new call method for external functions, which does not pass the special first argument to this function. Using this method which is available for [actions in production rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) and also for [predicates in reduction rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates), any global function in the host programming language can be called.
 	- External functions called by the rule engine can now return values of any type supported by the rule engine. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
 	- External functions called by the rule engiene can now actually be methods identified by a qualified name like *Singleton.Instance.myMethod*, as long as the name before the first dot identifies a valid object or class in the global name space.

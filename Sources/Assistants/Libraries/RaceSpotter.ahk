@@ -128,6 +128,7 @@ class CarInfo {
 	iRunning := false
 
 	iInPit := false
+	iInPitLap := false
 
 	iLapTimes := []
 	iSectorTimes := [[], [], []]
@@ -210,6 +211,12 @@ class CarInfo {
 	InPit {
 		Get {
 			return this.iInPit
+		}
+	}
+
+	InPitLap {
+		Get {
+			return this.iInPitLap
 		}
 	}
 
@@ -441,6 +448,9 @@ class CarInfo {
 	hasPitted(lap) {
 		local ignore, pitstop, pitstopLap
 
+		if ((lap - this.InPitLap) <= 2)
+			return true
+
 		for ignore, pitstop in this.Pitstops {
 			pitstopLap := pitstop.Lap
 
@@ -524,6 +534,9 @@ class CarInfo {
 		}
 
 		this.iInPit := inPit
+
+		if inPit
+			this.iInPitLap := lastLap
 
 		return valid
 	}

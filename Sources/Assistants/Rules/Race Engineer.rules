@@ -1309,22 +1309,23 @@ tyreMaxLaps(Wheel, FR, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound.Fr
 tyreMaxLaps(Wheel, RL, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound.RearLeft, !Tyre.Compound.Color.RearLeft, Laps.Max, ?maxLaps)
 tyreMaxLaps(Wheel, RR, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound.RearRight, !Tyre.Compound.Color.RearRight, Laps.Max, ?maxLaps)
 
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Wheel, FrontLeft, ?flWear)}, {Prove: pitstopTyreWear(Wheel, FrontRight, ?frWear)},
-	  {Is: ?difference = ?flWear - ?frWear}, {Prove: abs(?difference, ?absDifference)},
-	  [?absDifference > !Session.Settings.Tyre.Change.Wear.Axle.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: unevenTyreWear(!Session.Settings.Tyre.Service, Front)} =>
 		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, !Tyre.Compound.Target.FrontLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, !Tyre.Compound.Target.FrontRight),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Wheel, RearLeft, ?rlWear)}, {Prove: pitstopTyreWear(Wheel, RearRight, ?rrWear)},
-	  {Is: ?difference = ?rlWear - ?rrWear}, {Prove: abs(?difference, ?absDifference)},
-	  [?absDifference > !Session.Settings.Tyre.Change.Wear.Axle.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: wheelWearDifference(!Session.Settings.Tyre.Service, Rear)}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, !Tyre.Compound.Target.RearLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, !Tyre.Compound.Color.Target.RearLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.RearRight, !Tyre.Compound.Target.RearRight),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, !Tyre.Compound.Color.Target.RearRight)
+
+unevenTyreWear(Wheel, Front) <= pitstopTyreWear(Wheel, FrontLeft, ?flWear), pitstopTyreWear(Wheel, FrontRight, ?frWear),
+								?difference = ?flWear - ?frWear}, abs(?difference, ?absDifference),
+								?absDifference > !Session.Settings.Tyre.Change.Wear.Wheel.Difference
+unevenTyreWear(Wheel, Rear) <= pitstopTyreWear(Wheel, RearLeft, ?rlWear), pitstopTyreWear(Wheel, RearRight, ?rrWear),
+							   ?difference = ?rlWear - ?rrWear}, abs(?difference, ?absDifference),
+							   ?absDifference > !Session.Settings.Tyre.Change.Wear.Wheel.Difference
 
 pitstopTyreWear(Wheel, FrontLeft, 0) <= !Pitstop.Planned.Tyre.Compound.FrontLeft != false, !
 pitstopTyreWear(Axle, FrontLeft, 0) <= !Pitstop.Planned.Tyre.Compound.Front != false, !
@@ -1343,31 +1344,33 @@ pitstopTyreWear(Axle, RearRight, 0) <= !Pitstop.Planned.Tyre.Compound.Rear != fa
 pitstopTyreWear(All, RearRight, 0) <= !Pitstop.Planned.Tyre.Compound != false, !
 pitstopTyreWear(?, RearRight, ?wear) <= lapTyreWear(!Lap, FULL, RR, ?wear)
 
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Wheel, Front, ?flWear)}, {Prove: pitstopTyreWear(Wheel, Rear, ?rWear)},
-	  {Is: ?difference = ?fWear - ?rWear}, [?difference > !Session.Settings.Tyre.Change.Wear.All.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: unevenTyreWear(Axle, Front, !Session.Settings.Tyre.Service)}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.FrontLeft, !Tyre.Compound.Target.FrontLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontLeft, !Tyre.Compound.Color.Target.FrontLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.FrontRight, !Tyre.Compound.Target.FrontRight),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.FrontRight, !Tyre.Compound.Color.Target.FrontRight)
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Wheel, Front, ?flWear)}, {Prove: pitstopTyreWear(Wheel, Rear, ?rWear)},
-	  {Is: ?difference = ?rWear - ?fWear}, [?difference > !Session.Settings.Tyre.Change.Wear.All.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: unevenTyreWear(Axle, Rear, !Session.Settings.Tyre.Service)}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.RearLeft, !Tyre.Compound.Target.RearLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearLeft, !Tyre.Compound.Color.Target.RearLeft),
 		(Set: Pitstop.Planned.Tyre.Compound.RearRight, !Tyre.Compound.Target.RearRight),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.RearRight, !Tyre.Compound.Color.Target.RearRight)
 
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Axle], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Axle, Front, ?fWear)}, {Prove: pitstopTyreWear(Axle, Rear, ?rWear)},
-	  {Is: ?difference = ?fWear - ?rWear}, [?difference > !Session.Settings.Tyre.Change.Wear.All.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: unevenTyreWear(Axle, Front, !Session.Settings.Tyre.Service)}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.Front, !Tyre.Compound.Target.Front),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.Front, !Tyre.Compound.Color.Target.Front)
-{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Axle], [?Pitstop.Plan.Tyre.Change != false],
-	  {Prove: pitstopTyreWear(Axle, Front, ?fWear)}, {Prove: pitstopTyreWear(Axle, Rear, ?rWear)},
-	  {Is: ?difference = ?rWear - ?fWear}, [?difference > !Session.Settings.Tyre.Change.Wear.All.Difference]} =>
+{All: [?Pitstop.Plan], [?Pitstop.Plan.Tyre.Change != false], {Prove: unevenTyreWear(Axle, Rear, !Session.Settings.Tyre.Service)}} =>
 		(Set: Pitstop.Planned.Tyre.Compound.Rear, !Tyre.Compound.Target.Rear),
 		(Set: Pitstop.Planned.Tyre.Compound.Color.Rear, !Tyre.Compound.Color.Target.Rear)
+		
+unevenTyreWear(Axle, Front, Wheel) <= pitstopTyreWear(Wheel, Front, ?fWear), pitstopTyreWear(Wheel, Rear, ?rWear),
+									  ?difference = ?fWear - ?rWear, ?difference > !Session.Settings.Tyre.Change.Wear.Axle.Difference
+unevenTyreWear(Axle, Rear, Wheel) <= pitstopTyreWear(Wheel, Front, ?fWear), pitstopTyreWear(Wheel, Rear, ?rWear),
+									 ?difference = ?rWear - ?fWear, ?difference > !Session.Settings.Tyre.Change.Wear.Axle.Difference
+
+unevenTyreWear(Axle, Front, Axle) <= pitstopTyreWear(Axle, Front, ?fWear), pitstopTyreWear(Axle, Rear, ?rWear),
+									 ?difference = ?fWear - ?rWear}, ?difference > !Session.Settings.Tyre.Change.Wear.Axle.Difference
+unevenTyreWear(Axle, Rear, Axle) <= pitstopTyreWear(Axle, Front, ?fWear), pitstopTyreWear(Axle, Rear, ?rWear),
+									?difference = ?rWear - ?fWear}, ?difference > !Session.Settings.Tyre.Change.Wear.Axle.Difference
 
 pitstopTyreWear(?service, Front, ?wear) <= pitstopTyreWear(?service, FrontLeft, ?flWear),
 										   pitstopTyreWear(?service, FrontRight, ?frWear), max(?flWear, ?frWear, ?wear)

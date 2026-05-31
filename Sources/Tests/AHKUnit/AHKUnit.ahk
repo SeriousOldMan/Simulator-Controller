@@ -465,8 +465,13 @@ class AhkUnit_Runner {
 					testInstance.Assert_(assertion, "", caller)
 				} else {
 					this._AddFailure("Exception thrown in " . key)
-					try
-						this._AddFailure("Message: " . e.Message)
+
+					if isObject(e) {
+						try
+							this._AddFailure("Message: " . e.Message)
+					}
+					else
+						this._AddFailure("Message: " . e)
 					continue
 				}
 			}

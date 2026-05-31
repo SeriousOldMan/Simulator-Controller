@@ -512,13 +512,19 @@ The following statistical models are currently implemented:
 	   - When deciding to change a tyre based on the expected tyre wear, Jona uses [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) of the "Session Database" to determine the maximum allowed tyre wear for a given tyre.
 	   - When *Laps* has been chosen for the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings), tyres will be changed depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the [race rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-rules) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings).
 	   - If individual tyres can be changed in the simulation, and of course, if tyre wear information is available in the API, Jona will try to prevent very uneven tyre wear situations on the same axle and between the axles of the car, because this typically will unsettle the car. There are two additional settings available in the ["Session Database"]"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings), that can be used to specify the maximum tyre wear difference.
+	   
 	     - Max. tyre wear difference per axle
 		 
 		   If at least one tyre must be changed at the pitstop, this setting specifies the maximum allowed tyre wear difference for tyres on the same axle. If the wear difference will exceed the given value, the second tyre will be changed as well.
 		 - Max. tyre wear difference (front/rear)
 		 
 		   If at least one tyre must be changed at the pitstop, this setting specifies the maximum allowed tyre wear difference for tyres between the front and rear axles. If the wear difference will exceed the given value, the tyres on the other axle will be changed as well.
+		   
+	   In a first step, Jona makes sure, that the tyre wear difference between the tyres on an axle is not more than the specified max value. After that, the difference between the axles is leveled out. In both steps, Jona may decide to swap additional tyres.
+	   
 	   The default value for both settings is 30% max. wear difference, but this can be changed for every car / track combination as with every setting in the "Session Database".
+	   
+	   Good to know: If you don't want all this, set the max. difference for both settings to 100%.
 
   3. Tyre pressure development
   

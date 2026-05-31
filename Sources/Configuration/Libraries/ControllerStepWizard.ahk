@@ -1484,9 +1484,9 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			function := [function]
 		else {
 			if (actionDescriptor[2] == "Toggle")
-				buttons := translateMsgDlgButtons.Bind(["On/Off", "Off", "Cancel"])
+				buttons := ["On/Off", "Off", "Cancel"]
 			else
-				buttons := translateMsgDlgButtons.Bind(["Increase", "Decrease", "Cancel"])
+				buttons := ["Increase", "Decrease", "Cancel"]
 
 			msgResult := withBlockedWindows(MsgDlg, translate("Trigger for ") . action . translate("?")
 												  , translate("Trigger")

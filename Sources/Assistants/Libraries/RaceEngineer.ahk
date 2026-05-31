@@ -2765,6 +2765,8 @@ class RaceEngineer extends RaceAssistant {
 									  , "Session.Settings.Damage.Engine.Repair", engineRepair
 									  , "Session.Settings.Damage.Engine.Repair.Threshold", engineThreshold
 									  , "Session.Settings.Tyre.Change", getMultiMapValue(settings, "Session Settings", "Tyre.Change", "Wear")
+									  , "Session.Settings.Tyre.Change.Wear.Wheel.Difference", getMultiMapValue(settings, "Session Settings", "Tyre.Change.Wear.Wheel.Difference", 30)
+									  , "Session.Settings.Tyre.Change.Wear.Axle.Difference", getMultiMapValue(settings, "Session Settings", "Tyre.Change.Wear.Axle.Difference", 30)
 									  , "Session.Settings.Tyre.Compound.Change", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																											, "Tyre.Compound.Change", "Never")
 									  , "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"

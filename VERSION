@@ -1,9 +1,9 @@
 [Development]
 Version=6.9.9.0-dev
 Target=6.9.9.0-release
-Date=05/30/2026
+Date=05/31/2026
 Download=
-Changes=Spotter does not announce a problem for pitted cars anymore
+Changes=Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.8.0-release

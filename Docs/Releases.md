@@ -35,6 +35,7 @@
 
 #### Fixes
 
+  - Fixed a critical bug in the community database synchronization process, which was broken since two releases.
   - Fixed some translations in the session settings for Chinese.
   - Fixed a bug, that caused the Spotter to inform about a potential problem of an opponent who actually pitted in the last lap.
   - Fixed the background color to be transparent for the icons in the new modal dialogs introduced with Release 6.9.4.

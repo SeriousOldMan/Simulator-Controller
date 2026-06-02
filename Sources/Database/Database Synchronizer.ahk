@@ -544,13 +544,10 @@ updateSessionDatabase() {
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
 		useTelemetries := (inList(A_Args, "-Telemetries") != 0)
 
-		/*
 		id := inList(A_Args, "-ID")
 
 		if id
 			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
-		*/
-		PeriodicTask(synchronizeCommunityDatabase.Bind("42812.9640.8993", true, true, true, true), 2000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 
@@ -573,7 +570,7 @@ updateSessionDatabase() {
 		logError(exception, true)
 
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Database Synchronizer"}), translate("Error"), 262160)
-		
+
 		ExitApp(1)
 	}
 }

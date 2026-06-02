@@ -61,6 +61,7 @@ class DatabaseCreator {
 	iTargetDirectory := false
 
 	iIncludePressures := false
+	iIncludeWears := false
 	iIncludeStrategies := false
 	iIncludeTelemetries := false
 	iIncludeSetups := false
@@ -82,6 +83,12 @@ class DatabaseCreator {
 	IncludePressures {
 		Get {
 			return this.iIncludePressures
+		}
+	}
+
+	IncludeWears {
+		Get {
+			return this.iIncludeWears
 		}
 	}
 
@@ -109,10 +116,11 @@ class DatabaseCreator {
 		}
 	}
 
-	__New(sourceDirectory, targetDirectory, includePressures, includeSetups, includeStrategies, includeTelemetries) {
+	__New(sourceDirectory, targetDirectory, includePressures, includeWears, includeSetups, includeStrategies, includeTelemetries) {
 		this.iSourceDirectory := sourceDirectory
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
+		this.iIncludeWears := includeWears
 		this.iIncludeSetups := includeSetups
 		this.iIncludeStrategies := includeStrategies
 		this.iIncludeTelemetries := includeTelemetries
@@ -171,6 +179,9 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, Database(directory, kTyresSchemas))
 
+								if FileExist(directory . "Tyres.Wears.CSV")
+									this.loadWears(simulator, car, track, Database(directory, kTyresSchemas))
+
 								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.telemetry"
 									this.loadLapTelemetry(simulator, car, track, A_LoopFilePath)
 
@@ -212,6 +223,30 @@ class DatabaseCreator {
 												, row["Temperature.Air"], row["Temperature.Track"]
 												, compound, color, row["Type"], row["Tyre"]
 												, row["Pressure"], row["Count"], false, true, "Community", kNull)
+			}
+
+			this.TyresDatabase.flush()
+		}
+	}
+
+	loadWears(simulator, car, track, database) {
+		if this.IncludeWears {
+			updateProgress("Wears: " simulator . A_Space . car . A_Space . track . "...")
+
+			for ignore, row in database.Tables["Tyres.Wears"] {
+				compound := row["Compound"]
+				color := row["Compound.Color"]
+
+				if ((compound = kNull) || !compound || (StrLen(compound) = 0))
+					compound := "Dry"
+
+				if ((color = kNull) || !color || (StrLen(color) = 0))
+					color := "Black"
+
+				this.TyresDatabase.updateWear(simulator, car, track, row["Weather"]
+											, row["Temperature.Air"], row["Temperature.Track"]
+											, compound, color, row["Tyre"]
+											, row["Tyre.Laps"], row["Tyre.Wear"], false, true, "Community", kNull)
 			}
 
 			this.TyresDatabase.flush()
@@ -411,20 +446,25 @@ createDatabases(inputDirectory, outputDirectory) {
 
 	updateProgress("Processing [Pressures]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Pressures\", true, false, false, false).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Pressures\", true, false, false, false, false).createDatabase()
+
+	updateProgress("Processing [Wears]...")
+
+	DatabaseCreator(inputDirectory, outputDirectory . "Wears\", false, true, false, false, false).createDatabase()
 
 	updateProgress("Processing [Setups]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Setups\", false, true, false, false).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Setups\", false, false, true, false, false).createDatabase()
 
 	updateProgress("Processing [Strategies]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Strategies\", false, false, true, false).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Strategies\", false, false, false, true, false).createDatabase()
 
 	updateProgress("Processing [Telemetries]...")
 
-	DatabaseCreator(inputDirectory, outputDirectory . "Telemetries\", false, false, false, true).createDatabase()
+	DatabaseCreator(inputDirectory, outputDirectory . "Telemetries\", false, false, false, false, true).createDatabase()
 
+	/*
 	for strategiesLabel, strategiesEnabled in Map("Strategies", true, "No Strategies", false)
 		for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
 			for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
@@ -541,6 +581,32 @@ createDatabases(inputDirectory, outputDirectory) {
 				if FileExist(database . ".zip")
 					archives.Push(database . ".zip")
 			}
+	*/
+
+	for ignore, type in ["Pressures", "Wears", "Setups", "Strategies", "Telemetries"] {
+		updateProgress("Assembling [" . type . "]...")
+
+		database := (outputDirectory . type . "." . version1 . "." . version2)
+
+		if FileExist(outputDirectory . type)
+			DirCopy(outputDirectory . type, database, 1)
+
+		currentDir := A_WorkingDir
+
+		SetWorkingDir(database)
+
+		try {
+			RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
+
+			; RunWait("tar -a -c -f `"" . database . ".zip" . "`" Community", , "Hide")
+		}
+		finally {
+			SetWorkingDir(currentDir)
+		}
+
+		if FileExist(database . ".zip")
+			archives.Push(database . ".zip")
+	}
 
 	return archives
 }

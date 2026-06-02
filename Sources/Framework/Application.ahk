@@ -216,6 +216,9 @@ startDatabaseSynchronizer() {
 
 				options := ("-ID `"" . ID . "`" -Synchronize " . true)
 
+				if (getMultiMapValue(consent, "Consent", "Share Tyre Wears", "No") = "Yes")
+					options .= " -Wears"
+
 				if (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 					options .= " -Pressures"
 

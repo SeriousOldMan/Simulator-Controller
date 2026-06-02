@@ -54,7 +54,7 @@ global gSynchronizing := false
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploadTelemetries) {
+uploadSessionDatabase(id, uploadPressures, uploadWears, uploadSetups, uploadStrategies, uploadTelemetries) {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
@@ -63,8 +63,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	local configuration := newMultiMap()
 	local step := 20
 	local simulator, car, track, distFile
-	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
-	local name, extension, files, info, newInfo, sType
+	local directory, sourceDB, ignore, type, row, compound, compoundColor, weather, tyreCompound
+	local name, extension, files, info, newInfo, sType, lapsDB
 
 	updateState() {
 		if (++step > 20) {
@@ -128,7 +128,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 									if FileExist(directory . "Tyres.Pressures.Distribution.CSV") {
 										sourceDB := Database(directory, kTyresSchemas)
 
-										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID} }) {
+										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID}}) {
 											updateState()
 
 											compound := row["Compound"]
@@ -150,6 +150,31 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 
 										targetDB.flush()
 									}
+								}
+
+								if uploadWears {
+									lapsDB := LapsDatabase(simulator, car, track)
+
+									for ignore, weather in kWeatherConditions
+										for ignore, tyreCompound in SessionDatabase.getTyreCompounds(simulator, car, track) {
+											splitCompound(tyreCompound, &compound, &compoundColor)
+
+											for ignore, wear in lapsDB.getTyreCompoundWears(weather, compound, compoundColor
+																						  , ["Front.Left", "Front.Right"
+																						   , "Rear.Left", "Rear.Right"]
+																						  , sessionDB.ID) {
+												targetDB.updateWear(simulator, car, track, weather
+																  , wear["Temperature.Air"], wear["Temperature.Track"]
+																  , compound, compoundColor
+																  , wear["Tyre"], wear["Tyre.Laps"], wear["Tyre.Wear"]
+																  , false, true, "Community")
+
+												Sleep(1)
+
+											}
+										}
+
+									targetDB.flush()
 								}
 
 								if uploadSetups {
@@ -367,11 +392,12 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies, uploa
 	}
 }
 
-downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies, downloadTelemetries) {
+downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, downloadStrategies, downloadTelemetries) {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 	local sessionDBPath := SessionDatabase.DatabasePath
-	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
+	local downloadTimeStamp := (sessionDBPath . "DOWNLOAD")
 	local configuration := newMultiMap()
+	local types := []
 	local ignore, fileName, type, databaseDirectory
 
 	if FileExist(downloadTimeStamp)
@@ -407,8 +433,12 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
-			if (type = (downloadPressures . downloadSetups . downloadStrategies . downloadTelemetries)) {
+			if ((downloadPressures && (type = "Pressures")) || (downloadWears && (type = "Wears"))
+			 || (downloadSetups && (type = "Setups")) || (downloadStrategies && (type = "Strategies"))
+			 || (downloadTelemetries && (type = "Telemetries")))
 				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
+					types.Push(type)
+
 					; ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					ftpDownload(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads/" . fileName, kTempDirectory . fileName)
@@ -416,35 +446,35 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 					updateState()
 
 					try {
-						DirCreate(kTempDirectory . "Shared Database")
+						DirCreate(kTempDirectory . "Shared Database\" . type)
 
-						expand(kTempDirectory . fileName, kTempDirectory . "Shared Database")
+						expand(kTempDirectory . fileName, kTempDirectory . "Shared Database\" . type)
 					}
 					catch Any as exception {
 						logError(exception)
 					}
 
 					updateState()
-
-					deleteFile(kTempDirectory . fileName)
-					deleteDirectory(sessionDBPath . "Community")
-
-					try {
-						if FileExist(kTempDirectory . "Shared Database\" . databaseDirectory . "\Community")
-							DirMove(kTempDirectory . "Shared Database\" . databaseDirectory . "\Community", sessionDBPath . "Community", "R")
-						else if FileExist(kTempDirectory . "Shared Database\Community")
-							DirMove(kTempDirectory . "Shared Database\Community", sessionDBPath . "Community", "R")
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-
-					SessionDatabase.DatabaseVersion := databaseDirectory
-
-					break
 				}
-			}
 		}
+
+		deleteFile(kTempDirectory . fileName)
+		deleteDirectory(sessionDBPath . "Community")
+
+		for ignore, type in types
+			try {
+				if FileExist(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community")
+					DirCopy(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community", sessionDBPath . "Community")
+				else if FileExist(kTempDirectory . "Shared Database\" . type . "\Community")
+					DirCopy(kTempDirectory . "Shared Database\" . type . "\Community", sessionDBPath . "Community")
+
+				updateState()
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+		SessionDatabase.DatabaseVersion := databaseDirectory
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "DOWNLOAD")
@@ -467,7 +497,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 	}
 }
 
-synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTelemetries) {
+synchronizeCommunityDatabase(id, usePressures, useWears, useSetups, useStrategies, useTelemetries) {
 	global gSynchronizing
 
 	local oldCritical := Task.Critical
@@ -483,9 +513,9 @@ synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies, useTele
 
 	try {
 		if !FileExist(SessionDatabase().DatabasePath . "NOUPLOAD")
-			uploadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
+			uploadSessionDatabase(id, usePressures, useWears, useSetups, useStrategies, useTelemetries)
 
-		downloadSessionDatabase(id, usePressures, useSetups, useStrategies, useTelemetries)
+		downloadSessionDatabase(id, usePressures, useWears, useSetups, useStrategies, useTelemetries)
 	}
 	finally {
 		Task.Critical := oldCritical
@@ -531,7 +561,7 @@ synchronizeSessionDatabase(minutes) {
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, useStrategies, useTelemetries, id, minutes
+	local usePressures, useWears, useSetups, useStrategies, useTelemetries, id, minutes
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Database Synchronizer"
@@ -540,17 +570,17 @@ updateSessionDatabase() {
 		startupProcess()
 
 		usePressures := (inList(A_Args, "-Pressures") != 0)
+		useWears := (inList(A_Args, "-Wears") != 0)
 		useSetups := (inList(A_Args, "-Setups") != 0)
 		useStrategies := (inList(A_Args, "-Strategies") != 0)
 		useTelemetries := (inList(A_Args, "-Telemetries") != 0)
 
-		/*
 		id := inList(A_Args, "-ID")
 
 		if id
-			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
-		*/
-		PeriodicTask(synchronizeCommunityDatabase.Bind("42812.9640.8993", true, true, true, true), 2000, kLowPriority).start()
+			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useWears, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
+
+		; PeriodicTask(synchronizeCommunityDatabase.Bind("42812.9640.8993", true, true, true, true), 2000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 
@@ -573,7 +603,7 @@ updateSessionDatabase() {
 		logError(exception, true)
 
 		withBlockedWindows(MsgDlg, substituteVariables(translate("Cannot start %application% due to an internal error..."), {application: "Database Synchronizer"}), translate("Error"), 262160)
-		
+
 		ExitApp(1)
 	}
 }

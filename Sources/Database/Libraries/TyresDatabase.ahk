@@ -390,16 +390,27 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
-				, compound, compoundColor, maxWear := 75, default := false, driver := false) {
+				, compound, compoundColor, maxWear := 75, default := false
+				, community := kUndefined, driver := false) {
 		local lastLap := 0
 		local tyreWears := []
-		local wears, ignore, wear, lapWear, lastWear
+		local wears, ignore, wear, lapWear, lastWear, db
 
 		if !driver
 			driver := this.ID
 
 		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
 																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
+
+		if (((community == kUndefined) && SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
+																			, "Session Settings", "Tyre.Wear.Community", false))
+		 || (community && (community != kUndefined))) {
+			db := this.requireDatabase(simulator, car, track, "Community")
+
+			wears := concatenate(wears, db.query({Select: ["Tyre.Laps", "Tyre.Wear"]
+												, Where: Map("Driver", driver, "Weather", weather
+														   , "Compound", compound, "Compound.Color", compoundColor)}))
+		}
 
 		try {
 			for ignore, wear in bubbleSort(&wears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
@@ -604,9 +615,9 @@ class TyresDatabase extends SessionDatabase {
 			}
 	}
 
-	updateWears(simulator, car, track, weather, airTemperature, trackTemperature
-			  , compound, compoundColor, tyre, laps, wear
-			  , flush := true, require := true, scope := "User", driver := false, retry := 100) {
+	updateWear(simulator, car, track, weather, airTemperature, trackTemperature
+			 , compound, compoundColor, tyre, laps, wear
+			 , flush := true, require := true, scope := "User", driver := false, retry := 100) {
 		local db, rows, row
 
 		if (isNull(valueOrNull(wear)))
@@ -624,52 +635,43 @@ class TyresDatabase extends SessionDatabase {
 		else
 			db := this.iDatabase
 
-		try {
-			rows := db.query("Tyres.Wears"
-						   , {Where: Map("Driver", driver, "Weather", weather
-									   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-									   , "Compound", compound, "Compound.Color", compoundColor
-									   , "Tyre", tyre, "Tyre.Laps", laps)})
+		rows := db.query("Tyres.Wears"
+					   , {Where: Map("Driver", driver, "Weather", weather
+								   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								   , "Compound", compound, "Compound.Color", compoundColor
+								   , "Tyre", tyre, "Tyre.Laps", laps)})
 
-			if (rows.Length > 0) {
-				row := rows[1]
+		if (rows.Length > 0) {
+			row := rows[1]
 
-				row["Tyre.Wear"] := Round(((row["Tyre.Wear"] * row["Count"]) + wear) / (row["Count"] + 1), 4)
-				row["Count"] := (row["Count"] + 1)
-				row["Synchronized"] := kNull
+			row["Tyre.Wear"] := Round(((row["Tyre.Wear"] * row["Count"]) + wear) / (row["Count"] + 1), 4)
+			row["Count"] := (row["Count"] + 1)
+			row["Synchronized"] := kNull
 
-				if flush {
-					if (this.Shared && (scope = "User"))
-						this.unlock()
-					else
-						this.flush()
-				}
-				else
-					db.changed("Tyres.Wears")
-			}
-			else
-				try {
-					db.add("Tyres.Wears"
-						 , Database.Row("Driver", driver, "Weather", weather
-									  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-									  , "Compound", compound, "Compound.Color", compoundColor
-									  , "Tyre", tyre, "Tyre.Laps", laps, "Count", 1, "Tyre.Wear", Round(wear, 4))
-						 , false, retry)
-				}
-				catch Any as exception {
-					if retry
-						logError(exception, true)
-					else
-						throw exception
-				}
-		}
-		finally {
-			if flush
-				if this.Shared
+			if flush {
+				if (this.Shared && (scope = "User"))
 					this.unlock()
 				else
 					this.flush()
+			}
+			else
+				db.changed("Tyres.Wears")
 		}
+		else
+			try {
+				db.add("Tyres.Wears"
+					 , Database.Row("Driver", driver, "Weather", weather
+								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								  , "Compound", compound, "Compound.Color", compoundColor
+								  , "Tyre", tyre, "Tyre.Laps", laps, "Count", 1, "Tyre.Wear", Round(wear, 4))
+					 , false, retry)
+			}
+			catch Any as exception {
+				if retry
+					logError(exception, true)
+				else
+					throw exception
+			}
 	}
 
 	flush() {

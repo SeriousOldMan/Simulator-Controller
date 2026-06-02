@@ -26,15 +26,21 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTyresSchemas := CaseInsenseMap("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+global kTyresSchemas := CaseInsenseMap("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track"
+														 , "Compound", "Compound.Color"
 														 , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 														 , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 														 , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
 														 , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
 														 , "Identifier", "Synchronized"]
-									 , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+									 , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track"
+																	  , "Compound", "Compound.Color"
 																	  , "Type", "Tyre", "Pressure", "Count", "Driver"
-																	  , "Identifier", "Synchronized"])
+																	  , "Identifier", "Synchronized"]
+									 , "Tyres.Wears", ["Weather", "Temperature.Air", "Temperature.Track"
+													 , "Compound", "Compound.Color"
+													 , "Count", "Tyre", "Tyre.Laps", "Tyre.Wear", "Driver"
+													 , "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -471,7 +477,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false, retry := 100) {
+				  , compound, compoundColor, coldPressures, hotPressures
+				  , flush := true, driver := false, retry := 100) {
 		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure, compounds, compoundColors
 
 		if !driver
@@ -538,7 +545,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false, retry := 100) {
+				 , type, tyre, pressure, count := 1
+				 , flush := true, require := true, scope := "User", driver := false, retry := 100) {
 		local db, rows, row
 
 		if (isNull(valueOrNull(pressure)))
@@ -594,6 +602,74 @@ class TyresDatabase extends SessionDatabase {
 				else
 					throw exception
 			}
+	}
+
+	updateWears(simulator, car, track, weather, airTemperature, trackTemperature
+			  , compound, compoundColor, tyre, laps, wear
+			  , flush := true, require := true, scope := "User", driver := false, retry := 100) {
+		local db, rows, row
+
+		if (isNull(valueOrNull(wear)))
+			return
+
+		if !driver
+			driver := this.ID
+
+		if (!compoundColor || (compoundColor = ""))
+			compoundColor := "Black"
+
+		if require
+			db := ((this.Shared && flush && (scope = "User")) ? this.lock(simulator, car, track)
+															  : this.requireDatabase(simulator, car, track, scope))
+		else
+			db := this.iDatabase
+
+		try {
+			rows := db.query("Tyres.Wears"
+						   , {Where: Map("Driver", driver, "Weather", weather
+									   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+									   , "Compound", compound, "Compound.Color", compoundColor
+									   , "Tyre", tyre, "Tyre.Laps", laps)})
+
+			if (rows.Length > 0) {
+				row := rows[1]
+
+				row["Tyre.Wear"] := Round(((row["Tyre.Wear"] * row["Count"]) + wear) / (row["Count"] + 1), 4)
+				row["Count"] := (row["Count"] + 1)
+				row["Synchronized"] := kNull
+
+				if flush {
+					if (this.Shared && (scope = "User"))
+						this.unlock()
+					else
+						this.flush()
+				}
+				else
+					db.changed("Tyres.Wears")
+			}
+			else
+				try {
+					db.add("Tyres.Wears"
+						 , Database.Row("Driver", driver, "Weather", weather
+									  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+									  , "Compound", compound, "Compound.Color", compoundColor
+									  , "Tyre", tyre, "Tyre.Laps", laps, "Count", 1, "Tyre.Wear", Round(wear, 4))
+						 , false, retry)
+				}
+				catch Any as exception {
+					if retry
+						logError(exception, true)
+					else
+						throw exception
+				}
+		}
+		finally {
+			if flush
+				if this.Shared
+					this.unlock()
+				else
+					this.flush()
+		}
 	}
 
 	flush() {

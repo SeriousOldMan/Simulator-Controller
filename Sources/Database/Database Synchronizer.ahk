@@ -580,7 +580,7 @@ updateSessionDatabase() {
 		if id
 			PeriodicTask(synchronizeCommunityDatabase.Bind(A_Args[id + 1], usePressures, useWears, useSetups, useStrategies, useTelemetries), 2000, kLowPriority).start()
 
-		; PeriodicTask(synchronizeCommunityDatabase.Bind("42812.9640.8993", true, true, true, true), 2000, kLowPriority).start()
+		; PeriodicTask(synchronizeCommunityDatabase.Bind(FileRead(kUserConfigDirectory . "ID"), true, true, true, true, true), 2000, kLowPriority).start()
 
 		minutes := inList(A_Args, "-Synchronize")
 

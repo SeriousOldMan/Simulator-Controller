@@ -286,36 +286,36 @@ class LapsDatabase extends SessionDatabase {
 			for ignore, tyre in tyres {
 				if (tyreCompound.Length = 1) {
 					if ((tyreCompound[1] = compound) && (tyreCompoundColor[1] = compoundColor))
-						if isNumber(wear["Tyre.Wear." . tyre])
+						if (isNumber(wear["Tyre.Wear." . tyre]) && (wear["Tyre.Wear." . tyre] > 0))
 							tyreWears.Push(Database.Row("Temperature.Air", wear["Temperature.Air"]
-														"Temperature.Track", wear["Temperature.Track"]
-														"Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
+													  , "Temperature.Track", wear["Temperature.Track"]
+													  , "Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
 																	, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
 				}
 				else if (tyreCompound.Length = 2) {
 					if (tyreIndex[tyre] <= 2) {
 						if ((tyreCompound[1] = compound) && (tyreCompoundColor[1] = compoundColor))
-							if isNumber(wear["Tyre.Wear." . tyre])
+							if (isNumber(wear["Tyre.Wear." . tyre]) && (wear["Tyre.Wear." . tyre] > 0))
 								tyreWears.Push(Database.Row("Temperature.Air", wear["Temperature.Air"]
-															"Temperature.Track", wear["Temperature.Track"]
-															"Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
+														  , "Temperature.Track", wear["Temperature.Track"]
+														  , "Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
 																		, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
 					}
 					else {
 						if ((tyreCompound[2] = compound) && (tyreCompoundColor[2] = compoundColor))
-							if isNumber(wear["Tyre.Wear." . tyre])
+							if (isNumber(wear["Tyre.Wear." . tyre]) && (wear["Tyre.Wear." . tyre] > 0))
 								tyreWears.Push(Database.Row("Temperature.Air", wear["Temperature.Air"]
-															"Temperature.Track", wear["Temperature.Track"]
-															"Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
+														  , "Temperature.Track", wear["Temperature.Track"]
+														  , "Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
 																		, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
 					}
 				}
 				else if (tyreCompound.Length = 4)
 					if ((tyreCompound[tyreIndex[tyre]] = compound) && (tyreCompoundColor[tyreIndex[tyre]] = compoundColor))
-						if isNumber(wear["Tyre.Wear." . tyre])
+						if (isNumber(wear["Tyre.Wear." . tyre]) && (wear["Tyre.Wear." . tyre] > 0))
 							tyreWears.Push(Database.Row("Temperature.Air", wear["Temperature.Air"]
-														"Temperature.Track", wear["Temperature.Track"]
-														"Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
+													  , "Temperature.Track", wear["Temperature.Track"]
+													  , "Tyre", tyre, "Tyre.Laps", tyreLaps[tyreIndex[tyre]]
 																	, "Tyre.Wear", wear["Tyre.Wear." . tyre]))
 			}
 		}

@@ -1775,6 +1775,10 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV700() {
+	deleteFile(kDatabaseDirectory . "UPLOAD")
+}
+
 updateConfigurationForV688() {
 	local text
 

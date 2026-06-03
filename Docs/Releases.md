@@ -37,6 +37,7 @@
 
   - Fixed a critical bug in the community database synchronization process, which was broken since two releases.
   - Fixed a critical bug for *iRacing*, which prevented some of the pitstop settings (for example tyre pressure) to be changed correctly from a controller or by voice command.
+  - Fixed a bug for *RaceRoom Racing Experience*, which caused the readout of the current selection of pitstop settings to fail sometimes.
   - Fixed some translations in the session settings for Chinese.
   - Fixed a bug, that caused the Spotter to inform about a potential problem of an opponent who actually pitted in the last lap.
   - Fixed the background color to be transparent for the icons in the new modal dialogs introduced with Release 6.9.4.

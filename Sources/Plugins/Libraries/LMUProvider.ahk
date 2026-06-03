@@ -108,17 +108,6 @@ class LMUProvider extends Sector397Provider {
 		SimulatorProvider.registerSimulatorProvider("LMU", LMUProvider)
 	}
 
-	static getOptions(type, protocol, options := false) {
-		options := super.getOptions(type, protocol, options)
-
-		/*
-		if (LMUProvider.kAPIType = "LMU")
-			options := concatenate(["LMU=" . Application(this.Simulator).getProcessID()], options)
-		*/
-
-		return options
-	}
-
 	supportsPitstop(&refuelService?, &tyreService?, &brakeService?, &repairService?) {
 		refuelService := true
 		tyreService := "Wheel"

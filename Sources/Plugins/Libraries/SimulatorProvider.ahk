@@ -194,7 +194,7 @@ class SimulatorProvider {
 
 	static getOptions(type, protocol, options := []) {
 		if !isObject(options)
-			options := string2Values(InStr(options, ",") ? "," : A_Space, options)
+			options := string2Values(",", options)
 
 		if protocol.HasProp("Options") {
 			if options

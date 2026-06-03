@@ -29,7 +29,7 @@
 
 # Upcoming release
 
-## 6.9.9.0
+## 6.9.9.0 (planned)
 
 #### Date: 06/05/26
 

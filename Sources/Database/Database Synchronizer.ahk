@@ -464,9 +464,9 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 		for ignore, type in types
 			try {
 				if FileExist(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community")
-					DirCopy(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community", sessionDBPath . "Community")
+					DirCopy(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community", sessionDBPath . "Community", 1)
 				else if FileExist(kTempDirectory . "Shared Database\" . type . "\Community")
-					DirCopy(kTempDirectory . "Shared Database\" . type . "\Community", sessionDBPath . "Community")
+					DirCopy(kTempDirectory . "Shared Database\" . type . "\Community", sessionDBPath . "Community", 1)
 
 				updateState()
 			}

@@ -29,7 +29,35 @@
 
 # Upcoming release
 
-Not yet planned...
+## 6.9.9.0
+
+#### Date: 06/05/26
+
+#### Fixes
+
+  - Fixed a critical bug in the community database synchronization process, which was broken since two releases.
+  - Fixed a critical bug for *iRacing*, which prevented some of the pitstop settings (for example tyre pressure) to be changed correctly from a controller or by voice command.
+  - Fixed a bug for *RaceRoom Racing Experience*, which caused the readout of the current selection of pitstop settings to fail sometimes.
+  - Fixed some translations in the session settings for Chinese.
+  - Fixed a bug, that caused the Spotter to inform about a potential problem of an opponent who actually pitted in the last lap.
+  - Fixed the background color to be transparent for the icons in the new modal dialogs introduced with Release 6.9.4.
+  
+#### Changes
+
+  - Pitstops of all cars are no longer registered during the first few laps for two reasons:
+    1. Some sims report a car being in the pit during the initial grid formation, if that car has not entered the grid formation yet.
+	2. A car which pits so early (for examople for repairs), will have no benefit later in the race at all. So the pitstop does not count for strategy decisions.
+  - The Engineer will now avoid tyre configurations with a too high difference in tyre wear, when only some of the tyres have to be swapped at a pitstop.
+	- Two new settings "Max. tyre wear difference (axle)" and "Max. tyre wear difference (front/rear)" have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings), which let you specify the maximum imbalance in tyre wear you are willing to accept (with a default of 30%).
+    - See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
+  - [Developer] The support for using composite variables in the different rule types has been extended. Here are some examples:
+
+		[?Compose] => (Set: L = Object)
+		{All: [?Compose], [?L]} => (Set: ?L.prop1 = Yes)
+		{All: [?Compose], [?L]} => (Prove: setProp2(?L, No))
+		{All: [?Compose], [?L]} => (Prove: Set(?L.prop3, Maybe))
+
+		setProp2(?object, ?value) <= Set(?object.prop2, ?value)
 
 # Release history
 

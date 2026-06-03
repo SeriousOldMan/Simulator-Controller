@@ -4966,35 +4966,36 @@ class GridRaceAssistant extends RaceAssistant {
 	updatePitstops(lap, data) {
 		local carID, delta, pitstops, pitstop
 
-		if !this.iLastPitstopUpdate {
-			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
+		if (lap > this.LearningLaps) {
+			if !this.iLastPitstopUpdate {
+				this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
 
-			delta := 0
-		}
-		else {
-			delta := (this.iLastPitstopUpdate - Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
-
-			this.iLastPitstopUpdate -= delta
-		}
-
-		loop getMultiMapValue(data, "Position Data", "Car.Count", 0) {
-			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitLane", false)
-			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
-
-				pitstops := this.Pitstops[carID]
-
-				if (pitstops.Length = 0)
-					pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
-				else {
-					pitstop := pitstops[pitstops.Length]
-
-					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
-						pitstop.Duration := (pitstop.Duration + delta)
-					else
-						pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
-				}
+				delta := 0
 			}
+			else {
+				delta := (this.iLastPitstopUpdate - Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+
+				this.iLastPitstopUpdate -= delta
+			}
+
+			loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
+				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitLane", false)
+				 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
+					carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
+
+					pitstops := this.Pitstops[carID]
+
+					if (pitstops.Length = 0)
+						pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
+					else {
+						pitstop := pitstops[pitstops.Length]
+
+						if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
+							pitstop.Duration := (pitstop.Duration + delta)
+						else
+							pitstops.Push(GridRaceAssistant.Pitstop(carID, this.iLastPitstopUpdate, lap))
+					}
+				}
 		}
 	}
 

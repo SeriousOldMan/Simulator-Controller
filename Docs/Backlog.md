@@ -16,11 +16,17 @@
   3. Configurable priority for voice output between Spotter and other Assistants
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
+  6. Engineer can decide based on remaining laps and usable tyre laps to switch to a different tyre compound
+  
+#### Session Database
+
+  1. Share Laps (compressed) in the community database.
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
   3. Engineer's Diary with change history, lap times after change, notes and so on
+  4. Support for *Asseto Corsa EVO* setup files
   
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[6.9.9.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bnHH8iVe/Releases/Simulator%20Controller%206.9.9.0-beta.zip) (Test build for 6.9.9. Changes: Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#6990) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-699) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

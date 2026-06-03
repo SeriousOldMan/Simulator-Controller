@@ -1,9 +1,9 @@
 [Development]
-Version=6.9.9.0-dev
+Version=6.9.9.0-beta
 Target=6.9.9.0-release
-Date=06/01/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/rfDvQQmM/Releases/Simulator%20Controller%206.9.9.0-dev.zip
-Changes=Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered
+Date=06/03/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/bnHH8iVe/Releases/Simulator%20Controller%206.9.9.0-beta.zip
+Changes=Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.8.0-release
@@ -24,5 +24,5 @@ Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.9.9.0-dev
+Development=6.9.9.0-beta
 Release=6.9.8.0-release

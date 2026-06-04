@@ -21,6 +21,7 @@
   - The Engineer will now avoid tyre configurations with a too high difference in tyre wear, when only some of the tyres have to be swapped at a pitstop.
 	- Two new settings "Max. tyre wear difference (axle)" and "Max. tyre wear difference (front/rear)" have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings), which let you specify the maximum imbalance in tyre wear you are willing to accept (with a default of 30%).
     - See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
+  - Added the new car "ADESS AD25" for *Le Mans Ultimate*. Support for "Setup Workbench" will follow with the next release.
   - [Developer] The support for using composite variables in the different rule types has been extended. Here are some examples:
 
 		[?Compose] => (Set: L = Object)

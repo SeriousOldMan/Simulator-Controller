@@ -1823,8 +1823,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local speak := true
 		local fragments := (speaker ? speaker.Fragments : false)
-		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature.Air"))
-		local trackTemperature := Round(knowledgebase.getValue("Weather.Temperature.Track"))
+		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature"))
+		local trackTemperature := Round(knowledgebase.getValue("Track.Temperature"))
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", kUndefined)
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", kUndefined)
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)

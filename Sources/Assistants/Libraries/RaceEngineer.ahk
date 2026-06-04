@@ -2694,6 +2694,39 @@ class RaceEngineer extends RaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Pressures." . session, default)
 	}
 
+	pitstopTyreCompoundColor(laps, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor) {
+		local knowledgeBase, tyresDB, wearWarning, newColor, newLaps, usableLaps
+		local ignore, candidate
+
+		if getMultiMapValue(this.Settings, "Session Settings", "Tyre.Change.Compound.Color", false) {
+			knowledgeBase := this.KnowledgeBase
+			tyresDB := TyresDatabase()
+			wearWarning := this.SettingsDatabase.readSettingValue(this.Simulator, this.Car, this.Track, "*", weather
+																, "Session Settings", "Tyre.Wear.Warning"
+																, false)
+			newLaps := 2147483647
+
+			for ignore, candidate in SessionDatabase().getTyreCompounds(this.Simulator, this.Car, this.Track)
+				if (tyreCompound = compound(candidate)) {
+					tyreCompoundColor := compoundColor(candidate)
+
+					usableLaps := tyresDB.getUsableLaps(this.Simulator, this.Car, this.Track
+													  , weather, airTemperature, trackTemperature
+													  , tyreCompound, tyreCompoundColor
+													  , wearWarning ? (100 - wearWarning) : unset, kUndefined)
+
+					if ((usableLaps != kUndefined) && (usableLaps > laps) && (usableLaps < newLaps)) {
+						newColor := compoundColor(candidate)
+						newLaps := usableLaps
+					}
+				}
+
+			return newColor
+		}
+		else
+			return tyreCompoundColor
+	}
+
 	readSettings(simulator, car, track, &settings) {
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		local section := ("Simulator." . simulatorName)

@@ -3294,8 +3294,8 @@ class RaceStrategist extends GridRaceAssistant {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
 			if weather {
-				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
-				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature"))
+				trackTemperature := Round(knowledgeBase.getValue("Track.Temperature"))
 			}
 			else {
 				weather := strategy.Weather
@@ -3347,8 +3347,8 @@ class RaceStrategist extends GridRaceAssistant {
 			track := this.Track
 
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
-			airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air", 0))
-			trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track", 0))
+			airTemperature := Round(knowledgeBase.getValue("Weather.Temperature", 0))
+			trackTemperature := Round(knowledgeBase.getValue("Track.Temperature", 0))
 
 			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
 			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color", false)
@@ -3445,8 +3445,8 @@ class RaceStrategist extends GridRaceAssistant {
 			weather := knowledgeBase.getValue("Weather.Weather.10Min", false)
 
 			if weather {
-				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Air"))
-				trackTemperature := Round(knowledgeBase.getValue("Weather.Temperature.Track"))
+				airTemperature := Round(knowledgeBase.getValue("Weather.Temperature"))
+				trackTemperature := Round(knowledgeBase.getValue("Track.Temperature"))
 			}
 			else {
 				weather := strategy.Weather

@@ -1382,6 +1382,44 @@ pitstopTyreWear(?service, Front, ?wear) <= pitstopTyreWear(?service, FrontLeft, 
 										   pitstopTyreWear(?service, FrontRight, ?frWear), max(?flWear, ?frWear, ?wear)
 pitstopTyreWear(?service, Rear, ?wear) <= pitstopTyreWear(?service, RearLeft, ?rlWear),
 										  pitstopTyreWear(?service, RearRight, ?rrWear), max(?rlWear, ?rrWear, ?wear)
+										  
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel],
+	  [?Pitstop.Planned.Tyre.Compound.FrontLeft != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, FrontLeft))
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel],
+	  [?Pitstop.Planned.Tyre.Compound.FrontRight != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, FrontRight))
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel],
+	  [?Pitstop.Planned.Tyre.Compound.RearLeft != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, RearLeft))
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Wheel],
+	  [?Pitstop.Planned.Tyre.Compound.RearRight != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, RearRight))
+
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Axle],
+	  [?Pitstop.Planned.Tyre.Compound.Front != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, Front))
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = Axle],
+	  [?Pitstop.Planned.Tyre.Compound.Rear != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining, Rear))
+
+{All: [?Pitstop.Plan], [?Session.Settings.Tyre.Service = All],
+	  [?Pitstop.Planned.Tyre.Compound != false]} =>
+		(Prove: updateTyreCompoundColor(!Lap, !Pitstop.Planned.Laps.Remaining))
+
+updateTyreCompoundColor(?lap, ?remainingLaps, ?position) <=
+		Get(Pitstop.Planned.Tyre.Compound, ?position, ?compound), Get(Pitstop.Planned.Tyre.Compound.Color, ?position, ?compoundColor),
+		:%RaceEngineer.Instance.pitstopTyreCompoundColor%=(?remainingLaps,
+														   !Tyre.Weather.Target, !Weather.Temperature, !Track.Temperature,
+														   ?compound, ?compoundColor, ?newCompoundColor),
+		?compoundColor != ?newCompoundColor, Set(Pitstop.Planned.Tyre.Compound.Color, ?position, ?newCompoundColor)
+		
+updateTyreCompoundColor(?lap, ?remainingLaps) <=
+		:%RaceEngineer.Instance.pitstopTyreCompoundColor%=(?remainingLaps,
+														   !Tyre.Weather.Target, !Weather.Temperature, !Track.Temperature,
+														   !Pitstop.Planned.Tyre.Compound, !Pitstop.Planned.Tyre.Compound.Color, 
+														   ?newCompoundColor),
+		!Pitstop.Planned.Tyre.Compound.Color != ?newCompoundColor, Set(Pitstop.Planned.Tyre.Compound.Color, ?newCompoundColor)
 
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Set, ?Tyre.Set.Target)

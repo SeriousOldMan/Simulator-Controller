@@ -1014,8 +1014,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local tyreCompound := gTyreCompounds[inList(availableCompounds, selectedCompound)]
 		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
 															   , compoundWeather(tyreCompound)
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
+															   , "Session Settings", "Tyre.Wear.Warning", false)
 		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
 													  , compoundWeather(tyreCompound)
 													  , gAirTemperature, gTrackTemperature
@@ -1048,8 +1047,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
 														 , compoundWeather(tyreCompound)
-														 , "Session Settings"
-														 , "Session.Settings.Tyre.Wear.Warning", false)
+														 , "Session Settings", "Tyre.Wear.Warning", false)
 		tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
 												, compoundWeather(tyreCompound)
 												, gAirTemperature, gTrackTemperature
@@ -1239,8 +1237,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		for ignore, tyreCompound in gTyreCompounds {
 			wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
 															 , compoundWeather(tyreCompound)
-															 , "Session Settings"
-															 , "Session.Settings.Tyre.Wear.Warning", false)
+															 , "Session Settings", "Tyre.Wear.Warning", false)
 
 			tyreSetListView.Add("", translate(tyreCompound)
 								  , tyresDB.getUsableLaps(gSimulator, gCar, gTrack

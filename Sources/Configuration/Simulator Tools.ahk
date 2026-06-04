@@ -1777,7 +1777,6 @@ updateInstallationForV500() {
 
 updateConfigurationForV700() {
 	deleteFile(kDatabaseDirectory . "UPLOAD")
-	deleteFile(kDatabaseDirectory . "DOWNLOAD")
 }
 
 updateConfigurationForV699() {

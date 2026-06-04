@@ -2698,7 +2698,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase, tyresDB, wearWarning, newColor, newLaps, usableLaps
 		local ignore, candidate
 
-		if getMultiMapValue(this.Settings, "Session Settings", "Tyre.Change.Compound", false) {
+		if getMultiMapValue(this.Settings, "Session Settings", "Tyre.Change.Compound.Color", false) {
 			knowledgeBase := this.KnowledgeBase
 			tyresDB := TyresDatabase()
 			wearWarning := this.SettingsDatabase.readSettingValue(this.Simulator, this.Car, this.Track, "*", weather

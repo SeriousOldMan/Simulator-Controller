@@ -6,10 +6,10 @@ Download=
 Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Engineer can choose between different compound mixtures
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
-Version=6.9.8.0-release
-Date=05/29/2026
-Download=https://cutt.ly/xt1q8pjZ;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/J3h1mICp/Releases/Simulator%20Controller%206.9.8.0-release.zip;https://www.dropbox.com/scl/fi/2cczpyr0xa5aiwenykbnq/Simulator-Controller-6.9.8.0-release.zip?rlkey=1tb6z33wqpu4qdxm8zif9al94&st=ztaurvhu&dl=1;http://%master%/Releases/Simulator Controller 6.9.8.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.8.0-release.zip
-Changes=Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine, Fixed build rule for ACE SHM Spotter, Support for JSON serialization in rule engine, Support for method calls in rule engine
+Version=6.9.9.0-release
+Date=06/05/2026
+Download=https://cutt.ly/Ft0URuM4;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5Qf2Z_83/Releases/Simulator%20Controller%206.9.9.0-release.zip;https://www.dropbox.com/scl/fi/esadj85yr93ndeucl9552/Simulator-Controller-6.9.9.0-release.zip?rlkey=6qzz6een5fzc0wxx94ns2h3x5&st=064ecs95&dl=1;http://%master%/Releases/Simulator Controller 6.9.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.9.0-release.zip
+Changes=Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Components]
 Media.6.9.0.Path=Resources
@@ -24,5 +24,5 @@ Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=6.9.9.0-beta
-Release=6.9.8.0-release
+Development=7.0.0.0-release
+Release=6.9.9.0-release

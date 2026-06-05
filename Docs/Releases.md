@@ -47,8 +47,8 @@
   - [Important] Tyre wear data can now be shared in the community database. The consent dialog will be shown automatically the next time you use one of the applications of Simulator Controller. If you share your tyre wear data, you will be rewarded with tyre wear data of all other community members, of course.
     - A new setting "Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#session-settings) lets you choose, whether you want to use the wear data of the community beside your own collected data for any tyre wear related decisions (for example see next item).
   - The Engineer can now decide based on tyre wear data which will be the best tyre compound mixture when changing tyres for the next stint.
-    - A new setting "Choose Compound Mixture" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) allows you to enable this decision for the Engineer (default is Off).
-  
+    - A new setting "Choose Compound Mixture" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) allows you to enable this decision for the Engineer (it is disabled by default).
+
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you are using the settings for minimum tyre tread depth and the minimum brakepad thickness.
 
 # Release history

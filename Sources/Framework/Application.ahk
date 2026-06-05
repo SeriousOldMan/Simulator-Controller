@@ -34,6 +34,7 @@ consentDialog(id, consent := false, *) {
 	local consentGui, texts, chosen, x, y, fileName, ignore, section, keyValues, key, value
 
 	static tyrePressuresConsentDropDown
+	static tyreWearsConsentDropDown
 	static carSetupsConsentDropDown
 	static raceStrategiesConsentDropDown
 	static lapTelemetriesConsentDropDown
@@ -80,26 +81,31 @@ consentDialog(id, consent := false, *) {
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
 	tyrePressuresConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y324 w450 h23 +0x200", translate("Do you want to share your car setup data?"))
+	consentGui.Add("Text", "x8 yp+24 w450 h23 +0x200", translate("Do you want to share your tyre wear data?"))
+
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Tyre Wears", "Undecided"))
+	tyreWearsConsentDropDown := consentGui.Add("DropDownList", "x460 yp w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
+
+	consentGui.Add("Text", "x8 yp+24 w450 h23 +0x200", translate("Do you want to share your car setup data?"))
 
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Car Setups", "Undecided"))
-	carSetupsConsentDropDown := consentGui.Add("DropDownList", "x460 y324 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
+	carSetupsConsentDropDown := consentGui.Add("DropDownList", "x460 yp w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y348 w450 h23 +0x200", translate("Do you want to share your race strategies?"))
+	consentGui.Add("Text", "x8 yp+24 w450 h23 +0x200", translate("Do you want to share your race strategies?"))
 
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Race Strategies", "Undecided"))
-	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 y348 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
+	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 yp w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y372 w450 h23 +0x200", translate("Do you want to share your lap telemetry data?"))
+	consentGui.Add("Text", "x8 yp+24 w450 h23 +0x200", translate("Do you want to share your lap telemetry data?"))
 
 	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Lap Telemetries", "Undecided"))
-	lapTelemetriesConsentDropDown := consentGui.Add("DropDownList", "x460 y372 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
+	lapTelemetriesConsentDropDown := consentGui.Add("DropDownList", "x460 yp w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y412 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Text", "x8 y436 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
 
-	consentGui.Add("Link", "x8 y482 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Link", "x8 y506 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
 
-	consentGui.Add("Button", "x352 y538 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
+	consentGui.Add("Button", "x352 y562 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
 
 	consentGui.Opt("+AlwaysOnTop")
 
@@ -114,6 +120,7 @@ consentDialog(id, consent := false, *) {
 
 	try {
 		return Map("TyrePressures", ["Yes", "No", "Retry"][tyrePressuresConsentDropDown.Value]
+				 , "TyreWears", ["Yes", "No", "Retry"][tyreWearsConsentDropDown.Value]
 				 , "CarSetups", ["Yes", "No", "Retry"][carSetupsConsentDropDown.Value]
 				 , "RaceStrategies", ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value]
 				 , "LapTelemetries", ["Yes", "No", "Retry"][lapTelemetriesConsentDropDown.Value])
@@ -208,6 +215,9 @@ startDatabaseSynchronizer() {
 				consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
 				options := ("-ID `"" . ID . "`" -Synchronize " . true)
+
+				if (getMultiMapValue(consent, "Consent", "Share Tyre Wears", "No") = "Yes")
+					options .= " -Wears"
 
 				if (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 					options .= " -Pressures"
@@ -367,7 +377,7 @@ showConsentDialog(consent := false) {
 
 	result := withBlockedWindows(() => consentDialog(getMultiMapValue(consent, "General", "ID"), consent))
 
-	for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
+	for type, key in Map("TyrePressures", "Share Tyre Pressures", "TyreWears", "Share Tyre Wear", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
 		switch result[type], false {
 			case "Yes":
 				setMultiMapValue(consent, "Consent", key, "Yes")

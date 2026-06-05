@@ -1815,8 +1815,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 						setMultiMapValue(info, "Info", "Fuel", this.LastFuelAmount)
 						setMultiMapValue(info, "Info", "Weather", knowledgeBase.getValue("Weather", "Dry"))
-						setMultiMapValue(info, "Info", "AirTemperature", knowledgeBase.getValue("Weather.Temperature.Air", 23))
-						setMultiMapValue(info, "Info", "TrackTemperature", knowledgeBase.getValue("Weather.Temperature.Track", 27))
+						setMultiMapValue(info, "Info", "AirTemperature", knowledgeBase.getValue("Weather.Temperature", 23))
+						setMultiMapValue(info, "Info", "TrackTemperature", knowledgeBase.getValue("Track.Temperature", 27))
 
 						writeMultiMap(A_LoopFileFullPath . ".info", info)
 

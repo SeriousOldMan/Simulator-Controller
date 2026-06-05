@@ -618,8 +618,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			local wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
 																   , workbench.SelectedCar, workbench.SelectedTrack
 																   , "*", this.compoundWeather(tyreCompound)
-																   , "Session Settings"
-																   , "Session.Settings.Tyre.Wear.Warning", false)
+																   , "Session Settings", "Tyre.Wear.Warning", false)
 			local tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 														  , workbench.SelectedCar, workbench.SelectedTrack
 														  , this.compoundWeather(tyreCompound)
@@ -653,8 +652,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
 															 , workbench.SelectedCar, workbench.SelectedTrack
 															 , "*", this.compoundWeather(tyreCompound)
-															 , "Session Settings"
-															 , "Session.Settings.Tyre.Wear.Warning", false)
+															 , "Session Settings", "Tyre.Wear.Warning", false)
 			tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 													, workbench.SelectedCar, workbench.SelectedTrack
 													, this.compoundWeather(tyreCompound)
@@ -2579,8 +2577,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			wearWarning := SettingsDatabase().readSettingValue(this.SelectedSimulator
 															   , this.SelectedCar, this.SelectedTrack
 															   , "*", this.compoundWeather(tyreCompound)
-															   , "Session Settings"
-															   , "Session.Settings.Tyre.Wear.Warning", false)
+															   , "Session Settings", "Tyre.Wear.Warning", false)
 
 			this.TyreSetListView.Add("", translate(tyreCompound)
 									   , tyresDB.getUsableLaps(this.SelectedSimulator

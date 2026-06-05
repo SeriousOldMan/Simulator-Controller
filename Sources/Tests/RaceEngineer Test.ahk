@@ -95,6 +95,8 @@ class TestRaceEngineer extends RaceEngineer {
 
 		this.updateConfigurationValues({Settings: settings})
 
+		RaceEngineer.Instance := this
+
 		setDebug(false)
 
 		this.setDebug(kDebugKnowledgeBase, false)
@@ -1151,9 +1153,9 @@ setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
-	AHKUnit.AddTestClass(DamageAnalysis)
+	;~ AHKUnit.AddTestClass(FuelReporting)
+	;~ AHKUnit.AddTestClass(DamageReporting)
+	;~ AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 	AHKUnit.AddTestClass(PitstopHistory)
 

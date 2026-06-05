@@ -1468,7 +1468,7 @@ class RaceAssistant extends ConfigurationItem {
 							return Round(getMultiMapValue(this.Data, "Stint Data", "LapBestTime", 0) / 1000, 2)
 						case "Conditions":
 							return Values(knowledgeBase.getValue("Weather.Weather.Now")
-										, knowledgeBase.getValue("Weather.Temperature.Air")
+										, knowledgeBase.getValue("Weather.Temperature")
 										, knowledgeBase.getValue("Track.Temperature")
 										, knowledgeBase.getValue("Track.Grip")
 										, knowledgeBase.getValue("Weather.Weather.10Min")
@@ -1667,7 +1667,7 @@ class RaceAssistant extends ConfigurationItem {
 					knowledge["Weather"] := Map("Now", weather
 											  , "Forecast", Map("10 Minutes", knowledgeBase.getValue("Weather.Weather.10Min", "Dry")
 															  , "30 Minutes", knowledgeBase.getValue("Weather.Weather.30Min", "Dry"))
-											  , "Temperature", (convert("Temperature", knowledgeBase.getValue("Weather.Temperature.Air", 0)) . temperatureUnit))
+											  , "Temperature", (convert("Temperature", knowledgeBase.getValue("Weather.Temperature", 0)) . temperatureUnit))
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -2935,6 +2935,7 @@ class RaceAssistant extends ConfigurationItem {
 			this.updateDynamicValues({Weather: weatherNow})
 
 		knowledgeBase.setFact("Weather.Temperature.Air", airTemperature)
+		knowledgeBase.setFact("Weather.Temperature", airTemperature)
 		knowledgeBase.setFact("Weather.Temperature.Track", trackTemperature)
 		knowledgeBase.setFact("Weather.Weather.Now", weatherNow)
 		knowledgeBase.setFact("Weather.Weather.10Min", weather10Min)

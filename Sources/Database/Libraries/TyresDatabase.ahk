@@ -26,15 +26,21 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTyresSchemas := CaseInsenseMap("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+global kTyresSchemas := CaseInsenseMap("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track"
+														 , "Compound", "Compound.Color"
 														 , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 														 , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 														 , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
 														 , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
 														 , "Identifier", "Synchronized"]
-									 , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+									 , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track"
+																	  , "Compound", "Compound.Color"
 																	  , "Type", "Tyre", "Pressure", "Count", "Driver"
-																	  , "Identifier", "Synchronized"])
+																	  , "Identifier", "Synchronized"]
+									 , "Tyres.Wears", ["Weather", "Temperature.Air", "Temperature.Track"
+													 , "Compound", "Compound.Color"
+													 , "Count", "Tyre", "Tyre.Laps", "Tyre.Wear", "Driver"
+													 , "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -384,16 +390,27 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
-				, compound, compoundColor, maxWear := 75, default := false, driver := false) {
+				, compound, compoundColor, maxWear := 75, default := false
+				, community := kUndefined, driver := false) {
 		local lastLap := 0
 		local tyreWears := []
-		local wears, ignore, wear, lapWear, lastWear
+		local wears, ignore, wear, lapWear, lastWear, db
 
 		if !driver
 			driver := this.ID
 
 		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
 																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
+
+		if (((community == kUndefined) && SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
+																			, "Session Settings", "Tyre.Wear.Community", false))
+		 || (community && (community != kUndefined))) {
+			db := this.requireDatabase(simulator, car, track, "Community")
+
+			wears := concatenate(wears, db.query({Select: ["Tyre.Laps", "Tyre.Wear"]
+												, Where: Map("Driver", driver, "Weather", weather
+														   , "Compound", compound, "Compound.Color", compoundColor)}))
+		}
 
 		try {
 			for ignore, wear in bubbleSort(&wears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
@@ -471,7 +488,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false, retry := 100) {
+				  , compound, compoundColor, coldPressures, hotPressures
+				  , flush := true, driver := false, retry := 100) {
 		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure, compounds, compoundColors
 
 		if !driver
@@ -538,7 +556,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false, retry := 100) {
+				 , type, tyre, pressure, count := 1
+				 , flush := true, require := true, scope := "User", driver := false, retry := 100) {
 		local db, rows, row
 
 		if (isNull(valueOrNull(pressure)))
@@ -586,6 +605,65 @@ class TyresDatabase extends SessionDatabase {
 								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 								  , "Compound", compound, "Compound.Color", compoundColor
 								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count)
+					 , false, retry)
+			}
+			catch Any as exception {
+				if retry
+					logError(exception, true)
+				else
+					throw exception
+			}
+	}
+
+	updateWear(simulator, car, track, weather, airTemperature, trackTemperature
+			 , compound, compoundColor, tyre, laps, wear
+			 , flush := true, require := true, scope := "User", driver := false, retry := 100) {
+		local db, rows, row
+
+		if (isNull(valueOrNull(wear)))
+			return
+
+		if !driver
+			driver := this.ID
+
+		if (!compoundColor || (compoundColor = ""))
+			compoundColor := "Black"
+
+		if require
+			db := ((this.Shared && flush && (scope = "User")) ? this.lock(simulator, car, track)
+															  : this.requireDatabase(simulator, car, track, scope))
+		else
+			db := this.iDatabase
+
+		rows := db.query("Tyres.Wears"
+					   , {Where: Map("Driver", driver, "Weather", weather
+								   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								   , "Compound", compound, "Compound.Color", compoundColor
+								   , "Tyre", tyre, "Tyre.Laps", laps)})
+
+		if (rows.Length > 0) {
+			row := rows[1]
+
+			row["Tyre.Wear"] := Round(((row["Tyre.Wear"] * row["Count"]) + wear) / (row["Count"] + 1), 4)
+			row["Count"] := (row["Count"] + 1)
+			row["Synchronized"] := kNull
+
+			if flush {
+				if (this.Shared && (scope = "User"))
+					this.unlock()
+				else
+					this.flush()
+			}
+			else
+				db.changed("Tyres.Wears")
+		}
+		else
+			try {
+				db.add("Tyres.Wears"
+					 , Database.Row("Driver", driver, "Weather", weather
+								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								  , "Compound", compound, "Compound.Color", compoundColor
+								  , "Tyre", tyre, "Tyre.Laps", laps, "Count", 1, "Tyre.Wear", Round(wear, 4))
 					 , false, retry)
 			}
 			catch Any as exception {

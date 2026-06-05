@@ -1089,9 +1089,9 @@ class LMURESTProvider {
 			}
 		}
 
-		State {
+		State[internal := false] {
 			Get {
-				return this.getState()
+				return this.getState(internal)
 			}
 		}
 
@@ -1107,26 +1107,31 @@ class LMURESTProvider {
 			}
 		}
 
-		getState() {
+		getState(internal := false) {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if data {
-				if (data.Has("status") && (data["status"] = "unavailable"))
-					return "Inactive"
-				else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
-					return "Not Driving"
-				else if data.Has("MultiStintState") {
-					switch data["MultiStintState"], false {
-						case "Disabled":
-							return "Disabled"
-						case "Driving", "END_OF_RACE_GRACE":
-							return "Driving"
-						default:
-							return "Paused"
-					}
-				}
+				if internal
+					return ((data.Has("status") ? (data["status"] . ", ") . " , ")
+						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") . " , ")
+						  . (data.Has("MultiStintState") ? (data["MultiStintState"] . ", ") . " , "))
 				else
-					return "Paused"
+					if (data.Has("status") && (data["status"] = "unavailable"))
+						return "Inactive"
+					else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+						return "Not Driving"
+					else if data.Has("MultiStintState") {
+						switch data["MultiStintState"], false {
+							case "Disabled":
+								return "Disabled"
+							case "Driving", "END_OF_RACE_GRACE":
+								return "Driving"
+							default:
+								return "Paused"
+						}
+					}
+					else
+						return "Paused"
 			}
 			else
 				return "Inactive"

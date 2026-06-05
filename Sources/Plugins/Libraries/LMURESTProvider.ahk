@@ -1112,9 +1112,9 @@ class LMURESTProvider {
 
 			if data {
 				if internal
-					return ((data.Has("status") ? (data["status"] . ", ") . " , ")
-						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") . " , ")
-						  . (data.Has("MultiStintState") ? (data["MultiStintState"] . ", ") . " , "))
+					return ((data.Has("status") ? (data["status"] . ", ") : " , ")
+						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
+						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
 				else
 					if (data.Has("status") && (data["status"] = "unavailable"))
 						return "Inactive"

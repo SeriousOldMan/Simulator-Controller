@@ -21,7 +21,7 @@
   - The Engineer will now avoid tyre configurations with a too high difference in tyre wear, when only some of the tyres have to be swapped at a pitstop.
 	- Two new settings "Max. tyre wear difference (axle)" and "Max. tyre wear difference (front/rear)" have been integrated in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings), which let you specify the maximum imbalance in tyre wear you are willing to accept (with a default of 30%).
     - See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) for more information.
-  - Added the new car "ADESS AD25" for *Le Mans Ultimate*. Support for "Setup Workbench" will follow with the next release.
+  - Added the new car "ADESS AD25 LMP3" for *Le Mans Ultimate*. Support for "Setup Workbench" will follow with the next release.
   - [Developer] The support for using composite variables in the different rule types has been extended. Here are some examples:
 
 		[?Compose] => (Set: L = Object)
@@ -39,7 +39,7 @@
 
 #### Fixes
 
-  - Fixed a problem in the internal represenation of the settings for minimum tyre tread depth and the minimum brakepad thickness in the "Session Database". See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you have used this settings.
+  - Fixed a problem in the internal representation of the settings for minimum tyre tread depth and the minimum brakepad thickness in the "Session Database". See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you have used these settings.
   
 #### Changes
 
@@ -48,6 +48,9 @@
     - A new setting "Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#session-settings) lets you choose, whether you want to use the wear data of the community beside your own collected data for any tyre wear related decisions (for example see next item).
   - The Engineer can now decide based on tyre wear data which will be the best tyre compound mixture when changing tyres for the next stint.
     - A new setting "Choose Compound Mixture" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) allows you to enable this decision for the Engineer (it is disabled by default).
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - ADESS AD25 LMP3
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you are using the settings for minimum tyre tread depth and the minimum brakepad thickness.
 

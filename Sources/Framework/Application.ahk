@@ -168,12 +168,15 @@ requestShareSessionDatabaseConsent() {
 					result := CaseInsenseMap()
 
 					result["TyrePressures"] := "Retry"
+					result["TyreWears"] := "Retry"
 					result["RaceStrategies"] := "Retry"
 					result["CarSetups"] := "Retry"
 					result["LapTelemetries"] := "Retry"
 				}
 
-				for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
+				for type, key in Map("TyrePressures", "Share Tyre Pressures", "TyreWears", "Share Tyre Wears"
+								   , "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups"
+								   , "LapTelemetries", "Share Lap Telemetries")
 					switch result[type], false {
 						case "Yes":
 							setMultiMapValue(newConsent, "Consent", key, "Yes")
@@ -377,7 +380,9 @@ showConsentDialog(consent := false) {
 
 	result := withBlockedWindows(() => consentDialog(getMultiMapValue(consent, "General", "ID"), consent))
 
-	for type, key in Map("TyrePressures", "Share Tyre Pressures", "TyreWears", "Share Tyre Wear", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups", "LapTelemetries", "Share Lap Telemetries")
+	for type, key in Map("TyrePressures", "Share Tyre Pressures", "TyreWears", "Share Tyre Wears"
+					   , "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups"
+					   , "LapTelemetries", "Share Lap Telemetries")
 		switch result[type], false {
 			case "Yes":
 				setMultiMapValue(consent, "Consent", key, "Yes")

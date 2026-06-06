@@ -94,7 +94,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [Experts] Added new predicates *Assistant.Call=* and *Assistant.Property=* for the rule engine running in an Assistant process as well as the equally named functions for the Lua script engine. They allow to acquire the return value of the called method or property.
   - [Developer] Some very useful features have been added to the rule engine.
     - Added support for foreign functions called by the rule engine to return a value, which then is unified with the last argument to the function call. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
-	- Added support for using foreign function aliases (with or without return values) in production rule actions. Example:
+	- Added support for using foreign function aliases (with or without return values) in production rule conditions and actions. Example:
 	
 			{Is: :foreignCall=(Foo, ?Result)} => (Set: CallResult = ?Result)
     - General terms (compounds, lists and so on) are now supported in *Let* actions in production rules. Example:

@@ -525,7 +525,7 @@ The following statistical models are currently implemented:
 	     The default value for both settings is 30% max. wear difference, but this can be changed for every car / track combination as with every setting in the "Session Database".
 	   
 	     Good to know: If you don't want all this, set the max. difference for both settings to 100%.
-	   - Last, but not least, if the setting "Pitstop: Choose Compound Mixture" is enabled in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) (disbaled by default), Jona will try to choose the best possible tyre compound for the next stint, either by the specified number of usable laps or by the expected tyre wear for the chosen compound mixture (see above).
+	   - Last, but not least, if the setting "Pitstop: Choose Compound Mixture" is enabled in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) (disabled by default), Jona will try to choose the best possible tyre compound mixture for the next stint, either by the specified number of usable laps or by the expected tyre wear for the chosen compound mixture (see above).
 
   3. Tyre pressure development
   

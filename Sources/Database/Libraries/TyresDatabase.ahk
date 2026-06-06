@@ -392,6 +392,7 @@ class TyresDatabase extends SessionDatabase {
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
 				, compound, compoundColor, maxWear := 75, default := false
 				, community := kUndefined, driver := false) {
+		local settingsDB := SettingsDatabase()
 		local lastLap := 0
 		local tyreWears := []
 		local wears, ignore, wear, lapWear, lastWear, db
@@ -402,8 +403,8 @@ class TyresDatabase extends SessionDatabase {
 		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
 																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
 
-		if (((community == kUndefined) && SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
-																			, "Session Settings", "Tyre.Wear.Community", false))
+		if (((community == kUndefined) && settingsDB.readSettingValue(simulator, car, track, "*", weather
+																	, "Session Settings", "Tyre.Wear.Community", false))
 		 || (community && (community != kUndefined))) {
 			db := this.requireDatabase(simulator, car, track, "Community")
 

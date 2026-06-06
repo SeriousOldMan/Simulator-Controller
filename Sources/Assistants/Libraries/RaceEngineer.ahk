@@ -305,7 +305,7 @@ class PlanPitstopEvent extends EngineerEvent {
 
 		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
 								 , {targetLapRule: targetLapRule, refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
-								  , maxTyreWear: (100 - knowledgeBase.getValue("Session.Settings.Tyre.Wear.Warning", 25))
+								  , maxTyreWear: this.Assistant.sessionMaxTyreWear()
 								  , lastService: knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5)})
 	}
 
@@ -2694,26 +2694,122 @@ class RaceEngineer extends RaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Pressures." . session, default)
 	}
 
-	pitstopTyreCompoundColor(laps, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor) {
-		local knowledgeBase, tyresDB, wearWarning, newColor, newLaps, usableLaps
-		local ignore, candidate
+	sessionMaxTyreWear(weather := false, tyreCompound := false, tyreCompoundColor := false, default := 75) {
+		local knowledgeBase := this.KnowledgeBase
+		local minTreadDepth := knowledgeBase.getValue("Session.Settings.Tyre.Tread.Minimum", kUndefined)
+		local lap, mixedCompounds
 
-		if getMultiMapValue(this.Settings, "Session Settings", "Tyre.Change.Compound.Color", false) {
-			knowledgeBase := this.KnowledgeBase
-			tyresDB := TyresDatabase()
-			wearWarning := this.SettingsDatabase.readSettingValue(this.Simulator, this.Car, this.Track, "*", weather
-																, "Session Settings", "Tyre.Wear.Warning"
-																, false)
+		if !weather
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
+
+		if !tyreCompound {
+			lap := knowledgeBase.getValue("Lap", 0)
+
+			tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound", false)
+			tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color", false)
+
+			if this.Provider.supportsTyreManagement(&mixedCompounds) {
+				if (mixedCompounds = "Wheel") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.FrontLeft", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.FrontLeft", false)
+				}
+				else if (mixedCompounds = "Axle") {
+					tyreCompound := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Front", false)
+					tyreCompoundColor := knowledgeBase.getValue("Lap." . lap . ".Tyre.Compound.Color.Front", false)
+				}
+			}
+		}
+
+		if (minTreadDepth = kUndefined)
+			return default
+		else if isInteger(minTreadDepth)
+			return (100 - minTreadDepth)
+		else {
+			minTreadDepth := string2Map(";", "->", minTreadDepth)
+
+			if tyreCompound {
+				tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+				if minTreadDepth.Has(tyreCompound)
+					return (100 - minTreadDepth[tyreCompound])
+				else
+					return default
+			}
+			else
+				return (100 - average(getValues(minTreadDepth)))
+		}
+	}
+
+	pitstopMaxTyreWear(weather, tyreCompound, tyreCompoundColor, default := 75) {
+		local minTreadDepth := this.SettingsDatabase.readSettingValue(this.Simulator, this.Car, this.Track, "*", weather
+																	, "Session Settings", "Tyre.Tread.Minimum"
+																	, kUndefined)
+		local lap, mixedCompounds
+
+		if (minTreadDepth = kUndefined)
+			return default
+		else if isInteger(minTreadDepth)
+			return (100 - minTreadDepth)
+		else {
+			minTreadDepth := string2Map(";", "->", minTreadDepth)
+
+			if tyreCompound {
+				tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+				if minTreadDepth.Has(tyreCompound)
+					return (100 - minTreadDepth[tyreCompound])
+				else
+					return default
+			}
+			else
+				return (100 - average(getValues(minTreadDepth)))
+		}
+	}
+
+	pitstopTyreCompoundColor(laps, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor) {
+		local knowledgeBase := this.KnowledgeBase
+		local tyreCompounds := SessionDatabase().getTyreCompounds(this.Simulator, this.Car, this.Track)
+		local newColor := false
+		local tyresDB, wearWarning, newLaps, usableLaps
+		local ignore, candidate, maxTyreWear
+
+		if (this.SettingsDatabase.readSettingValue(this.Simulator, this.Car, this.Track, "*", weather
+												 , "Session Settings", "Tyre.Change", "Wear") = "Laps") {
 			newLaps := 2147483647
 
-			for ignore, candidate in SessionDatabase().getTyreCompounds(this.Simulator, this.Car, this.Track)
+			for ignore, candidate in tyreCompounds
+				if (tyreCompound = compound(candidate)) {
+					tyreCompoundColor := compoundColor(candidate)
+
+					usableLaps := knowledgeBase.getValue("Session.Settings.Tyre." . tyreCompound . "."
+																				  . tyreCompoundColor . ".Laps.Max"
+													   , kUndefined)
+
+					if ((usableLaps != kUndefined) && (usableLaps > laps) && (usableLaps < newLaps)) {
+						newColor := compoundColor(candidate)
+						newLaps := usableLaps
+					}
+				}
+
+			if newColor
+				return newColor
+		}
+
+		if getMultiMapValue(this.Settings, "Session Settings", "Tyre.Change.Compound.Color", false) {
+			tyresDB := TyresDatabase()
+			maxTyreWear := this.pitstopMaxTyreWear(weather, airTemperature, trackTemperature, kUndefined)
+
+			newColor := tyreCompoundColor
+			newLaps := 2147483647
+
+			for ignore, candidate in tyreCompounds
 				if (tyreCompound = compound(candidate)) {
 					tyreCompoundColor := compoundColor(candidate)
 
 					usableLaps := tyresDB.getUsableLaps(this.Simulator, this.Car, this.Track
 													  , weather, airTemperature, trackTemperature
 													  , tyreCompound, tyreCompoundColor
-													  , wearWarning ? (100 - wearWarning) : unset, kUndefined)
+													  , (maxTyreWear != kUndefined) ? maxTyreWear : unset, kUndefined)
 
 					if ((usableLaps != kUndefined) && (usableLaps > laps) && (usableLaps < newLaps)) {
 						newColor := compoundColor(candidate)
@@ -2834,8 +2930,8 @@ class RaceEngineer extends RaceAssistant {
 																												   , "Tyre.Wet.Pressure.Target.RR", 30.0)
 									  , "Session.Settings.Tyre.Pressure.Deviation", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																											   , "Tyre.Pressure.Deviation", 0.2)
-									  , "Session.Settings.Tyre.Wear.Warning", getMultiMapValue(settings, "Session Settings", "Tyre.Wear.Warning", 25)
-									  , "Session.Settings.Brake.Wear.Warning", getMultiMapValue(settings, "Session Settings", "Brake.Wear.Warning", 10)
+									  , "Session.Settings.Tyre.Tread.Minimum", getMultiMapValue(settings, "Session Settings", "Tyre.Tread.Minimum", 25)
+									  , "Session.Settings.Brake.Pad.Minimum", getMultiMapValue(settings, "Session Settings", "Brake.Pad.Minimum", 10)
 									  , "Session.Setup.Tyre.Set.Fresh", getDeprecatedValue(settings, "Session Setup", "Race Setup"
 																								   , "Tyre.Set.Fresh", 8)
 									  , "Session.Setup.Tyre.Set", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 7)

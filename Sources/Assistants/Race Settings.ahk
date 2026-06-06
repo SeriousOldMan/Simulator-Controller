@@ -242,6 +242,32 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 								  ? FileRead(kUserConfigDirectory . "Simulator.remote")
 								  : false)
 
+	getMaxTyreWear(weather, tyreCompound, tyreCompoundColor, default := 75) {
+		local minTreadDepth := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack
+																 , "*", weather, "Session Settings", "Tyre.Tread.Minimum"
+																 , kUndefined)
+		local lap, mixedCompounds
+
+		if (minTreadDepth = kUndefined)
+			return default
+		else if isInteger(minTreadDepth)
+			return (100 - minTreadDepth)
+		else {
+			minTreadDepth := string2Map(";", "->", minTreadDepth)
+
+			if tyreCompound {
+				tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+				if minTreadDepth.Has(tyreCompound)
+					return (100 - minTreadDepth[tyreCompound])
+				else
+					return default
+			}
+			else
+				return (100 - average(getValues(minTreadDepth)))
+		}
+	}
+
 	compoundWeather(tyreCompound) {
 		tyreCompound := compound(tyreCompound)
 
@@ -1012,14 +1038,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local selectedCompound := tyreSetListView.GetText(tyreSetListView.GetNext(0))
 		local tyreCompound := gTyreCompounds[inList(availableCompounds, selectedCompound)]
-		local wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
-															   , compoundWeather(tyreCompound)
-															   , "Session Settings", "Tyre.Wear.Warning", false)
+		local maxTyreWear := getMaxTyreWear(compoundWeather(tyreCompound)
+										  , compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 		local tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
 													  , compoundWeather(tyreCompound)
 													  , gAirTemperature, gTrackTemperature
 													  , compound(tyreCompound), compoundColor(tyreCompound)
-													  , wearWarning ? (100 - wearWarning) : unset)
+													  , (maxTyreWear != kUndefined) ? maxTyreWear : unset)
 
 		if tyreLaps {
 			settingsGui["tyreSetLapsEdit"].Text := tyreLaps
@@ -1031,7 +1056,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	addPSTyreSet(*) {
 		local availableCompounds := collect(gTyreCompounds, translate)
 		local usedCompounds := []
-		local index, ignore, candidate, tyreCompound, wearWarning, tyreLaps
+		local index, ignore, candidate, tyreCompound, maxTyreWear, tyreLaps
 
 		loop tyreSetListView.GetCount()
 			usedCompounds.Push(tyreSetListView.GetText(A_Index, 1))
@@ -1045,14 +1070,13 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		tyreCompound := gTyreCompounds[index]
 
-		wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
-														 , compoundWeather(tyreCompound)
-														 , "Session Settings", "Tyre.Wear.Warning", false)
+		maxTyreWear := getMaxTyreWear(compoundWeather(tyreCompound)
+									, compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 		tyreLaps := TyresDatabase().getUsableLaps(gSimulator, gCar, gTrack
 												, compoundWeather(tyreCompound)
 												, gAirTemperature, gTrackTemperature
 												, compound(tyreCompound), compoundColor(tyreCompound)
-												, wearWarning ? (100 - wearWarning) : unset, 50)
+												, (maxTyreWear != kUndefined) ? maxTyreWear : unset, 50)
 
 		tyreSetListView.Add("", translate(tyreCompound), tyreLaps, 99)
 		tyreSetListView.Modify(tyreSetListView.GetCount(), "Select Vis")
@@ -1222,7 +1246,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	loadTyreCompounds() {
 		local tyresDB := TyresDatabase()
 		local settings := (gSimulator ? SettingsDatabase().loadSettings(gSimulator, gCar, gTrack, "*", gWeather) : newMultiMap())
-		local translatedCompounds, ignore, tyreCompound, tyreLaps, wearWarning
+		local translatedCompounds, ignore, tyreCompound, tyreLaps, maxTyreWear
 
 		if !gRulesMode
 			return
@@ -1235,16 +1259,15 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		tyreSetListView.Delete()
 
 		for ignore, tyreCompound in gTyreCompounds {
-			wearWarning := SettingsDatabase().readSettingValue(gSimulator, gCar, gTrack, "*"
-															 , compoundWeather(tyreCompound)
-															 , "Session Settings", "Tyre.Wear.Warning", false)
+			maxTyreWear := getMaxTyreWear(compoundWeather(tyreCompound)
+										, compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 
 			tyreSetListView.Add("", translate(tyreCompound)
 								  , tyresDB.getUsableLaps(gSimulator, gCar, gTrack
 														, compoundWeather(tyreCompound)
 														, gAirTemperature, gTrackTemperature
 														, compound(tyreCompound), compoundColor(tyreCompound)
-														, wearWarning ? (100 - wearWarning) : unset, 50)
+														, (maxTyreWear != kUndefined) ? maxTyreWear : unset, 50)
 								  , 99)
 		}
 

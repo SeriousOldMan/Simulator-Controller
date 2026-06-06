@@ -1599,7 +1599,7 @@ else {
 						engineer.addLap(lap, &data)
 
 						if (lap = 5) {
-							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Wear.Warning", 25)
+							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Tread.Minimum", 25)
 
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 

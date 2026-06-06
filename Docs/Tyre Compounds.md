@@ -164,8 +164,14 @@ Depending on the given car and track combination, and also depending on the pers
 	Dry (S)->15;Dry (M)->25;Dry (H)->40
 
 where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.
-
+	
 Important: If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values, though.
+
+Another way to handle tyre life, which is available in simulators which provide the current tyre wear in the API, is to provide a threshold for the maximum tyre wear (or the minimu available tyre tread depth, whatever you prefer). You can specifiy the default values for the minimum available tyre tread depth in the "Session Database" using the "Pitstop: Minimum tyre tread depth" setting. The format is similar:
+
+	Dry (S)->60;Dry (M)->45;Dry (H)->30
+
+where the number specifies the tyre tread depth, up to which a tyre shows reasonable performance.
 
 ### Default Tyre Compound
 

@@ -1153,9 +1153,9 @@ setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(FuelReporting)
-	;~ AHKUnit.AddTestClass(DamageReporting)
-	;~ AHKUnit.AddTestClass(DamageAnalysis)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 	AHKUnit.AddTestClass(PitstopHistory)
 

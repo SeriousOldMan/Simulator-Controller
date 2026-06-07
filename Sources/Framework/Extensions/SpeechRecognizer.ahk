@@ -188,6 +188,8 @@ global kWhisperModels := ["tiny", "tiny.en", "base", "base.en", "small", "small.
 
 global kElevenLabsModels := ["scribe_v1", "scribe_v1_experimental"]
 
+global kYandexModels := ["general"]
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -330,7 +332,7 @@ class SpeechRecognizer {
 			if InStr(this.Engine, "Whisper")
 				return "Text"
 			else
-				return (inList(["Azure", "Google", "OpenAI", "ElevenLabs"], this.Engine) ? "Text" : "Pattern")
+				return (inList(["Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], this.Engine) ? "Text" : "Pattern")
 		}
 	}
 
@@ -619,7 +621,7 @@ class SpeechRecognizer {
 
 			this.setChoices("Digit", choices)
 		}
-		else if InStr(engine, "OpenAI|") {
+		else if (InStr(engine, "OpenAI|") || InStr(engine, "Yandex|")) {
 			engine := string2Values("|", engine, 3)
 
 			this.iEngine := engine[1]
@@ -676,6 +678,7 @@ class SpeechRecognizer {
 		if (engine != "Compiler") {
 			if (!InStr(this.Engine, "Whisper") && (this.Engine != "OpenAI")
 											   && (this.Engine != "ElevenLabs")
+											   && (this.Engine != "Yandex")
 											   && (this.Instance.OkCheck() != "OK")) {
 				if log {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
@@ -687,7 +690,7 @@ class SpeechRecognizer {
 
 			this.RecognizerList := this.createRecognizerList()
 
-			if ((this.RecognizerList.Length == 0) && (this.Engine != "OpenAI")) {
+			if ((this.RecognizerList.Length == 0) && (this.Engine != "OpenAI") && (this.Engine != "Yandex")) {
 				if log
 					logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
@@ -742,6 +745,8 @@ class SpeechRecognizer {
 					recognizer := "medium"
 				else if (this.Engine = "ElevenLabs")
 					recognizer := "scribe_v1"
+				else if (this.Engine = "Yandex")
+					recognizer := "general"
 				else if ((this.Engine != "OpenAI") || (recognizer == true))
 					recognizer := 0
 
@@ -799,6 +804,10 @@ class SpeechRecognizer {
 			if (Trim(this.iAPIKey) != "")
 				recognizerList := kElevenLabsModels
 		}
+		else if (this.Engine = "Yandex") {
+			if (Trim(this.iAPIKey) != "")
+				recognizerList := kYandexModels
+		}
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
@@ -840,7 +849,8 @@ class SpeechRecognizer {
 
 				this.Instance.Connector.SetModel(id)
 			}
-			else if ((this.Engine = "Whisper Local") || (this.Engine = "OpenAI") || (this.Engine = "ElevenLabs"))
+			else if ((this.Engine = "Whisper Local") || (this.Engine = "OpenAI")
+				  || (this.Engine = "Yandex") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -891,7 +901,8 @@ class SpeechRecognizer {
 					return false
 				}
 			}
-			else if ((this.Engine = "OpenAI") || (this.Engine = "ElevenLabs") || (InStr(this.Engine, "Whisper") && this.Model)) {
+			else if ((this.Engine = "OpenAI") || (this.Engine = "Yandex")
+				  || (this.Engine = "ElevenLabs") || (InStr(this.Engine, "Whisper") && this.Model)) {
 				this.iCapturedAudioFile := temporaryFileName("capturedAudio", "wav")
 
 				try {
@@ -931,6 +942,7 @@ class SpeechRecognizer {
 
 		local audioDevice := this.AudioDevice[true]
 		local httpService := (InStr(this.Engine, "Whisper") || (this.Engine = "OpenAI")
+															|| (this.Engine = "Yandex")
 															|| (this.Engine = "ElevenLabs"))
 
 		try {
@@ -1161,7 +1173,8 @@ class SpeechRecognizer {
 			if this.iChoices.Has(name)
 				return this.iChoices[name]
 			else if inList(["Azure", "Google", "Compiler"
-						  , "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine)
+						  , "Whisper Local", "Whisper Server", "OpenAI"
+						  , "Yandex", "ElevenLabs"], this.Engine)
 				return []
 			else
 				return (this.Instance ? ((this.Engine = "Server") ? this.Instance.GetServerChoices(name) : this.Instance.GetDesktopChoices(name)) : [])
@@ -1191,7 +1204,8 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"
+				   , "OpenAI", "Yandex", "ElevenLabs":
 					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
@@ -1206,7 +1220,8 @@ class SpeechRecognizer {
 			switch this.Engine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
-				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs":
+				case "Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"
+				   , "OpenAI", "Yandex", "ElevenLabs":
 					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
 					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
@@ -1217,7 +1232,8 @@ class SpeechRecognizer {
 	}
 
 	registerRecognitionHandler(owner, handler) {
-		if inList(["Azure", "Google", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine)
+		if inList(["Azure", "Google", "Whisper Local", "Whisper Server"
+				 , "OpenAI", "Yandex", "ElevenLabs"], this.Engine)
 			this._recognitionHandlers.Push(Array(owner, handler))
 	}
 
@@ -1243,7 +1259,8 @@ class SpeechRecognizer {
 
 		this._grammarCallbacks[name] := callback
 
-		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server", "OpenAI", "ElevenLabs"], this.Engine) {
+		if inList(["Azure", "Google", "Compiler", "Whisper Local", "Whisper Server"
+				 , "OpenAI", "Yandex", "ElevenLabs"], this.Engine) {
 			Task.startTask(prepareGrammar.Bind(name, theGrammar), 1000, kLowPriority)
 
 			theGrammar := {Name: name, Grammar: theGrammar, Callback: callback}

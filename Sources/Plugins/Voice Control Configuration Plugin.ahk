@@ -41,6 +41,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iAzureRecognizerWidgets := []
 	iGoogleRecognizerWidgets := []
 	iOpenAIRecognizerWidgets := []
+	iYandexRecognizerWidgets := []
 	iElevenLabsRecognizerWidgets := []
 	iWhisperRecognizerWidgets := []
 	iOtherWidgets := []
@@ -53,6 +54,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	iTopOpenAICredentialsVisible := false
 	iBottomOpenAICredentialsVisible := false
+
+	iBottomYandexCredentialsVisible := false
 
 	iTopElevenLabsCredentialsVisible := false
 	iBottomElevenLabsCredentialsVisible := false
@@ -195,6 +198,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				else if (oldChoice == 6)
 					this.hideElevenLabsRecognizerEditor()
 				else if (oldChoice == 7)
+					this.hideYandexRecognizerEditor()
+				else if (oldChoice == 8)
 					this.hideWhisperServerRecognizerEditor()
 				else
 					this.hideWhisperLocalRecognizerEditor()
@@ -274,6 +279,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 					this.showElevenLabsRecognizerEditor()
 			}
 			else if (voiceRecognizerDropDown.Value == 7) {
+				recognizers := []
+
+				if update
+					this.showYandexRecognizerEditor()
+			}
+			else if (voiceRecognizerDropDown.Value == 8) {
 				try {
 					recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
 												  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
@@ -481,7 +492,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		setButtonIcon(widget17, kIconsDirectory . "General Settings.ico", 1)
 
-		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Whisper Server"]
+		choices := ["Windows (Server)", "Windows (Desktop)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Yandex", "Whisper Server"]
 		chosen := 0
 
 		if (isDebug() || FileExist(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe"))
@@ -612,6 +623,19 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 										 , [window["openAIRecognizerAPIKeyLabel"], window["openAIRecognizerAPIKeyEdit"]]
 										 , [window["openAIListenerLabel"], window["openAIListenerModelEdit"]]]
 
+		widget64 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VyandexRecognizerServerURLLabel Hidden", translate("Server URL"))
+		widget65 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VyandexRecognizerServerURLEdit Hidden")
+
+		widget66 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VyandexRecognizerAPIKeyLabel Hidden", translate("Service Key"))
+		widget67 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VyandexRecognizerAPIKeyEdit Hidden")
+
+		widget68 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VyandexListenerLabel Hidden", translate("Model"))
+		widget69 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VyandexListenerModelEdit Hidden")
+
+		this.iYandexRecognizerWidgets := [[window["yandexRecognizerServerURLLabel"], window["yandexRecognizerServerURLEdit"]]
+										 , [window["yandexRecognizerAPIKeyLabel"], window["yandexRecognizerAPIKeyEdit"]]
+										 , [window["yandexListenerLabel"], window["yandexListenerModelEdit"]]]
+
 		widget44 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VelevenLabsAPIKeyLabel Hidden", translate("Service Key"))
 		widget45 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VelevenLabsAPIKeyEdit Hidden")
 		widget45.OnEvent("Change", updateElevenLabsVoices)
@@ -637,7 +661,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateLanguage(false)
 
-		loop 63
+		loop 69
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -649,6 +673,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.hideControls(this.iAzureRecognizerWidgets)
 		this.hideControls(this.iGoogleRecognizerWidgets)
 		this.hideControls(this.iOpenAIRecognizerWidgets)
+		this.hideControls(this.iYandexRecognizerWidgets)
 		this.hideControls(this.iElevenLabsRecognizerWidgets)
 		this.hideControls(this.iWhisperRecognizerWidgets)
 		this.hideControls(this.iOtherWidgets)
@@ -711,6 +736,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(recognizer, "OpenAI") == 1)
 				recognizer := "OpenAI"
 
+			if (InStr(recognizer, "Yandex") == 1)
+				recognizer := "Yandex"
+
 			if (InStr(recognizer, "ElevenLabs") == 1)
 				recognizer := "ElevenLabs"
 
@@ -723,9 +751,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs"], synthesizer)
 
 			if FileExist(kProgramsDirectory . "Whisper Runtime")
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "OpenAI", "ElevenLabs", "Whisper Server", "Whisper Local"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "OpenAI"
+														, "ElevenLabs", "Yandex"
+														, "Whisper Server", "Whisper Local"], recognizer) || 2)
 			else
-				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "OpenAI", "ElevenLabs", "Whisper Server"], recognizer) || 2)
+				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "OpenAI"
+														, "ElevenLabs", "Yandex", "Whisper Server"], recognizer) || 2)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
@@ -752,6 +783,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "")
 			this.Value["openAIRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", "")
 			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", "")
+
+			this.Value["yandexRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", "")
+			this.Value["yandexRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", "")
+			this.Value["yandexListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", "")
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control"
@@ -913,6 +948,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "ElevenLaps.APIKey", Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
 
+		setMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", Trim(this.Control["yandexRecognizerServerURLEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", Trim(this.Control["yandexRecognizerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", Trim(this.Control["yandexListenerModelEdit"].Text))
+
 		setMultiMapValue(configuration, "Voice Control", "Whisper.ServerURL", Trim(this.Control["whisperServerURLEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["speakerVolumeSlider"].Value)
@@ -940,7 +979,14 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 		else if (this.Control["voiceRecognizerDropDown"].Value == 6)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
-		else if (this.Control["voiceRecognizerDropDown"].Value == 7)
+		else if (this.Control["voiceRecognizerDropDown"].Value == 7) {
+			setMultiMapValue(configuration, "Voice Control", "Recognizer"
+										  , "Yandex|" . Trim(this.Control["yandexRecognizerServerURLEdit"].Text) . "|"
+													  . Trim(this.Control["yandexRecognizerAPIKeyEdit"].Text))
+
+			listener := Trim(this.Control["yandexListenerModelEdit"].Text)
+		}
+		else if (this.Control["voiceRecognizerDropDown"].Value == 8)
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text))
 		else
 			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Whisper Local")
@@ -986,6 +1032,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["openAIRecognizerServerURLEdit"].Text := this.Value["openAIRecognizerServerURL"]
 		this.Control["openAIRecognizerAPIKeyEdit"].Text := this.Value["openAIRecognizerAPIKey"]
 		this.Control["openAIListenerModelEdit"].Text := this.Value["openAIListenerModel"]
+
+		this.Control["yandexRecognizerServerURLEdit"].Text := this.Value["yandexRecognizerServerURL"]
+		this.Control["yandexRecognizerAPIKeyEdit"].Text := this.Value["yandexRecognizerAPIKey"]
+		this.Control["yandexListenerModelEdit"].Text := this.Value["yandexListenerModel"]
 
 		this.Control["googleAPIKeyFilePathButton"].Enabled := false
 
@@ -1034,10 +1084,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			else if (this.Control["voiceRecognizerDropDown"].Value = 6)
 				recognizers := SpeechRecognizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-			else if (this.Control["voiceRecognizerDropDown"].Value = 7)
+			else if (this.Control["voiceRecognizerDropDown"].Value = 7) {
+				recognizers := []
+
+				this.Control["yandexListenerModelEdit"].Text := this.Value["yandexListenerModel"]
+			}
+			else if (this.Control["voiceRecognizerDropDown"].Value = 8)
 				recognizers := SpeechRecognizer("Whisper Server|" . Trim(this.Control["whisperServerURLEdit"].Text)
 											  , false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
-			else if (this.Control["voiceRecognizerDropDown"].Value = 8)
+			else if (this.Control["voiceRecognizerDropDown"].Value = 9)
 				recognizers := SpeechRecognizer("Whisper Local", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 			else
 				recognizers := SpeechRecognizer((this.Control["voiceRecognizerDropDown"].Value = 1) ? "Server" : "Desktop"
@@ -1180,6 +1235,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		else if (voiceRecognizer == 6)
 			this.showElevenLabsRecognizerEditor()
 		else if (voiceRecognizer == 7)
+			this.showYandexRecognizerEditor()
+		else if (voiceRecognizer == 8)
 			this.showWhisperServerRecognizerEditor()
 		else
 			this.showWhisperLocalRecognizerEditor()
@@ -1220,6 +1277,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideOpenAIRecognizerEditor()
 		else if (this.iRecognizerMode = "ElevenLabs")
 			this.hideElevenLabsRecognizerEditor()
+		else if (this.iRecognizerMode = "Yandex")
+			this.hideYandexRecognizerEditor()
 		else if (this.iRecognizerMode = "Whisper Server")
 			this.hideWhisperServerRecognizerEditor()
 		else if (this.iRecognizerMode = "Whisper Local")
@@ -1229,6 +1288,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideControls(this.iGoogleRecognizerWidgets)
 			this.hideControls(this.iOpenAIRecognizerWidgets)
 			this.hideControls(this.iElevenLabsRecognizerWidgets)
+			this.hideControls(this.iYandexRecognizerWidgets)
 			this.hideControls(this.iWhisperRecognizerWidgets)
 		}
 
@@ -1243,6 +1303,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.iTopElevenLabsCredentialsVisible := false
 		this.iBottomElevenLabsCredentialsVisible := false
+
+		this.iBottomYandexCredentialsVisible := false
 
 		this.iBottomWhisperCredentialsVisible := false
 	}
@@ -1289,6 +1351,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -1310,6 +1373,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomYandexCredentialsVisible {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -1335,6 +1403,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1348,6 +1418,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -1369,6 +1440,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Yandex") {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -1395,6 +1471,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1406,6 +1484,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -1427,6 +1506,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomYandexCredentialsVisible {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -1452,6 +1536,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1465,6 +1551,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -1486,6 +1573,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Yandex") {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -1512,6 +1604,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1523,6 +1617,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -1544,6 +1639,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomYandexCredentialsVisible {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -1569,6 +1669,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1582,6 +1684,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -1603,6 +1706,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Yandex") {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -1630,6 +1738,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1641,6 +1751,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if this.iBottomAzureCredentialsVisible {
@@ -1662,6 +1773,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomYandexCredentialsVisible {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if this.iBottomWhisperCredentialsVisible {
 			whisperWasOpen := true
@@ -1687,6 +1803,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1700,6 +1818,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local googleWasOpen := false
 		local openAIWasOpen := false
 		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
 		local whisperWasOpen := false
 
 		if (this.iRecognizerMode = "Azure") {
@@ -1721,6 +1840,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			elevenLabsWasOpen := true
 
 			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Yandex") {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
 		}
 		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
 			whisperWasOpen := true
@@ -1747,6 +1871,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showOpenAIRecognizerEditor()
 		else if elevenLabsWasOpen
 			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
 		else if whisperWasOpen
 			this.showWhisperServerRecognizerEditor()
 
@@ -1819,6 +1945,58 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	hideWhisperLocalRecognizerEditor() {
+		this.iRecognizerMode := false
+	}
+
+	showYandexRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+				this.transposeControls(this.iYandexRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
+			else if this.iTopGoogleCredentialsVisible
+				this.transposeControls(this.iYandexRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+			else
+				this.transposeControls(this.iYandexRecognizerWidgets, (24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+
+			this.showControls(this.iYandexRecognizerWidgets)
+			this.transposeControls(this.iBottomWidgets, 24 * (this.iYandexRecognizerWidgets.Length - 1), titleBarHeight)
+
+			this.Control["listenerLabel"].Visible := false
+			this.Control["listenerDropDown"].Visible := false
+
+		}
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showYandexRecognizerEditor..."
+
+		this.iBottomYandexCredentialsVisible := true
+
+		this.iRecognizerMode := "Yandex"
+	}
+
+	hideYandexRecognizerEditor() {
+		local titleBarHeight := this.Window.TitleBarHeight
+
+		if (this.iRecognizerMode == "Yandex") {
+			this.hideControls(this.iYandexRecognizerWidgets)
+
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
+			else if this.iTopGoogleCredentialsVisible
+				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+			else
+				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+
+			this.transposeControls(this.iBottomWidgets, -24 * (this.iYandexRecognizerWidgets.Length - 1), titleBarHeight)
+
+			this.Control["listenerLabel"].Visible := true
+			this.Control["listenerDropDown"].Visible := true
+		}
+		else if (this.iRecognizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideYandexRecognizerEditor..."
+
+		this.iBottomYandexCredentialsVisible := false
+
 		this.iRecognizerMode := false
 	}
 

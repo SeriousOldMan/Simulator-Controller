@@ -786,7 +786,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			this.Value["yandexRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", "https://stt.api.cloud.yandex.net")
 			this.Value["yandexRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", "")
-			this.Value["yandexListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", "")
+			this.Value["yandexListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", "general")
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control"

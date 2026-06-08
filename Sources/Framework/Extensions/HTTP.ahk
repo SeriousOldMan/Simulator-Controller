@@ -333,7 +333,13 @@ class WinHTTPRequest extends WinHttpRequest._Call {
                 headers.Content_Type := ("multipart/form-data; boundary=`"" . boundary . "`"")
         }
         else {
-            body := this.ObjToQuery(body)
+           if isInstance(body, Buffer) {
+                body := StrGet(body, - body.Size, "")
+
+                len := StrLen(body)
+            }
+            else
+                body := this.ObjToQuery(body)
 
             if isInstance(headers, Map) {
                 if !headers.Has("Content-Type")

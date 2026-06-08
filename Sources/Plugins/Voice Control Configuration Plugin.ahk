@@ -780,11 +780,11 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
 			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
 			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
-			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "")
+			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "https://api.openai.com")
 			this.Value["openAIRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", "")
 			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", "")
 
-			this.Value["yandexRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", "")
+			this.Value["yandexRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", "https://stt.api.cloud.yandex.net")
 			this.Value["yandexRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", "")
 			this.Value["yandexListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", "")
 

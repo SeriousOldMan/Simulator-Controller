@@ -634,6 +634,12 @@ class SpeechRecognizer {
 
 			this.Instance := {AudioRecorder: SpeechRecognizer.AudioCapture()}
 
+			if (this.Engine = "Yandex") {
+				this.Instance.Connector := CLR_LoadLibrary(kBinariesDirectory . "Connectors\Yandex Connector.dll").CreateInstance("YandexConnector.SpeechRecognizer")
+
+				this.Instance.Connector.Initialize(this.iServerURL, "auto", this.iAPIKey) ; this.Language)
+			}
+
 			choices := []
 
 			loop 101
@@ -804,10 +810,8 @@ class SpeechRecognizer {
 			if (Trim(this.iAPIKey) != "")
 				recognizerList := kElevenLabsModels
 		}
-		else if (this.Engine = "Yandex") {
-			if (Trim(this.iAPIKey) != "")
-				recognizerList := kYandexModels
-		}
+		else if (this.Engine = "Yandex")
+			recognizerList := []
 		else if this.Instance {
 			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
@@ -844,13 +848,12 @@ class SpeechRecognizer {
 				this.Instance.SetLanguage(recognizer.Culture)
 				this.Instance.SetModel(recognizer.Model)
 			}
-			else if (this.Engine = "Whisper Server") {
+			else if ((this.Engine = "Whisper Server") || (this.Engine = "Yandex")) {
 				this.iModel := id
 
 				this.Instance.Connector.SetModel(id)
 			}
-			else if ((this.Engine = "Whisper Local") || (this.Engine = "OpenAI")
-				  || (this.Engine = "Yandex") || (this.Engine = "ElevenLabs"))
+			else if ((this.Engine = "Whisper Local") || (this.Engine = "OpenAI") || (this.Engine = "ElevenLabs"))
 				this.iModel := id
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
@@ -996,7 +999,9 @@ class SpeechRecognizer {
 	}
 
 	processAudio(audioFile) {
-		local request, result, name, install, progress, pid, settings
+		global kSox
+
+		local request, result, name, install, progress, pid, settings, options, rawFile
 
 		static computeType := kUndefined
 
@@ -1150,6 +1155,54 @@ class SpeechRecognizer {
 						try
 							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling ElevenLabs. Maybe your contingent is exhausted.")
 					}
+				}
+			}
+			else if (this.Engine = "Yandex") {
+				rawFile := false
+
+				try {
+					if kSox {
+						try {
+							rawFile := temporaryFileName("raw", "wav")
+
+							RunWait("`"" . kSoX . "`" `"" . audioFile . "`" -r 16000 -t raw -c 1 `"" . rawFile . "`"", , "Hide")
+						}
+						catch Any as exception {
+							kSox := false
+
+							if !kSilentMode
+								showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
+										  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+							throw exception
+						}
+					}
+					else
+						throw "Sox not configured during speech recognition..."
+
+					result := this.Instance.Connector.Recognize(rawFile)
+
+					if result {
+						result := JSON.parse(result)
+
+						if (result.Has("result"))
+							this._onTextCallback(result["result"])
+					}
+				}
+				catch Any as exception {
+					logError(exception, true)
+
+					try {
+						SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Yandex API. Maybe your contingent is exhausted.")
+					}
+					catch Any {
+						try
+							SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Yandex API. Maybe your contingent is exhausted.")
+					}
+				}
+				finally {
+					if rawFile
+						deleteFile(rawFile)
 				}
 			}
 		}

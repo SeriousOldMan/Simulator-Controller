@@ -426,7 +426,7 @@ Speech recognition is also supported for Yandex, a Russian search engine and clo
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Yandex.JPG)
 
-Do not change any of the default values for the *Service URL* and the *Model*, only supply the API key. To create an API key, you have to register an account on [Yandex AI Studio](https://aistudio.yandex.ru/). It is important to create a so called *service* account, otherwise the API key cannot be used for Simulator Controller.
+Do not change any of the default values for the *Server URL* and the *Model*, only supply the API key. To create an API key, you have to register an account on [Yandex AI Studio](https://aistudio.yandex.ru/). It is important to create a so called *service* account, otherwise the API key cannot be used for Simulator Controller.
 
 ###### Notes
 

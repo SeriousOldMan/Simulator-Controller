@@ -1,9 +1,9 @@
 [Development]
 Version=7.0.0.0-dev
 Target=7.0.0.0-release
-Date=06/05/2026
+Date=06/08/2026
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Z73dqtgz/Releases/Simulator%20Controller%207.0.0.0-dev.zip
-Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures
+Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench"
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=6.9.9.0-release

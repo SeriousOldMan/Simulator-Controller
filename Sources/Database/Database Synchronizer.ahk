@@ -449,6 +449,8 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 						DirCreate(kTempDirectory . "Shared Database\" . type)
 
 						expand(kTempDirectory . fileName, kTempDirectory . "Shared Database\" . type)
+
+						deleteFile(kTempDirectory . fileName)
 					}
 					catch Any as exception {
 						logError(exception)
@@ -458,7 +460,6 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 				}
 		}
 
-		deleteFile(kTempDirectory . fileName)
 		deleteDirectory(sessionDBPath . "Community")
 
 		for ignore, type in types

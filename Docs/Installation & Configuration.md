@@ -420,6 +420,8 @@ ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs
 
 You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with Eleven labs in the browser. Using the API, however, will require a paid subscription.
 
+Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
+
 ###### Yandex
 
 Speech recognition is also supported for Yandex, a Russian search engine and cloud service provider. Although Yandex's speech recognition can theoretically be used for any language, it only works reliably for Russian.

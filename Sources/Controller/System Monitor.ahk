@@ -620,14 +620,13 @@ systemMonitor(command := false, arguments*) {
 			if (remainingFuel > 0)
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Fuel") . "</th><td class=`"td-wdg`">" . displayValue("Float", convertUnit("Volume", remainingFuel), 1) . "</td></tr>")
 
-			if (getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
-				energyLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 0)) < 4)
-				energyConsumption := getMultiMapValue(sessionState, "Stint", "Energy.Consumption")
+			energyConsumption := getMultiMapValue(sessionState, "Stint", "Energy.Consumption", 0)
 
-				if (energyConsumption > 0) {
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", energyConsumption, 1) . "</td></tr>")
-					html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
-				}
+			if (energyConsumption > 0) {
+				energyLow := (Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 0)) < 4)
+
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Lap)") . "</th><td class=`"td-wdg`">" . displayValue("Float", energyConsumption, 1) . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Energy (Avg.)") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Stint", "Energy.AvgConsumption"), 1) . "</td></tr>")
 			}
 			else
 				energyLow := false

@@ -572,24 +572,28 @@ class LMUProvider extends Sector397Provider {
 							splitTime := A_TickCount
 						}
 
-						fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+						if lmuRESTAPI {
+							if !energyData
+								energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
-						if (!fuelAmount && lmuRESTAPI) {
-							if !carData
-								carData := LMURestProvider.CarData()
-
-							fuelAmount := carData.FuelAmount
+							fuelAmount := (energyData.hasVirtualEnergy() ? energyData.MaxFuelAmount : false)
 
 							if !fuelAmount {
-								if !energyData
-									energyData := LMURESTProvider.EnergyData(simulator, car, track)
+								fuelAmount := LMURestProvider.SetupData().FuelAmount
 
-								fuelAmount := energyData.MaxFuelAmount
+								if !fuelAmount {
+									if !carData
+										carData := LMURestProvider.CarData()
+
+									fuelAmount := carData.FuelAmount
+								}
+
+								if fuelAmount
+									setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
 							}
-
-							if fuelAmount
-								setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
 						}
+						else
+							fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
 
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))
@@ -600,7 +604,7 @@ class LMUProvider extends Sector397Provider {
 							if !energyData
 								energyData := LMURESTProvider.EnergyData(simulator, car, track)
 
-							virtualEnergy := energyData.RemainingVirtualEnergy
+							virtualEnergy := (energyData.hasVirtualEnergy() ? energyData.RemainingVirtualEnergy : false)
 
 							if virtualEnergy
 								setMultiMapValue(data, "Car Data", "EnergyRemaining", virtualEnergy)

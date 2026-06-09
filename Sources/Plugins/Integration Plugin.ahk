@@ -296,7 +296,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		local fuelConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0)
 		local avgConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0)
 		local remainingFuel := getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0)
-		local remainingEnergy := getMultiMapValue(sessionState, "Stint", "Energy.Remaining", 0)
+		local remainingEnergy := getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", 0)
 		local remainingFuelLaps := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)
 		local unit := {Type: "Volume", Unit: this.Unit["Volume"]}
 		local fuelLow := (Floor(remainingFuelLaps) < 4)

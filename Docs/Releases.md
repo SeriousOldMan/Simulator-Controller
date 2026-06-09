@@ -54,6 +54,7 @@
 	- The decision for a specific tyre compound mixture will either be taken based on the configured number of laps usable for a compound mixture (setting ["Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database") or by the tyre wear (see above), if this information is available in the simulator API. You can choose between the different methods using the setting ["Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database".
 	- More details can be found in the [extended documentation for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and for [tyre compound handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) in general.
   - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Yandex) for more information.
+  - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant boosters.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - ADESS AD25 LMP3

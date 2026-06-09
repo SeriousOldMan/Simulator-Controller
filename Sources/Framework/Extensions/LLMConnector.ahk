@@ -727,6 +727,29 @@ class LLMConnector {
 		}
 	}
 
+	class YandexConnector extends LLMConnector.APIConnector {
+		static Models {
+			Get {
+				return []
+			}
+		}
+
+		static GetDefaults(&serviceURL, &serviceKey, &model) {
+			serviceURL := "https://ai.api.cloud.yandex.net"
+			serviceKey := ""
+			model := ""
+		}
+
+		CreateHeaders(headers?) {
+			headers := super.CreateHeaders(headers?)
+
+			if (Trim(this.Token) != "")
+				headers["Authorization"] := ("Api-Key " . this.Token)
+
+			return headers
+		}
+	}
+
 	class AzureConnector extends LLMConnector.OpenAIConnector {
 		static Models {
 			Get {
@@ -759,7 +782,9 @@ class LLMConnector {
 			return substituteVariables(server, {model: this.iModel})
 		}
 
-		CreateHeaders(headers) {
+		CreateHeaders(headers?) {
+			headers := super.CreateHeaders(headers?)
+
 			if (Trim(this.Token) != "")
 				headers["api-key"] := this.Token
 
@@ -1274,9 +1299,9 @@ class LLMConnector {
 	static Providers {
 		Get {
 			if FileExist(kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
-				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "Yandex", "OpenRouter", "Ollama", "GPT4All", "LLM Runtime"]
 			else
-				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "OpenRouter", "Ollama", "GPT4All"]
+				return ["Generic", "OpenAI", "Anthropic", "Mistral AI", "Azure", "Google", "Yandex", "OpenRouter", "Ollama", "GPT4All"]
 		}
 	}
 

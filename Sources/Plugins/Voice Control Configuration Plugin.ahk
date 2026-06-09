@@ -37,6 +37,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iAzureSynthesizerWidgets := []
 	iGoogleSynthesizerWidgets := []
 	iOpenAISynthesizerWidgets := []
+	iYandexSynthesizerWidgets := []
 	iElevenLabsSynthesizerWidgets := []
 	iAzureRecognizerWidgets := []
 	iGoogleRecognizerWidgets := []
@@ -55,6 +56,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iTopOpenAICredentialsVisible := false
 	iBottomOpenAICredentialsVisible := false
 
+	iTopYandexCredentialsVisible := false
 	iBottomYandexCredentialsVisible := false
 
 	iTopElevenLabsCredentialsVisible := false
@@ -157,8 +159,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.hideGoogleSynthesizerEditor()
 			else if (oldChoice == 5)
 				this.hideOpenAISynthesizerEditor()
-			else
+			else if (oldChoice == 6)
 				this.hideElevenLabsSynthesizerEditor()
+			else
+				this.hideYandexSynthesizerEditor()
 
 			if (voiceSynthesizerDropDown.Value == 1)
 				this.showWindowsSynthesizerEditor()
@@ -170,8 +174,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.showGoogleSynthesizerEditor()
 			else if (voiceSynthesizerDropDown.Value == 5)
 				this.showOpenAISynthesizerEditor()
-			else
+			else if (voiceSynthesizerDropDown.Value == 6)
 				this.showElevenLabsSynthesizerEditor()
+			else
+				this.showYandexSynthesizerEditor()
 
 			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 5))
 				this.updateLanguage(false)
@@ -442,7 +448,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget2 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . " VvoiceLanguageDropDown Hidden", choices)
 		widget2.OnEvent("Change", updateLanguage)
 
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Yandex"]
 		chosen := 0
 
 		widget3 := window.Add("Text", "x" . x . " yp+32 w112 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
@@ -623,6 +629,19 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 										 , [window["openAIRecognizerAPIKeyLabel"], window["openAIRecognizerAPIKeyEdit"]]
 										 , [window["openAIListenerLabel"], window["openAIListenerModelEdit"]]]
 
+		widget70 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VyandexSpeakerServerURLLabel Hidden", translate("Server URL"))
+		widget71 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VyandexSpeakerServerURLEdit Hidden")
+
+		widget72 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VyandexSpeakerAPIKeyLabel Hidden", translate("Service Key"))
+		widget73 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VyandexSpeakerAPIKeyEdit Hidden")
+
+		widget74 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VyandexSpeakerLabel Hidden", translate("Voice"))
+		widget75 := window.Add("Edit", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VyandexSpeakerVoiceEdit Hidden")
+
+		widget76 := window.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget76.OnEvent("Click", (*) => this.testSpeaker())
+		setButtonIcon(widget76, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
 		widget64 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VyandexRecognizerServerURLLabel Hidden", translate("Server URL"))
 		widget65 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VyandexRecognizerServerURLEdit Hidden")
 
@@ -632,6 +651,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget68 := window.Add("Text", "x" . x . " yp+24 w112 h23 +0x200 VyandexListenerLabel Hidden", translate("Model"))
 		widget69 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VyandexListenerModelEdit Hidden")
 
+		this.iYandexSynthesizerWidgets := [[window["yandexSpeakerServerURLLabel"], window["yandexSpeakerServerURLEdit"]]
+										 , [window["yandexSpeakerAPIKeyLabel"], window["yandexSpeakerAPIKeyEdit"]]
+										 , [window["yandexSpeakerLabel"], window["yandexSpeakerVoiceEdit"]
+										 , widget76]]
 		this.iYandexRecognizerWidgets := [[window["yandexRecognizerServerURLLabel"], window["yandexRecognizerServerURLEdit"]]
 										 , [window["yandexRecognizerAPIKeyLabel"], window["yandexRecognizerAPIKeyEdit"]]
 										 , [window["yandexListenerLabel"], window["yandexListenerModelEdit"]]]
@@ -661,7 +684,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.updateLanguage(false)
 
-		loop 69
+		loop 76
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.hideControls(this.iTopWidgets)
@@ -670,6 +693,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.hideControls(this.iGoogleSynthesizerWidgets)
 		this.hideControls(this.iOpenAISynthesizerWidgets)
 		this.hideControls(this.iElevenLabsSynthesizerWidgets)
+		this.hideControls(this.iYandexSynthesizerWidgets)
 		this.hideControls(this.iAzureRecognizerWidgets)
 		this.hideControls(this.iGoogleRecognizerWidgets)
 		this.hideControls(this.iOpenAIRecognizerWidgets)
@@ -722,6 +746,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (InStr(synthesizer, "OpenAI") == 1)
 				synthesizer := "OpenAI"
 
+			if (InStr(synthesizer, "Yandex") == 1)
+				synthesizer := "Yandex"
+
 			if (InStr(synthesizer, "ElevenLabs") == 1)
 				synthesizer := "ElevenLabs"
 
@@ -748,7 +775,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (recognizer = "Whisper")
 				recognizer := "Whisper Local"
 
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs"], synthesizer)
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], synthesizer)
 
 			if FileExist(kProgramsDirectory . "Whisper Runtime")
 				this.Value["voiceRecognizer"] := (inList(["Server", "Desktop", "Azure", "Google", "OpenAI"
@@ -763,6 +790,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			this.Value["openAISpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			this.Value["yandexSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey"
@@ -775,15 +803,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 																			, getMultiMapValue(configuration, "Voice Control"
 																											, "APIKeyFile", ""))
 
-			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
+			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "https://api.openai.com")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
-			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
+			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "tts-1-hd")
 			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
 			this.Value["openAISpeakerInstructions"] := StrReplace(getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", ""), "\n", "`n")
 			this.Value["openAIRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerServerURL", "https://api.openai.com")
 			this.Value["openAIRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.RecognizerAPIKey", "")
 			this.Value["openAIListenerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.ListenerModel", "")
 
+			this.Value["yandexSpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", "https://tts.api.cloud.yandex.net")
+			this.Value["yandexSpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", "")
+			this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Yandex.Speaker", "")
 			this.Value["yandexRecognizerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", "https://stt.api.cloud.yandex.net")
 			this.Value["yandexRecognizerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", "")
 			this.Value["yandexListenerModel"] := getMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", "general")
@@ -876,6 +907,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 2) {
@@ -885,15 +917,18 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 3) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", azureSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["voiceSynthesizerDropDown"].Value = 4) {
@@ -901,6 +936,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
@@ -911,18 +947,31 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 													  . Trim(this.Control["openAISpeakerAPIKeyEdit"].Text) . "|"
 													  . StrReplace(StrReplace(Trim(this.Value["openAISpeakerInstructions"]), "`r`n", "\n"), "`n", "\n"))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", Trim(this.Control["openAISpeakerModelEdit"].Text) . "/" . Trim(this.Control["openAISpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
-		else {
+		else if (this.Control["voiceSynthesizerDropDown"].Value = 6) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", elevenLabsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Yandex|" . Trim(this.Control["yandexSpeakerServerURLEdit"].Text) . "|" . Trim(this.Control["yandexSpeakerAPIKeyEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["yandexSpeakerVoiceEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", Trim(this.Control["yandexSpeakerVoiceEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 
@@ -948,6 +997,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "ElevenLaps.APIKey", Trim(this.Control["elevenLabsAPIKeyEdit"].Text))
 
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", Trim(this.Control["yandexSpeakerVoiceEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", Trim(this.Control["yandexSpeakerServerURLEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", Trim(this.Control["yandexSpeakerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.Speaker", Trim(this.Control["yandexSpeakerVoiceEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerServerURL", Trim(this.Control["yandexRecognizerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "Yandex.RecognizerAPIKey", Trim(this.Control["yandexRecognizerAPIKeyEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "Yandex.ListenerModel", Trim(this.Control["yandexListenerModelEdit"].Text))
@@ -1033,6 +1086,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["openAIRecognizerAPIKeyEdit"].Text := this.Value["openAIRecognizerAPIKey"]
 		this.Control["openAIListenerModelEdit"].Text := this.Value["openAIListenerModel"]
 
+		this.Control["yandexSpeakerServerURLEdit"].Text := this.Value["yandexSpeakerServerURL"]
+		this.Control["yandexSpeakerAPIKeyEdit"].Text := this.Value["yandexSpeakerAPIKey"]
+		this.Control["yandexSpeakerVoiceEdit"].Text := this.Value["yandexSpeakerVoice"]
 		this.Control["yandexRecognizerServerURLEdit"].Text := this.Value["yandexRecognizerServerURL"]
 		this.Control["yandexRecognizerAPIKeyEdit"].Text := this.Value["yandexRecognizerAPIKey"]
 		this.Control["yandexListenerModelEdit"].Text := this.Value["yandexListenerModel"]
@@ -1049,6 +1105,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.updateAzureVoices(configuration)
 		this.updateGoogleVoices(configuration)
 		this.updateOpenAIVoices(configuration)
+		this.updateYandexVoices(configuration)
 		this.updateElevenLabsVoices(configuration)
 
 		this.Control["speakerVolumeSlider"].Value := this.Value["speakerVolume"]
@@ -1216,8 +1273,10 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showGoogleSynthesizerEditor()
 		else if (voiceSynthesizer == 5)
 			this.showOpenAISynthesizerEditor()
-		else
+		else if (voiceSynthesizer == 6)
 			this.showElevenLabsSynthesizerEditor()
+		else
+			this.showYandexSynthesizerEditor()
 
 		if !voiceRecognizer
 			voiceRecognizer := 1
@@ -1255,12 +1314,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.hideOpenAISynthesizerEditor()
 		else if (this.iSynthesizerMode = "ElevenLabs")
 			this.hideElevenLabsSynthesizerEditor()
+		else if (this.iSynthesizerMode = "Yandex")
+			this.hideYandexSynthesizerEditor()
 		else {
 			this.hideControls(this.iTopWidgets)
 			this.hideControls(this.iWindowsSynthesizerWidgets)
 			this.hideControls(this.iAzureSynthesizerWidgets)
 			this.hideControls(this.iGoogleSynthesizerWidgets)
 			this.hideControls(this.iOpenAISynthesizerWidgets)
+			this.hideControls(this.iYandexSynthesizerWidgets)
 			this.hideControls(this.iElevenLabsSynthesizerWidgets)
 			this.hideControls(this.iOtherWidgets)
 		}
@@ -1304,6 +1366,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iTopElevenLabsCredentialsVisible := false
 		this.iBottomElevenLabsCredentialsVisible := false
 
+		this.iTopYandexCredentialsVisible := false
 		this.iBottomYandexCredentialsVisible := false
 
 		this.iBottomWhisperCredentialsVisible := false
@@ -1719,7 +1782,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 
 		this.hideControls(this.iTopWidgets)
-		this.hideControls(this.iGoogleSynthesizerWidgets)
 		this.hideControls(this.iOpenAISynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
@@ -1728,7 +1790,140 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.iSynthesizerMode == "OpenAI")
 			this.transposeControls(this.iOtherWidgets, -24 * this.iOpenAISynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
-			throw "Internal error detected in VoiceControlConfigurator.hidepenAISynthesizerEditor..."
+			throw "Internal error detected in VoiceControlConfigurator.hideOpenAISynthesizerEditor..."
+
+		if azureWasOpen
+			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
+		else if openAIWasOpen
+			this.showOpenAIRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
+
+		this.iSynthesizerMode := false
+	}
+
+	showYandexSynthesizerEditor() {
+		local azureWasOpen := false
+		local googleWasOpen := false
+		local openAIWasOpen := false
+		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
+		local whisperWasOpen := false
+
+		if this.iBottomAzureCredentialsVisible {
+			azureWasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+		else if this.iBottomGoogleCredentialsVisible {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
+		}
+		else if this.iBottomOpenAICredentialsVisible {
+			openAIWasOpen := true
+
+			this.hideOpenAIRecognizerEditor()
+		}
+		else if this.iBottomElevenLabsCredentialsVisible {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
+		}
+		else if this.iBottomYandexCredentialsVisible {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
+		}
+		else if this.iBottomWhisperCredentialsVisible {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
+		}
+
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iYandexSynthesizerWidgets)
+
+		this.iTopYandexCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iYandexSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in VoiceControlConfigurator.showYandexSynthesizerEditor..."
+
+		if azureWasOpen
+			this.showAzureRecognizerEditor()
+		else if googleWasOpen
+			this.showGoogleRecognizerEditor()
+		else if openAIWasOpen
+			this.showOpenAIRecognizerEditor()
+		else if elevenLabsWasOpen
+			this.showElevenLabsRecognizerEditor()
+		else if yandexWasOpen
+			this.showYandexRecognizerEditor()
+		else if whisperWasOpen
+			this.showWhisperServerRecognizerEditor()
+
+		this.showOtherControls()
+
+		this.iSynthesizerMode := "Yandex"
+	}
+
+	hideYandexSynthesizerEditor() {
+		local azureWasOpen := false
+		local googleWasOpen := false
+		local openAIWasOpen := false
+		local elevenLabsWasOpen := false
+		local yandexWasOpen := false
+		local whisperWasOpen := false
+
+		if (this.iRecognizerMode = "Azure") {
+			azureWasOpen := true
+
+			this.hideAzureRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Google") {
+			googleWasOpen := true
+
+			this.hideGoogleRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "OpenAI") {
+			openAIWasOpen := true
+
+			this.hideOpenAIRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "ElevenLabs") {
+			elevenLabsWasOpen := true
+
+			this.hideElevenLabsRecognizerEditor()
+		}
+		else if (this.iRecognizerMode = "Yandex") {
+			yandexWasOpen := true
+
+			this.hideYandexRecognizerEditor()
+		}
+		else if (InStr(this.iRecognizerMode, "Whisper") = 1) {
+			whisperWasOpen := true
+
+			this.hideWhisperServerRecognizerEditor()
+		}
+
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iYandexSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopYandexCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "Yandex")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iYandexSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in VoiceControlConfigurator.hideYandexSynthesizerEditor..."
 
 		if azureWasOpen
 			this.showAzureRecognizerEditor()
@@ -1899,7 +2094,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local titleBarHeight := this.Window.TitleBarHeight
 
 		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
 			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
@@ -1923,7 +2118,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.iRecognizerMode == "Whisper Server") {
 			this.hideControls(this.iWhisperRecognizerWidgets)
 
-			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
 			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
@@ -1952,7 +2147,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local titleBarHeight := this.Window.TitleBarHeight
 
 		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iYandexRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
 			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iYandexRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
@@ -1980,7 +2175,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.iRecognizerMode == "Yandex") {
 			this.hideControls(this.iYandexRecognizerWidgets)
 
-			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
 			else if this.iTopGoogleCredentialsVisible
 				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
@@ -2008,7 +2203,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if this.iTopOpenAICredentialsVisible
+				else if (this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
 				else
 					delta := 7
@@ -2036,7 +2231,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if this.iTopOpenAICredentialsVisible
+				else if (this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
 				else
 					delta := 7
@@ -2058,7 +2253,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopGoogleCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
 				this.showControls(this.iGoogleRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -2077,7 +2272,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopGoogleCredentialsVisible {
 			if (this.iRecognizerMode == "Google") {
 				this.hideControls(this.iGoogleRecognizerWidgets)
-				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -2097,7 +2292,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
 				else
 					delta := 7
@@ -2128,7 +2323,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
-				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible)
+				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
 				else
 					delta := 7
@@ -2153,7 +2348,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopElevenLabsCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
 				this.showControls(this.iElevenLabsRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -2172,7 +2367,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopElevenLabsCredentialsVisible {
 			if (this.iRecognizerMode == "ElevenLabs") {
 				this.hideControls(this.iElevenLabsRecognizerWidgets)
-				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -2272,6 +2467,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.updateAzureVoices()
 		this.updateGoogleVoices()
 		this.updateOpenAIVoices()
+		this.updateYandexVoices()
 		this.updateElevenLabsVoices()
 
 		if recognizer {
@@ -2483,6 +2679,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	}
 
 	updateOpenAIVoices(configuration := false) {
+	}
+
+	updateYandexVoices(configuration := false) {
 	}
 
 	updateElevenLabsVoices(configuration := false) {

@@ -123,6 +123,10 @@ Also very similar to OpenAI. Create an account on [Mistral AI](https://console.m
 
 Google has added support for OpenAI-style REST/JSON access to their API. Create an account on [Google AI Studio](https://aistudio.google.com). You may have to register your credit card (depending on usage - see below). Then create an API key and include it in the configuration as described above. I recommend using the "Gemini 2.0 Flash-Lite" model for the start, which has the best price / performance ratio. Google currently offers a free tier which includes a rate limit with 30 requests per minute and a max of 1500 requests per day for the "Gemini 2.0 Flash-Lite" model. You don't even have to register a credit card for the free tier access.
 
+### Yandex
+
+Yandex, a Russian search engine and cloud service provider, also offers several GPT models, which excel especially in the Russian language. An account can be created on the [Yandex AI Studio](https://aistudio.yandex.ru/). You have to register a payment method, then create an API key. It is important to create a so called *service* account, otherwise the API key cannot be used for Simulator Controller. Then choose a model from the this [list](https://aistudio.yandex.ru/docs/en/ai-studio/concepts/generation/models.html) and make sure that it is marked as "OpenAI-compatible".
+
 ### OpenRouter
 
 [OpenRouter](https://openrouter.ai) is a kind of gateway and hosting environment for many models of different providers, even many source LLMs are available here. It has become my favorite provider in the sense of a one-stop-shop for LLM access. You have to buy a few credits (5$ at least) [here](https://openrouter.ai/credits), before you can use the service. Then create an API key in your user account and include it in the configuration as described above. The last step is to choose the model you want to use from the very long list [here](https://openrouter.ai/models). There are even models available, which do not create any costs when called through the API, like the "meta-llama/llama-3-8b-instruct:free". But as mentioned above, the performance and domain knowledge might not meet your expectations.

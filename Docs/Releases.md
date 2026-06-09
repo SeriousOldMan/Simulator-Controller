@@ -40,6 +40,8 @@
 #### Fixes
 
   - Fixed a problem in the internal representation of the settings for minimum tyre tread depth and the minimum brakepad thickness in the "Session Database". See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you have used these settings.
+  - Fixed calculation of remaining laps on fuel for cars without VE in *Le Mans Ultimate*.
+  - Fixed calculation of fuel capacity for cars without VE in *Le Mans Ultimate*.
   
 #### Changes
 

@@ -296,9 +296,11 @@ class IntegrationPlugin extends ControllerPlugin {
 		local fuelConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.Consumption", 0)
 		local avgConsumption := getMultiMapValue(sessionInfo, "Stint", "Fuel.AvgConsumption", 0)
 		local remainingFuel := getMultiMapValue(sessionInfo, "Stint", "Fuel.Remaining", 0)
+		local remainingEnergy := getMultiMapValue(sessionState, "Stint", "Energy.Remaining", 0)
+		local remainingFuelLaps := getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)
 		local unit := {Type: "Volume", Unit: this.Unit["Volume"]}
-		local fuelLow := (Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)) < 4)
-		local state := Map("RemainingLaps", Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0)))
+		local fuelLow := (Floor(remainingFuelLaps) < 4)
+		local state := Map("RemainingLaps", Floor(remainingFuelLaps))
 		local energyConsumption
 
 		if (fuelConsumption > 0)
@@ -315,15 +317,15 @@ class IntegrationPlugin extends ControllerPlugin {
 		else
 			state.Delete("RemainingLaps")
 
-		if (getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", kUndefined) != kUndefined) {
-			energyConsumption := getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption")
+		if (remainingEnergy > 0) {
+			state["RemainingEnergy"] := Round(remainingEnergy)
 
-			state["RemainingEnergy"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Remaining"), 0)
+			energyConsumption := getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", 0)
 
 			if (energyConsumption > 0) {
-				state["LastEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.Consumption"), 0)
+				state["LastEnergyConsumption"] := Round(energyConsumption, 0)
 				state["AvgEnergyConsumption"] := Round(getMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption"), 0)
-				state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", 0))
+				state["RemainingEnergyLaps"] := Floor(getMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Energy", 0))
 			}
 		}
 

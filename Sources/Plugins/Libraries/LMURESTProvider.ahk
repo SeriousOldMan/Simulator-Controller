@@ -865,7 +865,7 @@ class LMURESTProvider {
 		}
 
 		getFuelAmount() {
-			return (this.Data ? this.Data["fuelCapacity"] : false)
+			return false ; (this.Data ? this.Data["fuelCapacity"] : false)
 		}
 
 		getBrakeBrakePadWear(wheel) {

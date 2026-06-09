@@ -632,10 +632,13 @@ systemMonitor(command := false, arguments*) {
 			else
 				energyLow := false
 
-			if (remainingEnergy > 0)
+			if (remainingEnergy > 0) {
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Remaining Energy") . "</th><td class=`"td-wdg`">" . displayValue("Float", remainingEnergy, 1) . "</td></tr>")
 
-			remainingLaps := Min(Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")), Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 99999)))
+				remainingLaps := Min(Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel")), Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Energy", 99999)))
+			}
+			else
+				remainingLaps := Floor(getMultiMapValue(sessionState, "Stint", "Laps.Remaining.Fuel"))
 
 			if ((fuelConsumption > 0) || (energyConsumption > 0))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps Left") . "</th><td class=`"td-wdg`">" . ((fuelLow || energyLow) ? "<font color=`"red`">" : "") . remainingLaps . ((fuelLow || energyLow) ? "</font>" : "") . "</td></tr>")

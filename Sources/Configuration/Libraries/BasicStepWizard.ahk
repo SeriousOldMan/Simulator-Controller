@@ -1211,12 +1211,19 @@ class BasicStepWizard extends StepWizard {
 
 				setMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerInstructions", setup[4])
 			}
-			else {
+			else if (InStr(setup.Synthesizer, "ElevenLabs") = 1) {
 				setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", setup.Voice)
 
 				setup := string2Values("|", setup.Synthesizer)
 
 				setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", setup[2])
+			}
+			else if (InStr(setup.Synthesizer, "Yandex") = 1) {
+				setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", setup.Voice)
+
+				setup := string2Values("|", setup.Synthesizer)
+
+				setMultiMapValue(configuration, "Voice Control", "Yandex.APIKey", setup[2])
 			}
 
 			this.iSynthesizerEditor := SynthesizerEditor(this, assistant, configuration)

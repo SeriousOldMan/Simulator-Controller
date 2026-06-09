@@ -48,12 +48,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 	iAzureSynthesizerWidgets := []
 	iGoogleSynthesizerWidgets := []
 	iOpenAISynthesizerWidgets := []
+	iYandexSynthesizerWidgets := []
 	iElevenLabsSynthesizerWidgets := []
 	iOtherWidgets := []
 
 	iTopAzureCredentialsVisible := false
 	iTopGoogleCredentialsVisible := false
 	iTopOpenAICredentialsVisible := false
+	iTopYandexCredentialsVisible := false
 	iTopElevenLabsCredentialsVisible := false
 
 	Manager {
@@ -114,8 +116,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 				this.hideGoogleSynthesizerEditor()
 			else if (oldChoice == 5)
 				this.hideOpenAISynthesizerEditor()
-			else
+			else if (oldChoice == 6)
 				this.hideElevenLabsSynthesizerEditor()
+			else
+				this.hideYandexSynthesizerEditor()
 
 			if (voiceSynthesizerDropDown.Value == 1)
 				this.showWindowsSynthesizerEditor()
@@ -127,8 +131,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 				this.showGoogleSynthesizerEditor()
 			else if (voiceSynthesizerDropDown.Value == 5)
 				this.showOpenAISynthesizerEditor()
-			else
+			else if (voiceSynthesizerDropDown.Value == 6)
 				this.showElevenLabsSynthesizerEditor()
+			else
+				this.showYandexSynthesizerEditor()
 
 			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 4))
 				this.updateLanguage()
@@ -181,7 +187,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		w4 := width - (x4 - x)
 		x5 := x3 + 24
 
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Yandex"]
 		chosen := 0
 
 		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
@@ -345,6 +351,31 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.iElevenLabsSynthesizerWidgets := [[editorGui["basicElevenLabsAPIKeyLabel"], editorGui["basicElevenLabsAPIKeyEdit"]]
 											 , [editorGui["basicElevenLabsSpeakerLabel"], editorGui["basicElevenLabsSpeakerDropDown"], widget29]]
 
+		widget39 := editorGui.Add("Text", "x" . x0 . " ys+24 w112 h23 +0x200 VbasicYandexSpeakerServerURLLabel Hidden", translate("Server URL"))
+		widget39.Info := "Basic.Synthesizer.Info"
+		widget40 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicYandexSpeakerServerURLEdit Hidden")
+		widget40.Info := "Basic.Synthesizer.Info"
+
+		widget41 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicYandexSpeakerAPIKeyLabel Hidden", translate("Service Key"))
+		widget41.Info := "Basic.Synthesizer.Info"
+		widget42 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicYandexSpeakerAPIKeyEdit Hidden")
+		widget42.Info := "Basic.Synthesizer.Info"
+
+		widget43 := editorGui.Add("Text", "x" . x0 . " yp+24 w112 h23 +0x200 VbasicYandexSpeakerLabel Hidden", translate("Voice"))
+		widget43.Info := "Basic.Synthesizer.Info"
+
+		widget44 := editorGui.Add("Edit", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicYandexSpeakerVoiceEdit Hidden")
+		widget44.Info := "Basic.Synthesizer.Info"
+
+		widget45 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget45.Info := "Basic.Synthesizer.Play.Info"
+		widget45.OnEvent("Click", (*) => this.testSpeaker())
+		setButtonIcon(widget45, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		this.iYandexSynthesizerWidgets := [[editorGui["basicYandexSpeakerServerURLLabel"], editorGui["basicYandexSpeakerServerURLEdit"]]
+										 , [editorGui["basicYandexSpeakerAPIKeyLabel"], editorGui["basicYandexSpeakerAPIKeyEdit"]]
+										 , [editorGui["basicYandexSpeakerLabel"], editorGui["basicYandexSpeakerVoiceEdit"], widget45]]
+
 		this.updateLanguage()
 
 		this.hideControls(this.iTopWidgets)
@@ -352,6 +383,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.hideControls(this.iAzureSynthesizerWidgets)
 		this.hideControls(this.iGoogleSynthesizerWidgets)
 		this.hideControls(this.iOpenAISynthesizerWidgets)
+		this.hideControls(this.iYandexSynthesizerWidgets)
 		this.hideControls(this.iElevenLabsSynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
@@ -386,16 +418,20 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			if (InStr(synthesizer, "OpenAI") == 1)
 				synthesizer := "OpenAI"
 
+			if (InStr(synthesizer, "Yandex") == 1)
+				synthesizer := "Yandex"
+
 			if (InStr(synthesizer, "ElevenLabs") == 1)
 				synthesizer := "ElevenLabs"
 
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs"], synthesizer)
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], synthesizer)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
 			this.Value["dotNETSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			this.Value["googleSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			this.Value["openAISpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			this.Value["yandexSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey"
@@ -417,6 +453,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control", "APIKey", ""))
+
+			this.Value["yandexSpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", "")
+			this.Value["yandexSpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", "")
+			this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerVoice", "")
 
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
@@ -446,6 +486,12 @@ class SynthesizerEditor extends ConfiguratorPanel {
 					this.Value["openAISpeakerInstructions"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[4]
 				case "ElevenLabs":
 					this.Value["elevenLabsAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+				case "Yandex":
+					this.Value["yandexSpeakerServerURL"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
+					this.Value["yandexSpeakerAPIKey"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[3]
+
+					try
+						this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Speaker")
 			}
 
 			if this.Configuration
@@ -489,6 +535,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 2) {
@@ -498,6 +545,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 3) {
@@ -507,6 +555,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 4) {
@@ -516,6 +565,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", googleSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 5) {
@@ -527,16 +577,29 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
-		else {
+		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 6) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
 			setMultiMapValue(configuration, "Voice Control", "Speaker", elevenLabsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
+										  , "Yandex|" . Trim(this.Control["basicYandexSpeakerServerURLEdit"].Text) . "|"
+													  . Trim(this.Control["basicYandexSpeakerAPIKeyEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", Trim(this.Control["basicYandexSpeakerVoiceEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
@@ -556,6 +619,11 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", elevenLabsSpeaker)
 		setMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey", Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", Trim(this.Control["basicYandexSpeakerVoiceEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", Trim(this.Control["basicYandexSpeakerServerURLEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", Trim(this.Control["basicYandexSpeakerAPIKeyEdit"].Text))
+		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerVoice", Trim(this.Control["basicYandexSpeakerVoiceEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["basicSpeakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["basicSpeakerPitchSlider"].Value)
@@ -582,6 +650,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 		this.Control["basicElevenLabsAPIKeyEdit"].Text := this.Value["elevenLabsAPIKey"]
 
+		this.Control["basicYandexSpeakerServerURLEdit"].Text := this.Value["yandexSpeakerServerURL"]
+		this.Control["basicYandexSpeakerAPIKeyEdit"].Text := this.Value["yandexSpeakerAPIKey"]
+		this.Control["basicYandexSpeakerVoiceEdit"].Text := this.Value["yandexSpeakerVoice"]
+
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)
 		else if (this.Value["voiceSynthesizer"] = 2)
@@ -590,6 +662,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.updateAzureVoices(configuration)
 		this.updateGoogleVoices(configuration)
 		this.updateOpenAIVoices(configuration)
+		this.updateYandexVoices(configuration)
 		this.updateElevenLabsVoices(configuration)
 
 		this.Control["basicSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
@@ -693,8 +766,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.showGoogleSynthesizerEditor()
 		else if (voiceSynthesizer == 5)
 			this.showOpenAISynthesizerEditor()
-		else
+		else if (voiceSynthesizer == 6)
 			this.showElevenLabsSynthesizerEditor()
+		else
+			this.showYandexSynthesizerEditor()
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -882,6 +957,41 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.iSynthesizerMode := false
 	}
 
+	showYandexSynthesizerEditor() {
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iYandexSynthesizerWidgets)
+
+		this.iTopYandexCredentialsVisible := true
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iYandexSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in SynthesizerEditor.showYandexSynthesizerEditor..."
+
+		this.showControls(this.iOtherWidgets)
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := "Yandex"
+	}
+
+	hideYandexSynthesizerEditor() {
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iYandexSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		this.iTopYandexCredentialsVisible := false
+
+		if (this.iSynthesizerMode == "Yandex")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iYandexSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in SynthesizerEditor.hideYandexSynthesizerEditor..."
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := false
+	}
+
 	getCurrentLanguage() {
 		local voiceLanguage := this.iLanguage
 		local languages := availableLanguages("Grammars")
@@ -915,6 +1025,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.updateAzureVoices()
 		this.updateGoogleVoices()
 		this.updateOpenAIVoices()
+		this.updateYandexVoices()
 		this.updateElevenLabsVoices()
 	}
 
@@ -1067,6 +1178,9 @@ class SynthesizerEditor extends ConfiguratorPanel {
 	}
 
 	updateOpenAIVoices(configuration := false) {
+	}
+
+	updateYandexVoices(configuration := false) {
 	}
 
 	updateElevenLabsVoices(configuration := false) {

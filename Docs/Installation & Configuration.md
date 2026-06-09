@@ -422,11 +422,13 @@ You can register an account on [ElevenLabs](https://elevenlabs.io) and create an
 
 ###### Yandex
 
-Speech recognition is also supported for Yandex, a Russian search engine and cloud service provider. Although Yandex's speech recognition can theoretically be used for any language, it only works reliably for Russian.
+Yandex, a Russian search engine and cloud service provider, can be used for speech synthesis and also for speech recognition. Although Yandex's speech recognition can theoretically be used for any language, it works best for the Russian language.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Yandex.JPG)
 
-Do not change any of the default values for the *Service URL* and the *Model*, only supply the API key. To create an API key, you have to register an account on [Yandex AI Studio](https://aistudio.yandex.ru/). It is important to create a so called *service* account, otherwise the API key cannot be used for Simulator Controller.
+For speech synthesis, you must supply an API key and choose a voice (do not change the *Server URL*). To create an API key, you have to register an account on [Yandex AI Studio](https://aistudio.yandex.ru/). It is important to create a so called *service* account, otherwise the API key cannot be used for Simulator Controller. The list of [available voices](https://aistudio.yandex.ru/docs/en/speechkit/tts/voices) is available in the Yandex documentation. Only *V1* voices can be used and be sure to select a voice which matces the chosen language for best results.
+
+For recognition, do not change any of the default values for the *Service URL* as well and also not the *Model*, only supply the API key. A *service* account is also required here.
 
 ###### Notes
 

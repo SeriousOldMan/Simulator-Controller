@@ -72,6 +72,7 @@ class SpeechSynthesizer {
 
 	static sElevenLabsSampleFrequency := false
 	static sOpenAISampleFrequency := false
+	static sYandexSampleFrequency := false
 
 	static sInitializePostProcessing := true
 
@@ -161,7 +162,7 @@ class SpeechSynthesizer {
 		Get {
 			local voices, voice, lcid, ignore, candidate, name
 
-			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI"))
+			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI") || (this.Synthesizer = "Yandex"))
 				return this.iVoices
 			else {
 				voices := []
@@ -405,8 +406,11 @@ class SpeechSynthesizer {
 										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
-		else if ((InStr(synthesizer, "ElevenLabs|") == 1) || (InStr(synthesizer, "OpenAI|") == 1)) {
-			this.iSynthesizer := ((InStr(synthesizer, "OpenAI|") == 1) ? "OpenAI" : "ElevenLabs")
+		else if ((InStr(synthesizer, "ElevenLabs|") == 1) || (InStr(synthesizer, "OpenAI|") == 1)
+														  || (InStr(synthesizer, "Yandex|") == 1)) {
+			this.iSynthesizer := ((InStr(synthesizer, "OpenAI|") == 1) ? "OpenAI"
+																	   : ((InStr(synthesizer, "ElevenLabs|") == 1) ? "ElevenLabs"
+																												   : "Yandex"))
 
 			try {
 				if (this.Synthesizer = "OpenAI") {
@@ -415,6 +419,14 @@ class SpeechSynthesizer {
 
 					try
 						this.iInstructions := StrReplace(string2Values("|", synthesizer, 4)[4], "\n", A_Space)
+
+					if (this.iServerURL != "")
+						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
+							this.iServerURL := SubStr(this.iServerURL, 1, StrLen(this.iServerURL) - 1)
+				}
+				else if (this.Synthesizer = "Yandex") {
+					this.iServerURL := Trim(string2Values("|", synthesizer, 3)[2])
+					this.iAPIKey := string2Values("|", synthesizer, 3)[3]
 
 					if (this.iServerURL != "")
 						while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
@@ -447,6 +459,7 @@ class SpeechSynthesizer {
 																		   , getMultiMapValue(settings, "Voice", "Sample Frequency", 16000))
 			SpeechSynthesizer.sOpenAISampleFrequency := getMultiMapValue(settings, "Voice", "OpenAI.Sample Frequency"
 																	   , getMultiMapValue(settings, "Voice", "Sample Frequency", 24000))
+			SpeechSynthesizer.sYandexSampleFrequency := getMultiMapValue(settings, "Voice", "Yandex.Sample Frequency", 16000)
 		}
 
 		this.setVolume(100)
@@ -528,7 +541,7 @@ class SpeechSynthesizer {
 				else
 					return []
 			}
-			else if (this.Synthesizer = "OpenAI")
+			else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "Yandex"))
 				return []
 			else if (this.Synthesizer = "ElevenLabs") {
 				voices := []
@@ -646,7 +659,7 @@ class SpeechSynthesizer {
 
 		callback := this.SpeechStatusCallback
 
-		if (kSox && (this.Synthesizer != "OpenAI")) {
+		if kSox { ; && (this.Synthesizer != "OpenAI")) {
 			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile, this.AudioSettings)
 
 			if callback
@@ -895,7 +908,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-		else if inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs"], this.Synthesizer) {
+		else if inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], this.Synthesizer) {
 			tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 			this.speakToFile(tempName, text)
@@ -912,7 +925,7 @@ class SpeechSynthesizer {
 
 	speakToFile(fileName, text) {
 		local oldStream, stream, ssml, name, model, voice, request, result, header, file, id
-		local tempFileName
+		local tempFileName, options, buf
 
 		if (this.Synthesizer = "Windows") {
 			oldStream := this.iSpeechSynthesizer.AudioOutputStream
@@ -1090,6 +1103,45 @@ class SpeechSynthesizer {
 				}
 			}
 		}
+		else if (this.Synthesizer = "Yandex") {
+			try {
+				options := ("?sampleRateHertz=" . SpeechSynthesizer.sYandexSampleFrequency . "&format=mp3"
+						  . "&voice=" . this.Voice . "&speed=" . Min(3, Max(0.1, 1 + (0.05 * this.iRate)))
+						  . "&text=" . WinHTTPRequest._EncodeDecode(text, true, true))
+
+				result := WinHttpRequest().POST(this.iServerURL . "/speech/v1/tts:synthesize" . options
+											  , , Map("Authorization", ("Api-Key " . this.iAPIKey))
+											  , {Raw: true})
+
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					tempFileName := temporaryFileName("Audio", "mp3")
+
+					file := FileOpen(tempFileName, "w")
+
+					file.RawWrite(result.Raw)
+
+					file.Close()
+
+					RunWait("`"" . kBinariesDirectory . "Audio Capture\ffmpeg.exe`" -i `"" . tempFileName . "`" -acodec pcm_s16le -ac 1 -ar 16000 `"" . fileName . "`"", , "Hide")
+
+					if !isDebug()
+						deleteFile(tempFileName)
+				}
+				else
+					throw "Error during speech synthesis..."
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Yandex API. Maybe your contingent is exhausted.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Yandex API. Maybe your contingent is exhausted.")
+				}
+			}
+		}
 	}
 
 	speakTest(language := false) {
@@ -1110,6 +1162,8 @@ class SpeechSynthesizer {
 					this.speak("Zebras caolhas de Java querem mandar fax para moça gigante de New York")
 				case "PL":
 					this.speak("Mężny bądź, chroń pułk twój i sześć flag")
+				case "RU":
+					this.speak("Съешь ещё этих мягких французских булок да выпей чаю")
 				case "ZH":
 					this.speak("潮水冲淡了他们留在沙滩上的脚印")
 				case "JA":
@@ -1278,7 +1332,7 @@ class SpeechSynthesizer {
 					voice := availableVoices[1]
 			}
 		}
-		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs")) {
+		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "Yandex")) {
 			if (voice == true) {
 				count := availableVoices.Length
 
@@ -1289,6 +1343,8 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
+			else if (voice && (this.Synthesizer = "Yandex"))
+				return voice
 			else if (voice && (InStr(voice, "(") || InStr(voice, "/")))
 				return voice
 		}
@@ -1329,7 +1385,7 @@ class SpeechSynthesizer {
 			this.iVoice := name[1]
 			this.iLocale := StrReplace(name[2], ")", "")
 		}
-		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs")) {
+		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "Yandex")) {
 			this.iLanguage := language
 			this.iVoice := name
 		}

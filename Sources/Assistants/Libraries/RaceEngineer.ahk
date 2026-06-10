@@ -246,8 +246,8 @@ class PlanPitstopEvent extends EngineerEvent {
 
 	createTrigger(event, phrase, arguments) {
 		local knowledgeBase := this.Assistant.KnowledgeBase
-		local targetLap, refuelAmount, tyreChange, repairs
-		local targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds
+		local targetLap, refuelAmount, tyreChange, repairs, index, tyreCompound, tyreCompounds, numCompounds
+		local targetLapRule, refuelRule, tyreRule, repairRule, mixedCompounds, maxTyreWear
 
 		static instructions := false
 
@@ -278,6 +278,9 @@ class PlanPitstopEvent extends EngineerEvent {
 		else
 			refuelRule := getMultiMapValue(instructions, "Rules", "RefuelRuleTime")
 
+		tyreCompounds := SessionDatabase.getTyreCompounds(this.Assistant.Simulator
+														, this.Assistant.Car, this.Assistant.Track)
+
 		if ((tyreChange = kUndefined) || tyreChange) {
 			if (knowledgeBase.getValue("Session.Settings.Tyre.Change", "Wear") = "Always")
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAlways")
@@ -288,8 +291,7 @@ class PlanPitstopEvent extends EngineerEvent {
 			else
 				tyreRule := getMultiMapValue(instructions, "Rules", "TyreRuleAll")
 
-			if inList(SessionDatabase.getTyreCompounds(this.Assistant.Simulator, this.Assistant.Car, this.Assistant.Track)
-					, tyreChange)
+			if inList(tyreCompounds, tyreChange)
 				tyreRule .= (A_Space . substituteVariables(getMultiMapValue(instructions, "Rules", "TyreRuleRestrict")
 														 , {tyreCompound: tyreChange}))
 		}
@@ -303,9 +305,20 @@ class PlanPitstopEvent extends EngineerEvent {
 		else
 			repairRule := getMultiMapValue(instructions, "Rules", "RepairRuleNoRepairs")
 
+		maxTyreWear := ""
+		numCompounds := tyreCompounds.Length
+
+		for index, tyreCompound in tyreCompounds {
+			maxTyreWear .= (this.Assistant.sessionMaxTyreWear( , compound(tyreCompound), compoundColor(tyrecompound))
+						  . " percent for " . tyreCompound)
+
+			if (index != numCompounds)
+				maxTyreWear .= ((index = (numCompounds - 1)) ? " and " : ", ")
+		}
+
 		return substituteVariables(getMultiMapValue(instructions, "Instructions", "PitstopPlan")
 								 , {targetLapRule: targetLapRule, refuelRule: refuelRule, tyreRule: tyreRule, repairRule: repairRule
-								  , maxTyreWear: this.Assistant.sessionMaxTyreWear()
+								  , maxTyreWear: maxTyreWear
 								  , lastService: knowledgeBase.getValue("Session.Settings.Pitstop.Service.Last", 5)})
 	}
 

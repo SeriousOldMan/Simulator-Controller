@@ -526,6 +526,8 @@ The following statistical models are currently implemented:
 	   
 	     Good to know: If you don't want all this, set the max. difference for both settings to 100%.
 	   - Last, but not least, if the setting "Pitstop: Choose Compound Mixture" is enabled in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) (disabled by default), Jona will try to choose the best possible tyre compound mixture for the next stint, either by the specified number of usable laps or by the expected tyre wear for the chosen compound mixture (see above).
+	 
+	 Good to know: If you want to use the wear data from the community database beside your own data collected in your past sessions for any tyre wear related decisions, enable the setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings).
 
   3. Tyre pressure development
   

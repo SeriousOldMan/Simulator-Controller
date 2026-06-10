@@ -19,6 +19,7 @@ The following settings control when and how data is collected by the Assistants 
 | Collect Tyre Pressures during Qualifying | Boolean | False                           | No  | If enabled (*True*), pressures (hot and cold) are collected by the Engineer during qualifying sessions. The Engineer must not be disabled for this to work. |
 | Collect Tyre Pressures during Race       | Boolean | True                            | No  | If enabled (*True*), pressures (hot and cold) are collected by the Engineer during race sessions. The Engineer must not be disabled for this to work. |
 | Collect Tyre Pressures during Time Trial | Boolean | False                           | No  | If enabled (*True*), pressures (hot and cold) are collected by the Engineer during time trial sessions. The Engineer must not be disabled for this to work. |
+| Use tyre wear data from community        | Boolean  | False                          | No  | If not *False*, tyre wear data from the community database will be used beside your own collected data for any tyre wear related decisions. Examples are strategy development or the dynamic tyre compound mixture selection of the Engineer at pitstop time. For this to be effective, you must, of course, consent to the sharing of your own tyre wear data with the community. |
 
 ### Assistants Settings
 
@@ -184,7 +185,6 @@ Settings that apply to a session in general can be found here.
 | Average Lap Time                         | Integer | 120                             | Yes | Average lap time of the given car / track / weather combo. Only used in the first few laps in statistical calculations. This value will be updated automatically (depending on your [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer)), once you have been on the track. |
 | Formation Lap                            | Boolean | True                            | Yes | If enabled (*True*), the session rules require a formation lap, which is considered in fuel calculations. Typically not entered into the "Session Database", but into "Race Settings" just before the start of a session. |
 | Post Race Lap                            | Boolean | True                            | Yes | If enabled (*True*), the session rules require a cool down lap after the end of the session, which is considered in fuel calculations. Typically not entered into the "Session Database", but into "Race Settings" just before the start of a session. |
-| Use tyre wear data from community        | Boolean  | False                          | No  | If not *False*, tyre wear data from the community database will be used beside your own collected data for any tyre wear related decisions. Examples are strategy development or the dynamic tyre compound mixture selection of the Engineer at pitstop time. For this to be effective, you must, of course, consent to the sharing of your own tyre wear data with the community. |
 
 ### Setup Settings
 

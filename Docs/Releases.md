@@ -10,6 +10,7 @@
   - Fixed a bug for the Driving Coach, which prevented loading of the fastest reference lap from the session database in some cases.
   - Fixed calculation of remaining laps on fuel for cars without VE in *Le Mans Ultimate*.
   - Fixed calculation of fuel capacity for cars without VE in *Le Mans Ultimate*.
+  - Fixed several car rules for *Automobilista 2* for "Setup Workbench".
   
 #### Changes
 

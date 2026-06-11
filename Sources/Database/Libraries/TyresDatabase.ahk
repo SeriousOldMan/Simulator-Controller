@@ -94,7 +94,7 @@ class TyresDatabase extends SessionDatabase {
 
 	UseCommunityPressures[simulator, car := "*", track := "*", weather := "*"] {
 		Get {
-			local key := (simulator . "." . car . "." . track . "." . weather)
+			local key := (simulator . "." . car . "." . track . "." . weather . "." . this.UseCommunity)
 			local useCommunity
 
 			static cache := CaseInsenseMap()
@@ -116,7 +116,7 @@ class TyresDatabase extends SessionDatabase {
 
 	UseCommunityWears[simulator, car := "*", track := "*", weather := "*"] {
 		Get {
-			local key := (simulator . "." . car . "." . track . "." . weather)
+			local key := (simulator . "." . car . "." . track . "." . weather . "." . this.UseCommunity)
 			local useCommunity
 
 			static cache := CaseInsenseMap()

@@ -1,5 +1,41 @@
 # Latest stable release
 
+## 7.0.0.0
+
+#### Date: 06/12/26
+
+#### Fixes
+
+  - Fixed a problem in the internal representation of the settings for minimum tyre tread depth and the minimum brakepad thickness in the "Session Database". See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you have used these settings.
+  - Fixed a bug for the Driving Coach, which prevented loading of the fastest reference lap from the session database in some cases.
+  - Fixed calculation of remaining laps on fuel for cars without VE in *Le Mans Ultimate*.
+  - Fixed calculation of fuel capacity for cars without VE in *Le Mans Ultimate*.
+  
+#### Changes
+
+  - The storage and synchronization process of the community database has changed. The new process will be used at the very first next synchronization.
+  - [Important] Tyre wear data can now be shared in the community database. The consent dialog will be shown automatically the next time you use one of the applications of Simulator Controller. If you share your tyre wear data, you will be rewarded with tyre wear data of all other community members, of course.
+    - A new setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) lets you choose, whether you want to use the wear data of the community beside your own collected data for any tyre wear related decisions (for example see next item).
+  - The Engineer can now decide based on tyre wear data or a specified number of usable laps, which will be the best tyre compound mixture when changing tyres for the next stint.
+    - A new setting "Pitstop: Choose Compound Mixture" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) allows you to enable this decision for the Engineer (it is disabled by default).
+    - [Important] The definition of the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database" has changed. It can now be either a single percentage value (as before) or a descriptor for all available tyre compounds. See the [explanation of tyre compound life](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) for more information.
+	- The decision for a specific tyre compound mixture will either be taken based on the configured number of laps usable for a compound mixture (setting ["Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database") or by the tyre wear (see above), if this information is available in the simulator API. You can choose between the different methods using the setting ["Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database".
+	- The max. tyre wear for all available tyre compounds will also be passed to the *Reasoning* booster for the synthetical "Pitstop Planning" event for pitstop planning by the LLM, if enabled.
+	- More details can be found in the [extended documentation for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and for [tyre compound handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) in general.
+  - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Yandex) for more information.
+  - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant boosters.
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - ADESS AD25 LMP3
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you are using the settings for minimum tyre tread depth and the minimum brakepad thickness.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 6.9.9.0
 
 #### Date: 06/05/26
@@ -30,40 +66,6 @@
 		{All: [?Compose], [?L]} => (Prove: Set(?L.prop3, Maybe))
 
 		setProp2(?object, ?value) <= Set(?object.prop2, ?value)
-
-# Upcoming release
-
-## 7.0.0.0
-
-#### Date: 06/12/26 (planned)
-
-#### Fixes
-
-  - Fixed a problem in the internal representation of the settings for minimum tyre tread depth and the minimum brakepad thickness in the "Session Database". See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you have used these settings.
-  - Fixed a bug for the Driving Coach, which prevented loading of the fastest reference lap from the session database in some cases.
-  - Fixed calculation of remaining laps on fuel for cars without VE in *Le Mans Ultimate*.
-  - Fixed calculation of fuel capacity for cars without VE in *Le Mans Ultimate*.
-  
-#### Changes
-
-  - The storage and synchronization process of the community database has changed. The new process will be used at the very first next synchronization.
-  - [Important] Tyre wear data can now be shared in the community database. The consent dialog will be shown automatically the next time you use one of the applications of Simulator Controller. If you share your tyre wear data, you will be rewarded with tyre wear data of all other community members, of course.
-    - A new setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) lets you choose, whether you want to use the wear data of the community beside your own collected data for any tyre wear related decisions (for example see next item).
-  - The Engineer can now decide based on tyre wear data or a specified number of usable laps, which will be the best tyre compound mixture when changing tyres for the next stint.
-    - A new setting "Pitstop: Choose Compound Mixture" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) allows you to enable this decision for the Engineer (it is disabled by default).
-    - [Important] The definition of the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database" has changed. It can now be either a single percentage value (as before) or a descriptor for all available tyre compounds. See the [explanation of tyre compound life](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) for more information.
-	- The decision for a specific tyre compound mixture will either be taken based on the configured number of laps usable for a compound mixture (setting ["Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database") or by the tyre wear (see above), if this information is available in the simulator API. You can choose between the different methods using the setting ["Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database".
-	- The max. tyre wear for all available tyre compounds will also be passed to the *Reasoning* booster for the synthetical "Pitstop Planning" event for pitstop planning by the LLM, if enabled.
-	- More details can be found in the [extended documentation for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and for [tyre compound handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) in general.
-  - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Yandex) for more information.
-  - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant boosters.
-  - New car models for "Setup Workbench":
-    - Le Mans Ultimate
-	  - ADESS AD25 LMP3
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700), if you are using the settings for minimum tyre tread depth and the minimum brakepad thickness.
-
-# Release history
 
 ## 6.9.8.0
 

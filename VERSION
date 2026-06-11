@@ -1,15 +1,15 @@
 [Development]
-Version=7.0.0.0-dev
+Version=7.0.0.0-release
 Target=7.0.0.0-release
-Date=06/04/2026
-Download=
-Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures
+Date=06/12/2026
+Download=https://cutt.ly/Gt9O4P8S;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O6n8jP2j/Releases/Simulator%20Controller%207.0.0.0-release.zip;https://www.dropbox.com/scl/fi/orjrk3bmirtn7tt039kae/Simulator-Controller-7.0.0.0-release.zip?rlkey=3y1bsi9gte8yvtbhgvn6jqx18&st=nmmb43cl&dl=1;http://%master%/Releases/Simulator Controller 7.0.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.0.0.0-release.zip
+Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
-Version=6.9.9.0-release
-Date=06/05/2026
-Download=https://cutt.ly/Ft0URuM4;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5Qf2Z_83/Releases/Simulator%20Controller%206.9.9.0-release.zip;https://www.dropbox.com/scl/fi/esadj85yr93ndeucl9552/Simulator-Controller-6.9.9.0-release.zip?rlkey=6qzz6een5fzc0wxx94ns2h3x5&st=064ecs95&dl=1;http://%master%/Releases/Simulator Controller 6.9.9.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+6.9.9.0-release.zip
-Changes=Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization
+Version=7.0.0.0-release
+Date=06/12/2026
+Download=https://cutt.ly/Gt9O4P8S;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/O6n8jP2j/Releases/Simulator%20Controller%207.0.0.0-release.zip;https://www.dropbox.com/scl/fi/orjrk3bmirtn7tt039kae/Simulator-Controller-7.0.0.0-release.zip?rlkey=3y1bsi9gte8yvtbhgvn6jqx18&st=nmmb43cl&dl=1;http://%master%/Releases/Simulator Controller 7.0.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.0.0.0-release.zip
+Changes=Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Components]
 Media.6.9.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.6.9.2.Path=.
 Utilities.6.9.2.Content=Utilities
 Utilities.6.9.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/vSM_QhzO/Components/Utilities%206.9.2.zip;https://www.dropbox.com/scl/fi/780ucr9jfstiy9umhi5nz/Utilities-6.9.2.zip?rlkey=rbw1b5i3dlbc9f63o05722set&st=1mkiahg4&dl=1;http://%master%/Components/Utilities 6.9.2.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+6.9.2.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
 Development=7.0.0.0-release
-Release=6.9.9.0-release
+Release=7.0.0.0-release

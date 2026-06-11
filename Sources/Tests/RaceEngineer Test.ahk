@@ -1153,9 +1153,9 @@ setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(FuelReporting)
-	;~ AHKUnit.AddTestClass(DamageReporting)
-	;~ AHKUnit.AddTestClass(DamageAnalysis)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 	AHKUnit.AddTestClass(PitstopHistory)
 
@@ -1599,7 +1599,7 @@ else {
 						engineer.addLap(lap, &data)
 
 						if (lap = 5) {
-							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Wear.Warning", 25)
+							engineer.KnowledgeBase.setFact("Session.Settings.Tyre.Tread.Minimum", 25)
 
 							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 

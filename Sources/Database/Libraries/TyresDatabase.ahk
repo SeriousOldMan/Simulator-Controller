@@ -92,6 +92,50 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
+	UseCommunityPressures[simulator, car := "*", track := "*", weather := "*"] {
+		Get {
+			local key := (simulator . "." . car . "." . track . "." . weather . "." . this.UseCommunity)
+			local useCommunity
+
+			static cache := CaseInsenseMap()
+
+			if cache.Has(key)
+				return cache[key]
+			else {
+				useCommunity := SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
+																  , "Session Settings", "Tyre.Pressure.Community"
+																  , kUndefined)
+
+				if (useCommunity == kUndefined)
+					useCommunity := this.UseCommunity
+
+				return (cache[key] := useCommunity)
+			}
+		}
+	}
+
+	UseCommunityWears[simulator, car := "*", track := "*", weather := "*"] {
+		Get {
+			local key := (simulator . "." . car . "." . track . "." . weather . "." . this.UseCommunity)
+			local useCommunity
+
+			static cache := CaseInsenseMap()
+
+			if cache.Has(key)
+				return cache[key]
+			else {
+				useCommunity := SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
+																  , "Session Settings", "Tyre.Wear.Community"
+																  , kUndefined)
+
+				if (useCommunity == kUndefined)
+					useCommunity := this.UseCommunity
+
+				return (cache[key] := useCommunity)
+			}
+		}
+	}
+
 	getTyresDatabase(simulator, car, track, scope := "User") {
 		local directory
 
@@ -189,7 +233,7 @@ class TyresDatabase extends SessionDatabase {
 			conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
 										, condition["Compound"], condition["Compound.Color"])] := true
 
-		if this.UseCommunity {
+		if this.UseCommunityPressures[simulator, car, track] {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
 			for ignore, condition in database.query("Tyres.Pressures.Distribution"
@@ -297,7 +341,7 @@ class TyresDatabase extends SessionDatabase {
 					 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 					 , Compound: compound(row["Compound"], row["Compound.Color"]), Count: row["Count"]})
 
-		if this.UseCommunity {
+		if this.UseCommunityPressures[simulator, car, track, weather] {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", count, "Count"]]
@@ -338,7 +382,7 @@ class TyresDatabase extends SessionDatabase {
 		}
 
 		localTyresDatabase := this.requireDatabase(simulator, car, track)
-		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Community") : false)
+		globalTyresDatabase := (this.UseCommunityPressures[simulator, car, track, weather] ? this.getTyresDatabase(simulator, car, track, "Community") : false)
 
 		for ignore, weatherOffset in weatherCandidateOffsets {
 			weather := kWeatherConditions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherConditions.Length))]
@@ -353,7 +397,7 @@ class TyresDatabase extends SessionDatabase {
 					this.getPressureDistributions(localTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 											    , compound, compoundColor, distributions, driver*)
 
-					if this.UseCommunity
+					if this.UseCommunityPressures[simulator, car, track, weather]
 						this.getPressureDistributions(globalTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 													, compound, compoundColor, distributions, false)
 
@@ -392,6 +436,7 @@ class TyresDatabase extends SessionDatabase {
 	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
 				, compound, compoundColor, maxWear := 75, default := false
 				, community := kUndefined, driver := false) {
+		local settingsDB := SettingsDatabase()
 		local lastLap := 0
 		local tyreWears := []
 		local wears, ignore, wear, lapWear, lastWear, db
@@ -402,8 +447,7 @@ class TyresDatabase extends SessionDatabase {
 		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
 																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
 
-		if (((community == kUndefined) && SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
-																			, "Session Settings", "Tyre.Wear.Community", false))
+		if (((community == kUndefined) && this.UseCommunityWears[simulator, car, track, weather])
 		 || (community && (community != kUndefined))) {
 			db := this.requireDatabase(simulator, car, track, "Community")
 

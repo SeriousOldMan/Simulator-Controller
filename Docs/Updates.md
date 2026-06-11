@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 7.0.0
 
-The internal definition of the settings for minimum tyre tread depth and the minimum brakepad thickness have changed in the "Session Database". If you have used this setting, you have to delete and reassign it in the "Session Database".
+The internal definition of the settings for minimum tyre tread depth and the minimum brakepad thickness have changed in the "Session Database". If you have used this settings, you have to delete and reassign it in the "Session Database".
 
 ## Release 6.9.9
 

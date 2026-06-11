@@ -445,7 +445,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 																			, getMultiMapValue(configuration, "Voice Control"
 																											, "APIKeyFile", ""))
 
-			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "")
+			this.Value["openAISpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerServerURL", "https://api.openai.com")
 			this.Value["openAISpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerAPIKey", "")
 			this.Value["openAISpeakerModel"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerModel", "")
 			this.Value["openAISpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "OpenAI.SpeakerVoice", "")
@@ -454,7 +454,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.Value["elevenLabsAPIKey"] := getMultiMapValue(configuration, "Voice Control", "ElevenLabs.APIKey"
 																			, getMultiMapValue(configuration, "Voice Control", "APIKey", ""))
 
-			this.Value["yandexSpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", "")
+			this.Value["yandexSpeakerServerURL"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", "https://tts.api.cloud.yandex.net")
 			this.Value["yandexSpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", "")
 			this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerVoice", "")
 

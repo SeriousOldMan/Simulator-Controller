@@ -615,16 +615,14 @@ class StrategyWorkbench extends ConfigurationItem {
 			local availableCompounds := collect(workbench.TyreCompounds, translate)
 			local selectedCompound := workbench.TyreSetListView.GetText(workbench.TyreSetListView.GetNext(0))
 			local tyreCompound := workbench.TyreCompounds[inList(availableCompounds, selectedCompound)]
-			local wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
-																   , workbench.SelectedCar, workbench.SelectedTrack
-																   , "*", this.compoundWeather(tyreCompound)
-																   , "Session Settings", "Tyre.Wear.Warning", false)
+			local maxTyreWear := workbench.getMaxTyreWear(workbench.compoundWeather(tyreCompound)
+														, compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 			local tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 														  , workbench.SelectedCar, workbench.SelectedTrack
 														  , this.compoundWeather(tyreCompound)
 														  , workbench.AirTemperature, workbench.TrackTemperature
 														  , compound(tyreCompound), compoundColor(tyreCompound)
-														  , wearWarning ? (100 - wearWarning) : unset)
+														  , (maxTyreWear != kUndefined) ? maxTyreWear : unset)
 
 			if tyreLaps {
 				workbenchGui["tyreSetLapsEdit"].Text := tyreLaps
@@ -636,7 +634,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		addTyreSet(*) {
 			local availableCompounds := collect(workbench.TyreCompounds, translate)
 			local usedCompounds := []
-			local index, ignore, candidate, tyreCompound, tyreWears, wearWarning
+			local index, ignore, candidate, tyreCompound, tyreWears, maxTyreWear
 
 			loop workbench.TyreSetListView.GetCount()
 				usedCompounds.Push(workbench.TyreSetListView.GetText(A_Index, 1))
@@ -649,16 +647,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 
 			tyreCompound := workbench.TyreCompounds[index]
-			wearWarning := SettingsDatabase().readSettingValue(workbench.SelectedSimulator
-															 , workbench.SelectedCar, workbench.SelectedTrack
-															 , "*", this.compoundWeather(tyreCompound)
-															 , "Session Settings", "Tyre.Wear.Warning", false)
+			maxTyreWear := workbench.getMaxTyreWear(workbench.compoundWeather(tyreCompound)
+												  , compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 			tyreLaps := TyresDatabase().getUsableLaps(workbench.SelectedSimulator
 													, workbench.SelectedCar, workbench.SelectedTrack
 													, this.compoundWeather(tyreCompound)
 													, workbench.AirTemperature, workbench.TrackTemperature
 													, compound(tyreCompound), compoundColor(tyreCompound)
-													, wearWarning ? (100 - wearWarning) : unset, 50)
+													, (maxTyreWear != kUndefined) ? maxTyreWear : unset, 50)
 
 			workbench.TyreSetListView.Add("", translate(tyreCompound), tyreLaps, 99)
 			workbench.TyreSetListView.Modify(workbench.TyreSetListView.GetCount(), "Select Vis")
@@ -2564,7 +2560,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	loadTyreCompounds(simulator, car, track) {
 		local tyresDB := TyresDatabase()
 		local compounds := SessionDatabase().getTyreCompounds(simulator, car, track)
-		local ignore, tyreCompound, wearWarning, tyreLaps
+		local ignore, tyreCompound, maxTyreWear, tyreLaps
 
 		this.iTyreCompounds := compounds
 		this.iAvailableTyreCompounds := compounds
@@ -2574,10 +2570,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.TyreSetListView.Delete()
 
 		for ignore, tyreCompound in compounds {
-			wearWarning := SettingsDatabase().readSettingValue(this.SelectedSimulator
-															   , this.SelectedCar, this.SelectedTrack
-															   , "*", this.compoundWeather(tyreCompound)
-															   , "Session Settings", "Tyre.Wear.Warning", false)
+			maxTyreWear := this.getMaxTyreWear(this.compoundWeather(tyreCompound)
+											 , compound(tyreCompound), compoundColor(tyreCompound), kUndefined)
 
 			this.TyreSetListView.Add("", translate(tyreCompound)
 									   , tyresDB.getUsableLaps(this.SelectedSimulator
@@ -2585,7 +2579,7 @@ class StrategyWorkbench extends ConfigurationItem {
 															 , this.compoundWeather(tyreCompound)
 															 , this.AirTemperature, this.TrackTemperature
 															 , compound(tyreCompound), compoundColor(tyreCompound)
-															 , wearWarning ? (100 - wearWarning) : unset, 50)
+															 , (maxTyreWear != kUndefined) ? maxTyreWear : unset, 50)
 									   , 99)
 		}
 
@@ -3705,6 +3699,32 @@ class StrategyWorkbench extends ConfigurationItem {
 		html := ("<html>" . before . chart . charts . ";`n" . drawChartsFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
 
 		this.showComparisonChart(html)
+	}
+
+	getMaxTyreWear(weather, tyreCompound, tyreCompoundColor, default := 75) {
+		local minTreadDepth := SettingsDatabase().readSettingValue(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+																 , "*", weather, "Session Settings", "Tyre.Tread.Minimum"
+																 , kUndefined)
+		local lap, mixedCompounds
+
+		if (minTreadDepth = kUndefined)
+			return default
+		else if isInteger(minTreadDepth)
+			return (100 - minTreadDepth)
+		else {
+			minTreadDepth := string2Map(";", "->", minTreadDepth)
+
+			if tyreCompound {
+				tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+				if minTreadDepth.Has(tyreCompound)
+					return (100 - minTreadDepth[tyreCompound])
+				else
+					return default
+			}
+			else
+				return (100 - average(getValues(minTreadDepth)))
+		}
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {

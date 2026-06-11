@@ -710,7 +710,7 @@ pressureLossWarning(?tyre, ?lostPressure) <= Call(pressureLossWarning, ?tyre, ?l
 priority: -15, {All: [?Lap], {None: [?Tyre.Wear.Reported],
 					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: checkTyreWear(?Lap))
 
-checkTyreWear(?lap) <= ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning,
+checkTyreWear(?lap) <= ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum,
 					   criticalTyreWear(?lap, [FL, FR, RL, RR], ?threshold, ?tyre, ?wear),
 					   tyreWearWarning(?lap, ?tyre, ?wear), Set(Tyre.Wear.Reported, ?lap)
 
@@ -733,7 +733,7 @@ tyreWearWarning(?lap, ?tyre, ?wear) <= Call(tyreWearWarning, ?tyre, ?wear)
 
 {All: [?Lap], [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]} => (Prove: checkBrakeWear(?Lap))
 
-checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
+checkBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Pad.Minimum,
 						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear), !,
 						Set(Brake.Change.Target, true)
 checkBrakeWear(?lap) <= Set(Brake.Change.Target, false)
@@ -753,7 +753,7 @@ criticalBrakeWear(?lap, [? | ?brakes], ?threshold, ?brake, ?wear) <= criticalBra
 priority: -15, {All: [?Lap], [?Brake.Change.Target = true], {None: [?Brake.Wear.Reported],
 					 [?Lap.Remaining.Session > ?Session.Settings.Pitstop.Service.Last]}} => (Prove: reportBrakeWear(?Lap))
 
-reportBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Wear.Warning,
+reportBrakeWear(?lap) <= ?threshold = 100 - !Session.Settings.Brake.Pad.Minimum,
 						criticalBrakeWear(?lap, [FL, FR, RL, RR], ?threshold, ?brake, ?wear),
 						brakeWearWarning(?lap, ?brake, ?wear), Set(Brake.Wear.Reported, ?lap)
 
@@ -1166,7 +1166,7 @@ tyreChange(All, ?, !Tyre.Compound.Target, !Tyre.Compound.Color.Target)
 tyreChange(All, [], [], ?)
 tyreChange(All, [?tyre | ?tyres], [?avgWear | ?avgWears], ?remainingLaps) <=
 		lapTyreWear(!Lap, FULL, ?tyre, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold,
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold,
 		tyreChange(All, ?tyres, ?avgWears, ?remainingLaps)
 		
 tyreChange(All, [], ?)
@@ -1213,7 +1213,7 @@ tyreChange(Axle, Rear, ?, !Tyre.Compound.Target.Rear, !Tyre.Compound.Color.Targe
 
 tyreChange(Axle, ?tyre, ?remainingLaps) <=
 		lapAvgTyreWear(!Lap, ?tyre, ?avgWear), lapTyreWear(!Lap, FULL, ?tyre, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold
 
 tyreChange(Axle, [], ?)
 tyreChange(Axle, [?tyre | ?tyres], ?remainingLaps) <=
@@ -1241,7 +1241,7 @@ tyreChange(Wheel, FrontLeft, ?remainingLaps, false, false) <=
 		!Tyre.Compound.Target.FrontLeft = !Tyre.Compound.FrontLeft,
 		!Tyre.Compound.Color.Target.FrontLeft = !Tyre.Compound.Color.FrontLeft,
 		lapAvgTyreWear(!Lap, FL, ?avgWear), lapTyreWear(!Lap, FULL, FL, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold, !
 tyreChange(Wheel, FrontLeft, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps,
 		!Tyre.Compound.Target.FrontLeft = !Tyre.Compound.FrontLeft,
@@ -1254,7 +1254,7 @@ tyreChange(Wheel, FrontRight, ?remainingLaps, false, false) <=
 		!Tyre.Compound.Target.FrontRight = !Tyre.Compound.FrontRight,
 		!Tyre.Compound.Color.Target.FrontRight = !Tyre.Compound.Color.FrontRight,
 		lapAvgTyreWear(!Lap, FR, ?avgWear), lapTyreWear(!Lap, FULL, FR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold, !
 tyreChange(Wheel, FrontRight, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps,
 		!Tyre.Compound.Target.FrontRight = !Tyre.Compound.FrontRight,
@@ -1278,7 +1278,7 @@ tyreChange(Wheel, RearLeft, ?remainingLaps, false, false) <=
 		!Tyre.Compound.Target.RearLeft = !Tyre.Compound.RearLeft,
 		!Tyre.Compound.Color.Target.RearLeft = !Tyre.Compound.Color.RearLeft,
 		lapAvgTyreWear(!Lap, RL, ?avgWear), lapTyreWear(!Lap, FULL, RL, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold, !
 tyreChange(Wheel, RearLeft, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps,
 		!Tyre.Compound.Target.RearLeft = !Tyre.Compound.RearLeft,
@@ -1291,7 +1291,7 @@ tyreChange(Wheel, RearRight, ?remainingLaps, false, false) <=
 		!Tyre.Compound.Target.RearRight = !Tyre.Compound.RearRight,
 		!Tyre.Compound.Color.Target.RearRight = !Tyre.Compound.Color.RearRight,
 		lapAvgTyreWear(!Lap, RR, ?avgWear), lapTyreWear(!Lap, FULL, RR, ?wear), ?remainingWear = ?remainingLaps * ?avgWear,
-		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Wear.Warning, ?targetWear =< ?threshold, !
+		?targetWear = ?wear + ?remainingWear, ?threshold = 100 - !Session.Settings.Tyre.Tread.Minimum, ?targetWear =< ?threshold, !
 tyreChange(Wheel, RearRight, ?remainingLaps, false, false) <=
 		!Session.Settings.Tyre.Change = Laps,
 		!Tyre.Compound.Target.RearRight = !Tyre.Compound.RearRight,

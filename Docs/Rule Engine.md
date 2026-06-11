@@ -136,7 +136,7 @@ The empty list is this of course:
 
 	[]
 
-The "|" seperates the first element of the remaining elements of the list.
+The "|" seperates the first element (or elements, if separated by a ",") of the remaining element of the list, which can be a list as well, incl. the empty list. If this element is not a list, the result will be a degenerated list or a simple pair.
 
 	[?firstElement | ?moreElements]
 	

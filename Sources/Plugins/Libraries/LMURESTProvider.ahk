@@ -736,6 +736,12 @@ class LMURESTProvider {
 			}
 		}
 
+		FuelLevel {
+			Get {
+				return this.getFuelLevel()
+			}
+		}
+
 		FuelAmount {
 			Get {
 				return this.getFuelAmount()
@@ -754,19 +760,70 @@ class LMURESTProvider {
 			}
 		}
 
+		getFuelLevel() {
+			local carSetup, capacity
+
+			if this.Data {
+				carSetup := this.Data["carSetup"]["garageValues"]
+
+				try {
+					capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
+
+					if (capacity = "n/a")
+						throw "No VE..."
+					else {
+						if InStr(capacity, "gal")
+							capacity := (StrReplace(capacity, "gal", "") * 3.785411)
+						else
+							capacity := StrReplace(capacity, "l", "")
+
+						return ((carSetup["VM_VIRTUAL_ENERGY"]["value"] / 100) * capacity * carSetup["VM_FUEL_LEVEL"]["stringValue"])
+					}
+				}
+				catch Any {
+					try {
+						if InStr(string2Values(A_Space, carSetup["VM_FUEL_LEVEL"]["stringValue"])[1], "gal")
+							return (carSetup["VM_FUEL_LEVEL"]["value"] * 3.785411)
+						else
+							return carSetup["VM_FUEL_LEVEL"]["value"]
+					}
+					catch Any {
+						return false
+					}
+				}
+			}
+			else
+				return false
+		}
+
 		getFuelAmount() {
 			local carSetup, capacity
 
 			if this.Data {
 				carSetup := this.Data["carSetup"]["garageValues"]
-				capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
 
-				if InStr(capacity, "gal")
-					capacity := (StrReplace(capacity, "gal", "") * 3.785411)
-				else
-					capacity := StrReplace(capacity, "l", "")
+				try {
+					capacity := string2Values(A_Space, carSetup["VM_FUEL_CAPACITY"]["stringValue"])[1]
 
-				return ((carSetup["VM_VIRTUAL_ENERGY"]["value"] / 100) * capacity * carSetup["VM_FUEL_LEVEL"]["stringValue"])
+					if (capacity = "n/a")
+						throw "No VE..."
+					else
+						if InStr(capacity, "gal")
+							return (StrReplace(capacity, "gal", "") * 3.785411)
+						else
+							return StrReplace(capacity, "l", "")
+				}
+				catch Any {
+					try {
+						if InStr(string2Values(A_Space, carSetup["VM_FUEL_LEVEL"]["stringValue"])[1], "gal")
+							return (carSetup["VM_FUEL_LEVEL"]["maxValue"] * 3.785411)
+						else
+							return carSetup["VM_FUEL_LEVEL"]["maxValue"]
+					}
+					catch Any {
+						return false
+					}
+				}
 			}
 			else
 				return false
@@ -865,7 +922,7 @@ class LMURESTProvider {
 		}
 
 		getFuelAmount() {
-			return (this.Data ? this.Data["fuelCapacity"] : false)
+			return false ; (this.Data ? this.Data["fuelCapacity"] : false)
 		}
 
 		getBrakeBrakePadWear(wheel) {
@@ -1066,6 +1123,10 @@ class LMURESTProvider {
 			}
 		}
 
+		hasVirtualEnergy() {
+			return (this.Data && this.Data.Has("fuelInfo") && this.Data["fuelInfo"].Has("maxVirtualEnergy") && (this.Data["fuelInfo"]["maxVirtualEnergy"] > 0))
+		}
+
 		getRemainingVirtualEnergy() {
 			if (this.Data && this.Data.Has("fuelInfo") && this.Data["fuelInfo"].Has("currentVirtualEnergy"))
 				return Round(this.Data["fuelInfo"]["currentVirtualEnergy"] / this.Data["fuelInfo"]["maxVirtualEnergy"] * 100, 2)
@@ -1078,7 +1139,10 @@ class LMURESTProvider {
 		}
 
 		getMaxFuelAmount() {
-			return ((this.Data && this.Data.Has("fuelInfo")) ? Round(this.Data["fuelInfo"]["maxFuel"], 2) : false)
+			if (this.Data && this.Data.Has("fuelInfo") && this.Data["fuelInfo"].Has("currentVirtualEnergy") && (this.Data["fuelInfo"]["currentVirtualEnergy"] > 0))
+				return Round(this.Data["fuelInfo"]["currentFuel"] * (this.Data["fuelInfo"]["maxVirtualEnergy"] / this.Data["fuelInfo"]["currentVirtualEnergy"]), 2)
+			else
+				return false
 		}
 	}
 
@@ -1089,9 +1153,9 @@ class LMURESTProvider {
 			}
 		}
 
-		State {
+		State[internal := false] {
 			Get {
-				return this.getState()
+				return this.getState(internal)
 			}
 		}
 
@@ -1107,26 +1171,31 @@ class LMURESTProvider {
 			}
 		}
 
-		getState() {
+		getState(internal := false) {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if data {
-				if (data.Has("status") && (data["status"] = "unavailable"))
-					return "Inactive"
-				else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
-					return "Not Driving"
-				else if data.Has("MultiStintState") {
-					switch data["MultiStintState"], false {
-						case "Disabled":
-							return "Disabled"
-						case "Driving", "END_OF_RACE_GRACE":
-							return "Driving"
-						default:
-							return "Paused"
-					}
-				}
+				if internal
+					return ((data.Has("status") ? (data["status"] . ", ") : " , ")
+						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
+						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
 				else
-					return "Paused"
+					if (data.Has("status") && (data["status"] = "unavailable"))
+						return "Inactive"
+					else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+						return "Not Driving"
+					else if data.Has("MultiStintState") {
+						switch data["MultiStintState"], false {
+							case "Disabled":
+								return "Disabled"
+							case "Driving", "END_OF_RACE_GRACE":
+								return "Driving"
+							default:
+								return "Paused"
+						}
+					}
+					else
+						return "Paused"
 			}
 			else
 				return "Inactive"

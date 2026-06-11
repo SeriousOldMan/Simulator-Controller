@@ -520,11 +520,14 @@ The following statistical models are currently implemented:
 		 
 		   If at least one tyre must be changed at the pitstop, this setting specifies the maximum allowed tyre wear difference for tyres between the front and rear axles. If the wear difference will exceed the given value, the tyres on the other axle will be changed as well.
 		   
-	   In a first step, Jona makes sure, that the tyre wear difference between the tyres on an axle is not more than the specified max value. After that, the difference between the axles is leveled out. In both steps, Jona may decide to swap additional tyres.
+	     In a first step, Jona makes sure, that the tyre wear difference between the tyres on an axle is not more than the specified max value. After that, the difference between the axles is leveled out. In both steps, Jona may decide to swap additional tyres.
 	   
-	   The default value for both settings is 30% max. wear difference, but this can be changed for every car / track combination as with every setting in the "Session Database".
+	     The default value for both settings is 30% max. wear difference, but this can be changed for every car / track combination as with every setting in the "Session Database".
 	   
-	   Good to know: If you don't want all this, set the max. difference for both settings to 100%.
+	     Good to know: If you don't want all this, set the max. difference for both settings to 100%.
+	   - Last, but not least, if the setting "Pitstop: Choose Compound Mixture" is enabled in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) (disabled by default), Jona will try to choose the best possible tyre compound mixture for the next stint, either by the specified number of usable laps or by the expected tyre wear for the chosen compound mixture (see above).
+	 
+	 Good to know: If you want to use the wear data from the community database beside your own data collected in your past sessions for any tyre wear related decisions, enable the setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings).
 
   3. Tyre pressure development
   

@@ -427,19 +427,24 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (values.HasProp("Settings") && this.iReferenceModeAuto) {
 			this.iReferenceMode := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference", "Fastest")
-			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", "Fastest")
+			this.iLoadReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database", kUndefined)
 			this.iSaveReference := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Save", "Off")
+
+			if (this.LoadReference == kUndefined)
+				this.iLoadReference := (this.SettingsDatabase.UseCommunity ? "Fastest (incl. Community)" : "Fastest")
 
 			if !this.LoadReference
 				this.iLoadReference := "None"
 			else if (this.LoadReference == true)
-				this.iLoadReference := "Fastest"
+				this.iLoadReference := (this.SettingsDatabase.UseCommunity ? "Fastest (incl. Community)" : "Fastest")
 
 			if (this.LoadReference = "Named") {
 				lapName := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Reference.Database.Name", "")
 
 				if (Trim(lapName) != "")
 					this.iLoadReference := lapName
+				else
+					this.iLoadReference := "Fastest"
 			}
 
 			TelemetryAnalyzer.TCActivationsThreshold
@@ -1378,7 +1383,7 @@ class DrivingCoach extends GridRaceAssistant {
 				sessionDB := SessionDatabase()
 				bestLap := kUndefined
 
-				if (this.LoadReference == "Fastest") {
+				if (InStr(this.LoadReference, "Fastest") == 1) {
 					sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &telemetries := true, &ignore := false)
 
 					for ignore, candidate in telemetries {
@@ -1392,16 +1397,34 @@ class DrivingCoach extends GridRaceAssistant {
 							bestInfo := info
 						}
 					}
+
+					if (this.LoadReference = "Fastest (incl. Community)") {
+						sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &ignore := false, &telemetries := true)
+
+						for ignore, candidate in telemetries {
+							info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
+
+							lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+							if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
+								bestLap := candidate
+								bestLapTime := lapTime
+								bestInfo := info
+							}
+						}
+					}
 				}
 				else {
 					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, this.LoadReference)
 
-					lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+					if info {
+						lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
 
-					if lapTime {
-						bestLap := this.LoadReference
-						bestLapTime := lapTime
-						bestInfo := info
+						if lapTime {
+							bestLap := this.LoadReference
+							bestLapTime := lapTime
+							bestInfo := info
+						}
 					}
 				}
 

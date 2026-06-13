@@ -1775,6 +1775,47 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV701() {
+	local simulator, car, lapsDB, ignore, row, task
+
+	task := ProgressTask(translate("Compacting Database"))
+
+	withTask(task, () {
+		loop Files, kDatabaseDirectory . "User\*.*", "D" {
+			simulator := A_LoopFileName
+
+			if (simulator != "Tracks") {
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
+					car := A_LoopFileName
+
+					loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
+						task.updateProgress({Message: SessionDatabase.getSimulatorName(simulator) . translate(" / ")
+													. SessionDatabase.getCarName(simulator, car)})
+
+						lapsDB := Database(A_LoopFileFullPath . "\", kLapsSchemas)
+
+						lapsDB.lock("Electronics")
+
+						for ignore, row in lapsDB.Tables["Electronics"]
+							if InStr(row["BB"], ",") {
+								row["BB"] := kNull
+
+								lapsDB.changed("Electronics")
+							}
+							else if (isNumber(row["BB"]) && (Mod(row["BB"], 1) == 0)) {
+								row["BB"] := kNull
+
+								lapsDB.changed("Electronics")
+							}
+
+						lapsDB.unlock("Electronics", true)
+					}
+				}
+			}
+		}
+	})
+}
+
 updateConfigurationForV700() {
 	deleteFile(kDatabaseDirectory . "UPLOAD")
 }
@@ -2101,7 +2142,7 @@ renameSessionExtensions() {
 		loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
 			car := A_LoopFileName
 
-			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
 				track := A_LoopFileName
 
 				fileName := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
@@ -2761,7 +2802,7 @@ updateConfigurationForV426() {
 		loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
 			car := A_LoopFileName
 
-			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
 				track := A_LoopFileName
 
 				fileName := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
@@ -2918,7 +2959,7 @@ updateConfigurationForV423() {
 			loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
 				car := A_LoopFileName
 
-				loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
 					track := A_LoopFileName
 
 					empty := true
@@ -3002,7 +3043,7 @@ updateConfigurationForV422() {
 		loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
 			car := A_LoopFileName
 
-			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car "\*.*", "D" {
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
 				track := A_LoopFileName
 
 				db := LapsDatabase(simulator, car, track).Database

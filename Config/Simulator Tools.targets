@@ -23,6 +23,7 @@ Release 6.8.8=Release 6.8.1 -> updateConfigurationForV688
 Release 6.9.0=Release 6.8.8 -> updatePluginsForV690
 Release 6.9.9=Release 6.9.0 -> updateConfigurationForV699
 Release 7.0.0=Release 6.9.9 -> updateConfigurationForV700, renewConsent
+Release 7.0.1=Release 7.0.0 -> updateConfigurationForV701
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

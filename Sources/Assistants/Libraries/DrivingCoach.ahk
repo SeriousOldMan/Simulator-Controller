@@ -2728,6 +2728,9 @@ class DrivingCoach extends GridRaceAssistant {
 			if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
 				return
 
+			if isDebug()
+				logMessage(kLogDebug, "Approaching corner #" . cornerNr)
+
 			telemetry := this.getTelemetry(&reference := true, cornerNr)
 
 			if telemetry {
@@ -2770,6 +2773,20 @@ class DrivingCoach extends GridRaceAssistant {
 									if reference
 										command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
 																			   , {telemetry: reference.JSON}))
+
+									if isDebug() {
+										logMessage(kLogDebug, "Corner #" . cornerNr . " analyzed")
+
+										try
+											logMessage(kLogDebug, "   - Name of the corner: " . telemetry.Sections[1].Name)
+
+										logMessage(kLogDebug, "   - Lap time of analyzed lap #" . telemetry.Lap . ": " . telemetry.LapTime)
+
+										if (reference && (reference != telemetry))
+											logMessage(kLogDebug, "   - Lap time of reference lap: " . reference.LapTime)
+
+										logMessage(kLogDebug, "   - Starting LLM processing")
+									}
 
 									this.handleVoiceText("TEXT", command, false)
 								}

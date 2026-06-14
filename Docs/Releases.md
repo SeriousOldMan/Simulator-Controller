@@ -33,7 +33,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.0.1.0
+
+#### Date: 06/19/26 (planned)
+
+#### Fixes
+
+  - Fixed the handling of brake balance values in the laps data stored in the session database. Due to an internal error when running team races under control of the Team Server, wrong values could have end up in the database. An automatic correction has been implemented which will run automatically during update. Depending on the amount of data in your database, this can take a while.
+  
+#### Changes
+
+  - Lap time reporting by the Spotter is now suppressed for a few laps for cars that have been in the pit.
+  - The Driving Coach can now automatically use telemetry data from the community database, if they have been recorded for faster laps than your own ones. This is *Off* by default. Please take a look at the [setting "Load reference lap from database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database".
 
 # Release history
 

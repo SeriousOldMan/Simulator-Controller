@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.0.1.0-dev]() (Early build for 7.0.1. Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7010) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-701) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

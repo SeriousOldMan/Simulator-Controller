@@ -666,16 +666,16 @@ class Corner extends Section {
 		}
 
 		while (index <= endIndex) {
-			if (curvature = kNull) {
-				curvature := telemetry.getValue(index, "Curvature")
+			if !isNumber(curvature) {
+				curvature := telemetry.getValue(index, "Curvature", kNull)
 
-				if (curvature != kNull)
+				if isNumber(curvature)
 					apexIndex := index
 			}
 			else {
-				newCurvature := telemetry.getValue(index, "Curvature")
+				newCurvature := telemetry.getValue(index, "Curvature", kNull)
 
-				if ((newCurvature != kNull) && (newCurvature > curvature)) {
+				if (isNumber(newCurvature) && (newCurvature > curvature)) {
 					apexIndex := index
 
 					curvature := newCurvature

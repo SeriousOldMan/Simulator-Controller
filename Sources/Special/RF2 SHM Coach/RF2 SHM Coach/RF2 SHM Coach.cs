@@ -780,7 +780,9 @@ namespace RF2SHMCoach {
 						{
 							if (Math.Abs(xCoordinates[i] - coordinateX) < 20 && Math.Abs(yCoordinates[i] - coordinateY) < 20)
 							{
-								SendTriggerMessage("positionTrigger:" + tIndices[i] + ";" + xCoordinates[i] + ";" + yCoordinates[i]);
+								SendTriggerMessage("positionTrigger:" + tIndices[i] + ";" + xCoordinates[i] + ";" + yCoordinates[i] + ";" +
+                                                                        xCoordinates[i] + ";" + yCoordinates[i] + ";" +
+																		coordinateX + ";" + coordinateY);
 
 								nextUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds() + 2000;
 

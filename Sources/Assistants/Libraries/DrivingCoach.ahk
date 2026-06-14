@@ -1921,7 +1921,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, sessionDB, code, data, exePath, protocol, pid, arguments
-		local ignore, section, x, y
+		local ignore, section, x, y, index
 
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
@@ -1932,20 +1932,24 @@ class DrivingCoach extends GridRaceAssistant {
 				for ignore, section in sections
 					if section.Active
 						if (section.Type = "Corner") {
-							if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
-								positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							if analyzer.getSectionCoordinateIndex(section, &x, &y, &index, distance) {
+								if isDebug()
+									logMessage(kLogDebug, "Corner #" . section.Nr . A_Space . x . A_Space . y . A_Space . index)
+
+								positions .= (A_Space . A_Index . A_Space . x . A_Space . y)
+							}
 							else
-								positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+								positions .= (A_Space . A_Index . A_Space . -32767 . A_Space . -32767)
 						}
 						else
-							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . A_Index . A_Space . -32767 . A_Space . -32767)
 
 				for ignore, section in sections
 					if section.Active
 						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
-							positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							positions .= (A_Space . (sections.Length + A_Index) . A_Space . x . A_Space . y)
 						else
-							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . (sections.Length + A_Index) . A_Space . -32767 . A_Space . -32767)
 
 				sessionDB := SessionDatabase()
 
@@ -2598,11 +2602,11 @@ class DrivingCoach extends GridRaceAssistant {
 		playSound("DCSoundPlayer.exe", soundFile, this.AudioSettings, "echos 1 1 1 1")
 	}
 
-	positionTrigger(sectionNr, positionX, positionY) {
+	positionTrigger(sectionNr, positionX, positionY, diagnostics*) {
 		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
 		local wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
-		local cornerNr, instruct, telemetry, telemetryJSON, reference, command, instructionHints, problemsInstruction
+		local section, cornerNr, instruct, telemetry, telemetryJSON, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
@@ -2723,13 +2727,19 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if (analyzer && instruct) {
-			cornerNr := Integer(analyzer.TrackSections[sectionNr].Nr)
+			section := analyzer.TrackSections[sectionNr]
+
+			if (section.Type != "Corner")
+				return
+
+			cornerNr := Integer(section.Nr)
 
 			if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
 				return
 
 			if isDebug()
-				logMessage(kLogDebug, "Approaching corner #" . cornerNr)
+				logMessage(kLogDebug, "Approaching " . section.Type . " #" . cornerNr . " / " . sectionNr . " (" . positionX . ", " . positionY . ")"
+																	. ((diagnostics.Length > 0) ? (" - " . values2String("; ", diagnostics*)) : ""))
 
 			telemetry := this.getTelemetry(&reference := true, cornerNr)
 
@@ -2780,7 +2790,7 @@ class DrivingCoach extends GridRaceAssistant {
 										try
 											logMessage(kLogDebug, "   - Name of the corner: " . telemetry.Sections[1].Name)
 
-										logMessage(kLogDebug, "   - Lap time of analyzed lap #" . telemetry.Lap . ": " . telemetry.LapTime)
+										logMessage(kLogDebug, "   - Lap time of analyzed lap #" . telemetry.Lap . ": " . Round(telemetry.LapTime, 1))
 
 										if (reference && (reference != telemetry))
 											logMessage(kLogDebug, "   - Lap time of reference lap: " . reference.LapTime)

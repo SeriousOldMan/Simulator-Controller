@@ -1,9 +1,9 @@
 [Development]
 Version=7.0.1.0-dev
 Target=7.0.1.0-release
-Date=06/13/2026
+Date=06/14/2026
 Download=
-Changes=New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races
+Changes=New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=7.0.0.0-release

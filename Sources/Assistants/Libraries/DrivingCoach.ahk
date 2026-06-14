@@ -2783,7 +2783,7 @@ class DrivingCoach extends GridRaceAssistant {
 										logMessage(kLogDebug, "   - Lap time of analyzed lap #" . telemetry.Lap . ": " . telemetry.LapTime)
 
 										if (reference && (reference != telemetry))
-											logMessage(kLogDebug, "   - Lap time of reference lap: " . telemetry.LapTime)
+											logMessage(kLogDebug, "   - Lap time of reference lap: " . reference.LapTime)
 
 										logMessage(kLogDebug, "   - Starting LLM processing")
 									}

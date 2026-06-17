@@ -45,6 +45,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - Lap time reporting by the Spotter is now suppressed for a few laps for cars that have been in the pit.
+  - The Driving Coach now uses only valid laps for reference laps.
   - The Driving Coach can now automatically use telemetry data from the community database, if they have been recorded for faster laps than your own ones. This is *Off* by default. Please take a look at the [setting "Load reference lap from database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database".
   - Extended corner performance analytics by the Driving Coach, thus enabling current high end LLMs like GPT 5.5 to give a lot more detailed instructions while coaching on the track.
 

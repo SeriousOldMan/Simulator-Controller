@@ -1637,22 +1637,29 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				if (sectorTimes && (Trim(sectorTimes) != "")) {
-					sectorTimes := string2Values(",", sectorTimes)
+				if lapTime {
+					if (sectorTimes && (Trim(sectorTimes) != "")) {
+						sectorTimes := string2Values(",", sectorTimes)
 
-					if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+						if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+							sectorTimes := false
+					}
+					else
 						sectorTimes := false
-				}
-				else
-					sectorTimes := false
 
-				this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
-																					   , fileName, driver, lapTime, sectorTimes)
+					this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
+																						   , fileName, driver, lapTime, sectorTimes)
+				}
+				else {
+					this.AvailableTelemetry[lapNr] := false
+
+					continue
+				}
 			}
 
-			lap := this.AvailableTelemetry[lap]
+			lap := this.AvailableTelemetry[lapNr]
 
-			if (isSet(corner) && corner) {
+			if (lap && isSet(corner) && corner) {
 				lap := lap.Clone()
 
 				found := false
@@ -1677,7 +1684,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (!lastLap && (lapNr != 0))
 					lastLap := lap
 
-				if (!bestLap || (lap.LapTime < bestLap.LapTime))
+				if ((lap.LapTime > 0) && (!bestLap || (lap.LapTime < bestLap.LapTime)))
 					bestLap := lap
 			}
 			else if (lapNr != 0)
@@ -1690,7 +1697,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if theLap
 				if ((mode = "Fastest") && bestLap)
 					reference := bestLap
-				else if ((mode = "Last") && lastLap)
+				else if ((mode = "Last") && lastLap && (lastLap.LapTime > 0))
 					reference := lastLap
 		}
 

@@ -109,6 +109,12 @@ class SimulatorProvider {
 		}
 	}
 
+	NameFilter {
+		Get {
+			return false
+		}
+	}
+
 	Active {
 		Get {
 			return Application(this.Simulator, kSimulatorConfiguration).isRunning()
@@ -294,7 +300,8 @@ class SimulatorProvider {
 	}
 
 	readTelemetryData() {
-		local trackData, data
+		local nameFilter := this.NameFilter
+		local trackData, data, name, match
 
 		static sessionDB := false
 
@@ -306,11 +313,30 @@ class SimulatorProvider {
 
 		trackData := sessionDB.getTrackData(this.Simulator, this.Track)
 
-		return this.readSessionData(trackData ? ("Track=" . trackData) : "")
+		data := this.readSessionData(trackData ? ("Track=" . trackData) : "")
+
+		if nameFilter {
+			name := getMultiMapValue(data, "Stint Data", "DriverName", kUndefined)
+
+			if (name != kUndefined) {
+				if RegExMatch(name, nameFilter, &match) {
+					setMultiMapValue(data, "Stint Data", "DriverForName", match[1])
+
+					if (match.Count > 1)
+						setMultiMapValue(data, "Stint Data", "DriverSurname", match[2])
+
+					if (match.Count > 2)
+						setMultiMapValue(data, "Stint Data", "DriverNickname", match[3])
+				}
+			}
+		}
+
+		return data
 	}
 
 	readStandingsData(telemetryData, correct := false) {
-		local standingsData
+		local nameFilter := this.NameFilter
+		local standingsData, count, name, match
 
 		if kLogSimulator
 			logMessage(kLogDebug, "Read standings data for simulator " . this.Simulator)
@@ -322,6 +348,28 @@ class SimulatorProvider {
 		}
 		else
 			standingsData := this.readSessionData("Standings=true")
+
+		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
+
+		loop count
+			if nameFilter {
+				name := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverName", kUndefined)
+
+				if (name != kUndefined) {
+					if RegExMatch(name, nameFilter, &match) {
+						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverForname, match[1])
+
+						if (match.Count > 1)
+							setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverSurname, match[2])
+
+						if (match.Count > 2)
+							setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverNickname, match[3])
+					}
+				}
+
+				if !isDebug()
+					removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverName")
+			}
 
 		if correct {
 			standingsData := this.correctStandingsData(standingsData)

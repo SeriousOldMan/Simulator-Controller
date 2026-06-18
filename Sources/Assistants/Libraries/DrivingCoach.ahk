@@ -1827,30 +1827,33 @@ class DrivingCoach extends GridRaceAssistant {
 
 						car := knowledgeBase.getValue("Driver.Car", kUndefined)
 
-						driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.Forname")
-										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Surname")
-										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Nickname"))
 						lapTime := (this.getLapTime(car) / 1000)
-						sectorTimes := this.getSectorTimes(car)
 
-						info := newMultiMap()
+						if (lapTime > 0) {
+							info := newMultiMap()
 
-						setMultiMapValue(info, "Info", "Driver", driver)
-
-						if lapTime
 							setMultiMapValue(info, "Info", "LapTime", lapTime)
 
-						if (sectorTimes && (sectorTimes.Length > 0))
-							setMultiMapValue(info, "Info", "SectorTimes", values2String(",", collect(sectorTimes, (t) => Round(t / 1000, 2))*))
+							driver := driverName(knowledgeBase.getValue("Lap." . lap . ".Driver.Forname")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Surname")
+										   , knowledgeBase.getValue("Lap." . lap . ".Driver.Nickname"))
 
-						setMultiMapValue(info, "Info", "Fuel", this.LastFuelAmount)
-						setMultiMapValue(info, "Info", "Weather", knowledgeBase.getValue("Weather", "Dry"))
-						setMultiMapValue(info, "Info", "AirTemperature", knowledgeBase.getValue("Weather.Temperature", 23))
-						setMultiMapValue(info, "Info", "TrackTemperature", knowledgeBase.getValue("Track.Temperature", 27))
+							setMultiMapValue(info, "Info", "Driver", driver)
 
-						writeMultiMap(A_LoopFileFullPath . ".info", info)
+							sectorTimes := this.getSectorTimes(car)
 
-						newLaps.Push(lap)
+							if (sectorTimes && (sectorTimes.Length > 0))
+								setMultiMapValue(info, "Info", "SectorTimes", values2String(",", collect(sectorTimes, (t) => Round(t / 1000, 2))*))
+
+							setMultiMapValue(info, "Info", "Fuel", this.LastFuelAmount)
+							setMultiMapValue(info, "Info", "Weather", knowledgeBase.getValue("Weather", "Dry"))
+							setMultiMapValue(info, "Info", "AirTemperature", knowledgeBase.getValue("Weather.Temperature", 23))
+							setMultiMapValue(info, "Info", "TrackTemperature", knowledgeBase.getValue("Track.Temperature", 27))
+
+							writeMultiMap(A_LoopFileFullPath . ".info", info)
+
+							newLaps.Push(lap)
+						}
 
 						loadedLaps[lap] := true
 					}

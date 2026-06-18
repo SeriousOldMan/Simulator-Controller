@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.0.1.0-release]() (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
+[7.0.1.0-release](https://cutt.ly/5t8E4nyd) (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7010) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-701) of this version and all the versions you might have skipped, before installing and using this version.
 

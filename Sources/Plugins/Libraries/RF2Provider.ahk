@@ -138,7 +138,7 @@ class Sector397Provider extends SimulatorProvider {
 		model := normalizeFileName(model)
 	}
 
-	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
+	retrieveDriverName(carID, carName, forname, surname, nickname, &category?) {
 		category := false
 
 		return driverName(forname, surname, nickname)
@@ -180,11 +180,11 @@ class Sector397Provider extends SimulatorProvider {
 												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
 												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")))
 
-					parseDriverName(this.parseDriverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
-													   , carRaw, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
-															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
-													   , &driverCategory)
+					parseDriverName(this.retrieveDriverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+														  , carRaw, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+																  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+																  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
+														  , &driverCategory)
 								  , &forname, &surname, &nickname)
 
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)

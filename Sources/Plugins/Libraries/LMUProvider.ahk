@@ -196,7 +196,7 @@ class LMUProvider extends Sector397Provider {
 		}
 	}
 
-	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
+	retrieveDriverName(carID, carName, forname, surname, nickname, &category?) {
 		local drivers, standingsData
 
 		getCategory(drivers, driver) {
@@ -223,7 +223,7 @@ class LMUProvider extends Sector397Provider {
 		else
 			category := false
 
-		return super.parseDriverName(carID, carName, forname, surname, nickname)
+		return super.retrieveDriverName(carID, carName, forname, surname, nickname)
 	}
 
 	acquireStandingsData(telemetryData, finished := false) {

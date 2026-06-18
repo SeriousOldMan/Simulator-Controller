@@ -50,6 +50,8 @@ class SimulatorProvider {
 	iCar := false
 	iTrack := false
 
+	iNameParser := false
+
 	class GenericSimulatorProvider extends SimulatorProvider {
 		iSimulator := false
 
@@ -109,9 +111,12 @@ class SimulatorProvider {
 		}
 	}
 
-	NameFilter {
+	NameParser {
 		Get {
-			return false
+			if this.iNameParser
+				return this.iNameParser
+			else
+				return "^(.*)\s*(.*)\s\(?(.*)\)?)$"
 		}
 	}
 
@@ -138,6 +143,9 @@ class SimulatorProvider {
 	__New(car, track) {
 		this.iCar := SessionDatabase.getCarCode(this.Simulator, car)
 		this.iTrack := SessionDatabase.getTrackCode(this.Simulator, track)
+
+		if (car && track)
+			this.iNameParser := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Parser", false)
 	}
 
 	static getProtocols(simulator) {
@@ -256,6 +264,25 @@ class SimulatorProvider {
 	prepareProvider() {
 	}
 
+	parseDriverName(name, &forName, &surName, &nickName) {
+		local nameParser := this.NameParser
+		local match
+
+		if (nameParser && RegExMatch(Trim(name), nameParser, &match)) {
+			forName := match[1]
+			surName := ((match.Count > 1) ? match[2] : "")
+
+			if (match.Count > 2)
+				nickName := match[3]
+			else (if (forName != "") && (surName != ""))
+				nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+			else
+				nickName := ""
+		}
+		else
+			return parseDriverName(name, &forName, &surName, &nickName)
+	}
+
 	correctStandingsData(standingsData, needCorrection := false) {
 		local positions := Map()
 		local cars := []
@@ -300,8 +327,7 @@ class SimulatorProvider {
 	}
 
 	readTelemetryData() {
-		local nameFilter := this.NameFilter
-		local trackData, data, name, match
+		local trackData, data, name, forName, surName, nickName
 
 		static sessionDB := false
 
@@ -315,28 +341,24 @@ class SimulatorProvider {
 
 		data := this.readSessionData(trackData ? ("Track=" . trackData) : "")
 
-		if nameFilter {
-			name := getMultiMapValue(data, "Stint Data", "DriverName", kUndefined)
+		name := getMultiMapValue(data, "Stint Data", "DriverName", kUndefined)
 
-			if (name != kUndefined) {
-				if RegExMatch(name, nameFilter, &match) {
-					setMultiMapValue(data, "Stint Data", "DriverForName", match[1])
+		if (name != kUndefined) {
+			this.parseDriverName(name, &forName, &surName, &nickName)
 
-					if (match.Count > 1)
-						setMultiMapValue(data, "Stint Data", "DriverSurname", match[2])
+			setMultiMapValue(data, "Stint Data", "DriverForname", forName)
+			setMultiMapValue(data, "Stint Data", "DriverSurname", surName)
+			setMultiMapValue(data, "Stint Data", "DriverNickname", nickName)
 
-					if (match.Count > 2)
-						setMultiMapValue(data, "Stint Data", "DriverNickname", match[3])
-				}
-			}
+			if !isDebug()
+				removeMultiMapValue(data, "Stint Data", "DriverName")
 		}
 
 		return data
 	}
 
 	readStandingsData(telemetryData, correct := false) {
-		local nameFilter := this.NameFilter
-		local standingsData, count, name, match
+		local standingsData, prefix, name, forName, surName, nickName
 
 		if kLogSimulator
 			logMessage(kLogDebug, "Read standings data for simulator " . this.Simulator)
@@ -349,27 +371,21 @@ class SimulatorProvider {
 		else
 			standingsData := this.readSessionData("Standings=true")
 
-		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			prefix := ("Car." . A_Index . ".")
+			name := getMultiMapValue(standingsData, "Position Data", prefix . "DriverName", kUndefined)
 
-		loop count
-			if nameFilter {
-				name := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverName", kUndefined)
+			if (name != kUndefined) {
+				this.parseDriverName(name, &forName, &surName, &nickName)
 
-				if (name != kUndefined) {
-					if RegExMatch(name, nameFilter, &match) {
-						setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverForname, match[1])
-
-						if (match.Count > 1)
-							setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverSurname, match[2])
-
-						if (match.Count > 2)
-							setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverNickname, match[3])
-					}
-				}
+				setMultiMapValue(data, "Position Data", prefix . "DriverForname", forName)
+				setMultiMapValue(data, "Position Data", prefix . "DriverSurname", surName)
+				setMultiMapValue(data, "Position Data", prefix . "DriverNickname", nickName)
 
 				if !isDebug()
-					removeMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".DriverName")
+					removeMultiMapValue(standingsData, "Position Data", prefix . "DriverName")
 			}
+		}
 
 		if correct {
 			standingsData := this.correctStandingsData(standingsData)
@@ -396,7 +412,7 @@ class SimulatorProvider {
 	}
 
 	acquireSessionData(&telemetryData, &standingsData, finished := false) {
-		local count, driver, carNr
+		local prefix, driver, carNr
 
 		if kLogSimulator
 			logMessage(kLogDebug, "Acquire session data for simulator " . this.Simulator)
@@ -408,16 +424,16 @@ class SimulatorProvider {
 		else
 			standingsData := newMultiMap()
 
-		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
 		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
 
-		loop count {
-			carNr := StrReplace(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", "")
+		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+			prefix := ("Car." . A_Index . ".")
+			carNr := StrReplace(getMultiMapValue(standingsData, "Position Data", prefix . "Nr", ""), "`"", "")
 
 			if !IsAlnum(carNr)
 				carNr := "-"
 
-			setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Nr", carNr)
+			setMultiMapValue(standingsData, "Position Data", prefix . "Nr", carNr)
 		}
 
 		if (driver && (count > 0)) {

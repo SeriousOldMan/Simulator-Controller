@@ -143,13 +143,13 @@ class LMUProvider extends Sector397Provider {
 		return setupData.getRefuelLevel()
 	}
 
-	parseCategory(candidate, &rest) {
-		super.parseCategory(candidate, &rest)
+	retrieveCategory(candidate, &rest) {
+		super.retrieveCategory(candidate, &rest)
 
 		return false
 	}
 
-	parseCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
+	retrieveCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
 		local gridData
 
 		static nextReload := 0
@@ -177,10 +177,10 @@ class LMUProvider extends Sector397Provider {
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 				nr := this.parseNr(carName, &carName)
 
-				super.parseCarName(carID, carModel, carName, , , &category)
+				super.retrieveCarName(carID, carModel, carName, , , &category)
 			}
 			else
-				super.parseCarName(carID, carModel, carName, , &nr, &category)
+				super.retrieveCarName(carID, carModel, carName, , &nr, &category)
 		}
 		else {
 			model := carModel
@@ -189,10 +189,10 @@ class LMUProvider extends Sector397Provider {
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
 				nr := this.parseNr(carName, &carName)
 
-				super.parseCarName(carID, carModel, carName, , , &category)
+				super.retrieveCarName(carID, carModel, carName, , , &category)
 			}
 			else
-				super.parseCarName(carID, carModel, carName, , &nr, &category)
+				super.retrieveCarName(carID, carModel, carName, , &nr, &category)
 		}
 	}
 

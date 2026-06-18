@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.0.0.0-release](https://cutt.ly/Gt9O4P8S) (Changes: Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services.)
+[7.0.1.0-release]() (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7000) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-700) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7010) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-701) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[6.9.9.0-release](https://cutt.ly/Ft0URuM4) (Changes: Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization.)
+[7.0.0.0-release](https://cutt.ly/Gt9O4P8S) (Changes: Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services.)
 
-[6.9.8.0-release](https://cutt.ly/xt1q8pjZ) (Changes: Support for general expressions in list predicates, Support for any term as external function result in the rule engine, New calling method for external functions in the rule engine, ProveAll loops in rule engine, Fixed build rule for ACE SHM Spotter, Support for JSON serialization in rule engine, Support for method calls in rule engine.)
+[6.9.9.0-release](https://cutt.ly/Ft0URuM4) (Changes: Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization.)
 
 #### Current development build
 
-[7.0.1.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/xiztaxCF/Releases/Simulator%20Controller%207.0.1.0-dev.zip) (Early build for 7.0.1. Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7010) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-701) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

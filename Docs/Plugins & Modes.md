@@ -1726,7 +1726,7 @@ Several plugin arguments are provided, with which you can define the output file
 
 If no argument for *stateFile* is provided, the state info will be put in a file named "Session State.json" in the *Simulator Controller\Temp* folder which resides in your *Documents* folder.
 
-With *language*, which defaults to "EN", you can choose the language for all textual properties. Only languagesm for which a translation is available in Simulator Controller are supported.
+With *language*, which defaults to "EN", you can choose the language for all textual properties. Only languages, for which a translation is available in Simulator Controller, are supported.
 
 *formats* allows you to specify, how time spans are represented. Supported values are here: "[H:]M:S.##", "[H:]M:S,##", "S.##" and "S,##", where the last two will give plain seconds. Default is "[H:]M:S.##"
 

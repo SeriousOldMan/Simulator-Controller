@@ -1637,22 +1637,29 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := getMultiMapValue(info, "Info", "LapTime", false)
 				sectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
 
-				if (sectorTimes && (Trim(sectorTimes) != "")) {
-					sectorTimes := string2Values(",", sectorTimes)
+				if lapTime {
+					if (sectorTimes && (Trim(sectorTimes) != "")) {
+						sectorTimes := string2Values(",", sectorTimes)
 
-					if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+						if !first(sectorTimes, (s) => (isNumber(s) && (s != 0)))
+							sectorTimes := false
+					}
+					else
 						sectorTimes := false
-				}
-				else
-					sectorTimes := false
 
-				this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
-																					   , fileName, driver, lapTime, sectorTimes)
+					this.AvailableTelemetry[lapNr] := this.TelemetryAnalyzer.createTelemetry(lapNr ? lapNr : "Reference"
+																						   , fileName, driver, lapTime, sectorTimes)
+				}
+				else {
+					this.AvailableTelemetry[lapNr] := false
+
+					continue
+				}
 			}
 
-			lap := this.AvailableTelemetry[lap]
+			lap := this.AvailableTelemetry[lapNr]
 
-			if (isSet(corner) && corner) {
+			if (lap && isSet(corner) && corner) {
 				lap := lap.Clone()
 
 				found := false
@@ -1677,7 +1684,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if (!lastLap && (lapNr != 0))
 					lastLap := lap
 
-				if (!bestLap || (lap.LapTime < bestLap.LapTime))
+				if ((lap.LapTime > 0) && (!bestLap || (lap.LapTime < bestLap.LapTime)))
 					bestLap := lap
 			}
 			else if (lapNr != 0)
@@ -1690,7 +1697,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if theLap
 				if ((mode = "Fastest") && bestLap)
 					reference := bestLap
-				else if ((mode = "Last") && lastLap)
+				else if ((mode = "Last") && lastLap && (lastLap.LapTime > 0))
 					reference := lastLap
 		}
 
@@ -1921,7 +1928,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local sections, positions, sessionDB, code, data, exePath, protocol, pid, arguments
-		local ignore, section, x, y
+		local ignore, section, x, y, index
 
 		if (!this.iTrackTriggerPID && simulator && analyzer) {
 			sections := analyzer.TrackSections
@@ -1932,20 +1939,24 @@ class DrivingCoach extends GridRaceAssistant {
 				for ignore, section in sections
 					if section.Active
 						if (section.Type = "Corner") {
-							if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore, distance)
-								positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							if analyzer.getSectionCoordinateIndex(section, &x, &y, &index, distance) {
+								if isDebug()
+									logMessage(kLogDebug, "Corner #" . section.Nr . A_Space . x . A_Space . y . A_Space . index)
+
+								positions .= (A_Space . A_Index . A_Space . x . A_Space . y)
+							}
 							else
-								positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+								positions .= (A_Space . A_Index . A_Space . -32767 . A_Space . -32767)
 						}
 						else
-							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . A_Index . A_Space . -32767 . A_Space . -32767)
 
 				for ignore, section in sections
 					if section.Active
 						if analyzer.getSectionCoordinateIndex(section, &x, &y, &ignore)
-							positions .= (A_Space . section.Nr . A_Space . x . A_Space . y)
+							positions .= (A_Space . (sections.Length + A_Index) . A_Space . x . A_Space . y)
 						else
-							positions .= (A_Space . section.Nr . A_Space . -32767 . A_Space . -32767)
+							positions .= (A_Space . (sections.Length + A_Index) . A_Space . -32767 . A_Space . -32767)
 
 				sessionDB := SessionDatabase()
 
@@ -2598,11 +2609,11 @@ class DrivingCoach extends GridRaceAssistant {
 		playSound("DCSoundPlayer.exe", soundFile, this.AudioSettings, "echos 1 1 1 1")
 	}
 
-	positionTrigger(sectionNr, positionX, positionY) {
+	positionTrigger(sectionNr, positionX, positionY, diagnostics*) {
 		local analyzer := this.TelemetryAnalyzer
 		local oldMode := this.Mode
 		local wait := (getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Corner.Wait", 10) * 1000)
-		local cornerNr, instruct, telemetry, telemetryJSON, reference, command, instructionHints, problemsInstruction
+		local section, cornerNr, instruct, telemetry, telemetryJSON, reference, command, instructionHints, problemsInstruction
 		local speaker, index, hint, lastHint, conjunction, conclusion
 
 		static nextRecommendation := false
@@ -2723,10 +2734,19 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 
 		if (analyzer && instruct) {
-			cornerNr := Integer(analyzer.TrackSections[sectionNr].Nr)
+			section := analyzer.TrackSections[sectionNr]
+
+			if (section.Type != "Corner")
+				return
+
+			cornerNr := Integer(section.Nr)
 
 			if ((this.FocusedCorners.Length > 0) && !inList(this.FocusedCorners, String(cornerNr)))
 				return
+
+			if isDebug()
+				logMessage(kLogDebug, "Approaching " . section.Type . " #" . cornerNr . " / " . sectionNr . " (" . positionX . ", " . positionY . ")"
+																	. ((diagnostics.Length > 0) ? (" - " . values2String("; ", diagnostics*)) : ""))
 
 			telemetry := this.getTelemetry(&reference := true, cornerNr)
 
@@ -2770,6 +2790,20 @@ class DrivingCoach extends GridRaceAssistant {
 									if reference
 										command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
 																			   , {telemetry: reference.JSON}))
+
+									if isDebug() {
+										logMessage(kLogDebug, "Corner #" . cornerNr . " analyzed")
+
+										try
+											logMessage(kLogDebug, "   - Name of the corner: " . telemetry.Sections[1].Name)
+
+										logMessage(kLogDebug, "   - Lap time of analyzed lap #" . telemetry.Lap . ": " . Round(telemetry.LapTime, 1))
+
+										if (reference && (reference != telemetry))
+											logMessage(kLogDebug, "   - Lap time of reference lap: " . reference.LapTime)
+
+										logMessage(kLogDebug, "   - Starting LLM processing")
+									}
 
 									this.handleVoiceText("TEXT", command, false)
 								}

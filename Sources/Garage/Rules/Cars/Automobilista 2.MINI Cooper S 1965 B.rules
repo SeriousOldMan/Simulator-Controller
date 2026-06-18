@@ -27,4 +27,4 @@
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right, Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Radiator.Blanket.Water,
 										 Differential.Preload, Differential.Coast, Differential.Power,
-										 AntiRollBar.Rear,]))
+										 AntiRollBar.Rear]))

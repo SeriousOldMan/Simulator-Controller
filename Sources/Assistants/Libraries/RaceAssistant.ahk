@@ -1011,9 +1011,9 @@ class RaceAssistant extends ConfigurationItem {
 			options["Language"] := ((language == false) ? "EN" : ((language == true) ? options["Language"] : language))
 			options["Translator"] := ((translator == true) ? options["Translator"] : translator)
 			options["Synthesizer"] := ((synthesizer == true) ? options["Synthesizer"] : synthesizer)
-			options["Speaker"] := speaker ; ((speaker == true) ? options["Speaker"] : speaker)
+			options["Speaker"] := (((speaker == true) && options["Speaker"]) ? options["Speaker"] : speaker)
 			options["Recognizer"] := ((recognizer == true) ? options["Recognizer"] : recognizer)
-			options["Listener"] := listener ; ((listener == true) ? options["Listener"] : listener)
+			options["Listener"] := (((listener == true) && options["Listener"]) ? options["Listener"] : listener)
 			options["VoiceServer"] := voiceServer
 
 			if vocalics {
@@ -4034,7 +4034,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 					return
 				}
-				else if (inPit && (Abs(delta) < 30)) {
+				else if inPit { ; (inPit && (Abs(delta) < 30)) {
 					speaker.speakPhrase("AheadCarInPit")
 
 					return
@@ -4141,7 +4141,7 @@ class GridRaceAssistant extends RaceAssistant {
 
 					return
 				}
-				else if (inPit && (Abs(delta) < 30)) {
+				else if inpit { ; (inPit && (Abs(delta) < 30)) {
 					speaker.speakPhrase("BehindCarInPit")
 
 					return
@@ -4269,7 +4269,7 @@ class GridRaceAssistant extends RaceAssistant {
 					laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 					lapped := false
 
-					if ((delta == 0) || (inPit && (Abs(delta) < 30))) {
+					if ((delta == 0) || inpit) { ; (inPit && (Abs(delta) < 30))) {
 						speaker.speakPhrase(inPit ? "CarInPit" : "NoTrackGap")
 
 						return

@@ -24,4 +24,4 @@
 										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right, Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Radiator.Blanket.Water,
-										 Differential.Preload, Differential.Coast, Differential.Power,]))
+										 Differential.Preload, Differential.Coast, Differential.Power]))

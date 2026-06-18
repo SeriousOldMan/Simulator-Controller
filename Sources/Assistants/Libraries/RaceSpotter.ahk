@@ -710,7 +710,12 @@ class PositionInfo {
 	}
 
 	hasBestLapTime() {
-		return (Round(this.BestLapTime, 2) != Round(this.Car.BestLapTime, 2))
+		local car := this.Car
+
+		if car.hasPitted(car.LastLap)
+			return false
+		else
+			return (Round(this.BestLapTime, 2) != Round(this.Car.BestLapTime, 2))
 	}
 
 	hasGap(sector) {
@@ -2680,7 +2685,7 @@ class RaceSpotter extends GridRaceAssistant {
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 					laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-					if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (laps == 0))
+					if ((delta == 0) || inpit || (laps == 0)) ; (inPit && (Abs(delta) < 30))
 						return false
 					else if ((laps > lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
@@ -2735,7 +2740,7 @@ class RaceSpotter extends GridRaceAssistant {
 					inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 					laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-					if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (laps == 0))
+					if ((delta == 0) || inPit || (laps == 0)) ; (inPit && (Abs(delta) < 30))
 						return false
 					else if ((laps < lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 						return false
@@ -2800,7 +2805,7 @@ class RaceSpotter extends GridRaceAssistant {
 						inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 						laps := knowledgeBase.getValue("Car." . car . ".Laps", knowledgeBase.getValue("Car." . car . ".Lap", 0))
 
-						if ((delta == 0) || (inPit && (Abs(delta) < 30)) || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0))
+						if ((delta == 0) || inpit || (knowledgeBase.getValue("Car." . car . ".Laps", 0) == 0)) ; (inPit && (Abs(delta) < 30))
 							return false
 						else if ((laps < lap) && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time", 0) / 1000)))
 							return false
@@ -3332,32 +3337,34 @@ class RaceSpotter extends GridRaceAssistant {
 			if (Random(1, 10) > 8) {
 				rnd := Random(1, focused ? 133 : 100)
 
-				if ((rnd <= 33) && standingsAhead) {
+				if ((rnd <= 33) && standingsAhead
+								&& !standingsAhead.Car.hasPitted(standingsAhead.Car.LastLap)) {
 					lapTime := standingsAhead.LastLapTime
 					phrase := "AheadLapTime"
 					car := standingsAhead.Car
 				}
-				else if ((rnd > 33) && (rnd <= 66) && standingsBehind) {
+				else if ((rnd > 33) && (rnd <= 66) && standingsBehind
+									&& !standingsBehind.Car.hasPitted(standingsBehind.Car.LastLap)) {
 					lapTime := standingsBehind.LastLapTime
 					phrase := "BehindLapTime"
 					car := standingsBehind.Car
 				}
 				else {
 					if focused {
-						if ((rnd > 66) && (rnd <= 100)) {
+						if ((rnd > 66) && (rnd <= 100) && !focused.Car.hasPitted(focused.Car.LastLap)) {
 							lapTime := focused.LastLapTime
 							phrase := "FocusLapTime"
 							position := focused.Car.Position["Class"]
 							number := focused.Car.Nr
 							car := focused.Car
 						}
-						else if ((rnd > 100) && leader) {
+						else if ((rnd > 100) && leader && !leader.Car.hasPitted(leader.Car.LastLap)) {
 							lapTime := leader.LastLapTime
 							phrase := "LeaderLapTime"
 							car := leader.Car
 						}
 					}
-					else if ((rnd > 66) && leader) {
+					else if ((rnd > 66) && leader && !leader.Car.hasPitted(leader.Car.LastLap)) {
 						lapTime := leader.LastLapTime
 						phrase := "LeaderLapTime"
 						car := leader.Car

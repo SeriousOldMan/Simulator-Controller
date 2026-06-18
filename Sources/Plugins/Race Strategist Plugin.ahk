@@ -437,7 +437,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 							pressures := string2Values(",", telemetryData[16])
 							temperatures := string2Values(",", telemetryData[17])
 							wear := string2Values(",", telemetryData[18])
-							bb := ((telemetryData.Length > 23) ? telemetryData[24] : kNull)
+							bb := ((telemetryData.Length > 24) ? telemetryData[25] : kNull)
 
 							try {
 								lapsDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6]

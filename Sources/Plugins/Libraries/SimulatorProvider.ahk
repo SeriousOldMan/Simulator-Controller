@@ -116,7 +116,7 @@ class SimulatorProvider {
 			if this.iNameParser
 				return this.iNameParser
 			else
-				return "^(.*)\s*(.*)\s\(?(.*)\)?)$"
+				return "^(.*)\s+(.*)\s*\(?(.*)\)?$"
 		}
 	}
 
@@ -274,10 +274,9 @@ class SimulatorProvider {
 
 			if (match.Count > 2)
 				nickName := match[3]
-			else (if (forName != "") && (surName != ""))
+
+			if ((nickName = "") && (forName != "") && (surName != ""))
 				nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
-			else
-				nickName := ""
 		}
 		else
 			return parseDriverName(name, &forName, &surName, &nickName)
@@ -378,9 +377,9 @@ class SimulatorProvider {
 			if (name != kUndefined) {
 				this.parseDriverName(name, &forName, &surName, &nickName)
 
-				setMultiMapValue(data, "Position Data", prefix . "DriverForname", forName)
-				setMultiMapValue(data, "Position Data", prefix . "DriverSurname", surName)
-				setMultiMapValue(data, "Position Data", prefix . "DriverNickname", nickName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "DriverForname", forName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "DriverSurname", surName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "DriverNickname", nickName)
 
 				if !isDebug()
 					removeMultiMapValue(standingsData, "Position Data", prefix . "DriverName")
@@ -412,7 +411,7 @@ class SimulatorProvider {
 	}
 
 	acquireSessionData(&telemetryData, &standingsData, finished := false) {
-		local prefix, driver, carNr
+		local prefix, driver, carNr, count
 
 		if kLogSimulator
 			logMessage(kLogDebug, "Acquire session data for simulator " . this.Simulator)
@@ -424,9 +423,10 @@ class SimulatorProvider {
 		else
 			standingsData := newMultiMap()
 
+		count := getMultiMapValue(standingsData, "Position Data", "Car.Count", 0)
 		driver := getMultiMapValue(standingsData, "Position Data", "Driver.Car", false)
 
-		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
+		loop count {
 			prefix := ("Car." . A_Index . ".")
 			carNr := StrReplace(getMultiMapValue(standingsData, "Position Data", prefix . "Nr", ""), "`"", "")
 

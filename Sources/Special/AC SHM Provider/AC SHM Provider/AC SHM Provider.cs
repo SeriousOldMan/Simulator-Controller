@@ -401,6 +401,8 @@ namespace ACSHMProvider
             Console.WriteLine("DriverForname=" + staticInfo.PlayerName);
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
+				
+            Console.WriteLine("DriverName=" + staticInfo.PlayerName + " " + staticInfo.PlayerSurname);
             
             Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
             Console.WriteLine("Running=" + cars.cars[0].splinePosition);

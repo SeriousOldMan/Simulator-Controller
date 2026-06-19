@@ -616,6 +616,8 @@ namespace SHMConnector
                 strWriter.WriteLine("DriverForname=" + staticInfo.PlayerName);
                 strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
                 strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
+				
+                strWriter.WriteLine("DriverName=" + staticInfo.PlayerName + " " + staticInfo.PlayerSurname);
             
                 strWriter.WriteLine("Sector=" + (Math.Min(graphics.CurrentSectorIndex, 2) + 1));
                 strWriter.WriteLine("Running=" + cars.cars[0].splinePosition);

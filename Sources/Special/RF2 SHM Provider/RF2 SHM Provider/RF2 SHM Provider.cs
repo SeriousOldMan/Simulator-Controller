@@ -314,6 +314,8 @@ namespace RF2SHMProvider {
 				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
+				Console.Write("DriverName="); Console.WriteLine(scoring.mScoringInfo.mPlayerName);
+				
                 Console.Write("Position="); Console.WriteLine(playerScoring.mPlace);
 
                 Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");

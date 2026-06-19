@@ -387,6 +387,8 @@ namespace SHMConnector {
 				strWriter.Write("DriverSurname="); strWriter.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				strWriter.Write("DriverNickname="); strWriter.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
+				strWriter.Write("DriverName="); strWriter.WriteLine(scoring.mScoringInfo.mPlayerName);
+				
 				strWriter.Write("Position="); strWriter.WriteLine(playerScoring.mPlace);
 
 				strWriter.Write("LapValid="); strWriter.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");

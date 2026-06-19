@@ -503,6 +503,8 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 				writeStringOption(result, "DriverSurname=", "", &pos);
 				writeStringOption(result, "DriverNickname=", "", &pos);
 			}
+			
+			writeStringOption(result, "DriverName=", (char*)map_buffer->player_name, &pos);
 
 			writeIntOption(result, "Position=", map_buffer->all_drivers_data_1[getPlayerCarID()].place, &pos);
 

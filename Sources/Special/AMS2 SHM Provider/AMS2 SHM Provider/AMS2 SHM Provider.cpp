@@ -346,6 +346,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverSurname=%s\n", "");
 			printf("DriverNickname=%s\n", "");
 		}
+		
+		printf("DriverName=%s\n", localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName);
 
 		printf("Position=%ld\n", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 

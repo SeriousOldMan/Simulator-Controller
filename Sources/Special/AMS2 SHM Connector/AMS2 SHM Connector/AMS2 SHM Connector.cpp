@@ -417,6 +417,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "DriverSurname=", "");
 			printLine(&output, "DriverNickname=", "");
 		}
+		
+		printLine(&output, "DriverName=", localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName);
 
 		printLine(&output, "Position=", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 

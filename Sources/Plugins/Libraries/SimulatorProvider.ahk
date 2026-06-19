@@ -116,7 +116,7 @@ class SimulatorProvider {
 			if this.iNameParser
 				return this.iNameParser
 			else
-				return "^(.*)\s+(.*)\s*\(?(.*)\)?$"
+				return "^(.*)\s?(.*)\s?\(?(.*)\)?$"
 		}
 	}
 

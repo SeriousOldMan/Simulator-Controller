@@ -141,11 +141,27 @@ class SimulatorProvider {
 	}
 
 	__New(car, track) {
-		this.iCar := SessionDatabase.getCarCode(this.Simulator, car)
-		this.iTrack := SessionDatabase.getTrackCode(this.Simulator, track)
+		local key
 
-		if (car && track)
-			this.iNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Parser", false)
+		static patternCache := CaseInsenseMap()
+
+		car := SessionDatabase.getCarCode(this.Simulator, car)
+		track := SessionDatabase.getTrackCode(this.Simulator, track)
+
+		this.iCar := car
+		this.iTrack := track
+
+		if (car && track) {
+			key := (this.Simulator . car . track)
+
+			if patternCache.Has(key)
+				this.iNamePattern := patternCache[key]
+			else {
+				this.iNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Pattern", false)
+
+				patternCache[key] := this.iNamePattern
+			}
+		}
 	}
 
 	static getProtocols(simulator) {

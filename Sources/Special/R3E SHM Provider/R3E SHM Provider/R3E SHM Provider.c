@@ -246,6 +246,8 @@ int main(int argc, char* argv[])
 					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", id, "");
 				}
 
+				wprintf_s(L"Car.%d.Driver.Name=%S\n", id, (char*)vehicle.driver_info.name);
+
 				wprintf_s(L"Car.%d.InPitLane=%S\n", id, vehicle.in_pitlane ? "true" : "false");
 			}
 		}

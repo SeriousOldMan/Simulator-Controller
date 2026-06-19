@@ -314,6 +314,8 @@ extern __declspec(dllexport) int __stdcall call(char* request, char* result, int
 					writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".Driver.Nickname=", "", &pos);
 				}
 
+				writeStringOption(result, "Driver.Name=", (char*)vehicle.driver_info.name, &pos);
+
 				writeString(result, "Car.", &pos); writeInt(result, id, &pos); writeStringOption(result, ".InPitLane=", vehicle.in_pitlane ? "true" : "false", &pos);
 			}
 		}

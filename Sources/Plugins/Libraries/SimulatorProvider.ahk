@@ -50,7 +50,7 @@ class SimulatorProvider {
 	iCar := false
 	iTrack := false
 
-	iNameParser := false
+	iNamePattern := false
 
 	class GenericSimulatorProvider extends SimulatorProvider {
 		iSimulator := false
@@ -111,12 +111,12 @@ class SimulatorProvider {
 		}
 	}
 
-	NameParser {
+	NamePattern {
 		Get {
-			if this.iNameParser
-				return this.iNameParser
+			if this.iNamePattern
+				return this.iNamePattern
 			else
-				return "^(.*)\s?(.*)\s?\(?(.*)\)?$"
+				return "^([^\s]*)\s?([^\s]*)\s?\(?([^\s]*)\)?$"
 		}
 	}
 
@@ -145,7 +145,7 @@ class SimulatorProvider {
 		this.iTrack := SessionDatabase.getTrackCode(this.Simulator, track)
 
 		if (car && track)
-			this.iNameParser := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Parser", false)
+			this.iNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Parser", false)
 	}
 
 	static getProtocols(simulator) {
@@ -265,10 +265,10 @@ class SimulatorProvider {
 	}
 
 	parseDriverName(name, &forName, &surName, &nickName) {
-		local nameParser := this.NameParser
+		local namePattern := this.NamePattern
 		local match
 
-		if (nameParser && RegExMatch(Trim(name), nameParser, &match)) {
+		if (namePattern && RegExMatch(Trim(name), namePattern, &match)) {
 			forName := match[1]
 			surName := ((match.Count > 1) ? match[2] : "")
 
@@ -372,17 +372,17 @@ class SimulatorProvider {
 
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			prefix := ("Car." . A_Index . ".")
-			name := getMultiMapValue(standingsData, "Position Data", prefix . "DriverName", kUndefined)
+			name := getMultiMapValue(standingsData, "Position Data", prefix . "Driver.Name", kUndefined)
 
 			if (name != kUndefined) {
 				this.parseDriverName(name, &forName, &surName, &nickName)
 
-				setMultiMapValue(standingsData, "Position Data", prefix . "DriverForname", forName)
-				setMultiMapValue(standingsData, "Position Data", prefix . "DriverSurname", surName)
-				setMultiMapValue(standingsData, "Position Data", prefix . "DriverNickname", nickName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Forname", forName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Surname", surName)
+				setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Nickname", nickName)
 
 				if !isDebug()
-					removeMultiMapValue(standingsData, "Position Data", prefix . "DriverName")
+					removeMultiMapValue(standingsData, "Position Data", prefix . "Driver.Name")
 			}
 		}
 

@@ -519,6 +519,8 @@ namespace SHMConnector
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(driverName));
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(driverName));
 
+                        strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".Driver.Name="); strWriter.WriteLine(driverName);
+
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPitLane="); strWriter.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
                         strWriter.Write("Car."); strWriter.Write(idx); strWriter.Write(".InPit="); strWriter.WriteLine((car.isCarInPit == 0) ? "false" : "true");
 
@@ -616,7 +618,12 @@ namespace SHMConnector
                 strWriter.WriteLine("DriverForname=" + staticInfo.PlayerName);
                 strWriter.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
                 strWriter.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
-            
+				
+                if (staticInfo.PlayerName == staticInfo.PlayerSurname && staticInfo.PlayerName == staticInfo.PlayerNick)
+                    strWriter.WriteLine("DriverName=" + staticInfo.PlayerName);
+                else
+                    strWriter.WriteLine("DriverName=" + staticInfo.PlayerName + " " + staticInfo.PlayerSurname);
+
                 strWriter.WriteLine("Sector=" + (Math.Min(graphics.CurrentSectorIndex, 2) + 1));
                 strWriter.WriteLine("Running=" + cars.cars[0].splinePosition);
                 strWriter.WriteLine("Laps=" + graphics.CompletedLaps);

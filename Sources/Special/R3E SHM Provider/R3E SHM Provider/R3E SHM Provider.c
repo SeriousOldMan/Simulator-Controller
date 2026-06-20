@@ -246,6 +246,8 @@ int main(int argc, char* argv[])
 					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", id, "");
 				}
 
+				wprintf_s(L"Car.%d.Driver.Name=%S\n", id, (char*)vehicle.driver_info.name);
+
 				wprintf_s(L"Car.%d.InPitLane=%S\n", id, vehicle.in_pitlane ? "true" : "false");
 			}
 		}
@@ -431,6 +433,8 @@ int main(int argc, char* argv[])
 				wprintf_s(L"DriverSurname=%S\n", "");
 				wprintf_s(L"DriverNickname=%S\n", "");
 			}
+			
+			wprintf_s(L"DriverName=%S\n", (char*)map_buffer->player_name);
 
 			wprintf_s(L"Position=%ld\n", map_buffer->all_drivers_data_1[getPlayerCarID()].place);
 

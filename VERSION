@@ -1,8 +1,8 @@
 [Development]
 Version=7.0.2.0-dev
-Target=7.0.1.0-release
+Target=7.0.2.0-release
 Date=06/20/2026
-Changes=Fixed strategy pickup by Strategist
+Changes=Fixed strategy pickup by Strategist, Support for custome driver name patterns
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=7.0.1.0-release

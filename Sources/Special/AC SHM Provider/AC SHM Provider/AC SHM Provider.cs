@@ -315,6 +315,8 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
                     Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
 
+                    Console.Write("Car."); Console.Write(idx); Console.Write(".Driver.Name="); Console.WriteLine(driverName);
+
                     Console.Write("Car."); Console.Write(idx); Console.Write(".InPitLane="); Console.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
                     Console.Write("Car."); Console.Write(idx); Console.Write(".InPit="); Console.WriteLine((car.isCarInPit == 0) ? "false" : "true");
 					
@@ -401,6 +403,11 @@ namespace ACSHMProvider
             Console.WriteLine("DriverForname=" + staticInfo.PlayerName);
             Console.WriteLine("DriverSurname=" + staticInfo.PlayerSurname);
             Console.WriteLine("DriverNickname=" + staticInfo.PlayerNick);
+				
+            if (staticInfo.PlayerName == staticInfo.PlayerSurname && staticInfo.PlayerName == staticInfo.PlayerNick)
+                Console.WriteLine("DriverName=" + staticInfo.PlayerName);
+            else
+                Console.WriteLine("DriverName=" + staticInfo.PlayerName + " " + staticInfo.PlayerSurname);
             
             Console.WriteLine("Sector=" + (graphics.CurrentSectorIndex + 1));
             Console.WriteLine("Running=" + cars.cars[0].splinePosition);

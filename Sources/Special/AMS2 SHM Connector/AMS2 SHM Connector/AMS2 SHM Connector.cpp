@@ -417,6 +417,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 			printLine(&output, "DriverSurname=", "");
 			printLine(&output, "DriverNickname=", "");
 		}
+		
+		printLine(&output, "DriverName=", localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName);
 
 		printLine(&output, "Position=", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 
@@ -533,6 +535,8 @@ extern "C" __declspec(dllexport) int __stdcall call(char* request, char* result,
 					print(&output, "Car.", i); printLine(&output, ".Driver.Surname=", "");
 					print(&output, "Car.", i); printLine(&output, ".Driver.Nickname=", "");
 				}
+
+				print(&output, "Car.", i); printLine(&output, ".Driver.Name=", vehicle.mName);
 
 				print(&output, "Car.", i); printLine(&output, ".InPitLane=", localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
 				print(&output, "Car.", i); printLine(&output, ".InPit=", localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");

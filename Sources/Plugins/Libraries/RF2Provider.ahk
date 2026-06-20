@@ -68,7 +68,7 @@ class Sector397Provider extends SimulatorProvider {
 		}
 	}
 
-	parseCategory(candidate, &rest) {
+	retrieveCategory(candidate, &rest) {
 		local temp := ""
 		local char
 
@@ -89,7 +89,7 @@ class Sector397Provider extends SimulatorProvider {
 		return ((temp != "") ? temp : false)
 	}
 
-	parseCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
+	retrieveCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
 		local index
 
 		model := false
@@ -104,7 +104,7 @@ class Sector397Provider extends SimulatorProvider {
 			nr := this.parseNr(SubStr(carName, 2), &carName)
 
 			if (InStr(carName, ":") = 1)
-				category := this.parseCategory(SubStr(carName, 2), &carName)
+				category := this.retrieveCategory(SubStr(carName, 2), &carName)
 
 			model := carName
 		}
@@ -119,7 +119,7 @@ class Sector397Provider extends SimulatorProvider {
 			nr := this.parseNr(carName[2], &carName)
 
 			if (InStr(carName, ":") = 1) {
-				category := this.parseCategory(SubStr(carName, 2), &carName)
+				category := this.retrieveCategory(SubStr(carName, 2), &carName)
 
 				if (category = "")
 					category := false
@@ -138,7 +138,7 @@ class Sector397Provider extends SimulatorProvider {
 		model := normalizeFileName(model)
 	}
 
-	parseDriverName(carID, carName, forname, surname, nickname, &category?) {
+	retrieveDriverName(carID, carName, forname, surname, nickname, &category?) {
 		category := false
 
 		return driverName(forname, surname, nickname)
@@ -163,9 +163,9 @@ class Sector397Provider extends SimulatorProvider {
 			carRaw := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".CarRaw", kUndefined)
 
 			if (carRaw != kUndefined) {
-				this.parseCarName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
-								, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "")
-								, carRaw, &model, &nr, &carCategory, &team)
+				this.retrieveCarName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+								   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "")
+								   , carRaw, &model, &nr, &carCategory, &team)
 
 				if model
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", model)
@@ -180,11 +180,11 @@ class Sector397Provider extends SimulatorProvider {
 												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
 												  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")))
 
-					parseDriverName(this.parseDriverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
-													   , carRaw, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
-															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
-															   , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
-													   , &driverCategory)
+					parseDriverName(this.retrieveDriverName(getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
+														  , carRaw, getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", "")
+																  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname", "")
+																  , getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Nickname", "")
+														  , &driverCategory)
 								  , &forname, &surname, &nickname)
 
 					setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname", forname)
@@ -282,8 +282,8 @@ class Sector397Provider extends SimulatorProvider {
 														   , (lastSimulator = "rFactor 2") ? 60 : 20)
 		}
 
-		this.parseCarName(false, getMultiMapValue(telemetryData, "Session Data", "Car", "")
-							   , getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
+		this.retrieveCarName(false, getMultiMapValue(telemetryData, "Session Data", "Car", "")
+								  , getMultiMapValue(telemetryData, "Session Data", "CarRaw"), &model)
 
 		if model
 			setMultiMapValue(telemetryData, "Session Data", "Car", model)

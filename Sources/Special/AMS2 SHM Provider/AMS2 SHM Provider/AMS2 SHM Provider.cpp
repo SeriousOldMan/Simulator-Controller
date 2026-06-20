@@ -346,6 +346,8 @@ int main(int argc, char* argv[]) {
 			printf("DriverSurname=%s\n", "");
 			printf("DriverNickname=%s\n", "");
 		}
+		
+		printf("DriverName=%s\n", localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName);
 
 		printf("Position=%ld\n", (long)localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mRacePosition);
 
@@ -464,6 +466,8 @@ int main(int argc, char* argv[]) {
 					printf("Car.%d.Driver.Surname=%s\n", i, "");
 					printf("Car.%d.Driver.Nickname=%s\n", i, "");
 				}
+
+				printf("Car.%d.Driver.Name=%s\n", i, vehicle.mName);
 
 				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
 				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");

@@ -208,7 +208,9 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(vehicle.mDriverName));
 
-				Console.Write("Car."); Console.Write(index); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
+                Console.Write("Car."); Console.Write(index); Console.Write(".Driver.Name="); Console.WriteLine(vehicle.mDriverName);
+
+                Console.Write("Car."); Console.Write(index); Console.Write(".InPitLane="); Console.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 
 				if (vehicle.mInPits != 0)
 				{
@@ -314,6 +316,8 @@ namespace RF2SHMProvider {
 				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
+				Console.Write("DriverName="); Console.WriteLine(scoring.mScoringInfo.mPlayerName);
+				
                 Console.Write("Position="); Console.WriteLine(playerScoring.mPlace);
 
                 Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");

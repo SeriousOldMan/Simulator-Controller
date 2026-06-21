@@ -37,7 +37,7 @@ class Sector397Provider extends SimulatorProvider {
 		return true
 	}
 
-	parseNr(candidate, &rest) {
+	retrieveNr(candidate, &rest) {
 		local temp, char
 
 		candidate := Trim(candidate)
@@ -101,7 +101,7 @@ class Sector397Provider extends SimulatorProvider {
 		index := InStr(carName, "#")
 
 		if (index = 1) {
-			nr := this.parseNr(SubStr(carName, 2), &carName)
+			nr := this.retrieveNr(SubStr(carName, 2), &carName)
 
 			if (InStr(carName, ":") = 1)
 				category := this.retrieveCategory(SubStr(carName, 2), &carName)
@@ -116,7 +116,7 @@ class Sector397Provider extends SimulatorProvider {
 			if (model = "")
 				model := false
 
-			nr := this.parseNr(carName[2], &carName)
+			nr := this.retrieveNr(carName[2], &carName)
 
 			if (InStr(carName, ":") = 1) {
 				category := this.retrieveCategory(SubStr(carName, 2), &carName)

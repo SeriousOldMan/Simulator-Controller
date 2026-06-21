@@ -175,7 +175,7 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
-				nr := this.parseNr(carName, &carName)
+				nr := this.retrieveNr(carName, &carName)
 
 				super.retrieveCarName(carID, carModel, carName, , , &category)
 			}
@@ -187,7 +187,7 @@ class LMUProvider extends Sector397Provider {
 			team := ""
 
 			if ((carName != "") && isNumber(SubStr(carName, 1, 1))) {
-				nr := this.parseNr(carName, &carName)
+				nr := this.retrieveNr(carName, &carName)
 
 				super.retrieveCarName(carID, carModel, carName, , , &category)
 			}

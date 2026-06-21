@@ -18,7 +18,17 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.0.2.0
+
+#### Date: 06/26/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
+  
+#### Changes
+
+  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
 
 # Release history
 

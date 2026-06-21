@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.0.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Vs5r8uQ4/Releases/Simulator%20Controller%207.0.2.0-dev.zip) (Early build for 7.0.2. Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7020) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-702) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

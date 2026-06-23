@@ -518,14 +518,18 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if logRequests {
-				if (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false))
-					logMessage(kLogInfo, "LMU SHM Session State: Running...")
-				else if !getMultiMapValue(data, "Session Data", "Active", false)
-					logMessage(kLogInfo, "LMU SHM Session State: Shutdown...")
-				else if getMultiMapValue(data, "Session Data", "Paused", false)
-					logMessage(kLogInfo, "LMU SHM Session State: Paused...")
+				if !getMultiMapValue(data, "Session Data", "Active", false) {
+					logMessage(kLogWarn, "LMU SHM Session State: Shutdown...")
+					logMessage(kLogWarn, "LMU REST Session State: " . sessionData.State . " (" . sessionData.State[true] . ")...")
+				}
+				else {
+					if getMultiMapValue(data, "Session Data", "Paused", false)
+						logMessage(kLogInfo, "LMU SHM Session State: Paused...")
+					else
+						logMessage(kLogInfo, "LMU SHM Session State: Running...")
 
-				logMessage(kLogInfo, "LMU REST Session State: " . sessionData.State . " (" . sessionData.State[true] . ")...")
+					logMessage(kLogInfo, "LMU REST Session State: " . sessionData.State . " (" . sessionData.State[true] . ")...")
+				}
 			}
 
 			switch sessionData.State, false {

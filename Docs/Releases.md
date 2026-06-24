@@ -29,6 +29,7 @@
 #### Changes
 
   - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
 
 # Release history
 

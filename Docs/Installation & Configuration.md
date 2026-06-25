@@ -124,9 +124,8 @@ The Assistants acquire telemetry data from the different simulation games using 
 	 
   5. *F1 25*
   
-     
+     This is very special, because it is required to run Simulator Controller on a seperate PC or in a virtual machine. Please see the [dedicated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-f1-25) for more information.
 	 
-
 ### Using your own pictures, videos and sounds for all the splash screens
 
 The startup process of Simulator Controller can entertain you with nice images and even play videos and emotional songs while starting all the components or your favorite simulation game (no worry, this can be completely switched off using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), if you prefer a more reduced kind of life style). The standard distribution comes with some default media from the GT3 world, but, since every racer or even pilot might have a different taste, you can install your own media files. You will find all the standard media files in the *Resources\Splash Media* folder. For your own media, you can use any JPG, GIF, WAV or MP3 files, as long as the pictures and videos adhere to a strict 16:9 format. Last but not least, you can use the settings editor to choose between picture carousel or GIF animation, whether to play one of the sound files during startup, and so on. To keep the standard distribution clean, a *Simulator Controller\Splash Media* folder will be created by the configuration tool in your standard *Documents* folder, where you can store your media files. The "Simulator Configuration" tool allows you to [create a splash screen](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor) from all these files, which then can be selected for the various applications as default splash screen.

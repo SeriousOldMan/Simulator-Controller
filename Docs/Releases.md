@@ -1,5 +1,26 @@
 # Latest stable release
 
+## 7.0.2.0
+
+#### Date: 06/26/26
+
+#### Fixes
+
+  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
+  - Fixed a bug in the "Generic" GPT service connector for fully OpenAI-compatible endpoints.
+  
+#### Changes
+
+  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - The "Generic" GPT service connector now also supports Service URLs, that do not follow the OpenAI naming scheme.
+  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.0.1.0
 
 #### Date: 06/19/26
@@ -15,24 +36,6 @@
   - The Driving Coach now uses only valid laps for reference laps.
   - The Driving Coach can now automatically use telemetry data from the community database, if they have been recorded for faster laps than your own ones. This is *Off* by default. Please take a look at the [setting "Load reference lap from database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database".
   - Extended corner performance analytics by the Driving Coach, thus enabling current high end LLMs like GPT 5.5 to give a lot more detailed instructions while coaching on the track.
-
-# Upcoming release
-
-## 7.0.2.0
-
-#### Date: 06/26/26 (planned)
-
-#### Fixes
-
-  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
-  
-#### Changes
-
-  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
-  - The "Generic" GPT service connector now also supports Service URLs, that do not follow the OpenAI naming scheme.
-  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
-
-# Release history
 
 ## 7.0.0.0
 

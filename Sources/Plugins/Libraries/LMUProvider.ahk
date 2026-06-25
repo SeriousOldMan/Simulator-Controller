@@ -434,9 +434,7 @@ class LMUProvider extends Sector397Provider {
 			if (!standings && (getMultiMapValues(data, "Car Data").Count = 0)
 						   && (getMultiMapValue(data, "Stint Data", "Laps", 0) = 0)) {
 				if logRequests {
-					if !getMultiMapValue(data, "Session Data", "Active", false)
-						logMessage(kLogWarn, "SHM LMU Session State: Shutdown...")
-
+					logMessage(kLogWarn, "SHM LMU Session State: Waiting...")
 					logMessage(kLogInfo, "Read LMU session data (Overall):" . (A_TickCount - startTime) . " ms...")
 				}
 

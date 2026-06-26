@@ -1010,6 +1010,11 @@ class SpeechRecognizer {
 
 			computeType := getMultiMapValue(settings, "Voice", "Whisper.Compute Type"
 										  , getMultiMapValue(settings, "Voice", "Compute Type", false))
+
+			options := getMultiMapValue(settings, "Voice", "Whisper.Options", false)
+
+			if (options = "")
+				options := false
 		}
 
 		if (this.Engine = "Google") {
@@ -1052,7 +1057,7 @@ class SpeechRecognizer {
 					showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
 
 				try {
-					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off" . (computeType ? (" --compute_type " . computeType) : ""), , "Hide", &pid)
+					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off" . (computeType ? (" --compute_type " . computeType) : "") . (options ? (A_Space . options) : ""), , "Hide", &pid)
 
 					while ProcessExist(pid) {
 						if (install && !kSilentMode) {
@@ -1087,7 +1092,8 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "Whisper Server") {
 				try {
-					result := this.Instance.Connector.Recognize(audioFile, computeType ? computeType : "-")
+					result := this.Instance.Connector.Recognize(audioFile, computeType ? computeType : "-"
+																		 , options ? options : "-")
 
 					if result
 						this._onTextCallback(result)

@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.0.1.0-release](https://cutt.ly/5t8E4nyd) (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
+[7.0.2.0-release](https://cutt.ly/ut7djiTk) (Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns, Generic LLM connector now also supports non OpenAI style URLs.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7010) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-701) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7020) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-702) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.0.0.0-release](https://cutt.ly/Gt9O4P8S) (Changes: Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services.)
+[7.0.1.0-release](https://cutt.ly/5t8E4nyd) (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
 
-[6.9.9.0-release](https://cutt.ly/Ft0URuM4) (Changes: Fixed session settings translations for Chinese, Tyre wear balance thresholds for Race Engineer, More support for composite variables in hybrid rules, Spotter does not announce a problem for pitted cars anymore, Fixed message box icons background color, Prevent early pitstops from being registered, Fixed iRacing pitstop setting handling, Fixed database synchronization.)
+[7.0.0.0-release](https://cutt.ly/Gt9O4P8S) (Changes: Fixed tyre tread depth setting, Fixed break pad thickness setting, Rework of community database synchronization, Tyre wear data can be shared in the community database, Engineer can choose between different compound mixtures, New car models for "Setup Workbench", Supoort for Yandex speech recognition, Fixed remaining laps calculation for non-VE cars in LMU, Support for Yandex GPT services.)
 
 #### Current development build
 
-[7.0.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Vs5r8uQ4/Releases/Simulator%20Controller%207.0.2.0-dev.zip) (Early build for 7.0.2. Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7020) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-702) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

@@ -13,8 +13,8 @@ Let's start with some very low system level settings.
 
 | Category   | Setting  | Default | Description |
 |------------|----------|---------|-------------|
-| Locations  | Temp     | %homePath%\Documents\Simulator Controller\Temp | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike. |
-|            | Programs | %homePath%\Documents\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive. |
+| Locations  | Temp     | %homePath%\Documents\Simulator Controller\Temp | The location of all temporary files of Simulator Controller. Set this to a different location, if your Documents folder is under control of *One Drive* or alike.<br><br>If the location of the data folder of Simulator Controller had been changed during initial installation, different paths and locations apply, of course. |
+|            | Programs | %homePath%\Documents\Simulator Controller\Programs | The location of all additional or optional programs installed or created by Simulator Controller. Especially when using Whisper, this can consume quite a lot of disk space. Set this to a different location, if your Documents folder is on a drive with restricted size, but be sure to choose a fast alternative drive.<br><br>If the location of the data folder of Simulator Controller had been changed during initial installation, different paths and locations apply, of course.  |
 | Process    | Memory.Max | 2048 | The max memory in MB a process may consume, before it get killed by the watchdog. |
 |            | Memory.Critical | 80 | The percentage of max memory usage, when memory reporting starts and special debug code is activated. |
 |            | Memory.WatchDog | 10 | The number of seconds between each run of the memory watchdog. Low numbers may degrade system performance, but if the number is too high a process with a memory problem may be catched too late. *False* will disable the watchdog completely. |
@@ -78,6 +78,7 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Interruptable | False | If not *False*, the currently active speech will be interrupted, if Push-to-Talk is pressed. If the value is "All", all currently pending speeches will be discarded as well, before the listener is activated. |
 |      | ElevenLabs.Sample Frequency | 16000     | This is used for internal audio processing and represents the resolution of voice audion in Hz. This value is also used when requesting voice audio from the ElvenLabs text to speech API. The value here represents the *pcm_16000* format, of course. |
 |      | Whisper.Compute Type  | False | This setting only applies, when using Whisper as the voice recognition method. If not *False*, it specifies the computation method used on the graphics card, when evaluating the neural network. Allowed values are *default*, *auto*, *int8*, *int8_float32*, *int8_float16*, *int8_bfloat16*, *int16*, *float16*, *bfloat16*, *float32*. You won't touch this setting in most cases, with the exception of RTX 50xx GPUs, where it must be set to "float16". |
+|      | Whisper.Options  | - | Using this setting, that only applies, when using Whisper as the voice recognition method, you can supply additional arguments to Whisper. An example would be "--cuda:1", which will select a specific GPU for running the voice recognition. |
 
 ### Script Settings
 

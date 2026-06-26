@@ -685,11 +685,11 @@ class LLMConnector {
 
 	class GenericConnector extends LLMConnector.APIConnector {
 		CreateServiceURL(server) {
-			return this.CreateServerURL(server)
+			return server
 		}
 
 		CreateModelsURL(server) {
-			return StrReplace(this.CreateServerURL(server), "/v1/chat/completions", "/v1/models")
+			return StrReplace(server, "/v1/chat/completions", "/v1/models")
 		}
 	}
 

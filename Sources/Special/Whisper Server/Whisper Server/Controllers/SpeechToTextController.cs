@@ -56,7 +56,8 @@ namespace WhisperServer.Controllers
                 System.IO.File.WriteAllBytes(audioFilePath, Convert.FromBase64String(audio));
 
                 lock (_lock)
-                    return new Whisper(WhisperPath, language, model).Recognize(audioFilePath, computeType, options);
+                    return new Whisper(WhisperPath, language, model).Recognize(audioFilePath, (computeType != null) ? computeType : "-",
+																							  (options != null) ? options : "-");
             }
             catch (AggregateException exception)
             {

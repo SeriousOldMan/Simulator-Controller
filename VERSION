@@ -3,7 +3,7 @@ Version=7.0.3.0-dev
 Target=7.0.3.0-release
 Date=06/26/20266
 Download=
-Changes=Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center
+Changes=Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=7.0.2.0-release

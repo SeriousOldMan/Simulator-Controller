@@ -27,8 +27,8 @@ namespace WhisperServer
             process.StartInfo.Arguments = "\"" + audioFilePath + "\" -o \"" + WhisperPath +
                                           "\" --language " + Language.ToLower() +
                                           " -f json -m " + Model.ToLower() + " --beep_off" +
-                                          (((computeType != "-") ? (" --compute_type " + computeType) : "") +
-                                          (((options != "-") ? (" " + options) : ""));
+                                          ((computeType != "-") ? (" --compute_type " + computeType) : "") +
+                                          ((options != "-") ? (" " + options) : "");
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.RedirectStandardError = false;

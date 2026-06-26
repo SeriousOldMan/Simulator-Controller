@@ -3529,8 +3529,8 @@ class SoloCenter extends ConfigurationItem {
 
 		this.LapsListView.Modify(lap.Row, ((lap.State != "Valid") ? "-Check" : "Check")
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, lapTimeDisplayValue(lap.LapTime)
-										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+										, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.LapTime) : "-"
+										, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
 										, displayNullValue(fuelConsumption), remainingFuel
 										, values2String(", ", pressures*)
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
@@ -5342,8 +5342,8 @@ class SoloCenter extends ConfigurationItem {
 
 					this.LapsListView.Add((this.SessionExported || (lap.State != "Valid") || !isNumber(lap.LapTime)) ? "" : "Check"
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, lapTimeDisplayValue(lap.LapTime)
-										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+										, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.LapTime) : "-"
+										, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
 										, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
 				}

@@ -46,7 +46,7 @@ namespace WhisperServer.Controllers
 
         [HttpPost("recognize")]
         public string Post([FromQuery(Name = "language")] string language, [FromQuery(Name = "model")] string model,
-                           [FromQuery(Name = "compute")] string computeType,
+                           [FromQuery(Name = "compute")] string computeType, [FromQuery(Name = "options")] string options,
                            [FromBody] string audio)
         {
             string audioFilePath = Path.Combine(Environment.CurrentDirectory, "speech.wav");
@@ -56,7 +56,7 @@ namespace WhisperServer.Controllers
                 System.IO.File.WriteAllBytes(audioFilePath, Convert.FromBase64String(audio));
 
                 lock (_lock)
-                    return new Whisper(WhisperPath, language, model).Recognize(audioFilePath, computeType);
+                    return new Whisper(WhisperPath, language, model).Recognize(audioFilePath, computeType, options);
             }
             catch (AggregateException exception)
             {

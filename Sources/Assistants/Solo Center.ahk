@@ -7835,8 +7835,16 @@ class SoloCenter extends ConfigurationItem {
 			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+
+		if (lap.State != "Invalid") {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>-</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>-</td></tr>")
+		}
+
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")

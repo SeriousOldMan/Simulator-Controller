@@ -472,7 +472,7 @@ class SimulatorProvider {
 			if ((name != kUndefined) && this.parseCarName(name, &nr, &model, &class, &team))
 				if (model != "")
 					setMultiMapValue(data, "Session Data", "Car", model)
-		}i
+		}
 
 		return data
 	}
@@ -497,7 +497,7 @@ class SimulatorProvider {
 				name := getMultiMapValue(standingsData, "Position Data", prefix . "Driver.Name", kUndefined)
 
 				if (name != kUndefined) {
-					if this.parseDriverName(name, &forName, &surName, &nickName) {-
+					if this.parseDriverName(name, &forName, &surName, &nickName) {
 						setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Forname", forName)
 						setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Surname", surName)
 						setMultiMapValue(standingsData, "Position Data", prefix . "Driver.Nickname", nickName)

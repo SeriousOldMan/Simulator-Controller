@@ -7566,8 +7566,8 @@ class TeamCenter extends ConfigurationItem {
 							penalty := ""
 
 						this.LapsListView.Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-												, lapTimeDisplayValue(lap.Laptime)
-												, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+												, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.Laptime) : "-"
+												, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
 												, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 												, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 
@@ -8087,6 +8087,9 @@ class TeamCenter extends ConfigurationItem {
 
 				if row {
 					this.LapsListView.Modify(row, "Col12", theLap.Valid ? "" : translate("x"))
+
+					if !theLap.Valid
+						this.LapsListView.Modify(row, "Col7", "-", "-")
 
 					lapPressures := this.LapsListView.GetText(row, 11)
 
@@ -10319,8 +10322,8 @@ class TeamCenter extends ConfigurationItem {
 						penalty := ""
 
 					this.LapsListView.Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-											, lapTimeDisplayValue(lap.Laptime)
-											, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
+											, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.Laptime) : "-"
+											, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
 											, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 											, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 				}

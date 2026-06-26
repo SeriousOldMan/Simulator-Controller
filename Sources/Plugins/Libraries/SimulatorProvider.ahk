@@ -50,7 +50,8 @@ class SimulatorProvider {
 	iCar := false
 	iTrack := false
 
-	iNamePattern := false
+	iDriverNamePattern := false
+	iCarNamePattern := false
 
 	class GenericSimulatorProvider extends SimulatorProvider {
 		iSimulator := false
@@ -111,12 +112,18 @@ class SimulatorProvider {
 		}
 	}
 
-	NamePattern {
+	DriverNamePattern {
 		Get {
-			if this.iNamePattern
-				return this.iNamePattern
+			if this.iDriverNamePattern
+				return this.iDriverNamePattern
 			else
-				return "^([^\s]*)\s?([^\s]*)\s?\(?([^\s]*)\)?$"
+				return "^(?<forname>[^\s]*)\s?(?<surname>[^\s]*)\s?\(?(?<nickname>[^\s]*)\)?$"
+		}
+	}
+
+	CarNamePattern {
+		Get {
+			return this.iCarNamePattern
 		}
 	}
 
@@ -152,14 +159,24 @@ class SimulatorProvider {
 		this.iTrack := track
 
 		if (car && track) {
-			key := (this.Simulator . car . track)
+			key := ("#D" . this.Simulator . car . track)
 
 			if patternCache.Has(key)
-				this.iNamePattern := patternCache[key]
+				this.iDriverNamePattern := patternCache[key]
 			else {
-				this.iNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Pattern", false)
+				this.iDriverNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Driver.Name.Pattern", false)
 
-				patternCache[key] := this.iNamePattern
+				patternCache[key] := this.iDriverNamePattern
+			}
+
+			key := ("#C" . this.Simulator . car . track)
+
+			if patternCache.Has(key)
+				this.iCarNamePattern := patternCache[key]
+			else {
+				this.iCarNamePattern := SettingsDatabase().readSettingValue(this.Simulator, car, track, "*", "*", "Session Settings", "Car.Name.Pattern", false)
+
+				patternCache[key] := this.iCarNamePattern
 			}
 		}
 	}
@@ -281,21 +298,90 @@ class SimulatorProvider {
 	}
 
 	parseDriverName(name, &forName, &surName, &nickName) {
-		local namePattern := this.NamePattern
-		local match
+		local namePattern := this.DriverNamePattern
+		local match, hasNames
 
 		if (namePattern && RegExMatch(Trim(name), namePattern, &match)) {
-			forName := match[1]
-			surName := ((match.Count > 1) ? match[2] : "")
+			forName := ""
+			surName := ""
+			nickName := ""
+			hasNames := false
 
-			if (match.Count > 2)
-				nickName := match[3]
+			loop match.Count
+				if (match.Name[A_Index] != "") {
+					hasNames := true
 
-			if ((nickName = "") && (forName != "") && (surName != ""))
-				nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+					switch match.Name[A_Index], false {
+						case "forname":
+							forName := match[A_Index]
+						case "surname":
+							surName := match[A_Index]
+						case "nickname":
+							nickName := match[A_Index]
+					}
+				}
+
+			if !hasNames {
+				forName := match[1]
+				surName := ((match.Count > 1) ? match[2] : "")
+
+				if (match.Count > 2)
+					nickName := match[3]
+
+				if ((nickName = "") && (forName != "") && (surName != ""))
+					nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
+			}
+
+			return true
 		}
 		else
 			return parseDriverName(name, &forName, &surName, &nickName)
+	}
+
+	parseCarName(name, &nr, &model, &class, &team) {
+		local namePattern := this.CarNamePattern
+		local match, hasNames
+
+		nr := ""
+		model := ""
+		class := ""
+		team := false
+
+		if (namePattern && RegExMatch(Trim(name), namePattern, &match)) {
+			loop match.Count
+				if (match.Name[A_Index] != "") {
+					hasNames := true
+
+					switch match.Name[A_Index], false {
+						case "nr":
+							nr := match[A_Index]
+						case "model":
+							model := match[A_Index]
+						case "class":
+							class := match[A_Index]
+						case "team":
+							team := match[A_Index]
+					}
+				}
+
+			if !hasNames {
+				if (match.Count > 0)
+					nr := match[1]
+
+				if (match.Count > 1)
+					model := match[2]
+
+				if (match.Count > 2)
+					class := match[3]
+
+				if (match.Count > 3)
+					team := match[4]
+			}
+		}
+		else
+			model := name
+
+		return false
 	}
 
 	correctStandingsData(standingsData, needCorrection := false) {

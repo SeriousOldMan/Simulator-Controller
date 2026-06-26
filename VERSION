@@ -1,13 +1,13 @@
 [Development]
 Version=7.0.2.0-release
 Target=7.0.2.0-release
-Date=06/24/20266
+Date=06/26/20266
 Download=https://cutt.ly/ut7djiTk;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CqETywta/Releases/Simulator%20Controller%207.0.2.0-release.zip;https://www.dropbox.com/scl/fi/nincom4scp5t77a0nc95c/Simulator-Controller-7.0.2.0-release.zip?rlkey=n6cji1wxt3rpj5uptrezjiwwg&st=qvp51yjn&dl=1;http://%master%/Releases/Simulator Controller 7.0.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.0.2.0-release.zip
 Changes=Fixed strategy pickup by Strategist, Support for custom driver name patterns, Debug code for premature team session shutdown, Generic LLM connector now also supports non OpenAI style URLs
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2
 [Release]
 Version=7.0.2.0-release
-Date=06/24/20266
+Date=06/26/20266
 Download=https://cutt.ly/ut7djiTk;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/CqETywta/Releases/Simulator%20Controller%207.0.2.0-release.zip;https://www.dropbox.com/scl/fi/nincom4scp5t77a0nc95c/Simulator-Controller-7.0.2.0-release.zip?rlkey=n6cji1wxt3rpj5uptrezjiwwg&st=qvp51yjn&dl=1;http://%master%/Releases/Simulator Controller 7.0.2.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.0.2.0-release.zip
 Changes=Fixed strategy pickup by Strategist, Support for custom driver name patterns, Debug code for premature team session shutdown, Generic LLM connector now also supports non OpenAI style URLs
 Components=Media->6.9.0,Configuration->6.9.3,Utilities->6.9.2

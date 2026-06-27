@@ -1775,6 +1775,16 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV703() {
+	local text
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := "`nSoftware.MSSpeechLibrary_ru-RU.Requested=OPTIONAL"
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+}
+
 updateConfigurationForV701() {
 	local simulator, car, lapsDB, ignore, row, task
 

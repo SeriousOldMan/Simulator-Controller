@@ -17,7 +17,23 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.0.0
+
+#### Date: 07/03/26 (planned)
+
+#### Fixes
+
+  - Fixed many translations for all languages.
+  
+#### Changes
+
+  - With the help of @Samat Gimadeev, full support for the Russian language has been added. The UI has been fully translated and the Russian language can be used to communicate with the Assistants.
+  - Lap time and sector times for invalid laps will no longer be displayed in "Solo Center" and "Team Center".
+  - The setting "Data: Driver name pattern" introduced with the last release, will now also support regular expressions with named subpatterns.
+  - A customizeable pattern based filter has been implemented for car names. In some simulators more than just the name of the car model is returned as the name of the car. In *rFactor 2*, for example, the car name can contains the race number, the car model, the team name and other information. Using this setting, you can supply a regular expression, which parses the given car name string into the optional parts *nr*, *model* and *class*, *category* and *team*. Please see the new [setting "Data: Car name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - Added a new setting "Whisper.Options" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This setting let you pass additional arguments to Whisper. For example, if you want to run Whisper on a specific GPU, use "Whisper.Options=--cuda:2". If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), if you are using the "Whisper Server" to run Whisper on a second PC.
 
 # Release history
 

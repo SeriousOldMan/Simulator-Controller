@@ -1897,26 +1897,32 @@ class SoloCenter extends ConfigurationItem {
 
 			try {
 				if (state = "Valid") {
-					loop (this.LastLap ? this.LastLap.Nr : 0)
-						if (this.Laps.Has(A_Index) && (this.Laps[A_Index].State = "Invalid"))
-							this.LapsListView.Modify(this.Laps[A_Index].Row, "Col5", "-", "-")
+					loop (this.LastLap ? this.LastLap.Nr : 0) {
+						lapNumber := String(A_Index)
+
+						if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid"))
+							this.LapsListView.Modify(this.Laps[lapNumber].Row, "Col5", "-", "-")
+					}
 
 					state := "Invalid"
 				}
 				else {
-					loop (this.LastLap ? this.LastLap.Nr : 0)
-						if (this.Laps.Has(A_Index) && (this.Laps[A_Index].State != "Invalid")) {
-							lap := this.Laps[String(A_Index)]
+					loop (this.LastLap ? this.LastLap.Nr : 0) {
+						lapNumber := String(A_Index)
+
+						if this.Laps.Has(lapNumber) {
+							lap := this.Laps[lapNumber]
 
 							this.LapsListView.Modify(lap.Row, "Col5"
 												   , lapTimeDisplayValue(lap.LapTime)
 												   , values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*))
 						}
+					}
 
 					state := "Valid"
 				}
 			}
-		}, 1000, kLowPriority).start()
+		}, 2000, kLowPriority).start()
 
 		centerTab.UseTab(4)
 

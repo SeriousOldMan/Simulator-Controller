@@ -114,10 +114,10 @@ class SimulatorProvider {
 
 	DriverNamePattern {
 		Get {
-			if this.iDriverNamePattern
+			; if this.iDriverNamePattern
 				return this.iDriverNamePattern
-			else
-				return "^(?<forname>[^\s]*)\s?(?<surname>[^\s]*)\s?\(?(?<nickname>[^\s]*)\)?$"
+			; else
+			;	return "^(?<forname>[^\s]*)\s?(?<surname>[^\s]*)\s?\(?(?<nickname>[^\s]*)\)?$"
 		}
 	}
 
@@ -327,10 +327,10 @@ class SimulatorProvider {
 
 				if (match.Count > 2)
 					nickName := match[3]
-
-				if ((nickName = "") && (forName != "") && (surName != ""))
-					nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
 			}
+
+			if ((nickName = "") && (forName != "") && (surName != ""))
+				nickName := (SubStr(forName, 1, 1) . SubStr(surName, 1, 1))
 
 			return true
 		}

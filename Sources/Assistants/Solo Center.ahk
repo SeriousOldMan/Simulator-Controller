@@ -1890,6 +1890,34 @@ class SoloCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 		this.iLapsListView.OnEvent("ItemCheck", checkLap)
 
+		PeriodicTask(() {
+			local lapNumber, lap
+
+			static state := "Valid"
+
+			try {
+				if (state = "Valid") {
+					loop (this.LastLap ? this.LastLap.Nr : 0)
+						if (this.Laps.Has(A_Index) && (this.Laps[A_Index].State = "Invalid"))
+							this.LapsListView.Modify(this.Laps[A_Index].Row, "Col5", "-", "-")
+
+					state := "Invalid"
+				}
+				else {
+					loop (this.LastLap ? this.LastLap.Nr : 0)
+						if (this.Laps.Has(A_Index) && (this.Laps[A_Index].State != "Invalid")) {
+							lap := this.Laps[String(A_Index)]
+
+							this.LapsListView.Modify(lap.Row, "Col5"
+												   , lapTimeDisplayValue(lap.LapTime)
+												   , values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*))
+						}
+
+					state := "Valid"
+				}
+			}
+		}, 1000, kLowPriority).start()
+
 		centerTab.UseTab(4)
 
 		centerGui.Add("Text", "x24 ys+40 w105 h21", translate("Fuel Level"))

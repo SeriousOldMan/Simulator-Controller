@@ -2427,7 +2427,7 @@ class TeamCenter extends ConfigurationItem {
 		lvc.ShowColors()
 
 		PeriodicTask(() {
-			local lapNumber, lap
+			local lapNumber, lap, row
 
 			try {
 				lvc.Initialize()
@@ -2435,15 +2435,15 @@ class TeamCenter extends ConfigurationItem {
 				loop (this.LastLap ? this.LastLap.Nr : 0) {
 					lapNumber := String(A_Index)
 
-					if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid")) {
+					if this.Laps.Has(lapNumber) {
 						lap := this.Laps[lapNumber]
 
-						lvc.Cell(lap.Row, 5, , "Gray")
-						lvc.Cell(lap.Row, 6, , "Gray")
+						if (lap.State = "Invalid") {
+							row := lap.Row
 
-						this.LapsListView.Modify(lap.Row, "Col5"
-											   , lapTimeDisplayValue(lap.LapTime)
-											   , values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*))
+							lvc.Cell(row, 7, , "Gray")
+							lvc.Cell(row, 8, , "Gray")
+						}
 					}
 				}
 			}
@@ -7592,8 +7592,8 @@ class TeamCenter extends ConfigurationItem {
 							penalty := ""
 
 						this.LapsListView.Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-												, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.Laptime) : "-"
-												, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
+												, lapTimeDisplayValue(lap.Laptime)
+												, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
 												, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 												, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 
@@ -10348,8 +10348,8 @@ class TeamCenter extends ConfigurationItem {
 						penalty := ""
 
 					this.LapsListView.Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip)
-											, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.Laptime) : "-"
-											, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
+											, lapTimeDisplayValue(lap.Laptime)
+											, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
 											, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 											, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "", penalty)
 				}

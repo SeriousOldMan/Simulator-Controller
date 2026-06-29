@@ -1902,15 +1902,15 @@ class SoloCenter extends ConfigurationItem {
 				loop (this.LastLap ? this.LastLap.Nr : 0) {
 					lapNumber := String(A_Index)
 
-					if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid")) {
+					if this.Laps.Has(lapNumber) {
 						lap := this.Laps[lapNumber]
 
-						lvc.Cell(lap.Row, 5, , "Gray")
-						lvc.Cell(lap.Row, 6, , "Gray")
+						if (lap.State = "Invalid") {
+							row := lap.Row
 
-						this.LapsListView.Modify(lap.Row, "Col5"
-											   , lapTimeDisplayValue(lap.LapTime)
-											   , values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*))
+							lvc.Cell(row, 5, , "Gray")
+							lvc.Cell(row, 6, , "Gray")
+						}
 					}
 				}
 			}
@@ -3555,8 +3555,8 @@ class SoloCenter extends ConfigurationItem {
 
 		this.LapsListView.Modify(lap.Row, ((lap.State != "Valid") ? "-Check" : "Check")
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.LapTime) : "-"
-										, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
+										, lapTimeDisplayValue(lap.LapTime)
+										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
 										, displayNullValue(fuelConsumption), remainingFuel
 										, values2String(", ", pressures*)
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
@@ -5368,8 +5368,8 @@ class SoloCenter extends ConfigurationItem {
 
 					this.LapsListView.Add((this.SessionExported || (lap.State != "Valid") || !isNumber(lap.LapTime)) ? "" : "Check"
 										, lap.Nr, lap.Run.Nr, translate(lap.Weather), translate(lap.Grip)
-										, (lap.State != "Invalid") ? lapTimeDisplayValue(lap.LapTime) : "-"
-										, (lap.State != "Invalid") ? values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) : "-"
+										, lapTimeDisplayValue(lap.LapTime)
+										, values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*)
 										, displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -"
 										, (lap.State != "Invalid") ? "" : translate("x"), lap.Accident ? translate("x") : "")
 				}

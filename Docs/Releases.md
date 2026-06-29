@@ -24,6 +24,7 @@
 #### Fixes
 
   - Fixed many translations for all languages.
+  - Fixed an exception appearing in the logs of the community database synchronization process, which occured when no synchronization was actually required.
   
 #### Changes
 

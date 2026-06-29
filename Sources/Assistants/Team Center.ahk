@@ -1481,7 +1481,7 @@ class TeamCenter extends ConfigurationItem {
 		local center := this
 		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
-		local menu1, menu2, menus, htmlViewer
+		local menu1, menu2, menus, htmlViewer, listViewColors
 
 		validateInteger(minValue, field, operation, value?) {
 			if (operation = "Validate")
@@ -2423,29 +2423,23 @@ class TeamCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
-		lvc := Theme.ListViewColors(this.LapsListView)
-		lvc.ShowColors()
+		listViewColors := Theme.ListViewColors(this.iLapsListView)
+		listViewColors.ShowColors()
 
 		PeriodicTask(() {
-			local lapNumber, lap, row
+			local ignore, lap, row
 
 			try {
-				lvc.Initialize()
+				listViewColors.Initialize()
+				listViewColors.Clear()
 
-				loop (this.LastLap ? this.LastLap.Nr : 0) {
-					lapNumber := String(A_Index)
+				for ignore, lap in this.Laps
+					if (lap.State = "Invalid") {
+						row := lap.Row
 
-					if this.Laps.Has(lapNumber) {
-						lap := this.Laps[lapNumber]
-
-						if (lap.State = "Invalid") {
-							row := lap.Row
-
-							lvc.Cell(row, 7, , "Gray")
-							lvc.Cell(row, 8, , "Gray")
-						}
+						listViewColors.Cell(row, 7, , "Gray")
+						listViewColors.Cell(row, 8, , "Gray")
 					}
-				}
 			}
 		}, 2000, kLowPriority).start()
 

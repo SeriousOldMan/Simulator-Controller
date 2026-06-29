@@ -1252,7 +1252,7 @@ class SoloCenter extends ConfigurationItem {
 		local center := this
 		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
-		local simulator, car, track
+		local simulator, car, track, listViewColors
 		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, xB
 		local w12, w13
 
@@ -1890,29 +1890,23 @@ class SoloCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 		this.iLapsListView.OnEvent("ItemCheck", checkLap)
 
-		lvc := Theme.ListViewColors(this.LapsListView)
-		lvc.ShowColors()
+		listViewColors := Theme.ListViewColors(this.iLapsListView)
+		listViewColors.ShowColors()
 
 		PeriodicTask(() {
-			local lapNumber, lap
+			local ignore, lap, row
 
 			try {
-				lvc.Initialize()
+				listViewColors.Initialize()
+				listViewColors.Clear()
 
-				loop (this.LastLap ? this.LastLap.Nr : 0) {
-					lapNumber := String(A_Index)
+				for ignore, lap in this.Laps
+					if (lap.State = "Invalid") {
+						row := lap.Row
 
-					if this.Laps.Has(lapNumber) {
-						lap := this.Laps[lapNumber]
-
-						if (lap.State = "Invalid") {
-							row := lap.Row
-
-							lvc.Cell(row, 5, , "Gray")
-							lvc.Cell(row, 6, , "Gray")
-						}
+						listViewColors.Cell(row, 5, , "Gray")
+						listViewColors.Cell(row, 6, , "Gray")
 					}
-				}
 			}
 		}, 2000, kLowPriority).start()
 

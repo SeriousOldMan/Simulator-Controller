@@ -312,6 +312,355 @@ class Theme {
 		}
 	}
 
+	class ListViewColors {
+		__New(listView, isStatic := false, noSort := false, noSizing := false) {
+			listView.Opt("+LV0x010000")
+
+			this.LV := listView
+			this.HWND := listView.HWND
+
+			this.Header := SendMessage(0x101F, 0, 0, listView)
+			this.BkClr := SendMessage(0x1025, 0, 0, listView)
+			this.TxClr := SendMessage(0x1023, 0, 0, listView)
+
+			this.RowB := this.BkClr
+			this.RowT := this.TxClr
+
+			this.IsStatic := !!isStatic
+
+			this.AltCols := false
+			this.AltRows := false
+			this.SelColors := false
+
+			this.NoSort(!!noSort)
+			this.NoSizing(!!noSizing)
+
+			this.ShowColors()
+
+			this.RowCount := listView.GetCount()
+			this.ColCount := listView.GetCount("Col")
+
+			this.Rows := Map()
+			this.Rows.Capacity := this.RowCount
+
+			this.Cells := Map()
+			this.Cells.Capacity := this.RowCount
+		}
+
+		__Delete() {
+			this.ShowColors(false)
+
+			If WinExist(this.HWND)
+				WinRedraw(this.HWND)
+		}
+
+		Initialize() {
+			if !this.HWND
+				return false
+
+			this.BkClr := SendMessage(0x1025, 0, 0, this.LV)
+			this.TxClr := SendMessage(0x1023, 0, 0, this.LV)
+
+			this.RowCount := this.LV.GetCount()
+			this.Colcount := this.LV.GetCount("Col")
+
+			if WinExist(this.HWND)
+				WinRedraw(this.HWND)
+
+			return true
+		}
+
+		Clear(altRows := false, altCols := false) {
+			if (altCols)
+				this.AltCols := false
+
+			If (altRows)
+				this.AltRows := false
+
+			this.Rows.Clear()
+			this.Rows.Capacity := this.RowCount
+
+			this.Cells.Clear()
+			this.Cells.Capacity := this.RowCount
+
+			return true
+		}
+
+		AlternateRows(bkColor := "", txColor := "") {
+			local bkBGR, txBGR
+
+			if !this.HWND
+				return false
+
+			this.AltRows := false
+
+			if ((bkColor = "") && (txColor = ""))
+				return true
+
+			bkBGR := this.BGR(bkColor)
+			txBGR := this.BGR(txColor)
+
+			if ((bkBGR = "") && (txBGR = ""))
+				return false
+
+			this.ARB := ((bkBGR != "") ? bkBGR : this.BkClr)
+			this.ART := ((txBGR != "") ? txBGR : this.TxClr)
+
+			this.AltRows := true
+
+			return true
+		}
+
+		AlternateCols(bkColor := "", txColor := "") {
+			local bkBGR, txBGR
+
+			if !this.HWND
+				return false
+
+			this.AltCols := false
+
+			if (bkColor = "") && (txColor = "")
+				return true
+
+			bkBGR := this.BGR(bkColor)
+			txBGR := this.BGR(txColor)
+
+			if ((bkBGR = "") && (txBGR = ""))
+				return false
+
+			this.ACB := ((bkBGR != "") ? bkBGR : this.BkClr)
+			this.ACT := ((txBGR != "") ? txBGR : this.TxClr)
+
+			this.AltCols := true
+
+			return true
+		}
+
+		SelectionColors(bkColor := "", txColor := "") {
+			local bkBGR, txBGR
+
+			if !this.HWND
+				return false
+
+			this.SelColors := false
+
+			if ((bkColor = "") && (txColor = ""))
+				return true
+
+			bkBGR := this.BGR(bkColor)
+			txBGR := this.BGR(txColor)
+
+			If ((BkBGR = "") && (TxBGR = ""))
+				return false
+
+			this.SELB := bkBGR
+			this.SELT := txBGR
+
+			this.SelColors := true
+
+			return true
+		}
+
+		Row(row, bkColor := "", txColor := "") {
+			local bkBGR, txBGR
+
+			if !this.HWND
+				return false
+
+			if (row > this.RowCount)
+				return false
+
+			if this.IsStatic
+				row := this.MapIndexToID(row)
+
+			if this.Rows.Has(row)
+				this.Rows.Delete(row)
+
+			if ((bkColor = "") && (txColor = ""))
+				return true
+
+			bkBGR := this.BGR(bkColor)
+			txBGR := this.BGR(txColor)
+
+			if ((bkBGR = "") && (txBGR = ""))
+				return false
+
+			this.Rows[row] := Map("B", (bkBGR != "") ? bkBGR : this.BkClr
+								, "T", (txBGR != "") ? txBGR : this.TxClr)
+
+			return true
+		}
+
+		Cell(row, col, bkColor := "", txColor := "") {
+			local bkBGR, txBGR
+
+			if !this.HWND
+				return false
+
+			if ((row > this.RowCount) || (col > this.ColCount))
+				return false
+
+			if this.IsStatic
+				row := this.MapIndexToID(row)
+
+			if (this.Cells.Has(row) && this.Cells[row].Has(col))
+				this.Cells[row].Delete(col)
+
+			if ((bkColor = "") && (txColor = ""))
+				return true
+
+			bkBGR := this.BGR(bkColor)
+			txBGR := this.BGR(txColor)
+
+			if ((bkBGR = "") && (txBGR = ""))
+				return false
+
+			if !this.Cells.Has(row) {
+				this.Cells[row] := []
+				this.Cells[row].Capacity := this.ColCount
+			}
+
+			if (col > this.Cells[row].Length)
+				this.Cells[row].Length := col
+
+			this.Cells[row][col] := Map("B", (bkBGR != "") ? bkBGR : this.BkClr
+									  , "T", (txBGR != "") ? txBGR : this.TxClr)
+
+			return true
+		}
+
+		NoSort(apply := true) {
+			if !this.HWND
+				return false
+
+			this.LV.Opt((apply ? "+" : "-") . "NoSort")
+
+			return true
+		}
+
+		NoSizing(apply := true) {
+			if !this.Header
+				return false
+
+			ControlSetStyle((apply ? "+" : "-") . "0x0800", this.Header)
+
+			return true
+		}
+
+		ShowColors(apply := true) {
+			if (apply && !this.HasOwnProp("OnNotifyFunc")) {
+				if isInstance(this.LV, DarkTheme.DarkListView)
+					this.LV.ListViewColors := this
+				else {
+					this.OnNotifyFunc := ObjBindMethod(this, "NM_CUSTOMDRAW")
+
+					this.LV.OnNotify(-12, this.OnNotifyFunc)
+				}
+
+				WinRedraw(this.HWND)
+			}
+			else if (!apply && this.HasOwnProp("OnNotifyFunc")) {
+				if isInstance(this.LV, DarkTheme.DarkListView)
+					this.LV.DeleteProp("ListViewColors")
+				else {
+					this.LV.OnNotify(-12, this.OnNotifyFunc, 0)
+
+					this.OnNotifyFunc := ""
+
+					this.DeleteProp("OnNotifyFunc")
+				}
+
+				WinRedraw(this.HWND)
+			}
+
+			return true
+		}
+
+		NM_CUSTOMDRAW(LV, L) {
+			local drawStage, row, col, item, useAltCol, colColors, colB, colT
+
+			static SizeNMHDR := A_PtrSize * 3                  ; Size of NMHDR structure
+			static SizeNCD := SizeNMHDR + 16 + (A_PtrSize * 5) ; Size of NMCUSTOMDRAW structure
+			static OffItem := SizeNMHDR + 16 + (A_PtrSize * 2) ; Offset of dwItemSpec (NMCUSTOMDRAW)
+			static OffItemState := OffItem + A_PtrSize         ; Offset of uItemState  (NMCUSTOMDRAW)
+			static OffCT :=  SizeNCD                           ; Offset of clrText (NMLVCUSTOMDRAW)
+			static OffCB := OffCT + 4                          ; Offset of clrTextBk (NMLVCUSTOMDRAW)
+			static OffSubItem := OffCB + 4                     ; Offset of iSubItem (NMLVCUSTOMDRAW)
+
+			Critical -1
+
+			if (!this.HWND || (NumGet(L, "UPtr") != this.HWND))
+				return
+
+			drawStage := NumGet(L + SizeNMHDR, "UInt")
+			row := NumGet(L + OffItem, "UPtr") + 1
+			col := NumGet(L + OffSubItem, "Int") + 1
+			item := row - 1
+
+			if this.IsStatic
+				row := this.MapIndexToID(row)
+
+			if (drawStage = 0x030001) {
+				useAltCol := ((this.AltCols) && !(col & 1))
+
+				colColors := ((this.Cells.Has(row) && this.Cells[row].Has(col)) ? this.Cells[row][col] : Map("B", "", "T", ""))
+
+				colB := ((colColors["B"] != "") ? colColors["B"] : useAltCol ? this.ACB : this.RowB)
+				colT := ((colColors["T"] != "") ? colColors["T"] : useAltCol ? this.ACT : this.RowT)
+
+				NumPut("UInt", colT, L + OffCT), NumPut("UInt", colB, L + OffCB)
+
+				return ((!this.AltCols && (col > this.Cells[row].Length)) ? 0x00 : 0x020)
+			}
+
+			if (drawStage = 0x010001) {
+				if (this.SelColors && SendMessage(0x102C, item, 0x0002, this.HWND)) {
+					NumPut("UInt", NumGet(L + OffItemState, "UInt") & ~0x0011, L + OffItemState)
+
+					if (this.SELB != "")
+						NumPut("UInt", this.SELB, L + OffCB)
+
+					if (this.SELT != "")
+						NumPut("UInt", this.SELT, L + OffCT)
+
+					return 0x02
+				}
+
+				useAltRow := (this.AltRows && (item & 1))
+				rowColors := (this.Rows.Has(row) ? this.Rows[row] : "")
+
+				this.RowB := (rowColors ? rowColors["B"] : useAltRow ? this.ARB : this.BkClr)
+				this.RowT := (rowColors ? rowColors["T"] : useAltRow ? this.ART : this.TxClr)
+
+				if (this.AltCols || this.Cells.Has(row))
+					return 0x20
+
+				NumPut("UInt", this.RowT, L + OffCT)
+				NumPut("UInt", this.RowB, L + OffCB)
+
+				return 0x00
+			}
+
+			return ((drawStage = 0x000001) ? 0x20 : 0x00)
+		}
+
+		MapIndexToID(row) {
+			return SendMessage(0x10B4, row - 1, 0, this.HWND)
+		}
+
+		BGR(color, default := "") {
+			static HTML := {AQUA: 0xFFFF00, BLACK: 0x000000, BLUE: 0xFF0000, FUCHSIA: 0xFF00FF
+						  , GRAY: 0x808080, GREEN: 0x008000, LIME: 0x00FF00, MAROON: 0x000080
+						  , NAVY: 0x800000, OLIVE: 0x008080, PURPLE: 0x800080, RED: 0x0000FF
+						  , SILVER: 0xC0C0C0, TEAL: 0x808000, WHITE: 0xFFFFFF, YELLOW: 0x00FFFF}
+
+			if isInteger(color)
+				return (((color >> 16) & 0xFF) | (color & 0x00FF00) | ((color & 0xFF) << 16))
+
+			return (HTML.HasOwnProp(color) ? HTML.%color% : default)
+		}
+	}
+
 	static CurrentTheme {
 		Get {
 			return Theme.sCurrentTheme
@@ -1075,6 +1424,8 @@ class DarkTheme extends Theme {
 		}
 
 		static SetDarkMode(lv) {
+			local listView := lv
+
 			static LVS_EX_DOUBLEBUFFER := 0x10000
 			static NM_CUSTOMDRAW       := -12
 			static UIS_SET             := 1
@@ -1106,6 +1457,10 @@ class DarkTheme extends Theme {
 						return CDRF_NOTIFYITEMDRAW
 					case CDDS_ITEMPREPAINT:
 						SetTextColor(nmcd.hdc, DarkTheme.DarkColors["Font", true])
+
+						; if listView.HasProp("ListViewColors")
+						;	listView.ListViewColors.NM_CUSTOMDRAW(listView, lv)
+
 				}
 
 				return CDRF_DODEFAULT
@@ -1228,7 +1583,7 @@ class DarkTheme extends Theme {
 
 			uxtheme := DllCall("kernel32\GetModuleHandle", "Str", "uxtheme", "Ptr")
 
-			DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", window.Hwnd, "Int", DWMWA_USE_IMMERSIVE_DARK_MODE, "Int*", True, "Int", 4)
+			DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", window.Hwnd, "Int", DWMWA_USE_IMMERSIVE_DARK_MODE, "Int*", true, "Int", 4)
 
 			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 135, "Ptr") , "Int", PreferredAppMode["ForceDark"])
 			DllCall(DllCall("kernel32\GetProcAddress", "Ptr", uxtheme, "Ptr", 136, "Ptr"))
@@ -1355,7 +1710,7 @@ class DarkTheme extends Theme {
 					SetRoundedCorner(hWnd, 3)
 			}
 
-			return DllCall(This.OriWndProc, "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "UInt")
+			return DllCall(this.OriWndProc, "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "UInt")
 		}
 
 		SetDarkToolTip(hWnd) => DllCall("UxTheme\SetWindowTheme", "Ptr", hWnd, "Ptr", StrPtr("DarkMode_Explorer")

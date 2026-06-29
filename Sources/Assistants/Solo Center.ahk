@@ -1910,7 +1910,7 @@ class SoloCenter extends ConfigurationItem {
 					loop (this.LastLap ? this.LastLap.Nr : 0) {
 						lapNumber := String(A_Index)
 
-						if this.Laps.Has(lapNumber) {
+						if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid")) {
 							lap := this.Laps[lapNumber]
 
 							this.LapsListView.Modify(lap.Row, "Col5"

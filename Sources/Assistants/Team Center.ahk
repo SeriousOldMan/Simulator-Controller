@@ -2423,6 +2423,40 @@ class TeamCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 
+		PeriodicTask(() {
+			local lapNumber, lap
+
+			static state := "Valid"
+
+			try {
+				if (state = "Valid") {
+					loop (this.LastLap ? this.LastLap.Nr : 0) {
+						lapNumber := String(A_Index)
+
+						if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid"))
+							this.LapsListView.Modify(this.Laps[lapNumber].Row, "Col7", "-", "-")
+					}
+
+					state := "Invalid"
+				}
+				else {
+					loop (this.LastLap ? this.LastLap.Nr : 0) {
+						lapNumber := String(A_Index)
+
+						if (this.Laps.Has(lapNumber) && (this.Laps[lapNumber].State = "Invalid")) {
+							lap := this.Laps[lapNumber]
+
+							this.LapsListView.Modify(lap.Row, "Col7"
+												   , lapTimeDisplayValue(lap.LapTime)
+												   , values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*))
+						}
+					}
+
+					state := "Valid"
+				}
+			}
+		}, 2000, kLowPriority).start()
+
 		if (this.Mode = "Normal") {
 			centerTab.UseTab(4)
 

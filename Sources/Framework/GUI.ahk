@@ -312,7 +312,7 @@ class Theme {
 		}
 	}
 
-	class ListViewColors {
+	class ListViewManager {
 		__New(listView, isStatic := false, noSort := false, noSizing := false) {
 			listView.Opt("+LV0x010000")
 
@@ -550,7 +550,7 @@ class Theme {
 		ShowColors(apply := true) {
 			if (apply && !this.HasOwnProp("OnNotifyFunc")) {
 				if isInstance(this.LV, DarkTheme.DarkListView)
-					this.LV.ListViewColors := this
+					this.LV.ListViewManager := this
 				else {
 					this.OnNotifyFunc := ObjBindMethod(this, "NM_CUSTOMDRAW")
 
@@ -561,7 +561,7 @@ class Theme {
 			}
 			else if (!apply && this.HasOwnProp("OnNotifyFunc")) {
 				if isInstance(this.LV, DarkTheme.DarkListView)
-					this.LV.DeleteProp("ListViewColors")
+					this.LV.DeleteProp("ListViewManager")
 				else {
 					this.LV.OnNotify(-12, this.OnNotifyFunc, 0)
 
@@ -771,7 +771,7 @@ class Theme {
 	static GetSystemColor(code, asText := true) {
 		local BGR
 
-		if !isNumber(code) && kSystemColors.Has(code)
+		if (!isNumber(code) && kSystemColors.Has(code))
 			code := kSystemColors[code]
 
 		BGR := DllCall("User32.dll\GetSysColor", "Int", code, "UInt")
@@ -1457,10 +1457,6 @@ class DarkTheme extends Theme {
 						return CDRF_NOTIFYITEMDRAW
 					case CDDS_ITEMPREPAINT:
 						SetTextColor(nmcd.hdc, DarkTheme.DarkColors["Font", true])
-
-						; if listView.HasProp("ListViewColors")
-						;	listView.ListViewColors.NM_CUSTOMDRAW(listView, lv)
-
 				}
 
 				return CDRF_DODEFAULT

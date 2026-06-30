@@ -31,7 +31,7 @@
   - With the help of @Samat Gimadeev, full support for the Russian language has been added.
 	- The UI has been fully translated, incl. all help texts for the setup and configuration tool "Simulator Setup".
 	- Russian language can be used to communicate with the Assistants.
-	- The command reference sheets are available for the Russian language. See the reference sheet for the [Race Engiineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(RU)), for example.
+	- The command reference sheets are available for the Russian language. See the reference sheet for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(RU)), for example.
 	- Support for Yandex cloud services (speech synthesis and recognition as well as GPT services) already has been added in one of the last releases.
   - Lap time and sector times for invalid laps will now be grayed out in the lap data lists of "Solo Center" and "Team Center".
   - The setting "Data: Driver name pattern" introduced with the last release will now also support regular expressions with named subpatterns.

@@ -265,7 +265,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseLapTelemetries.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseLapTelemetries.Bind(kOk))
+		browserGui.Add("Button", "x197 yp w80 h23 Default vloadButton", translate("Load")).OnEvent("Click", browseLapTelemetries.Bind(kOk))
 		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseLapTelemetries.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
@@ -287,6 +287,8 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 					browserGui["openButton"].Text := translate("Import...")
 				else
 					browserGui["openButton"].Text := translate("Open...")
+
+				browserGui["loadButton"].Enabled := !!browserGui["telemetryListView"].GetNext(0)
 			}
 			until result
 
@@ -537,7 +539,7 @@ browseSoloSessions(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseSoloSessions.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseSoloSessions.Bind(kOk))
+		browserGui.Add("Button", "x197 yp w80 h23 Default vloadButton", translate("Load")).OnEvent("Click", browseSoloSessions.Bind(kOk))
 		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseSoloSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
@@ -559,6 +561,8 @@ browseSoloSessions(ownerOrCommand := false, arguments*) {
 					browserGui["openButton"].Text := translate("Import...")
 				else
 					browserGui["openButton"].Text := translate("Open...")
+
+				browserGui["loadButton"].Enabled := !!browserGui["sessionListView"].GetNext(0)
 			}
 			until result
 
@@ -768,7 +772,7 @@ browseTeamSessions(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseTeamSessions.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseTeamSessions.Bind(kOk))
+		browserGui.Add("Button", "x197 yp w80 h23 Default vloadButton", translate("Load")).OnEvent("Click", browseTeamSessions.Bind(kOk))
 		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseTeamSessions.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
@@ -790,6 +794,8 @@ browseTeamSessions(ownerOrCommand := false, arguments*) {
 					browserGui["openButton"].Text := translate("Import...")
 				else
 					browserGui["openButton"].Text := translate("Open...")
+
+				browserGui["loadButton"].Enabled := !!browserGui["sessionListView"].GetNext(0)
 			}
 			until result
 
@@ -1036,7 +1042,7 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseStrategies.Bind("Load"))
 
-		browserGui.Add("Button", "x197 yp w80 h23 Default", translate("Load")).OnEvent("Click", browseStrategies.Bind(kOk))
+		browserGui.Add("Button", "x197 yp w80 h23 Default vloadButton", translate("Load")).OnEvent("Click", browseStrategies.Bind(kOk))
 		browserGui.Add("Button", "x285 yp w80 h23", translate("&Cancel")).OnEvent("Click", browseStrategies.Bind(kCancel))
 
 		browserGui.Show("AutoSize Center")
@@ -1051,8 +1057,11 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 			browserGui.Show()
 
 		try {
-			loop
+			loop {
 				Sleep(100)
+
+				browserGui["loadButton"].Enabled := !!browserGui["strategyListView"].GetNext(0)
+			}
 			until result
 
 			if (result = kOk) {

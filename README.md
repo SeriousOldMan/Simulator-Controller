@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.1.0.0-dev]() (Early build for 7.1.0. Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
+[7.1.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Ubxxi9jF/Releases/Simulator%20Controller%207.1.0.0-beta.zip) (Test build for 7.1.0. Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7100) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710) of this version and all the versions you might have skipped, before installing and using this version.
 

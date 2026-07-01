@@ -26,7 +26,12 @@ namespace F125UDPProtocol
             { 0, "F1" },
             { 1, "F1 Classic" },
             { 2, "F2" },
-            { 3, "F1 Sprint" }
+            { 3, "F1 Sprint" },
+            { 4, "F1" },
+            { 6, "F1" },
+            { 8, "F1" },
+            { 9, "F1" },
+            { 13, "F1 26" }
         };
 
         public static readonly Dictionary<byte, string> PenaltyNames = new Dictionary<byte, string>
@@ -73,7 +78,12 @@ namespace F125UDPProtocol
             { 30, "Miami" },
             { 31, "Las Vegas" },
             { 32, "Losail" },
-            { 33, "Lusail" }
+            { 33, "Lusail" },
+            { 33, "Lusail" },
+            { 39, "Silverstone (Reverse)" },
+            { 40, "Austria (Reverse)" },
+            { 41, "Zandvoort (Reverse)" },
+            { 42, "Madrid" }
         };
 
         // Hardcoded names for teams. In this format ──> Team ID → Name
@@ -118,7 +128,31 @@ namespace F125UDPProtocol
             { 190, "Alpine '24" },
             { 191, "RB '24" },
             { 192, "Haas '24" },
-            { 193, "McLaren '24" }
+            { 193, "McLaren '24" },
+            { 194, "Sauber '24" },
+			
+            { 465, "Art GP '25" },
+			{ 466, "Campos '25" },
+			{ 467, "Rodin Motorsport '25" },
+			{ 468, "AIX Racing '25" },
+			{ 469, "DAMS '25" },
+			{ 470, "Hitech '25" },
+			{ 471, "MP Motorsport '25" },
+			{ 472, "Prema '25" },
+			{ 473, "Trident '25" },
+			{ 474, "Van Amersfoort Racing '25" },
+			{ 475, "Invicta '25" },
+			{ 476, "Mercedes '26" },
+			{ 477, "Ferrari '26" },
+			{ 478, "Red Bull Racing '26" },
+			{ 479, "Williams '26" },
+			{ 480, "Aston Martin '26" },
+			{ 481, "Alpine '26" },
+			{ 482, "RB '26" },
+			{ 483, "Haas '26" },
+			{ 484, "McLaren '26" },
+			{ 485, "Audi '26" },
+			{ 486, "Cadillac '26" }
         };
 
         // ── Tyre Compound → Visual Name ─────────────────────────────────
@@ -281,7 +315,19 @@ namespace F125UDPProtocol
             { "Aron", "Paul Aron" },
             { "Bortoleto", "Gabriel Bortoleto" },
             { "Colapinto", "Franco Colapinto" },
-            { "Barnard", "Taylor Barnard" }
+            { "Barnard", "Taylor Barnard" },
+			{ "Browning", "Luke Browning" },
+			{ "Shields", "Cian Shields" },
+			{ "Lindblad", "Arvid Lindblad" },
+			{ "Beganovic", "Dino Beganovic" },
+			{ "Fornaroli", "Leonardo Fornaroli" },
+			{ "Goethe", "Oliver Goethe" },
+			{ "Mini", "Gabriele Mini" },
+			{ "Montoya", "Sebastián Montoya" },
+			{ "Dunne", "Alexander Dunne" },
+			{ "Esterson", "Max Esterson" },
+			{ "Meguetounif", "Sami Meguetounif" },
+			{ "Bennet", "John Bennet" }
         };
 
         static F125Constants()

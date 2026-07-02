@@ -1,28 +1,12 @@
 # Latest stable release
 
-## 7.0.2.0
-
-#### Date: 06/26/26
-
-#### Fixes
-
-  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
-  - Fixed a bug in the "Generic" GPT service connector for fully OpenAI-compatible endpoints.
-  
-#### Changes
-
-  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
-  - The "Generic" GPT service connector now also supports Service URLs, that do not follow the OpenAI naming scheme.
-  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
-
-# Upcoming release
-
 ## 7.1.0.0
 
-#### Date: 07/03/26 (planned)
+#### Date: 07/03/26
 
 #### Fixes
 
+  - Fixed a critical problem with driver names for some simulators. This bug was introduced with the last release.
   - Fixed many translations for all languages.
   - Fixed an exception appearing in the logs of the community database synchronization process, which occured when no synchronization was actually required.
   
@@ -40,7 +24,26 @@
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), if you are using the "Whisper Server" to run Whisper on a second PC.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 7.0.2.0
+
+#### Date: 06/26/26
+
+#### Fixes
+
+  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
+  - Fixed a bug in the "Generic" GPT service connector for fully OpenAI-compatible endpoints.
+  
+#### Changes
+
+  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - The "Generic" GPT service connector now also supports Service URLs, that do not follow the OpenAI naming scheme.
+  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
 
 ## 7.0.1.0
 

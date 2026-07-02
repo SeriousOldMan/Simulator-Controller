@@ -1481,7 +1481,7 @@ class TeamCenter extends ConfigurationItem {
 		local center := this
 		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
-		local menu1, menu2, menus, htmlViewer
+		local menu1, menu2, menus, htmlViewer, listViewManager
 
 		validateInteger(minValue, field, operation, value?) {
 			if (operation = "Validate")
@@ -2422,6 +2422,26 @@ class TeamCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("Click", chooseLap.Bind(false))
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
+
+		listViewManager := Theme.ListViewManager(this.iLapsListView)
+		listViewManager.ShowColors()
+
+		PeriodicTask(() {
+			local ignore, lap, row
+
+			try {
+				listViewManager.Clear()
+				listViewManager.Initialize()
+
+				for ignore, lap in this.Laps
+					if (lap.State = "Invalid") {
+						row := lap.Row
+
+						listViewManager.Cell(row, 7, , 0x606060)
+						listViewManager.Cell(row, 8, , 0x606060)
+					}
+			}
+		}, 2000, kLowPriority).start()
 
 		if (this.Mode = "Normal") {
 			centerTab.UseTab(4)
@@ -8088,6 +8108,9 @@ class TeamCenter extends ConfigurationItem {
 				if row {
 					this.LapsListView.Modify(row, "Col12", theLap.Valid ? "" : translate("x"))
 
+					if !theLap.Valid
+						this.LapsListView.Modify(row, "Col7", "-", "-")
+
 					lapPressures := this.LapsListView.GetText(row, 11)
 
 					if (lapPressures = "-, -, -, -")
@@ -12773,8 +12796,16 @@ class TeamCenter extends ConfigurationItem {
 			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+
+		if (lap.State != "Invalid") {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>-</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>-</td></tr>")
+		}
+
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")

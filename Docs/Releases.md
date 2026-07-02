@@ -1,5 +1,50 @@
 # Latest stable release
 
+## 7.1.0.0
+
+#### Date: 07/03/26
+
+#### Fixes
+
+  - Fixed a critical problem with driver names for some simulators. This bug was introduced with the last release.
+  - Fixed many translations for all languages.
+  - Fixed an exception appearing in the logs of the community database synchronization process, which occured when no synchronization was actually required.
+  
+#### Changes
+
+  - With the help of @Samat Gimadeev, full support for the Russian language has been added.
+	- The UI has been fully translated, incl. all help texts for the setup and configuration tool "Simulator Setup".
+	- Russian language can be used to communicate with the Assistants.
+	- The command reference sheets are available for the Russian language. See the reference sheet for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(RU)), for example.
+	- Support for Yandex cloud services (speech synthesis and recognition as well as GPT services) already has been added in one of the last releases.
+  - Lap time and sector times for invalid laps will now be grayed out in the lap data lists of "Solo Center" and "Team Center".
+  - The setting "Data: Driver name pattern" introduced with the last release will now also support regular expressions with named subpatterns.
+  - A customizeable pattern based filter has now been implemented for car names as well. In some simulators more than just the name of the car model is returned as the name of the car. In *rFactor 2*, for example, the car name can contains the race number, the car model, the team name and other information. Using this setting, you can supply a regular expression, which parses the given car name string into the optional parts *nr*, *model* and *class*, *category* and *team*. Please see the new [setting "Data: Car name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - Added a new setting "Whisper.Options" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This setting let you pass additional arguments to Whisper. For example, if you want to run Whisper on a specific GPU, use "Whisper.Options=--cuda:2". If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), if you are using the "Whisper Server" to run Whisper on a second PC.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 7.0.2.0
+
+#### Date: 06/26/26
+
+#### Fixes
+
+  - Fixed a bug for the Strategist, who occasionally did not pick up a strategy for a race with less than 20 laps.
+  - Fixed a bug in the "Generic" GPT service connector for fully OpenAI-compatible endpoints.
+  
+#### Changes
+
+  - A customizeable pattern based filter has been implemented for driver names. Some leagues (for example LFM for *Assetto Corsa*) code additional information like the race number into the driver name in the entry list. Please see the new [setting "Data: Driver name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
+  - The "Generic" GPT service connector now also supports Service URLs, that do not follow the OpenAI naming scheme.
+  - [Internal] Added a bunch of debugging code to hunt down an occasional premature session end in LMU team races. Looks like the API is reporting weird state information in the moment of a driver swap. The debug code can be switched on using the "LogSimlator" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
+
 ## 7.0.1.0
 
 #### Date: 06/19/26
@@ -15,12 +60,6 @@
   - The Driving Coach now uses only valid laps for reference laps.
   - The Driving Coach can now automatically use telemetry data from the community database, if they have been recorded for faster laps than your own ones. This is *Off* by default. Please take a look at the [setting "Load reference lap from database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database".
   - Extended corner performance analytics by the Driving Coach, thus enabling current high end LLMs like GPT 5.5 to give a lot more detailed instructions while coaching on the track.
-
-# Upcoming release
-
-Not yet planned...
-
-# Release history
 
 ## 7.0.0.0
 

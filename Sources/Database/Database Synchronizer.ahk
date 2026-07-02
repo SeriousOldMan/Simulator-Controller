@@ -398,7 +398,8 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 	local downloadTimeStamp := (sessionDBPath . "DOWNLOAD")
 	local configuration := newMultiMap()
 	local types := []
-	local ignore, fileName, type, databaseDirectory
+	local databaseDirectory := false
+	local ignore, fileName, type
 
 	if FileExist(downloadTimeStamp)
 		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
@@ -475,7 +476,8 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 				logError(exception)
 			}
 
-		SessionDatabase.DatabaseVersion := databaseDirectory
+		if databaseDirectory
+			SessionDatabase.DatabaseVersion := databaseDirectory
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "DOWNLOAD")

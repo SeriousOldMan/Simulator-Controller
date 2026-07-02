@@ -268,7 +268,7 @@ namespace SHMConnector {
 					strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Driver.Surname="); strWriter.WriteLine(GetSurname(vehicle.mDriverName));
                     strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Driver.Nickname="); strWriter.WriteLine(GetNickname(vehicle.mDriverName));
 
-                    strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Driver.Name="); strWriter.WriteLine(vehicle.mDriverName);
+                    strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".Driver.Name="); strWriter.WriteLine(GetStringFromBytes(vehicle.mDriverName));
 
                     strWriter.Write("Car."); strWriter.Write(index); strWriter.Write(".InPitLane="); strWriter.WriteLine(vehicle.mInPits != 0 ? "true" : "false");
 
@@ -389,7 +389,7 @@ namespace SHMConnector {
 				strWriter.Write("DriverSurname="); strWriter.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				strWriter.Write("DriverNickname="); strWriter.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
-				strWriter.Write("DriverName="); strWriter.WriteLine(scoring.mScoringInfo.mPlayerName);
+				strWriter.Write("DriverName="); strWriter.WriteLine(GetStringFromBytes(scoring.mScoringInfo.mPlayerName));
 				
 				strWriter.Write("Position="); strWriter.WriteLine(playerScoring.mPlace);
 

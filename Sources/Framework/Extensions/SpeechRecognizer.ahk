@@ -1001,15 +1001,21 @@ class SpeechRecognizer {
 	processAudio(audioFile) {
 		global kSox
 
-		local request, result, name, install, progress, pid, settings, options, rawFile
+		local request, result, name, install, progress, pid, settings, options, rawFile, command
 
-		static computeType := kUndefined
+		static whisperComputeType := kUndefined
+		static whisperOptions
 
-		if (computeType == kUndefined) {
+		if (whisperComputeType == kUndefined) {
 			settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 
-			computeType := getMultiMapValue(settings, "Voice", "Whisper.Compute Type"
-										  , getMultiMapValue(settings, "Voice", "Compute Type", false))
+			whisperComputeType := getMultiMapValue(settings, "Voice", "Whisper.Compute Type"
+												 , getMultiMapValue(settings, "Voice", "Compute Type", false))
+
+			whisperOptions := getMultiMapValue(settings, "Voice", "Whisper.Options", false)
+
+			if (whisperOptions = "")
+				whisperOptions := false
 		}
 
 		if (this.Engine = "Google") {
@@ -1052,7 +1058,16 @@ class SpeechRecognizer {
 					showProgress({progress: (progress := 0), color: "Blue", title: translate("Downloading ") . this.Model . translate("...")})
 
 				try {
-					Run(kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language) . " -f json -m " . StrLower(this.Model) . " --beep_off" . (computeType ? (" --compute_type " . computeType) : ""), , "Hide", &pid)
+					command := (kProgramsDirectory . "Whisper Runtime\faster-whisper-xxl.exe `"" . audioFile
+												   . "`" -o `"" . kTempDirectory . "Whisper" . "`" --language " . StrLower(this.Language)
+												   . " -f json -m " . StrLower(this.Model) . " --beep_off"
+												   . (whisperComputeType ? (" --compute_type " . whisperComputeType) : "")
+												   . (whisperOptions ? (A_Space . whisperOptions) : ""))
+
+					if isDebug()
+						logMessage(kLogDebug, "Calling Whisper: " . command)
+
+					Run(command, , "Hide", &pid)
 
 					while ProcessExist(pid) {
 						if (install && !kSilentMode) {
@@ -1073,7 +1088,12 @@ class SpeechRecognizer {
 				SplitPath(audioFile, , , , &name)
 
 				try {
-					result := JSON.parse(FileRead(kTempDirectory . "Whisper\" . name . ".JSON"))
+					result := FileRead(kTempDirectory . "Whisper\" . name . ".JSON")
+
+					if isDebug()
+						logMessage(kLogDebug, "Whisper returned: " . result)
+
+					result := JSON.parse(result)
 
 					if result.Has("text")
 						this._onTextCallback(result["text"])
@@ -1087,7 +1107,8 @@ class SpeechRecognizer {
 			}
 			else if (this.Engine = "Whisper Server") {
 				try {
-					result := this.Instance.Connector.Recognize(audioFile, computeType ? computeType : "-")
+					result := this.Instance.Connector.Recognize(audioFile, whisperComputeType ? whisperComputeType : "-"
+																		 , whisperOptions ? whisperOptions : "-")
 
 					if result
 						this._onTextCallback(result)

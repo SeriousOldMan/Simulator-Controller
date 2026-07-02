@@ -68,6 +68,10 @@ copy "Driving Coach Commands (JA).md" ..\..\Controller.Wiki\Driving-Coach-Comman
 copy "Race Engineer Commands (JA).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(JA).md
 copy "Race Strategist Commands (JA).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(JA).md
 copy "Race Spotter Commands (JA).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(JA).md
+copy "Driving Coach Commands (RU).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(RU).md
+copy "Race Engineer Commands (RU).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(RU).md
+copy "Race Strategist Commands (RU).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(RU).md
+copy "Race Spotter Commands (RU).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(RU).md
 copy "Session Settings.md" ..\..\Controller.Wiki\Session-Settings.md
 copy "Keyboard Modifiers.md" ..\..\Controller.Wiki\Keyboard-Modifiers.md
 copy "Core Settings.md" ..\..\Controller.Wiki\Core-Settings.md

@@ -1252,7 +1252,7 @@ class SoloCenter extends ConfigurationItem {
 		local center := this
 		local wasDouble := false
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
-		local simulator, car, track
+		local simulator, car, track, listViewManager
 		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, xB
 		local w12, w13
 
@@ -1889,6 +1889,26 @@ class SoloCenter extends ConfigurationItem {
 		this.iLapsListView.OnEvent("DoubleClick", openLap)
 		this.iLapsListView.OnEvent("ItemSelect", selectLap)
 		this.iLapsListView.OnEvent("ItemCheck", checkLap)
+
+		listViewManager := Theme.ListViewManager(this.iLapsListView)
+		listViewManager.ShowColors()
+
+		PeriodicTask(() {
+			local ignore, lap, row
+
+			try {
+				listViewManager.Clear()
+				listViewManager.Initialize()
+
+				for ignore, lap in this.Laps
+					if (lap.State = "Invalid") {
+						row := lap.Row
+
+						listViewManager.Cell(row, 5, , 0x606060)
+						listViewManager.Cell(row, 6, , 0x606060)
+					}
+			}
+		}, 2000, kLowPriority).start()
 
 		centerTab.UseTab(4)
 
@@ -7835,8 +7855,16 @@ class SoloCenter extends ConfigurationItem {
 			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+
+		if (lap.State != "Invalid") {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . values2String(", ", collect(lap.SectorsTime, lapTimeDisplayValue)*) . "</td></tr>")
+		}
+		else {
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>-</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>-</td></tr>")
+		}
+
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")

@@ -37,7 +37,7 @@ class Sector397Provider extends SimulatorProvider {
 		return true
 	}
 
-	parseNr(candidate, &rest) {
+	retrieveNr(candidate, &rest) {
 		local temp, char
 
 		candidate := Trim(candidate)
@@ -90,52 +90,56 @@ class Sector397Provider extends SimulatorProvider {
 	}
 
 	retrieveCarName(carID, carModel, carName, &model?, &nr?, &category?, &team?) {
-		local index
+		local index, class
 
-		model := false
-		team := false
-		nr := false
-		category := false
+		if (this.CarNamePattern && this.parseCarName(carName, &nr, &model, &class, &category, &team))
+			return true
+		else {
+			model := false
+			team := false
+			nr := false
+			category := false
 
-		carName := Trim(carName)
-		index := InStr(carName, "#")
+			carName := Trim(carName)
+			index := InStr(carName, "#")
 
-		if (index = 1) {
-			nr := this.parseNr(SubStr(carName, 2), &carName)
+			if (index = 1) {
+				nr := this.retrieveNr(SubStr(carName, 2), &carName)
 
-			if (InStr(carName, ":") = 1)
-				category := this.retrieveCategory(SubStr(carName, 2), &carName)
+				if (InStr(carName, ":") = 1)
+					category := this.retrieveCategory(SubStr(carName, 2), &carName)
 
-			model := carName
-		}
-		else if index {
-			carName := StrSplit(carName, "#", , 2)
-
-			model := Trim(carName[1])
-
-			if (model = "")
-				model := false
-
-			nr := this.parseNr(carName[2], &carName)
-
-			if (InStr(carName, ":") = 1) {
-				category := this.retrieveCategory(SubStr(carName, 2), &carName)
-
-				if (category = "")
-					category := false
+				model := carName
 			}
+			else if index {
+				carName := StrSplit(carName, "#", , 2)
+
+				model := Trim(carName[1])
+
+				if (model = "")
+					model := false
+
+				nr := this.retrieveNr(carName[2], &carName)
+
+				if (InStr(carName, ":") = 1) {
+					category := this.retrieveCategory(SubStr(carName, 2), &carName)
+
+					if (category = "")
+						category := false
+				}
+			}
+			else if (carName != "")
+				model := carName
+
+			if (InStr(model, ":") && !category) {
+				carName := StrSplit(model, ":", , 2)
+
+				model := Trim(carName[1])
+				category := Trim(carName[2])
+			}
+
+			model := normalizeFileName(model)
 		}
-		else if (carName != "")
-			model := carName
-
-		if (InStr(model, ":") && !category) {
-			carName := StrSplit(model, ":", , 2)
-
-			model := Trim(carName[1])
-			category := Trim(carName[2])
-		}
-
-		model := normalizeFileName(model)
 	}
 
 	retrieveDriverName(carID, carName, forname, surname, nickname, &category?) {

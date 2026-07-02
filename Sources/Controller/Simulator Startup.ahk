@@ -538,7 +538,9 @@ viewNews(fileName, title := false, showAgain := true, readCallback := false) {
 	static newsGui := false
 	static callback := false
 
-	if !title
+	if title
+		title := StrReplace(title, " & ", " && ")
+	else
 		title := translate("News, tips and tricks")
 
 	if readCallback

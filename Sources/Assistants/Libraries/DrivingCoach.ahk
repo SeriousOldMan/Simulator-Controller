@@ -2782,7 +2782,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 								if ((Trim(problemsInstruction) != "") && (instructionHints.Length > 0))
 									telemetryJSON := (substituteVariables(problemsInstruction
-																		, {problems: values2String(", ", collect(instructionHints, (h) => translate(hintProblems[h]))*)
+																		, {problems: values2String(", ", choose(collect(instructionHints, (h) => translate(hintProblems[h]))
+																											  , (p) => (p != ""))*)
 																		 , corner: cornerNr})
 													. "\n\n" . telemetryJSON)
 

@@ -1382,7 +1382,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+27 w110 h20 +0x200", translate("Fuel Capacity"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w60 h20 VfuelCapacityEdit", displayValue("Float", convertUnit("Volume", 125))).OnValidate("LoseFocus", validateFuelCapacity)
-		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80")
+		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-300")
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w90 h20", getUnit("Volume", true))
 
 		workbenchGui.Add("Text", "x" . x . " yp+19 w110 h23 +0x200", translate("Safety Fuel"))
@@ -2764,7 +2764,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator, car, track, simulatorCode, dirName, file, settings, settingsDB, msgResult
 		local lapsDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
 		local validators, index, fileName, validator, index, forecast, time, hour, minute, value, fixedPitstop, found
-		local availableCompounds, found
+		local availableCompounds, found, fuelCapacity, initialFuelAmount
 
 		switch line {
 			case 3:
@@ -2797,10 +2797,15 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds (Refuel of 10 liters)")
 						}
 
+						fuelCapacity := convertUnit("Volume", strategy.FuelCapacity)
+
+						if (Round(fuelCapacity) = fuelCapacity)
+							fuelCapacity := Round(fuelCapacity)
+
 						this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", value)
 						this.Control["pitstopServiceDropDown"].Choose((strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2)
 						this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.SafetyFuel), 0)
-						this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelCapacity))
+						this.Control["fuelCapacityEdit"].Text := displayValue("Float", fuelCapacity)
 
 						this.iSelectedValidator := strategy.Validator
 
@@ -2980,7 +2985,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", strategy.AvgLapTime, 1)
 						this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
-						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
+
+						initialFuelAmount := convertUnit("Volume", strategy.StartFuel)
+
+						if (Round(initialFuelAmount) = initialFuelAmount)
+							initialFuelAmount := Round(initialFuelAmount)
+
+						this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", initialFuelAmount)
 						this.Control["simMapEdit"].Text := strategy.Map
 
 						; this.Control["simConsumptionVariation"].Value := strategy.ConsumptionVariation
@@ -3170,7 +3181,12 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
 
 						if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined) {
-							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount")))
+							fuelCapacity := convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount"))
+
+							if (Round(fuelCapacity) = fuelCapacity)
+								fuelCapacity := Round(fuelCapacity)
+
+							this.Control["fuelCapacityEdit"].Text := displayValue("Float", fuelCapacity)
 							this.Control["simInitialFuelAmountEdit"].Text := this.Control["fuelCapacityEdit"].Text
 						}
 
@@ -3236,11 +3252,19 @@ class StrategyWorkbench extends ConfigurationItem {
 						fuelCapacity := getMultiMapValue(data, "Session Data", "FuelAmount", kUndefined)
 						initialFuelAmount := getMultiMapValue(data, "Car Data", "FuelRemaining", kUndefined)
 
-						if (fuelCapacity != kUndefined)
-							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", fuelCapacity))
+						if (fuelCapacity != kUndefined) {
+							if (Round(fuelCapacity) = fuelCapacity)
+								fuelCapacity := Round(fuelCapacity)
 
-						if (initialFuelAmount != kUndefined)
-							this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", initialFuelAmount), 0)
+							this.Control["fuelCapacityEdit"].Text := displayValue("Float", convertUnit("Volume", fuelCapacity))
+						}
+
+						if (initialFuelAmount != kUndefined) {
+							if (Round(initialFuelAmount) = initialFuelAmount)
+								initialFuelAmount := Round(initialFuelAmount)
+
+							this.Control["simInitialFuelAmountEdit"].Text := displayValue("Float", convertUnit("Volume", initialFuelAmount))
+						}
 
 						tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined)
 						tyreCompoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", kUndefined)

@@ -26,7 +26,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.1.0
+
+#### Date: 07/10/26 (planned)
+
+#### Fixes
+
+  - The driver names for *rFactor 2*, which had been broken since Release 7.0.2, had been fixed. Driver names had shown sometimes as "System.Byte[]", which now should not happen again.
+  
+#### Changes
+
+  - API integration for *F1 25* has been updated, so that the new tracks and driver names of the 2026 season DLC are recognized. The new integration supports the UDP protocol 2025 as well as the new 2026 now.
+  - All fuel related input fields has been optimized in "Strategy Workbench", so that fractional units and the up/down control are handled better.
 
 # Release history
 

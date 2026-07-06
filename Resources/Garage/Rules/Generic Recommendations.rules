@@ -217,6 +217,97 @@
 [?Engine.Temperatures.Cold.Oil.Correction != 0] =>
 		(Prove: changeSetting(Radiator.Blanket.Oil, 1, ?Engine.Temperatures.Cold.Oil.Correction))
 
+[?Suspension.Sway.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right, Rear.Left, Rear.Right], 1, ?Suspension.Sway.Correction)),
+		(Prove: changeSetting(Damper.Rebound.Slow, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Suspension.Sway.Correction))
+
+{All: [?Suspension.Sway.Correction != 0], [?Suspension.Sway.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Slow, [Front.Left, Front.Right, Rear.Left, Rear.Right], 1, ?Suspension.Sway.Correction)),
+		(Prove: changeSetting(Damper.Rebound.Slow, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Suspension.Sway.Correction)),
+		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Suspension.Sway.Correction)),
+		(Prove: changeSetting(AntiRollBar, [Front, Rear], 2, ?Suspension.Sway.Correction))
+		
+[?Suspension.Bottom.Out.Front.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Front, 1, ?Suspension.Bottom.Out.Front.Correction)),
+		(Prove: changeSetting(Aero.Height.Front.Left, 1, ?Suspension.Bottom.Out.Front.Correction)),
+		(Prove: changeSetting(Aero.Height.Front.Right, 1, ?Suspension.Bottom.Out.Front.Correction))
+		
+[?Suspension.Bottom.Out.Front.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right], 0.5, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0], {Prove: settingAvailable(Damper.Compression.Fast.Front.Heave)}} =>
+		(Prove: changeSetting(Damper.Compression.Fast.Front.Heave, 0.5, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {None: {Prove: settingAvailable(Damper.Compression.Fast.Front.Heave)}},
+	  [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right], 1.0, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {Prove: settingAvailable(Damper.Compression.Fast.Front.Heave)},
+	  [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Fast.Front.Heave, 1.0, ?Suspension.Bottom.Out.Front.Correction))
+		
+{All: [?Suspension.Bottom.Out.Front.Correction != 0], [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 0.5, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {None: {Prove: settingAvailable(Spring.Rate.Front.Heave)}},
+	  [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], 0.5, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {Prove: settingAvailable(Spring.Rate.Front.Heave)},
+	  [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front.Heave, 1.0, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {Prove: settingAvailable(Spring.Rate.Front.Heave)},
+	  [?Suspension.Bottom.Out.Front.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Front.Heave, 1.0, ?Suspension.Bottom.Out.Front.Correction))
+
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  [?Suspension.Bottom.Out.Front.Value > 75]} =>
+		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Suspension.Bottom.Out.Front.Correction))
+		
+[?Suspension.Bottom.Out.Rear.Correction != 0] =>
+		(Prove: changeSetting(Aero.Height.Rear, 1, ?Suspension.Bottom.Out.Rear.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Left, 1, ?Suspension.Bottom.Out.Rear.Correction)),
+		(Prove: changeSetting(Aero.Height.Rear.Right, 1, ?Suspension.Bottom.Out.Rear.Correction))
+		
+[?Suspension.Bottom.Out.Rear.Correction != 0] =>
+		(Prove: changeSetting(Damper.Compression.Fast, [Rear.Left, Rear.Right], 0.5, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0], {Prove: settingAvailable(Damper.Compression.Fast.Rear.Heave)}} =>
+		(Prove: changeSetting(Damper.Compression.Fast.Rear.Heave, 0.5, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  {None: {Prove: settingAvailable(Damper.Compression.Fast.Rear.Heave)}},
+	  [?Suspension.Bottom.Out.Rear.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Fast, [Rear.Left, Rear.Right], 1.0, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  {Prove: settingAvailable(Damper.Compression.Fast.Rear.Heave)},
+	  [?Suspension.Bottom.Out.Rear.Value > 50]} =>
+		(Prove: changeSetting(Damper.Compression.Fast.Rear.Heave, 1.0, ?Suspension.Bottom.Out.Rear.Correction))
+		
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0], [?Suspension.Bottom.Out.Rear.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate, [Rear.Left, Rear.Right], 0.5, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  {None: {Prove: settingAvailable(Spring.Rate.Rear.Heave)}},
+	  [?Suspension.Bottom.Out.Rear.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate, [Rear.Left, Rear.Right], 0.5, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  {Prove: settingAvailable(Spring.Rate.Rear.Heave)},
+	  [?Suspension.Bottom.Out.Rear.Value > 50]} =>
+		(Prove: changeSetting(Spring.Rate.Rear.Heave, 1.0, ?Suspension.Bottom.Out.Rear.Correction))
+
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  [?Suspension.Bottom.Out.Rear.Value > 75]} =>
+		(Prove: changeSetting(Bumpstop.Range, [Rear.Left, Rear.Right], 1, ?Suspension.Bottom.Out.Rear.Correction))
+
 [?Curbs.Stability.Correction != 0] =>
 		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right, Rear.Left, Rear.Right], -1, ?Curbs.Stability.Correction)),
 		(Prove: changeSetting(Damper.Rebound.Fast, [Front.Left, Front.Right, Rear.Left, Rear.Right], 0.5, ?Curbs.Stability.Correction))

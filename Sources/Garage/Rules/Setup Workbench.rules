@@ -129,6 +129,8 @@ removeSettings(?simulator, ?car, [?setting | ?settings]) <=
 
 removeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, false)
 
+settingAvailable(?setting) <= settingAvailable(!Workbench.Simulator, !Workbench.Car, ?setting)
+
 settingAvailable(?simulator, ?car, ?setting) <= settingAvailable(?simulator, ?car, ?setting, true)
 settingAvailable(?, ?, false) <= !
 settingAvailable(?, ?, ?) <= fail

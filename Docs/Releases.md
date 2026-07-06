@@ -38,7 +38,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - API integration for *F1 25* has been updated, so that the new tracks and driver names of the 2026 season DLC are recognized. The integration now supports the UDP protocol 2025 as well as the new 2026 protocol.
   - All fuel related input fields has been optimized in "Strategy Workbench", so that fractional units and the up/down control are handled more intuitively.
-  - Suspension related issues (swaying, bottoming out) have been added to the "Setup Workbench".
+  - Suspension related issues (swaying, bottoming out) have been added to the "Setup Workbench". Currently only available when selecting the issue manually, but telemetry based anylysis will be added in one of the next releases.
 
 # Release history
 

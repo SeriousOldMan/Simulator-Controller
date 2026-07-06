@@ -232,10 +232,13 @@
 		(Prove: changeSetting(Aero.Height.Front.Left, 1, ?Suspension.Bottom.Out.Front.Correction)),
 		(Prove: changeSetting(Aero.Height.Front.Right, 1, ?Suspension.Bottom.Out.Front.Correction))
 		
-[?Suspension.Bottom.Out.Front.Correction != 0] =>
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  [?Suspension.Bottom.Out.Front.Value > 33]} =>
 		(Prove: changeSetting(Damper.Compression.Fast, [Front.Left, Front.Right], 0.5, ?Suspension.Bottom.Out.Front.Correction))
 
-{All: [?Suspension.Bottom.Out.Front.Correction != 0], {Prove: settingAvailable(Damper.Compression.Fast.Front.Heave)}} =>
+{All: [?Suspension.Bottom.Out.Front.Correction != 0],
+	  {Prove: settingAvailable(Damper.Compression.Fast.Front.Heave)},
+	  [?Suspension.Bottom.Out.Front.Value > 33]} =>
 		(Prove: changeSetting(Damper.Compression.Fast.Front.Heave, 0.5, ?Suspension.Bottom.Out.Front.Correction))
 
 {All: [?Suspension.Bottom.Out.Front.Correction != 0],
@@ -275,10 +278,13 @@
 		(Prove: changeSetting(Aero.Height.Rear.Left, 1, ?Suspension.Bottom.Out.Rear.Correction)),
 		(Prove: changeSetting(Aero.Height.Rear.Right, 1, ?Suspension.Bottom.Out.Rear.Correction))
 		
-[?Suspension.Bottom.Out.Rear.Correction != 0] =>
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  [?Suspension.Bottom.Out.Rear.Value > 33]} =>
 		(Prove: changeSetting(Damper.Compression.Fast, [Rear.Left, Rear.Right], 0.5, ?Suspension.Bottom.Out.Rear.Correction))
 
-{All: [?Suspension.Bottom.Out.Rear.Correction != 0], {Prove: settingAvailable(Damper.Compression.Fast.Rear.Heave)}} =>
+{All: [?Suspension.Bottom.Out.Rear.Correction != 0],
+	  {Prove: settingAvailable(Damper.Compression.Fast.Rear.Heave)},
+	  [?Suspension.Bottom.Out.Rear.Value > 33]} =>
 		(Prove: changeSetting(Damper.Compression.Fast.Rear.Heave, 0.5, ?Suspension.Bottom.Out.Rear.Correction))
 
 {All: [?Suspension.Bottom.Out.Rear.Correction != 0],

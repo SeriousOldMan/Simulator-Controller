@@ -892,7 +892,9 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Special notes for *iRacing*
 
-*iRacing* does not provide tyre pressure data in the API while you are out on the track and any calculation of cold pressures for changing tyres will end up in a desaster. Therefore, the handling of tyres during pitstop is disabled by default for the Race Engineer. You can change that using a setting in the "Session Database", but then be sure to check the pressures.
+- *iRacing* does not provide tyre pressure data in the API while you are out on the track and any calculation of cold pressures for changing tyres will end up in a desaster. Therefore, the handling of tyres during pitstop is disabled by default for the Race Engineer. You can change that using a setting in the "Session Database", but then be sure to check the pressures.
+
+- *iRacing* offers a special "Test Drive" session, where you can test cars that you do not own. You can use the Assistants in this type of session, if you want, but be aware that not much data is provided in this special session.
 
 ## Plugin *RF2*
 

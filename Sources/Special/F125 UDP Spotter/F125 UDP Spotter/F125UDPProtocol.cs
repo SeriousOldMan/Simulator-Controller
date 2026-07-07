@@ -335,7 +335,11 @@ namespace F125UDPProtocol
         static F125Constants()
         {
             foreach (KeyValuePair<string, string> entry in DriverNames.ToList())
-                DriverNames.Add(entry.Key.ToLower(), entry.Value);
+                try
+                {
+                    DriverNames.Add(entry.Key.ToLower(), entry.Value);
+                }
+                catch (Exception) { }
         }
 
         public static string GetClassName(byte classId)

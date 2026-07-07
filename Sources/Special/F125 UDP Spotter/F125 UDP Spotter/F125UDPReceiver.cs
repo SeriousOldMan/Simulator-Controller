@@ -15,6 +15,7 @@ namespace F125UDPReceiver
         private readonly string host;
         private readonly bool useMulticast;
 
+        private long lastSessionTimeLeft = -1;
         private long lastUpdate = 0;
 
         // Packet storage — one per packet type
@@ -137,6 +138,13 @@ namespace F125UDPReceiver
                             sessionData = PacketSessionData.Decode(data);
 
                             lastUpdate = Environment.TickCount;
+
+                            if (sessionData.SessionTimeLeft != lastSessionTimeLeft)
+                            {
+                                sessionActive = Int32.MaxValue;
+
+                                lastSessionTimeLeft = sessionData.SessionTimeLeft;
+                            }
 
                             break;
                         case 2:  // Lap Data

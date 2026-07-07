@@ -630,6 +630,7 @@ callSimulator(simulator, options := "", protocol?) {
 	static defaultProtocol := false
 	static protocols := CaseInsenseMap()
 	static connectors := CaseInsenseMap()
+	static dataIndex := 0
 
 	if !defaultProtocol {
 		settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
@@ -810,6 +811,21 @@ callSimulator(simulator, options := "", protocol?) {
 			}
 
 			setMultiMapValue(data, "Session Data", "Simulator", simulator)
+
+			if isDebug() {
+				if (dataIndex = 0) {
+					deleteDirectory(kTempDirectory . "Data")
+
+					DirCreate(kTempDirectory . "Data")
+				}
+
+				loop
+					dataIndex += 1
+
+				until !FileExist(dataFile := (kTempDirectory . "Data\" . format("{:06}", dataIndex) . " Data.data"))
+
+				writeMultiMap(dataFile, data)
+			}
 
 			return data
 		}

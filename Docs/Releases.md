@@ -33,6 +33,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - The driver names for *rFactor 2*, which had been broken since Release 7.0.2, had been fixed. Driver names had shown sometimes as "System.Byte[]", which now should not happen again.
+  - Fixed several bugs, which could cause the Assistants to miss the session start in *F1 25/26*.
   
 #### Changes
 

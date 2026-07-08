@@ -640,7 +640,7 @@ As you can see, defining individual actions is really an expert topic and requir
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Action%20Definition.JPG)
 
-This action calls the [controller aciton](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions) "trigger" with "!w" as an argument in the Simulator Cntroller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
+This action calls the [controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#trigger-actions) "trigger" with "!w" as an argument in the Simulator Controller process. This sends the keyboard command Alt-w to the current simulator, thereby starting the windscreen wiper. This action may be activated by a voice command like "Can you start the windscreen wiper?" when using the *Conversation* booster, or it can be automatically triggered by the *Reasoning* booster, when an event is signalled that tells that it just started raining.
 
 ## Managing Events
 
@@ -654,7 +654,7 @@ As you can see, this editor looks very similar to the actions editor discussed a
 
 1. You have to supply a "Signal" name which uniquely identifies the event. When an event is raised by code, you have to supply exactly this identifier.
 
-2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%." Since the "%" has therefore a special meaning, you must escape it when it is used alone. Preceed the percentage character with a backquote (`) or a backslash to do that.
+2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%." Since the "%" has therefore a special meaning, you must escape it when it is used alone. Preceed the percentage character with a backquote (`) or a backslash (\\) to do that.
 
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Reasoning%20Event%20Arguments.JPG)
 

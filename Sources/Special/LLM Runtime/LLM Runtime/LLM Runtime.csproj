@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
@@ -17,6 +17,7 @@
     <PackageReference Include="LLamaSharp.Backend.Cuda11" Version="0.24.0" />
     <PackageReference Include="LLamaSharp.Backend.Cuda12" Version="0.27.0" />
     <PackageReference Include="LLamaSharp.Backend.Vulkan" Version="0.27.0" />
+    <PackageReference Include="LlamaSharp.ToolCallEnvelopes" Version="0.1.2" />
   </ItemGroup>
 
 </Project>

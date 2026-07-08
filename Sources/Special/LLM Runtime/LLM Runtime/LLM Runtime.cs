@@ -82,13 +82,9 @@ public class LLMExecutor
             AntiPrompts = new List<string> { "User:" }
         };
 
-        string result = "";
+        string result = "<|### Answer ###|>\n";
 
-        await foreach (
-            var text
-            in session.ChatAsync(
-                new ChatHistory.Message(AuthorRole.User, userInput),
-                inferenceParams))
+        await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
             result += text;
 
         return result;
@@ -96,7 +92,6 @@ public class LLMExecutor
 
     public string Ask(string prompt)
     {
-
         return AskAsync(prompt).Result;
     }
 }

@@ -1640,7 +1640,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - If you quit a session before finishing it, the end of the session is not detected by the Assistants - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
    - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
    - Suspension damage cannot be detected in the data. There is a tyre damage information available (for example when jumping over sausage curbs), but this damage is issued too often to be used as substitute for suspension damage.
-   - When running Simulator Controller in *VirtualBox*, it can happen that reports in "Solo Center" or "Team Center" are not displayed correctly, although the data is error free.
+   - When running Simulator Controller in *VirtualBox*, it can happen that reports in "Solo Center" or "Team Center" are not displayed correctly, although the data is error free. In this case, save the session to a file and reload it. Everything should display correctly then.
 
 ## Plugin *ACE*
 

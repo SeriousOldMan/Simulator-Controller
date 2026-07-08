@@ -1,6 +1,7 @@
 using LLama.Common;
 using LLama;
 using System.Globalization;
+using System.Collections.Generic;
 using System.Text;
 
 namespace LLMRuntime;
@@ -34,20 +35,34 @@ public class LLMExecutor
 
     public string ParsePrompt(ChatHistory chatHistory, string prompt)
     {
-        void addMessage(AuthorRole role, string message)
+        List<string> toolDefs = new List<string>();
+
+		void addMessage(AuthorRole role, string message)
         {
             if (role != AuthorRole.Unknown)
                 chatHistory.AddMessage(role, message);
         }
+		
+        void addTool(string message)
+        {
+            toolDefs.Add(message);
+        }
 
         AuthorRole role = AuthorRole.Unknown;
         string message = "";
+		bool hasTools = false;
 
         foreach (string line in prompt.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None))
         {
             string input = line.Trim();
-
-            if (input.StartsWith("<|###"))
+			
+			if (hasTools && input.StartsWith("<|### --- ###|>"))
+			{
+				addTool(message);
+				
+				message = "";
+			}
+            else if (input.StartsWith("<|###"))
             {
                 addMessage(role, message);
 
@@ -59,13 +74,24 @@ public class LLMExecutor
                     role = AuthorRole.Assistant;
                 else if (input == "<|### User ###|>")
                     role = AuthorRole.User;
+                else if (input == "<|### Tools ###|>")
+					hasTools = true;
             }
             else
                 message += (input + Environment.NewLine);
         }
 
-        return (role == AuthorRole.User) ? message : "";
+        message = (role == AuthorRole.User) ? message : "";
+		
+		if (hasTools)
+			return BuildMessage(message, toolDefs);
+		else
+			return message;
     }
+	
+	public string BuildMessage(string userMessage, List<string> toolDefs) {
+		return message;
+	}
 
     public async Task<string> AskAsync(string prompt)
     {

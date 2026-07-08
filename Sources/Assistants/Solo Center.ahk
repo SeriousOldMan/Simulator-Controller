@@ -5095,7 +5095,8 @@ class SoloCenter extends ConfigurationItem {
 				if (fileName != "")
 					if progress {
 						withBlockedWindows(() {
-							withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", "")), saveSession.Bind(directory, fileName))
+							withTask(ProgressTask(StrReplace(translate("Save Session..."), "...", ""))
+								   , saveSession.Bind(directory, fileName))
 						})
 					}
 					else

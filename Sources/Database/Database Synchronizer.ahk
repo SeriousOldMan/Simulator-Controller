@@ -96,6 +96,8 @@ uploadSessionDatabase(id, uploadPressures, uploadWears, uploadSetups, uploadStra
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 
+		DirCreate(kTempDirectory . "Shared Database\Community")
+
 		loop Files, sessionDBPath . "User\*.*", "D" {
 			simulator := A_LoopFileName
 

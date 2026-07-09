@@ -892,7 +892,9 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 ### Special notes for *iRacing*
 
-*iRacing* does not provide tyre pressure data in the API while you are out on the track and any calculation of cold pressures for changing tyres will end up in a desaster. Therefore, the handling of tyres during pitstop is disabled by default for the Race Engineer. You can change that using a setting in the "Session Database", but then be sure to check the pressures.
+- *iRacing* does not provide tyre pressure data in the API while you are out on the track and any calculation of cold pressures for changing tyres will end up in a desaster. Therefore, the handling of tyres during pitstop is disabled by default for the Race Engineer. You can change that using a setting in the "Session Database", but then be sure to check the pressures.
+
+- *iRacing* offers a special "Test Drive" session, where you can test cars that you do not own. You can use the Assistants in this type of session, if you want, but be aware that not much data is provided in this special session.
 
 ## Plugin *RF2*
 
@@ -1608,6 +1610,8 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 1. The *F1 25* UDP settings must be configured for the so called broadcast mode, which is Okay for small home networks. However, if you do not want to use this, see [this article](https://www.stryder-it.de/simdashboard/help/en/For_PS4_and_XBox_One_Gamers/Advanced/Forward_UDP_Telemetry_to_other_applications_or_Devices) for an alternative. If you are using this alternative, this also affects the following points, of course.
 
+   You can configure either the 2025 or the 2026 UDP packet format, both are supported. All teams, drivers, tracks and other extensions of the 2026 DLC are supported.
+
 2. The *EA Javelin* AntiCheat software prevents using Simulator Controller on the same machine as *F1 25*. Therefore it is necessary to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
 
 3. When the PC version of *F1 25* is used, it is also possible to run Simulator Controller in a virtual environment like [VirtualBox](https://www.virtualbox.org/) or [VMware Player](https://www.techspot.com/downloads/1969-vmware-player.html). When setting up such an environment, the following must be noted:
@@ -1633,9 +1637,10 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 6. The current implementation of the *F1 25* API shows the following problems:
 
    - The data for the the last lap is not reported when the drivers car has crossed the finish line. Therefore, the last lap is missing from all reports, race review, and so on.
-   - If you quit a session before finishing it, the end of the session is not detected by the Assustints - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
+   - If you quit a session before finishing it, the end of the session is not detected by the Assistants - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
    - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
    - Suspension damage cannot be detected in the data. There is a tyre damage information available (for example when jumping over sausage curbs), but this damage is issued too often to be used as substitute for suspension damage.
+   - When running Simulator Controller in *VirtualBox*, it can happen that reports in "Solo Center" or "Team Center" are not displayed correctly, although the data is error free. In this case, save the session to a file and reload it. Everything should display correctly then.
 
 ## Plugin *ACE*
 

@@ -25,6 +25,7 @@ Release 6.9.9=Release 6.9.0 -> updateConfigurationForV699
 Release 7.0.0=Release 6.9.9 -> updateConfigurationForV700, renewConsent
 Release 7.0.1=Release 7.0.0 -> updateConfigurationForV701
 Release 7.1.0=Release 7.0.1 -> updateConfigurationForV710
+Release 7.1.1=Release 7.1.0 -> updateConfigurationForV711
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

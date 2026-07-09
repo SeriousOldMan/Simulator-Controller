@@ -21,6 +21,7 @@
   2. Gear ratio optimizer for the Issue Analyzer
   3. Engineer's Diary with change history, lap times after change, notes and so on
   4. Support for *Asseto Corsa EVO* setup files
+  5. Support telemetry analysis for suspension issues
   
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

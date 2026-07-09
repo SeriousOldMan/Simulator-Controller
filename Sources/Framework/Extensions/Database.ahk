@@ -379,7 +379,7 @@ class Database {
 
 				loop
 					try {
-						FileAppend(row, fileName)
+						FileAppend(row, fileName, "UTF-8")
 
 						break
 					}
@@ -525,7 +525,7 @@ class Database {
 						data .= (values2String(";", values*) . "`n")
 					}
 
-					FileAppend(data, fileName)
+					FileAppend(data, fileName, "UTF-8")
 				}
 
 				this.iTableChanged.Delete(name)

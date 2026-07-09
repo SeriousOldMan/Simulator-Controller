@@ -1775,6 +1775,85 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV711() {
+	local simulator, car, ignore, task, drivers, driver, ignore, candidate
+
+	fixDriver(fileName) {
+		local data
+
+		try {
+			data := FileRead(fileName, "`n")
+
+			if InStr(data, "System.Byte[]") {
+				data := StrReplace(data, "System.Byte[]", driver)
+
+				try
+					FileMove(fileName, fileName . ".backup")
+
+				deleteFile(fileName)
+
+				FileAppend(data, fileName, "UTF-16")
+			}
+		}
+	}
+
+	task := ProgressTask(translate("Fixing Driver Names"))
+
+	withTask(task, () {
+		loop Files, kDatabaseDirectory . "User\*.*", "D" {
+			simulator := A_LoopFileName
+
+			if (simulator != "Tracks") {
+				if FileExist(kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV")
+					try {
+						drivers := FileRead(kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV", "`n")
+
+						if InStr(drivers, "System.Byte[]") {
+							drivers := RegExReplace(drivers, "m)^.*System\.Byte\[\].*$`n", "")
+
+							try
+								FileMove(kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV"
+									   , kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV.backup")
+
+							deleteFile(kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV")
+
+							FileAppend(drivers, kDatabaseDirectory . "User\" . simulator . "\Drivers.CSV", "UTF-8")
+						}
+					}
+
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D" {
+					car := A_LoopFileName
+
+					task.updateProgress({Message: SessionDatabase.getSimulatorName(simulator) . translate(" / ")
+												. SessionDatabase.getCarName(simulator, car)})
+
+					loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
+						track := A_LoopFileName
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.info", "F"
+							fixDriver(A_LoopFileFullPath)
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Solo Sessions\*.info", "F"
+							fixDriver(A_LoopFileFullPath)
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Solo Sessions\*.solo", "F"
+							fixDriver(A_LoopFileFullPath)
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.info", "F"
+							fixDriver(A_LoopFileFullPath)
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Team Sessions\*.team", "F"
+							fixDriver(A_LoopFileFullPath)
+
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies\*.info", "F"
+							fixDriver(A_LoopFileFullPath)
+					}
+				}
+			}
+		}
+	})
+}
+
 updateConfigurationForV710() {
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data")
 		FileAppend("`nSoftware.MSSpeechLibrary_ru-RU.Requested=OPTIONAL"

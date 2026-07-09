@@ -1,9 +1,9 @@
 [Development]
-Version=7.1.1.0-dev
+Version=7.1.1.0-beta
 Target=7.1.1.0-release
-Date=07/02/2026
-Download=
-Changes=Updated F1 UDP integration for the 2026 DLC
+Date=07/07/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Js84yLkD/Releases/Simulator%20Controller%207.1.1.0-beta.zip
+Changes=Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
 Version=7.1.0.0-release
@@ -30,5 +30,5 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=7.1.1.0-dev
+Development=7.1.1.0-beta
 Release=7.1.0.0-release

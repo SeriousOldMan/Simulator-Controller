@@ -216,13 +216,13 @@ class PressuresEditor {
 	}
 
 	flushPressures() {
-		local sessionDatabase := this.SessionDatabase
-		local connectors := sessionDatabase.SessionDatabase.Connectors
-		local database := this.PressuresDatabase
-		local ignore, update, entry, row, connector, properties
-
 		withBlockedWindows(() {
 			withTask(ProgressTask(translate("Saving")), () {
+				local sessionDatabase := this.SessionDatabase
+				local connectors := sessionDatabase.SessionDatabase.Connectors
+				local database := this.PressuresDatabase
+				local ignore, update, entry, row, connector, properties
+
 				database.reload("Tyres.Pressures.Distribution", false)
 
 				if database.lock("Tyres.Pressures.Distribution", false)

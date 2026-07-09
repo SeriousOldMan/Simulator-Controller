@@ -26,7 +26,20 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.1.0
+
+#### Date: 07/10/26 (planned)
+
+#### Fixes
+
+  - The driver names for *rFactor 2*, which had been broken since Release 7.0.2, had been fixed. Driver names had shown sometimes as "System.Byte[]", which now should not happen again.
+  - Fixed several bugs, which could cause the Assistants to miss the session start in *F1 25/26*.
+  
+#### Changes
+
+  - API integration for *F1 25* has been updated, so that the new tracks and driver names of the 2026 season DLC are recognized. The integration now supports the UDP protocol 2025 as well as the new 2026 protocol.
+  - All fuel related input fields has been optimized in "Strategy Workbench", so that fractional units and the up/down control are handled more intuitively.
+  - Suspension related issues (swaying, bottoming out) have been added to the "Setup Workbench". Currently only available when selecting the issue manually, but telemetry based anylysis will be added in one of the next releases.
 
 # Release history
 

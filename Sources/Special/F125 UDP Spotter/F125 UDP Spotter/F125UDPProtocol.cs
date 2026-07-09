@@ -81,7 +81,6 @@ namespace F125UDPProtocol
             { 31, "Las Vegas" },
             { 32, "Losail" },
             { 33, "Lusail" },
-            { 33, "Lusail" },
             { 39, "Silverstone (Reverse)" },
             { 40, "Austria (Reverse)" },
             { 41, "Zandvoort (Reverse)" },
@@ -335,7 +334,11 @@ namespace F125UDPProtocol
         static F125Constants()
         {
             foreach (KeyValuePair<string, string> entry in DriverNames.ToList())
-                DriverNames.Add(entry.Key.ToLower(), entry.Value);
+                try
+                {
+                    DriverNames.Add(entry.Key.ToLower(), entry.Value);
+                }
+                catch (Exception) { }
         }
 
         public static string GetClassName(byte classId)
@@ -496,7 +499,7 @@ namespace F125UDPProtocol
         public static PacketMotionData Decode(byte[] data) {
             var p = new PacketMotionData();
             p.Header = PacketHeader.Decode(data);
-			int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+			int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.CarMotion = new CarMotionData[maxCars];
@@ -782,7 +785,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketLapData();
             p.Header = PacketHeader.Decode(data);
-			int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+			int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.LapDataArr = new LapData[maxCars];
@@ -888,7 +891,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketParticipantsData();
             p.Header = PacketHeader.Decode(data);
-			int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+			int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.Participants = new ParticipantData[maxCars];
@@ -968,7 +971,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketCarSetupData();
             p.Header = PacketHeader.Decode(data);
-			int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+			int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.CarSetups = new CarSetupData[maxCars];
@@ -1042,7 +1045,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketCarTelemetryData();
             p.Header = PacketHeader.Decode(data);
-            int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+            int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.CarTelemetry = new CarTelemetryData[maxCars];                                                         
@@ -1133,7 +1136,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketCarStatusData();
             p.Header = PacketHeader.Decode(data);
-            int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+            int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.CarStatus = new CarStatusData[maxCars];
@@ -1195,7 +1198,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketFinalClassificationData();
             p.Header = PacketHeader.Decode(data);
-            int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+            int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.ClassificationData = new FinalClassificationData[maxCars];
@@ -1263,7 +1266,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketLobbyInfoData();
             p.Header = PacketHeader.Decode(data);
-            int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+            int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
 			
 			p.LobbyPlayers = new LobbyInfoData[maxCars];
@@ -1341,7 +1344,7 @@ namespace F125UDPProtocol
         {
             var p = new PacketCarDamageData();
             p.Header = PacketHeader.Decode(data);
-            int maxCars = (p.Header.PacketFormat == 2026) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
+            int maxCars = (p.Header.PacketFormat == 2025) ? F125Constants.MaxCars25 : F125Constants.MaxCars26;
             int o = F125Constants.HeaderSize;
             
 			p.CarDamage = new CarDamageData[maxCars];

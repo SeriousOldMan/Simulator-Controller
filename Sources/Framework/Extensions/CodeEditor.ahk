@@ -241,7 +241,7 @@ class CodeEditor extends Gui.Custom {
                 return false
         }
 
-        for ignore, option in StrSplit(options," ")
+        for ignore, option in StrSplit(options, " ")
             if RegExMatch(option, "DefaultOpts?")
                 DefaultOpt := true
             else if (option = "SystemTheme")
@@ -507,7 +507,7 @@ class CodeEditor extends Gui.Custom {
         StrPut(this.SyntaxPunctChars, punctChar, "UTF-8")
         NumPut("UPtr", punctChar.ptr, buf, (A_PtrSize = 8) ? 64: 44)
 
-        str1 := Buffer(StrPut(this.SyntaxString1,"UTF-8"), 0)
+        str1 := Buffer(StrPut(this.SyntaxString1, "UTF-8"), 0)
 
         StrPut(this.SyntaxString1, str1, "UTF-8")
         NumPut("UPtr", str1.ptr, buf, (A_PtrSize = 8) ? 72 : 48)
@@ -1173,6 +1173,7 @@ class CodeEditor extends Gui.Custom {
                 this.Style.Fore := value
             }
         }
+
         BadLight(in_pos := -1) {
             return this._sms(0x930, in_pos)
         }
@@ -2455,7 +2456,7 @@ class CodeEditor extends Gui.Custom {
             local obj := ((this.__Class = "CodeEditor") ? this : this.ctl)
             local r, status
 
-            if obj.Hwnd {
+            if obj.Hwnd
                 if obj.UseDirect {
                     r := DllCall(obj.DirectStatusFunc, "UPtr", obj.DirectPtr, "UInt", msg, "Int", wParam, "Int", lParam, "Int*", &status := 0)
 
@@ -2463,7 +2464,6 @@ class CodeEditor extends Gui.Custom {
                 }
                 else
                     r := SendMessage(msg, wParam, lParam, obj.Hwnd)
-            }
 
             return (obj.LastCode := r)
         }

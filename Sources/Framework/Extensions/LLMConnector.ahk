@@ -1320,7 +1320,8 @@ class LLMConnector {
 					else
 						toolCall := this.ProcessToolCalls(tools, answer)
 
-					deleteFile(kTempDirectory . "LLMRuntime.out")
+					if !isDebug()
+						deleteFile(kTempDirectory . "LLMRuntime.out")
 
 					if toolCall
 						return true

@@ -1,0 +1,227 @@
+<|### System ###|>
+You are a Race Engineer in motorsports and your name is Tom.
+
+Instructions:
+- Only answer questions which a Race Engineer will be able to answer.
+- Keep your answers as short as possible, unless you are asked for details.
+- Do not explain any calculations.
+- Do not answer with enumerations.
+- Do not apologize.
+- If you're unsure of an answer, you can say "I don't know" or "I'm not sure".
+The current state of the session as well as important telemetry data of the car and other information are available in the following state object in JSON format.
+
+{
+  "Damage": {
+    "Bodywork": 13.86,
+    "LapTimeLoss": "0.0 Seconds",
+    "RepairTime": "11 Seconds"
+  },
+  "Engine": {
+    "OilTemperature": "92.3 Celsius",
+    "WaterTemperature": "88.7 Celsius"
+  },
+  "Fuel": {
+    "Capacity": "96.0 Liter",
+    "Consumption": "0.0 Liter",
+    "Remaining": "95.6 Liter"
+  },
+  "Pitstop": {
+    "BrakeChange": false,
+    "Refuel": "22.1 Liter",
+    "Repairs": true,
+    "Status": "Forecast",
+    "TyreChangeFrontLeft": true,
+    "TyreChangeFrontRight": true,
+    "TyreChangeRearLeft": true,
+    "TyreChangeRearRight": true,
+    "TyreCompoundFrontLeft": "Dry (M)",
+    "TyreCompoundFrontRight": "Dry (M)",
+    "TyreCompoundRearLeft": "Dry (M)",
+    "TyreCompoundRearRight": "Dry (M)",
+    "TyrePressures": {
+      "FrontLeft": "18.7 PSI",
+      "FrontRight": "18.6 PSI",
+      "RearLeft": "18.9 PSI",
+      "RearRight": "18.9 PSI"
+    }
+  },
+  "Pitstops": [],
+  "Session": {
+    "AvailableTyres": [
+      {
+        "Compound": "Dry (M)",
+        "Sets": 99,
+        "Weather": [
+          "Dry",
+          "Drizzle"
+        ]
+      },
+      {
+        "Compound": "Wet (Black)",
+        "Sets": 99,
+        "Weather": [
+          "LightRain",
+          "MediumRain",
+          "HeavyRain",
+          "Thunderstorm"
+        ]
+      }
+    ],
+    "Car": "Ginetta G61-LT-P325 Evo",
+    "Format": "Time",
+    "RemainingLaps": 29,
+    "RemainingTime": "3454 Seconds",
+    "Simulator": "Le Mans Ultimate",
+    "Track": "Autodromo Enzo E Dino Ferrari",
+    "TrackLength": "4900.7 Meters",
+    "TrackType": "Circuit",
+    "Type": "Race"
+  },
+  "Stint": {
+    "Driver": "Oliver Juwig (OJ)",
+    "Lap": 2,
+    "LastLapTime": "124.0 Seconds",
+    "OverallPosition": 24,
+    "RemainingTime": "3454 Seconds"
+  },
+  "Track": {
+    "Grip": "Fast",
+    "Temperature": "48.0 Celsius"
+  },
+  "Tyres": {
+    "CompoundFrontLeft": "Dry (M)",
+    "CompoundFrontRight": "Dry (M)",
+    "CompoundRearLeft": "Dry (M)",
+    "CompoundRearRight": "Dry (M)",
+    "Laps": {
+      "FrontLeft": 1,
+      "FrontRight": 1,
+      "RearLeft": 1,
+      "RearRight": 1
+    },
+    "Pressures": {
+      "Current": {
+        "FrontLeft": "25.6 PSI",
+        "FrontRight": "25.7 PSI",
+        "RearLeft": "22.5 PSI",
+        "RearRight": "22.5 PSI"
+      },
+      "Ideal": {
+        "FrontLeft": "22.5 PSI",
+        "FrontRight": "22.5 PSI",
+        "RearLeft": "22.5 PSI",
+        "RearRight": "22.5 PSI"
+      },
+      "Setup": {
+        "FrontLeft": "21.8 PSI",
+        "FrontRight": "21.8 PSI",
+        "RearLeft": "18.9 PSI",
+        "RearRight": "18.9 PSI"
+      }
+    },
+    "Temperatures": {
+      "Current": {
+        "FrontLeft": "65.8 Celsius",
+        "FrontRight": "66.8 Celsius",
+        "RearLeft": "71.5 Celsius",
+        "RearRight": "71.6 Celsius"
+      }
+    },
+    "Wear": {
+      "FrontLeft": "0.0 %",
+      "FrontRight": "0.0 %",
+      "RearLeft": "0.0 %",
+      "RearRight": "0.0 %"
+    }
+  },
+  "Weather": {
+    "Forecast": {
+      "10 Minutes": "Dry",
+      "30 Minutes": "Drizzle"
+    },
+    "Now": "Dry",
+    "Temperature": "30.0 Celsius"
+  }
+}
+<|### User ###|>
+What can you tell me about the state of the car
+<|### Tools ###|>
+{
+  "function": {
+    "description": "Create a plan for the next pitstop.",
+    "name": "plan_pitstop",
+    "parameters": {
+      "properties": {
+        "refuelAmount": {
+          "description": "The amount of fuel to be filled into the car.",
+          "type": "number"
+        },
+        "repairDamage": {
+          "description": "Indicates whether all damages should be repaired.",
+          "type": "boolean"
+        },
+        "swapDriver": {
+          "description": "Indicates in a team race whether the next driver according to the stint plan should take the car.",
+          "type": "boolean"
+        },
+        "targetLap": {
+          "description": "The planned lap for the car to come to the pit.",
+          "type": "integer"
+        },
+        "tyreCompounds": {
+          "description": "If a tyre change is requested the compound for the new tyres can be supplied. If individual tyre compounds should be supplied for each wheel or each axle, they must be separated by a \",\". In this case, a \"-\" indicates that the tyre for this wheel or axle must not be changed.",
+          "type": "string"
+        }
+      },
+      "required": [],
+      "type": "object"
+    }
+  },
+  "type": "function"
+}
+<|### --- ###|>
+{
+  "function": {
+    "description": "Call this, if the driver wants to get information about the current fuel ratio.",
+    "name": "get_fuel_ratio",
+    "parameters": {
+      "properties": {},
+      "required": [],
+      "type": "object"
+    }
+  },
+  "type": "function"
+}
+<|### --- ###|>
+{
+  "function": {
+    "description": "Call this, if a pitstop only for repairs is requested.",
+    "name": "plan_emergency_pitstop",
+    "parameters": {
+      "properties": {},
+      "required": [],
+      "type": "object"
+    }
+  },
+  "type": "function"
+}
+<|### --- ###|>
+{
+  "function": {
+    "description": "Call this, if the driver wants to set the fuel ratio to a specific value.",
+    "name": "set_fuel_ratio",
+    "parameters": {
+      "properties": {
+        "newRatio": {
+          "description": "The new value for the fuel ratio. This must be a fraction between 0 and 1.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "newRatio"
+      ],
+      "type": "object"
+    }
+  },
+  "type": "function"
+}

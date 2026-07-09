@@ -1168,7 +1168,7 @@ class LLMConnector {
 			prompt .= ("<|### User ###|>`n" . question)
 
 			if (tools.Length > 0)
-				prompt .= ("`n<|### Tools ###|>`n" . values2String("`n<|### --- ###|>`n", collect(tools, (t) => t.JSON)))
+				prompt .= ("`n<|### Tools ###|>`n" . values2String("`n<|### --- ###|>`n", collect(tools, (t) => t.JSON)*))
 
 			return prompt
 		}

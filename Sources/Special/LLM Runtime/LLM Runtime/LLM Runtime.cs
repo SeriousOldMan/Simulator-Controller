@@ -140,13 +140,11 @@ public class LLMExecutor
         if (tools.Count == 0)
         {
             ChatSession session = new(Executor, chatHistory);
-
             InferenceParams inferenceParams = new InferenceParams()
             {
                 MaxTokens = MaxTokens,
                 AntiPrompts = new List<string> { "User:" }
             };
-
             string result = "<|### Answer ###|>\n";
 
             await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
@@ -156,35 +154,18 @@ public class LLMExecutor
         }
         else
         {
+            ChatSession session = new(Executor, chatHistory);
             var pipeline = new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
-
             InferenceParams inferenceParams = new InferenceParams()
             {
                 MaxTokens = MaxTokens,
                 AntiPrompts = new List<string> { "User:" },
                 SamplingPipeline = pipeline
             };
-
             var output = new StringBuilder();
 
-            if (true)
-            {
-                ChatSession session = new(Executor, chatHistory);
-
-                await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
-                {
-                    Console.WriteLine(text);
-                    output.Append(text);
-                }
-            }
-            else
-            {
-                await foreach (var text in Executor.InferAsync(userInput, inferenceParams))
-                {
-                    Console.WriteLine(text);
-                    output.Append(text);
-                }
-            }
+            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+                output.Append(text);
 
             var rawModelOutput = output.ToString().Trim();
             var result = LlamaSharpToolEnvelopeParser.Parse(rawModelOutput);
@@ -202,7 +183,7 @@ public class LLMExecutor
                         else
                             toolCalls += "\n<|### --- ###|>\n";
 
-                        toolCalls += "{ \"function\": { \"name\": \"" + call.Name + ", \"arguments\": " + call.ArgumentsJson + "} }";
+                        toolCalls += "{ \"function\": { \"name\": \"" + call.Name + "\", \"arguments\": " + call.ArgumentsJson + "} }";
                     }
 
                     return toolCalls;

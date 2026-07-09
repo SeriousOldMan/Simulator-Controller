@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.1.0.0-release](https://cutt.ly/Et6wn7oO) (Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
+[7.1.1.0-release](https://cutt.ly/1ywwoiVh) (Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7100) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7110) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-711) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.0.2.0-release](https://cutt.ly/ut7djiTk) (Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns, Generic LLM connector now also supports non OpenAI style URLs.)
+[7.1.0.0-release](https://cutt.ly/Et6wn7oO) (Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
 
-[7.0.1.0-release](https://cutt.ly/5t8E4nyd) (Changes: New loading of telemetry for reference lap by the Driving Coach, Suppress Spotter lap time reporting for cars in the pit, Fixed storage of BB for lap data in team races, Fixed section detection by the Driving Coach, Driving Coach only uses valid laps for coaching.)
+[7.0.2.0-release](https://cutt.ly/ut7djiTk) (Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns, Generic LLM connector now also supports non OpenAI style URLs.)
 
 #### Current development build
 
-[7.1.1.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Js84yLkD/Releases/Simulator%20Controller%207.1.1.0-beta.zip) (Test build for 7.1.1. Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7110) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-711) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

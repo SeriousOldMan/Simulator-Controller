@@ -2,7 +2,7 @@
   "profiles": {
     "LLM Runtime": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"C:\\Users\\Developer\\AppData\\Local\\nomic.ai\\GPT4All\\Phi-3-mini-4k-instruct.Q4_0.gguf\" 0.50 1024 4"
+      "commandLineArgs": "\"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"D:\\Machine Learning\\LLM Studio\\lmstudio-community\\gemma-2-9b-it-GGUF\\gemma-2-9b-it-Q4_K_M.gguf\" 0.5 2048 4"
     }
   }
 }

@@ -46,9 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.1.1.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Js84yLkD/Releases/Simulator%20Controller%207.1.1.0-beta.zip) (Test build for 7.1.1. Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
+[7.1.2.0-dev]() (Early build for 7.1.2. Changes: Tool calling for LLM Runtime.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7110) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-711) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7120) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

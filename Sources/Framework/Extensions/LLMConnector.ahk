@@ -1232,7 +1232,7 @@ class LLMConnector {
 		ParseAnswer(answer) {
 			local ignore, label
 
-			for ignore, label in ["<|### Answer ###|>", "System:", "Assistant:", "User:"]
+			for ignore, label in ["<|### Answer ###|>", "System:", "Assistant:", "User:", "Answer:"]
 				answer := Trim(StrReplace(answer, label, ""))
 
 			return answer

@@ -1,5 +1,38 @@
 # Latest stable release
 
+## 7.1.1.0
+
+#### Date: 07/10/26
+
+#### Fixes
+
+  - The driver names for *rFactor 2*, which had been broken since Release 7.0.2, had been fixed. Driver names had shown sometimes as "System.Byte[]", which now should not happen again.
+  - Fixed several bugs, which could cause the Assistants to miss the session start in *F1 25/26*.
+  
+#### Changes
+
+  - API integration for *F1 25* has been updated, so that the new tracks and driver names of the 2026 season DLC are recognized. The integration now supports the UDP protocol 2025 as well as the new 2026 protocol.
+  - All fuel related input fields has been optimized in "Strategy Workbench", so that fractional units and the up/down control are handled more intuitively.
+  - Suspension related issues (swaying, bottoming out) have been added to the "Setup Workbench". Currently only available when selecting the issue manually, but telemetry based anylysis will be added in one of the next releases.
+
+# Upcoming release
+
+## 7.1.2.0
+
+#### Date: 07/17/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The local LLM Runtime now supports tool/function calling, which is required to run actions in the *Conversation* booster or even use it for the *Reasoning* booster. The LLM Runtime therefore now provides the same functionality as running an LLM in Ollama locally, but with a much better resource footprint and even some minor performance improvements. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712), if you are using the local LLM Runtime.
+
+# Release history
+
 ## 7.1.0.0
 
 #### Date: 07/03/26
@@ -23,24 +56,6 @@
   - Added a new setting "Whisper.Options" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This setting let you pass additional arguments to Whisper. For example, if you want to run Whisper on a specific GPU, use "Whisper.Options=--cuda:2". If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), if you are using the "Whisper Server" to run Whisper on a second PC.
-
-# Upcoming release
-
-## 7.1.2.0
-
-#### Date: 07/17/26 (planned)
-
-#### Fixes
-
-  - None this time...
-  
-#### Changes
-
-  - The local LLM Runtime now supports tool/function calling, which is required to run actions in the *Conversation* booster or even use it for the *Reasoning* booster. The LLM Runtime therefore now provides the same functionality as running an LLM in Ollama locally, but with a much better resource footprint and even some minor performance improvements. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712).
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712), if you are using the local LLM Runtime.
-
-# Release history
 
 ## 7.0.2.0
 

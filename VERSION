@@ -6,10 +6,10 @@ Download=
 Changes=Tool calling for LLM Runtime
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
-Version=7.1.0.0-release
-Date=07/03/2026
-Download=https://cutt.ly/Et6wn7oO;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zrJyfSxy/Releases/Simulator%20Controller%207.1.0.0-release.zip;https://www.dropbox.com/scl/fi/dyxgtss9lwt93ta0t3pwn/Simulator-Controller-7.1.0.0-release.zip?rlkey=i5lhw3fu38v64c4olk7pyqo9k&st=piwb3ufi&dl=1;http://%master%/Releases/Simulator Controller 7.1.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.1.0.0-release.zip
-Changes=Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support
+Version=7.1.1.0-release
+Date=07/10/2026
+Download=https://cutt.ly/1ywwoiVh;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QLBQfZMO/Releases/Simulator%20Controller%207.1.1.0-release.zip;https://www.dropbox.com/scl/fi/wf7v7qajwyn8scprprv5j/Simulator-Controller-7.1.1.0-release.zip?rlkey=zn3xdwvtqjh8xa2i7rf6dh5tv&st=y2bjinnm&dl=1;http://%master%/Releases/Simulator Controller 7.1.1.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.1.1.0-release.zip
+Changes=Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Components]
 Media.6.9.0.Path=Resources
@@ -31,4 +31,4 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 Type=Development
 [Version]
 Development=7.1.2.0-dev
-Release=7.1.0.0-release
+Release=7.1.1.0-release

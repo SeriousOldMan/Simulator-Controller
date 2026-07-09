@@ -136,10 +136,11 @@ public class LLMExecutor
         var chatHistory = new ChatHistory();
         List<ToolDefinition> tools;
         string userInput = ParsePrompt(chatHistory, prompt, out tools);
-        ChatSession session = new(Executor, chatHistory);
-
+        
         if (tools.Count == 0)
         {
+            ChatSession session = new(Executor, chatHistory);
+
             InferenceParams inferenceParams = new InferenceParams()
             {
                 MaxTokens = MaxTokens,
@@ -166,10 +167,23 @@ public class LLMExecutor
 
             var output = new StringBuilder();
 
-            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+            if (true)
             {
-                Console.WriteLine(text);
-                output.Append(text);
+                ChatSession session = new(Executor, chatHistory);
+
+                await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+                {
+                    Console.WriteLine(text);
+                    output.Append(text);
+                }
+            }
+            else
+            {
+                await foreach (var text in Executor.InferAsync(userInput, inferenceParams))
+                {
+                    Console.WriteLine(text);
+                    output.Append(text);
+                }
             }
 
             var rawModelOutput = output.ToString().Trim();
@@ -193,16 +207,11 @@ public class LLMExecutor
 
                     return toolCalls;
 
+                case LlamaSharpToolEnvelopeParser.MessageMode:
+                    return "<|### Answer ###|>\n" + result.Content;
+
                 case LlamaSharpToolEnvelopeParser.RefusalMode:
                     return "<|### Answer ###|>\n";
-
-                case LlamaSharpToolEnvelopeParser.MessageMode:
-                    string assistantMessage = "<|### Answer ###|>\n";
-
-                    await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
-                        assistantMessage += text;
-
-                    return assistantMessage;
             }
 
             return "<|### Answer ###|>\n";

@@ -2,7 +2,7 @@
   "profiles": {
     "LLM Runtime": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.cmd\" \"C:\\Users\\Developer\\Documents\\Simulator Controller\\Temp\\LLM.out\" \"D:\\Machine Learning\\LLM Studio\\lmstudio-community\\gemma-2-9b-it-GGUF\\gemma-2-9b-it-Q4_K_M.gguf\" 0.5 2048 4"
+      "commandLineArgs": "\"G:\\Simulator Controller\\Temp\\LLM.cmd\" \"G:\\Simulator Controller\\Temp\\LLM.out\" \"D:\\Machine Learning\\LM Studio\\Models\\bartowski\\Llama-3.3-70B-Instruct-GGUF\\Llama-3.3-70B-Instruct-Q4_K_M.gguf\" 0.5 2048 16"
     }
   }
 }

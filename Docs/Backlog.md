@@ -31,12 +31,4 @@
   4. Make X-Axis in consumption graph configurable
 
 #### Team Center
-  1. Change hot target pressures for the next pitstop
-  
-#### New Apps
-  1. Pitwall timing application with full information about all cars on the track
-     - Timings
-	 - Incidents
-	 - Drivers
-	 - Number of pitstops
-	 - Relative performance
+  1. Change hot target pressures for the next pitstops

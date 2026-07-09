@@ -50,7 +50,7 @@ None for the moment...
 
 ### Documentation
 
-A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 500 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 700 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 

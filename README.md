@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.1.1.0-release]() (Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
+[7.1.1.0-release](https://cutt.ly/1ywwoiVh) (Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7110) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-711) of this version and all the versions you might have skipped, before installing and using this version.
 

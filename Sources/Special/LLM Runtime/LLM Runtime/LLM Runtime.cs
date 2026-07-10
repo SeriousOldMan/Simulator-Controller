@@ -5,6 +5,7 @@ using LLama.Sampling;
 using LlamaSharp.ToolCallEnvelopes;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using static System.Collections.Specialized.BitVector32;
@@ -232,6 +233,9 @@ static class Program
 {
     static string WaitForPrompt(string fileName)
     {
+		using (Process p = Process.GetCurrentProcess()) 
+			p.PriorityClass = ProcessPriorityClass.BelowNormal; 
+
         while (true)
         {
             if (File.Exists(fileName))
@@ -257,7 +261,7 @@ static class Program
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-        try
+		try
         {
             LLMExecutor executor = new LLMExecutor(args[2],
                                                    (args.Length > 3) ? Double.Parse(args[3]) : 0.5,

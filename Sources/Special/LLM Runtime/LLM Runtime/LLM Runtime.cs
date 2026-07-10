@@ -125,7 +125,7 @@ public class LLMExecutor
 
     public string BuildGrammar(List<ToolDefinition> tools)
     {
-        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: true);
+        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: false);
 	}
 
     public async Task<string> AskAsync(string prompt)
@@ -134,10 +134,10 @@ public class LLMExecutor
         var chatHistory = new ChatHistory();
         List<ToolDefinition> tools;
         string userInput = ParsePrompt(chatHistory, prompt, out tools);
-        ChatSession session = new(Executor, chatHistory);
             
         if (tools.Count == 0)
         {
+            ChatSession session = new(Executor, chatHistory);
             InferenceParams inferenceParams = new InferenceParams()
             {
                 MaxTokens = MaxTokens,
@@ -162,9 +162,9 @@ public class LLMExecutor
 					};
             var promptHistory =
                 LlamaSharpToolPromptBuilder.Build(
-                    systemPrompt: "You are concise and use tools when they are needed.",
+                    systemPrompt: "You will use tools when they are needed.",
                     messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
-                    tools: tools, strictTools: true);
+                    tools: tools, strictTools: false);
             var userMessage = new ChatHistory();
 
             foreach (var message in promptHistory.Messages)
@@ -177,15 +177,21 @@ public class LLMExecutor
                     _ => throw new InvalidOperationException($"Unsupported prompt role '{message.Role}'.")
                 };
 
-                userMessage.AddMessage(role, message.Content);
+                if (role == AuthorRole.System)
+                    chatHistory.AddMessage(role, message.Content);
+                else
+                    userMessage.AddMessage(role, message.Content);
             }
 
+            ChatSession session = new(Executor, chatHistory);
+            
             var output = new StringBuilder();
 
             await foreach (var text in session.ChatAsync(userMessage, inferenceParams))
                 output.Append(text);
 
-            var result = LlamaSharpToolEnvelopeParser.Parse(output.ToString().Trim());
+            string rawOutput = output.ToString().Trim();
+            var result = LlamaSharpToolEnvelopeParser.Parse(rawOutput);
 
             switch (result.Mode)
             {
@@ -229,17 +235,18 @@ static class Program
         while (true)
         {
             if (File.Exists(fileName))
-            {
-                StreamReader promptStream = new StreamReader(fileName);
+                try {
+                    StreamReader promptStream = new StreamReader(fileName);
 
-                string prompt = promptStream.ReadToEnd();
+                    string prompt = promptStream.ReadToEnd();
 
-                promptStream.Close();
+                    promptStream.Close();
 
-                File.Delete(fileName);
+                    File.Delete(fileName);
 
-                return prompt;
-            }
+                    return prompt;
+                }
+                catch { }
 
             Thread.Sleep(100);
         }

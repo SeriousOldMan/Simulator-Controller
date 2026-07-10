@@ -1,4 +1,5 @@
 using LLama;
+using LLama.Batched;
 using LLama.Common;
 using LLama.Sampling;
 using LlamaSharp.ToolCallEnvelopes;
@@ -100,12 +101,12 @@ public class LLMExecutor
             else
                 userMessage = (role == AuthorRole.User) ? message : "";
 
-        tools = BuildTools(toolDefs);
+        tools = BuildTools(chatHistory, toolDefs);
 
         return userMessage;
     }
 
-    public List<ToolDefinition> BuildTools(List<string> toolDefs) {
+    public List<ToolDefinition> BuildTools(ChatHistory chatHistory, List<string> toolDefs) {
         List<ToolDefinition> tools = new List<ToolDefinition>();
 
         foreach (string toolDef in toolDefs)
@@ -152,15 +153,36 @@ public class LLMExecutor
         else
         {
             var pipeline = new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
-            InferenceParams inferenceParams = new InferenceParams()
+            InferenceParams inferenceParams =
+				new InferenceParams()
+					{
+						MaxTokens = MaxTokens,
+						AntiPrompts = new List<string> { "User:" },
+						SamplingPipeline = pipeline
+					};
+            var promptHistory =
+                LlamaSharpToolPromptBuilder.Build(
+                    systemPrompt: "You are concise and use tools when they are needed.",
+                    messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
+                    tools: tools, strictTools: true);
+            var userMessage = new ChatHistory();
+
+            foreach (var message in promptHistory.Messages)
             {
-                MaxTokens = MaxTokens,
-                AntiPrompts = new List<string> { "User:" },
-                SamplingPipeline = pipeline
-            };
+                var role = message.Role switch
+                {
+                    ToolPromptRole.System => AuthorRole.System,
+                    ToolPromptRole.User => AuthorRole.User,
+                    ToolPromptRole.Assistant => AuthorRole.Assistant,
+                    _ => throw new InvalidOperationException($"Unsupported prompt role '{message.Role}'.")
+                };
+
+                userMessage.AddMessage(role, message.Content);
+            }
+
             var output = new StringBuilder();
 
-            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+            await foreach (var text in session.ChatAsync(userMessage, inferenceParams))
                 output.Append(text);
 
             var result = LlamaSharpToolEnvelopeParser.Parse(output.ToString().Trim());

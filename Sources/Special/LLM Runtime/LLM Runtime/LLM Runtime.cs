@@ -1,7 +1,12 @@
-using LLama.Common;
 using LLama;
+using LLama.Common;
+using LLama.Sampling;
+using LlamaSharp.ToolCallEnvelopes;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
+using static System.Collections.Specialized.BitVector32;
 
 namespace LLMRuntime;
 
@@ -32,22 +37,45 @@ public class LLMExecutor
         Executor = new InteractiveExecutor(Model.CreateContext(Parameters));
     }
 
-    public string ParsePrompt(ChatHistory chatHistory, string prompt)
+    public string ParsePrompt(ChatHistory chatHistory, string prompt, out List<ToolDefinition> tools)
     {
+        List<string> toolDefs = new List<string>();
+        string userMessage = "";
+
         void addMessage(AuthorRole role, string message)
         {
-            if (role != AuthorRole.Unknown)
+            if (userMessage != "") {
+                chatHistory.AddMessage(AuthorRole.User, userMessage);
+
+                userMessage = "";
+            }
+
+            if (role == AuthorRole.User)
+                userMessage = message;
+            else if (role != AuthorRole.Unknown)
                 chatHistory.AddMessage(role, message);
+        }
+		
+        void addTool(string message)
+        {
+            toolDefs.Add(message);
         }
 
         AuthorRole role = AuthorRole.Unknown;
         string message = "";
+        bool hasTools = false;
 
         foreach (string line in prompt.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None))
         {
             string input = line.Trim();
-
-            if (input.StartsWith("<|###"))
+			
+			if (hasTools && input.StartsWith("<|### --- ###|>"))
+			{
+				addTool(message);
+				
+				message = "";
+			}
+            else if (input.StartsWith("<|###"))
             {
                 addMessage(role, message);
 
@@ -59,44 +87,120 @@ public class LLMExecutor
                     role = AuthorRole.Assistant;
                 else if (input == "<|### User ###|>")
                     role = AuthorRole.User;
+                else if (input == "<|### Tools ###|>")
+					hasTools = true;
             }
             else
                 message += (input + Environment.NewLine);
         }
 
-        return (role == AuthorRole.User) ? message : "";
+        if (message != "")
+            if (hasTools)
+                addTool(message);
+            else
+                userMessage = (role == AuthorRole.User) ? message : "";
+
+        if (hasTools)
+            tools = BuildTools(toolDefs);
+        else
+            tools = new List<ToolDefinition>();
+
+        return userMessage;
     }
+
+    public List<ToolDefinition> BuildTools(List<string> toolDefs) {
+        List<ToolDefinition> tools = new List<ToolDefinition>();
+
+        foreach (string toolDef in toolDefs)
+        {
+            var function = JsonDocument.Parse(toolDef).RootElement.GetProperty("function");
+            var tool = new ToolDefinition(function.GetProperty("name").GetString() ?? throw new InvalidOperationException("Tool name is required."),
+                                          function.TryGetProperty("description", out var description) ? description.GetString() ?? string.Empty
+                                                                                                      : string.Empty,
+                                          function.GetProperty("parameters").Clone());
+
+            tools.Add(tool);
+        }
+
+        return tools;
+    }
+
+    public string BuildGrammar(List<ToolDefinition> tools)
+    {
+        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: true);
+	}
 
     public async Task<string> AskAsync(string prompt)
     {
         // Add chat histories as prompt to tell AI how to act.
         var chatHistory = new ChatHistory();
-
-        string userInput = ParsePrompt(chatHistory, prompt);
-
-        ChatSession session = new(Executor, chatHistory);
-
-        InferenceParams inferenceParams = new InferenceParams()
+        List<ToolDefinition> tools;
+        string userInput = ParsePrompt(chatHistory, prompt, out tools);
+        
+        if (tools.Count == 0)
         {
-            MaxTokens = MaxTokens,
-            AntiPrompts = new List<string> { "User:" }
-        };
+            ChatSession session = new(Executor, chatHistory);
+            InferenceParams inferenceParams = new InferenceParams()
+            {
+                MaxTokens = MaxTokens,
+                AntiPrompts = new List<string> { "User:" }
+            };
+            string result = "<|### Answer ###|>\n";
 
-        string result = "";
+            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+                result += text;
 
-        await foreach (
-            var text
-            in session.ChatAsync(
-                new ChatHistory.Message(AuthorRole.User, userInput),
-                inferenceParams))
-            result += text;
+            return result;
+        }
+        else
+        {
+            ChatSession session = new(Executor, chatHistory);
+            var pipeline = new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
+            InferenceParams inferenceParams = new InferenceParams()
+            {
+                MaxTokens = MaxTokens,
+                AntiPrompts = new List<string> { "User:" },
+                SamplingPipeline = pipeline
+            };
+            var output = new StringBuilder();
 
-        return result;
+            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
+                output.Append(text);
+
+            var rawModelOutput = output.ToString().Trim();
+            var result = LlamaSharpToolEnvelopeParser.Parse(rawModelOutput);
+
+            switch (result.Mode)
+            {
+                case LlamaSharpToolEnvelopeParser.ToolCallsMode:
+                    string toolCalls = "<|### Tool Calls ###|>\n";
+                    bool first = true;
+
+                    foreach (var call in result.ToolCalls)
+                    {
+                        if (first)
+                            first = false;
+                        else
+                            toolCalls += "\n<|### --- ###|>\n";
+
+                        toolCalls += "{ \"function\": { \"name\": \"" + call.Name + "\", \"arguments\": " + call.ArgumentsJson + "} }";
+                    }
+
+                    return toolCalls;
+
+                case LlamaSharpToolEnvelopeParser.MessageMode:
+                    return "<|### Answer ###|>\n" + result.Content;
+
+                case LlamaSharpToolEnvelopeParser.RefusalMode:
+                    return "<|### Answer ###|>\n";
+            }
+
+            return "<|### Answer ###|>\n";
+        }
     }
 
     public string Ask(string prompt)
     {
-
         return AskAsync(prompt).Result;
     }
 }

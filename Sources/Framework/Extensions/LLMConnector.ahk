@@ -1167,15 +1167,75 @@ class LLMConnector {
 
 			prompt .= ("<|### User ###|>`n" . question)
 
+			if (tools.Length > 0)
+				prompt .= ("`n<|### Tools ###|>`n" . values2String("`n<|### --- ###|>`n", collect(tools, (t) => t.JSON)*))
+
 			return prompt
 		}
 
+		ParseToolCall(tools, descriptor, &name, &arguments) {
+			local tool
+
+			if descriptor.Has("function") {
+				tool := descriptor["function"]
+
+				name := tool["name"]
+				arguments := tool["arguments"]
+
+				tool := this.FindTool(tools, name)
+
+				if tool {
+					if isInstance(arguments, String)
+						arguments := JSON.parse(arguments)
+
+					arguments := this.ParseArguments(tool, toMap(arguments))
+
+					return tool
+				}
+				else
+					return false
+			}
+			else
+				throw "Unsupported tool type detected in LLMConnector.APIConnector.ParseToolCall..."
+		}
+
+		CallTool(tools, tool) {
+			local name, arguments
+
+			tool := this.ParseToolCall(tools, tool, &name, &arguments)
+
+			if tool {
+				tool.Callable.Call(arguments*)
+
+				return Array(tool, arguments)
+			}
+			else
+				return false
+		}
+
 		ProcessToolCalls(tools, message, &calls?) {
-			return false
+			if (InStr(message, "<|### Tool Calls ###|>") == 1) {
+				message := collect(string2Values("<|### --- ###|>", SubStr(message, "<|### Tool Calls ###|>", ""))
+								 , (c) => JSON.parse(c))
+
+				if isSet(calls)
+					calls := choose(collect(message, ObjBindMethod(this, "CallTool", tools)), (v) => !!v)
+				else
+					do(message, ObjBindMethod(this, "CallTool", tools))
+
+				return true
+			}
+			else
+				return false
 		}
 
 		ParseAnswer(answer) {
-			return StrReplace(StrReplace(StrReplace(super.ParseAnswer(answer), "System:", ""), "Assistant:", ""), "User:", "")
+			local ignore, label
+
+			for ignore, label in ["<|### Answer ###|>", "System:", "Assistant:", "User:", "Answer:"]
+				answer := Trim(StrReplace(answer, label, ""))
+
+			return answer
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
@@ -1245,12 +1305,12 @@ class LLMConnector {
 					return false
 				}
 
-				answer := FileRead(kTempDirectory . "LLMRuntime.out", "`n")
+				answer := Trim(FileRead(kTempDirectory . "LLMRuntime.out", "`n"))
 
 				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
-					answer := SubStr(answer, 2)
+					answer := Trim(SubStr(answer, 2))
 
-				if (Trim(answer) = "Error")
+				if (answer = "Error")
 					answer := false
 				else {
 					this.Manager.connectorState("Active")
@@ -1260,7 +1320,8 @@ class LLMConnector {
 					else
 						toolCall := this.ProcessToolCalls(tools, answer)
 
-					deleteFile(kTempDirectory . "LLMRuntime.out")
+					if !isDebug()
+						deleteFile(kTempDirectory . "LLMRuntime.out")
 
 					if toolCall
 						return true

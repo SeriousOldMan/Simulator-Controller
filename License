@@ -1570,3 +1570,26 @@ The software ffmpeg is covered by the
                    Version 3, 29 June 2007
 					   
 which was already printed above.
+
+-------------------------------------------------------------------------------
+
+Some parts of the local LLM Runtime are created by @mkn8rn. Original
+code can be found on GitHub:
+
+https://github.com/Supprocom/LlamaSharp.ToolCallEnvelopes
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS#
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more#
+details.
+
+For details of the GNU Affero General Public License see
+
+https://www.gnu.org/licenses/
+
+-------------------------------------------------------------------------------

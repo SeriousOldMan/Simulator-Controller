@@ -100,10 +100,7 @@ public class LLMExecutor
             else
                 userMessage = (role == AuthorRole.User) ? message : "";
 
-        if (hasTools)
-            tools = BuildTools(toolDefs);
-        else
-            tools = new List<ToolDefinition>();
+        tools = BuildTools(toolDefs);
 
         return userMessage;
     }
@@ -136,10 +133,10 @@ public class LLMExecutor
         var chatHistory = new ChatHistory();
         List<ToolDefinition> tools;
         string userInput = ParsePrompt(chatHistory, prompt, out tools);
-        
+        ChatSession session = new(Executor, chatHistory);
+            
         if (tools.Count == 0)
         {
-            ChatSession session = new(Executor, chatHistory);
             InferenceParams inferenceParams = new InferenceParams()
             {
                 MaxTokens = MaxTokens,
@@ -154,7 +151,6 @@ public class LLMExecutor
         }
         else
         {
-            ChatSession session = new(Executor, chatHistory);
             var pipeline = new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
             InferenceParams inferenceParams = new InferenceParams()
             {
@@ -167,8 +163,7 @@ public class LLMExecutor
             await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
                 output.Append(text);
 
-            var rawModelOutput = output.ToString().Trim();
-            var result = LlamaSharpToolEnvelopeParser.Parse(rawModelOutput);
+            var result = LlamaSharpToolEnvelopeParser.Parse(output.ToString().Trim());
 
             switch (result.Mode)
             {

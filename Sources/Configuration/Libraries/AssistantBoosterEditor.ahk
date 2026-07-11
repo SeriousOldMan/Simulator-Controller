@@ -172,7 +172,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		}
 
 		editFilter(type, title, *) {
-			this.editFilter(this.Assistant, type, this.iCurrentConversationProvider, title)
+			this.editFilter(this.Assistant, type, this.iCurrentConversationProvider, translate("Filter: ") . title)
 		}
 
 		editEvents(title, *) {

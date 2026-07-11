@@ -1721,7 +1721,7 @@ class CallbacksEditor {
 	}
 
 	updateState() {
-		local type
+		local type, comment, eventType
 
 		this.Control["addCallbackButton"].Enabled := true
 		this.Control["uploadCallbacksButton"].Enabled := true
@@ -1802,8 +1802,14 @@ class CallbacksEditor {
 				type := "Rule"
 
 			if (type = "Rule") {
-				if (this.ScriptEditor.Content[true] = "")
-					this.setScript("Rules", "; Insert your rules here...`n`n", this.SelectedCallback.Builtin)
+				if (this.ScriptEditor.Content[true] = "") {
+					eventType := (InStr(this.Type, "Events") ? "event" : "action")
+
+					comment := "; Insert your rules here...`n;`n"
+					comment .= ("; For an introduction to " . eventType . " rules see here:`n;`n; https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-" . eventType . "s`n`n")
+
+					this.setScript("Rules", comment, this.SelectedCallback.Builtin)
+				}
 
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
@@ -1812,8 +1818,12 @@ class CallbacksEditor {
 				this.PhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
 			}
 			else if (type = "Script") {
-				if (this.ScriptEditor.Content[true] = "")
-					this.setScript("Script", "-- Insert your script here...`n`n", this.SelectedCallback.Builtin)
+				if (this.ScriptEditor.Content[true] = "") {
+					comment := "-- Insert your script here...`n--`n"
+					comment .= ("-- For an introduction to action scripts see here:`n--`n-- https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-actions`n`n")
+
+					this.setScript("Script", comment, this.SelectedCallback.Builtin)
+				}
 
 				this.ScriptEditor.Visible := true
 				this.CallableField[1].Visible := false
@@ -2872,6 +2882,16 @@ editFilter(editorOrCommand, title := false, originalFilter := "", owner := false
 		editor := editorOrCommand
 		result := false
 
+		if (Trim(originalFilter) = "") {
+			originalFilter := "-- Insert your script here...`n--`n"
+			originalFilter .= "-- The script can access the text generated`n"
+			originalFilter .= "-- by the LLM through the global variable Answer`n"
+			originalFilter .= "-- and must return the possibly modified text.`n"
+			originalFilter .= "-- For an overview of Lua's text manipulation`n"
+			originalFilter .= "-- functions see here:`n--`n"
+			originalFilter .= "-- http://lua-users.org/wiki/StringLibraryTutorial`n`n"
+		}
+
 		filterGui := Window({Descriptor: "Booster Editor.Filter", Resizeable: true, Options: "0x400000"}, title)
 
 		scriptEditor := filterGui.Add("CodeEditor", "x8 w462 h200 DefaultOpt SystemTheme Border Disabled W:Grow H:Grow")
@@ -2879,12 +2899,12 @@ editFilter(editorOrCommand, title := false, originalFilter := "", owner := false
 		scriptEditor.CaseSense := true
 
 		scriptEditor.SetKeywords("_VERSION assert collectgarbage dofile error gcinfo loadfile loadstring print rawget rawset require tonumber tostring type unpack"
-									, "_ALERT _ERRORMESSAGE _INPUT _PROMPT _OUTPUT _STDERR _STDIN _STDOUT call dostring foreach foreachi getn globals newtype sort tinsert tremove"
-									, "and break do else elseif end false for function if in local nil not or repeat return then true until while"
-									, "abs acos asin atan atan2 ceil cos deg exp floor format frexp gsub ldexp log log10 max min mod rad random randomseed sin sqrt strbyte strchar strfind strlen strlower strrep strsub strupper tan"
-									, "openfile closefile readfrom writeto appendto remove rename flush seek tmpfile tmpname read write clock date difftime execute exit getenv setlocale time"
-									, "_G getfenv getmetatable ipairs loadlib next pairs pcall rawequal setfenv setmetatable xpcall string table math coroutine io os debug load module select"
-									, "string.byte string.char string.dump string.find string.len string.lower string.rep string.sub string.upper string.format string.gfind string.gsub table.concat table.foreach table.foreachi table.getn table.sort table.insert table.remove table.setn math.abs math.acos math.asin math.atan math.atan2 math.ceil math.cos math.deg math.exp math.floor math.frexp math.ldexp math.log math.log10 math.max math.min math.mod math.pi math.pow math.rad math.random math.randomseed math.sin math.sqrt math.tan string.gmatch string.match string.reverse table.maxn math.cosh math.fmod math.modf math.sinh math.tanh math.huge")
+							   , "_ALERT _ERRORMESSAGE _INPUT _PROMPT _OUTPUT _STDERR _STDIN _STDOUT call dostring foreach foreachi getn globals newtype sort tinsert tremove"
+							   , "and break do else elseif end false for function if in local nil not or repeat return then true until while"
+							   , "abs acos asin atan atan2 ceil cos deg exp floor format frexp gsub ldexp log log10 max min mod rad random randomseed sin sqrt strbyte strchar strfind strlen strlower strrep strsub strupper tan"
+							   , "openfile closefile readfrom writeto appendto remove rename flush seek tmpfile tmpname read write clock date difftime execute exit getenv setlocale time"
+							   , "_G getfenv getmetatable ipairs loadlib next pairs pcall rawequal setfenv setmetatable xpcall string table math coroutine io os debug load module select"
+							   , "string.byte string.char string.dump string.find string.len string.lower string.rep string.sub string.upper string.format string.gfind string.gsub table.concat table.foreach table.foreachi table.getn table.sort table.insert table.remove table.setn math.abs math.acos math.asin math.atan math.atan2 math.ceil math.cos math.deg math.exp math.floor math.frexp math.ldexp math.log math.log10 math.max math.min math.mod math.pi math.pow math.rad math.random math.randomseed math.sin math.sqrt math.tan string.gmatch string.match string.reverse table.maxn math.cosh math.fmod math.modf math.sinh math.tanh math.huge")
 
 		scriptEditor.Brace.Chars := "()[]{}"
 		scriptEditor.SyntaxEscapeChar := ""

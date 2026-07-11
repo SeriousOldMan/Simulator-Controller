@@ -24,18 +24,22 @@ public class LLMExecutor
     double Temperature;
     int MaxTokens;
     int GPULayers;
+	
+	bool Strict;
 
     ModelParams Parameters;
     LLamaWeights Model;
     InteractiveExecutor Executor;
 
-    public LLMExecutor(string modelPath, double temperature, int maxTokens, int gpuLayers,
+    public LLMExecutor(string modelPath, double temperature, int maxTokens, int gpuLayers, bool strict,
 					   uint contextSize = 32768, uint batchSize = 128, int threads = -1)
     {
         ModelPath = modelPath;
         Temperature = temperature;
         MaxTokens = maxTokens;
         GPULayers = gpuLayers;
+		
+		Strict = strict;
 		
 		if (threads < 0)
 			threads = Math.Max(1, Environment.ProcessorCount / 2);
@@ -138,7 +142,7 @@ public class LLMExecutor
 
     public string BuildGrammar(List<ToolDefinition> tools)
     {
-        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: false);
+        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: Strict);
 	}
 
     public async Task<string> AskAsync(string prompt)
@@ -177,7 +181,7 @@ public class LLMExecutor
                 LlamaSharpToolPromptBuilder.Build(
                     systemPrompt: "You will use tools when they are needed.",
                     messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
-                    tools: tools, strictTools: false);
+                    tools: tools, strictTools: Strict);
             var userMessage = new ChatHistory();
 
             foreach (var message in promptHistory.Messages)
@@ -279,9 +283,10 @@ static class Program
                                                    (args.Length > 3) ? Double.Parse(args[3]) : 0.5,
                                                    (args.Length > 4) ? int.Parse(args[4]) : 2048,
                                                    (args.Length > 5) ? int.Parse(args[5]) : 0,
-												   (args.Length > 6) ? uint.Parse(args[6]) : 32768,
-												   (args.Length > 7) ? uint.Parse(args[7]) : 256,
-												   (args.Length > 8) ? int.Parse(args[8]) : Math.Max(1, Environment.ProcessorCount / 2));
+												   ((args.Length > 6) ? args[6] : "Strict") == "Strict",
+												   (args.Length > 7) ? uint.Parse(args[7]) : 32768,
+												   (args.Length > 8) ? uint.Parse(args[8]) : 256,
+												   (args.Length > 9) ? int.Parse(args[9]) : Math.Max(1, Environment.ProcessorCount / 2));
 
             while (true)
             {

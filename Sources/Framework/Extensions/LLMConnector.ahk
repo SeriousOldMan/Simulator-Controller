@@ -1079,6 +1079,7 @@ class LLMConnector {
 
 		Connect(force := false) {
 			local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+			local outputFormat := getMultiMapValue(settings, "LLM Runtime", "Output Format", "Strict")
 			local contextSize := getMultiMapValue(settings, "LLM Runtime", "Context Size", 32768)
 			local batchSize := getMultiMapValue(settings, "LLM Runtime", "Batch Size", 128)
 			local threads := getMultiMapValue(settings, "LLM Runtime", "Threads", kUndefined)
@@ -1102,7 +1103,7 @@ class LLMConnector {
 						deleteFile(kTempDirectory . "LLMRuntime.out")
 
 						options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space
-								  . this.GPULayers . A_Space . contextSize . A_Space . batchSize
+								  . this.GPULayers . A_Space . outputFormat . A_Space . contextSize . A_Space . batchSize
 								  . (threads != kUndefined) ? (A_Space . threads) : "")
 
 						Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)

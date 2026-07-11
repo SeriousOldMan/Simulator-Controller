@@ -2870,7 +2870,7 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 }
 
 editFilter(editorOrCommand, title := false, originalFilter := "", owner := false) {
-	local valid, errorMessage, messages, fileName
+	local valid, errorMessage, messages, fileName, new
 
 	static editor, filter, filterGui, scriptEditor, result
 
@@ -2890,7 +2890,11 @@ editFilter(editorOrCommand, title := false, originalFilter := "", owner := false
 			originalFilter .= "-- For an overview of Lua's text manipulation`n"
 			originalFilter .= "-- functions see here:`n--`n"
 			originalFilter .= "-- http://lua-users.org/wiki/StringLibraryTutorial`n`n"
+
+			new := true
 		}
+		else
+			new := false
 
 		filterGui := Window({Descriptor: "Booster Editor.Filter", Resizeable: true, Options: "0x400000"}, title)
 
@@ -2937,6 +2941,8 @@ editFilter(editorOrCommand, title := false, originalFilter := "", owner := false
 
 		if getWindowSize("Booster Editor.Filter", &w, &h)
 			filterGui.Resize("Initialize", w, h)
+
+		SendInput(new ? "{Right}" : "{Left}")
 
 		try {
 			loop {

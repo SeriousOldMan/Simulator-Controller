@@ -27,7 +27,7 @@
   
 #### Changes
 
-  - Meta data for the new cars of *Assetto Corsa EVO* has been included.
+  - Meta data for the latest cars of *Assetto Corsa EVO* has been included.
   - The local LLM Runtime now supports tool/function calling, which is required to run actions in the *Conversation* booster or even use it for the *Reasoning* booster. The LLM Runtime therefore now provides the same functionality as running an LLM in Ollama locally, but with a much better resource footprint and even some minor performance improvements. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712).
   - Changed the process priority of the local LLM Runtime to *BelowNormal*, so that it can be run alongside the running simulator on the CPU without causing stutter.
   - New settings for fine-tuning LLM processing, especially by the LLM Runtime, have been added to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#llm-settings).

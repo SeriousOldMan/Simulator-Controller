@@ -21,6 +21,7 @@
 
 #Include "Task.ahk"
 #Include "LLMConnector.ahk"
+#Include "ScriptEngine.ahk"
 #Include "SpeechRecognizer.ahk"
 
 
@@ -32,6 +33,7 @@ class LLMBooster extends ConfigurationItem {
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
+	iAnswerProcessor := false
 
 	Type {
 		Get {
@@ -52,6 +54,12 @@ class LLMBooster extends ConfigurationItem {
 	Providers {
 		Get {
 			return LLMConnector.Providers
+		}
+	}
+
+	Booster {
+		Get {
+			throw "Virtual property LLMBooster.Booster must be implemented in a subclass..."
 		}
 	}
 
@@ -79,9 +87,16 @@ class LLMBooster extends ConfigurationItem {
 		}
 	}
 
+	AnswerProcessor {
+		Get {
+			return this.iAnswerProcessor
+		}
+	}
+
 	loadFromConfiguration(configuration) {
 		local descriptor := this.Descriptor
 		local options := this.Options
+		local fileName
 
 		super.loadFromConfiguration(configuration)
 
@@ -91,6 +106,12 @@ class LLMBooster extends ConfigurationItem {
 
 		if (string2Values("|", options["Service"], 2)[1] = "LLM Runtime")
 			options["GPULayers"] := getMultiMapValue(configuration, this.Type . " Booster", descriptor . ".GPULayers", 0)
+
+		fileName := (kUserHomeDirectory . "Scripts\Booster\" . this.Descriptor . "." . this.Booster . "."
+															 . string2Values("|", options["Service"], 3)[1] . ".script")
+
+		if (FileExist(fileName) && (Trim(FileRead(fileName)) != ""))
+			this.iAnswerProcessor := fileName
 	}
 
 	startBooster() {
@@ -126,6 +147,32 @@ class LLMBooster extends ConfigurationItem {
 		}
 		else
 			throw "Unsupported service detected in LLMBooster.startBooster..."
+	}
+
+	processAnswer(answer) {
+		local context, message
+
+		if this.AnswerProcessor {
+			context := scriptOpenContext()
+
+			if !scriptLoad(context, this.AnswerProcessor, &message)
+				throw message
+
+			scriptPushValue(context, answer)
+			scriptSetGlobal(context, "Answer")
+
+			scriptPushValue(context, (c) {
+				return scriptExternHandler(c)
+			})
+			scriptSetGlobal(context, "extern")
+
+			if scriptExecute(context, &message)
+				answer := scriptGetString(context)
+			else
+				throw message
+		}
+
+		return answer
 	}
 }
 
@@ -321,6 +368,12 @@ class ConversationBooster extends LLMBooster {
 }
 
 class SpeechBooster extends ConversationBooster {
+	Booster {
+		Get {
+			return "Rephrasing"
+		}
+	}
+
 	Probability {
 		Get {
 			return this.Options["Probability"]
@@ -392,7 +445,7 @@ class SpeechBooster extends ConversationBooster {
 																		  , variables)])
 
 					if answer
-						answer := this.normalizeAnswer(answer)
+						answer := this.processAnswer(this.normalizeAnswer(answer))
 
 					if (answer && (answer != "")) {
 						this.logInteraction(text, answer)
@@ -423,6 +476,12 @@ class RecognitionBooster extends ConversationBooster {
 	iGrammars := CaseInsenseMap()
 
 	iCommands := false
+
+	Booster {
+		Get {
+			return "Understanding"
+		}
+	}
 
 	Mode {
 		Get {
@@ -582,6 +641,12 @@ class RecognitionBooster extends ConversationBooster {
 class ChatBooster extends ConversationBooster {
 	iManager := false
 
+	Booster {
+		Get {
+			return "Conversation"
+		}
+	}
+
 	MaxHistory {
 		Get {
 			return this.Options["MaxHistory"]
@@ -687,7 +752,7 @@ class ChatBooster extends ConversationBooster {
 											   , false, &calls := [])
 
 					if (answer && (answer != true))
-						answer := this.normalizeAnswer(answer)
+						answer := this.processAnswer(this.normalizeAnswer(answer))
 
 					if (answer && (answer != "")) {
 						this.logInteraction(question, (answer == true) ? values2String("`n", collect(calls, printCall)*) : answer)

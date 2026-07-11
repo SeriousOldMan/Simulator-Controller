@@ -1,9 +1,9 @@
 [Development]
 Version=7.1.2.0-dev
 Target=7.1.2.0-release
-Date=07/09/2026
+Date=07/11/2026
 Download=
-Changes=Tool calling for LLM Runtime
+Changes=Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
 Version=7.1.1.0-release

@@ -171,6 +171,10 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				this.editInstructions(type, title)
 		}
 
+		editFilter(type, title, *) {
+			this.editFilter(this.Assistant, type, this.iCurrentConversationProvider, title)
+		}
+
 		editEvents(title, *) {
 			this.editEvents(this.Assistant, title)
 		}
@@ -272,6 +276,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
 
+		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviSpeakerFilterButton", translate("Filter...")).OnEvent("Click", editFilter.Bind("Rephrasing", translate("Rephrasing")))
+
 		editorGui.SetFont("Italic", "Arial")
 		editorGui.Add("Checkbox", "x" . x0 . " yp+36 w100 h21 vviListenerCheck", translate("Understanding")).OnEvent("Click", (*) => this.updateState())
 		editorGui.Add("Text", "x127 yp+11 w" . (width + 8 - 127) . " 0x10 W:Grow")
@@ -303,6 +309,8 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vviConversationTemperatureEdit").OnValidate("LoseFocus", validatePercentage.Bind("viConversationTemperatureEdit"))
 		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
 		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
+
+		editorGui.Add("Button", "x" . (width - 100) . " yp w100 h23 X:Move vviConversationFilterButton", translate("Filter...")).OnEvent("Click", editFilter.Bind("Conversation", translate("Conversation")))
 
 		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200", translate("Actions"))
 		editorGui.Add("DropDownList", "x" . x1 . " yp w60 vviConversationActionsDropdown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
@@ -1034,6 +1042,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viSpeakerProbabilityEdit"].Text := ""
 			this.Control["viSpeakerTemperatureEdit"].Text := ""
 			this.Control["viSpeakerInstructionsButton"].Enabled := false
+			this.Control["viSpeakerFilterButton"].Enabled := false
 		}
 		else {
 			this.Control["viSpeakerProbabilityEdit"].Enabled := true
@@ -1046,6 +1055,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				this.Control["viSpeakerTemperatureEdit"].Text := 50
 
 			this.Control["viSpeakerInstructionsButton"].Enabled := true
+			this.Control["viSpeakerFilterButton"].Enabled := true
 		}
 
 		if ((this.Control["viListenerCheck"].Value = 0) || !inList(this.iBoosters, "Listener")) {
@@ -1077,6 +1087,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 			this.Control["viConversationTemperatureEdit"].Text := ""
 			this.Control["viConversationActionsDropDown"].Choose(0)
 			this.Control["viConversationInstructionsButton"].Enabled := false
+			this.Control["viConversationFilterButton"].Enabled := false
 		}
 		else {
 			this.Control["viConversationMaxHistoryEdit"].Enabled := true
@@ -1093,6 +1104,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 				this.Control["viConversationActionsDropDown"].Choose(2)
 
 			this.Control["viConversationInstructionsButton"].Enabled := true
+			this.Control["viConversationFilterButton"].Enabled := true
 			this.Control["viConversationEditActionsButton"].Enabled := (this.Control["viConversationActionsDropDown"].Value = 1)
 		}
 
@@ -1195,6 +1207,33 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			if instructions
 				this.setInstructions(type, instructions)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editFilter(type, booster, provider, title) {
+		local window := this.Window
+		local filter, fileName
+
+		window.Block()
+
+		try {
+			fileName := (kUserHomeDirectory . "Scripts\Booster\" . type . "." . booster . "." . provider . ".script")
+			filter := (FileExist(fileName) ? FileRead(fileName) : "")
+
+			filter := editFilter(this, title, filter, window)
+
+			if (filter != false) {
+				deleteFile(fileName)
+
+				if (filter != "") {
+					DirCreate(kUserHomeDirectory . "Scripts\Booster")
+
+					FileAppend(filter, fileName, "UTF-8")
+				}
+			}
 		}
 		finally {
 			window.Unblock()
@@ -2816,6 +2855,119 @@ editInstructions(editorOrCommand, type := false, title := false, originalInstruc
 		}
 		finally {
 			instructionsGui.Destroy()
+		}
+	}
+}
+
+editFilter(editorOrCommand, title := false, originalFilter := "", owner := false) {
+	local valid, errorMessage, messages, fileName
+
+	static editor, filter, filterGui, scriptEditor, result
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else {
+		editor := editorOrCommand
+		result := false
+
+		filterGui := Window({Descriptor: "Booster Editor.Filter", Resizeable: true, Options: "0x400000"}, title)
+
+		scriptEditor := filterGui.Add("CodeEditor", "x8 w462 h200 DefaultOpt SystemTheme Border Disabled W:Grow H:Grow")
+
+		scriptEditor.CaseSense := true
+
+		scriptEditor.SetKeywords("_VERSION assert collectgarbage dofile error gcinfo loadfile loadstring print rawget rawset require tonumber tostring type unpack"
+									, "_ALERT _ERRORMESSAGE _INPUT _PROMPT _OUTPUT _STDERR _STDIN _STDOUT call dostring foreach foreachi getn globals newtype sort tinsert tremove"
+									, "and break do else elseif end false for function if in local nil not or repeat return then true until while"
+									, "abs acos asin atan atan2 ceil cos deg exp floor format frexp gsub ldexp log log10 max min mod rad random randomseed sin sqrt strbyte strchar strfind strlen strlower strrep strsub strupper tan"
+									, "openfile closefile readfrom writeto appendto remove rename flush seek tmpfile tmpname read write clock date difftime execute exit getenv setlocale time"
+									, "_G getfenv getmetatable ipairs loadlib next pairs pcall rawequal setfenv setmetatable xpcall string table math coroutine io os debug load module select"
+									, "string.byte string.char string.dump string.find string.len string.lower string.rep string.sub string.upper string.format string.gfind string.gsub table.concat table.foreach table.foreachi table.getn table.sort table.insert table.remove table.setn math.abs math.acos math.asin math.atan math.atan2 math.ceil math.cos math.deg math.exp math.floor math.frexp math.ldexp math.log math.log10 math.max math.min math.mod math.pi math.pow math.rad math.random math.randomseed math.sin math.sqrt math.tan string.gmatch string.match string.reverse table.maxn math.cosh math.fmod math.modf math.sinh math.tanh math.huge")
+
+		scriptEditor.Brace.Chars := "()[]{}"
+		scriptEditor.SyntaxEscapeChar := ""
+		scriptEditor.SyntaxCommentLine := "--"
+
+		scriptEditor.Tab.Width := 4
+
+		scriptEditor.Loading := true
+
+		try {
+			scriptEditor.Content[true] := originalFilter
+			scriptEditor.Editable := true
+			scriptEditor.Enabled := true
+		}
+		finally {
+			scriptEditor.Loading := false
+		}
+
+		filterGui.Add("Button", "x160 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editFilter.Bind(kOk))
+		filterGui.Add("Button", "x246 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editFilter.Bind(kCancel))
+
+		filterGui.Opt("+Owner" . owner.Hwnd)
+
+		filterGui.Show("AutoSize Center")
+
+		if getWindowPosition("Booster Editor.Filter", &x, &y)
+			filterGui.Show("x" . x . " y" . y)
+		else
+			filterGui.Show("AutoSize Center")
+
+		if getWindowSize("Booster Editor.Filter", &w, &h)
+			filterGui.Resize("Initialize", w, h)
+
+		try {
+			loop {
+				while !result
+					Sleep(100)
+
+				try {
+					if (result == kCancel)
+						return false
+					else if (result == kOk) {
+						fileName := temporaryFilename("Script", "script")
+						valid := true
+
+						try {
+							FileAppend(scriptEditor.Content[true], fileName)
+
+							if !scriptCheck(fileName, &messages){
+								errorMessage .= ("`n" . values2String("`n", collect(messages, (m) => (translate("Error: ") . m))*))
+
+								valid := false
+							}
+						}
+						catch Any as exception {
+							errorMessage .= ("`n" . translate("Error: ") . (isObject(exception) ? exception.Message : exception))
+
+							valid := false
+						}
+						finally {
+							deleteFile(fileName)
+						}
+
+						if valid
+							return scriptEditor.Content[true]
+						else {
+							if (StrLen(errorMessage) > 0)
+								errorMessage := ("`n" . errorMessage)
+
+							withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct...") . errorMessage, translate("Error"), 262160)
+
+							result := false
+
+							continue
+						}
+					}
+				}
+			}
+		}
+		finally {
+			scriptEditor.Destroy()
+
+			filterGui.Destroy()
 		}
 	}
 }

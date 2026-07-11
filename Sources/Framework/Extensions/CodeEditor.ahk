@@ -30,6 +30,7 @@
 
 class CodeEditor extends Gui.Custom {
     iEditable := true
+    iContent := ""
 
     static p := A_PtrSize
     static u := StrLen(Chr(0xFFFF))
@@ -256,6 +257,9 @@ class CodeEditor extends Gui.Custom {
         ctl := window.Add("Custom", "ClassScintilla " . newOptions)
         ctl.Base := CodeEditor.Prototype
         ctl.Zombie := false
+        ctl.Editable := true
+
+        ctl.iContent := ""
 
         buf := Buffer(8, 0)
 

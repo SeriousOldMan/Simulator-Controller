@@ -80,6 +80,16 @@ The following group let's you control a couple of aspects of the voice recogniti
 |      | Whisper.Compute Type  | False | This setting only applies, when using Whisper as the voice recognition method. If not *False*, it specifies the computation method used on the graphics card, when evaluating the neural network. Allowed values are *default*, *auto*, *int8*, *int8_float32*, *int8_float16*, *int8_bfloat16*, *int16*, *float16*, *bfloat16*, *float32*. You won't touch this setting in most cases, with the exception of RTX 50xx GPUs, where it must be set to "float16". |
 |      | Whisper.Options  | - | Using this setting, that only applies, when using Whisper as the voice recognition method, you can supply additional arguments to Whisper. An example would be "--cuda:1", which will select a specific GPU for running the voice recognition. |
 
+### LLM Settings
+
+Here you will find very special settings for the large language model runtime processing, especially for the optional LLm Runtime.
+
+| Category | Setting | Default | Description |
+|----------|---------|---------|-------------|
+| LLM Runtime | Context Size  | 32768    | This is the number of tokens in the context window of the model. Roughly the amount of data, the model has in its memory. |
+|             | Batch Size  | 128    | This is the number of tokens processed in parallel by the model. Larger numbers will generally increase the performance, but will also increase the amount of consumed memory, either on the GPU or by the CPU. |
+|             | Threads  | *number of cores* | This is the number of parallel threads used, when evaluating model layers on the CPU. If you cannot offload the model to the GPU and encounter stutter, reduce this number. |
+
 ### Script Settings
 
 The Script Engine used by the Assistants is based on the well-known *Lua* scripting language. *Lua* can use libraries or modules, which can be loaded on demand using the *require* statement. These libraries will be searched in those directories defined in a correspnding *Path* setting. If you have defined your own libraries, put them in a folder and point the settings below to this folder. However, if you are using the *Lua* package manager *luarocks* and use only libraries from there, this is not necessary, as long as the packages are located in "%appdata%\luarocks\share\lua\5.4" and "%appdata%\luarocks\lib\lua\5.4", which are the defaults for *luarocks*.

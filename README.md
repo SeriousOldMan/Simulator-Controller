@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.1.2.0-dev]() (Early build for 7.1.2. Changes: Tool calling for LLM Runtime.)
+[7.1.2.0-dev]() (Early build for 7.1.2. Changes: Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7120) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712) of this version and all the versions you might have skipped, before installing and using this version.
 

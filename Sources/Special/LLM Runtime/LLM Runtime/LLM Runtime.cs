@@ -10,6 +10,12 @@ using System.Text;
 using System.Text.Json;
 using static System.Collections.Specialized.BitVector32;
 
+//
+// For a good explanation of the approach of this solution, see:
+//
+// https://thirty25.blog/blog/2025/04/intro-to-local-models-with-dotnet/
+//
+
 namespace LLMRuntime;
 
 public class LLMExecutor
@@ -23,17 +29,23 @@ public class LLMExecutor
     LLamaWeights Model;
     InteractiveExecutor Executor;
 
-    public LLMExecutor(string modelPath, double temperature, int maxTokens, int gpuLayers)
+    public LLMExecutor(string modelPath, double temperature, int maxTokens, int gpuLayers,
+					   uint contextSize = 32768, uint batchSize = 128, int threads = -1)
     {
         ModelPath = modelPath;
         Temperature = temperature;
         MaxTokens = maxTokens;
         GPULayers = gpuLayers;
+		
+		if (threads < 0)
+			threads = Math.Max(1, Environment.ProcessorCount / 2);
 
         Parameters = new ModelParams(modelPath)
         {
-            ContextSize = 32768,
-            GpuLayerCount = gpuLayers 
+            ContextSize = contextSize,
+            GpuLayerCount = gpuLayers,
+			BatchSize = batchSize,
+			Threads = threads
         };
         Model = LLamaWeights.LoadFromFile(Parameters);
         Executor = new InteractiveExecutor(Model.CreateContext(Parameters));
@@ -266,7 +278,10 @@ static class Program
             LLMExecutor executor = new LLMExecutor(args[2],
                                                    (args.Length > 3) ? Double.Parse(args[3]) : 0.5,
                                                    (args.Length > 4) ? int.Parse(args[4]) : 2048,
-                                                   (args.Length > 5) ? int.Parse(args[5]) : 0);
+                                                   (args.Length > 5) ? int.Parse(args[5]) : 0,
+												   (args.Length > 6) ? uint.Parse(args[6]) : 32768,
+												   (args.Length > 7) ? uint.Parse(args[7]) : 256,
+												   (args.Length > 8) ? int.Parse(args[8]) : Math.Max(1, Environment.ProcessorCount / 2));
 
             while (true)
             {

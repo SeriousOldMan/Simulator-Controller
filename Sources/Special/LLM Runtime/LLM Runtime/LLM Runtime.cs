@@ -174,7 +174,7 @@ public class LLMExecutor
             tools: tools, strictTools: Strict);
     }
 
-    public ChatHistory BuildUserMessage(ToolPromptHistory promptHistory, ChatHistory chatHistory)
+    public ChatHistory BuildUserMessage(ToolPromptHistory promptHistory, ref ChatHistory chatHistory)
     {
         var userMessage = new ChatHistory();
 
@@ -197,6 +197,59 @@ public class LLMExecutor
         return userMessage;
     }
 
+    public async Task<string> CreateAnswer(ChatHistory chatHistory, string userInput)
+    {
+        var session = new ChatSession(Executor, chatHistory);
+        string result = "<|### Answer ###|>\n";
+
+        await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
+                                                     BuildInferenceParams()))
+            result += text;
+
+        return result;
+    }
+
+    public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools,
+                                           string userInput)
+    {
+        var userMessage = BuildUserMessage(BuildToolPromptHistory(tools, userInput), ref chatHistory);
+        var session = new ChatSession(Executor, chatHistory);
+        var outputBuilder = new StringBuilder();
+
+        await foreach (var text in session.ChatAsync(userMessage, BuildInferenceParams(BuildPipeline(tools))))
+            outputBuilder.Append(text);
+
+        var output = outputBuilder.ToString().Trim();
+        var result = LlamaSharpToolEnvelopeParser.Parse(output);
+
+        switch (result.Mode)
+        {
+            case LlamaSharpToolEnvelopeParser.ToolCallsMode:
+                string toolCalls = "<|### Tool Calls ###|>\n";
+                bool first = true;
+
+                foreach (var call in result.ToolCalls)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        toolCalls += "\n<|### --- ###|>\n";
+
+                    toolCalls += "{ \"function\": { \"name\": \"" + call.Name + "\", \"arguments\": " + call.ArgumentsJson + "} }";
+                }
+
+                return toolCalls;
+
+            case LlamaSharpToolEnvelopeParser.MessageMode:
+                return "<|### Answer ###|>\n" + result.Content;
+
+            case LlamaSharpToolEnvelopeParser.RefusalMode:
+                return "<|### Answer ###|>\n";
+        }
+
+        return "<|### Answer ###|>\n";
+    }
+
     public async Task<string> AskAsync(string prompt)
     {
         // Add chat histories as prompt to tell AI how to act.
@@ -205,57 +258,9 @@ public class LLMExecutor
         string userInput = ParsePrompt(chatHistory, prompt, out tools);
             
         if (tools.Count == 0)
-        {
-            ChatSession session = new(Executor, chatHistory);
-            IInferenceParams inferenceParams = BuildInferenceParams();
-            string result = "<|### Answer ###|>\n";
-
-            await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
-                result += text;
-
-            return result;
-        }
+            return await CreateAnswer(chatHistory, userInput);
         else
-        {
-            var inferenceParams = BuildInferenceParams(BuildPipeline(tools));
-            var userMessage = BuildUserMessage(BuildToolPromptHistory(tools, userInput), chatHistory);
-            ChatSession session = new(Executor, chatHistory);
-            
-            var output = new StringBuilder();
-
-            await foreach (var text in session.ChatAsync(userMessage, inferenceParams))
-                output.Append(text);
-
-            string rawOutput = output.ToString().Trim();
-            var result = LlamaSharpToolEnvelopeParser.Parse(rawOutput);
-
-            switch (result.Mode)
-            {
-                case LlamaSharpToolEnvelopeParser.ToolCallsMode:
-                    string toolCalls = "<|### Tool Calls ###|>\n";
-                    bool first = true;
-
-                    foreach (var call in result.ToolCalls)
-                    {
-                        if (first)
-                            first = false;
-                        else
-                            toolCalls += "\n<|### --- ###|>\n";
-
-                        toolCalls += "{ \"function\": { \"name\": \"" + call.Name + "\", \"arguments\": " + call.ArgumentsJson + "} }";
-                    }
-
-                    return toolCalls;
-
-                case LlamaSharpToolEnvelopeParser.MessageMode:
-                    return "<|### Answer ###|>\n" + result.Content;
-
-                case LlamaSharpToolEnvelopeParser.RefusalMode:
-                    return "<|### Answer ###|>\n";
-            }
-
-            return "<|### Answer ###|>\n";
-        }
+            return await CreateAnswer(chatHistory, tools, userInput);
     }
 
     public string Ask(string prompt)

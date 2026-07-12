@@ -8,11 +8,13 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
-//
 // For a good explanation of the approach of this solution, see:
 //
 // https://thirty25.blog/blog/2025/04/intro-to-local-models-with-dotnet/
 //
+// and
+//
+// https://github.com/Supprocom/LlamaSharp.ToolCallEnvelopes/blob/main/docs/getting-started.md
 
 namespace LLMRuntime;
 
@@ -22,7 +24,6 @@ public class LLMExecutor
     double Temperature;
     int MaxTokens;
     int GPULayers;
-	
 	bool Strict;
 
     ModelParams Parameters;

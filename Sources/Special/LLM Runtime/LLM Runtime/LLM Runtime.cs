@@ -145,7 +145,7 @@ public class LLMExecutor
             new ToolEnvelopeGrammarOptions
             {
                 ToolChoice = ToolChoice.Auto,
-                EnvelopeMode = ToolEnvelopeMode.StrictDeclared,
+                EnvelopeMode = ToolEnvelopeMode.Inferred,
                 ParallelToolCalls = true,
                 StrictTools = Strict
             });

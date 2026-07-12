@@ -140,7 +140,17 @@ public class LLMExecutor
 
     public string BuildGrammar(List<ToolDefinition> tools)
     {
-        return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: Strict);
+        return LlamaSharpToolGrammar.BuildCompleteEnvelopeGrammar(
+            tools,
+            new ToolEnvelopeGrammarOptions
+            {
+                ToolChoice = ToolChoice.Auto,
+                EnvelopeMode = ToolEnvelopeMode.StrictDeclared,
+                ParallelToolCalls = true,
+                StrictTools = Strict
+            });
+
+        // return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: Strict);
     }
 
     public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools)

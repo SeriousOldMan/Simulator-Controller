@@ -1104,7 +1104,7 @@ class LLMConnector {
 
 						options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space
 								  . this.GPULayers . A_Space . grammar . A_Space . contextSize . A_Space . batchSize
-								  . (threads != kUndefined) ? (A_Space . threads) : "")
+								  . ((threads != kUndefined) ? (A_Space . threads) : ""))
 
 						Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)
 

@@ -460,7 +460,7 @@ Example: For the *problem* mentioned above, when a model prepends a "New text: "
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Answer%20Processing.JPG)
 	
-For more information about the text manipulation capabilities of *Lua*, see [here](http://lua-users.org/wiki/StringLibraryTutorial).
+For more information about the text manipulation capabilities of *Lua*, see [here](http://lua-users.org/wiki/StringLibraryTutorial). Please be aware, that most of the text functions in the *Lua* standard library are case-sensitive in their manipulation.
 
 ## How it works
 

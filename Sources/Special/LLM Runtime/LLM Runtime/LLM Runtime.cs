@@ -1,14 +1,12 @@
 using LLama;
-using LLama.Batched;
+using LLama.Abstractions;
 using LLama.Common;
 using LLama.Sampling;
 using LlamaSharp.ToolCallEnvelopes;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using static System.Collections.Specialized.BitVector32;
 
 //
 // For a good explanation of the approach of this solution, see:
@@ -38,7 +36,6 @@ public class LLMExecutor
         Temperature = temperature;
         MaxTokens = maxTokens;
         GPULayers = gpuLayers;
-		
 		Strict = strict;
 		
 		if (threads < 0)
@@ -143,7 +140,62 @@ public class LLMExecutor
     public string BuildGrammar(List<ToolDefinition> tools)
     {
         return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: Strict);
-	}
+    }
+
+    public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools)
+    {
+        return new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
+    }
+
+    public IInferenceParams BuildInferenceParams()
+    {
+        return new InferenceParams()
+            {
+                MaxTokens = MaxTokens,
+                AntiPrompts = new List<string> { "User:" }
+            };
+    }
+
+    public IInferenceParams BuildInferenceParams(ISamplingPipeline pipeline)
+    {
+        return new InferenceParams()
+            {
+                MaxTokens = MaxTokens,
+                AntiPrompts = new List<string> { "User:" },
+                SamplingPipeline = pipeline
+            };
+    }
+
+    public ToolPromptHistory BuildToolPromptHistory(List<ToolDefinition> tools, string userInput)
+    {
+        return LlamaSharpToolPromptBuilder.Build(
+            systemPrompt: "You will use tools when they are needed.",
+            messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
+            tools: tools, strictTools: Strict);
+    }
+
+    public ChatHistory BuildUserMessage(ToolPromptHistory promptHistory, ChatHistory chatHistory)
+    {
+        var userMessage = new ChatHistory();
+
+        foreach (var message in promptHistory.Messages)
+        {
+            var role = message.Role switch
+            {
+                ToolPromptRole.System => AuthorRole.System,
+                ToolPromptRole.User => AuthorRole.User,
+                ToolPromptRole.Assistant => AuthorRole.Assistant,
+                _ => throw new InvalidOperationException($"Unsupported prompt role '{message.Role}'.")
+            };
+
+            if (role == AuthorRole.System)
+                chatHistory.AddMessage(role, message.Content);
+            else
+                userMessage.AddMessage(role, message.Content);
+        }
+
+        return userMessage;
+    }
 
     public async Task<string> AskAsync(string prompt)
     {
@@ -155,11 +207,7 @@ public class LLMExecutor
         if (tools.Count == 0)
         {
             ChatSession session = new(Executor, chatHistory);
-            InferenceParams inferenceParams = new InferenceParams()
-            {
-                MaxTokens = MaxTokens,
-                AntiPrompts = new List<string> { "User:" }
-            };
+            IInferenceParams inferenceParams = BuildInferenceParams();
             string result = "<|### Answer ###|>\n";
 
             await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput), inferenceParams))
@@ -169,37 +217,8 @@ public class LLMExecutor
         }
         else
         {
-            var pipeline = new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
-            InferenceParams inferenceParams =
-				new InferenceParams()
-					{
-						MaxTokens = MaxTokens,
-						AntiPrompts = new List<string> { "User:" },
-						SamplingPipeline = pipeline
-					};
-            var promptHistory =
-                LlamaSharpToolPromptBuilder.Build(
-                    systemPrompt: "You will use tools when they are needed.",
-                    messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
-                    tools: tools, strictTools: Strict);
-            var userMessage = new ChatHistory();
-
-            foreach (var message in promptHistory.Messages)
-            {
-                var role = message.Role switch
-                {
-                    ToolPromptRole.System => AuthorRole.System,
-                    ToolPromptRole.User => AuthorRole.User,
-                    ToolPromptRole.Assistant => AuthorRole.Assistant,
-                    _ => throw new InvalidOperationException($"Unsupported prompt role '{message.Role}'.")
-                };
-
-                if (role == AuthorRole.System)
-                    chatHistory.AddMessage(role, message.Content);
-                else
-                    userMessage.AddMessage(role, message.Content);
-            }
-
+            var inferenceParams = BuildInferenceParams(BuildPipeline(tools));
+            var userMessage = BuildUserMessage(BuildToolPromptHistory(tools, userInput), chatHistory);
             ChatSession session = new(Executor, chatHistory);
             
             var output = new StringBuilder();

@@ -89,7 +89,7 @@ Here you will find very special settings for the large language model runtime pr
 | LLM Runtime | Context Size  | 32768    | This is the number of tokens in the context window of the model. Roughly the amount of data, the model has in its memory. |
 |             | Batch Size  | 128    | This is the number of tokens processed in parallel by the model. Larger numbers will generally increase the performance, but will also increase the amount of consumed memory, either on the GPU or by the CPU. |
 |             | Threads  | *number of cores* | This is the number of parallel threads used, when evaluating model layers on the CPU. If you cannot offload the model to the GPU and encounter stutter, reduce this number. |
-|             | Output Format | Strict | This is a very special one. Values can be either *Strict* or *Relaxed*, which specify how the output of the model should be matched against any formal specifications. This is especially useful, when tools have been made available to the model. Larger models normally do not have a problem with strict output generation, whereas smaller models will fail here most of the time. In this case, a *Relaxed* value may help, but this may introduce unexpected results. |
+|             | Grammar | Strict | This is a very special one. Values can be either *Strict* or *Relaxed*, which specify how the output of the model should be matched against any formal specifications. This is especially useful, when tools have been made available to the model. Larger models normally do not have a problem with strict output generation, whereas smaller models will fail here most of the time. In this case, a *Relaxed* value may help, but this may introduce unexpected results. |
 
 ### Script Settings
 

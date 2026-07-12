@@ -24,6 +24,7 @@
 #### Fixes
 
   - Fixed loading of custom cars in "Setup Workbench", that were installed locally in the user data folder, but are otherwise unknown in Simulator Controller.
+  - Fixed some phrases in the Assistant grammars for Portuguese.
   
 #### Changes
 

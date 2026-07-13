@@ -30,6 +30,8 @@
 
   - Meta data for the latest cars of *Assetto Corsa EVO* has been included.
   - The local LLM Runtime now supports tool/function calling, which is required to run actions in the *Conversation* booster or even use it for the *Reasoning* booster. The LLM Runtime therefore now provides the same functionality as running a LLM in Ollama locally, but with a much better resource footprint and even some minor performance improvements. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#llm-runtime) for more information.
+	
+	A good model for successful experiments with local model execution incl. tool calling (actions) might be Qwen 3 with 27B parameters in minimum Q4_K_M quantization. Can be found on [Hugging Face](https://huggingface.co/bottlecapai/ThinkingCap-Qwen3.6-27B), for example. Requires a machine with 64 GB Ram and at least 16 GB VRam. Even then the model needs to be run partially on CPU.
   
     Important: The old version of the LLM Runtime is no longer compatible with the other components of Simulator Controller. Therefore, if you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712).
   - Changed the process priority of the local LLM Runtime to *BelowNormal*, so that it can be run alongside the running simulator on the CPU without causing stutter.

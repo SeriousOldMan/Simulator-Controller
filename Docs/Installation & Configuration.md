@@ -415,11 +415,9 @@ Beside the services of OpenAI itself, you can use any OpenAI compatible speech s
 
 ###### ElevenLabs
 
-ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs allows you to create new voices by using an AI to analyze the voice of any speaker. Voices can also be shared with the community, so the list of available voices is extremely huge, although many of them are of poor quality. Anyway, if you want the Race Spotter to talk with your favorite Crew Chief voice or with the voice of a well-known celebrity, give it a go. ElevenLabs can also be used for voice recognition. The recognition quality is extremely good, comparable to Whisper, and support free conversation.
+ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs allows you to create new voices by using an AI to analyze the voice of any speaker. Voices can also be shared with the community, so the list of available voices is extremely huge, although many of them are of poor quality. Anyway, if you want the Race Spotter to talk with your favorite Crew Chief voice or with the voice of a well-known celebrity, give it a go. ElevenLabs can also be used for voice recognition. The recognition quality is extremely good, comparable to Whisper, and free conversation is supported.
 
-You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with Eleven labs in the browser. Using the API, however, will require a paid subscription.
-
-Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
+You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with ElevenLabs in the browser. Using the API, however, will require a paid subscription.
 
 ###### Yandex
 
@@ -431,13 +429,13 @@ For speech synthesis, you must supply an API key and choose a voice (do not chan
 
 For recognition, do not change any of the default values for the *Service URL* as well and also not the *Model*, only supply the API key. A *service* account is also required here.
 
-Important: Only audio input not longer than 30 seconds will be processed reliably, so keep your commands and questions short.
+Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
 
 ###### Notes
 
 1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
 
-2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings).
+2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings).
 
 3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
 
@@ -471,14 +469,14 @@ If you are using English to interact with all Assistants, you can use one of the
 
 IMPORTANT:
 
-- If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings) "Compute Type" and set it to *float16*.
+- If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings) "Compute Type" and set it to *float16*.
 
 - When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
  
 ###### Notes
 
 1. You will use the same Azure or Google subscription and the same cloud resource for both the speech synthetization and speech recognition. If Azure or Google has been selected for both, only one set of fields for the endpoint and the API key will appear.
-2. Regardles of what you have configured as listener for each Assistant (see below), a separate listener with the chosen language from this configuration will be used for the activation commands, with or without *Push-To-Talk*. Either the Desktop recognition engine will be used here or you can configure the Server recognition engine (when you have installed the required libraries) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings). This applies always, also when you are not using cloud based recognition services.
+2. Regardles of what you have configured as listener for each Assistant (see below), a separate listener with the chosen language from this configuration will be used for the activation commands, with or without *Push-To-Talk*. Either the Desktop recognition engine will be used here or you can configure the Server recognition engine (when you have installed the required libraries) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This applies always, also when you are not using cloud based recognition services.
 3. As mentioned above, using the cloud-based recognition engines or Whisper without *Push-To-Talk* is not a very good idea. It is not only because of the costs but even more, because the recognition will try to react to each and every thing you say. You will get a lot of "Sorry, can you repeat that, please", while you try to talk to your other Assistants while one is listening using the cloud-based recognition engine.
 
 Last, but not least, if you have installed [SoX](http://sox.sourceforge.net/), it will be used to apply audio post processing to the spoken voice to achieve a sound like a typical team radio. Really immersive stuff, you won't miss that. When you have chosen the location of the *SoX* application folder, you can click on the small button with the gear icon. This opens a small dialog, where you can specify the strength of the different sound effects. The default settings will give you the typical car radio sound with some background noises, crackles and a little bit of distortion.

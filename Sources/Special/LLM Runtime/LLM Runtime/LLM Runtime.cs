@@ -145,7 +145,7 @@ public class LLMExecutor
             new ToolEnvelopeGrammarOptions
             {
                 ToolChoice = ToolChoice.Auto,
-                EnvelopeMode = ToolEnvelopeMode.Inferred,
+                EnvelopeMode = ToolEnvelopeMode.StrictDeclared,
                 ParallelToolCalls = true,
                 StrictTools = Strict
             });
@@ -162,8 +162,7 @@ public class LLMExecutor
     {
         return new InferenceParams()
             {
-                MaxTokens = MaxTokens,
-                AntiPrompts = new List<string> { "User:" }
+                MaxTokens = MaxTokens
             };
     }
 
@@ -172,7 +171,6 @@ public class LLMExecutor
         return new InferenceParams()
             {
                 MaxTokens = MaxTokens,
-                AntiPrompts = new List<string> { "User:" },
                 SamplingPipeline = pipeline
             };
     }

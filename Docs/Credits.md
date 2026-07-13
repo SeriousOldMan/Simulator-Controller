@@ -5,7 +5,7 @@ Therefore, I would like to thank everyone who made this project possible and I w
 ### Languages and Libraries
 
 - All contributors of the *AutoHotkey* programming language, most and foremost Steve Gray (@Lexikos). Without this marveleous language many features of Simulator Controller would have been much more effort.
-- *LlamaSharp* is an outstanding library to work with large language models on your local computer. It is the foundation of the integrated LLM runtime of Simulator Controller.
+- *LlamaSharp* is an outstanding library to work with large language models on your local computer. It is the foundation of the integrated LLM runtime of Simulator Controller. And at this point, I want to thank @mkn8rn for his great addition to *LlamaSharp*, which integrates tool/function calling support to any model in a very flexible and customizeable approach. 
 - I want to thank @TheIronWolfModding for the incredible shared memory API plugin for *rFactor 2* and *Le Mans Ultimate*.
 - Another valuable starting point for me was the work of @evilC for speech generation and recognition.
 

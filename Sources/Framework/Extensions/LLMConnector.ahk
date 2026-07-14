@@ -1051,11 +1051,29 @@ class LLMConnector {
 
 	class LLMRuntimeConnector extends LLMConnector {
 		iLLMRuntime := false
+
+		iExitCallback := false
+
+		iPromptFile := false
+		iAnswerFile := false
+
 		iGPULayers := 0
 
 		LLMRuntime {
 			Get {
 				return this.iLLMRuntime
+			}
+		}
+
+		PromptFile {
+			Get {
+				return this.iPromptFile
+			}
+		}
+
+		AnswerFile {
+			Get {
+				return this.iAnswerFile
 			}
 		}
 
@@ -1072,9 +1090,10 @@ class LLMConnector {
 		__New(manager, model, gpuLayers := 0) {
 			this.iGPULayers := gpuLayers
 
-			super.__New(manager, model)
+			this.iPromptFile := temporaryFileName("LLMRuntime", "prompt")
+			this.iAnswerFile := temporaryFileName("LLMRuntime", "answer")
 
-			OnExit((*) => this.Disconnect())
+			super.__New(manager, model)
 		}
 
 		Connect(force := false) {
@@ -1091,49 +1110,50 @@ class LLMConnector {
 			if (!this.LLMRuntime || force) {
 				this.Disconnect(force)
 
-				llmRuntime := ProcessExist("LLM Runtime.exe")
+				exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
 
-				if llmRuntime
-					this.iLLMRuntime := llmRuntime
-				else {
-					exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
+				if FileExist(exePath) {
+					deleteFile(this.PromptFile)
+					deleteFile(this.AnswerFile)
 
-					if FileExist(exePath) {
-						deleteFile(kTempDirectory . "LLMRuntime.cmd")
-						deleteFile(kTempDirectory . "LLMRuntime.out")
+					options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space
+							  . this.GPULayers . A_Space . grammar . A_Space . contextSize . A_Space . batchSize
+							  . ((threads != kUndefined) ? (A_Space . threads) : ""))
 
-						options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space
-								  . this.GPULayers . A_Space . grammar . A_Space . contextSize . A_Space . batchSize
-								  . ((threads != kUndefined) ? (A_Space . threads) : ""))
+					Run("`"" . exePath . "`" `"" . this.PromptFile . "`" `"" . this.AnswerFile . "`" " . options
+					  , kProgramsDirectory . "LLM Runtime", "Hide", &llmRuntime)
 
-						Run("`"" . exePath . "`" `"" . kTempDirectory . "LLMRuntime.cmd`" `"" . kTempDirectory . "LLMRuntime.out`" " . options, kBinariesDirectory, "Hide", &llmRuntime)
+					if llmRuntime {
+						Sleep(1000)
 
-						if llmRuntime {
-							Sleep(1000)
+						if ProcessExist(llmRuntime) {
+							this.iLLMRuntime := llmRuntime
 
-							if ProcessExist(llmRuntime) {
-								this.iLLMRuntime := llmRuntime
+							if !this.iExitCallback {
+								this.iExitCallback := ObjBindMethod(this, "Disconnect", true)
 
-								return true
+								OnExit(this.iExitCallback)
 							}
+
+							return true
 						}
 					}
-
-					return false
 				}
+
+				return false
 			}
 
 			return true
 		}
 
 		Disconnect(force := false) {
-			if ((this.LLMRuntime || force) && ProcessExist("LLM Runtime.exe")) {
+			if this.LLMRuntime {
 				loop 5 {
 					try {
-						deleteFile(kTempDirectory . "LLMRuntime.cmd")
+						deleteFile(this.PromptFile)
 
 						try
-							FileAppend("Exit`n", kTempDirectory . "LLMRuntime.cmd")
+							FileAppend("Exit`n", this.PromptFile)
 					}
 					catch Any as exception {
 						if (A_Index = 5)
@@ -1142,9 +1162,12 @@ class LLMConnector {
 
 					Sleep(250)
 
-					if !ProcessExist("LLM Runtime.exe")
+					if !ProcessExist(this.LLMRuntime)
 						break
 				}
+
+				if ProcessExist(this.LLMRuntime)
+					ProcessClose(this.LLMRuntime)
 
 				this.iLLMRuntime := false
 			}
@@ -1266,17 +1289,15 @@ class LLMConnector {
 						FileAppend(prompt, kTempDirectory . "LLM.request")
 				}
 
-				; prompt := StrReplace(StrReplace(prompt, "`"", "\`""), "`n", "\n")
-
-				while !deleteFile(kTempDirectory . "LLMRuntime.cmd")
+				while !deleteFile(this.PromptFile)
 					Sleep(50)
 
-				while !deleteFile(kTempDirectory . "LLMRuntime.out")
+				while !deleteFile(this.AnswerFile)
 					Sleep(50)
 
 				loop 5
 					try {
-						FileAppend(prompt, kTempDirectory . "LLMRuntime.cmd")
+						FileAppend(prompt, this.PromptFile)
 
 						break
 					}
@@ -1289,7 +1310,7 @@ class LLMConnector {
 
 				loop (isDebug() ? 240 : 120)
 					try
-						if FileExist(kTempDirectory . "LLMRuntime.out") {
+						if FileExist(this.AnswerFile) {
 							Sleep(500)
 
 							break
@@ -1306,13 +1327,13 @@ class LLMConnector {
 			}
 
 			try {
-				if !FileExist(kTempDirectory . "LLMRuntime.out") {
+				if !FileExist(this.AnswerFile) {
 					this.Manager.connectorState("Error", "Answer")
 
 					return false
 				}
 
-				answer := Trim(FileRead(kTempDirectory . "LLMRuntime.out", "`n"))
+				answer := Trim(FileRead(this.AnswerFile, "`n"))
 
 				while ((StrLen(answer) > 0) && (SubStr(answer, 1, 1) = "`n"))
 					answer := Trim(SubStr(answer, 2))
@@ -1328,7 +1349,7 @@ class LLMConnector {
 						toolCall := this.ProcessToolCalls(tools, answer)
 
 					if !isDebug()
-						deleteFile(kTempDirectory . "LLMRuntime.out")
+						deleteFile(this.AnswerFile)
 
 					if toolCall
 						return true

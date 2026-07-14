@@ -127,12 +127,11 @@ public class LLMExecutor
         foreach (string toolDef in toolDefs)
         {
             var function = JsonDocument.Parse(toolDef).RootElement.GetProperty("function");
-            var tool = new ToolDefinition(function.GetProperty("name").GetString() ?? throw new InvalidOperationException("Tool name is required."),
-                                          function.TryGetProperty("description", out var description) ? description.GetString() ?? string.Empty
-                                                                                                      : string.Empty,
-                                          function.GetProperty("parameters").Clone());
-
-            tools.Add(tool);
+            
+            tools.Add(new ToolDefinition(function.GetProperty("name").GetString() ?? throw new InvalidOperationException("Tool name is required."),
+										 function.TryGetProperty("description", out var description) ? description.GetString() ?? string.Empty
+																									 : string.Empty,
+										 function.GetProperty("parameters").Clone()));
         }
 
         return tools;
@@ -149,8 +148,6 @@ public class LLMExecutor
                 ParallelToolCalls = true,
                 StrictTools = Strict
             });
-
-        // return LlamaSharpToolGrammar.Build(ToolChoice.Auto, parallelCalls: true, tools: tools, strict: Strict);
     }
 
     public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools)
@@ -160,19 +157,12 @@ public class LLMExecutor
 
     public IInferenceParams BuildInferenceParams()
     {
-        return new InferenceParams()
-            {
-                MaxTokens = MaxTokens
-            };
+        return new InferenceParams() { MaxTokens = MaxTokens };
     }
 
     public IInferenceParams BuildInferenceParams(ISamplingPipeline pipeline)
     {
-        return new InferenceParams()
-            {
-                MaxTokens = MaxTokens,
-                SamplingPipeline = pipeline
-            };
+        return new InferenceParams() { MaxTokens = MaxTokens, SamplingPipeline = pipeline };
     }
 
     public ToolPromptHistory BuildToolPromptHistory(List<ToolDefinition> tools, string userInput)
@@ -209,13 +199,15 @@ public class LLMExecutor
     public async Task<string> CreateAnswer(ChatHistory chatHistory, string userInput)
     {
         var session = new ChatSession(Executor, chatHistory);
-        string result = "<|### Answer ###|>\n";
+        var outputBuilder = new StringBuilder();
 
+		outputBuilder.Append("<|### Answer ###|>\n");
+		
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
                                                      BuildInferenceParams()))
-            result += text;
+            outputBuilder.Append(text);
 
-        return result;
+        return outputBuilder.ToString();
     }
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools,
@@ -228,35 +220,35 @@ public class LLMExecutor
         await foreach (var text in session.ChatAsync(userMessage, BuildInferenceParams(BuildPipeline(tools))))
             outputBuilder.Append(text);
 
-        var output = outputBuilder.ToString().Trim();
-        var result = LlamaSharpToolEnvelopeParser.Parse(output);
+        var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim());
 
         switch (result.Mode)
         {
             case LlamaSharpToolEnvelopeParser.ToolCallsMode:
-                string toolCalls = "<|### Tool Calls ###|>\n";
+				var answerBuilder = new StringBuilder();
                 bool first = true;
+				
+				answerBuilder.Append("<|### Tool Calls ###|>\n");
 
                 foreach (var call in result.ToolCalls)
                 {
                     if (first)
                         first = false;
                     else
-                        toolCalls += "\n<|### --- ###|>\n";
+						answerBuilder.Append("\n<|### --- ###|>\n");
 
-                    toolCalls += "{ \"function\": { \"name\": \"" + call.Name + "\", \"arguments\": " + call.ArgumentsJson + "} }";
+                    answerBuilder.Append("{ \"function\": { \"name\": \"" + call.Name +
+													   "\", \"arguments\": " + call.ArgumentsJson + "} }");
                 }
 
-                return toolCalls;
+                return answerBuilder.ToString();
 
             case LlamaSharpToolEnvelopeParser.MessageMode:
                 return "<|### Answer ###|>\n" + result.Content;
 
-            case LlamaSharpToolEnvelopeParser.RefusalMode:
+            default:
                 return "<|### Answer ###|>\n";
         }
-
-        return "<|### Answer ###|>\n";
     }
 
     public async Task<string> AskAsync(string prompt)

@@ -165,35 +165,31 @@ public class LLMExecutor
         return new InferenceParams() { MaxTokens = MaxTokens, SamplingPipeline = pipeline };
     }
 
-    public ToolPromptHistory BuildToolPromptHistory(List<ToolDefinition> tools, string userInput)
+    public ToolPromptHistory BuildToolInstructions(List<ToolDefinition> tools)
     {
         return LlamaSharpToolPromptBuilder.Build(
             systemPrompt: "You will use tools when they are needed.",
-            messages: new List<ToolAwareMessage> { ToolAwareMessage.User(userInput) },
+            messages: new List<ToolAwareMessage>(),
             tools: tools, strictTools: Strict);
     }
 
-    public ChatHistory BuildUserMessage(ToolPromptHistory promptHistory, ref ChatHistory chatHistory)
+    public ChatHistory BuildChatHistory(ChatHistory chatHistory, ToolPromptHistory toolsInstructions)
     {
-        var userMessage = new ChatHistory();
+        ChatHistory combinedChatHistory = new ChatHistory();
 
-        foreach (var message in promptHistory.Messages)
-        {
-            var role = message.Role switch
-            {
-                ToolPromptRole.System => AuthorRole.System,
-                ToolPromptRole.User => AuthorRole.User,
-                ToolPromptRole.Assistant => AuthorRole.Assistant,
-                _ => throw new InvalidOperationException($"Unsupported prompt role '{message.Role}'.")
-            };
+        foreach (var message in chatHistory.Messages)
+            if (message.AuthorRole == AuthorRole.System)
+                combinedChatHistory.AddMessage(AuthorRole.System, message.Content);
 
-            if (role == AuthorRole.System)
-                chatHistory.AddMessage(role, message.Content);
-            else
-                userMessage.AddMessage(role, message.Content);
-        }
+        foreach (var message in toolsInstructions.Messages)
+            if (message.Role == ToolPromptRole.System)
+                combinedChatHistory.AddMessage(AuthorRole.System, message.Content);
 
-        return userMessage;
+        foreach (var message in chatHistory.Messages)
+            if (message.AuthorRole != AuthorRole.System)
+                combinedChatHistory.AddMessage(message.AuthorRole, message.Content);
+
+        return combinedChatHistory;
     }
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, string userInput)
@@ -202,7 +198,7 @@ public class LLMExecutor
         var outputBuilder = new StringBuilder();
 
 		outputBuilder.Append("<|### Answer ###|>\n");
-		
+
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
                                                      BuildInferenceParams()))
             outputBuilder.Append(text);
@@ -210,15 +206,14 @@ public class LLMExecutor
         return outputBuilder.ToString();
     }
 
-    public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools,
-                                           string userInput)
+    public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools, string userInput)
     {
-        var userMessage = BuildUserMessage(BuildToolPromptHistory(tools, userInput), ref chatHistory);
-        var session = new ChatSession(Executor, chatHistory);
+        var session = new ChatSession(Executor, BuildChatHistory(chatHistory, BuildToolInstructions(tools)));
         var outputBuilder = new StringBuilder();
         int nlCount = 0;
 
-        await foreach (var text in session.ChatAsync(userMessage, BuildInferenceParams(BuildPipeline(tools))))
+        await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
+                                                     BuildInferenceParams(BuildPipeline(tools))))
         {
             if ((text == Environment.NewLine) || (text == "\n"))
             {

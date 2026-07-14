@@ -216,9 +216,20 @@ public class LLMExecutor
         var userMessage = BuildUserMessage(BuildToolPromptHistory(tools, userInput), ref chatHistory);
         var session = new ChatSession(Executor, chatHistory);
         var outputBuilder = new StringBuilder();
+        int nlCount = 0;
 
         await foreach (var text in session.ChatAsync(userMessage, BuildInferenceParams(BuildPipeline(tools))))
+        {
+            if ((text == Environment.NewLine) || (text == "\n"))
+            {
+                if (nlCount++ > 5)
+                    break;
+            }
+            else
+                nlCount = 0;
+
             outputBuilder.Append(text);
+        }
 
         var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim());
 

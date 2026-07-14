@@ -196,14 +196,26 @@ public class LLMExecutor
     {
         var session = new ChatSession(Executor, chatHistory);
         var outputBuilder = new StringBuilder();
+        int nlCount = 0;
 
-		outputBuilder.Append("<|### Answer ###|>\n");
+        outputBuilder.Append("<|### Answer ###|>\n");
 
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
                                                      BuildInferenceParams()))
-            outputBuilder.Append(text);
+        {
+            if ((text == Environment.NewLine) || (text == "\n"))
+            {
+                if (nlCount++ > 5)
+                    break;
+            }
+            else
+                nlCount = 0;
 
-        return outputBuilder.ToString();
+            Console.WriteLine(text);
+            outputBuilder.Append(text);
+        }
+
+        return outputBuilder.ToString().Trim();
     }
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools, string userInput)

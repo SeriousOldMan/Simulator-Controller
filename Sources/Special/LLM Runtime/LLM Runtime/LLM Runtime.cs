@@ -150,19 +150,35 @@ public class LLMExecutor
             });
     }
 
+    public ISamplingPipeline BuildPipeline()
+    {
+        return new DefaultSamplingPipeline
+        {
+            Temperature = (float)Temperature
+        };
+    }
+
     public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools)
     {
-        return new DefaultSamplingPipeline { Grammar = new Grammar(BuildGrammar(tools), "root") };
+        return new DefaultSamplingPipeline
+        {
+            Grammar = new Grammar(BuildGrammar(tools), "root"),
+            Temperature = (float)Temperature
+        };
     }
 
     public IInferenceParams BuildInferenceParams()
     {
-        return new InferenceParams() { MaxTokens = MaxTokens };
+        return new InferenceParams() {
+            MaxTokens = MaxTokens
+        };
     }
 
     public IInferenceParams BuildInferenceParams(ISamplingPipeline pipeline)
     {
-        return new InferenceParams() { MaxTokens = MaxTokens, SamplingPipeline = pipeline };
+        return new InferenceParams() {
+            MaxTokens = MaxTokens,
+            SamplingPipeline = pipeline };
     }
 
     public ToolPromptHistory BuildToolInstructions(List<ToolDefinition> tools)
@@ -201,7 +217,7 @@ public class LLMExecutor
         outputBuilder.Append("<|### Answer ###|>\n");
 
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
-                                                     BuildInferenceParams()))
+                                                     BuildInferenceParams(BuildPipeline())))
         {
             if ((text == Environment.NewLine) || (text == "\n"))
             {

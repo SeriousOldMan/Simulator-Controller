@@ -157,12 +157,19 @@ public class LLMExecutor
 
     public IInferenceParams BuildInferenceParams()
     {
-        return new InferenceParams() { MaxTokens = MaxTokens };
+        return new InferenceParams() {
+            MaxTokens = MaxTokens,
+            AntiPrompts = new List<string> { "User:" }
+        };
     }
 
     public IInferenceParams BuildInferenceParams(ISamplingPipeline pipeline)
     {
-        return new InferenceParams() { MaxTokens = MaxTokens, SamplingPipeline = pipeline };
+        return new InferenceParams() {
+            MaxTokens = MaxTokens,
+            AntiPrompts = new List<string> { "User:" },
+            SamplingPipeline = pipeline
+        };
     }
 
     public ToolPromptHistory BuildToolInstructions(List<ToolDefinition> tools)
@@ -194,7 +201,7 @@ public class LLMExecutor
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, string userInput)
     {
-        var session = new ChatSession(Executor, chatHistory);
+        var session = new ChatSession(Executor);
         var outputBuilder = new StringBuilder();
         int nlCount = 0;
 
@@ -211,11 +218,11 @@ public class LLMExecutor
             else
                 nlCount = 0;
 
-            Console.WriteLine(text);
+            // Console.WriteLine(text);
             outputBuilder.Append(text);
         }
 
-        return outputBuilder.ToString().Trim();
+        return outputBuilder.ToString().Trim().Replace("User:", "");
     }
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools, string userInput)
@@ -235,10 +242,11 @@ public class LLMExecutor
             else
                 nlCount = 0;
 
+            // Console.WriteLine(text);
             outputBuilder.Append(text);
         }
 
-        var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim());
+        var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim().Replace("User:", ""));
 
         switch (result.Mode)
         {
@@ -328,7 +336,7 @@ static class Program
                                                    (args.Length > 5) ? int.Parse(args[5]) : 0,
 												   ((args.Length > 6) ? args[6] : "Strict") == "Strict",
 												   (args.Length > 7) ? uint.Parse(args[7]) : 32768,
-												   (args.Length > 8) ? uint.Parse(args[8]) : 256,
+												   (args.Length > 8) ? uint.Parse(args[8]) : 128,
 												   (args.Length > 9) ? int.Parse(args[9]) : Math.Max(1, Environment.ProcessorCount / 2));
 
             while (true)

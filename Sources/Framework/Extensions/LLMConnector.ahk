@@ -1115,8 +1115,7 @@ class LLMConnector {
 								  . grammar . A_Space . contextSize . A_Space . batchSize
 								  . ((threads != kUndefined) ? (A_Space . threads) : ""))
 
-						Run("`"" . exePath . "`" " . options
-						  , kProgramsDirectory . "LLM Runtime", "Hide", &pid)
+						Run("`"" . exePath . "`" " . options, kProgramsDirectory . "LLM Runtime", "Hide", &pid)
 
 						if pid {
 							Sleep(1000)
@@ -1141,8 +1140,10 @@ class LLMConnector {
 				return true
 			}
 
-			Disconnect(force := false) {
-				MsgBox this.PID
+			Disconnect(force := false, arguments*) {
+				if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+					return false
+
 				if this.PID {
 					loop 5 {
 						try {
@@ -1162,11 +1163,8 @@ class LLMConnector {
 							break
 					}
 
-					if ProcessExist(this.PID) {
-						MsgBox("Kill")
+					if ProcessExist(this.PID)
 						ProcessClose(this.PID)
-						MsgBox("Killed")
-					}
 
 					this.iPID := false
 				}
@@ -1212,10 +1210,7 @@ class LLMConnector {
 		}
 
 		Disconnect(force := false) {
-			if this.Runtime
-				return this.Runtime.Disconnect(force)
-			else
-				return false
+			return (this.Runtime ? this.Runtime.Disconnect(force) : false)
 		}
 
 		CreatePrompt(instructions, tools, question) {

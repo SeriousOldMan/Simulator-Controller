@@ -1,8 +1,8 @@
 [Development]
-Version=7.1.2.0-dev
+Version=7.1.2.0-beta
 Target=7.1.2.0-release
-Date=07/12/2026
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ulzdhJJ9/Releases/Simulator%20Controller%207.1.2.0-dev.zip
+Date=07/15/2026
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/zUm5KRP1/Releases/Simulator%20Controller%207.1.2.0-beta.zip
 Changes=Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster, Fixed loading of custom cars in "Setup Workbench"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
@@ -30,5 +30,5 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=7.1.2.0-dev
+Development=7.1.2.0-beta
 Release=7.1.1.0-release

@@ -21,7 +21,6 @@ namespace LLMRuntime;
 public class LLMExecutor
 {
     string ModelPath;
-    double Temperature;
     int MaxTokens;
     int GPULayers;
 	bool Strict;
@@ -30,11 +29,17 @@ public class LLMExecutor
     LLamaWeights Model;
     InteractiveExecutor Executor;
 
-    public LLMExecutor(string modelPath, double temperature, int maxTokens, int gpuLayers, bool strict,
+	public class Answer {
+		public string Text;
+		public string File;
+		
+		public Answer() { }
+	}
+	
+    public LLMExecutor(string modelPath, int maxTokens, int gpuLayers, bool strict,
 					   uint contextSize = 32768, uint batchSize = 128, int threads = -1)
     {
         ModelPath = modelPath;
-        Temperature = temperature;
         MaxTokens = maxTokens;
         GPULayers = gpuLayers;
 		Strict = strict;
@@ -53,7 +58,8 @@ public class LLMExecutor
         Executor = new InteractiveExecutor(Model.CreateContext(Parameters));
     }
 
-    public string ParsePrompt(ChatHistory chatHistory, string prompt, out List<ToolDefinition> tools)
+    public string ParsePrompt(string prompt, ChatHistory chatHistory,
+							  out List<ToolDefinition> tools, out float temperature, out string answerFile)
     {
         List<string> toolDefs = new List<string>();
         string userMessage = "";
@@ -80,12 +86,26 @@ public class LLMExecutor
         AuthorRole role = AuthorRole.Unknown;
         string message = "";
         bool hasTools = false;
+		bool inOptions = false;
+		
+		temperature = 0.5f;
+		answerFile = "";
 
         foreach (string line in prompt.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None))
         {
             string input = line.Trim();
 			
-			if (hasTools && input.StartsWith("<|### --- ###|>"))
+			if (inOptions) {
+				if (input.Contains("Temperature"))
+					temperature = float.Parse(input.Replace("Temperature=", ""));
+				else if (input.Contains("Output"))
+					answerFile = input.Replace("Output=", "");
+				
+				inOptions = false;
+			}
+			else if (input.StartsWith("<|### Options ###|>"))
+				inOptions = true;
+			else if (hasTools && input.StartsWith("<|### --- ###|>"))
 			{
 				addTool(message);
 				
@@ -93,6 +113,8 @@ public class LLMExecutor
 			}
             else if (input.StartsWith("<|###"))
             {
+				inOptions = false;
+				
                 addMessage(role, message);
 
                 message = "";
@@ -150,20 +172,20 @@ public class LLMExecutor
             });
     }
 
-    public ISamplingPipeline BuildPipeline()
+    public ISamplingPipeline BuildPipeline(float temperature)
     {
         return new DefaultSamplingPipeline
         {
-            Temperature = (float)Temperature
+            Temperature = temperature
         };
     }
 
-    public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools)
+    public ISamplingPipeline BuildPipeline(List<ToolDefinition> tools, float temperature)
     {
         return new DefaultSamplingPipeline
         {
             Grammar = new Grammar(BuildGrammar(tools), "root"),
-            Temperature = (float)Temperature
+            Temperature = temperature
         };
     }
 
@@ -208,7 +230,7 @@ public class LLMExecutor
         return combinedChatHistory;
     }
 
-    public async Task<string> CreateAnswer(ChatHistory chatHistory, string userInput)
+    public async Task<string> CreateAnswer(ChatHistory chatHistory, float temperature, string userInput)
     {
         var session = new ChatSession(Executor, chatHistory);
         var outputBuilder = new StringBuilder();
@@ -217,7 +239,7 @@ public class LLMExecutor
         outputBuilder.Append("<|### Answer ###|>\n");
 
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
-                                                     BuildInferenceParams(BuildPipeline())))
+                                                     BuildInferenceParams(BuildPipeline(temperature))))
         {
             if ((text == Environment.NewLine) || (text == "\n"))
             {
@@ -227,21 +249,21 @@ public class LLMExecutor
             else
                 nlCount = 0;
 
-            Console.WriteLine(text);
             outputBuilder.Append(text);
         }
 
         return outputBuilder.ToString().Trim();
     }
 
-    public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools, string userInput)
+    public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools,
+										   float temperature, string userInput)
     {
         var session = new ChatSession(Executor, BuildChatHistory(chatHistory, BuildToolInstructions(tools)));
         var outputBuilder = new StringBuilder();
         int nlCount = 0;
 
         await foreach (var text in session.ChatAsync(new ChatHistory.Message(AuthorRole.User, userInput),
-                                                     BuildInferenceParams(BuildPipeline(tools))))
+                                                     BuildInferenceParams(BuildPipeline(tools, temperature))))
         {
             if ((text == Environment.NewLine) || (text == "\n"))
             {
@@ -285,22 +307,26 @@ public class LLMExecutor
         }
     }
 
-    public async Task<string> AskAsync(string prompt)
+    public async Task<Answer> AskAsync(string prompt)
     {
-        // Add chat histories as prompt to tell AI how to act.
         var chatHistory = new ChatHistory();
         List<ToolDefinition> tools;
-        string userInput = ParsePrompt(chatHistory, prompt, out tools);
-            
-        if (tools.Count == 0)
-            return await CreateAnswer(chatHistory, userInput);
-        else
-            return await CreateAnswer(chatHistory, tools, userInput);
+		float temperature;
+		string answerFile;
+        string userInput = ParsePrompt(prompt, chatHistory, out tools, out temperature, out answerFile);
+        string answer = ((tools.Count == 0) ? CreateAnswer(chatHistory, temperature, userInput).Result
+											: CreateAnswer(chatHistory, tools, temperature, userInput).Result);
+		
+        return new Answer { Text = answer, File = answerFile };
     }
 
-    public string Ask(string prompt)
+    public string Ask(string prompt, out string answerFile)
     {
-        return AskAsync(prompt).Result;
+		Answer answer = AskAsync(prompt).Result;
+		
+		answerFile = answer.File;
+		
+        return answer.Text;
     }
 }
 
@@ -338,14 +364,13 @@ static class Program
 
 		try
         {
-            LLMExecutor executor = new LLMExecutor(args[2],
-                                                   (args.Length > 3) ? Double.Parse(args[3]) : 0.5,
-                                                   (args.Length > 4) ? int.Parse(args[4]) : 2048,
-                                                   (args.Length > 5) ? int.Parse(args[5]) : 0,
-												   ((args.Length > 6) ? args[6] : "Strict") == "Strict",
-												   (args.Length > 7) ? uint.Parse(args[7]) : 32768,
-												   (args.Length > 8) ? uint.Parse(args[8]) : 256,
-												   (args.Length > 9) ? int.Parse(args[9]) : Math.Max(1, Environment.ProcessorCount / 2));
+            LLMExecutor executor = new LLMExecutor(args[1],
+                                                   (args.Length > 2) ? int.Parse(args[2]) : 2048,
+                                                   (args.Length > 3) ? int.Parse(args[3]) : 0,
+												   ((args.Length > 4) ? args[4] : "Strict") == "Strict",
+												   (args.Length > 5) ? uint.Parse(args[5]) : 32768,
+												   (args.Length > 6) ? uint.Parse(args[6]) : 256,
+												   (args.Length > 7) ? int.Parse(args[7]) : Math.Max(1, Environment.ProcessorCount / 2));
 
             while (true)
             {
@@ -356,8 +381,9 @@ static class Program
 
                 try
                 {
-                    string answer = executor.Ask(prompt);
-                    StreamWriter outStream = new StreamWriter(args[1], false, Encoding.Unicode);
+					string answerFile;
+                    string answer = executor.Ask(prompt, out answerFile);
+                    StreamWriter outStream = new StreamWriter(answerFile, false, Encoding.Unicode);
 
                     outStream.Write(answer);
                     outStream.Flush();

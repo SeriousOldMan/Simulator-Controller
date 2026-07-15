@@ -1226,11 +1226,9 @@ class LLMConnector {
 				}
 			}
 
-			prompt .= "<|### Options ###|>`n"
-			prompt .= ("Temperature=" . this.Temperature . "`n")
-			prompt .= ("Output=" . this.AnswerFile . "`n")
-
 			do(instructions, addInstruction)
+
+			prompt := ("<|### Options ###|>`nTemperature=" . this.Temperature . "`nOutput=" . this.AnswerFile . "`n" . prompt)
 
 			for ignore, conversation in (this.History ? this.History : []) {
 				prompt .= ("<|### User ###|>`n" . conversation[1] . "`n")

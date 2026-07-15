@@ -233,7 +233,7 @@ public class LLMExecutor
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, float temperature, string userInput)
     {
-        var session = new ChatSession(Executor);
+        var session = new ChatSession(Executor, chatHistory);
         var outputBuilder = new StringBuilder();
         int nlCount = 0;
 

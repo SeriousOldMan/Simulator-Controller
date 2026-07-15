@@ -2,6 +2,9 @@
 
 1. Test Input:
 
+<|### Options ###|>
+Temperature=0.5
+Output=C:\Users\Developer\Documents\Simulator Controller\Temp\LLM.out
 <|### User ###|>
 What is the current temperature in Paris?
 <|### Tools ###|>

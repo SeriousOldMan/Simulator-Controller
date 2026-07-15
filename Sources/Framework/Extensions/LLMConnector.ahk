@@ -1067,6 +1067,12 @@ class LLMConnector {
 
 			iPromptFile := false
 
+			Connector {
+				Get {
+					return this.iConnector
+				}
+			}
+
 			PID {
 				Get {
 					return this.iPID
@@ -1119,7 +1125,7 @@ class LLMConnector {
 								this.iPID := pid
 
 								if !this.iExitCallback {
-									this.iExitCallback := ObjBindMethod(this, "Disconnect", true)
+									this.iExitCallback := (*) => this.Disconnect(true)
 
 									OnExit(this.iExitCallback)
 								}
@@ -1136,6 +1142,7 @@ class LLMConnector {
 			}
 
 			Disconnect(force := false) {
+				MsgBox this.PID
 				if this.PID {
 					loop 5 {
 						try {
@@ -1155,8 +1162,11 @@ class LLMConnector {
 							break
 					}
 
-					if ProcessExist(this.PID)
+					if ProcessExist(this.PID) {
+						MsgBox("Kill")
 						ProcessClose(this.PID)
+						MsgBox("Killed")
+					}
 
 					this.iPID := false
 				}
@@ -1306,7 +1316,6 @@ class LLMConnector {
 		}
 
 		Ask(question, instructions := false, tools := false, &calls?) {
-			local runtime := this.Runtime
 			local toolCall := false
 			local command, prompt, answer
 
@@ -1315,6 +1324,8 @@ class LLMConnector {
 
 				return false
 			}
+
+			runtime := this.Runtime
 
 			try {
 				prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()

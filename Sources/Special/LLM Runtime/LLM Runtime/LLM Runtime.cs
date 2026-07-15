@@ -95,13 +95,11 @@ public class LLMExecutor
         {
             string input = line.Trim();
 			
-			if (inOptions) {
+			if (inOptions && !input.StartsWith("<|###")) {
 				if (input.Contains("Temperature"))
 					temperature = float.Parse(input.Replace("Temperature=", ""));
 				else if (input.Contains("Output"))
 					answerFile = input.Replace("Output=", "");
-				
-				inOptions = false;
 			}
 			else if (input.StartsWith("<|### Options ###|>"))
 				inOptions = true;

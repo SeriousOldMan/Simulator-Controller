@@ -330,11 +330,8 @@ public class LLMExecutor
 
 static class Program
 {
-    static string WaitForPrompt(string fileName)
+    static async void ReadPrompts(List<string> prompts, string fileName)
     {
-		using (Process p = Process.GetCurrentProcess()) 
-			p.PriorityClass = ProcessPriorityClass.BelowNormal; 
-
         while (true)
         {
             if (File.Exists(fileName))
@@ -347,9 +344,32 @@ static class Program
 
                     File.Delete(fileName);
 
-                    return prompt;
+					lock(prompts) {
+						prompts.Add(prompt);
+					}
                 }
                 catch { }
+
+            Thread.Sleep(100);
+        }
+    }
+	
+    static string WaitForPrompt(List<string> prompts)
+    {
+		using (Process p = Process.GetCurrentProcess()) 
+			p.PriorityClass = ProcessPriorityClass.BelowNormal; 
+
+        while (true)
+        {
+			lock(prompts) {
+				if (prompts.Count > 0) {
+					string prompt = prompts[0];
+
+					prompts.Remove(prompt);
+					
+					return prompt;
+				}
+			}
 
             Thread.Sleep(100);
         }
@@ -358,6 +378,8 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
+		List<string> prompts = new List<string>();
+		
         Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
 		try
@@ -370,9 +392,11 @@ static class Program
 												   (args.Length > 6) ? uint.Parse(args[6]) : 256,
 												   (args.Length > 7) ? int.Parse(args[7]) : Math.Max(1, Environment.ProcessorCount / 2));
 
+			Task.Run(() => ReadPrompts(prompts, args[0]));
+			
             while (true)
             {
-                string prompt = WaitForPrompt(args[0]);
+                string prompt = WaitForPrompt(prompts);
 
                 if (prompt.Trim() == "Exit")
                     break;

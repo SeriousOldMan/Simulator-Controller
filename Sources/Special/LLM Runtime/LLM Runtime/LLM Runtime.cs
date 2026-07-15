@@ -190,7 +190,8 @@ public class LLMExecutor
     public IInferenceParams BuildInferenceParams()
     {
         return new InferenceParams() {
-            MaxTokens = MaxTokens
+            MaxTokens = MaxTokens,
+            AntiPrompts = new List<string> { "User:" }
         };
     }
 
@@ -198,7 +199,9 @@ public class LLMExecutor
     {
         return new InferenceParams() {
             MaxTokens = MaxTokens,
-            SamplingPipeline = pipeline };
+            AntiPrompts = new List<string> { "User:" },
+            SamplingPipeline = pipeline
+        };
     }
 
     public ToolPromptHistory BuildToolInstructions(List<ToolDefinition> tools)
@@ -247,10 +250,11 @@ public class LLMExecutor
             else
                 nlCount = 0;
 
+            // Console.WriteLine(text);
             outputBuilder.Append(text);
         }
 
-        return outputBuilder.ToString().Trim();
+        return outputBuilder.ToString().Trim().Replace("User:", "");
     }
 
     public async Task<string> CreateAnswer(ChatHistory chatHistory, List<ToolDefinition> tools,
@@ -271,10 +275,11 @@ public class LLMExecutor
             else
                 nlCount = 0;
 
+            // Console.WriteLine(text);
             outputBuilder.Append(text);
         }
 
-        var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim());
+        var result = LlamaSharpToolEnvelopeParser.Parse(outputBuilder.ToString().Trim().Replace("User:", ""));
 
         switch (result.Mode)
         {

@@ -1050,24 +1050,132 @@ class LLMConnector {
 	}
 
 	class LLMRuntimeConnector extends LLMConnector {
-		iLLMRuntime := false
+		static sRuntimes := CaseInsenseMap()
 
-		iExitCallback := false
+		iRuntime := false
 
-		iPromptFile := false
 		iAnswerFile := false
 
 		iGPULayers := 0
 
-		LLMRuntime {
-			Get {
-				return this.iLLMRuntime
+		class LLMRuntime {
+			iConnector := false
+
+			iPID := false
+
+			iExitCallback := false
+
+			iPromptFile := false
+
+			Connector {
+				Get {
+					return this.iConnector
+				}
+			}
+
+			PID {
+				Get {
+					return this.iPID
+				}
+			}
+
+			PromptFile {
+				Get {
+					return this.iPromptFile
+				}
+			}
+
+			__New(connector) {
+				this.iConnector := connector
+				this.iPromptFile := temporaryFileName("LLMRuntime", "prompt")
+			}
+
+			Connect(force := false) {
+				local connector := this.Connector
+				local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
+				local grammar := getMultiMapValue(settings, "LLM Runtime", "Grammar", "Strict")
+				local contextSize := getMultiMapValue(settings, "LLM Runtime", "Context Size", 32768)
+				local batchSize := getMultiMapValue(settings, "LLM Runtime", "Batch Size", 128)
+				local threads := getMultiMapValue(settings, "LLM Runtime", "Threads", kUndefined)
+				local exePath, options, pid
+
+				if (!force && this.PID && !ProcessExist(this.PID))
+					return false
+
+				if (!this.PID || force) {
+					this.Disconnect(force)
+
+					exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
+
+					if FileExist(exePath) {
+						deleteFile(this.PromptFile)
+
+						options := ("`"" . this.PromptFile . "`" `"" . connector.Model . "`" "
+								  . connector.MaxTokens . A_Space . connector.GPULayers . A_Space
+								  . grammar . A_Space . contextSize . A_Space . batchSize
+								  . ((threads != kUndefined) ? (A_Space . threads) : ""))
+
+						Run("`"" . exePath . "`" " . options, kProgramsDirectory . "LLM Runtime", "Hide", &pid)
+
+						if pid {
+							Sleep(1000)
+
+							if ProcessExist(pid) {
+								this.iPID := pid
+
+								if !this.iExitCallback {
+									this.iExitCallback := (*) => this.Disconnect(true)
+
+									OnExit(this.iExitCallback)
+								}
+
+								return true
+							}
+						}
+					}
+
+					return false
+				}
+
+				return true
+			}
+
+			Disconnect(force := false, arguments*) {
+				if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+					return false
+
+				if this.PID {
+					loop 5 {
+						try {
+							deleteFile(this.PromptFile)
+
+							try
+								FileAppend("Exit`n", this.PromptFile)
+						}
+						catch Any as exception {
+							if (A_Index = 5)
+								logError(exception, true)
+						}
+
+						Sleep(250)
+
+						if !ProcessExist(this.PID)
+							break
+					}
+
+					if ProcessExist(this.PID)
+						ProcessClose(this.PID)
+
+					this.iPID := false
+				}
+
+				return false
 			}
 		}
 
-		PromptFile {
+		Runtime {
 			Get {
-				return this.iPromptFile
+				return this.iRuntime
 			}
 		}
 
@@ -1081,98 +1189,28 @@ class LLMConnector {
 			Get {
 				return this.iGPULayers
 			}
-
-			Set {
-				return (this.iGPULayers := value)
-			}
 		}
 
 		__New(manager, model, gpuLayers := 0) {
 			this.iGPULayers := gpuLayers
-
-			this.iPromptFile := temporaryFileName("LLMRuntime", "prompt")
 			this.iAnswerFile := temporaryFileName("LLMRuntime", "answer")
 
 			super.__New(manager, model)
 		}
 
 		Connect(force := false) {
-			local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-			local grammar := getMultiMapValue(settings, "LLM Runtime", "Grammar", "Strict")
-			local contextSize := getMultiMapValue(settings, "LLM Runtime", "Context Size", 32768)
-			local batchSize := getMultiMapValue(settings, "LLM Runtime", "Batch Size", 128)
-			local threads := getMultiMapValue(settings, "LLM Runtime", "Threads", kUndefined)
-			local exePath, options, llmRuntime
+			if !this.Runtime {
+				if !LLMConnector.LLMRuntimeConnector.sRuntimes.Has(this.Model)
+					LLMConnector.LLMRuntimeConnector.sRuntimes[this.Model] := LLMConnector.LLMRuntimeConnector.LLMRuntime(this)
 
-			if (!force && this.LLMRuntime && !ProcessExist(this.LLMRuntime))
-				return false
-
-			if (!this.LLMRuntime || force) {
-				this.Disconnect(force)
-
-				exePath := (kProgramsDirectory . "LLM Runtime\LLM Runtime.exe")
-
-				if FileExist(exePath) {
-					deleteFile(this.PromptFile)
-					deleteFile(this.AnswerFile)
-
-					options := ("`"" . this.Model . "`" " . this.Temperature . A_Space . this.MaxTokens . A_Space
-							  . this.GPULayers . A_Space . grammar . A_Space . contextSize . A_Space . batchSize
-							  . ((threads != kUndefined) ? (A_Space . threads) : ""))
-
-					Run("`"" . exePath . "`" `"" . this.PromptFile . "`" `"" . this.AnswerFile . "`" " . options
-					  , kProgramsDirectory . "LLM Runtime", "Hide", &llmRuntime)
-
-					if llmRuntime {
-						Sleep(1000)
-
-						if ProcessExist(llmRuntime) {
-							this.iLLMRuntime := llmRuntime
-
-							if !this.iExitCallback {
-								this.iExitCallback := ObjBindMethod(this, "Disconnect", true)
-
-								OnExit(this.iExitCallback)
-							}
-
-							return true
-						}
-					}
-				}
-
-				return false
+				this.iRuntime := LLMConnector.LLMRuntimeConnector.sRuntimes[this.Model]
 			}
 
-			return true
+			return this.Runtime.Connect(force)
 		}
 
 		Disconnect(force := false) {
-			if this.LLMRuntime {
-				loop 5 {
-					try {
-						deleteFile(this.PromptFile)
-
-						try
-							FileAppend("Exit`n", this.PromptFile)
-					}
-					catch Any as exception {
-						if (A_Index = 5)
-							logError(exception, true)
-					}
-
-					Sleep(250)
-
-					if !ProcessExist(this.LLMRuntime)
-						break
-				}
-
-				if ProcessExist(this.LLMRuntime)
-					ProcessClose(this.LLMRuntime)
-
-				this.iLLMRuntime := false
-			}
-
-			return false
+			return (this.Runtime ? this.Runtime.Disconnect(force) : false)
 		}
 
 		CreatePrompt(instructions, tools, question) {
@@ -1187,6 +1225,10 @@ class LLMConnector {
 					prompt .= (instruction . "`n")
 				}
 			}
+
+			prompt .= "<|### Options ###|>`n"
+			prompt .= ("Temperature=" . this.Temperature . "`n")
+			prompt .= ("Output=" . this.AnswerFile . "`n")
 
 			do(instructions, addInstruction)
 
@@ -1278,6 +1320,8 @@ class LLMConnector {
 				return false
 			}
 
+			runtime := this.Runtime
+
 			try {
 				prompt := this.CreatePrompt(instructions ? instructions : this.GetInstructions()
 										  , tools ? tools : this.GetTools(), question)
@@ -1289,7 +1333,7 @@ class LLMConnector {
 						FileAppend(prompt, kTempDirectory . "LLM.request")
 				}
 
-				while !deleteFile(this.PromptFile)
+				while !deleteFile(runtime.PromptFile)
 					Sleep(50)
 
 				while !deleteFile(this.AnswerFile)
@@ -1297,7 +1341,7 @@ class LLMConnector {
 
 				loop 5
 					try {
-						FileAppend(prompt, this.PromptFile)
+						FileAppend(prompt, runtime.PromptFile)
 
 						break
 					}

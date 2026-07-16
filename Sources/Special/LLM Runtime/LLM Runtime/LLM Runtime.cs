@@ -397,7 +397,7 @@ static class Program
 												   (args.Length > 6) ? uint.Parse(args[6]) : 256,
 												   (args.Length > 7) ? int.Parse(args[7]) : Math.Max(1, Environment.ProcessorCount / 2));
 
-			Task.Run(() => ReadPrompts(prompts, args[0]));
+			Task.Run(async () => ReadPrompts(prompts, args[0]));
 			
             while (true)
             {

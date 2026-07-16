@@ -548,11 +548,11 @@ Additionally you can export and import actions here to build a library for you a
    
    - Assistant.Call=(method, arg1, arg2, ..., result)
    
-     Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error. The value of the property is not used in this case (see below).
+     Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error.
    
    - Assistant.Property(property, arg1, arg2, ...)
    
-     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error. The value of the property is not used in this case (see below).
    
    - Assistant.Property=(method, arg1, arg2, ..., result)
    

@@ -932,7 +932,7 @@ class SetupWorkbench extends ConfigurationItem {
 			for ignore, directory in [kResourcesDirectory, kUserHomeDirectory]
 				for ignore, files in ["Garage\Definitions\Cars\" . simulator . ".*.ini"
 									, "Garage\Rules\Cars\" . simulator . ".*.rules"]
-					loop Files, kResourcesDirectory . files, "F" {
+					loop Files, directory . files, "F" {
 						SplitPath(A_LoopFileName, , , &extension, &descriptor)
 
 						car := StrReplace(StrReplace(descriptor, simulator . ".", ""), "." . extension, "")

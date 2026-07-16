@@ -1,3 +1,6 @@
+<|### Options ###|>
+Temperature=0.5
+Output=C:\Users\Developer\Documents\Simulator Controller\Temp\LLM.out
 <|### System ###|>
 You are a Race Engineer in motorsports and your name is Tom.
 

@@ -34,25 +34,23 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.1.1.0-release](https://cutt.ly/1ywwoiVh) (Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7110) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-711) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[7.1.0.0-release](https://cutt.ly/Et6wn7oO) (Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
-
-[7.0.2.0-release](https://cutt.ly/ut7djiTk) (Changes: Fixed strategy pickup by Strategist, Support for custom driver name patterns, Generic LLM connector now also supports non OpenAI style URLs.)
-
-#### Current development build
-
-[7.1.2.0-dev]() (Early build for 7.1.2. Changes: Tool calling for LLM Runtime.)
+[7.1.2.0-release](https://cutt.ly/MyeC3Uvc) (Test build for 7.1.2. Changes: Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster, Fixed loading of custom cars in "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7120) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712) of this version and all the versions you might have skipped, before installing and using this version.
 
+##### Earlier release builds
+
+[7.1.1.0-release](https://cutt.ly/1ywwoiVh) (Changes: Updated F1 UDP integration for the 2026 DLC, Fixed driver names for rFactor 2, Optimized handling of fuel range controls in "Strategy Workbench", New suspension issues for "Setup Workbench", Fixed session start in F1 25/26.)
+
+[7.1.0.0-release](https://cutt.ly/Et6wn7oO) (Changes: Extend driver name pattern for named subpatterns, Added car name pattern expression support, Suppress lap time display for invalid laps in Solo and Team Center, Support for passing additional options to Whisper, Updated Whisper Server DLC, Fixed translation errors, Added Ruassian language support.)
+
+#### Current development build
+
+None for the moment...
+
 ### Documentation
 
-A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 500 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 700 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 

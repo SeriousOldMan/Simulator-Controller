@@ -3472,13 +3472,13 @@ runSpecialTargets(&buildProgress) {
 				SetWorkingDir(directory)
 
 				for ignore, file in getFileNames("*.sln", directory . "\") {
-					success := true
-
 					SplitPath(file, , , , &solution)
 
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})
 
 					loop {
+						success := true
+
 						try {
 							result := RunWait(A_ComSpec . " /c `"`"" . msBuild . "`" `"" . file . "`" /p:Configuration=Debug -t:Restore -p:RestorePackagesConfig=true > `""
 														. kTempDirectory . "Special Build.out`"`"", , "Hide")

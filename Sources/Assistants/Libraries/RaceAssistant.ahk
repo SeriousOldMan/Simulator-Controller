@@ -5467,6 +5467,23 @@ Assistant_Command := command
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+matchFragment(words, fragment) {
+	local score := 0
+	local fragmentWords := string2Values(A_Space, fragment)
+	local ignore, word, wordScore, candidate
+
+	for ignore, word in fragmentWords {
+		wordScore := 0
+
+		for ignore, candidate in words
+			wordScore := Max(matchWords(candidate, word), wordScore)
+
+		score += wordScore
+	}
+
+	return (score / fragmentWords.Length)
+}
+
 createTools(assistant, type, target := false, categories := ["Custom", "Builtin"], chime := true, names := false) {
 	local configuration := readMultiMap(kResourcesDirectory . "Actions\" . assistant.AssistantType . ".actions")
 	local tools := []
@@ -5944,23 +5961,6 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 	}
 
 	return tools
-}
-
-matchFragment(words, fragment) {
-	local score := 0
-	local fragmentWords := string2Values(A_Space, fragment)
-	local ignore, word, wordScore, candidate
-
-	for ignore, word in fragmentWords {
-		wordScore := 0
-
-		for ignore, candidate in words
-			wordScore := Max(matchWords(candidate, word), wordScore)
-
-		score += wordScore
-	}
-
-	return (score / fragmentWords.Length)
 }
 
 normalizeArguments(arguments, remote := false) {

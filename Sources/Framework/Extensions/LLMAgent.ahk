@@ -56,6 +56,12 @@ class AgentBooster extends LLMBooster {
 		}
 	}
 
+	Booster {
+		Get {
+			return "Reasoning"
+		}
+	}
+
 	Descriptor {
 		Get {
 			return this.Options["Descriptor"]

@@ -317,10 +317,10 @@ public class LLMExecutor
 		float temperature;
 		string answerFile;
         string userInput = ParsePrompt(prompt, chatHistory, out tools, out temperature, out answerFile);
-        string answer = ((tools.Count == 0) ? CreateAnswer(chatHistory, temperature, userInput).Result
-											: CreateAnswer(chatHistory, tools, temperature, userInput).Result);
 		
-        return new Answer { Text = answer, File = answerFile };
+        return new Answer { Text = await ((tools.Count == 0) ? CreateAnswer(chatHistory, temperature, userInput)
+                                                             : CreateAnswer(chatHistory, tools, temperature, userInput)),
+                            File = answerFile };
     }
 
     public string Ask(string prompt, out string answerFile)

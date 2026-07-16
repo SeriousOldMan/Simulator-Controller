@@ -146,6 +146,8 @@ global kExecutionTestRules := "
 				{All: [?Test], {Is: :%answerString%=(?var)}, {Prove: checkStruct(live(?var))}} =>
 				 			(Let: ?x = 13), (Set: ParseResult9 = ?var)
 				[?Test] => (Let: ?var = answer(!Answer)), (Set: Answer = 42), (Set: ParseResult10 = ?var)
+				[?Test] => (Let: ?var = #Compiler.Life.Question), (Set: CallResult4 = ?var)
+				[?Test] => (Let: ?var = "Compiler.Life.Question"), (Prove: extern=(?var, ?val)), (Set: CallResult5 = ?val)
 
 				checkStruct(live(answer(?x)))
 
@@ -276,6 +278,8 @@ class ScriptKnowledgeBase extends KnowledgeBase {
 }
 
 class Compiler extends Assert {
+	static Life := {Question: 42}
+
 	removeWhiteSpace(text) {
 		text := StrReplace(text, A_Space, "")
 		text := StrReplace(text, A_Tab, "")
@@ -354,7 +358,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(29, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(31, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(43, reductions.Length, "Not all reduction rules compiled...")
 	}
 
@@ -397,7 +401,7 @@ class Compiler extends Assert {
 			}
 		})
 
-		this.AssertEqual(29, pCount, "Not all production rules converted...")
+		this.AssertEqual(31, pCount, "Not all production rules converted...")
 		this.AssertEqual(43, rCount, "Not all reduction rules compiled...")
 	}
 }
@@ -781,6 +785,8 @@ class HybridEngine extends Assert {
 		this.AssertEqual("Foo_Bar", kb.getValue("CallResult1"), "Unexpected function call result...")
 		this.AssertEqual("Foo_Bar", kb.getValue("CallResult2"), "Unexpected function call result...")
 		this.AssertEqual("Baz_Bar", kb.getValue("CallResult3"), "Unexpected function call result...")
+		this.AssertEqual(42, kb.getValue("CallResult4"), "Unexpected external call result...")
+		this.AssertEqual(42, kb.getValue("CallResult5"), "Unexpected external call result...")
 		this.AssertEqual("father(Peter, Paul)", kb.getValue("FatherResult"), "Unexpected function call result...")
 		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult1"), "Unexpected function call result...")
 		this.AssertEqual("47.11", kb.getValue("ParseResult2"), "Unexpected function call result...")

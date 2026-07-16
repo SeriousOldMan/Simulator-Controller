@@ -1095,7 +1095,7 @@ class LLMConnector {
 				local settings := readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 				local grammar := getMultiMapValue(settings, "LLM Runtime", "Grammar", "Strict")
 				local contextSize := getMultiMapValue(settings, "LLM Runtime", "Context Size", 32768)
-				local batchSize := getMultiMapValue(settings, "LLM Runtime", "Batch Size", 128)
+				local batchSize := getMultiMapValue(settings, "LLM Runtime", "Batch Size", 2)
 				local threads := getMultiMapValue(settings, "LLM Runtime", "Threads", kUndefined)
 				local exePath, options, pid
 

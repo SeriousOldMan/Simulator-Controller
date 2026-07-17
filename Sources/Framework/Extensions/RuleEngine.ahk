@@ -63,8 +63,8 @@ global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squ
 						   , RuleEngine.Builtins.parse, RuleEngine.Builtins.print
 						   , RuleEngine.Builtins.addRule, RuleEngine.Builtins.removeRule
 						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions
-						   , RuleEngine.Builtins.externValue]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1, 2]
+						   , RuleEngine.Builtins.extern, RuleEngine.Builtins.externValue]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1, 1, 2]
 
 global kProduction := "Production"
 global kReduction := "Reduction"

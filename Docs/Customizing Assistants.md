@@ -545,6 +545,8 @@ Additionally you can export and import actions here to build a library for you a
    - Assistant.Call(method, arg1, arg2, ...)
    
      Invokes the *method* on the instance of the Race Assistant instance with some arguments. A variable number of arguments are supported. The predicate will fail, if the method invocation throws an error. The value of the method call is not used in this case (see below).
+	 
+	 By the way, Assistant.Call(method, arg1, arg2, ...) can actually be expressed with Assistant.Call=(method, arg1, arg2, ...) and is therefore provided for convinience.
    
    - Assistant.Call=(method, arg1, arg2, ..., result)
    
@@ -553,8 +555,10 @@ Additionally you can export and import actions here to build a library for you a
    - Assistant.Property(property, arg1, arg2, ...)
    
      Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error. The value of the property is not used in this case (see below).
+	 
+	 By the way, Assistant.Property(property, arg1, arg2, ...) can actually be expressed with Assistant.Property=(property, arg1, arg2, ...) and is therefore provided for convinience.
    
-   - Assistant.Property=(method, arg1, arg2, ..., result)
+   - Assistant.Property=(property, arg1, arg2, ..., result)
    
      Similar to *Assistant.Property*, but the last argument will be unified with the value of the property. The predicate will fail, if the method invocation throws an error.
 	 

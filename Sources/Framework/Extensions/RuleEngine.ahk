@@ -50,7 +50,8 @@ global kExecute := "Execute:"
 
 global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!="
 						  , "unbound?", "append", "get", "execute"
-						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"]
+						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"
+						  , "extern="]
 global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squareRoot
 						   , RuleEngine.Builtins.plus, RuleEngine.Builtins.minus
 						   , RuleEngine.Builtins.multiply, RuleEngine.Builtins.divide
@@ -61,8 +62,9 @@ global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squ
 						   , RuleEngine.Builtins.get, RuleEngine.Builtins.execute
 						   , RuleEngine.Builtins.parse, RuleEngine.Builtins.print
 						   , RuleEngine.Builtins.addRule, RuleEngine.Builtins.removeRule
-						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1]
+						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions
+						   , RuleEngine.Builtins.externValue]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1, 2]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -1037,6 +1039,89 @@ class Literal extends Primary {
 			return (this.Literal = choicePoint.ResultSet.KnowledgeBase.Facts.getValue(term.Fact))
 		else
 			return false
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; Sealed Class             External                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class External extends Primary {
+	iIdentifier := kNotInitialized
+
+	Identifier {
+		Get {
+			return this.iIdentifier
+		}
+	}
+
+	__New(value) {
+		if isInstance(value, Term)
+			throw "Identifiers must not be terms..."
+
+		this.iIdentifier := value
+
+		if (this.base != External.Prototype)
+			throw "Subclassing of External is not allowed..."
+	}
+
+	getValue(bindings := kNotInitialized, *) {
+		if isInstance(bindings, Facts)
+			return this.toString(bindings)
+		else if this.isUnbound(bindings)
+			return this
+		else
+			return Literal(this.toString(bindings))
+	}
+
+	isUnbound(bindings) {
+		return (this.iIdentifier = kNotInitialized)
+	}
+
+	toString(bindings := kNotInitialized) {
+		local identifier := this.Identifier
+		local object, value
+
+		try {
+			if InStr(identifier, ".") {
+				identifier := string2Values(".", identifier)
+
+				loop identifier.Length
+					if (A_Index = identifier.Length)
+						value := object.%identifier[A_Index]%
+					else if (A_Index = 1)
+						object := %identifier[A_Index]%
+					else
+						object := object.%identifier[A_Index]%
+			}
+			else
+				value := Literal(%identifier[A_Index]%)
+
+			return value
+		}
+		catch Any {
+			return ("#" . this.Identifier)
+		}
+	}
+
+	toDescriptor(bindings := kNotInitialized) {
+		local object := super.toDescriptor(bindings)
+
+		object.Class := "External"
+		object.Value := this.Identifier
+
+		return object
+	}
+
+	static fromDescriptor(descriptor) {
+		return External(toMap(descriptor)["Value"])
+	}
+
+	unify(choicePoint, term) {
+		if isInstance(term, External)
+			return (this.Identifier = term.Identifier)
+		else
+			return choicePoint.ResultSet.unify(choicePoint, term, this.getValue())
 	}
 }
 
@@ -5211,6 +5296,71 @@ class RuleEngine {
 
 			return resultSet.unify(choicePoint, reductions, list)
 		}
+
+		static extern := (choicePoint, identifier) {
+			local resultSet := choicePoint.ResultSet
+			local object
+
+			identifier := identifier.getValue(resultSet, identifier)
+
+			if (isInstance(identifier, Variable) || (identifier.isUnbound(resultSet)))
+				return false
+			else
+				try {
+					identifier := identifier.toString(resultSet)
+
+					if InStr(identifier, ".") {
+						identifier := string2Values(".", identifier)
+
+						loop identifier.Length
+							if (A_Index = identifier.Length) {
+								object.%identifier[A_Index]%
+
+								return true
+							}
+							else if (A_Index = 1)
+								object := %identifier[A_Index]%
+							else
+								object := object.%identifier[A_Index]%
+					}
+					else
+						%identifier%
+				}
+				catch Any {
+					return false
+				}
+		}
+
+		static externValue := (choicePoint, identifier, value) {
+			local resultSet := choicePoint.ResultSet
+			local object
+
+			identifier := identifier.getValue(resultSet, identifier)
+
+			if (isInstance(identifier, Variable) || (identifier.isUnbound(resultSet)))
+				return false
+			else
+				try {
+					identifier := identifier.toString(resultSet)
+
+					if InStr(identifier, ".") {
+						identifier := string2Values(".", identifier)
+
+						loop identifier.Length
+							if (A_Index = identifier.Length)
+								return resultSet.unify(choicePoint, value, Literal(object.%identifier[A_Index]%))
+							else if (A_Index = 1)
+								object := %identifier[A_Index]%
+							else
+								object := object.%identifier[A_Index]%
+					}
+					else
+						return resultSet.unify(choicePoint, value, Literal(%identifier%))
+				}
+				catch Any {
+					return false
+				}
+		}
 	}
 
 	InitialFacts {
@@ -6226,10 +6376,14 @@ class PredicateParser extends Parser {
 
 class PrimaryParser extends Parser {
 	parse(expression) {
+		local identifier
+
 		if (SubStr(expression, 1, 1) == "?")
 			return this.getVariable(expression)
 		else if (SubStr(expression, 1, 1) == "!")
 			return Fact(SubStr(expression, 2))
+		else if (SubStr(expression, 1, 1) == "#")
+			return External(SubStr(expression, 2))
 		else
 			return Literal(expression)
 	}

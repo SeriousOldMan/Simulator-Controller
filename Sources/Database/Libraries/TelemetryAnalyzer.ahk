@@ -1920,6 +1920,10 @@ class TelemetryAnalyzer {
 
 		return issues
 	}
+	
+	analyzeSuspension(telemetries, thresholds := false) {
+		return newMultiMap()
+	}
 }
 
 

@@ -501,7 +501,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
-		local collector, issues, handling, ignore, type, speed, where, issue, index, language
+		local collector, issues, handling, suspension, ignore, type, speed, where, issue, index, language
 		local key, value, text, filter, telemetry, reference, command, data
 
 		static sessions := false
@@ -631,7 +631,7 @@ class DrivingCoach extends GridRaceAssistant {
 										if (++index > 1)
 											handling .= "`n"
 
-										handling .= ("- " . substituteVariables(translate("%severity% %type% at %speed% corner %where%")
+										handling .= ("- " . substituteVariables(translate("%severity% %type% %speed% corner %where%")
 																			  , {severity: translate(issue.Severity . A_Space)
 																			   , type: translate(type . A_Space)
 																			   , speed: translate(speed . A_Space)
@@ -640,6 +640,43 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if index
 							return substituteVariables(this.Instructions["Handling"], {handling: handling})
+					}
+				}
+			case "Suspension":
+				if (knowledgeBase && this.Announcements["SuspensionInformation"] && (this.Mode = "Conversation")) {
+					collector := this.iIssueCollector
+
+					if collector {
+						issues := collector.Suspension
+
+						suspension := ""
+						index := 0
+
+						for ignore, type in ["Suspension.Bottom.Out"]
+							for ignore, where in ["Front", "Rear"]
+								for ignore, issue in issues[type . "." . where] {
+									if (++index > 1)
+										suspension .= "`n"
+
+									suspension .= ("- " . substituteVariables(translate("%severity% %type% %where%")
+																			, {severity: translate(issue.Severity . A_Space)
+																			 , type: translate(type . A_Space)
+																			 , where: translate(where . A_Space)}))
+								}
+
+						issue := issues["Suspension.Sway"]
+
+						if issue {
+							if (++index > 1)
+								suspension .= "`n"
+
+							suspension .= ("- " . substituteVariables(translate("%severity% %type%")
+																	, {severity: translate(issue.Severity . A_Space)
+																	 , type: translate("Suspension.Sway" . A_Space)}))
+						}
+
+						if index
+							return substituteVariables(this.Instructions["Suspension"], {suspension: suspension})
 					}
 				}
 			case "Coaching":

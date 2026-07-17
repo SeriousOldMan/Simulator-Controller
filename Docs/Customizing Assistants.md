@@ -26,7 +26,7 @@ Said this, it is clear, that the interaction with the grammar-based Assistants, 
 
 Please note, that the first three conversation-related boosters all share a GPT service and a single model, whereas you can choose a separate GPT service and model for the *Reasoning* booster, which requires strong reasoning skills, but no conversational skills at all. This might be helpful to select the best possible model for each task.
 
-Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here. Please note, that *GPT4All* and also the local *LLM Runtime* do not support the so called function or tool calling of LLMs at the time of this writing. They therefore cannot be used for the *Conversation* booster with activated actions and absolutely not for the *Resoning* booster. This may change in the future.
+Please take a look at the documentation for the [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for a description of the different providers and LLMs which can be configured here. Please note, that *GPT4All* o not support the so called function or tool calling of LLMs at the time of this writing. This provider therefore cannot be used for the *Conversation* booster with activated actions and absolutely not for the *Resoning* booster. This may change in the future.
 
 As said, the Driving Coach is a bit different in the sense, that it allows free conversation with a LLM using a GPT service. But it also uses several pattern-based grammars for pre-defined commands like the other Assistants, therefore the Driving Coach is a kind of a hybrid, when it comes to voice interaction. For the pattern-based voice commands, the Driving Coach also supports the *Rephrasing* booster and the *Understanding* booster described a described below.
 
@@ -548,11 +548,11 @@ Additionally you can export and import actions here to build a library for you a
    
    - Assistant.Call=(method, arg1, arg2, ..., result)
    
-     Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error. The value of the property is not used in this case (see below).
+     Similar to *Assistant.Call*, but the last argument will be unified with the result of the method call. The predicate will fail, if the method invocation throws an error.
    
    - Assistant.Property(property, arg1, arg2, ...)
    
-     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error.
+     Accesses the *property* of the instance of the Race Assistant instance, optionally with some arguments. The predicate will fail, if the property access throws an error. The value of the property is not used in this case (see below).
    
    - Assistant.Property=(method, arg1, arg2, ..., result)
    

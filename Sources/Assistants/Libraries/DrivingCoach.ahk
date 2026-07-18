@@ -660,8 +660,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 									suspension .= ("- " . substituteVariables(translate("%severity% %type% %where%")
 																			, {severity: translate(issue.Severity . A_Space)
-																			 , type: translate(type . A_Space)
-																			 , where: translate(where . A_Space)}))
+																			 , type: translate(type)
+																			 , where: translate(where)}))
 								}
 
 						issue := issues["Suspension.Sway"]
@@ -672,7 +672,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 							suspension .= ("- " . substituteVariables(translate("%severity% %type%")
 																	, {severity: translate(issue.Severity . A_Space)
-																	 , type: translate("Suspension.Sway" . A_Space)}))
+																	 , type: translate("Suspension.Sway")}))
 						}
 
 						if index

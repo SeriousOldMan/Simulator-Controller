@@ -1798,7 +1798,7 @@ class TelemetryAnalyzer {
 			loop theTelemetry.Data.Length {
 				yawRate := theTelemetry.getValue(A_Index, "YawRate")
 
-				if (yawRate != kNull) {
+				if (yawRate != kUndefined) {
 					steerAngle := theTelemetry.getValue(A_Index, "Steering")
 					speed := theTelemetry.getValue(A_Index, "Speed")
 					acceleration := ((lastSpeed == kUndefined) ? 0 : (speed - lastSpeed))
@@ -1920,7 +1920,7 @@ class TelemetryAnalyzer {
 
 		return issues
 	}
-	
+
 	analyzeSuspension(telemetries, thresholds := false) {
 		return newMultiMap()
 	}

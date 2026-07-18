@@ -51,7 +51,7 @@ global kExecute := "Execute:"
 global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!="
 						  , "unbound?", "append", "get", "execute"
 						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"
-						  , "extern="]
+						  , "extern", "extern="]
 global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squareRoot
 						   , RuleEngine.Builtins.plus, RuleEngine.Builtins.minus
 						   , RuleEngine.Builtins.multiply, RuleEngine.Builtins.divide

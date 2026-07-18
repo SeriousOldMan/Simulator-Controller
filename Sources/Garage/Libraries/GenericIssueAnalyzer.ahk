@@ -1174,21 +1174,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
 							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
 
-				withTask(ProgressTask(translate("Analyzing Data")), () {
-					issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
-																	 , analyzer.WheelBase, analyzer.TrackWidth
-																	 , thresholds)
+				analyzerGui.Block()
 
-					issues := IssueCollector.createHandling(issues)
+				try {
+					withTask(ProgressTask(translate("Analyzing Data")), () {
+						issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
+																		 , analyzer.WheelBase, analyzer.TrackWidth
+																		 , thresholds)
 
-					analyzer.Handling := issues
-					
-					issues := theAnalyzer.analyzeSuspension(telemetries, thresholds)
-					
-					issues := IssueCollector.createSuspension(issues)
+						issues := IssueCollector.createHandling(issues)
 
-					analyzer.Suspension := issues
-				})
+						analyzer.Handling := issues
+
+						issues := theAnalyzer.analyzeSuspension(telemetries, thresholds)
+
+						issues := IssueCollector.createSuspension(issues)
+
+						analyzer.Suspension := issues
+					})
+				}
+				finally {
+					analyzerGui.Unblock()
+				}
 
 				for ignore, widget in prepareWidgets {
 					widget.Enabled := false
@@ -1541,7 +1548,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
 																			  , translate(issue.Severity), issue.Frequency)
 				}
-			
+
 			if suspension.Has("Suspension.Sway")
 				for ignore, issue in suspension["Suspension.Sway"]
 					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels["Suspension.Sway"]
@@ -1976,7 +1983,7 @@ runCalibrator(commandOrAnalyzer, *) {
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
 		cleanValues := analyzer.Handling
-		
+
 		addMultiMapValues(cleanValues, analyzer.Suspension)
 
 		analyzer.stopIssueAnalyzer()
@@ -1990,7 +1997,7 @@ runCalibrator(commandOrAnalyzer, *) {
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
 		overValues := analyzer.Handling
-		
+
 		addMultiMapValues(overValues, analyzer.Suspension)
 
 		analyzer.stopIssueAnalyzer()

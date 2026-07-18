@@ -30,7 +30,27 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.3.0
+
+#### Date: 07/24/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The real time [issue analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) in "Setup Workbench" can now detect suspension related issues like bottoming out.
+  - The same suspension related issues will also be recognized by the Driving Coach, when *handling* information is enabled during conversation. You may have to include the new *suspension* instructions, though. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713)
+  - [Developer] A few extensions to the internal rule engine:
+    - Objects (and properties) in the global namespace of the host programming language can be referenced using a literal. Example:
+	
+		#RaceEngineer.Singleton.LastPitstop
+		
+    - A similar, even more flexible functionality is available as predicates *extern*, which only accesses the object (useful for functional properties), and *extern=*, which also unifies the value with a supplied term. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) for a required update to the Driving Coach configuration.
+
 
 # Release history
 
@@ -69,7 +89,7 @@ Not yet planned...
   - Lap time and sector times for invalid laps will now be grayed out in the lap data lists of "Solo Center" and "Team Center".
   - The setting "Data: Driver name pattern" introduced with the last release will now also support regular expressions with named subpatterns.
   - A customizeable pattern based filter has now been implemented for car names as well. In some simulators more than just the name of the car model is returned as the name of the car. In *rFactor 2*, for example, the car name can contains the race number, the car model, the team name and other information. Using this setting, you can supply a regular expression, which parses the given car name string into the optional parts *nr*, *model* and *class*, *category* and *team*. Please see the new [setting "Data: Car name pattern"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) for more information.
-  - Added a new setting "Whisper.Options" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This setting let you pass additional arguments to Whisper. For example, if you want to run Whisper on a specific GPU, use "Whisper.Options=--cuda:2". If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-651), because the server needs an update.
+  - Added a new setting "Whisper.Options" to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings). This setting let you pass additional arguments to Whisper. For example, if you want to run Whisper on a specific GPU, use "Whisper.Options=--cuda:2". If you are running a "Whisper Server", please take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), because the server needs an update.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-710), if you are using the "Whisper Server" to run Whisper on a second PC.
 

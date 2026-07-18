@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.1.2.0-release](https://cutt.ly/MyeC3Uvc) (Test build for 7.1.2. Changes: Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster, Fixed loading of custom cars in "Setup Workbench".)
+[7.1.2.0-release](https://cutt.ly/MyeC3Uvc) (Changes: Tool calling for LLM Runtime, New core settings for the LLM Runtime, Answer post processing for the booster, Fixed loading of custom cars in "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7120) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712) of this version and all the versions you might have skipped, before installing and using this version.
 
@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.1.3.0-dev]() (Early build for 7.1.3. Changes: External references in the rule engine, Suspension related issues in the issue analyzer, Suspension related issues detected by the Driving Coach, Changed default for data update frequency.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7130) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

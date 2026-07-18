@@ -42,15 +42,15 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - The real time [issue analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) in "Setup Workbench" can now detect suspension related issues like bottoming out.
   - The same suspension related issues will also be recognized by the Driving Coach, when *handling* information is enabled during conversation. You may have to include the new *suspension* instructions, though. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713)
+  - [Important] The default value for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has been reduced from 10 to 4 seconds. Reducing the data update frequency will increase the responsiveness of the Assistants. The change reflects the fact, that most users of Simulator Controller are now on the latest generation of gaming PCs. But if you are not that lucky and encounter problems, for example stutter or stalled Assistants, increase the value again in the "Session Database".
   - [Developer] A few extensions to the internal rule engine:
     - Objects (and properties) in the global namespace of the host programming language can be referenced using a literal. Example:
 	
-		#RaceEngineer.Singleton.LastPitstop
+			#RaceEngineer.Singleton.LastPitstop
 		
     - A similar, even more flexible functionality is available as predicates *extern*, which only accesses the object (useful for functional properties), and *extern=*, which also unifies the value with a supplied term. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) for a required update to the Driving Coach configuration.
-
 
 # Release history
 

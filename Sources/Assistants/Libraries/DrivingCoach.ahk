@@ -168,7 +168,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Suspension", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -643,7 +643,7 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Suspension":
-				if (knowledgeBase && this.Announcements["SuspensionInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -1176,7 +1176,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if knowledgeBase {
 			this.iIssueCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-														, {Handling: true, Frequency: 5000})
+														, {Handling: true, Suspension: true, Frequency: 5000})
 
 			this.iIssueCollector.loadFromSettings()
 

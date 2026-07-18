@@ -80,9 +80,9 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Corner.Problems", "Instructions.Coaching.Corner.Review", "Instructions.Coaching.Reference"]
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Session", "Instructions.Stint", "Instructions.Knowledge", "Instructions.Handling", "Instructions.Suspension", "Instructions.Coaching", "Instructions.Coaching.Lap", "Instructions.Coaching.Corner", "Instructions.Coaching.Corner.Approaching", "Instructions.Coaching.Corner.Problems", "Instructions.Coaching.Corner.Review", "Instructions.Coaching.Reference"]
 			else
-				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
+				return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Suspension", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
 		}
 	}
 
@@ -371,7 +371,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 				}
 				else if isSet(VoiceControlConfigurator) {
 					language := VoiceControlConfigurator.Instance.getCurrentLanguage(&translated)
-					
+
 					if translated
 						language := "EN"
 				}
@@ -417,7 +417,7 @@ class DrivingCoachConfigurator extends ConfiguratorPanel {
 		}
 		else if isSet(VoiceControlConfigurator) {
 			language := VoiceControlConfigurator.Instance.getCurrentLanguage(&translated)
-			
+
 			if translated
 				language := "EN"
 		}

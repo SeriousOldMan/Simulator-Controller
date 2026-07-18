@@ -657,7 +657,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	}
 
 	startIssueAnalyzer(calibrate := false) {
-		local settings := {Handling: true, Temperatures: true, Frequency: 2000}
+		local settings := {Handling: true, Suspension: true, Temperatures: true, Frequency: 2000}
 		local ignore, setting
 
 		this.stopIssueAnalyzer()

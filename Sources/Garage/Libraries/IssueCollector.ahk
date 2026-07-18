@@ -160,7 +160,7 @@ class IssueCollector {
 		this.iAcousticFeedback := acousticFeedback
 
 		for setting, value in settings.OwnProps()
-			if ((setting = "Handling") || ((setting = "Temperatures")))
+			if inList(["Handling", "Suspension", "Temperatures"], setting)
 				this.iCategories.Push(setting)
 			else if (setting = "Frequency")
 				this.iSampleFrequency := value
@@ -515,7 +515,7 @@ class IssueCollector {
 								value := getMultiMapValue(data, type, where, false)
 
 								if value
-									suspension[type . "." . where] := value
+									suspension[type "." . where] := value
 							}
 
 						value := getMultiMapValue(data, "Suspension.Sway", "Value", false)

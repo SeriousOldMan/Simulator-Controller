@@ -530,7 +530,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 				}
 			case "Session":
-				if (knowledgeBase && this.Announcements["SessionInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["SessionInformation"]) {
 					position := this.GridPosition
 
 					if (position != 0)
@@ -540,7 +540,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , classPosition: this.GridPosition["Class"], overallPosition: position})
 				}
 			case "Stint":
-				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["StintInformation"]) {
 					language := this.VoiceManager.Language["Original"]
 					position := this.getPosition(false, "Class")
 
@@ -615,7 +615,7 @@ class DrivingCoach extends GridRaceAssistant {
 						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")})
 				}
 			case "Handling":
-				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -643,7 +643,7 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Suspension":
-				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector
 
 					if collector {

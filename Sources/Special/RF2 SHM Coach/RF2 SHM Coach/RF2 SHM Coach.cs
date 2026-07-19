@@ -191,7 +191,48 @@ namespace RF2SHMCoach {
 				return;
             }
         }
+		
+		class SuspensionDeflections {
+            public int CompletedLaps;
+			public long TimeMS;
+			
+			public float SuspensionDeflectionFL;
+			public float SuspensionDeflectionFR;
+			public float SuspensionDeflectionRL;
+			public float SuspensionDeflectionRR;
+			
+			public SuspensionDeflections(int completedLaps, float suspensionDeflectionFL, float suspensionDeflectionFR,
+															float suspensionDeflectionRL, float suspensionDeflectionRR) {
+				TimeMS = Environment.TickCount;
+				
+				CompletedLaps = completedLaps;
+				
+				SuspensionDeflectionFL = suspensionDeflectionFL;
+				SuspensionDeflectionFR = suspensionDeflectionFR;
+				SuspensionDeflectionRL = suspensionDeflectionRL;
+				SuspensionDeflectionRR = suspensionDeflectionRR;
+			}
+		}
+		
+		class SuspensionBottomOuts {
+			public int CompletedLaps;
+			
+			public string Severity;
+			public string Type;
+			public string Axle;
+			
+			public SuspensionBottomOuts(int completedLaps, string severity, string type, string axle) {
+				CompletedLaps = completedLaps;
+				
+				Severity = severity;
+				Type = type;
+				Axle = axle;
+			}
+		}
 
+		List<SuspensionDeflections> suspensionDeflectionsList = new List<SuspensionDeflections>();
+		List<SuspensionBottomOuts> suspensionBottomOutsList = new List<SuspensionBottomOuts>();
+		
 		class CornerDynamics
         {
             public double Speed;
@@ -229,7 +270,7 @@ namespace RF2SHMCoach {
         List<float> recentGLongs = new List<float>();
         List<float> recentIdealAngVels = new List<float>();
         List<float> recentRealAngVels = new List<float>();
-
+		
         void pushValue(List<float> values, float value)
         {
             values.Add(value);
@@ -325,6 +366,9 @@ namespace RF2SHMCoach {
                 }
 			
             return true;
+		}
+		
+		void updateSuspensionDynamics() {
 		}
 
 		bool collectTelemetry(string soundsDirectory, string audioDevice)
@@ -461,6 +505,20 @@ namespace RF2SHMCoach {
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
+					
+					while (true)
+						if (suspensionDeflectionsList[0].CompletedLaps < completedLaps - 1)
+							suspensionDeflectionsList.RemoveAt(0);
+						else
+							break;
+					
+					while (true)
+						if (suspensionBottomOutsList[0].CompletedLaps < completedLaps - 1)
+							suspensionBottomOutsList.RemoveAt(0);
+						else
+							break;
+						
+					updateSuspensionDynamics();
 				}
 			}
 
@@ -470,6 +528,32 @@ namespace RF2SHMCoach {
         void writeTelemetry()
         {
             StreamWriter output = new StreamWriter(dataFile + ".tmp", false);
+			
+			void writeBottomOut(string severity) {
+				int count = 0;
+				int front = 0;
+				int rear = 0;
+				
+				foreach (var bottomOut in suspensionBottomOutsList)
+					if (bottomOut.Severity == severity) {
+						count += 1;
+					
+						if (bottomOut.Axle == "Front")
+							front += 1;
+						else if (bottomOut.Axle == "Rear")
+							rear += 1;
+					}
+				
+				if (count > 0) {
+					output.WriteLine("[Suspension.Bottom.Out." + severity + "]");
+					
+					if (front > 0)
+						output.WriteLine("Front=" + front);
+					
+					if (rear > 0)
+						output.WriteLine("Front=" + rear);
+				}
+			}
 
             try
             {
@@ -700,6 +784,10 @@ namespace RF2SHMCoach {
 						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
 						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
 					}
+					
+					writeBottomOut("Heavy");
+					writeBottomOut("Medium");
+					writeBottomOut("Light");
 				}
 
                 output.Close();

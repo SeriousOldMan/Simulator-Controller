@@ -502,29 +502,14 @@ class IssueCollector {
 
 		suspension.Default := false
 
-		if dataFile {
+		if (dataFile && !this.iCalibrate) {
 			tries := 10
 
 			while (tries-- > 0) {
 				data := readMultiMap(dataFile)
 
 				if (data.Count > 0) {
-					if this.iCalibrate {
-						for ignore, type in ["Suspension.Bottom.Out"]
-							for ignore, where in ["Front", "Rear"] {
-								value := getMultiMapValue(data, type, where, false)
-
-								if value
-									suspension[type "." . where] := value
-							}
-
-						value := getMultiMapValue(data, "Suspension.Sway", "Value", false)
-
-						if value
-							suspension["Suspension.Sway"] := value
-					}
-					else
-						suspension := IssueCollector.createSuspension(data)
+					suspension := IssueCollector.createSuspension(data)
 
 					break
 				}

@@ -196,21 +196,21 @@ namespace RF2SHMCoach {
             public int CompletedLaps;
 			public long TimeMS;
 			
-			public float SuspensionDeflectionFL;
-			public float SuspensionDeflectionFR;
-			public float SuspensionDeflectionRL;
-			public float SuspensionDeflectionRR;
+			public double FrontLeft;
+			public double FrontRight;
+			public double RearLeft;
+			public double RearRight;
 			
-			public SuspensionDeflections(int completedLaps, float suspensionDeflectionFL, float suspensionDeflectionFR,
-															float suspensionDeflectionRL, float suspensionDeflectionRR) {
+			public SuspensionDeflections(int completedLaps, double suspensionDeflectionFL, double suspensionDeflectionFR,
+															double suspensionDeflectionRL, double suspensionDeflectionRR) {
 				TimeMS = Environment.TickCount;
 				
 				CompletedLaps = completedLaps;
 				
-				SuspensionDeflectionFL = suspensionDeflectionFL;
-				SuspensionDeflectionFR = suspensionDeflectionFR;
-				SuspensionDeflectionRL = suspensionDeflectionRL;
-				SuspensionDeflectionRR = suspensionDeflectionRR;
+				FrontLeft = suspensionDeflectionFL * 1000;
+				FrontRight = suspensionDeflectionFR * 1000;
+				RearLeft = suspensionDeflectionRL * 1000;
+				RearRight = suspensionDeflectionRR * 1000;
 			}
 		}
 		
@@ -367,9 +367,6 @@ namespace RF2SHMCoach {
 			
             return true;
 		}
-		
-		void updateSuspensionDynamics() {
-		}
 
 		bool collectTelemetry(string soundsDirectory, string audioDevice)
 		{
@@ -517,9 +514,13 @@ namespace RF2SHMCoach {
 							suspensionBottomOutsList.RemoveAt(0);
 						else
 							break;
-						
-					updateSuspensionDynamics();
-				}
+
+					suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps, telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
+                                                                                           telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
+                                                                                           telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
+                                                                                           telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
+
+                }
 			}
 
             return true;
@@ -788,7 +789,13 @@ namespace RF2SHMCoach {
 					writeBottomOut("Heavy");
 					writeBottomOut("Medium");
 					writeBottomOut("Light");
-				}
+
+                    output.WriteLine("[Suspension.Deflections]");
+
+					foreach (var deflections in suspensionDeflectionsList)
+                        output.WriteLine("Deflections=" + deflections.FrontLeft + "," + deflections.FrontRight + "," +
+                                                          deflections.RearLeft + "," + deflections.RearRight);
+                }
 
                 output.Close();
 

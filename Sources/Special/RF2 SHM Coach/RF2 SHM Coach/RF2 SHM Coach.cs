@@ -492,36 +492,36 @@ namespace RF2SHMCoach {
 				if (cd != null)
 					cornerDynamicsList.Add(cd);
 
+				int completedLaps = playerScoring.mTotalLaps;
+
 				suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps,
 																		telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
 																		telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
 																		telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
 																		telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
 
-				int completedLaps = playerScoring.mTotalLaps;
-
 				if (lastCompletedLaps != completedLaps) {
 					lastCompletedLaps = completedLaps;
 					
-					while (true)
+					while (cornerDynamicsList.Count > 0)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
 							cornerDynamicsList.RemoveAt(0);
 						else
 							break;
 					
-					while (true)
+					while (suspensionDeflectionsList.Count > 0)
 						if (suspensionDeflectionsList[0].CompletedLaps < completedLaps - 1)
 							suspensionDeflectionsList.RemoveAt(0);
 						else
 							break;
 					
-					while (true)
+					while (suspensionBottomOutsList.Count > 0)
 						if (suspensionBottomOutsList[0].CompletedLaps < completedLaps - 1)
 							suspensionBottomOutsList.RemoveAt(0);
 						else
 							break;
 
-					if (true)
+					if (false)
 					{
 						StreamWriter output = new StreamWriter(dataFile + ".deflections", true);
 
@@ -531,7 +531,6 @@ namespace RF2SHMCoach {
 
 						output.Close();
 
-						Thread.Sleep(200);
 					}
                 }
 			}

@@ -492,6 +492,12 @@ namespace RF2SHMCoach {
 				if (cd != null)
 					cornerDynamicsList.Add(cd);
 
+				suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps,
+																		telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
+
 				int completedLaps = playerScoring.mTotalLaps;
 
 				if (lastCompletedLaps != completedLaps) {
@@ -515,11 +521,18 @@ namespace RF2SHMCoach {
 						else
 							break;
 
-					suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps, telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
-                                                                                           telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
-                                                                                           telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
-                                                                                           telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
+					if (true)
+					{
+						StreamWriter output = new StreamWriter(dataFile + ".deflections", true);
 
+						foreach (var deflections in suspensionDeflectionsList)
+							output.WriteLine(deflections.FrontLeft + "," + deflections.FrontRight + "," +
+											 deflections.RearLeft + "," + deflections.RearRight);
+
+						output.Close();
+
+						Thread.Sleep(200);
+					}
                 }
 			}
 
@@ -789,12 +802,6 @@ namespace RF2SHMCoach {
 					writeBottomOut("Heavy");
 					writeBottomOut("Medium");
 					writeBottomOut("Light");
-
-                    output.WriteLine("[Suspension.Deflections]");
-
-					foreach (var deflections in suspensionDeflectionsList)
-                        output.WriteLine("Deflections=" + deflections.FrontLeft + "," + deflections.FrontRight + "," +
-                                                          deflections.RearLeft + "," + deflections.RearRight);
                 }
 
                 output.Close();
@@ -1126,7 +1133,7 @@ namespace RF2SHMCoach {
                         {
                             if (collectTelemetry(soundsDirectory, audioDevice))
 							{
-                                if (counter % 20 == 0)
+                                if (counter % 200 == 0)
                                     writeTelemetry();
 
 								Thread.Sleep(10);

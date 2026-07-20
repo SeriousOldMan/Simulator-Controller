@@ -36,7 +36,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed a startup crash in "Strategy Workbench", when community tyre wear data is used.
   
 #### Changes
 

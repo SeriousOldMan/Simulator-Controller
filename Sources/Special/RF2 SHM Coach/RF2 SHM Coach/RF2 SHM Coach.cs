@@ -11,9 +11,13 @@ using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -21,6 +25,8 @@ using static RF2SHMCoach.rFactor2Constants;
 using static RF2SHMCoach.rFactor2Constants.rF2GamePhase;
 using static RF2SHMCoach.rFactor2Constants.rF2PitState;
 using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace RF2SHMCoach {
@@ -191,47 +197,79 @@ namespace RF2SHMCoach {
 				return;
             }
         }
-		
-		class SuspensionDeflections {
-            public int CompletedLaps;
-			public long TimeMS;
+
+        public class MovingAverage
+        {
+            private readonly double[] Window;
+            private int Head;
+            private int Count;
+            private double Sum;
+
+            public MovingAverage(int period)
+            {
+				if (period <= 0)
+					throw new ArgumentException("Period must be greater than zero.", nameof(period));
+
+                Window = new double[period];
+
+                Head = 0;
+                Count = 0;
+                Sum = 0;
+            }
+
+            public double Add(double newValue)
+            {
+				if (Count == Window.Length)
+                    Sum -= Window[Head];
+
+				Window[Head] = newValue;
+
+                Sum += newValue;
+				Head = (Head + 1) % Window.Length;
+
+                if (Count < Window.Length)
+				    Count++;
+
+				return Sum / Count;
+            }
+        }
+
+        class SuspensionDeflections {
+            public readonly int CompletedLaps;
+			public readonly long TimeMS;
 			
-			public double FrontLeft;
-			public double FrontRight;
-			public double RearLeft;
-			public double RearRight;
-			
-			public SuspensionDeflections(int completedLaps, double suspensionDeflectionFL, double suspensionDeflectionFR,
-															double suspensionDeflectionRL, double suspensionDeflectionRR) {
-				TimeMS = Environment.TickCount;
-				
-				CompletedLaps = completedLaps;
-				
-				FrontLeft = suspensionDeflectionFL * 1000;
-				FrontRight = suspensionDeflectionFR * 1000;
-				RearLeft = suspensionDeflectionRL * 1000;
-				RearRight = suspensionDeflectionRR * 1000;
-			}
-		}
-		
-		class SuspensionBottomOuts {
+			public readonly double FrontLeft;
+			public readonly double FrontRight;
+			public readonly double RearLeft;
+			public readonly	double RearRight;
+
+            public SuspensionDeflections(int completedLaps, double suspensionDeflectionFL, double suspensionDeflectionFR,
+                                                            double suspensionDeflectionRL, double suspensionDeflectionRR)
+            {
+                TimeMS = Environment.TickCount;
+
+                CompletedLaps = completedLaps;
+
+                FrontLeft = suspensionDeflectionFL * 1000;
+                FrontRight = suspensionDeflectionFR * 1000;
+                RearLeft = suspensionDeflectionRL * 1000;
+                RearRight = suspensionDeflectionRR * 1000;
+            }
+        }
+
+        class SuspensionBottomOuts {
 			public int CompletedLaps;
 			
 			public string Severity;
-			public string Type;
 			public string Axle;
 			
-			public SuspensionBottomOuts(int completedLaps, string severity, string type, string axle) {
+			public SuspensionBottomOuts(int completedLaps, string severity, string axle) {
 				CompletedLaps = completedLaps;
 				
 				Severity = severity;
-				Type = type;
 				Axle = axle;
 			}
 		}
-
-		List<SuspensionDeflections> suspensionDeflectionsList = new List<SuspensionDeflections>();
-		List<SuspensionBottomOuts> suspensionBottomOutsList = new List<SuspensionBottomOuts>();
 		
 		class CornerDynamics
         {
@@ -305,6 +343,7 @@ namespace RF2SHMCoach {
         }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
+        List<SuspensionDeflections> suspensionDeflectionsList = new List<SuspensionDeflections>();
 
         string dataFile = "";
         int understeerLightThreshold = 12;
@@ -514,12 +553,6 @@ namespace RF2SHMCoach {
 							suspensionDeflectionsList.RemoveAt(0);
 						else
 							break;
-					
-					while (suspensionBottomOutsList.Count > 0)
-						if (suspensionBottomOutsList[0].CompletedLaps < completedLaps - 1)
-							suspensionBottomOutsList.RemoveAt(0);
-						else
-							break;
 
 					if (false)
 					{
@@ -538,16 +571,160 @@ namespace RF2SHMCoach {
             return true;
         }
 
+        delegate (long TimeMS, double Deflection) Deflection(SuspensionDeflections deflectsions);
+
+        IEnumerable<SuspensionBottomOuts> createSuspensionIssues()
+		{
+			MovingAverage frontLeft = new MovingAverage(5);
+			MovingAverage frontRight = new MovingAverage(5);
+			MovingAverage rearLeft = new MovingAverage(5);
+			MovingAverage rearRight = new MovingAverage(5);
+			List<SuspensionDeflections> smoothedDeflections = new List<SuspensionDeflections>();
+			
+            List<(long TimeMS, double Acceleration)> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
+			{
+				List<(long TimeMS, double Acceleration)> accelerations = new List<(long TimeMS, double Acceleration)>();
+
+				double CalculateAcceleration(long lastTime, double lastDeflection,
+											 long time, double deflection,
+											 long nextTime, double nextDeflection)
+				{
+					long dt1 = time - lastTime;
+					long dt2 = nextTime - time;
+
+					if (dt1 <= 0 || dt2 <= 0)
+						throw new InvalidOperationException("Invalid timestamps detected...");
+
+					double term1 = (nextDeflection - deflection) / dt2;
+					double term2 = (deflection - lastDeflection) / dt1;
+
+					return 2.0 * (term1 - term2) / (dt1 + dt2);
+				}
+
+				for (int i = 1; i < deflections.Count - 1; i++)
+					accelerations.Add((deflections[i].TimeMS,
+									   CalculateAcceleration(deflections[i - 1].TimeMS,
+															 deflections[i - 1].Deflection,
+															 deflections[i].TimeMS,
+															 deflections[i].Deflection,
+															 deflections[i + 1].TimeMS,
+															 deflections[i + 1].Deflection)));
+
+				return deflections;
+			}
+
+            List<(long TimeMS, double Deflection)> ExtractDeflections(List<SuspensionDeflections> deflections,
+																	  Deflection Getter)
+			{
+				List<(long TimeMS, double Deflection)> extractedDeflections = new List<(long TimeMS, double Deflection)>();
+				MovingAverage Smooth = new MovingAverage(5);
+
+				foreach (var deflection in suspensionDeflectionsList)
+				{
+					(long TimeMS, double Deflection) value = Getter(deflection);
+
+					value.Deflection = Smooth.Add(value.Deflection);
+
+					extractedDeflections.Add(value);
+				}
+
+				return extractedDeflections;
+            }
+
+			List<int> DetectSpikes(int period, List<(long TimeMS, double Acceleration)> accelerations)
+			{
+				List<int> spikes = new List<int>();
+
+				double standardDeviation(double[] values)
+				{
+					double mean = values.Average();
+					double sumOfSquaredDifferences = values.Sum(x => Math.Pow(x - mean, 2));
+
+					return Math.Sqrt(sumOfSquaredDifferences / values.Length);
+				}
+
+				if (accelerations.Count < period * 2)
+					return spikes;
+
+				double[] movingAverage = new double[accelerations.Count];
+				MovingAverage Average = new MovingAverage(5);
+
+				for (int i = 0; i < accelerations.Count; i++)
+					movingAverage[i] = Average.Add(accelerations[i].Acceleration);
+
+                double[] segment = new double[period];
+
+                for (int i = period; i < accelerations.Count - period; i++)
+				{
+					for (int j = i; i < period; i++)
+						segment[j] = movingAverage[i];
+
+					double acceleration = accelerations[i].Acceleration;
+
+                    if (acceleration < 0 && Math.Abs(acceleration) > 2 * standardDeviation(segment) + Math.Abs(movingAverage[i]))
+						spikes.Add(i);
+				}
+
+				return spikes;
+			}
+
+            List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<(long TimeMS, double Acceleration)> leftAccelerations,
+                                                                     List<(long TimeMS, double Acceleration)> rightAccelerations)
+			{
+                List<SuspensionBottomOuts> bottomOuts = new List<SuspensionBottomOuts>();
+                List<int> leftSpikes = DetectSpikes(5, leftAccelerations);
+                List<int> rightSpikes = DetectSpikes(5, rightAccelerations);
+
+				string GetSeverity(double acceleration)
+				{
+					double gForce = Math.Abs(acceleration / 1000);
+
+					if (gForce > 30)
+						return "Heavy";
+					else if (gForce > 20)
+                        return "Medium";
+					else
+						return "Light";
+				}
+
+				foreach (int index in leftSpikes)
+					bottomOuts.Add(new SuspensionBottomOuts(suspensionDeflectionsList[index].CompletedLaps,
+															GetSeverity(leftAccelerations[index].Acceleration),
+															axle));
+
+                foreach (int index in rightSpikes)
+					if (!leftSpikes.Contains(index))
+                        bottomOuts.Add(new SuspensionBottomOuts(suspensionDeflectionsList[index].CompletedLaps,
+																GetSeverity(rightAccelerations[index].Acceleration),
+																axle));
+
+                return bottomOuts;
+            }
+
+            List<(long TimeMS, double Acceleration)> frontLeftAccels =
+                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.FrontLeft)));
+            List<(long TimeMS, double Acceleration)> frontRightAccels =
+                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.FrontRight)));
+            List<(long TimeMS, double Acceleration)> rearLeftAccels =
+                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.RearLeft)));
+            List<(long TimeMS, double Acceleration)> rearRightAccels =
+                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.RearRight)));
+
+			return CreateBottomOuts("Front",
+									frontLeftAccels,
+									frontRightAccels).Concat(CreateBottomOuts("Rear", rearLeftAccels, rearRightAccels));
+		}
+
         void writeTelemetry()
         {
             StreamWriter output = new StreamWriter(dataFile + ".tmp", false);
 			
-			void writeBottomOut(string severity) {
+			void writeBottomOut(IEnumerable<SuspensionBottomOuts> suspensionIssues, string severity) {
 				int count = 0;
 				int front = 0;
 				int rear = 0;
 				
-				foreach (var bottomOut in suspensionBottomOutsList)
+				foreach (var bottomOut in suspensionIssues)
 					if (bottomOut.Severity == severity) {
 						count += 1;
 					
@@ -797,10 +974,12 @@ namespace RF2SHMCoach {
 						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
 						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
 					}
+
+                    IEnumerable<SuspensionBottomOuts> suspensionIssues = createSuspensionIssues();
 					
-					writeBottomOut("Heavy");
-					writeBottomOut("Medium");
-					writeBottomOut("Light");
+					writeBottomOut(suspensionIssues, "Heavy");
+					writeBottomOut(suspensionIssues, "Medium");
+					writeBottomOut(suspensionIssues, "Light");
                 }
 
                 output.Close();

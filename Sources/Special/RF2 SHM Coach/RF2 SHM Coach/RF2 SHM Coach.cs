@@ -262,8 +262,38 @@ namespace RF2SHMCoach {
 			
 			public string Severity;
 			public string Axle;
-			
-			public SuspensionBottomOuts(int completedLaps, string severity, string axle) {
+
+            /// <summary>
+            /// Start time of the event (milliseconds from data start)
+            /// </summary>
+            public long StartTimeMs { get; set; }
+
+            /// <summary>
+            /// End time of the event (milliseconds from data start)
+            /// </summary>
+            public long EndTimeMs { get; set; }
+
+            /// <summary>
+            /// Duration of the event in milliseconds
+            /// </summary>
+            public long DurationMs => EndTimeMs - StartTimeMs;
+
+            /// <summary>
+            /// Peak acceleration during the event
+            /// </summary>
+            public double PeakAccelerationMagnitude { get; set; }
+
+            /// <summary>
+            /// Average acceleration during the event
+            /// </summary>
+            public double AvgAccelerationMagnitude { get; set; }
+
+            /// <summary>
+            /// Impulse (integral of acceleration over time)
+            /// </summary>
+            public double ImpulseValue { get; set; }
+
+            public SuspensionBottomOuts(int completedLaps, string severity, string axle) {
 				CompletedLaps = completedLaps;
 				
 				Severity = severity;
@@ -573,17 +603,11 @@ namespace RF2SHMCoach {
 
         delegate (long TimeMS, double Deflection) Deflection(SuspensionDeflections deflectsions);
 
-        IEnumerable<SuspensionBottomOuts> createSuspensionIssues()
+		IEnumerable<SuspensionBottomOuts> createSuspensionIssues()
 		{
-			MovingAverage frontLeft = new MovingAverage(5);
-			MovingAverage frontRight = new MovingAverage(5);
-			MovingAverage rearLeft = new MovingAverage(5);
-			MovingAverage rearRight = new MovingAverage(5);
-			List<SuspensionDeflections> smoothedDeflections = new List<SuspensionDeflections>();
-			
-            List<(long TimeMS, double Acceleration)> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
+			List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
 			{
-				List<(long TimeMS, double Acceleration)> accelerations = new List<(long TimeMS, double Acceleration)>();
+				List<double> accelerations = new List<double>();
 
 				double CalculateAcceleration(long lastTime, double lastDeflection,
 											 long time, double deflection,
@@ -602,21 +626,20 @@ namespace RF2SHMCoach {
 				}
 
 				for (int i = 1; i < deflections.Count - 1; i++)
-					accelerations.Add((deflections[i].TimeMS,
-									   CalculateAcceleration(deflections[i - 1].TimeMS,
-															 deflections[i - 1].Deflection,
-															 deflections[i].TimeMS,
-															 deflections[i].Deflection,
-															 deflections[i + 1].TimeMS,
-															 deflections[i + 1].Deflection)));
+					accelerations.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
+															deflections[i - 1].Deflection,
+															deflections[i].TimeMS,
+															deflections[i].Deflection,
+															deflections[i + 1].TimeMS,
+															deflections[i + 1].Deflection));
 
-				return deflections;
+				return accelerations;
 			}
 
-            List<(long TimeMS, double Deflection)> ExtractDeflections(List<SuspensionDeflections> deflections,
+			List<(long TimeMS, double Deflection)> ExtractDeflections(List<SuspensionDeflections> deflections,
 																	  Deflection Getter)
 			{
-				List<(long TimeMS, double Deflection)> extractedDeflections = new List<(long TimeMS, double Deflection)>();
+				List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
 				MovingAverage Smooth = new MovingAverage(5);
 
 				foreach (var deflection in suspensionDeflectionsList)
@@ -625,55 +648,28 @@ namespace RF2SHMCoach {
 
 					value.Deflection = Smooth.Add(value.Deflection);
 
-					extractedDeflections.Add(value);
+                    smoothedDeflections.Add(value);
 				}
 
-				return extractedDeflections;
-            }
-
-			List<int> DetectSpikes(int period, List<(long TimeMS, double Acceleration)> accelerations)
-			{
-				List<int> spikes = new List<int>();
-
-				double standardDeviation(double[] values)
-				{
-					double mean = values.Average();
-					double sumOfSquaredDifferences = values.Sum(x => Math.Pow(x - mean, 2));
-
-					return Math.Sqrt(sumOfSquaredDifferences / values.Length);
-				}
-
-				if (accelerations.Count < period * 2)
-					return spikes;
-
-				double[] movingAverage = new double[accelerations.Count];
-				MovingAverage Average = new MovingAverage(5);
-
-				for (int i = 0; i < accelerations.Count; i++)
-					movingAverage[i] = Average.Add(accelerations[i].Acceleration);
-
-                double[] segment = new double[period];
-
-                for (int i = period; i < accelerations.Count - period; i++)
-				{
-					for (int j = i; i < period; i++)
-						segment[j] = movingAverage[i];
-
-					double acceleration = accelerations[i].Acceleration;
-
-                    if (acceleration < 0 && Math.Abs(acceleration) > 2 * standardDeviation(segment) + Math.Abs(movingAverage[i]))
-						spikes.Add(i);
-				}
-
-				return spikes;
+				return smoothedDeflections;
 			}
 
-            List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<(long TimeMS, double Acceleration)> leftAccelerations,
-                                                                     List<(long TimeMS, double Acceleration)> rightAccelerations)
+            List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
+																	 List<double> rightAccelerations)
 			{
-                List<SuspensionBottomOuts> bottomOuts = new List<SuspensionBottomOuts>();
-                List<int> leftSpikes = DetectSpikes(5, leftAccelerations);
-                List<int> rightSpikes = DetectSpikes(5, rightAccelerations);
+	            const double accelerationThreshold = 10;
+				const int minEventDurationMs = 30;
+				const int samplingIntervalMs = 20;
+				const int minEventGapMs = 100;
+
+                int minSamplesRequired = Math.Max(1, minEventDurationMs / samplingIntervalMs);
+                
+				var events = new List<SuspensionBottomOuts>();
+
+				// Use magnitude (absolute value) of acceleration for detection
+				var combinedAccel = new double[leftAccelerations.Count];
+				var leftAboveThreshold = new bool[leftAccelerations.Count];
+				var rightAboveThreshold = new bool[rightAccelerations.Count];
 
 				string GetSeverity(double acceleration)
 				{
@@ -682,37 +678,189 @@ namespace RF2SHMCoach {
 					if (gForce > 30)
 						return "Heavy";
 					else if (gForce > 20)
-                        return "Medium";
+						return "Medium";
 					else
 						return "Light";
 				}
 
-				foreach (int index in leftSpikes)
-					bottomOuts.Add(new SuspensionBottomOuts(suspensionDeflectionsList[index].CompletedLaps,
-															GetSeverity(leftAccelerations[index].Acceleration),
-															axle));
+				/// <summary>
+				/// Calculates impulse (integral of acceleration) for an event
+				/// </summary>
+				double CalculateImpulse(long duration, List<double> accelerationValues)
+				{
+					if (accelerationValues.Count == 0)
+						return 0f;
 
-                foreach (int index in rightSpikes)
-					if (!leftSpikes.Contains(index))
-                        bottomOuts.Add(new SuspensionBottomOuts(suspensionDeflectionsList[index].CompletedLaps,
-																GetSeverity(rightAccelerations[index].Acceleration),
-																axle));
+					// Impulse = integral of acceleration over time
+					// Using trapezoidal rule for numerical integration
+					double impulse = 0f;
+					
+					for (int i = 0; i < accelerationValues.Count - 1; i++)
+						// Trapezoidal rule: (a[i] + a[i+1]) / 2 * dt
+						impulse += (accelerationValues[i] + accelerationValues[i + 1]) / 2f * ((double)duration / 1000);
+					
+					return impulse;
+				}
 
-                return bottomOuts;
-            }
+				/// <summary>
+				/// Merges bottoming out events that are too close together or part of the same peak
+				/// </summary>
+				List<SuspensionBottomOuts> MergeCloseEvents(List<SuspensionBottomOuts> allEvents)
+				{
+					if (allEvents.Count <= 1)
+						return allEvents;
 
-            List<(long TimeMS, double Acceleration)> frontLeftAccels =
-                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.FrontLeft)));
-            List<(long TimeMS, double Acceleration)> frontRightAccels =
-                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.FrontRight)));
-            List<(long TimeMS, double Acceleration)> rearLeftAccels =
-                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.RearLeft)));
-            List<(long TimeMS, double Acceleration)> rearRightAccels =
-                CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => (d.TimeMS, d.RearRight)));
+					var merged = new List<SuspensionBottomOuts>();
+					var currentEvent = new SuspensionBottomOuts(allEvents[0].CompletedLaps, allEvents[0].Severity, allEvents[0].Axle)
+					{
+						StartTimeMs = allEvents[0].StartTimeMs,
+						EndTimeMs = allEvents[0].EndTimeMs,
+						PeakAccelerationMagnitude = allEvents[0].PeakAccelerationMagnitude,
+						AvgAccelerationMagnitude = allEvents[0].AvgAccelerationMagnitude,
+						ImpulseValue = allEvents[0].ImpulseValue
+					};
+
+					for (int i = 1; i < allEvents.Count; i++)
+					{
+						long gap = allEvents[i].StartTimeMs - currentEvent.EndTimeMs;
+
+						if (gap < minEventGapMs)
+						{
+							// Merge events that are close together
+							currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
+							currentEvent.PeakAccelerationMagnitude = Math.Max(currentEvent.PeakAccelerationMagnitude,
+								allEvents[i].PeakAccelerationMagnitude);
+							currentEvent.ImpulseValue += allEvents[i].ImpulseValue;
+
+							// Recalculate average (approximate)
+							currentEvent.AvgAccelerationMagnitude =
+								(currentEvent.AvgAccelerationMagnitude + allEvents[i].AvgAccelerationMagnitude) / 2f;
+						}
+						else
+						{
+							// Add current event and start new one
+							merged.Add(currentEvent);
+
+							currentEvent = new SuspensionBottomOuts(allEvents[i].CompletedLaps, allEvents[i].Severity, allEvents[i].Axle)
+                            {
+								StartTimeMs = allEvents[i].StartTimeMs,
+								EndTimeMs = allEvents[i].EndTimeMs,
+								PeakAccelerationMagnitude = allEvents[i].PeakAccelerationMagnitude,
+								AvgAccelerationMagnitude = allEvents[i].AvgAccelerationMagnitude,
+								ImpulseValue = allEvents[i].ImpulseValue
+							};
+						}
+					}
+
+					merged.Add(currentEvent);
+
+					return merged;
+				}
+
+				for (int i = 0; i < leftAccelerations.Count; i++)
+				{
+					double leftMagnitude = leftAccelerations[i];
+					double rightMagnitude = rightAccelerations[i];
+
+					if (leftMagnitude < 0 && rightMagnitude < 0) {
+						leftMagnitude = Math.Abs(leftMagnitude);
+						rightMagnitude = Math.Abs(rightMagnitude);
+
+						// Use maximum magnitude (most severe)
+						combinedAccel[i] = Math.Max(leftMagnitude, rightMagnitude);
+
+						leftAboveThreshold[i] = leftMagnitude >= accelerationThreshold;
+						rightAboveThreshold[i] = rightMagnitude >= accelerationThreshold;
+					}
+				}
+
+				bool inEvent = false;
+				int eventStartIndex = 0;
+				double peakAccelInEvent = 0;
+				var accelValuesInEvent = new List<double>();
+
+				for (int i = 0; i < combinedAccel.Length; i++)
+					if (leftAboveThreshold[i] || rightAboveThreshold[i])
+					{
+						if (!inEvent)
+						{
+							// Start new event
+							inEvent = true;
+							eventStartIndex = i;
+							peakAccelInEvent = 0f;
+							accelValuesInEvent.Clear();
+						}
+
+						// Track data for this event
+						peakAccelInEvent = Math.Max(peakAccelInEvent, combinedAccel[i]);
+						accelValuesInEvent.Add(combinedAccel[i]);
+					}
+					else
+					{
+						if (inEvent)
+						{
+							// Only create event if it meets minimum duration
+							if (i - eventStartIndex >= minSamplesRequired)
+							{
+                                var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
+                                var endTime = suspensionDeflectionsList[i].TimeMS;
+                                var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+																			  GetSeverity(peakAccelInEvent), axle)
+								{
+									StartTimeMs = startTime,
+									EndTimeMs = endTime,
+									PeakAccelerationMagnitude = peakAccelInEvent,
+									AvgAccelerationMagnitude = accelValuesInEvent.Average(),
+									ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+								};
+
+								events.Add(bottomOutEvent);
+							}
+
+							inEvent = false;
+						}
+					}
+
+				// Handle event that extends to end of data
+				if (inEvent)
+				{
+					int eventDurationSamples = combinedAccel.Length - eventStartIndex;
+					if (eventDurationSamples >= minSamplesRequired)
+					{
+						var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
+						var endTime = suspensionDeflectionsList[suspensionDeflectionsList.Count - 1].TimeMS;
+                        var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+																	  GetSeverity(peakAccelInEvent), axle)
+						{
+							StartTimeMs = startTime,
+							EndTimeMs = endTime,
+							PeakAccelerationMagnitude = peakAccelInEvent,
+							AvgAccelerationMagnitude = accelValuesInEvent.Average(),
+							ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+						};
+
+						events.Add(bottomOutEvent);
+					}
+				}
+
+				// Merge events that are too close together
+				return MergeCloseEvents(events);
+			}
+
+			List<double> frontLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
+																					 d => (d.TimeMS, d.FrontLeft)));
+            List<double> frontRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
+																					  d => (d.TimeMS, d.FrontRight)));
+            List<double> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
+																					d => (d.TimeMS, d.RearLeft)));
+            List<double> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
+																					 d => (d.TimeMS, d.RearRight)));
 
 			return CreateBottomOuts("Front",
 									frontLeftAccels,
-									frontRightAccels).Concat(CreateBottomOuts("Rear", rearLeftAccels, rearRightAccels));
+									frontRightAccels).Concat(CreateBottomOuts("Rear",
+																			  rearLeftAccels,
+																			  rearRightAccels));
 		}
 
         void writeTelemetry()

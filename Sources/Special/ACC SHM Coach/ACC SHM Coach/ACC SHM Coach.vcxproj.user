@@ -3,6 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommandArguments>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_3984.trigger"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_3984.trigger"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommandArguments>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"</LocalDebuggerCommandArguments>

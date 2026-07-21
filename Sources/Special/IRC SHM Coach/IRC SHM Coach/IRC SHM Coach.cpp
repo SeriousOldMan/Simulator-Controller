@@ -1213,7 +1213,7 @@ int main(int argc, char* argv[])
 
 					if (handlingAnalyzer) {
 						if (collectTelemetry(pHeader, g_data, soundsDirectory, audioDevice, handlingCalibrator)) {
-							if (remainder(counter, 20) == 0)
+							if (remainder(counter, 200) == 0)
 								writeTelemetry(pHeader, g_data, handlingCalibrator);
 
 							Sleep(10);

@@ -517,7 +517,7 @@ namespace PMRUDPCoach {
 				if (lastCompletedLaps != completedLaps) {
 					lastCompletedLaps = completedLaps;
 					
-					while (true)
+					while (cornerDynamicsList.Count > 0)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 1)
 							cornerDynamicsList.RemoveAt(0);
 						else
@@ -1405,7 +1405,7 @@ namespace PMRUDPCoach {
 							if (collectTelemetry(ref playerVehicle, ref playerTelemetry,
 												 soundsDirectory, audioDevice))
 							{
-								if (counter % 20 == 0)
+								if (counter % 200 == 0)
 									writeTelemetry();
 
 								Thread.Sleep(10);

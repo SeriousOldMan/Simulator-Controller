@@ -611,8 +611,8 @@ namespace ACSHMCoach {
 
 				if (lastCompletedLaps != completedLaps) {
 					lastCompletedLaps = completedLaps;
-					
-					while (true)
+
+                    while (cornerDynamicsList.Count > 0)
 						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
 							cornerDynamicsList.RemoveAt(0);
 						else
@@ -1474,7 +1474,7 @@ namespace ACSHMCoach {
                 {
                     if (collectTelemetry(soundsDirectory, audioDevice))
 					{
-                        if (counter % 20 == 0)
+                        if (counter % 200 == 0)
                             writeTelemetry();
 
 						Thread.Sleep(10);

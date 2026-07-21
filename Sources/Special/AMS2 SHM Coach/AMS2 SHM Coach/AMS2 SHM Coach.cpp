@@ -889,7 +889,7 @@ int main(int argc, char* argv[]) {
 
 			if (handlingAnalyzer) {
 				if (collectTelemetry(localCopy, soundsDirectory, audioDevice, handlingCalibrator)) {
-					if (remainder(counter, 20) == 0)
+					if (remainder(counter, 200) == 0)
 						writeTelemetry(localCopy, handlingCalibrator);
 
 					Sleep(10);

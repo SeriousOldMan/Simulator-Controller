@@ -639,7 +639,7 @@ namespace RF2SHMCoach {
             List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
 																	 List<double> rightAccelerations)
 			{
-	            const double accelerationThreshold = 10;
+	            const double accelerationThreshold = 10 * 1000;
 				const int minEventDurationMs = 30;
 				const int samplingIntervalMs = 20;
 				const int minEventGapMs = 100;
@@ -834,7 +834,19 @@ namespace RF2SHMCoach {
             List<double> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearLeft));
             List<double> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearRight));
 
-			return CreateBottomOuts("Front",
+            if (false)
+            {
+                StreamWriter output = new StreamWriter(dataFile + ".accelerations", true);
+
+				for (int i = 0; i < frontLeftAccels.Count; i++)
+                    output.WriteLine(frontLeftAccels + "," + frontRightAccels + "," +
+                                     rearLeftAccels + "," + rearRightAccels);
+
+                output.Close();
+
+            }
+
+            return CreateBottomOuts("Front",
 									frontLeftAccels,
 									frontRightAccels).Concat(CreateBottomOuts("Rear",
 																			  rearLeftAccels,

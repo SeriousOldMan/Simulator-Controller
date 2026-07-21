@@ -437,10 +437,10 @@ namespace F125UDPCoach {
 
             if (speed > 60)
                 suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps,
-                                                                        motionEx.SuspensionPosition[2],
-                                                                        motionEx.SuspensionPosition[3],
-                                                                        motionEx.SuspensionPosition[0],
-                                                                        motionEx.SuspensionPosition[1]));
+                                                                        motionEx.SuspensionPosition[2] * 0.00025,
+                                                                        motionEx.SuspensionPosition[3] * 0.00025,
+                                                                        motionEx.SuspensionPosition[0] * 0.00025,
+                                                                        motionEx.SuspensionPosition[1] * 0.00025));
 
             lastSpeed = speed;
 

@@ -442,12 +442,19 @@ namespace RF2SHMCoach {
             if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
                 return true;
 
-			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
-
+            int completedLaps = playerScoring.mTotalLaps;
+            float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
             float speed = (float)vehicleSpeed(ref telemetry.mVehicles[carID]);
             float acceleration = (float)speed - lastSpeed;
 
-			lastSpeed = speed;
+			if (speed > 60)
+				suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps,
+																		telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
+																		telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
+
+            lastSpeed = speed;
 
             pushValue(recentGLongs, acceleration);
 
@@ -549,14 +556,6 @@ namespace RF2SHMCoach {
 				if (cd != null)
 					cornerDynamicsList.Add(cd);
 
-				int completedLaps = playerScoring.mTotalLaps;
-
-				suspensionDeflectionsList.Add(new SuspensionDeflections(completedLaps,
-																		telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection,
-																		telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection,
-																		telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection,
-																		telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection));
-
 				if (lastCompletedLaps != completedLaps) {
 					lastCompletedLaps = completedLaps;
 					
@@ -571,18 +570,6 @@ namespace RF2SHMCoach {
 							suspensionDeflectionsList.RemoveAt(0);
 						else
 							break;
-
-					if (false)
-					{
-						StreamWriter output = new StreamWriter(dataFile + ".deflections", true);
-
-						foreach (var deflections in suspensionDeflectionsList)
-							output.WriteLine(deflections.FrontLeft + "," + deflections.FrontRight + "," +
-											 deflections.RearLeft + "," + deflections.RearRight);
-
-						output.Close();
-
-					}
                 }
 			}
 
@@ -601,16 +588,16 @@ namespace RF2SHMCoach {
 											 long time, double deflection,
 											 long nextTime, double nextDeflection)
 				{
-					long dt1 = time - lastTime;
-					long dt2 = nextTime - time;
+					long dt1 = (time - lastTime);
+					long dt2 = (nextTime - time);
 
 					if (dt1 <= 0 || dt2 <= 0)
-						throw new InvalidOperationException("Invalid timestamps detected...");
+						return 0;
 
 					double term1 = (nextDeflection - deflection) / dt2;
 					double term2 = (deflection - lastDeflection) / dt1;
 
-					return 2.0 * (term1 - term2) / (dt1 + dt2);
+					return 2.0 * (term1 - term2) / ((double)(dt1 + dt2) / 1000.0);
 				}
 
 				for (int i = 1; i < deflections.Count - 1; i++)
@@ -621,7 +608,19 @@ namespace RF2SHMCoach {
 															deflections[i + 1].TimeMS,
 															deflections[i + 1].Deflection));
 
-				return accelerations;
+                try
+                {
+                    accelerations.Add(accelerations[accelerations.Count - 1]);
+                }
+                catch { }
+
+                try
+                {
+                    accelerations.Insert(0, accelerations[accelerations.Count - 1]);
+                }
+                catch { }
+
+                return accelerations;
 			}
 
 			List<(long TimeMS, double Deflection)> ExtractDeflections(List<SuspensionDeflections> deflections,
@@ -639,7 +638,7 @@ namespace RF2SHMCoach {
             List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
 																	 List<double> rightAccelerations)
 			{
-	            const double accelerationThreshold = 10 * 1000;
+	            const double accelerationThreshold = 5;
 				const int minEventDurationMs = 30;
 				const int samplingIntervalMs = 20;
 				const int minEventGapMs = 100;
@@ -655,11 +654,11 @@ namespace RF2SHMCoach {
 
 				string GetSeverity(double acceleration)
 				{
-					double gForce = Math.Abs(acceleration / 1000);
+					double gForce = Math.Abs(acceleration);
 
-					if (gForce > 30)
+					if (gForce > 15)
 						return "Heavy";
-					else if (gForce > 20)
+					else if (gForce > 10)
 						return "Medium";
 					else
 						return "Light";
@@ -836,14 +835,21 @@ namespace RF2SHMCoach {
 
             if (false)
             {
-                StreamWriter output = new StreamWriter(dataFile + ".accelerations", true);
+                StreamWriter output = new StreamWriter(dataFile + ".deflections", false);
 
-				for (int i = 0; i < frontLeftAccels.Count; i++)
-                    output.WriteLine(frontLeftAccels + "," + frontRightAccels + "," +
-                                     rearLeftAccels + "," + rearRightAccels);
+                foreach (var deflections in suspensionDeflectionsList)
+                    output.WriteLine(deflections.FrontLeft + "," + deflections.FrontRight + "," +
+                                     deflections.RearLeft + "," + deflections.RearRight);
 
                 output.Close();
 
+                output = new StreamWriter(dataFile + ".accelerations", false);
+
+				for (int i = 0; i < frontLeftAccels.Count; i++)
+					output.WriteLine(frontLeftAccels[i] + "," + frontRightAccels[i] + "," +
+                                     rearLeftAccels[i] + "," + rearRightAccels[i]);
+
+                output.Close();
             }
 
             return CreateBottomOuts("Front",
@@ -879,7 +885,7 @@ namespace RF2SHMCoach {
 						output.WriteLine("Front=" + front);
 					
 					if (rear > 0)
-						output.WriteLine("Front=" + rear);
+						output.WriteLine("Rear=" + rear);
 				}
 			}
 

@@ -7,27 +7,15 @@ using RF2SHMCoach.rFactor2Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 using static RF2SHMCoach.rFactor2Constants;
 using static RF2SHMCoach.rFactor2Constants.rF2GamePhase;
 using static RF2SHMCoach.rFactor2Constants.rF2PitState;
-using static System.Net.WebRequestMethods;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace RF2SHMCoach {
 	public class SHMCoach {
@@ -601,7 +589,7 @@ namespace RF2SHMCoach {
             return true;
         }
 
-        delegate (long TimeMS, double Deflection) Deflection(SuspensionDeflections deflectsions);
+        delegate double Deflection(SuspensionDeflections deflectsions);
 
 		IEnumerable<SuspensionBottomOuts> createSuspensionIssues()
 		{
@@ -640,17 +628,11 @@ namespace RF2SHMCoach {
 																	  Deflection Getter)
 			{
 				List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-				MovingAverage Smooth = new MovingAverage(5);
+				MovingAverage Deflection = new MovingAverage(5);
 
 				foreach (var deflection in suspensionDeflectionsList)
-				{
-					(long TimeMS, double Deflection) value = Getter(deflection);
-
-					value.Deflection = Smooth.Add(value.Deflection);
-
-                    smoothedDeflections.Add(value);
-				}
-
+				    smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));
+				
 				return smoothedDeflections;
 			}
 
@@ -847,14 +829,10 @@ namespace RF2SHMCoach {
 				return MergeCloseEvents(events);
 			}
 
-			List<double> frontLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
-																					 d => (d.TimeMS, d.FrontLeft)));
-            List<double> frontRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
-																					  d => (d.TimeMS, d.FrontRight)));
-            List<double> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
-																					d => (d.TimeMS, d.RearLeft)));
-            List<double> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList,
-																					 d => (d.TimeMS, d.RearRight)));
+			List<double> frontLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontLeft));
+            List<double> frontRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontRight));
+            List<double> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearLeft));
+            List<double> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearRight));
 
 			return CreateBottomOuts("Front",
 									frontLeftAccels,
@@ -1015,6 +993,8 @@ namespace RF2SHMCoach {
 					output.WriteLine("Exit=" + fastOSMin[2]);
 				}
 				else {
+					Task<IEnumerable<SuspensionBottomOuts>> suspensionIssues = Task.Run(createSuspensionIssues);
+
 					output.WriteLine("[Understeer.Slow.Light]");
 
 					if (slowTotalNum > 0)
@@ -1123,11 +1103,11 @@ namespace RF2SHMCoach {
 						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
 					}
 
-                    IEnumerable<SuspensionBottomOuts> suspensionIssues = createSuspensionIssues();
-					
-					writeBottomOut(suspensionIssues, "Heavy");
-					writeBottomOut(suspensionIssues, "Medium");
-					writeBottomOut(suspensionIssues, "Light");
+                    IEnumerable<SuspensionBottomOuts> suspensionBottomOuts = suspensionIssues.Result;
+
+                    writeBottomOut(suspensionBottomOuts, "Heavy");
+                    writeBottomOut(suspensionBottomOuts, "Medium");
+                    writeBottomOut(suspensionBottomOuts, "Light");
                 }
 
                 output.Close();

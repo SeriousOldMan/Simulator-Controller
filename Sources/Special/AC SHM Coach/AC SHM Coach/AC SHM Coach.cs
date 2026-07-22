@@ -636,7 +636,7 @@ namespace ACSHMCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
-				MovingAverage Acceleration = new MovingAverage(5);
+				MovingAverage Acceleration = new MovingAverage(2);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -681,7 +681,7 @@ namespace ACSHMCoach {
                                                                       Deflection Getter)
             {
                 List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-                MovingAverage Deflection = new MovingAverage(7);
+                MovingAverage Deflection = new MovingAverage(5);
 
                 foreach (var deflection in suspensionDeflectionsList)
                     smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));
@@ -702,7 +702,8 @@ namespace ACSHMCoach {
                 var events = new List<SuspensionBottomOuts>();
 
                 // Use magnitude (absolute value) of acceleration for detection
-                var combinedAccel = new double[leftAccelerations.Count];
+                var combinedAccel = new
+				double[leftAccelerations.Count];
                 var leftAboveThreshold = new bool[leftAccelerations.Count];
                 var rightAboveThreshold = new bool[rightAccelerations.Count];
 

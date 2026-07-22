@@ -541,7 +541,7 @@ namespace PMRUDPCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
-				MovingAverage Acceleration = new MovingAverage(5);
+				MovingAverage Acceleration = new MovingAverage(2);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -586,7 +586,7 @@ namespace PMRUDPCoach {
                                                                       Deflection Getter)
             {
                 List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-                MovingAverage Deflection = new MovingAverage(7);
+                MovingAverage Deflection = new MovingAverage(5);
 
                 foreach (var deflection in suspensionDeflectionsList)
                     smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));

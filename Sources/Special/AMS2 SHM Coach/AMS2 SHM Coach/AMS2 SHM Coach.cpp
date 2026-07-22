@@ -364,7 +364,7 @@ std::vector<double> CalculateAccelerations(
 		};
 
 	int size = deflections.size();
-	MovingAverage accelerationMA(5);
+	MovingAverage accelerationMA(2);
 
 	if (size > 3)
 		for (size_t i = 1; i < size - 1; ++i)
@@ -388,7 +388,7 @@ std::vector<std::pair<long, double>> ExtractDeflections(
 	const DeflectionGetter& getter)
 {
 	std::vector<std::pair<long, double>> smoothedDeflections;
-	MovingAverage deflectionMA(7);
+	MovingAverage deflectionMA(5);
 
 	for (const auto& deflection : suspensionDeflectionsList)
 	{

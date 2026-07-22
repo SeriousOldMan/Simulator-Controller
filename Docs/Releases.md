@@ -50,7 +50,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [Developer] A few extensions to the internal rule engine:
     - Objects (and properties) in the global namespace of the host programming language can be referenced using a literal. Example:
 	
-			#RaceEngineer.Singleton.LastPitstop
+			#RaceEngineer.Instance.LastPitstop
 		
     - A similar, even more flexible functionality is available as predicates *extern*, which only accesses the object (useful for functional properties), and *extern=*, which also unifies the value with a supplied term. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
 

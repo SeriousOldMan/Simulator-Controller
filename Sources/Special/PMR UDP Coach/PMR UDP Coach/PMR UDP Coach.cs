@@ -541,6 +541,7 @@ namespace PMRUDPCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
+				MovingAverage Acceleration = new MovingAverage(5);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -559,12 +560,12 @@ namespace PMRUDPCoach {
                 }
 
                 for (int i = 1; i < deflections.Count - 1; i++)
-                    accelerations.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
-                                                            deflections[i - 1].Deflection,
-                                                            deflections[i].TimeMS,
-                                                            deflections[i].Deflection,
-                                                            deflections[i + 1].TimeMS,
-                                                            deflections[i + 1].Deflection));
+                    accelerations.Add(Acceleration.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
+																			 deflections[i - 1].Deflection,
+																			 deflections[i].TimeMS,
+																			 deflections[i].Deflection,
+																			 deflections[i + 1].TimeMS,
+																			 deflections[i + 1].Deflection)));
 
                 try
                 {
@@ -585,7 +586,7 @@ namespace PMRUDPCoach {
                                                                       Deflection Getter)
             {
                 List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-                MovingAverage Deflection = new MovingAverage(5);
+                MovingAverage Deflection = new MovingAverage(7);
 
                 foreach (var deflection in suspensionDeflectionsList)
                     smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));

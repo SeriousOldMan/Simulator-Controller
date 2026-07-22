@@ -1046,6 +1046,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static lightBottomOutEdit
 	static mediumBottomOutEdit
 	static heavyBottomOutEdit
+	static durationBottomOutEdit
+	static gapBottomOutEdit
 
 	static issuesListView
 
@@ -1063,9 +1065,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static updateTask := false
 
 	validateInteger(minValue, maxValue, field, operation, value?) {
-		if (operation = "Validate") {
+		if (operation = "Validate")
 			return (isInteger(value) && (value >= minValue) && (value <= maxValue))
-		}
 	}
 
 	validateTemperature(field, operation, value?) {
@@ -1161,27 +1162,16 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzer.BottomOutThresholds["Medium"] := mediumBottomOutEdit.Text
 			analyzer.BottomOutThresholds["Heavy"] := heavyBottomOutEdit.Text
 		}
+	}
+	else if (commandOrAnalyzer == "UpdateBOTimings") {
+		if !validateInteger(10, 200, durationBottomOutEdit, "Validate", durationBottomOutEdit.Text)
+			durationBottomOutEdit.Text := 30
 
-		for ignore, type in ["Oversteer", "Understeer"]
-			for ignore, severity in ["Light", "Medium", "Heavy"] {
-				if fromEdit {
-					value := %severity . type . "ThresholdEdit"%.Text
+		if !validateInteger(50, 500, gapBottomOutEdit, "Validate", gapBottomOutEdit.Text)
+			gapBottomOutEdit.Text := 100
 
-					if !isInteger(value) {
-						%severity . type . "ThresholdEdit"%.Text := 0
-						value := 0
-					}
-
-					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
-
-					%severity . type . "ThresholdSlider"%.Value := newValue
-
-					if (newValue != value)
-						%severity . type . "ThresholdEdit"%.Text := newValue
-				}
-				else
-					%severity . type . "ThresholdEdit"%.Text := %severity . type . "ThresholdSlider"%.Value
-			}
+		analyzer.BottomOutDuration := durationBottomOutEdit.Text
+		analyzer.BottomOutGap := gapBottomOutEdit.Text
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
 		analyzerGui.Block()
@@ -1773,9 +1763,24 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget82 := mediumBottomOutEdit
 		widget83 := heavyBottomOutEdit
 
-		lightBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
-		mediumBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
-		heavyBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
+		lightBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
+		mediumBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
+		heavyBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
+
+		widget87 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Min. Length"))
+		durationBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutDuration)
+		widget88 := durationBottomOutEdit
+		widget89 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range10-200", analyzer.BottomOutDuration)
+		widget90 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
+
+		widget91 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Min. Gap"))
+		gapBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutGap)
+		widget92 := gapBottomOutEdit
+		widget93 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range50-500", analyzer.BottomOutGap)
+		widget94 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
+
+		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings", true))
+		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings", true))
 
 		tabView .UseTab(3)
 
@@ -1881,7 +1886,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 86
+		loop 94
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

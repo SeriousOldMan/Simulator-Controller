@@ -54,7 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <vector>
 #include <string>
-
+#include <functional>
+#include <algorithm>
+#include <numeric>
+#include <chrono>
+#include <stdexcept>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -308,6 +312,96 @@ void playSound(std::string wavFile, bool wait = true) {
 	}
 }
 
+class MovingAverage
+{
+private:
+	std::vector<double> Window;
+	int Head;
+	int Count;
+	double Sum;
+
+public:
+	MovingAverage(int period)
+		: Head(0), Count(0), Sum(0.0)
+	{
+		if (period <= 0)
+			throw std::invalid_argument("Period must be greater than zero.");
+
+		Window.resize(period, 0.0);
+	}
+
+	double Add(double newValue)
+	{
+		if (Count == static_cast<int>(Window.size()))
+			Sum -= Window[Head];
+
+		Window[Head] = newValue;
+		Sum += newValue;
+		Head = (Head + 1) % Window.size();
+
+		if (Count < static_cast<int>(Window.size()))
+			Count++;
+
+		return Sum / Count;
+	}
+};
+
+struct SuspensionDeflections
+{
+	int CompletedLaps;
+	long TimeMS;
+
+	double FrontLeft;
+	double FrontRight;
+	double RearLeft;
+	double RearRight;
+
+	SuspensionDeflections(int completedLaps, double suspensionDeflectionFL,
+		double suspensionDeflectionFR,
+		double suspensionDeflectionRL, double suspensionDeflectionRR)
+		: CompletedLaps(completedLaps),
+		FrontLeft(suspensionDeflectionFL * 1000.0),
+		FrontRight(suspensionDeflectionFR * 1000.0),
+		RearLeft(suspensionDeflectionRL * 1000.0),
+		RearRight(suspensionDeflectionRR * 1000.0)
+	{
+		// Get current time in milliseconds since epoch
+		auto now = std::chrono::high_resolution_clock::now();
+		auto duration = now.time_since_epoch();
+		TimeMS = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+	}
+};
+
+struct SuspensionBottomOuts
+{
+	int CompletedLaps;
+	std::string Severity;
+	std::string Axle;
+
+	long StartTimeMs;
+	long EndTimeMs;
+	double PeakAccelerationMagnitude;
+	double AvgAccelerationMagnitude;
+	double ImpulseValue;
+
+	long GetDurationMs() const
+	{
+		return EndTimeMs - StartTimeMs;
+	}
+
+	SuspensionBottomOuts(int completedLaps, const std::string& severity, const std::string& axle)
+		: CompletedLaps(completedLaps),
+		Severity(severity),
+		Axle(axle),
+		StartTimeMs(0),
+		EndTimeMs(0),
+		PeakAccelerationMagnitude(0.0),
+		AvgAccelerationMagnitude(0.0),
+		ImpulseValue(0.0)
+	{
+	}
+};
+
 class CornerDynamics {
 public:
 	float speed;
@@ -367,6 +461,7 @@ float smoothValue(std::vector<float>& values, float value) {
 }
 
 std::vector<CornerDynamics> cornerDynamicsList;
+std::vector<SuspensionDeflections> suspensionDeflectionsList;
 
 std::string dataFile = "";
 int understeerLightThreshold = 12;
@@ -417,6 +512,301 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 		return false;
 }
 
+using DeflectionGetter = std::function<double(const SuspensionDeflections&)>;
+
+std::vector<double> CalculateAccelerations(
+	const std::vector<std::pair<long, double>>& deflections)
+{
+	std::vector<double> accelerations;
+
+	auto CalculateAcceleration = [](long lastTime, double lastDeflection,
+		long time, double deflection,
+		long nextTime, double nextDeflection) -> double
+		{
+			long dt1 = (time - lastTime);
+			long dt2 = (nextTime - time);
+
+			if (dt1 <= 0 || dt2 <= 0)
+				return 0.0;
+
+			double term1 = (nextDeflection - deflection) / dt2;
+			double term2 = (deflection - lastDeflection) / dt1;
+
+			return 2.0 * (term1 - term2) / ((dt1 + dt2) / 1000.0);
+		};
+
+	for (size_t i = 1; i < deflections.size() - 1; ++i)
+	{
+		accelerations.push_back(CalculateAcceleration(
+			deflections[i - 1].first, deflections[i - 1].second,
+			deflections[i].first, deflections[i].second,
+			deflections[i + 1].first, deflections[i + 1].second));
+	}
+
+	if (!accelerations.empty())
+	{
+		accelerations.push_back(accelerations.back());
+		accelerations.insert(accelerations.begin(), accelerations.back());
+	}
+
+	return accelerations;
+}
+
+std::vector<std::pair<long, double>> ExtractDeflections(
+	const DeflectionGetter& getter)
+{
+	std::vector<std::pair<long, double>> smoothedDeflections;
+	MovingAverage deflectionMA(5);
+
+	for (const auto& deflection : suspensionDeflectionsList)
+	{
+		smoothedDeflections.emplace_back(
+			deflection.TimeMS,
+			deflectionMA.Add(getter(deflection)));
+	}
+
+	return smoothedDeflections;
+}
+
+std::vector<SuspensionBottomOuts> CreateBottomOuts(
+	const std::string& axle,
+	const std::vector<double>& leftAccelerations,
+	const std::vector<double>& rightAccelerations)
+{
+	const double accelerationThreshold = 5.0;
+	const int minEventDurationMs = 30;
+	const int samplingIntervalMs = 20;
+	const int minEventGapMs = 100;
+
+	int minSamplesRequired = max(1, minEventDurationMs / samplingIntervalMs);
+	std::vector<SuspensionBottomOuts> events;
+
+	auto GetSeverity = [](double acceleration) -> std::string
+		{
+			double gForce = std::abs(acceleration);
+
+			if (gForce > 15.0)
+				return "Heavy";
+			else if (gForce > 10.0)
+				return "Medium";
+			else
+				return "Light";
+		};
+
+	auto CalculateImpulse = [](long duration, const std::vector<double>& accelerationValues) -> double
+		{
+			if (accelerationValues.empty())
+				return 0.0;
+
+			double impulse = 0.0;
+
+			for (size_t i = 0; i < accelerationValues.size() - 1; ++i)
+				impulse += (accelerationValues[i] + accelerationValues[i + 1]) / 2.0 *
+				(static_cast<double>(duration) / 1000.0);
+
+			return impulse;
+		};
+
+	auto MergeCloseEvents = [minEventGapMs](std::vector<SuspensionBottomOuts>& allEvents)
+		-> std::vector<SuspensionBottomOuts>
+		{
+			if (allEvents.size() <= 1)
+				return allEvents;
+
+			std::vector<SuspensionBottomOuts> merged;
+			SuspensionBottomOuts currentEvent(allEvents[0].CompletedLaps,
+				allEvents[0].Severity,
+				allEvents[0].Axle);
+			currentEvent.StartTimeMs = allEvents[0].StartTimeMs;
+			currentEvent.EndTimeMs = allEvents[0].EndTimeMs;
+			currentEvent.PeakAccelerationMagnitude = allEvents[0].PeakAccelerationMagnitude;
+			currentEvent.AvgAccelerationMagnitude = allEvents[0].AvgAccelerationMagnitude;
+			currentEvent.ImpulseValue = allEvents[0].ImpulseValue;
+
+			for (size_t i = 1; i < allEvents.size(); ++i)
+			{
+				long gap = allEvents[i].StartTimeMs - currentEvent.EndTimeMs;
+
+				if (gap < minEventGapMs)
+				{
+					currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
+					currentEvent.PeakAccelerationMagnitude = max(
+						currentEvent.PeakAccelerationMagnitude,
+						allEvents[i].PeakAccelerationMagnitude);
+					currentEvent.ImpulseValue += allEvents[i].ImpulseValue;
+					currentEvent.AvgAccelerationMagnitude =
+						(currentEvent.AvgAccelerationMagnitude + allEvents[i].AvgAccelerationMagnitude) / 2.0;
+				}
+				else
+				{
+					merged.push_back(currentEvent);
+
+					currentEvent = SuspensionBottomOuts(allEvents[i].CompletedLaps,
+						allEvents[i].Severity,
+						allEvents[i].Axle);
+					currentEvent.StartTimeMs = allEvents[i].StartTimeMs;
+					currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
+					currentEvent.PeakAccelerationMagnitude = allEvents[i].PeakAccelerationMagnitude;
+					currentEvent.AvgAccelerationMagnitude = allEvents[i].AvgAccelerationMagnitude;
+					currentEvent.ImpulseValue = allEvents[i].ImpulseValue;
+				}
+			}
+
+			merged.push_back(currentEvent);
+
+			return merged;
+		};
+
+	// Process acceleration data
+	std::vector<double> combinedAccel(leftAccelerations.size(), 0.0);
+	std::vector<bool> leftAboveThreshold(leftAccelerations.size(), false);
+	std::vector<bool> rightAboveThreshold(rightAccelerations.size(), false);
+
+	for (size_t i = 0; i < leftAccelerations.size(); ++i)
+	{
+		double leftMagnitude = leftAccelerations[i];
+		double rightMagnitude = rightAccelerations[i];
+
+		if (leftMagnitude < 0 && rightMagnitude < 0)
+		{
+			leftMagnitude = std::abs(leftMagnitude);
+			rightMagnitude = std::abs(rightMagnitude);
+
+			combinedAccel[i] = max(leftMagnitude, rightMagnitude);
+
+			leftAboveThreshold[i] = leftMagnitude >= accelerationThreshold;
+			rightAboveThreshold[i] = rightMagnitude >= accelerationThreshold;
+		}
+	}
+
+	bool inEvent = false;
+	size_t eventStartIndex = 0;
+	double peakAccelInEvent = 0.0;
+	std::vector<double> accelValuesInEvent;
+
+	for (size_t i = 0; i < combinedAccel.size(); ++i)
+	{
+		if (leftAboveThreshold[i] || rightAboveThreshold[i])
+		{
+			if (!inEvent)
+			{
+				inEvent = true;
+				eventStartIndex = i;
+				peakAccelInEvent = 0.0;
+				accelValuesInEvent.clear();
+			}
+
+			peakAccelInEvent = max(peakAccelInEvent, combinedAccel[i]);
+			accelValuesInEvent.push_back(combinedAccel[i]);
+		}
+		else
+		{
+			if (inEvent)
+			{
+				if (static_cast<int>(i - eventStartIndex) >= minSamplesRequired)
+				{
+					long startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
+					long endTime = suspensionDeflectionsList[i].TimeMS;
+
+					SuspensionBottomOuts bottomOutEvent(
+						suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+						GetSeverity(peakAccelInEvent),
+						axle);
+
+					bottomOutEvent.StartTimeMs = startTime;
+					bottomOutEvent.EndTimeMs = endTime;
+					bottomOutEvent.PeakAccelerationMagnitude = peakAccelInEvent;
+					bottomOutEvent.AvgAccelerationMagnitude =
+						std::accumulate(accelValuesInEvent.begin(), accelValuesInEvent.end(), 0.0) / accelValuesInEvent.size();
+					bottomOutEvent.ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent);
+
+					events.push_back(bottomOutEvent);
+				}
+
+				inEvent = false;
+			}
+		}
+	}
+
+	// Handle event extending to end of data
+	if (inEvent)
+	{
+		int eventDurationSamples = static_cast<int>(combinedAccel.size() - eventStartIndex);
+		if (eventDurationSamples >= minSamplesRequired)
+		{
+			long startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
+			long endTime = suspensionDeflectionsList[suspensionDeflectionsList.size() - 1].TimeMS;
+
+			SuspensionBottomOuts bottomOutEvent(
+				suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+				GetSeverity(peakAccelInEvent),
+				axle);
+
+			bottomOutEvent.StartTimeMs = startTime;
+			bottomOutEvent.EndTimeMs = endTime;
+			bottomOutEvent.PeakAccelerationMagnitude = peakAccelInEvent;
+			bottomOutEvent.AvgAccelerationMagnitude =
+				std::accumulate(accelValuesInEvent.begin(), accelValuesInEvent.end(), 0.0)
+				/ accelValuesInEvent.size();
+			bottomOutEvent.ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent);
+
+			events.push_back(bottomOutEvent);
+		}
+	}
+
+	return MergeCloseEvents(events);
+}
+
+std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
+{
+	std::vector<double> frontLeftAccels = CalculateAccelerations(
+		ExtractDeflections([](const SuspensionDeflections& d) { return d.FrontLeft; }));
+	std::vector<double> frontRightAccels = CalculateAccelerations(
+		ExtractDeflections([](const SuspensionDeflections& d) { return d.FrontRight; }));
+	std::vector<double> rearLeftAccels = CalculateAccelerations(
+		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearLeft; }));
+	std::vector<double> rearRightAccels = CalculateAccelerations(
+		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
+
+	if (false) {
+		{
+			std::ofstream output;
+
+			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+
+			for (const auto& deflections : suspensionDeflectionsList)
+				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
+				deflections.RearLeft << "," << deflections.RearRight << std::endl;
+
+			output.close();
+		}
+
+		{
+			std::ofstream output;
+
+			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+
+			for (int i = 0; i < frontLeftAccels.size(); i++)
+				output << frontLeftAccels[i] << "," << frontRightAccels[i] << "," <<
+				rearLeftAccels[i] << "," << rearRightAccels[i] << std::endl;
+
+			output.close();
+		}
+
+		Sleep(200);
+	}
+
+	std::vector<SuspensionBottomOuts> result;
+
+	auto frontEvents = CreateBottomOuts("Front", frontLeftAccels, frontRightAccels);
+	auto rearEvents = CreateBottomOuts("Rear", rearLeftAccels, rearRightAccels);
+
+	result.insert(result.end(), frontEvents.begin(), frontEvents.end());
+	result.insert(result.end(), rearEvents.begin(), rearEvents.end());
+
+	return result;
+}
+
 bool collectTelemetry(const irsdk_header* header, const char* data, std::string soundsDirectory, std::string audioDevice, bool calibrate) {
 	char result[64];
 	bool onTrack = true;
@@ -446,6 +836,10 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 	if (!onTrack || inPit)
 		return true;
 
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int completedLaps = *((int*)rawValue);
+
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
 
 	float maxSteerAngle = *((float*)rawValue);
@@ -455,13 +849,36 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
 	float rawSteerAngle = -*((float*)rawValue);
-
 	float steerAngle = smoothValue(recentSteerAngles, rawSteerAngle / maxSteerAngle);
 
 	getRawDataValue(rawValue, header, data, "Speed");
 
 	float speed = *((float*)rawValue) * 3.6;
 	float acceleration = speed - lastSpeed;
+
+	float lfDeflection = 0;
+	float rfDeflection = 0;
+	float lrDeflection = 0;
+	float rrDeflection = 0;
+
+	if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
+		lfDeflection = *((float*)rawValue) * 1000;
+
+	if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
+		rfDeflection = *((float*)rawValue) * 1000;
+
+	if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
+		lrDeflection = *((float*)rawValue) * 1000;
+
+	if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
+		rrDeflection = *((float*)rawValue) * 1000;
+
+	if ((speed > 60) && (lfDeflection > 0 || rfDeflection > 0 || lrDeflection > 0 || rrDeflection > 0))
+		suspensionDeflectionsList.push_back(SuspensionDeflections(completedLaps,
+																  lfDeflection,
+																  rfDeflection,
+																  lrDeflection,
+																  rrDeflection));
 
 	lastSpeed = speed;
 
@@ -470,10 +887,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 	getRawDataValue(rawValue, header, data, "LatAccel");
 
 	float lateralAcceleration = smoothValue(recentLatAccels, *((float*)rawValue));
-
-	getRawDataValue(rawValue, header, data, "Lap");
-
-	int completedLaps = *((int*)rawValue);
 
 	getRawDataValue(rawValue, header, data, "YawRate");
 
@@ -575,14 +988,51 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 			lastCompletedLaps = completedLaps;
 
 			// Delete all corner data nore than 2 laps old.
-			cornerDynamicsList.erase(
-				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
-					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
-				cornerDynamicsList.end());
+			if (cornerDynamicsList.size() > 0)
+				cornerDynamicsList.erase(
+					std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+						[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+					cornerDynamicsList.end());
+
+			if (suspensionDeflectionsList.size() > 0)
+				suspensionDeflectionsList.erase(
+					std::remove_if(suspensionDeflectionsList.begin(), suspensionDeflectionsList.end(),
+						[completedLaps](const SuspensionDeflections& o) { return o.CompletedLaps < completedLaps - 1; }),
+					suspensionDeflectionsList.end());
 		}
 	}
 
 	return true;
+}
+
+void writeBottomOut(
+	std::ostream& output,
+	const std::vector<SuspensionBottomOuts>& suspensionIssues,
+	const std::string& severity) {
+	int count = 0;
+	int front = 0;
+	int rear = 0;
+
+	for (const auto& bottomOut : suspensionIssues) {
+		if (bottomOut.Severity == severity) {
+			count += 1;
+
+			if (bottomOut.Axle == "Front")
+				front += 1;
+			else if (bottomOut.Axle == "Rear")
+				rear += 1;
+		}
+	}
+
+	if (count > 0) {
+		output << "[Suspension.Bottom.Out." << severity << "]\n";
+
+		if (front > 0)
+			output << "Front=" << front << '\n';
+
+		if (rear > 0)
+			output << "Rear=" << rear << '\n';
+	}
 }
 
 void writeTelemetry(const irsdk_header* header, const char* data, bool calibrate) {
@@ -793,6 +1243,12 @@ void writeTelemetry(const irsdk_header* header, const char* data, bool calibrate
 				output << "Apex=" << (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum) << std::endl;
 				output << "Exit=" << (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum) << std::endl;
 			}
+
+			std::vector<SuspensionBottomOuts> suspensionBottomOuts = CreateSuspensionIssues();
+
+			writeBottomOut(output, suspensionBottomOuts, "Heavy");
+			writeBottomOut(output, suspensionBottomOuts, "Medium");
+			writeBottomOut(output, suspensionBottomOuts, "Light");
 		}
 
 		output.close();

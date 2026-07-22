@@ -60,7 +60,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iWaterTemperature := [80, 90, 100]
 	iOilTemperature := [80, 90, 100]
 
-	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "High", 15)
+	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "Heavy", 15)
 	iBottomOutDuration := 30
 	iBottomOutGap := 100
 
@@ -410,7 +410,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultRearBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearBrakeTemperatures", "300,550,680")
 		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
 		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
-		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|High->15")
+		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|Heavy->15")
 		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 30)
 		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
 		local fileName, configuration, settings, prefix
@@ -1043,6 +1043,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static minOilTemperatureEdit
 	static maxOilTemperatureEdit
 	static idealOilTemperatureEdit
+	static lightBottomOutEdit
+	static mediumBottomOutEdit
+	static heavyBottomOutEdit
 
 	static issuesListView
 
@@ -1106,6 +1109,58 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 	else if (commandOrAnalyzer == "UpdateSlider") {
 		fromEdit := ((arguments.Length > 0) && arguments[1])
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, severity in ["Light", "Medium", "Heavy"] {
+				if fromEdit {
+					value := %severity . type . "ThresholdEdit"%.Text
+
+					if !isInteger(value) {
+						%severity . type . "ThresholdEdit"%.Text := 0
+						value := 0
+					}
+
+					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
+
+					%severity . type . "ThresholdSlider"%.Value := newValue
+
+					if (newValue != value)
+						%severity . type . "ThresholdEdit"%.Text := newValue
+				}
+				else
+					%severity . type . "ThresholdEdit"%.Text := %severity . type . "ThresholdSlider"%.Value
+			}
+	}
+	else if (commandOrAnalyzer == "UpdateBOThresholds") {
+		fromEdit := ((arguments.Length > 0) && arguments[1])
+
+		if fromEdit {
+			value := lightBottomOutEdit.Text
+
+			if isInteger(value)
+				analyzer.BottomOutThresholds["Light"] := value
+			else
+				analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text := 5
+
+			value := mediumBottomOutEdit.Text
+
+			if isInteger(value)
+				analyzer.BottomOutThresholds["Medium"] := value
+			else
+				analyzer.BottomOutThresholds["Medium"] := lightBottomOutEdit.Text := 10
+
+			value := heavyBottomOutEdit.Text
+
+			if isInteger(value)
+				analyzer.BottomOutThresholds["Heavy"] := value
+			else
+				analyzer.BottomOutThresholds["Heavy"] := lightBottomOutEdit.Text := 15
+		}
+		else {
+			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Medium"] := mediumBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Heavy"] := heavyBottomOutEdit.Text
+		}
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, severity in ["Light", "Medium", "Heavy"] {
@@ -1556,7 +1611,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h388 Section", collect(["Handling", "Temperatures"], translate))
+		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h388 Section", collect(["Handling", "Suspension", "Temperatures"], translate))
 		widget36 := tabView
 
 		tabView .UseTab(1)
@@ -1699,6 +1754,33 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("Italic", "Arial")
 
+		widget76 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h130", translate("Bottom Out"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget77 := analyzerGui.Add("Text", "x174 yp+17 w45 h23 +0x200 Center", translate("Light"))
+		widget78 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Medium"))
+		widget79 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Heavy"))
+
+		widget80 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Thresholds (m/s²)"))
+		lightBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutThresholds["Light"])
+		widget84 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Light"])
+		mediumBottomOutEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", analyzer.BottomOutThresholds["Medium"])
+		widget85 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Medium"])
+		heavyBottomOutEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", analyzer.BottomOutThresholds["Heavy"])
+		widget86 := analyzerGui.Add("UpDown", "x274 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Heavy"])
+		widget81 := lightBottomOutEdit
+		widget82 := mediumBottomOutEdit
+		widget83 := heavyBottomOutEdit
+
+		lightBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
+		mediumBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
+		heavyBottomOutEdit.OnEvent("Change", runAnalyzer.Bind("UpdateBOThresholds", true))
+
+		tabView .UseTab(3)
+
+		analyzerGui.SetFont("Italic", "Arial")
+
 		widget37 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h130", translate("Tyres"))
 
 		analyzerGui.SetFont("Norm", "Arial")
@@ -1799,7 +1881,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 75
+		loop 86
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

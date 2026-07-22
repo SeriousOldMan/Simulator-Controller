@@ -41,6 +41,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - The real time [issue analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) in "Setup Workbench" can now detect suspension related issues like bottoming out.
+    - Not yet supported for *Project Motor Racing* and *RaceRoom Racing Experience*.
+	- Not yet fully tested and calibrated for all simulators.
+	- The next release will include options to finetune the bottom out detection based on car and track.
   - The same suspension related issues will also be recognized by the Driving Coach, when *handling* information is enabled during conversation. You may have to include the new *suspension* instructions, though. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713)
   - The filter in the telemetry based issue analyzer of "Setup Workbench" can now also decide between light, medium and heavy issues.
   - [Important] The default value for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has been reduced from 10 to 4 seconds. Reducing the data update frequency will increase the responsiveness of the Assistants. The change reflects the fact, that most users of Simulator Controller are now on the latest generation of gaming PCs. But if you are not that lucky and encounter problems, for example stutter or stalled Assistants, increase the value again in the "Session Database".

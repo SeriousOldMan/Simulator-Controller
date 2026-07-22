@@ -1001,7 +1001,7 @@ int main(int argc, char* argv[])
 
 			if (handlingAnalyzer) {
 				if (collectTelemetry(soundsDirectory, handlingCalibrator)) {
-					if (remainder(counter, 20) == 0)
+					if (remainder(counter, 200) == 0)
 						writeTelemetry(handlingCalibrator);
 
 					Sleep(10);

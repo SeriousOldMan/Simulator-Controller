@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_3984.trigger"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-Analyze "D:\Dateien\Dokumente\Simulator Controller\Temp\Telemetry_66071.data" 40 70 100 -40 -70 -100 120 480 12 270 150 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sounds_80926"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArgumentsHistory>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_3984.trigger"|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArgumentsHistory>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_3984.trigger"|-Analyze "D:\Dateien\Dokumente\Simulator Controller\Temp\Telemetry_66071.data" 40 70 100 -40 -70 -100 120 480 12 270 150 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sounds_80926"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommandArguments>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>

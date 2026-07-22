@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.1.3.0-dev]() (Early build for 7.1.3. Changes: External references in the rule engine, Suspension related issues in the issue analyzer, Suspension related issues detected by the Driving Coach, Changed default for data update frequency, Fixed startup crash in "Strategy Workbench".)
+[7.1.3.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1t5_2INY/Releases/Simulator%20Controller%207.1.3.0-alpha.zip) (Test build for 7.1.3. Changes: External references in the rule engine, Suspension related issues in the issue analyzer, Suspension related issues detected by the Driving Coach, Changed default for data update frequency, Fixed startup crash in "Strategy Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7130) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) of this version and all the versions you might have skipped, before installing and using this version.
 

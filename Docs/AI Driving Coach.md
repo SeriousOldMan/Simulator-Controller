@@ -160,7 +160,7 @@ Additional installation reequirements:
 
 You also have to download a LLM. Make sure the model is in GGUF file format. You can find good models on the [GPT4All website](https://gpt4all.io/index.html) or on the [Hugging Face website](https://huggingface.co/), the largest community for AI development world wide. I recommend starting with *Wizard 1.2* (["wizardlm-13b-v1.2.Q4_0.gguf"](https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf)), which is a very good allround model. Another very good model at the time of this writing is *Hermes* (["nous-hermes-llama2-13b.Q4_0.gguf"](https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf)). Both models consume up to 16GB of RAM, so you need to have at least 32 GB RAM in your machine. There are also some smaller models available on the GPT4All website, but their knowledge about our domain is very limited.
 
-Once you have selected and downloaded a model, enter the full path to the model file into the "Model" field and your done. And you can specify, how many layers of the model would be executed on your graphics card, which of course requires that the GPU can provide the amount of memory to the model. This might need some try and errors, until you find a suitable configuration, which also allows you to still tun your favorite simulator. Additional settings are available for experts in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#llm-settings). Be sure, what you are doing, when changing them. Normally, you only want to change the "Threads" setting, when you encounter heavy stutter, when the LLM Runtime is using the CPU.
+Once you have selected and downloaded a model, enter the full path to the model file into the "Model" field and your done. And you can specify, how many layers of the model would be executed on your graphics card, which of course requires that the GPU can provide the amount of memory to the model. This might need some try and errors, until you find a suitable configuration, which also allows you to still run your favorite simulator. Additional settings are available for experts in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#llm-settings). Be sure what you are doing when changing them. Normally, you only want to change the "Threads" setting, when you encounter heavy stutter, when the LLM Runtime is using the CPU. As a general rule of thumb, set the number of threads to (number of cores / 2) for a CPU with more than 8 cores and to (number of cores / 4) for a CPU with less than 8 cores, if you encounter stutter.
 
 Good to know: The LLM Runtime supports tool/function calling which is required to trigger actions in the [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster) or even use a LLM for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster). But not every LLM can handle tool calls, therefore check the model card on the the [Hugging Face website](https://huggingface.co/). It is normally mentioned there, whether a given model supports tool calling. In general, you will need models with at least 13B parameters and a decent quantization.
 
@@ -213,6 +213,8 @@ Below you find all instruction categories and the supported variables:
 |             | %telemetry%       | This variable is substituted with the content of the knowledge base in a self-explaining JSON format. |
 | Handling    | Scope             | This instruction is used only when handling problems had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
 |             | %handling%        | An enumeration of all detected handing problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
+| Suspension  | Scope             | This instruction is used only when suspension related handling problems, like bottoming out had been detected in the telemetry. See the chapter below about detecting handling problems and discussin them with Aiden. |
+|             | %suspension%      | An enumeration of all detected suspension problems. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#detecting-and-discussing-handling-problems) below for more information. |
 | Coaching    | Scope             | This is a very long instruction, which is used when the telemetry-based coaching is active. It describes many areas to check in the telemetry data when looking for potential imrpvements. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 |             | %telemetry%       | This is a special variable, because it is actually not part of the instruction text, but is appended in *normal* conversation when corner by corner coaching is active. This variable will be replaced with condensed telemetry data in JSON format for the last lap and possible recent laps. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
 | Coaching.Lap | Scope            | This is synthetic question/command, which is sent to the LLM, if the user request a complete telemetry review of the last lap. |
@@ -265,15 +267,20 @@ The above list are only few of the rules to follow, though the most important on
 
 ### Detecting and discussing handling problems
 
-The Driving Coach will try to detect possible handling problems using the same mechanism that is used by the "Setup Workbench". In fact, Aiden uses the same [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Issue Analyzer for the given car and track.
+The Driving Coach will try to detect possible handling problems and suspension related problems using the same mechanism that is used by the "Setup Workbench". In fact, Aiden uses the same [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) as the "Setup Workbench" and will use the same settings and thresholds you have selected for the same car and track last time. Therefore, if you want to discuss your handling issues with Aiden, be sure to have created a valid or even calibrated configuration in the Issue Analyzer for the given car and track.
 
 When at least one handling issue had been detected, the "Handling" instruction will be used to describe the handling issues to the Driving Coach. Each issue will be described on a single line in the instructions. Example:
  
-	- Heavy Understeer on Slow corner Entry
+	- Heavy Understeer Slow corner Entry
+	- Medium Oversteer Fast corner Exit
 	
 Using this knowledge, Aiden should be able to give you information how to cope with the given handling issues, for example by changing your driver inputs or changes to the car setup.
 
-Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
+Suspension related problems will be available to Aiden in a similar format:
+
+	- Heavy Bottom Out Rear
+
+Information: You can disable this instruction (and every other instruction as well) completely, by clearing it in the configuration, if you don't want Aiden to give you information regarding handling or suspension problems. If you want to temporarily enable or disable it during a running session, you can use the voice commands below.
 
 ### List of all voice commands
 
@@ -305,7 +312,7 @@ As discussed above Aiden can process information about your current session in a
 
 	[Please] do not pay attention *information* anymore [please]
 
-As you might expect, the word "please" is optional. Available options for *information* are: "session information", "stint information", "handling information". These options resemble, as you already may have recognized, the instructions discussed above. After you have disabled one of the information processings (all are enabled by default), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *information* are: "session information", "stint information", "handling information" (which includes also suspension related problems). These options resemble, as you already may have recognized, the instructions discussed above. After you have disabled one of the information processings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] pay attention to *information* again [please]
 

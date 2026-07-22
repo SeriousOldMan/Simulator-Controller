@@ -64,6 +64,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 	iIssueCollector := false
 	iLastHandling := false
+	iLastSuspension := false
 	iLastTemperatures := false
 
 	iExitCallback := false
@@ -334,6 +335,23 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		Set {
 			return (this.iLastHandling := value)
+		}
+	}
+
+	Suspension {
+		Get {
+			if this.iIssueCollector
+				return (this.iLastSuspension := this.iIssueCollector.Suspension)
+			else if !this.iLastSuspension {
+				this.iLastSuspension := CaseInsenseMap()
+				this.iLastSuspension.Default := []
+			}
+
+			return this.iLastSuspension
+		}
+
+		Set {
+			return (this.iLastSuspension := value)
 		}
 	}
 
@@ -639,7 +657,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	}
 
 	startIssueAnalyzer(calibrate := false) {
-		local settings := {Handling: true, Temperatures: true, Frequency: 2000}
+		local settings := {Handling: true, Suspension: true, Temperatures: true, Frequency: 2000}
 		local ignore, setting
 
 		this.stopIssueAnalyzer()
@@ -670,6 +688,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		if collector {
 			this.iLastHandling := collector.Handling
+			this.iLastSuspension := collector.Suspension
 
 			collector.stopIssueCollector()
 		}
@@ -928,7 +947,8 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local issues, filteredHandling, issue, temperatures, type, speed, severity, where, value, newValue, frequency
+	local issues, issue, handling, suspension, temperatures, filteredHandling, filteredSuspension
+	local type, speed, severity, where, value, newValue, frequency
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 	local category, temperature, position, key, info, simulator, car, track, fileName
@@ -1154,13 +1174,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
 							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
 
-				withTask(ProgressTask(translate("Analyzing Data")), () {
-					issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
-																	 , analyzer.WheelBase, analyzer.TrackWidth
-																	 , thresholds)
+				analyzerGui.Block()
 
-					issues := IssueCollector.createHandling(issues)
-				})
+				try {
+					withTask(ProgressTask(translate("Analyzing Data")), () {
+						issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
+																		 , analyzer.WheelBase, analyzer.TrackWidth
+																		 , thresholds)
+
+						issues := IssueCollector.createHandling(issues)
+
+						analyzer.Handling := issues
+
+						issues := theAnalyzer.analyzeSuspension(telemetries, thresholds)
+
+						issues := IssueCollector.createSuspension(issues)
+
+						analyzer.Suspension := issues
+					})
+				}
+				finally {
+					analyzerGui.Unblock()
+				}
 
 				for ignore, widget in prepareWidgets {
 					widget.Enabled := false
@@ -1174,9 +1209,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 				state := "Analyze"
 
-				analyzer.Handling := issues
-
-				runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"))
+				runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"), runAnalyzer("FilterSuspension"))
 			}
 		}
 		else {
@@ -1218,12 +1251,16 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		state := "Analyze"
 
-		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"), runAnalyzer("FilterTemperatures"))
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling")
+									 , runAnalyzer("FilterSuspension")
+									 , runAnalyzer("FilterTemperatures"))
 	}
 	else if (commandOrAnalyzer == "Threshold")
-		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling"), runAnalyzer("FilterTemperatures"))
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterHandling")
+									 , runAnalyzer("FilterSuspension")
+									 , runAnalyzer("FilterTemperatures"))
 	else if (commandOrAnalyzer == "UpdateSamples")
-		runAnalyzer("UpdateTelemetry", analyzer.Handling, analyzer.Temperatures)
+		runAnalyzer("UpdateTelemetry", analyzer.Handling, analyzer.Suspension, analyzer.Temperatures)
 	else if (commandOrAnalyzer == "FilterHandling") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
@@ -1270,6 +1307,87 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						issues[where] := filteredHandling
 					}
 				}
+
+		return issues
+	}
+	else if (commandOrAnalyzer == "FilterSuspension") {
+		workbench := analyzer.Workbench
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
+		final := ((arguments.Length > 0) && arguments[1])
+
+		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Handling.Clone())
+
+		for ignore, type in ["Suspension.Bottom.Out"]
+			for ignore, where in ["Front", "Rear"] {
+				where := (type . "." . where)
+				filteredSuspension := []
+
+				if issues.Has(where) {
+					for ignore, issue in issues[where] {
+						severity := issue.Severity
+
+						include := (issue.Frequency >= applyThresholdSlider.Value)
+
+						if (include && final) {
+							include := false
+
+							characteristic := characteristicLabels[where]
+
+							row := resultListView.GetNext(0, "C")
+
+							while row {
+								value := resultListView.GetText(row)
+
+								if (value = characteristic) {
+									include := true
+
+									break
+								}
+								else
+									row := resultListView.GetNext(row, "C")
+							}
+						}
+
+						if include
+							filteredSuspension.Push(issue)
+					}
+
+					issues[where] := filteredSuspension
+				}
+			}
+
+		if issues.Has("Suspension.Sway") {
+			for ignore, issue in issues["Suspension.Sway"] {
+				severity := issue.Severity
+
+				include := (issue.Frequency >= applyThresholdSlider.Value)
+
+				if (include && final) {
+					include := false
+
+					characteristic := characteristicLabels["Suspension.Sway"]
+
+					row := resultListView.GetNext(0, "C")
+
+					while row {
+						value := resultListView.GetText(row)
+
+						if (value = characteristic) {
+							include := true
+
+							break
+						}
+						else
+							row := resultListView.GetNext(row, "C")
+					}
+				}
+
+				if include
+					filteredSuspension.Push(issue)
+			}
+
+			issues["Suspension.Sway"] := filteredSuspension
+		}
 
 		return issues
 	}
@@ -1401,7 +1519,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		handling := ((arguments.Length > 0) ? arguments[1] : false)
-		temperatures := ((arguments.Length > 1) ? arguments[2] : false)
+		suspension := ((arguments.Length > 1) ? arguments[2] : false)
+		temperatures := ((arguments.Length > 2) ? arguments[3] : false)
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)
 
@@ -1418,6 +1537,23 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 								theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
 																				  , translate(issue.Severity), issue.Frequency)
 					}
+
+		if suspension {
+			for ignore, type in ["Suspension.Bottom.Out"]
+				for ignore, where in ["Front", "Rear"] {
+					characteristic := (type . "." . where)
+
+					if suspension.Has(characteristic)
+						for ignore, issue in suspension[characteristic]
+							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic]
+																			  , translate(issue.Severity), issue.Frequency)
+				}
+
+			if suspension.Has("Suspension.Sway")
+				for ignore, issue in suspension["Suspension.Sway"]
+					theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels["Suspension.Sway"]
+																	  , translate(issue.Severity), issue.Frequency)
+		}
 
 		if temperatures {
 			for ignore, category in ["Around", "Inner", "Outer"]
@@ -1458,7 +1594,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			theListView.ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
-		result := combine(runAnalyzer("FilterHandling", true), runAnalyzer("FilterTemperatures", true))
+		result := combine(runAnalyzer("FilterHandling", true)
+						, runAnalyzer("FilterSuspension", true)
+						, runAnalyzer("FilterTemperatures", true))
 	else {
 		analyzer := commandOrAnalyzer
 		updateTask := false
@@ -1846,6 +1984,8 @@ runCalibrator(commandOrAnalyzer, *) {
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
 		cleanValues := analyzer.Handling
 
+		addMultiMapValues(cleanValues, analyzer.Suspension)
+
 		analyzer.stopIssueAnalyzer()
 
 		infoText.Text := translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press `"Finish`".")
@@ -1857,6 +1997,8 @@ runCalibrator(commandOrAnalyzer, *) {
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
 		overValues := analyzer.Handling
+
+		addMultiMapValues(overValues, analyzer.Suspension)
 
 		analyzer.stopIssueAnalyzer()
 

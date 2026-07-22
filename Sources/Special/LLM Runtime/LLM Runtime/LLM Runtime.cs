@@ -52,6 +52,7 @@ public class LLMExecutor
             ContextSize = contextSize,
             GpuLayerCount = gpuLayers,
 			BatchSize = batchSize,
+            BatchThreads = threads,
 			Threads = threads
         };
         Model = LLamaWeights.LoadFromFile(Parameters);

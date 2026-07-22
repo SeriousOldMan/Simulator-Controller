@@ -111,6 +111,10 @@ Literals are represented as a sequence of characters. They can contain almost an
    4. Strings
 
       Strings are all literals, that are not numbers, variables or facts. An interesting aspect here is, that strings in the rules must not be enclosed in quotes, as long as they do not contain spaces or other reserved characters like parantheses.
+   
+   5. Externals
+
+      This is a special one. If a string literal is preceeded by a "#", it represents a reference to an object in the global namespace of the host language. If the string literal contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object. Example: *#Singleton.Instance.myProperty*
 
 #### Expressions
 
@@ -250,7 +254,7 @@ Once the condition of a production rule is matched, all actions on the right-han
 	
 	They can be used to access the internal state of the knowledge base and the current state of execution in the rule engine. It is even possible to invoke the rule engine recursively while processing the action.
 	
-	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method on that last object. Example: *Singleton.Instance.myMethod*
+	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method of that last object. Example: *Singleton.Instance.myMethod*
 	
 	If the name of the function or the method descriptor is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
@@ -574,11 +578,13 @@ The rule engine has some builtin predicates which can be used when formulating r
 	
 	*function* must return *true*, if the call succeeds and the next subgoal should be processed. If *function* returns *false*, it fails and the next alternative will be processed by the rule engine.
 	
-	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method on that last object. Example: *Singleton.Instance.myMethod*
+	If the name of the function contains at least one dot ("."), it specifies actually a method of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a method of that last object. Example: *Singleton.Instance.myMethod*
 	
 	If the name of the function or the method descriptor is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
 	Syntax: call(%function%, arg1, ..., argN) or :%function%(arg1, ..., argN)
+	
+	By the way, call(function, arg1, ..., argN) can actually be expressed with call=(%function%, arg1, ..., argN, ?) and is therefore provided for convinience.
   
   - call=
   
@@ -595,6 +601,24 @@ The rule engine has some builtin predicates which can be used when formulating r
 	If the name of the function is enclosed in percentage characters, it refers to a *normal* function in the global namespace of the host language. In this case the first special argument is not passed to that function.
   
 	Syntax: call=(%function%, arg1, ..., argN, result) or :%function%=(arg1, ..., argN, result)
+  
+  - extern
+  
+	Syntax: extern(identifier)
+	
+	This predicate will *access* the object/property in the global namespace of the host language. If the *identifier* contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object. The current value will **not** be used, but the predicate will fail, if no such object/property exist.
+	
+	By the way, extern(identifier) can actually be expressed with extern=(identifier, ?) and is therefore provided for convinience.
+	
+	See also the #*identifier* literal, which may be much more expressive, if the identifier is known at coding time.
+	
+  - extern=
+  
+	Syntax: extern=(identifier, value)
+	
+	The second argument will be unified with the value currently hold the given *identifier* in the global namespace of the host language. If the identifier contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object. The current value of the specified object/property will be unified with the supplied *value*.
+	
+	See also the #*identifier* literal, which may be much more expressive, if the identifier is known at coding time.
 
   - produce
   

@@ -17,6 +17,7 @@
 #include <numeric>
 #include <chrono>
 #include <stdexcept>
+#include <future>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -957,6 +958,8 @@ void writeTelemetry(bool calibrate) {
 			output << "Exit=" << fastOSMin[2] << endl;
 		}
 		else {
+			auto suspensionBottomOutsTask = async(CreateSuspensionIssues);
+
 			output << "[Understeer.Slow.Light]" << endl;
 
 			if (slowTotalNum > 0) {
@@ -1053,7 +1056,7 @@ void writeTelemetry(bool calibrate) {
 				output << "Exit=" << (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum) << endl;
 			}
 
-			std::vector<SuspensionBottomOuts> suspensionBottomOuts = CreateSuspensionIssues();
+			std::vector<SuspensionBottomOuts> suspensionBottomOuts = suspensionBottomOutsTask.get();
 
 			writeBottomOut(output, suspensionBottomOuts, "Heavy");
 			writeBottomOut(output, suspensionBottomOuts, "Medium");

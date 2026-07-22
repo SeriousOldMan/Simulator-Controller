@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <numeric>
 #include <chrono>
 #include <stdexcept>
+#include <future>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -1148,6 +1149,8 @@ void writeTelemetry(const irsdk_header* header, const char* data, bool calibrate
 			output << "Exit=" << fastOSMin[2] << std::endl;
 		}
 		else {
+			auto suspensionBottomOutsTask = async(CreateSuspensionIssues);
+
 			output << "[Understeer.Slow.Light]" << std::endl;
 
 			if (slowTotalNum > 0) {
@@ -1244,7 +1247,7 @@ void writeTelemetry(const irsdk_header* header, const char* data, bool calibrate
 				output << "Exit=" << (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum) << std::endl;
 			}
 
-			std::vector<SuspensionBottomOuts> suspensionBottomOuts = CreateSuspensionIssues();
+			std::vector<SuspensionBottomOuts> suspensionBottomOuts = suspensionBottomOutsTask.get();
 
 			writeBottomOut(output, suspensionBottomOuts, "Heavy");
 			writeBottomOut(output, suspensionBottomOuts, "Medium");

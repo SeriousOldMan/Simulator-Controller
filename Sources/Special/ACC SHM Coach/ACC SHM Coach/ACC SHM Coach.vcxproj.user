@@ -8,5 +8,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommandArguments>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-Telemetry 4096 "D:\Dateien\Dokumente\Simulator Controller\Temp\Sessions\Practice\Telemetry"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>

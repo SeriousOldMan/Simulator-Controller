@@ -655,6 +655,34 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 	std::vector<double> rearRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
+	if (false) {
+		{
+			std::ofstream output;
+
+			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+
+			for (const auto& deflections : suspensionDeflectionsList)
+				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
+				deflections.RearLeft << "," << deflections.RearRight << std::endl;
+
+			output.close();
+		}
+
+		{
+			std::ofstream output;
+
+			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+
+			for (int i = 0; i < frontLeftAccels.size(); i++)
+				output << frontLeftAccels[i] << "," << frontRightAccels[i] << "," <<
+				rearLeftAccels[i] << "," << rearRightAccels[i] << std::endl;
+
+			output.close();
+		}
+
+		Sleep(200);
+	}
+
 	std::vector<SuspensionBottomOuts> result;
 
 	auto frontEvents = CreateBottomOuts("Front", frontLeftAccels, frontRightAccels);

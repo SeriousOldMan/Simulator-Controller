@@ -60,6 +60,10 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iWaterTemperature := [80, 90, 100]
 	iOilTemperature := [80, 90, 100]
 
+	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "High", 15)
+	iBottomOutDuration := 30
+	iBottomOutGap := 100
+
 	iAcousticFeedback := true
 
 	iIssueCollector := false
@@ -308,6 +312,51 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
+	BottomOutThresholds[key?] {
+		Get {
+			return (isSet(key) ? this.iBottomOutThresholds[key] : this.iBottomOutThresholds)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iBottomOutThresholds[key] := value
+
+				setAnalyzerSetting(this, "BottomOutThresholds", map2String("|", "->", this.iBottomOutThresholds))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "BottomOutThresholds", map2String("|", "->", value))
+
+				return (this.iBottomOutThresholds := value)
+			}
+		}
+	}
+
+	BottomOutDuration {
+		Get {
+			return this.iBottomOutDuration
+		}
+
+		Set {
+			setAnalyzerSetting(this, "BottomOutDuration", value)
+
+			return (this.iBottomOutDuration := value)
+		}
+	}
+
+	BottomOutGap {
+		Get {
+			return this.iBottomOutGap
+		}
+
+		Set {
+			setAnalyzerSetting(this, "BottomOutGap", value)
+
+			return (this.iBottomOutGap := value)
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -361,6 +410,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultRearBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearBrakeTemperatures", "300,550,680")
 		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
 		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
+		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|High->15")
+		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 30)
+		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
 		local fileName, configuration, settings, prefix
 
 		static first := true
@@ -407,6 +459,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				defaultRearBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 				defaultWaterTemperature := getMultiMapValue(configuration, "Analyzer", "WaterTemperature", defaultWaterTemperature)
 				defaultOilTemperature := getMultiMapValue(configuration, "Analyzer", "OilTemperature", defaultOilTemperature)
+				defaultBottomOutThresholds := getMultiMapValue(configuration, "Analyzer", "BottomOutThresholds", defaultBottomOutThresholds)
+				defaultBottomOutDuration := getMultiMapValue(configuration, "Analyzer", "BottomOutDuration", defaultBottomOutDuration)
+				defaultBottomOutGap := getMultiMapValue(configuration, "Analyzer", "BottomOutGap", defaultBottomOutGap)
 			}
 		}
 
@@ -431,6 +486,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Settings", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 		defaultWaterTemperature := getMultiMapValue(settings, "Settings", prefix . "WaterTemperature", defaultWaterTemperature)
 		defaultOilTemperature := getMultiMapValue(settings, "Settings", prefix . "OilTemperature", defaultOilTemperature)
+		defaultBottomOutThresholds := getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds)
+		defaultBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
+		defaultBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
@@ -461,6 +519,10 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 												   , prefix . "WaterTemperature", defaultWaterTemperature))
 		this.iOilTemperature := string2Values(",", getMultiMapValue(settings, "Settings"
 												 , prefix . "OilTemperature", defaultOilTemperature))
+
+		this.iBottomOutThresholds := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds))
+		this.iBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
+		this.iBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
 
 		super.__New(workbench, simulator)
 

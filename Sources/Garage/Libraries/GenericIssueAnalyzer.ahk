@@ -947,7 +947,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local issues, issue, handling, suspension, temperatures, filteredHandling, filteredSuspension
+	local issues, issue, handling, suspension, temperatures, filteredHandling, filteredSuspension, filteredTemperatures
 	local type, speed, severity, where, value, newValue, frequency
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
@@ -1313,7 +1313,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Handling.Clone())
+		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Suspension.Clone())
 
 		for ignore, type in ["Suspension.Bottom.Out"]
 			for ignore, where in ["Front", "Rear"] {
@@ -1397,7 +1397,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				for ignore, position in ["Front", "Rear"] {
 					key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
-					filteredHandling := []
+					filteredTemperatures := []
 
 					for ignore, issue in issues[key] {
 						severity := issue.Severity
@@ -1423,17 +1423,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						}
 
 						if include
-							filteredHandling.Push(issue)
+							filteredTemperatures.Push(issue)
 					}
 
-					issues[key] := filteredHandling
+					issues[key] := filteredTemperatures
 				}
 
 		for ignore, category in ["Front", "Rear"]
 			for ignore, temperature in ["Cold", "Hot"] {
 				key := ("Brake.Temperatures." . temperature . "." category)
 
-				filteredHandling := []
+				filteredTemperatures := []
 
 				for ignore, issue in issues[key] {
 					severity := issue.Severity
@@ -1459,17 +1459,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					}
 
 					if include
-						filteredHandling.Push(issue)
+						filteredTemperatures.Push(issue)
 				}
 
-				issues[key] := filteredHandling
+				issues[key] := filteredTemperatures
 			}
 
 		for ignore, category in ["Water", "Oil"]
 			for ignore, temperature in ["Cold", "Hot"] {
 				key := ("Engine.Temperatures." . temperature . "." category)
 
-				filteredHandling := []
+				filteredTemperatures := []
 
 				for ignore, issue in issues[key] {
 					severity := issue.Severity
@@ -1495,10 +1495,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					}
 
 					if include
-						filteredHandling.Push(issue)
+						filteredTemperatures.Push(issue)
 				}
 
-				issues[key] := filteredHandling
+				issues[key] := filteredTemperatures
 			}
 
 		return issues

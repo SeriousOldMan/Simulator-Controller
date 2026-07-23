@@ -752,7 +752,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		if !this.iIssueCollector {
 			if !calibrate
-				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"]
+				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"
+									  , "BottomOutThresholds", "BottomOutDuration", "BottomOutGap"
+									  , "SampleSettings"]
 					if this.settingAvailable(setting)
 						settings.%setting% := this.%setting%
 

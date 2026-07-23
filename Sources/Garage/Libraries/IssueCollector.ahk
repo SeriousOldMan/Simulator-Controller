@@ -38,6 +38,11 @@ class IssueCollector {
 	iWheelBase := false
 	iTrackWidth := false
 
+	iBottomOutThresholds := false
+	iBottomOutDuration := false
+	iBottomOutGap := false
+	iSamplerSettings := false
+
 	iAcousticFeedback := true
 	iSoundsDirectory := false
 
@@ -114,6 +119,30 @@ class IssueCollector {
 		}
 	}
 
+	BottomOutThresholds[key?] {
+		Get {
+			return (isSet(key) ? this.iBottomOutThresholds[key] : this.iBottomOutThresholds)
+		}
+	}
+
+	BottomOutDuration {
+		Get {
+			return this.iBottomOutDuration
+		}
+	}
+
+	BottomOutGap {
+		Get {
+			return this.iBottomOutGap
+		}
+	}
+
+	SamplerSettings[key?] {
+		Get {
+			return (isSet(key) ? this.iSamplerSettings[key] : this.iSamplerSettings)
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -185,10 +214,14 @@ class IssueCollector {
 		deleteDirectory(this.iSoundsDirectory)
 	}
 
-	loadFromSettings(settings := false, section := "Settigs") {
+	loadFromSettings(settings := false, section := "Settings") {
 		local defaultUndersteerThresholds := "40,70,100"
 		local defaultOversteerThresholds := "-40,-70,-100"
 		local defaultLowspeedThreshold := 120
+		local defaultBottomOutThresholds := "Light->5|Medium->10|Heavy->15"
+		local defaultBottomOutDuration := 30
+		local defaultBottomOutGap := 100
+		local defaultSamplerSettings := "Samples->2|Deflection->5|Acceleration->2"
 		local prefix
 
 		if !settings
@@ -211,6 +244,11 @@ class IssueCollector {
 		defaultUndersteerThresholds := getMultiMapValue(settings, section, prefix . "UndersteerThresholds", defaultUndersteerThresholds)
 		defaultOversteerThresholds := getMultiMapValue(settings, section, prefix . "OversteerThresholds", defaultOversteerThresholds)
 		defaultLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		defaultBottomOutThresholds := getMultiMapValue(settings, section, prefix . "BottomOutThresholds", defaultBottomOutThresholds)
+		defaultBottomOutDuration := getMultiMapValue(settings, section, prefix . "BottomOutDuration", defaultBottomOutDuration)
+		defaultBottomOutGap := getMultiMapValue(settings, section, prefix . "BottomOutGap", defaultBottomOutGap)
+		defaultSamplerSettings := getMultiMapValue(settings, section, prefix . "SamplerSettings", defaultSamplerSettings)
 
 		prefix := (this.Simulator . "." . (this.Car ? this.Car : "*") . "." . (this.Track ? this.Track : "*") . ".")
 
@@ -236,6 +274,18 @@ class IssueCollector {
 
 		if this.settingAvailable("LowspeedThreshold", true)
 			this.iLowspeedThreshold := getMultiMapValue(settings, section, prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		if this.settingAvailable("BottomOutThresholds", true)
+			this.iBottomOutThresholds := string2Map("|", "->", getMultiMapValue(settings, section, prefix . "BottomOutThresholds", defaultBottomOutThresholds))
+
+		if this.settingAvailable("BottomOutDuration", true)
+			this.iBottomOutDuration := getMultiMapValue(settings, section, prefix . "BottomOutDuration", defaultBottomOutDuration)
+
+		if this.settingAvailable("BottomOutGap", true)
+			this.iBottomOutGap := getMultiMapValue(settings, section, prefix . "BottomOutGap", defaultBottomOutGap)
+
+		if this.settingAvailable("SamplerSettings", true)
+			this.iSamplerSettings := string2Map("|", "->", getMultiMapValue(settings, section, prefix . "SamplerSettings", defaultSamplerSettings))
 	}
 
 	settingAvailable(setting, force := false) {
@@ -293,16 +343,34 @@ class IssueCollector {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
-				if this.AcousticFeedback {
-					options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
+				if !calibrate {
+					if this.settingAvailable("BottomOutThresholds")
+						options .= (A_Space . values2String(A_Space, this.BottomOutThresholds["Light"]
+																   , this.BottomOutThresholds["Medium"]
+																   , this.BottomOutThresholds["Heavy"]))
 
-					if this.AudioSettings {
-						if kSox
-							SplitPath(kSox, , &workingDirectory)
-						else
-							workingDirectory := A_WorkingDir
+					if this.settingAvailable("BottomOutDuration")
+						options .= (A_Space . this.BottomOutDuration)
 
-						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+					if this.settingAvailable("BottomOutGap")
+						options .= (A_Space . this.BottomOutGap)
+
+					if this.settingAvailable("SamplerSettings")
+						options .= (A_Space . values2String(A_Space, this.SamplerSettings["Samples"]
+																   , this.SamplerSettings["Deflection"]
+																   , this.SamplerSettings["Acceleration"]))
+
+					if this.AcousticFeedback {
+						options .= (A_Space . "`"" . this.iSoundsDirectory . "`"")
+
+						if this.AudioSettings {
+							if kSox
+								SplitPath(kSox, , &workingDirectory)
+							else
+								workingDirectory := A_WorkingDir
+
+							options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+						}
 					}
 				}
 

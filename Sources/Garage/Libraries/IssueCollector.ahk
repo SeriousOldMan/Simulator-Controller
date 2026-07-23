@@ -185,7 +185,7 @@ class IssueCollector {
 		deleteDirectory(this.iSoundsDirectory)
 	}
 
-	loadFromSettings(settings := false, section := "Settigs") {
+	loadFromSettings(settings := false, section := "Settings") {
 		local defaultUndersteerThresholds := "40,70,100"
 		local defaultOversteerThresholds := "-40,-70,-100"
 		local defaultLowspeedThreshold := 120

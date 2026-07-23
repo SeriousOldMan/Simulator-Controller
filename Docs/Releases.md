@@ -7,6 +7,7 @@
 #### Fixes
 
   - Fixed a startup crash in "Strategy Workbench", when community tyre wear data is used.
+  - Fixed a bug for the Driving Coach, who did not use the correct settings for the handing issue analyzer in some rare cases.
   
 #### Changes
 

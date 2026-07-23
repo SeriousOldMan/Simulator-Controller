@@ -627,16 +627,17 @@ class DrivingCoach extends GridRaceAssistant {
 						for ignore, type in ["Oversteer", "Understeer"]
 							for ignore, speed in ["Slow", "Fast"]
 								for ignore, where in ["Entry", "Apex", "Exit"]
-									for ignore, issue in issues[type . ".Corner." . where . "." . speed] {
-										if (++index > 1)
-											handling .= "`n"
+									if issues.Has(type . ".Corner." . where . "." . speed)
+										for ignore, issue in issues[type . ".Corner." . where . "." . speed] {
+											if (++index > 1)
+												handling .= "`n"
 
-										handling .= ("- " . substituteVariables(translate("%severity% %type% %speed% corner %where%")
-																			  , {severity: translate(issue.Severity . A_Space)
-																			   , type: translate(type . A_Space)
-																			   , speed: translate(speed . A_Space)
-																			   , where: translate(where . A_Space)}))
-									}
+											handling .= ("- " . substituteVariables(translate("%severity% %type% %speed% corner %where%")
+																				  , {severity: translate(issue.Severity . A_Space)
+																				   , type: translate(type . A_Space)
+																				   , speed: translate(speed . A_Space)
+																				   , where: translate(where . A_Space)}))
+										}
 
 						if index
 							return substituteVariables(this.Instructions["Handling"], {handling: handling})
@@ -654,26 +655,26 @@ class DrivingCoach extends GridRaceAssistant {
 
 						for ignore, type in ["Suspension.Bottom.Out"]
 							for ignore, where in ["Front", "Rear"]
-								for ignore, issue in issues[type . "." . where] {
-									if (++index > 1)
-										suspension .= "`n"
+								if issues.Has(type . "." . where)
+									for ignore, issue in issues[type . "." . where] {
+										if (++index > 1)
+											suspension .= "`n"
 
-									suspension .= ("- " . substituteVariables(translate("%severity% %type% %where%")
-																			, {severity: translate(issue.Severity . A_Space)
-																			 , type: translate(type)
-																			 , where: translate(where)}))
-								}
+										suspension .= ("- " . substituteVariables(translate("%severity% %type% %where%")
+																				, {severity: translate(issue.Severity . A_Space)
+																				 , type: translate(type)
+																				 , where: translate(where)}))
+									}
 
-						issue := issues["Suspension.Sway"]
+						if issues.Has("Suspension.Sway")
+							for ignore, issue in issues["Suspension.Sway"] {
+								if (++index > 1)
+									suspension .= "`n"
 
-						if issue {
-							if (++index > 1)
-								suspension .= "`n"
-
-							suspension .= ("- " . substituteVariables(translate("%severity% %type%")
-																	, {severity: translate(issue.Severity . A_Space)
-																	 , type: translate("Suspension.Sway")}))
-						}
+								suspension .= ("- " . substituteVariables(translate("%severity% %type%")
+																		, {severity: translate(issue.Severity . A_Space)
+																		 , type: translate("Suspension.Sway")}))
+							}
 
 						if index
 							return substituteVariables(this.Instructions["Suspension"], {suspension: suspension})

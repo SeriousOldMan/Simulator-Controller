@@ -168,7 +168,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Suspension", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -501,7 +501,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local settingsDB := this.SettingsDatabase
 		local simulator, car, track, position, hasSectorTimes, laps, lapData, ignore, carData, standingsData
-		local collector, issues, handling, ignore, type, speed, where, issue, index, language
+		local collector, issues, handling, suspension, ignore, type, speed, where, issue, index, language
 		local key, value, text, filter, telemetry, reference, command, data
 
 		static sessions := false
@@ -530,7 +530,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 				}
 			case "Session":
-				if (knowledgeBase && this.Announcements["SessionInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["SessionInformation"]) {
 					position := this.GridPosition
 
 					if (position != 0)
@@ -540,7 +540,7 @@ class DrivingCoach extends GridRaceAssistant {
 												  , classPosition: this.GridPosition["Class"], overallPosition: position})
 				}
 			case "Stint":
-				if (knowledgeBase && this.Announcements["StintInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["StintInformation"]) {
 					language := this.VoiceManager.Language["Original"]
 					position := this.getPosition(false, "Class")
 
@@ -615,7 +615,7 @@ class DrivingCoach extends GridRaceAssistant {
 						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")})
 				}
 			case "Handling":
-				if (knowledgeBase && this.Announcements["HandlingInformation"] && (this.Mode = "Conversation")) {
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -631,7 +631,7 @@ class DrivingCoach extends GridRaceAssistant {
 										if (++index > 1)
 											handling .= "`n"
 
-										handling .= ("- " . substituteVariables(translate("%severity% %type% at %speed% corner %where%")
+										handling .= ("- " . substituteVariables(translate("%severity% %type% %speed% corner %where%")
 																			  , {severity: translate(issue.Severity . A_Space)
 																			   , type: translate(type . A_Space)
 																			   , speed: translate(speed . A_Space)
@@ -640,6 +640,43 @@ class DrivingCoach extends GridRaceAssistant {
 
 						if index
 							return substituteVariables(this.Instructions["Handling"], {handling: handling})
+					}
+				}
+			case "Suspension":
+				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
+					collector := this.iIssueCollector
+
+					if collector {
+						issues := collector.Suspension
+
+						suspension := ""
+						index := 0
+
+						for ignore, type in ["Suspension.Bottom.Out"]
+							for ignore, where in ["Front", "Rear"]
+								for ignore, issue in issues[type . "." . where] {
+									if (++index > 1)
+										suspension .= "`n"
+
+									suspension .= ("- " . substituteVariables(translate("%severity% %type% %where%")
+																			, {severity: translate(issue.Severity . A_Space)
+																			 , type: translate(type)
+																			 , where: translate(where)}))
+								}
+
+						issue := issues["Suspension.Sway"]
+
+						if issue {
+							if (++index > 1)
+								suspension .= "`n"
+
+							suspension .= ("- " . substituteVariables(translate("%severity% %type%")
+																	, {severity: translate(issue.Severity . A_Space)
+																	 , type: translate("Suspension.Sway")}))
+						}
+
+						if index
+							return substituteVariables(this.Instructions["Suspension"], {suspension: suspension})
 					}
 				}
 			case "Coaching":
@@ -1139,7 +1176,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if knowledgeBase {
 			this.iIssueCollector := %this.CollectorClass%(this.Simulator, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-														, {Handling: true, Frequency: 5000})
+														, {Handling: true, Suspension: true, Frequency: 5000})
 
 			this.iIssueCollector.loadFromSettings()
 

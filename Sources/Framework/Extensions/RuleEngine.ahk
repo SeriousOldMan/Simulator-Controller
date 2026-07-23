@@ -51,7 +51,7 @@ global kExecute := "Execute:"
 global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!="
 						  , "unbound?", "append", "get", "execute"
 						  , "parse", "print", "addRule", "removeRule", "productions", "reductions"
-						  , "extern="]
+						  , "extern", "extern="]
 global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squareRoot
 						   , RuleEngine.Builtins.plus, RuleEngine.Builtins.minus
 						   , RuleEngine.Builtins.multiply, RuleEngine.Builtins.divide
@@ -63,8 +63,8 @@ global kBuiltinFunctions := [RuleEngine.Builtins.option, RuleEngine.Builtins.squ
 						   , RuleEngine.Builtins.parse, RuleEngine.Builtins.print
 						   , RuleEngine.Builtins.addRule, RuleEngine.Builtins.removeRule
 						   , RuleEngine.Builtins.productions, RuleEngine.Builtins.reductions
-						   , RuleEngine.Builtins.externValue]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1, 2]
+						   , RuleEngine.Builtins.extern, RuleEngine.Builtins.externValue]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, -1, -1, -1, 2, 2, 2, 1, 1, 1, 1, 2]
 
 global kProduction := "Production"
 global kReduction := "Reduction"

@@ -602,11 +602,23 @@ The rule engine has some builtin predicates which can be used when formulating r
   
 	Syntax: call=(%function%, arg1, ..., argN, result) or :%function%=(arg1, ..., argN, result)
   
+  - extern
+  
+	Syntax: extern(identifier)
+	
+	This predicate will *access* the object/property in the global namespace of the host language. If the *identifier* contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object. The current value will **not** be used, but the predicate will fail, if no such object/property exist.
+	
+	By the way, extern(identifier) can actually be expressed with extern=(identifier, ?) and is therefore provided for convinience.
+	
+	See also the #*identifier* literal, which may be much more expressive, if the identifier is known at coding time.
+	
   - extern=
   
 	Syntax: extern=(identifier, value)
 	
-	The second argument will be unified with the value currently hold the given *identifier* in the global namespace of the host language. If the identifier contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object.
+	The second argument will be unified with the value currently hold the given *identifier* in the global namespace of the host language. If the identifier contains at least one dot ("."), it specifies actually a property of an object. The part before the first dot must be an object in the global namespace. All other parts except the last one is treated as a property and the last one must specify a property of that last object. The current value of the specified object/property will be unified with the supplied *value*.
+	
+	See also the #*identifier* literal, which may be much more expressive, if the identifier is known at coding time.
 
   - produce
   

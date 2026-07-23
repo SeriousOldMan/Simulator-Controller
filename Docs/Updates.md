@@ -33,6 +33,10 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you probably want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 7.1.3
+
+A new instruction has been added to the Driving Coach, which handles suspension related issues like bottoming out. This new instruction may have to be included in the Driving Coach configuration. Open the configuration tool you are using (either "Simulator Setup" or "Simulator Configuration"), go to the Driving Coach page and make sure thet the *Suspension* instruction is included. Then recreate or save the configuration.
+
 ## Release 7.1.2
 
 The local LLM Runtime has been updated. If you are using the LLM Runtime, you **must** update it to the new version. Open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.

@@ -451,7 +451,8 @@ class TyresDatabase extends SessionDatabase {
 		 || (community && (community != kUndefined))) {
 			db := this.requireDatabase(simulator, car, track, "Community")
 
-			wears := concatenate(wears, db.query({Select: ["Tyre.Laps", "Tyre.Wear"]
+			wears := concatenate(wears, db.query("Tyres.Wears"
+											   , {Select: ["Tyre.Laps", "Tyre.Wear"]
 												, Where: Map("Driver", driver, "Weather", weather
 														   , "Compound", compound, "Compound.Color", compoundColor)}))
 		}

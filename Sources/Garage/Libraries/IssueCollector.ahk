@@ -126,6 +126,12 @@ class IssueCollector {
 		}
 	}
 
+	Suspension {
+		Get {
+			return (inList(this.iCategories, "Suspension") ? this.getSuspension() : false)
+		}
+	}
+
 	Temperatures {
 		Get {
 			return (inList(this.iCategories, "Temperatures") ? this.getTemperatures() : false)
@@ -154,7 +160,7 @@ class IssueCollector {
 		this.iAcousticFeedback := acousticFeedback
 
 		for setting, value in settings.OwnProps()
-			if ((setting = "Handling") || ((setting = "Temperatures")))
+			if inList(["Handling", "Suspension", "Temperatures"], setting)
 				this.iCategories.Push(setting)
 			else if (setting = "Frequency")
 				this.iSampleFrequency := value
@@ -252,7 +258,7 @@ class IssueCollector {
 		local exePath, protocol, arguments, pid, options, code, message, audioDevice, workingDirectory
 
 		collectSamples() {
-			this.updateSamples()
+			this.updateTemperatures()
 
 			Task.CurrentTask.Sleep := this.iSampleFrequency
 		}
@@ -418,10 +424,44 @@ class IssueCollector {
 		return handling
 	}
 
+	static createSuspension(issues) {
+		local suspension := CaseInsenseMap()
+		local ignore, type, severity, where, frequency, key
+
+		suspension.Default := []
+
+		for ignore, type in ["Suspension.Bottom.Out"]
+			for ignore, where in ["Front", "Rear"] {
+				key := (type . "." . where)
+
+				for ignore, severity in ["Light", "Medium", "Heavy"] {
+					frequency := getMultiMapValue(issues, type . "." . severity, where, false)
+
+					if frequency
+						if suspension.Has(key)
+							suspension[key].Push({Severity: severity, Frequency: frequency})
+						else
+							suspension[key] := [{Severity: severity, Frequency: frequency}]
+				}
+			}
+
+		for ignore, severity in ["Light", "Medium", "Heavy"] {
+			frequency := getMultiMapValue(issues, "Suspension.Sway." . severity, "Value", false)
+
+			if frequency
+				if suspension.Has("Suspension.Sway")
+					suspension["Suspension.Sway"].Push({Severity: severity, Frequency: frequency})
+				else
+					suspension["Suspension.Sway"] := [{Severity: severity, Frequency: frequency}]
+		}
+
+		return suspension
+	}
+
 	getHandling() {
 		local handling := CaseInsenseMap()
 		local dataFile := this.iDataFile
-		local handling, tries, data, ignore, type, speed, where, value
+		local tries, data, ignore, type, speed, where, value
 
 		handling.Default := false
 
@@ -455,11 +495,37 @@ class IssueCollector {
 		return handling
 	}
 
+	getSuspension() {
+		local suspension := CaseInsenseMap()
+		local dataFile := this.iDataFile
+		local tries, data, ignore, type, where, value
+
+		suspension.Default := false
+
+		if (dataFile && !this.iCalibrate) {
+			tries := 10
+
+			while (tries-- > 0) {
+				data := readMultiMap(dataFile)
+
+				if (data.Count > 0) {
+					suspension := IssueCollector.createSuspension(data)
+
+					break
+				}
+				else
+					Sleep(20)
+			}
+		}
+
+		return suspension
+	}
+
 	getTemperatures() {
 		return this.iTemperatureSamples.Clone()
 	}
 
-	updateSamples() {
+	updateTemperatures() {
 		local hasValues := false
 		local data, tyreTemperatures, tyreInnerTemperatures, tyreOuterTemperatures, brakeTemperatures
 		local waterTemperature, oilTemperature, sample

@@ -1026,11 +1026,14 @@ class SetupWorkbench extends ConfigurationItem {
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar[false]
 
-		this.compileRules(getFileName("Garage\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
-		this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
+		this.compileRules(getFileName("Garage\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory)
+						, &productions, &reductions, &includes)
+		this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory)
+						, &productions, &reductions, &includes)
 
 		if (car != true)
-			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions, &includes)
+			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory)
+							, &productions, &reductions, &includes)
 	}
 
 	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {

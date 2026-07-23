@@ -37,7 +37,7 @@ public class LLMExecutor
 	}
 	
     public LLMExecutor(string modelPath, int maxTokens, int gpuLayers, bool strict,
-					   uint contextSize = 32768, uint batchSize = 128, int threads = -1)
+					   uint contextSize = 32768, uint batchSize = 2, int threads = -1)
     {
         ModelPath = modelPath;
         MaxTokens = maxTokens;
@@ -52,6 +52,7 @@ public class LLMExecutor
             ContextSize = contextSize,
             GpuLayerCount = gpuLayers,
 			BatchSize = batchSize,
+            BatchThreads = threads,
 			Threads = threads
         };
         Model = LLamaWeights.LoadFromFile(Parameters);
@@ -317,10 +318,10 @@ public class LLMExecutor
 		float temperature;
 		string answerFile;
         string userInput = ParsePrompt(prompt, chatHistory, out tools, out temperature, out answerFile);
-        string answer = ((tools.Count == 0) ? CreateAnswer(chatHistory, temperature, userInput).Result
-											: CreateAnswer(chatHistory, tools, temperature, userInput).Result);
 		
-        return new Answer { Text = answer, File = answerFile };
+        return new Answer { Text = await ((tools.Count == 0) ? CreateAnswer(chatHistory, temperature, userInput)
+                                                             : CreateAnswer(chatHistory, tools, temperature, userInput)),
+                            File = answerFile };
     }
 
     public string Ask(string prompt, out string answerFile)
@@ -394,7 +395,7 @@ static class Program
                                                    (args.Length > 3) ? int.Parse(args[3]) : 0,
 												   ((args.Length > 4) ? args[4] : "Strict") == "Strict",
 												   (args.Length > 5) ? uint.Parse(args[5]) : 32768,
-												   (args.Length > 6) ? uint.Parse(args[6]) : 256,
+												   (args.Length > 6) ? uint.Parse(args[6]) : 2,
 												   (args.Length > 7) ? int.Parse(args[7]) : Math.Max(1, Environment.ProcessorCount / 2));
 
 			Task.Run(async () => ReadPrompts(prompts, args[0]));

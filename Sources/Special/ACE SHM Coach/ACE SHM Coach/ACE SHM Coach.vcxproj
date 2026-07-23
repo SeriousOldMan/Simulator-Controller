@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ACE SHM Coach.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SharedFileOut.h" />
     <ClInclude Include="stdafx.h" />

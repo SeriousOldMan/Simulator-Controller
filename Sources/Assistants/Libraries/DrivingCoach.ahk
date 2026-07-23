@@ -27,6 +27,7 @@
 #Include "..\..\Garage\Libraries\IRCIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\R3EIssueCollector.ahk"
 #Include "..\..\Garage\Libraries\PMRIssueCollector.ahk"
+#Include "..\..\Garage\Libraries\F125IssueCollector.ahk"
 #Include "..\..\Plugins\Libraries\SimulatorProvider.ahk"
 #Include "RaceAssistant.ahk"
 
@@ -116,6 +117,8 @@ class DrivingCoach extends GridRaceAssistant {
 					return "R3EIssueCollector"
 				case "PMR":
 					return "PMRIssueCollector"
+				case "F125":
+					return "F125IssueCollector"
 				default:
 					return "IssueCollector"
 			}

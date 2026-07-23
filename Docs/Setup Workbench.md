@@ -61,7 +61,23 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
-On the second tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
+The second tab "Suspension" let you tweak the bottom out detection for the specific car and track.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%205.JPG)
+
+In general, it is not possible to detect a bootom out event directly with the data supplied by the APIs of most simulators. Therefore, a mathematical method based on the used suspension travel data is used instead:
+
+1. Collect the suspension deflection (the current travel into the suspension) for each wheel with a high sample rate.
+2. Compute the movement speed and the first derivative, the acceleration of the suspension piston.
+3. Smooth out the data and collect events, where the negative acceleration is above a given threshold, and which met certain criterias for event length and distance between them.
+4. Calculate the impulse, which is equivalent to the energy submitted into the frame.
+5. Classify the events into light, medium and heavy.
+
+In the upper group of fields, you can specifiy the acceleration thresholds for the different severity levels of a bottom out event. But only events with the specified minimum length will be considered and all events that are closer together than the specified gap will be combined into one event.
+
+The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a great influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
+
+On the third tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%204.JPG)
 

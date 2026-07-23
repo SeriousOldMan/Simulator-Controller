@@ -63,6 +63,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "Heavy", 15)
 	iBottomOutDuration := 30
 	iBottomOutGap := 100
+	iSamplerSettings := CaseInsenseMap("Samples", 2, "Deflection", 5, "Acceleration", 2)
 
 	iAcousticFeedback := true
 
@@ -357,6 +358,27 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
+	SamplerSettings[key?] {
+		Get {
+			return (isSet(key) ? this.iSamplerSettings[key] : this.iSamplerSettings)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iSamplerSettings[key] := value
+
+				setAnalyzerSetting(this, "SamplerSettings", map2String("|", "->", this.iSamplerSettings))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "SamplerSettings", map2String("|", "->", value))
+
+				return (this.iSamplerSettings := value)
+			}
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -413,6 +435,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|Heavy->15")
 		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 30)
 		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
+		local defaultSamplerSettings := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SamplerSettings", "Samples->2|Deflection->5|Acceleration->2")
 		local fileName, configuration, settings, prefix
 
 		static first := true
@@ -462,6 +485,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				defaultBottomOutThresholds := getMultiMapValue(configuration, "Analyzer", "BottomOutThresholds", defaultBottomOutThresholds)
 				defaultBottomOutDuration := getMultiMapValue(configuration, "Analyzer", "BottomOutDuration", defaultBottomOutDuration)
 				defaultBottomOutGap := getMultiMapValue(configuration, "Analyzer", "BottomOutGap", defaultBottomOutGap)
+				defaultSamplerSettings := getMultiMapValue(configuration, "Analyzer", "SamplerSettings", defaultSamplerSettings)
 			}
 		}
 
@@ -489,6 +513,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		defaultBottomOutThresholds := getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds)
 		defaultBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
 		defaultBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
+		defaultSamplerSettings := getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
@@ -523,6 +548,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		this.iBottomOutThresholds := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds))
 		this.iBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
 		this.iBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
+		this.iSamplerSettings := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings))
 
 		super.__New(workbench, simulator)
 
@@ -1048,6 +1074,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static heavyBottomOutEdit
 	static durationBottomOutEdit
 	static gapBottomOutEdit
+	static minSamplesEdit
+	static deflectionWindowEdit
+	static accelerationWindowEdit
 
 	static issuesListView
 
@@ -1133,35 +1162,26 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 	}
 	else if (commandOrAnalyzer == "UpdateBOThresholds") {
-		fromEdit := ((arguments.Length > 0) && arguments[1])
+		value := lightBottomOutEdit.Text
 
-		if fromEdit {
-			value := lightBottomOutEdit.Text
+		if isInteger(value)
+			analyzer.BottomOutThresholds["Light"] := value
+		else
+			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text := 5
 
-			if isInteger(value)
-				analyzer.BottomOutThresholds["Light"] := value
-			else
-				analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text := 5
+		value := mediumBottomOutEdit.Text
 
-			value := mediumBottomOutEdit.Text
+		if isInteger(value)
+			analyzer.BottomOutThresholds["Medium"] := value
+		else
+			analyzer.BottomOutThresholds["Medium"] := lightBottomOutEdit.Text := 10
 
-			if isInteger(value)
-				analyzer.BottomOutThresholds["Medium"] := value
-			else
-				analyzer.BottomOutThresholds["Medium"] := lightBottomOutEdit.Text := 10
+		value := heavyBottomOutEdit.Text
 
-			value := heavyBottomOutEdit.Text
-
-			if isInteger(value)
-				analyzer.BottomOutThresholds["Heavy"] := value
-			else
-				analyzer.BottomOutThresholds["Heavy"] := lightBottomOutEdit.Text := 15
-		}
-		else {
-			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text
-			analyzer.BottomOutThresholds["Medium"] := mediumBottomOutEdit.Text
-			analyzer.BottomOutThresholds["Heavy"] := heavyBottomOutEdit.Text
-		}
+		if isInteger(value)
+			analyzer.BottomOutThresholds["Heavy"] := value
+		else
+			analyzer.BottomOutThresholds["Heavy"] := lightBottomOutEdit.Text := 15
 	}
 	else if (commandOrAnalyzer == "UpdateBOTimings") {
 		if !validateInteger(10, 200, durationBottomOutEdit, "Validate", durationBottomOutEdit.Text)
@@ -1172,6 +1192,26 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.BottomOutDuration := durationBottomOutEdit.Text
 		analyzer.BottomOutGap := gapBottomOutEdit.Text
+	}
+	else if (commandOrAnalyzer == "UpdateBOSamples") {
+		value := deflectionWindowEdit.Text
+
+		if isInteger(value)
+			analyzer.SamplerSettings["Deflection"] := value
+		else
+			analyzer.SamplerSettings["Deflection"] := deflectionWindowEdit.Text := 5
+
+		value := accelerationWindowEdit.Text
+
+		if isInteger(value)
+			analyzer.SamplerSettings["Acceleration"] := value
+		else
+			analyzer.SamplerSettings["Acceleration"] := accelerationWindowEdit.Text := 2
+
+		if !validateInteger(1, 10, minSamplesEdit, "Validate", minSamplesEdit.Text)
+			minSamplesEdit.Text := 2
+
+		analyzer.SamplerSettings["Samples"] := minSamplesEdit.Text
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
 		analyzerGui.Block()
@@ -1763,24 +1803,54 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget82 := mediumBottomOutEdit
 		widget83 := heavyBottomOutEdit
 
-		lightBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
-		mediumBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
-		heavyBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds", true))
+		lightBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
+		mediumBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
+		heavyBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
 
-		widget87 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Min. Length"))
+		widget87 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Minimum Length"))
 		durationBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutDuration)
 		widget88 := durationBottomOutEdit
 		widget89 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range10-200", analyzer.BottomOutDuration)
 		widget90 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
 
-		widget91 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Min. Gap"))
+		widget91 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Minimum Gap"))
 		gapBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutGap)
 		widget92 := gapBottomOutEdit
 		widget93 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range50-500", analyzer.BottomOutGap)
 		widget94 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
 
-		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings", true))
-		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings", true))
+		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+
+		analyzerGui.SetFont("Italic", "Arial")
+
+		widget95 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h108", translate("Samples && Smoothing"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget96 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Minimum Length"))
+		minSamplesEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Samples"])
+		widget97 := minSamplesEdit
+		widget98 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range1-10", analyzer.SamplerSettings["Samples"])
+		widget99 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		minSamplesEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
+
+		widget100 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Deflection"))
+		deflectionWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Deflection"])
+		widget101 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Deflection"])
+		widget102 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		widget103 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Acceleration"))
+		accelerationWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", analyzer.SamplerSettings["Acceleration"])
+		widget104 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Acceleration"])
+		widget105 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		widget106 := deflectionWindowEdit
+		widget107 := accelerationWindowEdit
+
+		deflectionWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
+		accelerationWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
 
 		tabView .UseTab(3)
 
@@ -1886,7 +1956,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 94
+		loop 107
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

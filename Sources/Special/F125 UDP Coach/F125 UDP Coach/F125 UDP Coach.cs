@@ -244,7 +244,11 @@ namespace F125UDPCoach {
         {
             public int CompletedLaps;
 
-            public string Severity;
+            public string Severity
+            {
+                get { return GetSeverity(PeakAcceleration); }
+            }
+
             public string Axle;
 
             /// <summary>
@@ -265,24 +269,35 @@ namespace F125UDPCoach {
             /// <summary>
             /// Peak acceleration during the event
             /// </summary>
-            public double PeakAccelerationMagnitude { get; set; }
+            public double PeakAcceleration { get; set; }
 
             /// <summary>
             /// Average acceleration during the event
             /// </summary>
-            public double AvgAccelerationMagnitude { get; set; }
+            public double AvgAcceleration { get; set; }
 
             /// <summary>
             /// Impulse (integral of acceleration over time)
             /// </summary>
-            public double ImpulseValue { get; set; }
+            public double Impulse { get; set; }
 
-            public SuspensionBottomOuts(int completedLaps, string severity, string axle)
+            public SuspensionBottomOuts(int completedLaps, double acceleration, string axle)
             {
                 CompletedLaps = completedLaps;
-
-                Severity = severity;
+                PeakAcceleration = acceleration;
                 Axle = axle;
+            }
+
+            string GetSeverity(double acceleration)
+            {
+                double gForce = Math.Abs(acceleration);
+
+                if (gForce > 15)
+                    return "Heavy";
+                else if (gForce > 10)
+                    return "Medium";
+                else
+                    return "Light";
             }
         }
 
@@ -579,7 +594,7 @@ namespace F125UDPCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
-				MovingAverage Acceleration = new MovingAverage(2);
+                MovingAverage Acceleration = new MovingAverage(2);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -599,11 +614,11 @@ namespace F125UDPCoach {
 
                 for (int i = 1; i < deflections.Count - 1; i++)
                     accelerations.Add(Acceleration.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
-																			 deflections[i - 1].Deflection,
-																			 deflections[i].TimeMS,
-																			 deflections[i].Deflection,
-																			 deflections[i + 1].TimeMS,
-																			 deflections[i + 1].Deflection)));
+                                                                             deflections[i - 1].Deflection,
+                                                                             deflections[i].TimeMS,
+                                                                             deflections[i].Deflection,
+                                                                             deflections[i + 1].TimeMS,
+                                                                             deflections[i + 1].Deflection)));
 
                 try
                 {
@@ -689,13 +704,12 @@ namespace F125UDPCoach {
                         return allEvents;
 
                     var merged = new List<SuspensionBottomOuts>();
-                    var currentEvent = new SuspensionBottomOuts(allEvents[0].CompletedLaps, allEvents[0].Severity, allEvents[0].Axle)
+                    var currentEvent = new SuspensionBottomOuts(allEvents[0].CompletedLaps, allEvents[0].PeakAcceleration, allEvents[0].Axle)
                     {
                         StartTimeMs = allEvents[0].StartTimeMs,
                         EndTimeMs = allEvents[0].EndTimeMs,
-                        PeakAccelerationMagnitude = allEvents[0].PeakAccelerationMagnitude,
-                        AvgAccelerationMagnitude = allEvents[0].AvgAccelerationMagnitude,
-                        ImpulseValue = allEvents[0].ImpulseValue
+                        AvgAcceleration = allEvents[0].AvgAcceleration,
+                        Impulse = allEvents[0].Impulse
                     };
 
                     for (int i = 1; i < allEvents.Count; i++)
@@ -706,26 +720,27 @@ namespace F125UDPCoach {
                         {
                             // Merge events that are close together
                             currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
-                            currentEvent.PeakAccelerationMagnitude = Math.Max(currentEvent.PeakAccelerationMagnitude,
-                                allEvents[i].PeakAccelerationMagnitude);
-                            currentEvent.ImpulseValue += allEvents[i].ImpulseValue;
+                            currentEvent.PeakAcceleration = Math.Max(currentEvent.PeakAcceleration,
+                                                                     allEvents[i].PeakAcceleration);
+                            currentEvent.Impulse += allEvents[i].Impulse;
 
                             // Recalculate average (approximate)
-                            currentEvent.AvgAccelerationMagnitude =
-                                (currentEvent.AvgAccelerationMagnitude + allEvents[i].AvgAccelerationMagnitude) / 2f;
+                            currentEvent.AvgAcceleration =
+                                (currentEvent.AvgAcceleration + allEvents[i].AvgAcceleration) / 2f;
                         }
                         else
                         {
                             // Add current event and start new one
                             merged.Add(currentEvent);
 
-                            currentEvent = new SuspensionBottomOuts(allEvents[i].CompletedLaps, allEvents[i].Severity, allEvents[i].Axle)
+                            currentEvent = new SuspensionBottomOuts(allEvents[i].CompletedLaps,
+                                                                    allEvents[i].PeakAcceleration,
+                                                                    allEvents[i].Axle)
                             {
                                 StartTimeMs = allEvents[i].StartTimeMs,
                                 EndTimeMs = allEvents[i].EndTimeMs,
-                                PeakAccelerationMagnitude = allEvents[i].PeakAccelerationMagnitude,
-                                AvgAccelerationMagnitude = allEvents[i].AvgAccelerationMagnitude,
-                                ImpulseValue = allEvents[i].ImpulseValue
+                                AvgAcceleration = allEvents[i].AvgAcceleration,
+                                Impulse = allEvents[i].Impulse
                             };
                         }
                     }
@@ -784,13 +799,12 @@ namespace F125UDPCoach {
                                 var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                                 var endTime = suspensionDeflectionsList[i].TimeMS;
                                 var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-                                                                              GetSeverity(peakAccelInEvent), axle)
+                                                                              peakAccelInEvent, axle)
                                 {
                                     StartTimeMs = startTime,
                                     EndTimeMs = endTime,
-                                    PeakAccelerationMagnitude = peakAccelInEvent,
-                                    AvgAccelerationMagnitude = accelValuesInEvent.Average(),
-                                    ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+                                    AvgAcceleration = accelValuesInEvent.Average(),
+                                    Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
                                 };
 
                                 events.Add(bottomOutEvent);
@@ -809,13 +823,12 @@ namespace F125UDPCoach {
                         var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                         var endTime = suspensionDeflectionsList[suspensionDeflectionsList.Count - 1].TimeMS;
                         var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-                                                                      GetSeverity(peakAccelInEvent), axle)
+                                                                      peakAccelInEvent, axle)
                         {
                             StartTimeMs = startTime,
                             EndTimeMs = endTime,
-                            PeakAccelerationMagnitude = peakAccelInEvent,
-                            AvgAccelerationMagnitude = accelValuesInEvent.Average(),
-                            ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+                            AvgAcceleration = accelValuesInEvent.Average(),
+                            Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
                         };
 
                         events.Add(bottomOutEvent);
@@ -852,7 +865,7 @@ namespace F125UDPCoach {
 
             return CreateBottomOuts("Front",
                                     frontLeftAccels,
-									frontRightAccels).Concat(CreateBottomOuts("Rear",
+                                    frontRightAccels).Concat(CreateBottomOuts("Rear",
                                                                               rearLeftAccels,
                                                                               rearRightAccels));
         }

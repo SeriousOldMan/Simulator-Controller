@@ -265,30 +265,41 @@ struct SuspensionDeflections
 struct SuspensionBottomOuts
 {
 	int CompletedLaps;
-	std::string Severity;
 	std::string Axle;
 
 	long StartTimeMs;
 	long EndTimeMs;
-	double PeakAccelerationMagnitude;
-	double AvgAccelerationMagnitude;
-	double ImpulseValue;
+	double PeakAcceleration;
+	double AvgAcceleration;
+	double Impulse;
 
 	long GetDurationMs() const
 	{
 		return EndTimeMs - StartTimeMs;
 	}
 
-	SuspensionBottomOuts(int completedLaps, const std::string& severity, const std::string& axle)
+	SuspensionBottomOuts(int completedLaps, const double acceleration, const std::string& axle)
 		: CompletedLaps(completedLaps),
-		Severity(severity),
 		Axle(axle),
+		PeakAcceleration(acceleration),
 		StartTimeMs(0),
 		EndTimeMs(0),
-		PeakAccelerationMagnitude(0.0),
-		AvgAccelerationMagnitude(0.0),
-		ImpulseValue(0.0)
+		AvgAcceleration(0.0),
+		Impulse(0.0)
 	{
+	}
+
+public:
+	const std::string GetSeverity()
+	{
+		double gForce = std::abs(PeakAcceleration);
+
+		if (gForce > 15.0)
+			return "Heavy";
+		else if (gForce > 10.0)
+			return "Medium";
+		else
+			return "Light";
 	}
 };
 
@@ -471,18 +482,6 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 	int minSamplesRequired = max(1, minEventDurationMs / samplingIntervalMs);
 	std::vector<SuspensionBottomOuts> events;
 
-	auto GetSeverity = [](double acceleration) -> std::string
-		{
-			double gForce = std::abs(acceleration);
-
-			if (gForce > 15.0)
-				return "Heavy";
-			else if (gForce > 10.0)
-				return "Medium";
-			else
-				return "Light";
-		};
-
 	auto CalculateImpulse = [](long duration, const std::vector<double>& accelerationValues) -> double
 		{
 			if (accelerationValues.empty())
@@ -505,13 +504,12 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 			std::vector<SuspensionBottomOuts> merged;
 			SuspensionBottomOuts currentEvent(allEvents[0].CompletedLaps,
-				allEvents[0].Severity,
-				allEvents[0].Axle);
+											  allEvents[0].PeakAcceleration,
+											  allEvents[0].Axle);
 			currentEvent.StartTimeMs = allEvents[0].StartTimeMs;
 			currentEvent.EndTimeMs = allEvents[0].EndTimeMs;
-			currentEvent.PeakAccelerationMagnitude = allEvents[0].PeakAccelerationMagnitude;
-			currentEvent.AvgAccelerationMagnitude = allEvents[0].AvgAccelerationMagnitude;
-			currentEvent.ImpulseValue = allEvents[0].ImpulseValue;
+			currentEvent.AvgAcceleration = allEvents[0].AvgAcceleration;
+			currentEvent.Impulse = allEvents[0].Impulse;
 
 			for (size_t i = 1; i < allEvents.size(); ++i)
 			{
@@ -520,25 +518,23 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 				if (gap < minEventGapMs)
 				{
 					currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
-					currentEvent.PeakAccelerationMagnitude = max(
-						currentEvent.PeakAccelerationMagnitude,
-						allEvents[i].PeakAccelerationMagnitude);
-					currentEvent.ImpulseValue += allEvents[i].ImpulseValue;
-					currentEvent.AvgAccelerationMagnitude =
-						(currentEvent.AvgAccelerationMagnitude + allEvents[i].AvgAccelerationMagnitude) / 2.0;
+					currentEvent.PeakAcceleration = max(currentEvent.PeakAcceleration,
+														allEvents[i].PeakAcceleration);
+					currentEvent.Impulse += allEvents[i].Impulse;
+					currentEvent.AvgAcceleration =
+						(currentEvent.AvgAcceleration + allEvents[i].AvgAcceleration) / 2.0;
 				}
 				else
 				{
 					merged.push_back(currentEvent);
 
 					currentEvent = SuspensionBottomOuts(allEvents[i].CompletedLaps,
-						allEvents[i].Severity,
-						allEvents[i].Axle);
+														allEvents[i].PeakAcceleration,
+														allEvents[i].Axle);
 					currentEvent.StartTimeMs = allEvents[i].StartTimeMs;
 					currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
-					currentEvent.PeakAccelerationMagnitude = allEvents[i].PeakAccelerationMagnitude;
-					currentEvent.AvgAccelerationMagnitude = allEvents[i].AvgAccelerationMagnitude;
-					currentEvent.ImpulseValue = allEvents[i].ImpulseValue;
+					currentEvent.AvgAcceleration = allEvents[i].AvgAcceleration;
+					currentEvent.Impulse = allEvents[i].Impulse;
 				}
 			}
 
@@ -601,15 +597,14 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 						SuspensionBottomOuts bottomOutEvent(
 							suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-							GetSeverity(peakAccelInEvent),
+							peakAccelInEvent,
 							axle);
 
 						bottomOutEvent.StartTimeMs = startTime;
 						bottomOutEvent.EndTimeMs = endTime;
-						bottomOutEvent.PeakAccelerationMagnitude = peakAccelInEvent;
-						bottomOutEvent.AvgAccelerationMagnitude =
+						bottomOutEvent.AvgAcceleration =
 							std::accumulate(accelValuesInEvent.begin(), accelValuesInEvent.end(), 0.0) / accelValuesInEvent.size();
-						bottomOutEvent.ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent);
+						bottomOutEvent.Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent);
 
 						events.push_back(bottomOutEvent);
 					}
@@ -630,16 +625,15 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 				SuspensionBottomOuts bottomOutEvent(
 					suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-					GetSeverity(peakAccelInEvent),
+					peakAccelInEvent,
 					axle);
 
 				bottomOutEvent.StartTimeMs = startTime;
 				bottomOutEvent.EndTimeMs = endTime;
-				bottomOutEvent.PeakAccelerationMagnitude = peakAccelInEvent;
-				bottomOutEvent.AvgAccelerationMagnitude =
+				bottomOutEvent.AvgAcceleration =
 					std::accumulate(accelValuesInEvent.begin(), accelValuesInEvent.end(), 0.0)
 					/ accelValuesInEvent.size();
-				bottomOutEvent.ImpulseValue = CalculateImpulse(endTime - startTime, accelValuesInEvent);
+				bottomOutEvent.Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent);
 
 				events.push_back(bottomOutEvent);
 			}
@@ -824,14 +818,14 @@ bool collectTelemetry(string soundsDirectory, string audioDevice, bool calibrate
 
 void writeBottomOut(
 	std::ostream& output,
-	const std::vector<SuspensionBottomOuts>& suspensionIssues,
+	std::vector<SuspensionBottomOuts>& suspensionIssues,
 	const std::string& severity) {
 	int count = 0;
 	int front = 0;
 	int rear = 0;
 
-	for (const auto& bottomOut : suspensionIssues) {
-		if (bottomOut.Severity == severity) {
+	for (auto& bottomOut : suspensionIssues)
+		if (bottomOut.GetSeverity() == severity) {
 			count += 1;
 
 			if (bottomOut.Axle == "Front")
@@ -839,7 +833,6 @@ void writeBottomOut(
 			else if (bottomOut.Axle == "Rear")
 				rear += 1;
 		}
-	}
 
 	if (count > 0) {
 		output << "[Suspension.Bottom.Out." << severity << "]\n";

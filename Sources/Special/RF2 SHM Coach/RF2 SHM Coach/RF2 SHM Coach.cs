@@ -291,16 +291,16 @@ namespace RF2SHMCoach {
 			}
 
             string GetSeverity(double acceleration)
-            {
-                double gForce = Math.Abs(acceleration);
+			{
+				double gForce = Math.Abs(acceleration);
 
-                if (gForce > 15)
-                    return "Heavy";
-                else if (gForce > 10)
-                    return "Medium";
-                else
-                    return "Light";
-            }
+				if (gForce > SHMCoach.heavyBottomOutThreshold)
+					return "Heavy";
+				else if (gForce > SHMCoach.mediumBottomOutThreshold)
+					return "Medium";
+				else
+					return "Light";
+			}
         }
 		
 		class CornerDynamics
@@ -390,9 +390,9 @@ namespace RF2SHMCoach {
         int wheelbase = 270;
         int trackWidth = 150;
 
-		int lightBottomOutThreshold = 5;
-		int mediumBottomOutThreshold = 10;
-		int heavyBottomOutThreshold = 15;
+		static int lightBottomOutThreshold = 5;
+		static int mediumBottomOutThreshold = 10;
+		static int heavyBottomOutThreshold = 15;
 		int bottomOutDuration = 30;
 		int bottomOutGap = 100;
 		int samplerMinSamples = 2;
@@ -662,26 +662,12 @@ namespace RF2SHMCoach {
             List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
 																	 List<double> rightAccelerations)
 			{
-	            const int bottomOutDuration = 30;
-				
-                var events = new List<SuspensionBottomOuts>();
+	            var events = new List<SuspensionBottomOuts>();
 
 				// Use magnitude (absolute value) of acceleration for detection
 				var combinedAccel = new double[leftAccelerations.Count];
 				var leftAboveThreshold = new bool[leftAccelerations.Count];
 				var rightAboveThreshold = new bool[rightAccelerations.Count];
-
-				string GetSeverity(double acceleration)
-				{
-					double gForce = Math.Abs(acceleration);
-
-					if (gForce > heavyBottomOutThreshold)
-						return "Heavy";
-					else if (gForce > mediumBottomOutThreshold)
-						return "Medium";
-					else
-						return "Light";
-				}
 
 				/// <summary>
 				/// Calculates impulse (integral of acceleration) for an event

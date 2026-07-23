@@ -386,9 +386,9 @@ namespace ACSHMCoach {
             {
                 double gForce = Math.Abs(acceleration);
 
-                if (gForce > 15)
+                if (gForce > SHMCoach.heavyBottomOutThreshold)
                     return "Heavy";
-                else if (gForce > 10)
+                else if (gForce > SHMCoach.mediumBottomOutThreshold)
                     return "Medium";
                 else
                     return "Light";
@@ -468,7 +468,16 @@ namespace ACSHMCoach {
         int wheelbase = 270;
         int trackWidth = 150;
 
-        int lastCompletedLaps = 0;
+        static int lightBottomOutThreshold = 5;
+		static int mediumBottomOutThreshold = 10;
+		static int heavyBottomOutThreshold = 15;
+		int bottomOutDuration = 30;
+		int bottomOutGap = 100;
+		int samplerMinSamples = 2;
+		int deflectionMovingAverage = 5;
+		int accelerationMovingAverage = 2;
+        
+		int lastCompletedLaps = 0;
         float lastSpeed = 0.0f;
 		
 		bool calibrate = false;
@@ -651,7 +660,7 @@ namespace ACSHMCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
-                MovingAverage Acceleration = new MovingAverage(2);
+                MovingAverage Acceleration = new MovingAverage(accelerationMovingAverage);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -696,7 +705,7 @@ namespace ACSHMCoach {
                                                                       Deflection Getter)
             {
                 List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-                MovingAverage Deflection = new MovingAverage(5);
+                MovingAverage Deflection = new MovingAverage(deflectionMovingAverage);
 
                 foreach (var deflection in suspensionDeflectionsList)
                     smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));
@@ -707,31 +716,12 @@ namespace ACSHMCoach {
             List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
                                                                      List<double> rightAccelerations)
             {
-                const double accelerationThreshold = 5;
-                const int minEventDurationMs = 30;
-                const int samplingIntervalMs = 20;
-                const int minEventGapMs = 100;
-
-                int minSamplesRequired = Math.Max(1, minEventDurationMs / samplingIntervalMs);
-
                 var events = new List<SuspensionBottomOuts>();
 
                 // Use magnitude (absolute value) of acceleration for detection
                 var combinedAccel = new double[leftAccelerations.Count];
                 var leftAboveThreshold = new bool[leftAccelerations.Count];
                 var rightAboveThreshold = new bool[rightAccelerations.Count];
-
-                string GetSeverity(double acceleration)
-                {
-                    double gForce = Math.Abs(acceleration);
-
-                    if (gForce > 15)
-                        return "Heavy";
-                    else if (gForce > 10)
-                        return "Medium";
-                    else
-                        return "Light";
-                }
 
                 /// <summary>
                 /// Calculates impulse (integral of acceleration) for an event
@@ -773,7 +763,7 @@ namespace ACSHMCoach {
                     {
                         long gap = allEvents[i].StartTimeMs - currentEvent.EndTimeMs;
 
-                        if (gap < minEventGapMs)
+                        if (gap < bottomOutGap)
                         {
                             // Merge events that are close together
                             currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
@@ -820,8 +810,8 @@ namespace ACSHMCoach {
                         // Use maximum magnitude (most severe)
                         combinedAccel[i] = Math.Max(leftMagnitude, rightMagnitude);
 
-                        leftAboveThreshold[i] = leftMagnitude >= accelerationThreshold;
-                        rightAboveThreshold[i] = rightMagnitude >= accelerationThreshold;
+                        leftAboveThreshold[i] = leftMagnitude >= lightBottomOutThreshold;
+                        rightAboveThreshold[i] = rightMagnitude >= lightBottomOutThreshold;
                     }
                 }
 
@@ -851,7 +841,7 @@ namespace ACSHMCoach {
                         if (inEvent)
                         {
                             // Only create event if it meets minimum duration
-                            if (i - eventStartIndex >= minSamplesRequired)
+                            if (i - eventStartIndex >= samplerMinSamples)
                             {
                                 var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                                 var endTime = suspensionDeflectionsList[i].TimeMS;
@@ -875,20 +865,23 @@ namespace ACSHMCoach {
                 if (inEvent)
                 {
                     int eventDurationSamples = combinedAccel.Length - eventStartIndex;
-                    if (eventDurationSamples >= minSamplesRequired)
+                    if (eventDurationSamples >= samplerMinSamples)
                     {
                         var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                         var endTime = suspensionDeflectionsList[suspensionDeflectionsList.Count - 1].TimeMS;
-                        var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-                                                                      peakAccelInEvent, axle)
-                        {
-                            StartTimeMs = startTime,
-                            EndTimeMs = endTime,
-                            AvgAcceleration = accelValuesInEvent.Average(),
-                            Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
-                        };
+						
+						if (endTime - startTime > bottomOutDuration) {
+							var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+																		  peakAccelInEvent, axle)
+							{
+								StartTimeMs = startTime,
+								EndTimeMs = endTime,
+								AvgAcceleration = accelValuesInEvent.Average(),
+								Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+							};
 
-                        events.Add(bottomOutEvent);
+							events.Add(bottomOutEvent);
+						}
                     }
                 }
 
@@ -1453,20 +1446,29 @@ namespace ACSHMCoach {
 				wheelbase = int.Parse(args[11]);
 				trackWidth = int.Parse(args[12]);
 
-                if (args.Length > 13) {
-                    soundsDirectory = args[13];
+                lightBottomOutThreshold = int.Parse(args[13]);
+				mediumBottomOutThreshold = int.Parse(args[14]);
+				heavyBottomOutThreshold = int.Parse(args[15]);
+				bottomOutDuration = int.Parse(args[16]);
+				bottomOutGap = int.Parse(args[17]);
+				samplerMinSamples = int.Parse(args[18]);
+				deflectionMovingAverage = int.Parse(args[19]);
+				accelerationMovingAverage = int.Parse(args[20]);
+				
+                if (args.Length > 21) {
+                    soundsDirectory = args[21];
 
-					if (args.Length > 14)
-						audioDevice = args[14];
+                    if (args.Length > 22)
+                        audioDevice = args[22];
 
-                    if (args.Length > 15)
-                        volume = float.Parse(args[15]);
+                    if (args.Length > 23)
+                        volume = float.Parse(args[23]);
 
-                    if (args.Length > 16)
-                        player = args[16];
+                    if (args.Length > 24)
+                        player = args[24];
 
-                    if (args.Length > 17)
-                        workingDirectory = args[17];
+                    if (args.Length > 25)
+                        workingDirectory = args[25];
                 }
             }
         }

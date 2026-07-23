@@ -1,8 +1,8 @@
 [Development]
 Version=7.1.4.0-dev
 Target=7.1.4.0-release
-Date=07/24/26
-Download=Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach
+Date=07/23/26
+Download=Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
 Version=7.1.3.0-release

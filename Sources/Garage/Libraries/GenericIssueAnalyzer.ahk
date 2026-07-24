@@ -589,8 +589,27 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 	createCharacteristics(issues := false) {
 		local workbench, severities, maxFrequency
-		local characteristicLabels, key, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
+		local characteristicLabels, key, characteristic, characteristics, ignore, type, severity, speed, where
 		local temperature, position, category
+
+		addCharacteristic(key) {
+			local ignore, issue, value, severity
+
+			if issues.Has(key)
+				for ignore, issue in issues[key] {
+					value := issue.Frequency
+					severity := issue.Severity
+
+					if !characteristics.Has(key)
+						characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+					else {
+						characteristic := characteristics[key]
+
+						characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+						characteristic[2] := Max(characteristic[2], severities[severity])
+					}
+				}
+		}
 
 		if issues {
 			workbench := this.Workbench
@@ -603,9 +622,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 			workbench.ProgressCount := 0
 
-			if issues {
-				showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
+			showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
 
+			if issues {
 				for ignore, type in ["Oversteer", "Understeer"]
 					for ignore, speed in ["Slow", "Fast"]
 						for ignore, where in ["Entry", "Apex", "Exit"]
@@ -616,24 +635,22 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				if (maxFrequency > 0)
 					for ignore, type in ["Oversteer", "Understeer"]
 						for ignore, speed in ["Slow", "Fast"]
-							for ignore, where in ["Entry", "Apex", "Exit"] {
-								key := (type . ".Corner." . where . "." . speed)
+							for ignore, where in ["Entry", "Apex", "Exit"]
+								addCharacteristic(type . ".Corner." . where . "." . speed)
 
-								if issues.Has(key)
-									for ignore, issue in issues[key] {
-										value := issue.Frequency
-										severity := issue.Severity
+				maxFrequency := 0
 
-										if !characteristics.Has(key)
-											characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-										else {
-											characteristic := characteristics[key]
+				for ignore, type in ["Suspension.Bottom.Out"]
+					for ignore, where in ["Front", "Rear"]
+						if issues.Has(type . "." . where)
+							for ignore, issue in issues[type . "." . where]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-											characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-											characteristic[2] := Max(characteristic[2], severities[severity])
-										}
-									}
-							}
+				if (maxFrequency > 0)
+					for ignore, type in ["Suspension.Bottom.Out"]
+						for ignore, where in ["Front", "Rear"]
+							for ignore, issue in issues[type . "." . where]
+								addCharacteristic(type . "." . where)
 
 				maxFrequency := 0
 
@@ -647,24 +664,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				if (maxFrequency > 0)
 					for ignore, category in ["Around", "Inner", "Outer"]
 						for ignore, temperature in ["Cold", "Hot"]
-							for ignore, position in ["Front", "Rear"] {
-								key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
-
-								if issues.Has(key)
-									for ignore, issue in issues[key] {
-										value := issue.Frequency
-										severity := issue.Severity
-
-										if !characteristics.Has(key)
-											characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-										else {
-											characteristic := characteristics[key]
-
-											characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-											characteristic[2] := Max(characteristic[2], severities[severity])
-										}
-									}
-							}
+							for ignore, position in ["Front", "Rear"]
+								addCharacteristic("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
 				maxFrequency := 0
 
@@ -676,24 +677,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 				if (maxFrequency > 0)
 					for ignore, category in ["Front", "Rear"]
-						for ignore, temperature in ["Cold", "Hot"] {
-							key := ("Brake.Temperatures." . temperature . "." category)
-
-							if issues.Has(key)
-								for ignore, issue in issues[key] {
-									value := issue.Frequency
-									severity := issue.Severity
-
-									if !characteristics.Has(key)
-										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-									else {
-										characteristic := characteristics[key]
-
-										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-										characteristic[2] := Max(characteristic[2], severities[severity])
-									}
-								}
-						}
+						for ignore, temperature in ["Cold", "Hot"]
+							addCharacteristic("Brake.Temperatures." . temperature . "." category)
 
 				maxFrequency := 0
 
@@ -705,24 +690,8 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 				if (maxFrequency > 0)
 					for ignore, category in ["Water", "Oil"]
-						for ignore, temperature in ["Cold", "Hot"] {
-							key := ("Engine.Temperatures." . temperature . "." . category)
-
-							if issues.Has(key)
-								for ignore, issue in issues[key] {
-									value := issue.Frequency
-									severity := issue.Severity
-
-									if !characteristics.Has(key)
-										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-									else {
-										characteristic := characteristics[key]
-
-										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-										characteristic[2] := Max(characteristic[2], severities[severity])
-									}
-								}
-						}
+						for ignore, temperature in ["Cold", "Hot"]
+							addCharacteristic("Engine.Temperatures." . temperature . "." . category)
 			}
 
 			Sleep(500)

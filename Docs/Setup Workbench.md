@@ -26,7 +26,11 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and your targeted driving style. Let's start withe first tab "Handling":
+In this dialog you can initialize the analyzer for your car and your targeted driving style.
+
+##### Handling
+
+Let's start withe first tab "Handling":
 
   1. It is absolutely crucial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   
@@ -61,6 +65,8 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
+##### Suspension
+
 The second tab "Suspension" let you tweak the bottom out detection for the specific car and track.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%205.JPG)
@@ -76,6 +82,8 @@ In general, it is not possible to detect a bootom out event directly with the da
 In the upper group of fields, you can specifiy the acceleration thresholds for the different severity levels of a bottom out event. But only events with the specified minimum length will be considered and all events that are closer together than the specified gap will be combined into one event.
 
 The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a great influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
+
+##### Temperatures
 
 On the third tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
 

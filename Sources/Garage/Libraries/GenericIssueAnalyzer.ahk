@@ -520,8 +520,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, where in ["Entry", "Apex", "Exit"]
-						for ignore, issue in issues[type . ".Corner." . where . "." . speed]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
+						if issues.Has(type . ".Corner." . where . "." . speed)
+							for ignore, issue in issues[type . ".Corner." . where . "." . speed]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			if (maxFrequency > 0)
 				for ignore, type in ["Oversteer", "Understeer"]
@@ -529,19 +530,50 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 						for ignore, where in ["Entry", "Apex", "Exit"] {
 							key := (type . ".Corner." . where . "." . speed)
 
-							for ignore, issue in issues[key] {
-								value := issue.Frequency
-								severity := issue.Severity
+							if issues.Has(key)
+								for ignore, issue in issues[key] {
+									value := issue.Frequency
+									severity := issue.Severity
 
-								if !characteristics.Has(key)
-									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-								else {
-									characteristic := characteristics[key]
+									if !characteristics.Has(key)
+										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+									else {
+										characteristic := characteristics[key]
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
+										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+										characteristic[2] := Max(characteristic[2], severities[severity])
+									}
 								}
-							}
+						}
+
+			maxFrequency := 0
+
+			for ignore, type in ["Suspension.Bottom.Out"]
+				for ignore, where in ["Front", "Rear"]
+					if issues.Has(type . "." . where)
+						for ignore, issue in issues[type . "." . where]
+							maxFrequency := Max(maxFrequency, issue.Frequency)
+
+			if (maxFrequency > 0)
+				for ignore, type in ["Suspension.Bottom.Out"]
+					for ignore, where in ["Front", "Rear"]
+						for ignore, issue in issues[type . "." . where] {
+							key := (type . "." . where)
+
+							if issues.Has(key)
+								for ignore, issue in issues[key] {
+									value := issue.Frequency
+									severity := issue.Severity
+
+									if !characteristics.Has(key)
+										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+									else {
+										characteristic := characteristics[key]
+
+										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+										characteristic[2] := Max(characteristic[2], severities[severity])
+									}
+								}
 						}
 
 			maxFrequency := 0
@@ -549,8 +581,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			for ignore, category in ["Around", "Inner", "Outer"]
 				for ignore, temperature in ["Cold", "Hot"]
 					for ignore, position in ["Front", "Rear"]
-						for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
+						if issues.Has("Tyre.Temperatures." . temperature . "." . position . "." . category)
+							for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			if (maxFrequency > 0)
 				for ignore, category in ["Around", "Inner", "Outer"]
@@ -558,6 +591,36 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 						for ignore, position in ["Front", "Rear"] {
 							key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
+							if issues.Has(key)
+								for ignore, issue in issues[key] {
+									value := issue.Frequency
+									severity := issue.Severity
+
+									if !characteristics.Has(key)
+										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+									else {
+										characteristic := characteristics[key]
+
+										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+										characteristic[2] := Max(characteristic[2], severities[severity])
+									}
+								}
+						}
+
+			maxFrequency := 0
+
+			for ignore, category in ["Front", "Rear"]
+				for ignore, temperature in ["Cold", "Hot"]
+					if issues.Has("Brake.Temperatures." . temperature . "." . category)
+						for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
+							maxFrequency := Max(maxFrequency, issue.Frequency)
+
+			if (maxFrequency > 0)
+				for ignore, category in ["Front", "Rear"]
+					for ignore, temperature in ["Cold", "Hot"] {
+						key := ("Brake.Temperatures." . temperature . "." category)
+
+						if issues.Has(key)
 							for ignore, issue in issues[key] {
 								value := issue.Frequency
 								severity := issue.Severity
@@ -571,60 +634,35 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 									characteristic[2] := Max(characteristic[2], severities[severity])
 								}
 							}
-						}
-
-			maxFrequency := 0
-
-			for ignore, category in ["Front", "Rear"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
-				for ignore, category in ["Front", "Rear"]
-					for ignore, temperature in ["Cold", "Hot"] {
-						key := ("Brake.Temperatures." . temperature . "." category)
-
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
-
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
-
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
-							}
-						}
 					}
 
 			maxFrequency := 0
 
 			for ignore, category in ["Water", "Oil"]
 				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
+					if issues.Has("Engine.Temperatures." . temperature . "." . category)
+						for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
+							maxFrequency := Max(maxFrequency, issue.Frequency)
 
 			if (maxFrequency > 0)
 				for ignore, category in ["Water", "Oil"]
 					for ignore, temperature in ["Cold", "Hot"] {
 						key := ("Engine.Temperatures." . temperature . "." . category)
 
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
+						if issues.Has(key)
+							for ignore, issue in issues[key] {
+								value := issue.Frequency
+								severity := issue.Severity
 
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
+								if !characteristics.Has(key)
+									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+								else {
+									characteristic := characteristics[key]
 
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
+									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+									characteristic[2] := Max(characteristic[2], severities[severity])
+								}
 							}
-						}
 					}
 
 			Sleep(500)

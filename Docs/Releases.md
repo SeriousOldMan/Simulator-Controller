@@ -43,6 +43,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
   - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
+  - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
+    - The weighting of the spring stiffness has changed.
+	- Bumpstop rates will be taken into account, if available.
+	- Changes to heave suspension settings will be applied more aggressively.
 
 # Release history
 

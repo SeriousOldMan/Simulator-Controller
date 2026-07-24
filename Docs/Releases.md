@@ -1,5 +1,38 @@
 # Latest stable release
 
+## 7.1.3.0
+
+#### Date: 07/24/26
+
+#### Fixes
+
+  - Fixed a startup crash in "Strategy Workbench", when community tyre wear data is used.
+  - Fixed a bug for the Driving Coach, who did not use the correct settings for the handing issue analyzer in some rare cases.
+  
+#### Changes
+
+  - The real time [issue analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) in "Setup Workbench" can now detect suspension related issues like bottoming out.
+    - Not yet supported for *Project Motor Racing* and *RaceRoom Racing Experience*.
+	- Not yet fully tested and calibrated for all simulators.
+	- The next release will include options to finetune the bottom out detection based on car and track.
+  - The same suspension related issues will also be recognized by the Driving Coach, when *handling* information is enabled during conversation. You may have to include the new *suspension* instructions, though. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713)
+  - The filter in the telemetry based issue analyzer of "Setup Workbench" can now also decide between light, medium and heavy issues.
+  - [Important] The default value for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has been reduced from 10 to 4 seconds. Reducing the data update frequency will increase the responsiveness of the Assistants. The change reflects the fact, that most users of Simulator Controller are now on the latest generation of gaming PCs. But if you are not that lucky and encounter problems, for example stutter or stalled Assistants, increase the value again in the "Session Database".
+  - [Developer] A few extensions to the internal rule engine:
+    - Objects (and properties) in the global namespace of the host programming language can be referenced using a literal. Example:
+	
+			#RaceEngineer.Instance.LastPitstop
+		
+    - A similar, even more flexible functionality is available as predicates *extern*, which only accesses the object (useful for functional properties), and *extern=*, which also unifies the value with a supplied term. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) for a required update to the Driving Coach configuration.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.1.2.0
 
 #### Date: 07/17/26
@@ -27,35 +60,6 @@
     - Instances of LLM Runtime will be killed automatically when the owning process of Simulator Controller terminates.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-712), if you are using the local LLM Runtime.
-
-# Upcoming release
-
-## 7.1.3.0
-
-#### Date: 07/24/26 (planned)
-
-#### Fixes
-
-  - Fixed a startup crash in "Strategy Workbench", when community tyre wear data is used.
-  
-#### Changes
-
-  - The real time [issue analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer) in "Setup Workbench" can now detect suspension related issues like bottoming out.
-    - Not yet supported for *Project Motor Racing* and *RaceRoom Racing Experience*.
-	- Not yet fully tested and calibrated for all simulators.
-	- The next release will include options to finetune the bottom out detection based on car and track.
-  - The same suspension related issues will also be recognized by the Driving Coach, when *handling* information is enabled during conversation. You may have to include the new *suspension* instructions, though. See the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713)
-  - [Important] The default value for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has been reduced from 10 to 4 seconds. Reducing the data update frequency will increase the responsiveness of the Assistants. The change reflects the fact, that most users of Simulator Controller are now on the latest generation of gaming PCs. But if you are not that lucky and encounter problems, for example stutter or stalled Assistants, increase the value again in the "Session Database".
-  - [Developer] A few extensions to the internal rule engine:
-    - Objects (and properties) in the global namespace of the host programming language can be referenced using a literal. Example:
-	
-			#RaceEngineer.Singleton.LastPitstop
-		
-    - A similar, even more flexible functionality is available as predicates *extern*, which only accesses the object (useful for functional properties), and *extern=*, which also unifies the value with a supplied term. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#builtin-predicates) for more information.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-713) for a required update to the Driving Coach configuration.
-
-# Release history
 
 ## 7.1.1.0
 

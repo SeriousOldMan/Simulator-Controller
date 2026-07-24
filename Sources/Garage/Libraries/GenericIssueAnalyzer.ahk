@@ -947,7 +947,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local x, y, ignore, widget, workbench, row, include
-	local issues, issue, handling, suspension, temperatures, filteredHandling, filteredSuspension
+	local issues, issue, handling, suspension, temperatures, filteredHandling, filteredSuspension, filteredTemperatures
 	local type, speed, severity, where, value, newValue, frequency
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
@@ -1005,7 +1005,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static issuesListView
 
 	static resultListView
-	static applyThresholdSlider
+	static applyThresholdSlider, applyThresholdDropDown
 
 	static result := false
 	static analyzer := false
@@ -1278,7 +1278,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						for ignore, issue in issues[where] {
 							severity := issue.Severity
 
-							include := (issue.Frequency >= applyThresholdSlider.Value)
+							include := ((issue.Frequency >= applyThresholdSlider.Value)
+									 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 							if (include && final) {
 								include := false
@@ -1287,17 +1288,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 								row := resultListView.GetNext(0, "C")
 
-								while row {
-									value := resultListView.GetText(row)
-
-									if (value = characteristic) {
+								while row
+									if (resultListView.GetText(row) = characteristic) {
 										include := true
 
 										break
 									}
 									else
 										row := resultListView.GetNext(row, "C")
-								}
 							}
 
 							if include
@@ -1315,7 +1313,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
-		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Handling.Clone())
+		issues := ((arguments.Length > 1) ? arguments[2] : analyzer.Suspension.Clone())
 
 		for ignore, type in ["Suspension.Bottom.Out"]
 			for ignore, where in ["Front", "Rear"] {
@@ -1326,7 +1324,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					for ignore, issue in issues[where] {
 						severity := issue.Severity
 
-						include := (issue.Frequency >= applyThresholdSlider.Value)
+						include := ((issue.Frequency >= applyThresholdSlider.Value)
+								 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 						if (include && final) {
 							include := false
@@ -1335,17 +1334,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 							row := resultListView.GetNext(0, "C")
 
-							while row {
-								value := resultListView.GetText(row)
-
-								if (value = characteristic) {
+							while row
+								if (resultListView.GetText(row) = characteristic) {
 									include := true
 
 									break
 								}
 								else
 									row := resultListView.GetNext(row, "C")
-							}
 						}
 
 						if include
@@ -1360,7 +1356,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			for ignore, issue in issues["Suspension.Sway"] {
 				severity := issue.Severity
 
-				include := (issue.Frequency >= applyThresholdSlider.Value)
+				include := ((issue.Frequency >= applyThresholdSlider.Value)
+						 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 				if (include && final) {
 					include := false
@@ -1369,17 +1366,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 					row := resultListView.GetNext(0, "C")
 
-					while row {
-						value := resultListView.GetText(row)
-
-						if (value = characteristic) {
+					while row
+						if (resultListView.GetText(row) = characteristic) {
 							include := true
 
 							break
 						}
 						else
 							row := resultListView.GetNext(row, "C")
-					}
 				}
 
 				if include
@@ -1403,12 +1397,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				for ignore, position in ["Front", "Rear"] {
 					key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
-					filteredHandling := []
+					filteredTemperatures := []
 
 					for ignore, issue in issues[key] {
 						severity := issue.Severity
 
-						include := (issue.Frequency >= applyThresholdSlider.Value)
+						include := ((issue.Frequency >= applyThresholdSlider.Value)
+								 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 						if (include && final) {
 							include := false
@@ -1417,36 +1412,34 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 							row := resultListView.GetNext(0, "C")
 
-							while row {
-								value := resultListView.GetText(row)
-
-								if (value = characteristic) {
+							while row
+								if (resultListView.GetText(row) = characteristic) {
 									include := true
 
 									break
 								}
 								else
 									row := resultListView.GetNext(row, "C")
-							}
 						}
 
 						if include
-							filteredHandling.Push(issue)
+							filteredTemperatures.Push(issue)
 					}
 
-					issues[key] := filteredHandling
+					issues[key] := filteredTemperatures
 				}
 
 		for ignore, category in ["Front", "Rear"]
 			for ignore, temperature in ["Cold", "Hot"] {
 				key := ("Brake.Temperatures." . temperature . "." category)
 
-				filteredHandling := []
+				filteredTemperatures := []
 
 				for ignore, issue in issues[key] {
 					severity := issue.Severity
 
-					include := (issue.Frequency >= applyThresholdSlider.Value)
+					include := ((issue.Frequency >= applyThresholdSlider.Value)
+							 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 					if (include && final) {
 						include := false
@@ -1455,36 +1448,34 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 						row := resultListView.GetNext(0, "C")
 
-						while row {
-							value := resultListView.GetText(row)
-
-							if (value = characteristic) {
+						while row
+							if (resultListView.GetText(row) = characteristic) {
 								include := true
 
 								break
 							}
 							else
 								row := resultListView.GetNext(row, "C")
-						}
 					}
 
 					if include
-						filteredHandling.Push(issue)
+						filteredTemperatures.Push(issue)
 				}
 
-				issues[key] := filteredHandling
+				issues[key] := filteredTemperatures
 			}
 
 		for ignore, category in ["Water", "Oil"]
 			for ignore, temperature in ["Cold", "Hot"] {
 				key := ("Engine.Temperatures." . temperature . "." category)
 
-				filteredHandling := []
+				filteredTemperatures := []
 
 				for ignore, issue in issues[key] {
 					severity := issue.Severity
 
-					include := (issue.Frequency >= applyThresholdSlider.Value)
+					include := ((issue.Frequency >= applyThresholdSlider.Value)
+							 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 					if (include && final) {
 						include := false
@@ -1493,24 +1484,21 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 						row := resultListView.GetNext(0, "C")
 
-						while row {
-							value := resultListView.GetText(row)
-
-							if (value = characteristic) {
+						while row
+							if (resultListView.GetText(row) = characteristic) {
 								include := true
 
 								break
 							}
 							else
 								row := resultListView.GetNext(row, "C")
-						}
 					}
 
 					if include
-						filteredHandling.Push(issue)
+						filteredTemperatures.Push(issue)
 				}
 
-				issues[key] := filteredHandling
+				issues[key] := filteredTemperatures
 			}
 
 		return issues
@@ -1902,12 +1890,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		resultListView := widget1
 
 		widget2 := analyzerGui.Add("Text", "x16 yp+262 w130 h23 +0x200 Hidden", translate("Threshold"))
-		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp w60 Thick15 0x10 Range0-25 ToolTip Hidden", 0)
+
+		applyThresholdDropDown := analyzerGui.Add("DropDownList", "x158 yp w75 Choose1 Hidden", [translate("Light"), translate("Medium"), translate("Heavy")])
+		applyThresholdDropDown.OnEvent("Change", runAnalyzer.Bind("Threshold"))
+		widget5 := applyThresholdDropDown
+
+		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp+24 w60 Thick15 0x10 Range0-25 ToolTip Hidden", 0)
 		applyThresholdSlider.OnEvent("Change", runAnalyzer.Bind("Threshold"))
 		widget3 := applyThresholdSlider
 		widget4 := analyzerGui.Add("Text", "x220 yp+3 Hidden", translate("%"))
 
-		loop 4
+		loop 5
 			analyzeWidgets.Push(%"widget" . A_Index%)
 
 		tabView.UseTab(0)

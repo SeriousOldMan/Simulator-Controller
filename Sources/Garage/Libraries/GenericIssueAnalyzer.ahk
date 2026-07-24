@@ -451,7 +451,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
 		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
 		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|Heavy->15")
-		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 30)
+		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 20)
 		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
 		local defaultSamplerSettings := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SamplerSettings", "Samples->2|Deflection->5|Acceleration->2")
 		local fileName, configuration, settings, prefix
@@ -603,117 +603,127 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 			workbench.ProgressCount := 0
 
-			showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
+			if issues {
+				showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
 
-			for ignore, type in ["Oversteer", "Understeer"]
-				for ignore, speed in ["Slow", "Fast"]
-					for ignore, where in ["Entry", "Apex", "Exit"]
-						for ignore, issue in issues[type . ".Corner." . where . "." . speed]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, type in ["Oversteer", "Understeer"]
 					for ignore, speed in ["Slow", "Fast"]
-						for ignore, where in ["Entry", "Apex", "Exit"] {
-							key := (type . ".Corner." . where . "." . speed)
+						for ignore, where in ["Entry", "Apex", "Exit"]
+							if issues.Has(type . ".Corner." . where . "." . speed)
+								for ignore, issue in issues[type . ".Corner." . where . "." . speed]
+									maxFrequency := Max(maxFrequency, issue.Frequency)
 
-							for ignore, issue in issues[key] {
-								value := issue.Frequency
-								severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, type in ["Oversteer", "Understeer"]
+						for ignore, speed in ["Slow", "Fast"]
+							for ignore, where in ["Entry", "Apex", "Exit"] {
+								key := (type . ".Corner." . where . "." . speed)
 
-								if !characteristics.Has(key)
-									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-								else {
-									characteristic := characteristics[key]
+								if issues.Has(key)
+									for ignore, issue in issues[key] {
+										value := issue.Frequency
+										severity := issue.Severity
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
-								}
+										if !characteristics.Has(key)
+											characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+										else {
+											characteristic := characteristics[key]
+
+											characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+											characteristic[2] := Max(characteristic[2], severities[severity])
+										}
+									}
 							}
-						}
 
-			maxFrequency := 0
+				maxFrequency := 0
 
-			for ignore, category in ["Around", "Inner", "Outer"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, position in ["Front", "Rear"]
-						for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, category in ["Around", "Inner", "Outer"]
 					for ignore, temperature in ["Cold", "Hot"]
-						for ignore, position in ["Front", "Rear"] {
-							key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+						for ignore, position in ["Front", "Rear"]
+							if issues.Has("Tyre.Temperatures." . temperature . "." . position . "." . category)
+								for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
+									maxFrequency := Max(maxFrequency, issue.Frequency)
 
-							for ignore, issue in issues[key] {
-								value := issue.Frequency
-								severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, category in ["Around", "Inner", "Outer"]
+						for ignore, temperature in ["Cold", "Hot"]
+							for ignore, position in ["Front", "Rear"] {
+								key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
-								if !characteristics.Has(key)
-									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-								else {
-									characteristic := characteristics[key]
+								if issues.Has(key)
+									for ignore, issue in issues[key] {
+										value := issue.Frequency
+										severity := issue.Severity
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
-								}
+										if !characteristics.Has(key)
+											characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+										else {
+											characteristic := characteristics[key]
+
+											characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+											characteristic[2] := Max(characteristic[2], severities[severity])
+										}
+									}
 							}
-						}
 
-			maxFrequency := 0
+				maxFrequency := 0
 
-			for ignore, category in ["Front", "Rear"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, category in ["Front", "Rear"]
-					for ignore, temperature in ["Cold", "Hot"] {
-						key := ("Brake.Temperatures." . temperature . "." category)
+					for ignore, temperature in ["Cold", "Hot"]
+						if issues.Has("Brake.Temperatures." . temperature . "." . category)
+							for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, category in ["Front", "Rear"]
+						for ignore, temperature in ["Cold", "Hot"] {
+							key := ("Brake.Temperatures." . temperature . "." category)
 
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
+							if issues.Has(key)
+								for ignore, issue in issues[key] {
+									value := issue.Frequency
+									severity := issue.Severity
 
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
-							}
+									if !characteristics.Has(key)
+										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+									else {
+										characteristic := characteristics[key]
+
+										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+										characteristic[2] := Max(characteristic[2], severities[severity])
+									}
+								}
 						}
-					}
 
-			maxFrequency := 0
+				maxFrequency := 0
 
-			for ignore, category in ["Water", "Oil"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, category in ["Water", "Oil"]
-					for ignore, temperature in ["Cold", "Hot"] {
-						key := ("Engine.Temperatures." . temperature . "." . category)
+					for ignore, temperature in ["Cold", "Hot"]
+						if issues.Has("Engine.Temperatures." . temperature . "." . category)
+							for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, category in ["Water", "Oil"]
+						for ignore, temperature in ["Cold", "Hot"] {
+							key := ("Engine.Temperatures." . temperature . "." . category)
 
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
+							if issues.Has(key)
+								for ignore, issue in issues[key] {
+									value := issue.Frequency
+									severity := issue.Severity
 
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
-							}
+									if !characteristics.Has(key)
+										characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+									else {
+										characteristic := characteristics[key]
+
+										characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+										characteristic[2] := Max(characteristic[2], severities[severity])
+									}
+								}
 						}
-					}
+			}
 
 			Sleep(500)
 
@@ -754,7 +764,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 			if !calibrate
 				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"
 									  , "BottomOutThresholds", "BottomOutDuration", "BottomOutGap"
-									  , "SampleSettings"]
+									  , "SamplerSettings"]
 					if this.settingAvailable(setting)
 						settings.%setting% := this.%setting%
 

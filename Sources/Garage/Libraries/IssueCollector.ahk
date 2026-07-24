@@ -219,7 +219,7 @@ class IssueCollector {
 		local defaultOversteerThresholds := "-40,-70,-100"
 		local defaultLowspeedThreshold := 120
 		local defaultBottomOutThresholds := "Light->5|Medium->10|Heavy->15"
-		local defaultBottomOutDuration := 30
+		local defaultBottomOutDuration := 20
 		local defaultBottomOutGap := 100
 		local defaultSamplerSettings := "Samples->2|Deflection->5|Acceleration->2"
 		local prefix

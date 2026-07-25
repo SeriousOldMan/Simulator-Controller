@@ -273,9 +273,9 @@ namespace PMRUDPCoach {
             {
                 double gForce = Math.Abs(acceleration);
 
-                if (gForce > 15)
+                if (gForce > UDPCoach.heavyBottomOutThreshold)
                     return "Heavy";
-                else if (gForce > 10)
+                else if (gForce > UDPCoach.mediumBottomOutThreshold)
                     return "Medium";
                 else
                     return "Light";
@@ -364,6 +364,15 @@ namespace PMRUDPCoach {
         
 		// int wheelbase = 270;
         // int trackWidth = 150;
+
+        static int lightBottomOutThreshold = 5;
+		static int mediumBottomOutThreshold = 10;
+		static int heavyBottomOutThreshold = 15;
+		int bottomOutDuration = 30;
+		int bottomOutGap = 100;
+		int samplerMinSamples = 2;
+		int deflectionMovingAverage = 5;
+		int accelerationMovingAverage = 2;
 
         int lastCompletedLaps = 0;
         float lastSpeed = 0.0f;
@@ -556,7 +565,7 @@ namespace PMRUDPCoach {
             List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
                 List<double> accelerations = new List<double>();
-                MovingAverage Acceleration = new MovingAverage(2);
+                MovingAverage Acceleration = new MovingAverage(accelerationMovingAverage);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
                                              long time, double deflection,
@@ -601,7 +610,7 @@ namespace PMRUDPCoach {
                                                                       Deflection Getter)
             {
                 List<(long TimeMS, double Deflection)> smoothedDeflections = new List<(long TimeMS, double Deflection)>();
-                MovingAverage Deflection = new MovingAverage(5);
+                MovingAverage Deflection = new MovingAverage(deflectionMovingAverage);
 
                 foreach (var deflection in suspensionDeflectionsList)
                     smoothedDeflections.Add((deflection.TimeMS, Deflection.Add(Getter(deflection))));
@@ -612,31 +621,12 @@ namespace PMRUDPCoach {
             List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
                                                                      List<double> rightAccelerations)
             {
-                const double accelerationThreshold = 5;
-                const int minEventDurationMs = 30;
-                const int samplingIntervalMs = 20;
-                const int minEventGapMs = 100;
-
-                int minSamplesRequired = Math.Max(1, minEventDurationMs / samplingIntervalMs);
-
                 var events = new List<SuspensionBottomOuts>();
 
                 // Use magnitude (absolute value) of acceleration for detection
                 var combinedAccel = new double[leftAccelerations.Count];
                 var leftAboveThreshold = new bool[leftAccelerations.Count];
                 var rightAboveThreshold = new bool[rightAccelerations.Count];
-
-                string GetSeverity(double acceleration)
-                {
-                    double gForce = Math.Abs(acceleration);
-
-                    if (gForce > 15)
-                        return "Heavy";
-                    else if (gForce > 10)
-                        return "Medium";
-                    else
-                        return "Light";
-                }
 
                 /// <summary>
                 /// Calculates impulse (integral of acceleration) for an event
@@ -678,7 +668,7 @@ namespace PMRUDPCoach {
                     {
                         long gap = allEvents[i].StartTimeMs - currentEvent.EndTimeMs;
 
-                        if (gap < minEventGapMs)
+                        if (gap < bottomOutGap)
                         {
                             // Merge events that are close together
                             currentEvent.EndTimeMs = allEvents[i].EndTimeMs;
@@ -725,8 +715,8 @@ namespace PMRUDPCoach {
                         // Use maximum magnitude (most severe)
                         combinedAccel[i] = Math.Max(leftMagnitude, rightMagnitude);
 
-                        leftAboveThreshold[i] = leftMagnitude >= accelerationThreshold;
-                        rightAboveThreshold[i] = rightMagnitude >= accelerationThreshold;
+                        leftAboveThreshold[i] = leftMagnitude >= lightBottomOutThreshold;
+                        rightAboveThreshold[i] = rightMagnitude >= lightBottomOutThreshold;
                     }
                 }
 
@@ -756,20 +746,23 @@ namespace PMRUDPCoach {
                         if (inEvent)
                         {
                             // Only create event if it meets minimum duration
-                            if (i - eventStartIndex >= minSamplesRequired)
+                            if (i - eventStartIndex >= samplerMinSamples)
                             {
                                 var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                                 var endTime = suspensionDeflectionsList[i].TimeMS;
-                                var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
-                                                                              peakAccelInEvent, axle)
-                                {
-                                    StartTimeMs = startTime,
-                                    EndTimeMs = endTime,
-                                    AvgAcceleration = accelValuesInEvent.Average(),
-                                    Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
-                                };
+								
+								if (endTime - startTime > bottomOutDuration) {
+									var bottomOutEvent = new SuspensionBottomOuts(suspensionDeflectionsList[eventStartIndex].CompletedLaps,
+																				  peakAccelInEvent, axle)
+									{
+										StartTimeMs = startTime,
+										EndTimeMs = endTime,
+										AvgAcceleration = accelValuesInEvent.Average(),
+										Impulse = CalculateImpulse(endTime - startTime, accelValuesInEvent)
+									};
 
-                                events.Add(bottomOutEvent);
+									events.Add(bottomOutEvent);
+								}
                             }
 
                             inEvent = false;
@@ -780,7 +773,7 @@ namespace PMRUDPCoach {
                 if (inEvent)
                 {
                     int eventDurationSamples = combinedAccel.Length - eventStartIndex;
-                    if (eventDurationSamples >= minSamplesRequired)
+                    if (eventDurationSamples >= samplerMinSamples)
                     {
                         var startTime = suspensionDeflectionsList[eventStartIndex].TimeMS;
                         var endTime = suspensionDeflectionsList[suspensionDeflectionsList.Count - 1].TimeMS;
@@ -1368,6 +1361,15 @@ namespace PMRUDPCoach {
 				wheelbase = int.Parse(args[index++]);
 				trackWidth = int.Parse(args[index++]);
 				*/
+
+				lightBottomOutThreshold = int.Parse(args[index++]);
+				mediumBottomOutThreshold = int.Parse(args[index++]);
+				heavyBottomOutThreshold = int.Parse(args[index++]);
+				bottomOutDuration = int.Parse(args[index++]);
+				bottomOutGap = int.Parse(args[index++]);
+				samplerMinSamples = int.Parse(args[index++]);
+				deflectionMovingAverage = int.Parse(args[index++]);
+				accelerationMovingAverage = int.Parse(args[index++]);
 
                 if (args.Length > index) {
                     soundsDirectory = args[index++];

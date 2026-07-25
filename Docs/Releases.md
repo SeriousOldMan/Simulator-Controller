@@ -29,7 +29,24 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.4.0
+
+#### Date: 07/31/26 (planned)
+
+#### Fixes
+
+  - Fixed the optional acoustic feedback for handling problems in the issue analyzer of "Setup Workbench" for *Project Motor Racing* and *F1 25/26*.
+  - Fixed a bug that prevented the usage of the handling thresholds applied in the issue analyzer of "Setup Workbench" when the Drivng Coach is asked about handling problems for the same car / track combination.
+  - Fixed a bug introduced with the last release, which could prevent the transfer of issues detected by the telemetry-based issue analyzer to the working area of "Setup Workbench".
+  
+#### Changes
+
+  - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
+  - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
+  - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
+    - The weighting of the spring stiffness has changed.
+	- Bumpstop rates will be taken into account, if available.
+	- Changes to heave suspension settings will be applied more aggressively.
 
 # Release history
 

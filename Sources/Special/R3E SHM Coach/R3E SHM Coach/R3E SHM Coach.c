@@ -1068,7 +1068,7 @@ BottomOutArray* CreateBottomOuts(
 	for (i = 0; i < (int)leftAccelerations->size; i++) {
 		int condition = leftAboveThreshold[i] || rightAboveThreshold[i] ||
 			(inEvent && (fabs(leftAccelerations->second[i] - leftStartDeflection) < releaseThreshold ||
-				fabs(rightAccelerations->second[i] - rightStartDeflection) < releaseThreshold));
+						 fabs(rightAccelerations->second[i] - rightStartDeflection) < releaseThreshold));
 
 		if (condition) {
 			if (!inEvent) {
@@ -1180,20 +1180,20 @@ BottomOutArray* CreateSuspensionIssues()
 			fprintf(output, "----- Deflections -----\n");
 			for (int i = 0; i < suspensionDeflectionsList->size; i++) {
 				fprintf(output, "%f,%f,%f,%f\n",
-					suspensionDeflectionsList->items[i]->frontLeft,
-					suspensionDeflectionsList->items[i]->frontRight,
-					suspensionDeflectionsList->items[i]->rearLeft,
-					suspensionDeflectionsList->items[i]->rearRight);
+						suspensionDeflectionsList->items[i]->frontLeft,
+						suspensionDeflectionsList->items[i]->frontRight,
+						suspensionDeflectionsList->items[i]->rearLeft,
+						suspensionDeflectionsList->items[i]->rearRight);
 			}
 
 			fprintf(output, "----- Accelerations -----\n");
 			if (frontLeftAccels->size > 0) {
 				for (int i = 0; i < frontLeftAccels->size; i++) {
 					fprintf(output, "%f,%f,%f,%f\n",
-						frontLeftAccels->first[i],
-						frontRightAccels->first[i],
-						rearLeftAccels->first[i],
-						rearRightAccels->first[i]);
+							frontLeftAccels->first[i],
+							frontRightAccels->first[i],
+							rearLeftAccels->first[i],
+							rearRightAccels->first[i]);
 				}
 			}
 

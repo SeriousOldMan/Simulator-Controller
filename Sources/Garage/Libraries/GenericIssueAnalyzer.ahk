@@ -1926,7 +1926,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget78 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Medium"))
 		widget79 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Heavy"))
 
-		widget80 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Thresholds (m/s²)"))
+		widget80 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Thresholds (m/s²)"))
 		lightBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutThresholds["Light"])
 		widget84 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Light"])
 		mediumBottomOutEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", analyzer.BottomOutThresholds["Medium"])
@@ -1941,13 +1941,22 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		mediumBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
 		heavyBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
 
-		widget87 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Minimum Length"))
+		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Threshold (Rebound)"))
+		releaseThresholdEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", Round(analyzer.ReleaseThreshold, 1))
+		widget109 := releaseThresholdEdit
+		widget110 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("mm"))
+
+		releaseThresholdEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+
+		widget87 := analyzerGui.Add("Text", "x32 yp+30 w120 h23 +0x200", translate("Event Length"))
+		widget111 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
 		durationBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutDuration)
 		widget88 := durationBottomOutEdit
 		widget89 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range10-200", analyzer.BottomOutDuration)
 		widget90 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
 
-		widget91 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Minimum Gap"))
+		widget91 := analyzerGui.Add("Text", "x32 yp+24 w120 h23 +0x200", translate("Gap between Events"))
+		widget112 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
 		gapBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutGap)
 		widget92 := gapBottomOutEdit
 		widget93 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range50-500", analyzer.BottomOutGap)
@@ -1956,20 +1965,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 
-		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Release Threshold"))
-		releaseThresholdEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", Round(analyzer.ReleaseThreshold, 1))
-		widget109 := releaseThresholdEdit
-		widget110 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("mm"))
-
-		releaseThresholdEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
-
 		analyzerGui.SetFont("Italic", "Arial")
 
 		widget95 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h108", translate("Samples && Smoothing"))
 
 		analyzerGui.SetFont("Norm", "Arial")
 
-		widget96 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Minimum Length"))
+		widget96 := analyzerGui.Add("Text", "x32 yp+24 w120 h23 +0x200", translate("Valid, if"))
+		widget113 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
 		minSamplesEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Samples"])
 		widget97 := minSamplesEdit
 		widget98 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range1-10", analyzer.SamplerSettings["Samples"])
@@ -1977,12 +1980,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		minSamplesEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
 
-		widget100 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Deflection"))
+		widget100 := analyzerGui.Add("Text", "x32 yp+30 w140 h23 +0x200", translate("Average (Deflection)"))
 		deflectionWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Deflection"])
 		widget101 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Deflection"])
 		widget102 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
 
-		widget103 := analyzerGui.Add("Text", "x32 yp+24 w130 h23 +0x200", translate("Acceleration"))
+		widget103 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Average (Acceleration)"))
 		accelerationWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", analyzer.SamplerSettings["Acceleration"])
 		widget104 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Acceleration"])
 		widget105 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
@@ -2097,7 +2100,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 110
+		loop 113
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

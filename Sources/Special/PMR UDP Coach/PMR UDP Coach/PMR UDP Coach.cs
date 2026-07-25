@@ -368,6 +368,7 @@ namespace PMRUDPCoach {
         static int lightBottomOutThreshold = 5;
 		static int mediumBottomOutThreshold = 10;
 		static int heavyBottomOutThreshold = 15;
+        float releaseThreshold = 0.2f;
 		int bottomOutDuration = 30;
 		int bottomOutGap = 100;
 		int samplerMinSamples = 2;
@@ -735,8 +736,8 @@ namespace PMRUDPCoach {
 
                 for (int i = 0; i < combinedAccel.Length; i++)
                     if (leftAboveThreshold[i] || rightAboveThreshold[i] ||
-                        (inEvent && (Math.Abs(leftDeflection[i] - leftStartDeflection) < 0.2 ||
-                                     Math.Abs(rightDeflection[i] - rightStartDeflection) < 0.2)))
+                        (inEvent && (Math.Abs(leftDeflection[i] - leftStartDeflection) < releaseThreshold ||
+                                     Math.Abs(rightDeflection[i] - rightStartDeflection) < releaseThreshold)))
                     {
                         if (!inEvent)
                         {
@@ -1377,8 +1378,9 @@ namespace PMRUDPCoach {
 				lightBottomOutThreshold = int.Parse(args[index++]);
 				mediumBottomOutThreshold = int.Parse(args[index++]);
 				heavyBottomOutThreshold = int.Parse(args[index++]);
-				bottomOutDuration = int.Parse(args[index++]);
-				bottomOutGap = int.Parse(args[index++]);
+                releaseThreshold = float.Parse(args[index++]);
+                bottomOutDuration = int.Parse(args[index++]);
+                bottomOutGap = int.Parse(args[index++]);
 				samplerMinSamples = int.Parse(args[index++]);
 				deflectionMovingAverage = int.Parse(args[index++]);
 				accelerationMovingAverage = int.Parse(args[index++]);

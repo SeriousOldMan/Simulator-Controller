@@ -185,6 +185,7 @@ template <typename T> int sgn(T val) {
 int lightBottomOutThreshold = 5;
 int mediumBottomOutThreshold = 10;
 int heavyBottomOutThreshold = 15;
+float releaseThreshold = 0.2;
 int bottomOutDuration = 30;
 int bottomOutGap = 100;
 int samplerMinSamples = 2;
@@ -1324,26 +1325,27 @@ int main(int argc, char* argv[])
 				lightBottomOutThreshold = atoi(argv[14]);
 				mediumBottomOutThreshold = atoi(argv[15]);
 				heavyBottomOutThreshold = atoi(argv[16]);
-				bottomOutDuration = atoi(argv[17]);
-				bottomOutGap = atoi(argv[18]);
-				samplerMinSamples = atoi(argv[19]);
-				deflectionMovingAverage = atoi(argv[20]);
-				accelerationMovingAverage = atoi(argv[21]);
+				releaseThreshold = atof(argv[17]);
+				bottomOutDuration = atoi(argv[18]);
+				bottomOutGap = atoi(argv[19]);
+				samplerMinSamples = atoi(argv[20]);
+				deflectionMovingAverage = atoi(argv[21]);
+				accelerationMovingAverage = atoi(argv[22]);
 
-				if (argc > 22) {
-					soundsDirectory = argv[22];
-
-					if (argc > 23)
-						audioDevice = argv[23];
+				if (argc > 23) {
+					soundsDirectory = argv[23];
 
 					if (argc > 24)
-						volume = atof(argv[24]);
+						audioDevice = argv[24];
 
 					if (argc > 25)
-						player = argv[25];
+						volume = atof(argv[25]);
 
 					if (argc > 26)
-						workingDirectory = argv[26];
+						player = argv[26];
+
+					if (argc > 27)
+						workingDirectory = argv[27];
 				}
 			}
 		}

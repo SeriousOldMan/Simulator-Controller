@@ -61,6 +61,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iOilTemperature := [80, 90, 100]
 
 	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "Heavy", 15)
+	iReleaseThreshold := 0.2
 	iBottomOutDuration := 30
 	iBottomOutGap := 100
 	iSamplerSettings := CaseInsenseMap("Samples", 2, "Deflection", 5, "Acceleration", 2)
@@ -335,6 +336,18 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
+	ReleaseThreshold {
+		Get {
+			return this.iReleaseThreshold
+		}
+
+		Set {
+			setAnalyzerSetting(this, "ReleaseThreshold", value)
+
+			return (this.iReleaseThreshold := value)
+		}
+	}
+
 	BottomOutDuration {
 		Get {
 			return this.iBottomOutDuration
@@ -451,6 +464,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
 		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
 		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|Heavy->15")
+		local defaultReleaseThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "ReleaseThreshold", 0.2)
 		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 20)
 		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
 		local defaultSamplerSettings := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SamplerSettings", "Samples->2|Deflection->5|Acceleration->2")
@@ -501,6 +515,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				defaultWaterTemperature := getMultiMapValue(configuration, "Analyzer", "WaterTemperature", defaultWaterTemperature)
 				defaultOilTemperature := getMultiMapValue(configuration, "Analyzer", "OilTemperature", defaultOilTemperature)
 				defaultBottomOutThresholds := getMultiMapValue(configuration, "Analyzer", "BottomOutThresholds", defaultBottomOutThresholds)
+				defaultReleaseThreshold := getMultiMapValue(configuration, "Analyzer", "ReleaseThreshold", defaultReleaseThreshold)
 				defaultBottomOutDuration := getMultiMapValue(configuration, "Analyzer", "BottomOutDuration", defaultBottomOutDuration)
 				defaultBottomOutGap := getMultiMapValue(configuration, "Analyzer", "BottomOutGap", defaultBottomOutGap)
 				defaultSamplerSettings := getMultiMapValue(configuration, "Analyzer", "SamplerSettings", defaultSamplerSettings)
@@ -529,6 +544,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		defaultWaterTemperature := getMultiMapValue(settings, "Settings", prefix . "WaterTemperature", defaultWaterTemperature)
 		defaultOilTemperature := getMultiMapValue(settings, "Settings", prefix . "OilTemperature", defaultOilTemperature)
 		defaultBottomOutThresholds := getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds)
+		defaultReleaseThreshold := getMultiMapValue(settings, "Settings", prefix . "ReleaseThreshold", defaultReleaseThreshold)
 		defaultBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
 		defaultBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
 		defaultSamplerSettings := getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings)
@@ -564,6 +580,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 												 , prefix . "OilTemperature", defaultOilTemperature))
 
 		this.iBottomOutThresholds := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds))
+		this.iReleaseThreshold := getMultiMapValue(settings, "Settings", prefix . "ReleaseThreshold", defaultReleaseThreshold)
 		this.iBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
 		this.iBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
 		this.iSamplerSettings := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings))
@@ -732,7 +749,7 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		if !this.iIssueCollector {
 			if !calibrate
 				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"
-									  , "BottomOutThresholds", "BottomOutDuration", "BottomOutGap"
+									  , "BottomOutThresholds", "ReleaseThreshold", "BottomOutDuration", "BottomOutGap"
 									  , "SamplerSettings"]
 					if this.settingAvailable(setting)
 						settings.%setting% := this.%setting%
@@ -1075,6 +1092,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static heavyBottomOutEdit
 	static durationBottomOutEdit
 	static gapBottomOutEdit
+	static releaseThresholdEdit
 	static minSamplesEdit
 	static deflectionWindowEdit
 	static accelerationWindowEdit
@@ -1097,6 +1115,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	validateInteger(minValue, maxValue, field, operation, value?) {
 		if (operation = "Validate")
 			return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+	}
+
+	validateFloat(minValue, maxValue, field, operation, value?) {
+		if (operation = "Validate")
+			return (isNumber(value) && (value >= minValue) && (value <= maxValue))
 	}
 
 	validateTemperature(field, operation, value?) {
@@ -1191,8 +1214,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		if !validateInteger(50, 500, gapBottomOutEdit, "Validate", gapBottomOutEdit.Text)
 			gapBottomOutEdit.Text := 100
 
+		if !validateFloat(0, 5, releaseThresholdEdit, "Validate", releaseThresholdEdit.Text)
+			releaseThresholdEdit.Text := Round(0.2, 1)
+
 		analyzer.BottomOutDuration := durationBottomOutEdit.Text
 		analyzer.BottomOutGap := gapBottomOutEdit.Text
+		analyzer.ReleaseThreshold := releaseThresholdEdit.Text
 	}
 	else if (commandOrAnalyzer == "UpdateBOSamples") {
 		value := deflectionWindowEdit.Text
@@ -1891,7 +1918,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("Italic", "Arial")
 
-		widget76 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h130", translate("Bottom Out"))
+		widget76 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h160", translate("Bottom Out"))
 
 		analyzerGui.SetFont("Norm", "Arial")
 
@@ -1928,6 +1955,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+
+		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Release"))
+		releaseThresholdEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", Round(analyzer.ReleaseThreshold, 1))
+		widget109 := releaseThresholdEdit
+		widget110 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("mm"))
+
+		releaseThresholdEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 
 		analyzerGui.SetFont("Italic", "Arial")
 
@@ -2063,7 +2097,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 107
+		loop 110
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

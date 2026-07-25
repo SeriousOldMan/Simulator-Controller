@@ -471,6 +471,7 @@ namespace ACSHMCoach {
         static int lightBottomOutThreshold = 5;
 		static int mediumBottomOutThreshold = 10;
 		static int heavyBottomOutThreshold = 15;
+        float releaseThreshold = 0.2f;
 		int bottomOutDuration = 30;
 		int bottomOutGap = 100;
 		int samplerMinSamples = 2;
@@ -830,8 +831,8 @@ namespace ACSHMCoach {
 
                 for (int i = 0; i < combinedAccel.Length; i++)
                     if (leftAboveThreshold[i] || rightAboveThreshold[i] ||
-                        (inEvent && (Math.Abs(leftDeflection[i] - leftStartDeflection) < 0.2 ||
-                                     Math.Abs(rightDeflection[i] - rightStartDeflection) < 0.2)))
+                        (inEvent && (Math.Abs(leftDeflection[i] - leftStartDeflection) < releaseThreshold ||
+                                     Math.Abs(rightDeflection[i] - rightStartDeflection) < releaseThreshold)))
                     {
                         if (!inEvent)
                         {
@@ -1461,26 +1462,27 @@ namespace ACSHMCoach {
                 lightBottomOutThreshold = int.Parse(args[13]);
 				mediumBottomOutThreshold = int.Parse(args[14]);
 				heavyBottomOutThreshold = int.Parse(args[15]);
-				bottomOutDuration = int.Parse(args[16]);
-				bottomOutGap = int.Parse(args[17]);
-				samplerMinSamples = int.Parse(args[18]);
-				deflectionMovingAverage = int.Parse(args[19]);
-				accelerationMovingAverage = int.Parse(args[20]);
+                releaseThreshold = float.Parse(args[16]);
+				bottomOutDuration = int.Parse(args[17]);
+				bottomOutGap = int.Parse(args[18]);
+				samplerMinSamples = int.Parse(args[19]);
+				deflectionMovingAverage = int.Parse(args[20]);
+				accelerationMovingAverage = int.Parse(args[21]);
 				
-                if (args.Length > 21) {
-                    soundsDirectory = args[21];
-
-                    if (args.Length > 22)
-                        audioDevice = args[22];
+                if (args.Length > 22) {
+                    soundsDirectory = args[22];
 
                     if (args.Length > 23)
-                        volume = float.Parse(args[23]);
+                        audioDevice = args[23];
 
                     if (args.Length > 24)
-                        player = args[24];
+                        volume = float.Parse(args[24]);
 
                     if (args.Length > 25)
-                        workingDirectory = args[25];
+                        player = args[25];
+
+                    if (args.Length > 26)
+                        workingDirectory = args[26];
                 }
             }
         }

@@ -648,10 +648,10 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 
 	if (lastSpeed > 60)
 		suspensionDeflectionsList.push_back(SuspensionDeflections(completedLaps,
-																  sharedData->mSuspensionTravel[0] * 1000,
-																  sharedData->mSuspensionTravel[1] * 1000,
-																  sharedData->mSuspensionTravel[2] * 1000,
-																  sharedData->mSuspensionTravel[3] * 1000));
+																  sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] * 1000,
+																  sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] * 1000,
+																  sharedData->mSuspensionTravel[TYRE_REAR_LEFT] * 1000,
+																  sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] * 1000));
 
 	pushValue(recentGLongs, acceleration);
 

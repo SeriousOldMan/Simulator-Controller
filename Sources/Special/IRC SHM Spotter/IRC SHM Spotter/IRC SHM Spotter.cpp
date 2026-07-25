@@ -1512,7 +1512,27 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 
 			getRawDataValue(rawValue, header, data, "YawRate");
 
-			telemetryFile << *((float*)rawValue) << std::endl;
+			telemetryFile << *((float*)rawValue) << ";";
+
+			float lfDeflection = 0;
+			float rfDeflection = 0;
+			float lrDeflection = 0;
+			float rrDeflection = 0;
+
+			if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
+				lfDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
+				rfDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
+				lrDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
+				rrDeflection = *((float*)rawValue) * 1000;
+
+			telemetryFile << lfDeflection << ";" << rfDeflection << ";"
+						  << lrDeflection << ";" << rrDeflection << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1538,8 +1558,28 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 
 					getRawDataValue(rawValue, header, data, "YawRate");
 
-					file << *((float*)rawValue) << std::endl;
-	
+					file << *((float*)rawValue) << ";";
+
+					float lfDeflection = 0;
+					float rfDeflection = 0;
+					float lrDeflection = 0;
+					float rrDeflection = 0;
+
+					if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
+						lfDeflection = *((float*)rawValue) * 1000;
+
+					if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
+						rfDeflection = *((float*)rawValue) * 1000;
+
+					if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
+						lrDeflection = *((float*)rawValue) * 1000;
+
+					if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
+						rrDeflection = *((float*)rawValue) * 1000;
+
+					file << lfDeflection << ";" << rfDeflection << ";"
+						 << lrDeflection << ";" << rrDeflection << std::endl;
+
 					file.close();
 				}
 				catch (...) {}

@@ -1768,7 +1768,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", analyzer.Simulator)
 
 		analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Car"))
-		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", (analyzer.Car ? analyzer.Car : translate("Unknown")))
+		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", (analyzer.Car ? analyzer.Car : translate("All")))
 
 		if analyzer.Track {
 			analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Track"))
@@ -1956,7 +1956,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
 
-		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Release"))
+		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Release Threshold"))
 		releaseThresholdEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", Round(analyzer.ReleaseThreshold, 1))
 		widget109 := releaseThresholdEdit
 		widget110 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("mm"))

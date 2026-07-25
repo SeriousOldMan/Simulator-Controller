@@ -316,6 +316,7 @@ void playSound(std::string wavFile, bool wait = true) {
 int lightBottomOutThreshold = 5;
 int mediumBottomOutThreshold = 10;
 int heavyBottomOutThreshold = 15;
+float releaseThreshold = 0.2f;
 int bottomOutDuration = 30;
 int bottomOutGap = 100;
 int samplerMinSamples = 2;
@@ -535,10 +536,10 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 
 using DeflectionGetter = std::function<double(const SuspensionDeflections&)>;
 
-std::vector<double> CalculateAccelerations(
+std::vector<std::pair<double, double>> CalculateAccelerations(
 	const std::vector<std::pair<long, double>>& deflections)
 {
-	std::vector<double> accelerations;
+	std::vector<std::pair<double, double>> accelerations;
 
 	auto CalculateAcceleration = [](long lastTime, double lastDeflection,
 		long time, double deflection,
@@ -562,10 +563,12 @@ std::vector<double> CalculateAccelerations(
 	if (size > 3)
 		for (size_t i = 1; i < (size - 1); i++)
 		{
-			accelerations.push_back(accelerationMA.Add(CalculateAcceleration(
-				deflections[i - 1].first, deflections[i - 1].second,
-				deflections[i].first, deflections[i].second,
-				deflections[i + 1].first, deflections[i + 1].second)));
+			accelerations.push_back(std::make_pair(
+				accelerationMA.Add(CalculateAcceleration(
+					deflections[i - 1].first, deflections[i - 1].second,
+					deflections[i].first, deflections[i].second,
+					deflections[i + 1].first, deflections[i + 1].second)),
+				deflections[i].second));
 		}
 
 	if (!accelerations.empty())
@@ -593,8 +596,8 @@ std::vector<std::pair<long, double>> ExtractDeflections(
 
 std::vector<SuspensionBottomOuts> CreateBottomOuts(
 	const std::string& axle,
-	const std::vector<double>& leftAccelerations,
-	const std::vector<double>& rightAccelerations)
+	const std::vector<std::pair<double, double>>& leftAccelerations,
+	const std::vector<std::pair<double, double>>& rightAccelerations)
 {
 	std::vector<SuspensionBottomOuts> events;
 
@@ -661,14 +664,19 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 	// Process acceleration data
 	std::vector<double> combinedAccel(leftAccelerations.size(), 0.0);
+	std::vector<bool> leftDeflection(leftAccelerations.size(), false);
+	std::vector<bool> rightDeflection(rightAccelerations.size(), false);
 	std::vector<bool> leftAboveThreshold(leftAccelerations.size(), false);
 	std::vector<bool> rightAboveThreshold(rightAccelerations.size(), false);
 
 	if (leftAccelerations.size() > 0) {
 		for (size_t i = 0; i < leftAccelerations.size(); ++i)
 		{
-			double leftMagnitude = leftAccelerations[i];
-			double rightMagnitude = rightAccelerations[i];
+			double leftMagnitude = leftAccelerations[i].first;
+			double rightMagnitude = rightAccelerations[i].first;
+
+			leftDeflection[i] = leftAccelerations[i].second;
+			rightDeflection[i] = rightAccelerations[i].second;
 
 			if (leftMagnitude < 0 && rightMagnitude < 0)
 			{
@@ -684,17 +692,23 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 		bool inEvent = false;
 		size_t eventStartIndex = 0;
+		double leftStartDeflection = 0;
+		double rightStartDeflection = 0;
 		double peakAccelInEvent = 0.0;
 		std::vector<double> accelValuesInEvent;
 
 		for (size_t i = 0; i < combinedAccel.size(); ++i)
 		{
-			if (leftAboveThreshold[i] || rightAboveThreshold[i])
+			if (leftAboveThreshold[i] || rightAboveThreshold[i] ||
+				(inEvent && (abs(leftDeflection[i] - leftStartDeflection) < releaseThreshold ||
+					         abs(rightDeflection[i] - rightStartDeflection) < releaseThreshold)))
 			{
 				if (!inEvent)
 				{
 					inEvent = true;
 					eventStartIndex = i;
+					leftStartDeflection = leftDeflection[i];
+					rightStartDeflection = rightDeflection[i];
 					peakAccelInEvent = 0.0;
 					accelValuesInEvent.clear();
 				}
@@ -765,13 +779,13 @@ std::vector<SuspensionBottomOuts> CreateBottomOuts(
 
 std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 {
-	std::vector<double> frontLeftAccels = CalculateAccelerations(
+	std::vector<std::pair<double, double>> frontLeftAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.FrontLeft; }));
-	std::vector<double> frontRightAccels = CalculateAccelerations(
+	std::vector<std::pair<double, double>> frontRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.FrontRight; }));
-	std::vector<double> rearLeftAccels = CalculateAccelerations(
+	std::vector<std::pair<double, double>> rearLeftAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearLeft; }));
-	std::vector<double> rearRightAccels = CalculateAccelerations(
+	std::vector<std::pair<double, double>> rearRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
 	if (true) {
@@ -782,7 +796,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 
 			for (const auto& deflections : suspensionDeflectionsList)
 				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
-				deflections.RearLeft << "," << deflections.RearRight << std::endl;
+						  deflections.RearLeft << "," << deflections.RearRight << std::endl;
 
 			output.close();
 		}
@@ -794,8 +808,8 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 
 			if (frontLeftAccels.size() > 0)
 				for (int i = 0; i < frontLeftAccels.size(); i++)
-					output << frontLeftAccels[i] << "," << frontRightAccels[i] << "," <<
-					rearLeftAccels[i] << "," << rearRightAccels[i] << std::endl;
+					output << frontLeftAccels[i].first << "," << frontRightAccels[i].first << "," <<
+							  rearLeftAccels[i].first << "," << rearRightAccels[i].first << std::endl;
 
 			output.close();
 		}
@@ -1619,26 +1633,27 @@ int main(int argc, char* argv[])
 				lightBottomOutThreshold = atoi(argv[13]);
 				mediumBottomOutThreshold = atoi(argv[14]);
 				heavyBottomOutThreshold = atoi(argv[15]);
-				bottomOutDuration = atoi(argv[16]);
-				bottomOutGap = atoi(argv[17]);
-				samplerMinSamples = atoi(argv[18]);
-				deflectionMovingAverage = atoi(argv[19]);
-				accelerationMovingAverage = atoi(argv[20]);
+				releaseThreshold = atof(argv[16]);
+				bottomOutDuration = atoi(argv[17]);
+				bottomOutGap = atoi(argv[18]);
+				samplerMinSamples = atoi(argv[19]);
+				deflectionMovingAverage = atoi(argv[20]);
+				accelerationMovingAverage = atoi(argv[21]);
 
-				if (argc > 21) {
-					soundsDirectory = argv[21];
-
-					if (argc > 22)
-						audioDevice = argv[22];
+				if (argc > 22) {
+					soundsDirectory = argv[22];
 
 					if (argc > 23)
-						volume = atof(argv[23]);
+						audioDevice = argv[23];
 
 					if (argc > 24)
-						player = argv[24];
+						volume = atof(argv[24]);
 
 					if (argc > 25)
-						workingDirectory = argv[25];
+						player = argv[25];
+
+					if (argc > 26)
+						workingDirectory = argv[26];
 				}
 			}
 		}

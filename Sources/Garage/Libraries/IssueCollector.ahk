@@ -190,8 +190,8 @@ class IssueCollector {
 		local setting, value
 
 		this.iSimulator := SessionDatabase.getSimulatorName(simulator)
-		this.iCar := (car ? SessionDatabase.getCarName(simulator, car) : false)
-		this.iTrack := (car ? SessionDatabase.getTrackName(simulator, track) : false)
+		this.iCar := ((car && (car != true)) ? SessionDatabase.getCarName(simulator, car) : false)
+		this.iTrack := ((this.Car && (track && (track != true))) ? SessionDatabase.getTrackName(simulator, track) : false)
 
 		this.iAcousticFeedback := acousticFeedback
 

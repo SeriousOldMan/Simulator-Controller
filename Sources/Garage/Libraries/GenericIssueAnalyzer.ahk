@@ -1038,7 +1038,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 	local category, temperature, position, key, info, simulator, car, track, fileName
-	local telemetries, theAnalyzer, thresholds
+	local telemetries, theAnalyzer
 
 	static analyzerGui
 
@@ -1321,27 +1321,34 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				else
 					telemetries.Push(theAnalyzer.createTelemetry(1, fileName))
 
-				thresholds := {LowSpeed: analyzer.LowspeedThreshold
-							 , LightOversteer: analyzer.OversteerThresholds[1]
-							 , MediumOversteer: analyzer.OversteerThresholds[2]
-							 , HeavyOversteer: analyzer.OversteerThresholds[3]
-							 , LightUndersteer: analyzer.UndersteerThresholds[1]
-							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
-							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
-
 				analyzerGui.Block()
 
 				try {
 					withTask(ProgressTask(translate("Analyzing Data")), () {
-						issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
-																		 , analyzer.WheelBase, analyzer.TrackWidth
-																		 , thresholds)
+						issues := theAnalyzer.analyzeHandling(telemetries
+															, analyzer.SteerLock, analyzer.SteerRatio
+															, analyzer.WheelBase, analyzer.TrackWidth
+															, {LowSpeed: analyzer.LowspeedThreshold
+															 , LightOversteer: analyzer.OversteerThresholds[1]
+															 , MediumOversteer: analyzer.OversteerThresholds[2]
+															 , HeavyOversteer: analyzer.OversteerThresholds[3]
+															 , LightUndersteer: analyzer.UndersteerThresholds[1]
+															 , MediumUndersteer: analyzer.UndersteerThresholds[2]
+															 , HeavyUndersteer: analyzer.UndersteerThresholds[3]})
 
 						issues := IssueCollector.createHandling(issues)
 
 						analyzer.Handling := issues
 
-						issues := theAnalyzer.analyzeSuspension(telemetries, thresholds)
+						issues := theAnalyzer.analyzeSuspension(telemetries
+															  , analyzer.BottomOutDuration, analyzer.BottomOutGap
+														      , analyzer.SamplesSettings["Samples"]
+															  , analyzer.SamplesSettings["Deflection"]
+															  , analyzer.SamplesSettings["Acceleration"]
+															  , {LightBottomOut: analyzer.BottomOutThresholds["Light"]
+															   , MediumBottomOut: analyzer.BottomOutThresholds["Medium"]
+															   , HeavyBottomOut: analyzer.BottomOutThresholds["Heavy"]
+															   , Release: analyzer.ReleaseThreshold})
 
 						issues := IssueCollector.createSuspension(issues)
 

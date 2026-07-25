@@ -1921,8 +1921,111 @@ class TelemetryAnalyzer {
 		return issues
 	}
 
-	analyzeSuspension(telemetries, thresholds := false) {
-		return newMultiMap()
+	analyzeSuspension(telemetries, duration, gap
+					, samples, deflectionAverage, accelerationAverage
+					, thresholds := false) {
+		local deflections := []
+		local time, flAccelerations, frAccelerations, rlAccelerations, rrAccelerations, bottomOuts
+		local ignore, theTelemetry, deflectionFL
+
+		computeAccelerations(type, deflections) {
+			local accelerations := []
+			local length := deflections.Length
+			local ignore, deflection
+
+			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
+				local dt1 := (time - lastTime)
+				local dt2 := (nextTime - time)
+				local term1, term2
+
+				if ((dt1 <= 0) || (dt2 <= 0))
+					return 0
+
+				term1 := ((nextDeflection - deflection) / dt2
+				term2 := ((deflection - lastDeflection) / dt1)
+
+				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
+			}
+
+			loop length
+				if ((A_Index > 1) && (A_Index < length))
+					accelerations.Push(Values(calculateAcceleration(deflections[A_Index - 1].Time
+																  , deflections[A_Index - 1].%type%
+																  , deflections[A_Index].Time
+																  , deflections[A_Index].%type%
+																  , deflections[A_Index + 1].Time
+																  , deflections[A_Index + 1].%type%)
+											, deflections[A_Index].%type%))
+
+			if (accelerations.Length > 0) {
+				accelerations.Push(accelerations[accelerations.Length])
+				accelerations.InsertAt(1, accelerations[1])
+			}
+
+			return accelerations
+		}
+
+		computeBottomOuts(axle, leftAccelerations, rightAccelerations) {
+		}
+
+		createIssues(bottomOuts, severity) {
+			local issues := newMultiMap()
+			local frontCount := 0
+			local rearCount := 0
+			local ignore, type, severity, key, count
+
+			do(bottomOuts, (bottomOut) {
+				setMultiMapValue(issues, "Suspension.Bottom.Out." . bottomOut.Severity, bottomOut.Axle
+							   , getMultiMapValue(issues, "Suspension.Bottom.Out." . bottomOut.Severity
+														, bottomOut.Axle, 0) + 1)
+
+				if (bottomOut.Axle = "Front")
+					frontCount += 1
+				else
+					rearCount += 1
+			})
+
+			for ignore, type in ["Suspension.Bottom.Out"]
+				for ignore, severity in ["Heavy", "Medium", "Light"] {
+					key := (type . "." . severity)
+
+					for ignore, where in ["Front", "Rear"] {
+						count := ((where = "Front") ? frontCount : rearCount)
+
+						setMultiMapValue(issues, key, where
+									   , Round(100 * getMultiMapValue(issues, key, where, 0) / count))
+					}
+				}
+
+			return issues
+		}
+
+		if !thresholds
+			thresholds := {LightBottomOut: 5, MediumBottomOut: 10, HeavyBottomOut: 15, Release: 0.2}
+
+		if isInstance(telemetries, Telemetry)
+			telemetries := [telemetries]
+
+		for ignore, theTelemetry in telemetries
+			loop theTelemetry.Data.Length {
+				time := theTelemetry.getValue(A_Index, "Time")
+				deflectionFL := theTelemetry.getValue(A_Index, "SuspDefl FL")
+
+				if ((deflectionFL != kUndefined) && (time != kUndefined))
+					deflections.Push({Time: time
+									, FrontLeft: deflectionFL
+									, FrontRight: theTelemetry.getValue(A_Index, "SuspDefl FR")
+									, RearLeft: theTelemetry.getValue(A_Index, "SuspDefl RL")
+									, RearRight: theTelemetry.getValue(A_Index, "SuspDefl RR")})
+			}
+
+		flAccelerations := computeAccelerations("FrontLeft", deflections)
+		frAccelerations := computeAccelerations("FrontRight", deflections)
+		rlAccelerations := computeAccelerations("RearLeft", deflections)
+		rrAccelerations := computeAccelerations("RearRight", deflections)
+
+		return createIssues(concatenate(computeBottomOuts("Front", flAccelerations, frAccelerations)
+									  , computeBottomOuts("Rear", rlAccelerations, rrAccelerations)))
 	}
 }
 

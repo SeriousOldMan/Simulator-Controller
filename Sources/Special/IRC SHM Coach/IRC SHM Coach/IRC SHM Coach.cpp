@@ -574,7 +574,7 @@ std::vector<std::pair<double, double>> CalculateAccelerations(
 	if (!accelerations.empty())
 	{
 		accelerations.push_back(accelerations.back());
-		accelerations.insert(accelerations.begin(), accelerations.back());
+		accelerations.insert(accelerations.begin(), accelerations[0]);
 	}
 
 	return accelerations;

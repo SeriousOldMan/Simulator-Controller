@@ -1252,9 +1252,14 @@ void collectCarTelemetry(int playerID) {
 																 map_buffer->all_drivers_data_1[index].position.x,
 																 -map_buffer->all_drivers_data_1[index].position.z);
 
-		fprintf(telemetryFile, "%d;%f\n", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000),
-										  (float)map_buffer->player.local_angular_velocity.y);
-		
+		fprintf(telemetryFile, "%d;%f;", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000),
+										 (float)map_buffer->player.local_angular_velocity.y);
+
+		fprintf(telemetryFile, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
+												map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
+												map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT] * 1000.0,
+												map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT] * 1000.0);
+												
 		int offset = strlen(telemetryDirectory);
 
 		strcpy_s(tmpFileName, 512, telemetryDirectory);
@@ -1283,7 +1288,12 @@ void collectCarTelemetry(int playerID) {
 				else
 					fprintf(file, "n/a;");
 				
-				fprintf(file, "%f\n", (float)map_buffer->player.local_angular_velocity.y);
+				fprintf(file, "%f;", (float)map_buffer->player.local_angular_velocity.y);
+
+				fprintf(file, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
+											   map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT] * 1000.0,
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT] * 1000.0);
 
 				fclose(file);
 			}

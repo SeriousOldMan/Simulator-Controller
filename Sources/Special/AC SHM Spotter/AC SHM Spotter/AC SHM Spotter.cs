@@ -1249,9 +1249,14 @@ namespace ACSHMSpotter {
 						
                         telemetryFile.Write(graphics.iCurrentTime + ";");
 						
-						telemetryFile.WriteLine(physics.LocalAngularVelocity[1]);
+						telemetryFile.WriteLine(physics.LocalAngularVelocity[1] + ";");
 
-						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
+                        telemetryFile.WriteLine(physics.SuspensionTravel[0] + ";");
+                        telemetryFile.WriteLine(physics.SuspensionTravel[1] + ";");
+                        telemetryFile.WriteLine(physics.SuspensionTravel[2] + ";");
+                        telemetryFile.WriteLine(physics.SuspensionTravel[3]);
+
+                        if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
 								StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 
@@ -1272,10 +1277,15 @@ namespace ACSHMSpotter {
 								file.Write(cars.cars[carID].worldPosition.z + ";");
 								
 								file.Write(graphics.iCurrentTime + ";");
-						
-								file.WriteLine(physics.LocalAngularVelocity[1]);
 
-								file.Close();
+                                file.WriteLine(physics.LocalAngularVelocity[1] + ";");
+
+                                file.WriteLine(physics.SuspensionTravel[0] + ";");
+                                file.WriteLine(physics.SuspensionTravel[1] + ";");
+                                file.WriteLine(physics.SuspensionTravel[2] + ";");
+                                file.WriteLine(physics.SuspensionTravel[3]);
+
+                                file.Close();
                             }
                             catch (Exception) { }
 

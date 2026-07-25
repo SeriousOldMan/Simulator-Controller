@@ -36,7 +36,11 @@ global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
 							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [normalizeTime]}
 							, {Name: "PosX", Indices: [12], Channels: []}
 							, {Name: "PosY", Indices: [13], Channels: []}
-							, {Name: "YawRate", Indices: [15], Channels: ["YawRate"]}]
+							, {Name: "YawRate", Indices: [15], Channels: ["YawRate"]}
+							, {Name: "YawRate", Indices: [16], Channels: ["SuspDefl FL"]}
+							, {Name: "YawRate", Indices: [17], Channels: ["SuspDefl FR"]}
+							, {Name: "YawRate", Indices: [18], Channels: ["SuspDefl RL"]}
+							, {Name: "YawRate", Indices: [19], Channels: ["SuspDefl RR"]}]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -47,6 +47,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - The weighting of the spring stiffness has changed.
 	- Bumpstop rates will be taken into account, if available.
 	- Changes to heave suspension settings will be applied more aggressively.
+  - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
 
 # Release history
 

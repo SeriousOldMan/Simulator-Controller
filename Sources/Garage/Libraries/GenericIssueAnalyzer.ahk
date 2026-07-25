@@ -1342,9 +1342,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 						issues := theAnalyzer.analyzeSuspension(telemetries
 															  , analyzer.BottomOutDuration, analyzer.BottomOutGap
-														      , analyzer.SamplesSettings["Samples"]
-															  , analyzer.SamplesSettings["Deflection"]
-															  , analyzer.SamplesSettings["Acceleration"]
+														      , analyzer.SamplerSettings["Samples"]
+															  , analyzer.SamplerSettings["Deflection"]
+															  , analyzer.SamplerSettings["Acceleration"]
 															  , {LightBottomOut: analyzer.BottomOutThresholds["Light"]
 															   , MediumBottomOut: analyzer.BottomOutThresholds["Medium"]
 															   , HeavyBottomOut: analyzer.BottomOutThresholds["Heavy"]

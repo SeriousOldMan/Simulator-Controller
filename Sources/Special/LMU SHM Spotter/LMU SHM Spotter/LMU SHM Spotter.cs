@@ -1221,6 +1221,9 @@ namespace LMUSHMSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
+		long sumReadTime = 0;
+		long allReadCount = 0;
+		
         void collectCarTelemetry(ref LMUVehicleScoring playerScoring)
         {
             int playerID = playerScoring.mID;
@@ -1236,6 +1239,21 @@ namespace LMUSHMSpotter {
                     {
                         if (telemetryFile != null) {
                             telemetryFile.Close();
+							
+							if (true) {
+								telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".stats", false);
+							
+								telemetryFile.WriteLine(this.scoringBuffer.GetStats());
+								telemetryFile.WriteLine(this.telemetryBuffer.GetStats());
+								telemetryFile.WriteLine(this.extendedBuffer.GetStats());
+								telemetryFile.WriteLine("Average time for data: " + Math.Round(sumReadTime / allReadCount) + " ms");
+								
+								this.scoringBuffer.ClearStats();
+								this.telemetryBuffer.ClearStats();
+								this.extendedBuffer.ClearStats();
+								
+								telemetryFile.Close();
+							}
 
                             FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
 
@@ -1252,8 +1270,7 @@ namespace LMUSHMSpotter {
 
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false,
-													 Encoding.UTF8, 4096 * 16);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 					
 					lastRunning = -1;
                 }
@@ -1397,6 +1414,7 @@ namespace LMUSHMSpotter {
 			int countdown = 4000;
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
+			long readStart = 0;
 
 			telemetryDirectory = telemetryFolder;
 
@@ -1410,9 +1428,14 @@ namespace LMUSHMSpotter {
 				{
 					try
 					{
+						readStart = Environment.TickCount;
+						
 						if (!extendedBuffer.GetMappedData(ref extended) || !scoringBuffer.GetMappedData(ref scoring)
 																	    || !telemetryBuffer.GetMappedData(ref telemetry))
 							continue;
+						
+						sumReadTime += (Environment.TickCount - readStart);
+						allReadCount += 1;
                     }
 					catch (Exception)
 					{

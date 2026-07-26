@@ -1042,6 +1042,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static analyzerGui
 
+	static temperatureSavers
+
 	static telemetryButton
 	static activateButton
 	static calibrateButton
@@ -1130,22 +1132,29 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 	}
 
-	createTemperatureUpdater(name, widgets) {
+	initializeTemperatureSettings(setting, name, widgets) {
 		local ignore, widget
 
-		updateTemperature(widget, *) {
-			if widget.Validate()
-				analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text), false)
-								  , convertUnit("Temperature", internalValue("Float", widgets[2].Text), false)
-								  , convertUnit("Temperature", internalValue("Float", widgets[3].Text), false)]
+		validateTemperature(widget, *) {
+			return widget.Validate()
 		}
 
-		for ignore, widget in widgets
-			widget.OnEvent("Change", updateTemperature.Bind(widget))
-	}
+		saveTemperature(name, widgets) {
+			analyzer.%name% := collect(widgets, (w) => convertUnit("Temperature", internalValue("Float", w.Text), false))
+		}
 
-	updateTemperature(name, widget, *) {
-		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text), false)
+		if analyzer.settingAvailable(setting) {
+			for ignore, widget in widgets {
+				widget.OnEvent("Change", validateTemperature.Bind(widget))
+
+				temperatureSavers.Push(saveTemperature.Bind(name, widgets))
+			}
+		}
+		else
+			for ignore, widget in widgets {
+				widget.Enabled := false
+				widget.Text := ""
+			}
 	}
 
 	noSelect(listView, *) {
@@ -1186,60 +1195,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			}
 	}
 	else if (commandOrAnalyzer == "UpdateBOThresholds") {
-		value := lightBottomOutEdit.Text
-
-		if isInteger(value)
-			analyzer.BottomOutThresholds["Light"] := value
-		else
-			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text := 5
-
-		value := mediumBottomOutEdit.Text
-
-		if isInteger(value)
-			analyzer.BottomOutThresholds["Medium"] := value
-		else
-			analyzer.BottomOutThresholds["Medium"] := lightBottomOutEdit.Text := 10
-
-		value := heavyBottomOutEdit.Text
-
-		if isInteger(value)
-			analyzer.BottomOutThresholds["Heavy"] := value
-		else
-			analyzer.BottomOutThresholds["Heavy"] := lightBottomOutEdit.Text := 15
+		if !validateInteger(1, 50, lightBottomOutEdit, "Validate", lightBottomOutEdit.Text)
+			lightBottomOutEdit.Text := 5
+		if !validateInteger(1, 50, mediumBottomOutEdit, "Validate", mediumBottomOutEdit.Text)
+			mediumBottomOutEdit.Text := 10
+		if !validateInteger(1, 50, heavyBottomOutEdit, "Validate", heavyBottomOutEdit.Text)
+			heavyBottomOutEdit.Text := 15
 	}
 	else if (commandOrAnalyzer == "UpdateBOTimings") {
 		if !validateInteger(10, 200, durationBottomOutEdit, "Validate", durationBottomOutEdit.Text)
 			durationBottomOutEdit.Text := 30
-
 		if !validateInteger(50, 500, gapBottomOutEdit, "Validate", gapBottomOutEdit.Text)
 			gapBottomOutEdit.Text := 100
-
 		if !validateFloat(0, 5, releaseThresholdEdit, "Validate", releaseThresholdEdit.Text)
 			releaseThresholdEdit.Text := Round(0.2, 1)
-
-		analyzer.BottomOutDuration := durationBottomOutEdit.Text
-		analyzer.BottomOutGap := gapBottomOutEdit.Text
-		analyzer.ReleaseThreshold := releaseThresholdEdit.Text
 	}
 	else if (commandOrAnalyzer == "UpdateBOSamples") {
-		value := deflectionWindowEdit.Text
-
-		if isInteger(value)
-			analyzer.SamplerSettings["Deflection"] := value
-		else
-			analyzer.SamplerSettings["Deflection"] := deflectionWindowEdit.Text := 5
-
-		value := accelerationWindowEdit.Text
-
-		if isInteger(value)
-			analyzer.SamplerSettings["Acceleration"] := value
-		else
-			analyzer.SamplerSettings["Acceleration"] := accelerationWindowEdit.Text := 2
-
+		if !validateFloat(1, 20, deflectionWindowEdit, "Validate", deflectionWindowEdit.Text)
+			deflectionWindowEdit.Text := 5
+		if !validateFloat(1, 20, accelerationWindowEdit, "Validate", accelerationWindowEdit.Text)
+			accelerationWindowEdit.Text := 2
 		if !validateInteger(1, 10, minSamplesEdit, "Validate", minSamplesEdit.Text)
 			minSamplesEdit.Text := 2
-
-		analyzer.SamplerSettings["Samples"] := minSamplesEdit.Text
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
 		analyzerGui.Block()
@@ -1292,6 +1269,29 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		if analyzer.settingAvailable("UndersteerThresholds")
 			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider.Value, mediumUndersteerThresholdSlider.Value, heavyUndersteerThresholdSlider.Value]
+
+		if analyzer.settingAvailable("BottomOutThresholds") {
+			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Medium"] := mediumBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Heavy"] := heavyBottomOutEdit.Text
+		}
+
+		if analyzer.settingAvailable("ReleaseThreshold")
+			analyzer.ReleaseThreshold := releaseThresholdEdit.Text
+
+		if analyzer.settingAvailable("BottomOutDuration")
+			analyzer.BottomOutDuration := durationBottomOutEdit.Text
+
+		if analyzer.settingAvailable("BottomOutGap")
+			analyzer.BottomOutGap := gapBottomOutEdit.Text
+
+		if analyzer.settingAvailable("SamplerSettings") {
+			analyzer.SamplerSettings["Samples"] := minSamplesEdit.Text
+			analyzer.SamplerSettings["Deflection"] := deflectionWindowEdit.Text
+			analyzer.SamplerSettings["Acceleration"] := accelerationWindowEdit.Text
+		}
+
+		do(temperatureSavers, (s) => s())
 
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
@@ -1758,6 +1758,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		runWidgets := []
 		analyzeWidgets := []
 
+		temperatureSavers := []
+
 		analyzerGui := Window({Descriptor: "Setup Workbench.Analyzer", Options: "0x400000"})
 
 		analyzerGui.SetFont("s10 Bold", "Arial")
@@ -2003,6 +2005,39 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		deflectionWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
 		accelerationWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
 
+		if !analyzer.settingAvailable("BottomOutThresholds") {
+			lightBottomOutEdit.Enabled := false
+			lightBottomOutEdit.Text := ""
+			mediumBottomOutEdit.Enabled := false
+			mediumBottomOutEdit.Text := ""
+			heavyBottomOutEdit.Enabled := false
+			heavyBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("ReleaseThreshold") {
+			releaseThresholdEdit.Enabled := false
+			releaseThresholdEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("BottomOutDuration") {
+			durationBottomOutEdit.Enabled := false
+			durationBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("BottomOutGap") {
+			gapBottomOutEdit.Enabled := false
+			gapBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("SamplerSettings") {
+			minSamplesEdit.Enabled := false
+			deflectionWindowEdit.Enabled := false
+			accelerationWindowEdit.Enabled := false
+			minSamplesEdit.Text := ""
+			deflectionWindowEdit.Text := ""
+			accelerationWindowEdit.Text := ""
+		}
+
 		tabView .UseTab(3)
 
 		analyzerGui.SetFont("Italic", "Arial")
@@ -2083,20 +2118,22 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget73 := maxOilTemperatureEdit
 		widget74 := idealOilTemperatureEdit
 
-		createTemperatureUpdater("FrontTyreTemperatures"
-							   , [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
-		createTemperatureUpdater("RearTyreTemperatures"
-							   , [minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.Front", "FrontTyreTemperatures"
+									, [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.Rear", "RearTyreTemperatures"
+									, [minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.OIDifference", "OITemperatureDifference"
+									, [maxOITemperatureDifferenceEdit])
 
-		maxOITemperatureDifferenceEdit.OnEvent("Change", updateTemperature.Bind("OITemperatureDifference", maxOITemperatureDifferenceEdit))
+		initializeTemperatureSettings("BrakeTemperatures.Front", "FrontBrakeTemperatures"
+									, [minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit])
+		initializeTemperatureSettings("BrakeTemperatures.Rear", "RearBrakeTemperatures"
+									, [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
 
-		createTemperatureUpdater("FrontBrakeTemperatures"
-							   , [minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit])
-		createTemperatureUpdater("RearBrakeTemperatures"
-							   , [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
-
-		createTemperatureUpdater("WaterTemperature", [minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit])
-		createTemperatureUpdater("OilTemperature", [minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit])
+		initializeTemperatureSettings("EngineTemperatures.Water", "WaterTemperature"
+							   , [minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit])
+		initializeTemperatureSettings("EngineTemperatures.Oil", "OilTemperature"
+							   , [minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit])
 
 		for ignore, widget in [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit
 							 , minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit

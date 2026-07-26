@@ -1987,12 +1987,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		minSamplesEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
 
-		widget100 := analyzerGui.Add("Text", "x32 yp+30 w140 h23 +0x200", translate("Average (Deflection)"))
+		widget100 := analyzerGui.Add("Text", "x32 yp+30 w140 h23 +0x200", translate("Ø Deflection"))
 		deflectionWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Deflection"])
 		widget101 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Deflection"])
 		widget102 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
 
-		widget103 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Average (Acceleration)"))
+		widget103 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Ø Acceleration"))
 		accelerationWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", analyzer.SamplerSettings["Acceleration"])
 		widget104 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Acceleration"])
 		widget105 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))

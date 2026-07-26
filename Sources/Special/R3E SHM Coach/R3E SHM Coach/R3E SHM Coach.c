@@ -900,14 +900,18 @@ DoublePairArray* CalculateAccelerations(const LongDoublePairArray* deflections)
 		DoublePairArray_Add(accelerations,
 			accelerations->first[accelerations->size - 1],
 			accelerations->second[accelerations->size - 1]);
+			
+		// To make sure, array holds an additional element...
+		DoublePairArray_Add(accelerations,
+			accelerations->first[accelerations->size - 1],
+			accelerations->second[accelerations->size - 1]);
 
 		memmove(accelerations->first + 1, accelerations->first,
-			(accelerations->size - 1) * sizeof(double));
+			(accelerations->size - 2) * sizeof(double));
 		memmove(accelerations->second + 1, accelerations->second,
-			(accelerations->size - 1) * sizeof(double));
+			(accelerations->size - 2) * sizeof(double));
 		accelerations->first[0] = accelerations->first[1];
 		accelerations->second[0] = accelerations->second[1];
-		accelerations->size++;
 	}
 
 	MovingAverage_Destroy(accelerationMA);

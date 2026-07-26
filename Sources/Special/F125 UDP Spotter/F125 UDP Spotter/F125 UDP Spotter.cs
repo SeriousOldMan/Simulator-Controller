@@ -1232,11 +1232,11 @@ namespace F125UDPSpotter {
 
                     telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
 
-                    telemetryFile.WriteLine(motionEx.AngularVelocityY + ";");
+                    telemetryFile.Write(motionEx.AngularVelocityY + ";");
 
-                    telemetryFile.WriteLine(motionEx.SuspensionPosition[2] * 0.00025 + ";");
-                    telemetryFile.WriteLine(motionEx.SuspensionPosition[3] * 0.00025 + ";");
-                    telemetryFile.WriteLine(motionEx.SuspensionPosition[0] * 0.00025 + ";");
+                    telemetryFile.Write(motionEx.SuspensionPosition[2] * 0.00025 + ";");
+                    telemetryFile.Write(motionEx.SuspensionPosition[3] * 0.00025 + ";");
+                    telemetryFile.Write(motionEx.SuspensionPosition[0] * 0.00025 + ";");
                     telemetryFile.WriteLine(motionEx.SuspensionPosition[1] * 0.00025);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
@@ -1263,11 +1263,11 @@ namespace F125UDPSpotter {
 
                             file.Write(playerLap.CurrentLapTimeInMS + ";");
 					
-							file.WriteLine(motionEx.AngularVelocityY);
+							file.Write(motionEx.AngularVelocityY + ";");
 
-                            file.WriteLine(motionEx.SuspensionPosition[2] * 0.00025 + ";");
-                            file.WriteLine(motionEx.SuspensionPosition[3] * 0.00025 + ";");
-                            file.WriteLine(motionEx.SuspensionPosition[0] * 0.00025 + ";");
+                            file.Write(motionEx.SuspensionPosition[2] * 0.00025 + ";");
+                            file.Write(motionEx.SuspensionPosition[3] * 0.00025 + ";");
+                            file.Write(motionEx.SuspensionPosition[0] * 0.00025 + ";");
                             file.WriteLine(motionEx.SuspensionPosition[1] * 0.00025);
 
                             file.Close();

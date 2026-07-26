@@ -601,7 +601,7 @@ namespace PMRUDPCoach {
 
                 try
                 {
-                    accelerations.Insert(0, accelerations[accelerations.Count - 1]);
+                    accelerations.Insert(0, accelerations[0]);
                 }
                 catch { }
 

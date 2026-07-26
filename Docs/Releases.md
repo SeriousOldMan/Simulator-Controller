@@ -41,6 +41,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
+  - Changed settings are no longer saved in the issue analyzer in "Setup Workbench" when the dialog is cancelled.
   - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
   - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
   - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
@@ -48,6 +49,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Bumpstop rates will be taken into account, if available.
 	- Changes to heave suspension settings will be applied more aggressively.
   - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
+  - The offline issue analysis, which uses telemetry files, can alos detect suspension issues with all files generated with this release or later.
 
 # Release history
 

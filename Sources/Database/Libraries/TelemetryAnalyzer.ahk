@@ -1943,6 +1943,12 @@ class TelemetryAnalyzer {
 				local dt2 := (nextTime - time)
 				local term1, term2
 
+				while (Abs(dt1) > 100)
+					dt1 /= 10
+
+				while (Abs(dt2) > 100)
+					dt2 /= 10
+
 				if ((dt1 <= 0) || (dt2 <= 0))
 					return 0
 
@@ -2007,7 +2013,10 @@ class TelemetryAnalyzer {
 				leftMagnitude := Abs(leftAccelerations[A_Index][1])
 				rightMagnitude := Abs(rightAccelerations[A_Index][1])
 
-				if ((leftAccelerations[A_Index][2] < 0) && (rightAccelerations[A_Index][2] < 0)
+				; if ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut))
+				;	MsgBox "Hit"
+
+				if ((leftAccelerations[A_Index][1] < 0) && (rightAccelerations[A_Index][1] < 0)
 				 && ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut)
 				  || (event && ((Abs(leftAccelerations[A_Index][2] - leftAccelerations[event.Index][2]) < thresholds.Release) ||
 								(Abs(rightAccelerations[A_Index][2] - rightAccelerations[event.Index][2]) < thresholds.Release))))) {
@@ -2018,8 +2027,7 @@ class TelemetryAnalyzer {
 				}
 				else {
 					if event {
-						if ((A_Index - event.Index) >= samples)
-						{
+						if ((A_Index - event.Index) >= samples) {
 							startTime := deflections[event.Index].Time
 							endTime := deflections[A_Index].Time
 
@@ -2097,10 +2105,10 @@ class TelemetryAnalyzer {
 
 				if ((deflectionFL != kUndefined) && (time != kUndefined))
 					deflections.Push({Time: time
-									, FrontLeft: flAverage.Add(deflectionFL)
-									, FrontRight: frAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl FR"))
-									, RearLeft: rlAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RL"))
-									, RearRight: rrAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RR"))})
+									, FrontLeft: flAverage.Add(deflectionFL) * 1000
+									, FrontRight: frAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl FR")) * 1000
+									, RearLeft: rlAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RL")) * 1000
+									, RearRight: rrAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RR")) * 1000})
 			}
 
 		flAccelerations := computeAccelerations("FrontLeft", deflections)
@@ -2112,9 +2120,9 @@ class TelemetryAnalyzer {
 								, computeBottomOuts("Rear", rlAccelerations, rrAccelerations))
 
 		do(bottomOuts, (bottomOut) {
-			if (bottomOuts.Acceleration > thresholds.HeavyBottomOut)
+			if (bottomOut.Acceleration > thresholds.HeavyBottomOut)
 				bottomOut.Severity := "Heavy"
-			else if (bottomOuts.Acceleration > thresholds.MediumBottomOut)
+			else if (bottomOut.Acceleration > thresholds.MediumBottomOut)
 				bottomOut.Severity := "Medium"
 			else
 				bottomOut.Severity := "Light"

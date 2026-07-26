@@ -10,6 +10,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class MovingAverage {
+	iPeriod := 0
+
 	iWindow := []
 	iHead := 1
 	iCount := 0
@@ -19,21 +21,27 @@ class MovingAverage {
 		if (period <= 0)
 			throw "Invalid period detected in MovingAverage.__New..."
 
+		this.iPeriod := period
+
 		loop period
 			this.iWindow.Push(0)
 	}
 
     Add(newValue) {
-		if (this.iCount == this.iWindow.Length)
-			this.iValues -= this.iWindow[this.iHead]
+		local period := this.iPeriod
+		local head := this.iHead
+		local count := this.iCount
 
-		this.iWindow[this.iHead] = newValue
+		if (count == period)
+			this.iValues -= this.iWindow[head]
+
+		this.iWindow[head] := newValue
 		this.iValues += newValue
 
-		if (++this.iHead > this.iWindow.Length)
+		if (++this.iHead > period)
 			this.iHead := 1
 
-		if (this.iCount < Window.Length)
+		if (count < period)
 			this.iCount += 1
 
 		return (this.iValues / this.iCount)

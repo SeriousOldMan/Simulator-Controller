@@ -1282,11 +1282,11 @@ namespace LMUSHMSpotter {
 
 					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
 
-                    telemetryFile.WriteLine(vehicle.mLocalRot.z + ";");
+                    telemetryFile.Write(vehicle.mLocalRot.z + ";");
 
-                    telemetryFile.WriteLine(vehicle.mWheels[0].mSuspensionDeflection + ";");
-                    telemetryFile.WriteLine(vehicle.mWheels[1].mSuspensionDeflection + ";");
-                    telemetryFile.WriteLine(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
                     telemetryFile.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
@@ -1311,13 +1311,13 @@ namespace LMUSHMSpotter {
                             file.Write(playerScoring.mPos.x + ";");
                             file.Write(-playerScoring.mPos.z + ";");
 
-                            file.WriteLine(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
+                            file.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
 
-                            file.WriteLine(vehicle.mLocalRot.z + ";");
+                            file.Write(vehicle.mLocalRot.z + ";");
 
-                            file.WriteLine(vehicle.mWheels[0].mSuspensionDeflection + ";");
-                            file.WriteLine(vehicle.mWheels[1].mSuspensionDeflection + ";");
-                            file.WriteLine(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
                             file.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                             file.Close();

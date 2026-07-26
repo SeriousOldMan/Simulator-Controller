@@ -1118,12 +1118,12 @@ namespace PMRUDPSpotter {
 						telemetryFile.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);
 					else
 					{
-                        telemetryFile.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2] + ";");
+                        telemetryFile.Write(playerTelemetry.Chassis.AngularVelocityLS[2] + ";");
 
 						/*
-                        telemetryFile.WriteLine(telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection + ";");
-                        telemetryFile.WriteLine(telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection + ";");
-                        telemetryFile.WriteLine(telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection + ";");
+                        telemetryFile.Write(telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection + ";");
+                        telemetryFile.Write(telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection + ";");
+                        telemetryFile.Write(telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection + ";");
                         telemetryFile.WriteLine(telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection);
 						*/
                     }
@@ -1156,12 +1156,12 @@ namespace PMRUDPSpotter {
                                 file.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);
                             else
                             {
-                                file.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2] + ";");
+                                file.Write(playerTelemetry.Chassis.AngularVelocityLS[2] + ";");
 
                                 /*
-                                file.WriteLine(telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection + ";");
-                                file.WriteLine(telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection + ";");
-                                file.WriteLine(telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection + ";");
+                                file.Write(telemetry.mVehicles[carID].mWheels[0].mSuspensionDeflection + ";");
+                                file.Write(telemetry.mVehicles[carID].mWheels[1].mSuspensionDeflection + ";");
+                                file.Write(telemetry.mVehicles[carID].mWheels[2].mSuspensionDeflection + ";");
                                 file.WriteLine(telemetry.mVehicles[carID].mWheels[3].mSuspensionDeflection);
                                 */
                             }

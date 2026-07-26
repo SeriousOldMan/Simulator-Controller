@@ -1217,8 +1217,7 @@ namespace RF2SHMSpotter {
 
         string telemetryDirectory = "";
         StreamWriter telemetryFile = null;
-        StringWriter telemetryData = null;
-        int startTelemetryLap = -1;
+		int startTelemetryLap = -1;
         int telemetryLap = -1;
 		double lastRunning = -1;
 
@@ -1236,7 +1235,6 @@ namespace RF2SHMSpotter {
                     try
                     {
                         if (telemetryFile != null) {
-							telemetryFile.Write(telemetryData);
                             telemetryFile.Close();
 
                             FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
@@ -1255,8 +1253,7 @@ namespace RF2SHMSpotter {
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
-					telemetryData = new StringWriter();
-
+					
 					lastRunning = -1;
                 }
 
@@ -1266,31 +1263,31 @@ namespace RF2SHMSpotter {
 
                     lastRunning = playerScoring.mLapDist;
 					
-					telemetryData.Write(playerScoring.mLapDist + ";");
-					telemetryData.Write((float)vehicle.mFilteredThrottle + ";");
-					telemetryData.Write((float)vehicle.mFilteredBrake + ";");
-					telemetryData.Write((float)vehicle.mFilteredSteering + ";");
-					telemetryData.Write((float)vehicle.mGear + ";");
-					telemetryData.Write((float)vehicle.mEngineRPM + ";");
-					telemetryData.Write(vehicleSpeed(ref playerScoring) + ";");
+					telemetryFile.Write(playerScoring.mLapDist + ";");
+					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");
+					telemetryFile.Write((float)vehicle.mFilteredBrake + ";");
+					telemetryFile.Write((float)vehicle.mFilteredSteering + ";");
+					telemetryFile.Write((float)vehicle.mGear + ";");
+					telemetryFile.Write((float)vehicle.mEngineRPM + ";");
+					telemetryFile.Write(vehicleSpeed(ref playerScoring) + ";");
 
-					telemetryData.Write("n/a;");
-					telemetryData.Write("n/a;");
+					telemetryFile.Write("n/a;");
+					telemetryFile.Write("n/a;");
 
-					telemetryData.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
-					telemetryData.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
+					telemetryFile.Write((-playerScoring.mLocalAccel.z / 9.807f) + ";");
+					telemetryFile.Write((playerScoring.mLocalAccel.x / 9.807f) + ";");
 
-					telemetryData.Write(playerScoring.mPos.x + ";");
-					telemetryData.Write(-playerScoring.mPos.z + ";");
+					telemetryFile.Write(playerScoring.mPos.x + ";");
+					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
-					telemetryData.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
+					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
 
-                    telemetryData.Write(vehicle.mLocalRot.z + ";");
+                    telemetryFile.Write(vehicle.mLocalRot.z + ";");
 
-                    telemetryData.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
-                    telemetryData.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
-                    telemetryData.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
-                    telemetryData.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
+                    telemetryFile.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try

@@ -1252,7 +1252,8 @@ namespace RF2SHMSpotter {
 
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
-                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
+                    telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false,
+													 Encoding.UTF8, 4096 * 16);
 					
 					lastRunning = -1;
                 }

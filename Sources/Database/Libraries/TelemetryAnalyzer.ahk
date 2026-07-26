@@ -1941,19 +1941,22 @@ class TelemetryAnalyzer {
 			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
 				local dt1 := (time - lastTime)
 				local dt2 := (nextTime - time)
+				local factor := 1 ; (Round(((log(Abs(dt1)) + log(Abs(dt2))) / 2) / 10) * 10)
 				local term1, term2
 
+				/*
 				while (Abs(dt1) > 100)
 					dt1 /= 10
 
 				while (Abs(dt2) > 100)
 					dt2 /= 10
+				*/
 
 				if ((dt1 <= 0) || (dt2 <= 0))
 					return 0
 
-				term1 := ((nextDeflection - deflection) / dt2)
-				term2 := ((deflection - lastDeflection) / dt1)
+				term1 := (((nextDeflection - deflection) / dt2) * factor)
+				term2 := (((deflection - lastDeflection) / dt1) * factor)
 
 				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
 			}
@@ -2012,9 +2015,6 @@ class TelemetryAnalyzer {
 			loop leftAccelerations.Length {
 				leftMagnitude := Abs(leftAccelerations[A_Index][1])
 				rightMagnitude := Abs(rightAccelerations[A_Index][1])
-
-				; if ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut))
-				;	MsgBox "Hit"
 
 				if ((leftAccelerations[A_Index][1] < 0) && (rightAccelerations[A_Index][1] < 0)
 				 && ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut)

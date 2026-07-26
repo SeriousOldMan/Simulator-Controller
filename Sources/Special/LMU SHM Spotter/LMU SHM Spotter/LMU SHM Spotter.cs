@@ -1281,8 +1281,13 @@ namespace LMUSHMSpotter {
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
 					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
-							
-					telemetryFile.WriteLine(vehicle.mLocalRot.z);
+
+                    telemetryFile.WriteLine(vehicle.mLocalRot.z + ";");
+
+                    telemetryFile.WriteLine(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1307,8 +1312,13 @@ namespace LMUSHMSpotter {
                             file.Write(-playerScoring.mPos.z + ";");
 
                             file.WriteLine(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
-							
-							file.WriteLine(vehicle.mLocalRot.z);
+
+                            file.WriteLine(vehicle.mLocalRot.z + ";");
+
+                            file.WriteLine(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                            file.WriteLine(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                            file.WriteLine(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                            file.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                             file.Close();
                         }

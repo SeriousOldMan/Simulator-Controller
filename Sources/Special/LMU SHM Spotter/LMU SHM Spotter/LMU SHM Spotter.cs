@@ -1221,9 +1221,9 @@ namespace LMUSHMSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
-		int sumReadTime = 0;
-		int sumWriteTime = 0;
-		int runCount = 0;
+		long sumReadTime = 0;
+		long sumWriteTime = 0;
+		long runCount = 0;
 		
         void collectCarTelemetry(ref LMUVehicleScoring playerScoring)
         {
@@ -1247,7 +1247,7 @@ namespace LMUSHMSpotter {
 								telemetryFile.WriteLine(this.scoringBuffer.GetStats());
 								telemetryFile.WriteLine(this.telemetryBuffer.GetStats());
 								telemetryFile.WriteLine(this.extendedBuffer.GetStats());
-								telemetryFile.WriteLine("Average time for data: " + Math.Round(sumReadTime / allReadCount) + " ms");
+								telemetryFile.WriteLine("Average time for data: " + (sumReadTime / runCount) + " ms");
 								
 								this.scoringBuffer.ClearStats();
 								this.telemetryBuffer.ClearStats();
@@ -1485,7 +1485,7 @@ namespace LMUSHMSpotter {
                             if (running)
 							{
                                 if (carTelemetry) {
-									writeStart = Environment.TickCounut;
+									writeStart = Environment.TickCount;
 									
                                     collectCarTelemetry(ref playerScoring);
 									

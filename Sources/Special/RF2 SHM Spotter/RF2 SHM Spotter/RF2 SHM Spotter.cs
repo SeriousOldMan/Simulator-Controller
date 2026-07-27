@@ -1257,7 +1257,7 @@ namespace RF2SHMSpotter {
 					lastRunning = -1;
                 }
 
-				if (playerScoring.mLapDist > lastRunning)
+				if (true || playerScoring.mLapDist > lastRunning)
                 {
                     ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 

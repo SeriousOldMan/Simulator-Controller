@@ -1242,7 +1242,7 @@ namespace LMUSHMSpotter {
                         if (telemetryFile != null) {
                             telemetryFile.Close();
 							
-							if (true) {
+							if (false) {
 								telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".stats", false);
 							
 								telemetryFile.WriteLine(this.scoringBuffer.GetStats());
@@ -1275,7 +1275,7 @@ namespace LMUSHMSpotter {
 					
 					lastRunning = -1;
 
-					if (true)
+					if (false)
 					{
 						this.scoringBuffer.ClearStats();
 						this.telemetryBuffer.ClearStats();
@@ -1288,7 +1288,7 @@ namespace LMUSHMSpotter {
 					}
                 }
 
-				if (playerScoring.mLapDist > lastRunning)
+				if (true || playerScoring.mLapDist > lastRunning)
                 {
                     ref LMUVehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 

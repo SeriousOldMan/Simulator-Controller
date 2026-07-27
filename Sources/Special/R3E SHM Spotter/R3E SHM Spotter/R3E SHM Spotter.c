@@ -1228,7 +1228,7 @@ void collectCarTelemetry(int playerID) {
 
 	double running = map_buffer->all_drivers_data_1[index].lap_distance;
 	
-	if (running > lastRunning) {
+	// if (running > lastRunning) {
 		/*
 		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",
 							   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
@@ -1298,7 +1298,7 @@ void collectCarTelemetry(int playerID) {
 		}
 
 		lastRunning = running;
-	}
+	// }
 }
 
 BOOL started = FALSE;

@@ -852,7 +852,9 @@ class TelemetryViewer {
 									 , Cluster: 1
 									 , Channels: choose(kTelemetryChannels
 													  , (c) => (!inList(["Speed", "Throttle", "Brake", "TC", "ABS"
-																	   , "Long G", "Lat G"], c.Name) && c.HasProp("Size")))})
+																	   , "Long G", "Lat G", "YawRate"
+																	   , "SuspDefl FL", "SuspDefl FR"
+																	   , "SuspDefl RL", "SuspDefl RR"], c.Name) && c.HasProp("Size")))})
 
 		this.iLayouts := layouts
 		this.iSelectedLayout := getMultiMapValue(configuration, "Selected", "Layout", translate("Standard"))

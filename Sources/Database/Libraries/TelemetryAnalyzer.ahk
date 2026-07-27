@@ -2017,7 +2017,7 @@ class TelemetryAnalyzer {
 				rightMagnitude := Abs(rightAccelerations[A_Index][1])
 
 				if ((leftAccelerations[A_Index][1] < 0) && (rightAccelerations[A_Index][1] < 0)
-				 && ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut)
+				 && ((leftMagnitude >= (thresholds.LightBottomOut - 1)) || (rightMagnitude >= (thresholds.LightBottomOut - 1))
 				  || (event && ((Abs(leftAccelerations[A_Index][2] - leftAccelerations[event.Index][2]) < thresholds.Release) ||
 								(Abs(rightAccelerations[A_Index][2] - rightAccelerations[event.Index][2]) < thresholds.Release))))) {
 					if !event
@@ -2120,9 +2120,9 @@ class TelemetryAnalyzer {
 								, computeBottomOuts("Rear", rlAccelerations, rrAccelerations))
 
 		do(bottomOuts, (bottomOut) {
-			if (bottomOut.Acceleration > thresholds.HeavyBottomOut)
+			if (bottomOut.Acceleration >= thresholds.HeavyBottomOut)
 				bottomOut.Severity := "Heavy"
-			else if (bottomOut.Acceleration > thresholds.MediumBottomOut)
+			else if (bottomOut.Acceleration >= thresholds.MediumBottomOut)
 				bottomOut.Severity := "Medium"
 			else
 				bottomOut.Severity := "Light"

@@ -29,7 +29,27 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.4.0
+
+#### Date: 07/31/26 (planned)
+
+#### Fixes
+
+  - Fixed the optional acoustic feedback for handling problems in the issue analyzer of "Setup Workbench" for *Project Motor Racing* and *F1 25/26*.
+  - Fixed a bug that prevented the usage of the handling thresholds applied in the issue analyzer of "Setup Workbench" when the Drivng Coach is asked about handling problems for the same car / track combination.
+  - Fixed a bug introduced with the last release, which could prevent the transfer of issues detected by the telemetry-based issue analyzer to the working area of "Setup Workbench".
+  
+#### Changes
+
+  - Changed settings are no longer saved in the issue analyzer in "Setup Workbench" when the dialog is cancelled.
+  - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
+  - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
+  - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
+    - The weighting of the spring stiffness has changed.
+	- Bumpstop rates will be taken into account, if available.
+	- Changes to heave suspension settings will be applied more aggressively.
+  - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
+  - The offline issue analysis, which uses telemetry files, can alos detect suspension issues with all files generated with this release or later. However, because the sampling frequency for telemetry data is way lower than that used by the live issue analyzer, some or even all bottom out events may be missed by the detection method.
 
 # Release history
 

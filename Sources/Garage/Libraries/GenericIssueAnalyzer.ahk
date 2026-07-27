@@ -60,6 +60,12 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 	iWaterTemperature := [80, 90, 100]
 	iOilTemperature := [80, 90, 100]
 
+	iBottomOutThresholds := CaseInsenseMap("Light", 5, "Medium", 10, "Heavy", 15)
+	iReleaseThreshold := 0.2
+	iBottomOutDuration := 30
+	iBottomOutGap := 100
+	iSamplerSettings := CaseInsenseMap("Samples", 2, "Deflection", 5, "Acceleration", 2)
+
 	iAcousticFeedback := true
 
 	iIssueCollector := false
@@ -309,6 +315,84 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		}
 	}
 
+	BottomOutThresholds[key?] {
+		Get {
+			return (isSet(key) ? this.iBottomOutThresholds[key] : this.iBottomOutThresholds)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iBottomOutThresholds[key] := value
+
+				setAnalyzerSetting(this, "BottomOutThresholds", map2String("|", "->", this.iBottomOutThresholds))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "BottomOutThresholds", map2String("|", "->", value))
+
+				return (this.iBottomOutThresholds := value)
+			}
+		}
+	}
+
+	ReleaseThreshold {
+		Get {
+			return this.iReleaseThreshold
+		}
+
+		Set {
+			setAnalyzerSetting(this, "ReleaseThreshold", value)
+
+			return (this.iReleaseThreshold := value)
+		}
+	}
+
+	BottomOutDuration {
+		Get {
+			return this.iBottomOutDuration
+		}
+
+		Set {
+			setAnalyzerSetting(this, "BottomOutDuration", value)
+
+			return (this.iBottomOutDuration := value)
+		}
+	}
+
+	BottomOutGap {
+		Get {
+			return this.iBottomOutGap
+		}
+
+		Set {
+			setAnalyzerSetting(this, "BottomOutGap", value)
+
+			return (this.iBottomOutGap := value)
+		}
+	}
+
+	SamplerSettings[key?] {
+		Get {
+			return (isSet(key) ? this.iSamplerSettings[key] : this.iSamplerSettings)
+		}
+
+		Set {
+			if isSet(key) {
+				this.iSamplerSettings[key] := value
+
+				setAnalyzerSetting(this, "SamplerSettings", map2String("|", "->", this.iSamplerSettings))
+
+				return value
+			}
+			else {
+				setAnalyzerSetting(this, "SamplerSettings", map2String("|", "->", value))
+
+				return (this.iSamplerSettings := value)
+			}
+		}
+	}
+
 	AcousticFeedback {
 		Get {
 			return this.iAcousticFeedback
@@ -379,6 +463,11 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		local defaultRearBrakeTemperatures := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "RearBrakeTemperatures", "300,550,680")
 		local defaultWaterTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "WaterTemperature", "80,90,100")
 		local defaultOilTemperature := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OilTemperature", "80,90,100")
+		local defaultBottomOutThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutThresholds", "Light->5|Medium->10|Heavy->15")
+		local defaultReleaseThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "ReleaseThreshold", 0.2)
+		local defaultBottomOutDuration := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutDuration", 20)
+		local defaultBottomOutGap := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "BottomOutGap", 100)
+		local defaultSamplerSettings := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SamplerSettings", "Samples->2|Deflection->5|Acceleration->2")
 		local fileName, configuration, settings, prefix
 
 		static first := true
@@ -425,6 +514,11 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 				defaultRearBrakeTemperatures := getMultiMapValue(configuration, "Analyzer", "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 				defaultWaterTemperature := getMultiMapValue(configuration, "Analyzer", "WaterTemperature", defaultWaterTemperature)
 				defaultOilTemperature := getMultiMapValue(configuration, "Analyzer", "OilTemperature", defaultOilTemperature)
+				defaultBottomOutThresholds := getMultiMapValue(configuration, "Analyzer", "BottomOutThresholds", defaultBottomOutThresholds)
+				defaultReleaseThreshold := getMultiMapValue(configuration, "Analyzer", "ReleaseThreshold", defaultReleaseThreshold)
+				defaultBottomOutDuration := getMultiMapValue(configuration, "Analyzer", "BottomOutDuration", defaultBottomOutDuration)
+				defaultBottomOutGap := getMultiMapValue(configuration, "Analyzer", "BottomOutGap", defaultBottomOutGap)
+				defaultSamplerSettings := getMultiMapValue(configuration, "Analyzer", "SamplerSettings", defaultSamplerSettings)
 			}
 		}
 
@@ -449,6 +543,11 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		defaultRearBrakeTemperatures := getMultiMapValue(settings, "Settings", prefix . "RearBrakeTemperatures", defaultRearBrakeTemperatures)
 		defaultWaterTemperature := getMultiMapValue(settings, "Settings", prefix . "WaterTemperature", defaultWaterTemperature)
 		defaultOilTemperature := getMultiMapValue(settings, "Settings", prefix . "OilTemperature", defaultOilTemperature)
+		defaultBottomOutThresholds := getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds)
+		defaultReleaseThreshold := getMultiMapValue(settings, "Settings", prefix . "ReleaseThreshold", defaultReleaseThreshold)
+		defaultBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
+		defaultBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
+		defaultSamplerSettings := getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
@@ -480,6 +579,12 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		this.iOilTemperature := string2Values(",", getMultiMapValue(settings, "Settings"
 												 , prefix . "OilTemperature", defaultOilTemperature))
 
+		this.iBottomOutThresholds := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "BottomOutThresholds", defaultBottomOutThresholds))
+		this.iReleaseThreshold := getMultiMapValue(settings, "Settings", prefix . "ReleaseThreshold", defaultReleaseThreshold)
+		this.iBottomOutDuration := getMultiMapValue(settings, "Settings", prefix . "BottomOutDuration", defaultBottomOutDuration)
+		this.iBottomOutGap := getMultiMapValue(settings, "Settings", prefix . "BottomOutGap", defaultBottomOutGap)
+		this.iSamplerSettings := string2Map("|", "->", getMultiMapValue(settings, "Settings", prefix . "SamplerSettings", defaultSamplerSettings))
+
 		super.__New(workbench, simulator)
 
 		if !this.iExitCallback {
@@ -501,8 +606,27 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 	createCharacteristics(issues := false) {
 		local workbench, severities, maxFrequency
-		local characteristicLabels, key, characteristic, characteristics, ignore, type, severity, speed, where, value, issue
+		local characteristicLabels, key, characteristic, characteristics, ignore, type, severity, speed, where
 		local temperature, position, category
+
+		addCharacteristic(key) {
+			local ignore, issue, value, severity
+
+			if issues.Has(key)
+				for ignore, issue in issues[key] {
+					value := issue.Frequency
+					severity := issue.Severity
+
+					if !characteristics.Has(key)
+						characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
+					else {
+						characteristic := characteristics[key]
+
+						characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
+						characteristic[2] := Max(characteristic[2], severities[severity])
+					}
+				}
+		}
 
 		if issues {
 			workbench := this.Workbench
@@ -517,115 +641,75 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 			showProgress({color: "Green", width: 350, title: translate("Creating Issues"), message: translate("Preparing Characteristics...")})
 
-			for ignore, type in ["Oversteer", "Understeer"]
-				for ignore, speed in ["Slow", "Fast"]
-					for ignore, where in ["Entry", "Apex", "Exit"]
-						for ignore, issue in issues[type . ".Corner." . where . "." . speed]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
+			if issues {
 				for ignore, type in ["Oversteer", "Understeer"]
 					for ignore, speed in ["Slow", "Fast"]
-						for ignore, where in ["Entry", "Apex", "Exit"] {
-							key := (type . ".Corner." . where . "." . speed)
+						for ignore, where in ["Entry", "Apex", "Exit"]
+							if issues.Has(type . ".Corner." . where . "." . speed)
+								for ignore, issue in issues[type . ".Corner." . where . "." . speed]
+									maxFrequency := Max(maxFrequency, issue.Frequency)
 
-							for ignore, issue in issues[key] {
-								value := issue.Frequency
-								severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, type in ["Oversteer", "Understeer"]
+						for ignore, speed in ["Slow", "Fast"]
+							for ignore, where in ["Entry", "Apex", "Exit"]
+								addCharacteristic(type . ".Corner." . where . "." . speed)
 
-								if !characteristics.Has(key)
-									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-								else {
-									characteristic := characteristics[key]
+				maxFrequency := 0
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
-								}
-							}
-						}
+				for ignore, type in ["Suspension.Bottom.Out"]
+					for ignore, where in ["Front", "Rear"]
+						if issues.Has(type . "." . where)
+							for ignore, issue in issues[type . "." . where]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-			maxFrequency := 0
+				if (maxFrequency > 0)
+					for ignore, type in ["Suspension.Bottom.Out"]
+						for ignore, where in ["Front", "Rear"]
+							for ignore, issue in issues[type . "." . where]
+								addCharacteristic(type . "." . where)
 
-			for ignore, category in ["Around", "Inner", "Outer"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, position in ["Front", "Rear"]
-						for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
-							maxFrequency := Max(maxFrequency, issue.Frequency)
+				maxFrequency := 0
 
-			if (maxFrequency > 0)
 				for ignore, category in ["Around", "Inner", "Outer"]
 					for ignore, temperature in ["Cold", "Hot"]
-						for ignore, position in ["Front", "Rear"] {
-							key := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+						for ignore, position in ["Front", "Rear"]
+							if issues.Has("Tyre.Temperatures." . temperature . "." . position . "." . category)
+								for ignore, issue in issues["Tyre.Temperatures." . temperature . "." . position . "." . category]
+									maxFrequency := Max(maxFrequency, issue.Frequency)
 
-							for ignore, issue in issues[key] {
-								value := issue.Frequency
-								severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, category in ["Around", "Inner", "Outer"]
+						for ignore, temperature in ["Cold", "Hot"]
+							for ignore, position in ["Front", "Rear"]
+								addCharacteristic("Tyre.Temperatures." . temperature . "." . position . "." . category)
 
-								if !characteristics.Has(key)
-									characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-								else {
-									characteristic := characteristics[key]
+				maxFrequency := 0
 
-									characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-									characteristic[2] := Max(characteristic[2], severities[severity])
-								}
-							}
-						}
-
-			maxFrequency := 0
-
-			for ignore, category in ["Front", "Rear"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, category in ["Front", "Rear"]
-					for ignore, temperature in ["Cold", "Hot"] {
-						key := ("Brake.Temperatures." . temperature . "." category)
+					for ignore, temperature in ["Cold", "Hot"]
+						if issues.Has("Brake.Temperatures." . temperature . "." . category)
+							for ignore, issue in issues["Brake.Temperatures." . temperature . "." . category]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
+				if (maxFrequency > 0)
+					for ignore, category in ["Front", "Rear"]
+						for ignore, temperature in ["Cold", "Hot"]
+							addCharacteristic("Brake.Temperatures." . temperature . "." category)
 
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
+				maxFrequency := 0
 
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
-							}
-						}
-					}
-
-			maxFrequency := 0
-
-			for ignore, category in ["Water", "Oil"]
-				for ignore, temperature in ["Cold", "Hot"]
-					for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
-						maxFrequency := Max(maxFrequency, issue.Frequency)
-
-			if (maxFrequency > 0)
 				for ignore, category in ["Water", "Oil"]
-					for ignore, temperature in ["Cold", "Hot"] {
-						key := ("Engine.Temperatures." . temperature . "." . category)
+					for ignore, temperature in ["Cold", "Hot"]
+						if issues.Has("Engine.Temperatures." . temperature . "." . category)
+							for ignore, issue in issues["Engine.Temperatures." . temperature . "." . category]
+								maxFrequency := Max(maxFrequency, issue.Frequency)
 
-						for ignore, issue in issues[key] {
-							value := issue.Frequency
-							severity := issue.Severity
-
-							if !characteristics.Has(key)
-								characteristics[key] := [Round(value / maxFrequency * 66), severities[severity]]
-							else {
-								characteristic := characteristics[key]
-
-								characteristic[1] := Max(characteristic[1], Round(value / maxFrequency * 66))
-								characteristic[2] := Max(characteristic[2], severities[severity])
-							}
-						}
-					}
+				if (maxFrequency > 0)
+					for ignore, category in ["Water", "Oil"]
+						for ignore, temperature in ["Cold", "Hot"]
+							addCharacteristic("Engine.Temperatures." . temperature . "." . category)
+			}
 
 			Sleep(500)
 
@@ -664,7 +748,9 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 
 		if !this.iIssueCollector {
 			if !calibrate
-				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"]
+				for ignore, setting in ["UndersteerThresholds", "OversteerThresholds"
+									  , "BottomOutThresholds", "ReleaseThreshold", "BottomOutDuration", "BottomOutGap"
+									  , "SamplerSettings"]
 					if this.settingAvailable(setting)
 						settings.%setting% := this.%setting%
 
@@ -952,9 +1038,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local characteristic, characteristicLabels, fromEdit
 	local calibration, theListView, chosen, tabView
 	local category, temperature, position, key, info, simulator, car, track, fileName
-	local telemetries, theAnalyzer, thresholds
+	local telemetries, theAnalyzer
 
 	static analyzerGui
+
+	static temperatureSavers
 
 	static telemetryButton
 	static activateButton
@@ -1001,6 +1089,15 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static minOilTemperatureEdit
 	static maxOilTemperatureEdit
 	static idealOilTemperatureEdit
+	static lightBottomOutEdit
+	static mediumBottomOutEdit
+	static heavyBottomOutEdit
+	static durationBottomOutEdit
+	static gapBottomOutEdit
+	static releaseThresholdEdit
+	static minSamplesEdit
+	static deflectionWindowEdit
+	static accelerationWindowEdit
 
 	static issuesListView
 
@@ -1018,9 +1115,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static updateTask := false
 
 	validateInteger(minValue, maxValue, field, operation, value?) {
-		if (operation = "Validate") {
+		if (operation = "Validate")
 			return (isInteger(value) && (value >= minValue) && (value <= maxValue))
-		}
+	}
+
+	validateFloat(minValue, maxValue, field, operation, value?) {
+		if (operation = "Validate")
+			return (isNumber(value) && (value >= minValue) && (value <= maxValue))
 	}
 
 	validateTemperature(field, operation, value?) {
@@ -1031,22 +1132,31 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 	}
 
-	createTemperatureUpdater(name, widgets) {
+	initializeTemperatureSettings(setting, name, widgets) {
 		local ignore, widget
 
-		updateTemperature(widget, *) {
-			if widget.Validate()
-				analyzer.%name% := [convertUnit("Temperature", internalValue("Float", widgets[1].Text), false)
-								  , convertUnit("Temperature", internalValue("Float", widgets[2].Text), false)
-								  , convertUnit("Temperature", internalValue("Float", widgets[3].Text), false)]
+		validateTemperature(widget, *) {
+			return widget.Validate()
 		}
 
-		for ignore, widget in widgets
-			widget.OnEvent("Change", updateTemperature.Bind(widget))
-	}
+		saveTemperature(name, widgets) {
+			local values := collect(widgets, (w) => convertUnit("Temperature", internalValue("Float", w.Text), false))
 
-	updateTemperature(name, widget, *) {
-		analyzer.%name% := convertUnit("Temperature", internalValue("Float", widget.Text), false)
+			analyzer.%name% := ((widgets.Length = 1) ? values[1] : values)
+		}
+
+		if analyzer.settingAvailable(setting) {
+			for ignore, widget in widgets {
+				widget.OnEvent("Change", validateTemperature.Bind(widget))
+
+				temperatureSavers.Push(saveTemperature.Bind(name, widgets))
+			}
+		}
+		else
+			for ignore, widget in widgets {
+				widget.Enabled := false
+				widget.Text := ""
+			}
 	}
 
 	noSelect(listView, *) {
@@ -1085,6 +1195,30 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				else
 					%severity . type . "ThresholdEdit"%.Text := %severity . type . "ThresholdSlider"%.Value
 			}
+	}
+	else if (commandOrAnalyzer == "UpdateBOThresholds") {
+		if !validateInteger(1, 50, lightBottomOutEdit, "Validate", lightBottomOutEdit.Text)
+			lightBottomOutEdit.Text := 5
+		if !validateInteger(1, 50, mediumBottomOutEdit, "Validate", mediumBottomOutEdit.Text)
+			mediumBottomOutEdit.Text := 10
+		if !validateInteger(1, 50, heavyBottomOutEdit, "Validate", heavyBottomOutEdit.Text)
+			heavyBottomOutEdit.Text := 15
+	}
+	else if (commandOrAnalyzer == "UpdateBOTimings") {
+		if !validateInteger(10, 200, durationBottomOutEdit, "Validate", durationBottomOutEdit.Text)
+			durationBottomOutEdit.Text := 30
+		if !validateInteger(50, 500, gapBottomOutEdit, "Validate", gapBottomOutEdit.Text)
+			gapBottomOutEdit.Text := 100
+		if !validateFloat(0, 5, releaseThresholdEdit, "Validate", releaseThresholdEdit.Text)
+			releaseThresholdEdit.Text := Round(0.2, 1)
+	}
+	else if (commandOrAnalyzer == "UpdateBOSamples") {
+		if !validateFloat(1, 20, deflectionWindowEdit, "Validate", deflectionWindowEdit.Text)
+			deflectionWindowEdit.Text := 5
+		if !validateFloat(1, 20, accelerationWindowEdit, "Validate", accelerationWindowEdit.Text)
+			accelerationWindowEdit.Text := 2
+		if !validateInteger(1, 10, minSamplesEdit, "Validate", minSamplesEdit.Text)
+			minSamplesEdit.Text := 2
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
 		analyzerGui.Block()
@@ -1138,6 +1272,29 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		if analyzer.settingAvailable("UndersteerThresholds")
 			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider.Value, mediumUndersteerThresholdSlider.Value, heavyUndersteerThresholdSlider.Value]
 
+		if analyzer.settingAvailable("BottomOutThresholds") {
+			analyzer.BottomOutThresholds["Light"] := lightBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Medium"] := mediumBottomOutEdit.Text
+			analyzer.BottomOutThresholds["Heavy"] := heavyBottomOutEdit.Text
+		}
+
+		if analyzer.settingAvailable("ReleaseThreshold")
+			analyzer.ReleaseThreshold := releaseThresholdEdit.Text
+
+		if analyzer.settingAvailable("BottomOutDuration")
+			analyzer.BottomOutDuration := durationBottomOutEdit.Text
+
+		if analyzer.settingAvailable("BottomOutGap")
+			analyzer.BottomOutGap := gapBottomOutEdit.Text
+
+		if analyzer.settingAvailable("SamplerSettings") {
+			analyzer.SamplerSettings["Samples"] := minSamplesEdit.Text
+			analyzer.SamplerSettings["Deflection"] := deflectionWindowEdit.Text
+			analyzer.SamplerSettings["Acceleration"] := accelerationWindowEdit.Text
+		}
+
+		do(temperatureSavers, (s) => s())
+
 		analyzer.AcousticFeedback := ((acousticFeedbackDropDown.Value = 1) ? true : false)
 
 		if ((commandOrAnalyzer == "Telemetry") && analyzer.Car && analyzer.Track) {
@@ -1166,27 +1323,34 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				else
 					telemetries.Push(theAnalyzer.createTelemetry(1, fileName))
 
-				thresholds := {LowSpeed: analyzer.LowspeedThreshold
-							 , LightOversteer: analyzer.OversteerThresholds[1]
-							 , MediumOversteer: analyzer.OversteerThresholds[2]
-							 , HeavyOversteer: analyzer.OversteerThresholds[3]
-							 , LightUndersteer: analyzer.UndersteerThresholds[1]
-							 , MediumUndersteer: analyzer.UndersteerThresholds[2]
-							 , HeavyUndersteer: analyzer.UndersteerThresholds[3]}
-
 				analyzerGui.Block()
 
 				try {
 					withTask(ProgressTask(translate("Analyzing Data")), () {
-						issues := theAnalyzer.analyzeHandling(telemetries, analyzer.SteerLock, analyzer.SteerRatio
-																		 , analyzer.WheelBase, analyzer.TrackWidth
-																		 , thresholds)
+						issues := theAnalyzer.analyzeHandling(telemetries
+															, analyzer.SteerLock, analyzer.SteerRatio
+															, analyzer.WheelBase, analyzer.TrackWidth
+															, {LowSpeed: analyzer.LowspeedThreshold
+															 , LightOversteer: analyzer.OversteerThresholds[1]
+															 , MediumOversteer: analyzer.OversteerThresholds[2]
+															 , HeavyOversteer: analyzer.OversteerThresholds[3]
+															 , LightUndersteer: analyzer.UndersteerThresholds[1]
+															 , MediumUndersteer: analyzer.UndersteerThresholds[2]
+															 , HeavyUndersteer: analyzer.UndersteerThresholds[3]})
 
 						issues := IssueCollector.createHandling(issues)
 
 						analyzer.Handling := issues
 
-						issues := theAnalyzer.analyzeSuspension(telemetries, thresholds)
+						issues := theAnalyzer.analyzeSuspension(telemetries
+															  , analyzer.BottomOutDuration, analyzer.BottomOutGap
+														      , analyzer.SamplerSettings["Samples"]
+															  , analyzer.SamplerSettings["Deflection"]
+															  , analyzer.SamplerSettings["Acceleration"]
+															  , {LightBottomOut: analyzer.BottomOutThresholds["Light"]
+															   , MediumBottomOut: analyzer.BottomOutThresholds["Medium"]
+															   , HeavyBottomOut: analyzer.BottomOutThresholds["Heavy"]
+															   , Release: analyzer.ReleaseThreshold})
 
 						issues := IssueCollector.createSuspension(issues)
 
@@ -1596,6 +1760,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		runWidgets := []
 		analyzeWidgets := []
 
+		temperatureSavers := []
+
 		analyzerGui := Window({Descriptor: "Setup Workbench.Analyzer", Options: "0x400000"})
 
 		analyzerGui.SetFont("s10 Bold", "Arial")
@@ -1613,14 +1779,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", analyzer.Simulator)
 
 		analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Car"))
-		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", (analyzer.Car ? analyzer.Car : translate("Unknown")))
+		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", (analyzer.Car ? analyzer.Car : translate("All")))
 
 		if analyzer.Track {
 			analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Track"))
 			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h388 Section", collect(["Handling", "Temperatures"], translate))
+		tabView := analyzerGui.Add("Tab3", "x16 yp+30 w340 h388 Section", collect(["Handling", "Suspension", "Temperatures"], translate))
 		widget36 := tabView
 
 		tabView .UseTab(1)
@@ -1763,6 +1929,121 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("Italic", "Arial")
 
+		widget76 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h160", translate("Bottom Out"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget77 := analyzerGui.Add("Text", "x174 yp+17 w45 h23 +0x200 Center", translate("Light"))
+		widget78 := analyzerGui.Add("Text", "x224 yp w45 h23 +0x200 Center", translate("Medium"))
+		widget79 := analyzerGui.Add("Text", "x274 yp w45 h23 +0x200 Center", translate("Heavy"))
+
+		widget80 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Thresholds (m/s²)"))
+		lightBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutThresholds["Light"])
+		widget84 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Light"])
+		mediumBottomOutEdit := analyzerGui.Add("Edit", "x224 yp w45 h23 +0x200", analyzer.BottomOutThresholds["Medium"])
+		widget85 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Medium"])
+		heavyBottomOutEdit := analyzerGui.Add("Edit", "x274 yp w45 h23 +0x200", analyzer.BottomOutThresholds["Heavy"])
+		widget86 := analyzerGui.Add("UpDown", "x274 yp w45 h23 Range0-99", analyzer.BottomOutThresholds["Heavy"])
+		widget81 := lightBottomOutEdit
+		widget82 := mediumBottomOutEdit
+		widget83 := heavyBottomOutEdit
+
+		lightBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
+		mediumBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
+		heavyBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOThresholds"))
+
+		widget108 := analyzerGui.Add("Text", "x32 yp+30 w130 h23 +0x200", translate("Threshold (Rebound)"))
+		releaseThresholdEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", Round(analyzer.ReleaseThreshold, 1))
+		widget109 := releaseThresholdEdit
+		widget110 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("mm"))
+
+		releaseThresholdEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+
+		widget87 := analyzerGui.Add("Text", "x32 yp+30 w120 h23 +0x200", translate("Event Length"))
+		widget111 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
+		durationBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutDuration)
+		widget88 := durationBottomOutEdit
+		widget89 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range10-200", analyzer.BottomOutDuration)
+		widget90 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
+
+		widget91 := analyzerGui.Add("Text", "x32 yp+24 w120 h23 +0x200", translate("Gap between Events"))
+		widget112 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
+		gapBottomOutEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.BottomOutGap)
+		widget92 := gapBottomOutEdit
+		widget93 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range50-500", analyzer.BottomOutGap)
+		widget94 := analyzerGui.Add("Text", "x220 yp w40 h23 +0x200", translate("ms"))
+
+		durationBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+		gapBottomOutEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOTimings"))
+
+		analyzerGui.SetFont("Italic", "Arial")
+
+		widget95 := analyzerGui.Add("GroupBox", "x24 yp+42 w320 h108", translate("Samples && Smoothing"))
+
+		analyzerGui.SetFont("Norm", "Arial")
+
+		widget96 := analyzerGui.Add("Text", "x32 yp+24 w120 h23 +0x200", translate("Valid, if"))
+		widget113 := analyzerGui.Add("Text", "x155 yp w18 h23 +0x200", translate(">"))
+		minSamplesEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Samples"])
+		widget97 := minSamplesEdit
+		widget98 := analyzerGui.Add("UpDown", "x224 yp w45 h23 Range1-10", analyzer.SamplerSettings["Samples"])
+		widget99 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		minSamplesEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
+
+		widget100 := analyzerGui.Add("Text", "x32 yp+30 w140 h23 +0x200", translate("Ø Deflection"))
+		deflectionWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200 Number", analyzer.SamplerSettings["Deflection"])
+		widget101 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Deflection"])
+		widget102 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		widget103 := analyzerGui.Add("Text", "x32 yp+24 w140 h23 +0x200", translate("Ø Acceleration"))
+		accelerationWindowEdit := analyzerGui.Add("Edit", "x174 yp w45 h23 +0x200", analyzer.SamplerSettings["Acceleration"])
+		widget104 := analyzerGui.Add("UpDown", "x174 yp w45 h23 Range1-20", analyzer.SamplerSettings["Acceleration"])
+		widget105 := analyzerGui.Add("Text", "x220 yp w80 h23 +0x200", translate("Samples"))
+
+		widget106 := deflectionWindowEdit
+		widget107 := accelerationWindowEdit
+
+		deflectionWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
+		accelerationWindowEdit.OnEvent("LoseFocus", runAnalyzer.Bind("UpdateBOSamples"))
+
+		if !analyzer.settingAvailable("BottomOutThresholds") {
+			lightBottomOutEdit.Enabled := false
+			lightBottomOutEdit.Text := ""
+			mediumBottomOutEdit.Enabled := false
+			mediumBottomOutEdit.Text := ""
+			heavyBottomOutEdit.Enabled := false
+			heavyBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("ReleaseThreshold") {
+			releaseThresholdEdit.Enabled := false
+			releaseThresholdEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("BottomOutDuration") {
+			durationBottomOutEdit.Enabled := false
+			durationBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("BottomOutGap") {
+			gapBottomOutEdit.Enabled := false
+			gapBottomOutEdit.Text := ""
+		}
+
+		if !analyzer.settingAvailable("SamplerSettings") {
+			minSamplesEdit.Enabled := false
+			deflectionWindowEdit.Enabled := false
+			accelerationWindowEdit.Enabled := false
+			minSamplesEdit.Text := ""
+			deflectionWindowEdit.Text := ""
+			accelerationWindowEdit.Text := ""
+		}
+
+		tabView .UseTab(3)
+
+		analyzerGui.SetFont("Italic", "Arial")
+
 		widget37 := analyzerGui.Add("GroupBox", "x24 ys+30 w320 h130", translate("Tyres"))
 
 		analyzerGui.SetFont("Norm", "Arial")
@@ -1839,20 +2120,22 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		widget73 := maxOilTemperatureEdit
 		widget74 := idealOilTemperatureEdit
 
-		createTemperatureUpdater("FrontTyreTemperatures"
-							   , [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
-		createTemperatureUpdater("RearTyreTemperatures"
-							   , [minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.Front", "FrontTyreTemperatures"
+									, [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.Rear", "RearTyreTemperatures"
+									, [minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit])
+		initializeTemperatureSettings("TyreTemperatures.OIDifference", "OITemperatureDifference"
+									, [maxOITemperatureDifferenceEdit])
 
-		maxOITemperatureDifferenceEdit.OnEvent("Change", updateTemperature.Bind("OITemperatureDifference", maxOITemperatureDifferenceEdit))
+		initializeTemperatureSettings("BrakeTemperatures.Front", "FrontBrakeTemperatures"
+									, [minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit])
+		initializeTemperatureSettings("BrakeTemperatures.Rear", "RearBrakeTemperatures"
+									, [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
 
-		createTemperatureUpdater("FrontBrakeTemperatures"
-							   , [minFrontBrakeTemperatureEdit, idealFrontBrakeTemperatureEdit, maxFrontBrakeTemperatureEdit])
-		createTemperatureUpdater("RearBrakeTemperatures"
-							   , [minRearBrakeTemperatureEdit, idealRearBrakeTemperatureEdit, maxRearBrakeTemperatureEdit])
-
-		createTemperatureUpdater("WaterTemperature", [minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit])
-		createTemperatureUpdater("OilTemperature", [minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit])
+		initializeTemperatureSettings("EngineTemperatures.Water", "WaterTemperature"
+							   , [minWaterTemperatureEdit, idealWaterTemperatureEdit, maxWaterTemperatureEdit])
+		initializeTemperatureSettings("EngineTemperatures.Oil", "OilTemperature"
+							   , [minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit])
 
 		for ignore, widget in [minFrontTyreTemperatureEdit, idealFrontTyreTemperatureEdit, maxFrontTyreTemperatureEdit
 							 , minRearTyreTemperatureEdit, idealRearTyreTemperatureEdit, maxRearTyreTemperatureEdit
@@ -1863,7 +2146,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 							 , minOilTemperatureEdit, idealOilTemperatureEdit, maxOilTemperatureEdit]
 			widget.OnValidate("LoseFocus", validateTemperature)
 
-		loop 75
+		loop 113
 			prepareWidgets.Push(%"widget" . A_Index%)
 
 		tabView .UseTab(0)

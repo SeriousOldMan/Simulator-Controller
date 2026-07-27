@@ -1921,8 +1921,214 @@ class TelemetryAnalyzer {
 		return issues
 	}
 
-	analyzeSuspension(telemetries, thresholds := false) {
-		return newMultiMap()
+	analyzeSuspension(telemetries, duration, gap
+					, samples, deflectionAverage, accelerationAverage
+					, thresholds := false) {
+		local deflections := []
+		local flAverage := MovingAverage(deflectionAverage)
+		local frAverage := MovingAverage(deflectionAverage)
+		local rlAverage := MovingAverage(deflectionAverage)
+		local rrAverage := MovingAverage(deflectionAverage)
+		local time, flAccelerations, frAccelerations, rlAccelerations, rrAccelerations, bottomOuts
+		local ignore, theTelemetry, deflectionFL, bottomOuts
+
+		computeAccelerations(type, deflections) {
+			local accelerations := []
+			local accAverage := MovingAverage(accelerationAverage)
+			local length := deflections.Length
+			local ignore, deflection
+
+			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
+				local dt1 := (time - lastTime)
+				local dt2 := (nextTime - time)
+				local factor := 1 ; (Round(((log(Abs(dt1)) + log(Abs(dt2))) / 2) / 10) * 10)
+				local term1, term2
+
+				/*
+				while (Abs(dt1) > 100)
+					dt1 /= 10
+
+				while (Abs(dt2) > 100)
+					dt2 /= 10
+				*/
+
+				if ((dt1 <= 0) || (dt2 <= 0))
+					return 0
+
+				term1 := (((nextDeflection - deflection) / dt2) * factor)
+				term2 := (((deflection - lastDeflection) / dt1) * factor)
+
+				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
+			}
+
+			loop length
+				if ((A_Index > 1) && (A_Index < length))
+					accelerations.Push(Values(accAverage.Add(calculateAcceleration(deflections[A_Index - 1].Time
+																				 , deflections[A_Index - 1].%type%
+																				 , deflections[A_Index].Time
+																				 , deflections[A_Index].%type%
+																				 , deflections[A_Index + 1].Time
+																				 , deflections[A_Index + 1].%type%))
+											, deflections[A_Index].%type%))
+
+			if (accelerations.Length > 0) {
+				accelerations.Push(accelerations[accelerations.Length])
+				accelerations.InsertAt(1, accelerations[1])
+			}
+
+			return accelerations
+		}
+
+		computeBottomOuts(axle, leftAccelerations, rightAccelerations) {
+			local events := []
+			local event := false
+			local leftMagnitude, rightMagnitude, startTime, endTime
+
+			mergeCloseEvents(events) {
+				local merged := []
+				local event
+
+				if (events.Length <= 1)
+					return events
+
+				event := events[1].Clone()
+
+				loop events.Length
+					if (A_Index > 1) {
+						if ((events[A_Index].Start - event.End) < gap) {
+							event.End := events[A_Index].End
+							event.Values := concatenate(event.Values, events[A_Index].Values)
+							event.Acceleration := Max(event.Values*)
+						}
+						else {
+							merged.Push(event)
+
+							event := events[A_Index].Clone()
+						}
+					}
+
+				merged.Push(event)
+
+				return merged
+			}
+
+			loop leftAccelerations.Length {
+				leftMagnitude := Abs(leftAccelerations[A_Index][1])
+				rightMagnitude := Abs(rightAccelerations[A_Index][1])
+
+				if ((leftAccelerations[A_Index][1] < 0) && (rightAccelerations[A_Index][1] < 0)
+				 && ((leftMagnitude >= thresholds.LightBottomOut) || (rightMagnitude >= thresholds.LightBottomOut)
+				  || (event && ((Abs(leftAccelerations[A_Index][2] - leftAccelerations[event.Index][2]) < thresholds.Release) ||
+								(Abs(rightAccelerations[A_Index][2] - rightAccelerations[event.Index][2]) < thresholds.Release))))) {
+					if !event
+						event := {Index: A_Index, Axle: axle, Acceleration: 0, Values: []}
+
+					event.Values.Push(Max(leftMagnitude, rightMagnitude))
+				}
+				else {
+					if event {
+						if ((A_Index - event.Index) >= samples) {
+							startTime := deflections[event.Index].Time
+							endTime := deflections[A_Index].Time
+
+							if ((endTime - startTime) > duration) {
+								event.Start := startTime
+								event.End := endTime
+								event.Acceleration := Max(event.Values*)
+
+								events.Push(event)
+							}
+						}
+
+						event := false
+					}
+				}
+			}
+
+			if (event && (event.Values.Length >= samples)) {
+				startTime := deflections[event.Index].Time
+				endTime := deflections[deflections.Length].Time
+
+				event.Start := startTime
+				event.End := endTime
+				event.Acceleration := Max(event.Values*)
+
+				events.Push(event)
+			}
+
+			return mergeCloseEvents(events)
+		}
+
+		createIssues(bottomOuts) {
+			local issues := newMultiMap()
+			local frontCount := 0
+			local rearCount := 0
+			local ignore, type, severity, key, count
+
+			do(bottomOuts, (bottomOut) {
+				setMultiMapValue(issues, "Suspension.Bottom.Out." . bottomOut.Severity, bottomOut.Axle
+							   , getMultiMapValue(issues, "Suspension.Bottom.Out." . bottomOut.Severity
+														, bottomOut.Axle, 0) + 1)
+
+				if (bottomOut.Axle = "Front")
+					frontCount += 1
+				else
+					rearCount += 1
+			})
+
+			for ignore, type in ["Suspension.Bottom.Out"]
+				for ignore, severity in ["Heavy", "Medium", "Light"] {
+					key := (type . "." . severity)
+
+					for ignore, where in ["Front", "Rear"] {
+						count := ((where = "Front") ? frontCount : rearCount)
+
+						if (count > 0)
+							setMultiMapValue(issues, key, where
+										   , Round(100 * getMultiMapValue(issues, key, where, 0) / count))
+					}
+				}
+
+			return issues
+		}
+
+		if !thresholds
+			thresholds := {LightBottomOut: 5, MediumBottomOut: 10, HeavyBottomOut: 15, Release: 0.2}
+
+		if isInstance(telemetries, Telemetry)
+			telemetries := [telemetries]
+
+		for ignore, theTelemetry in telemetries
+			loop theTelemetry.Data.Length {
+				time := theTelemetry.getValue(A_Index, "Time")
+				deflectionFL := theTelemetry.getValue(A_Index, "SuspDefl FL")
+
+				if ((deflectionFL != kUndefined) && (time != kUndefined))
+					deflections.Push({Time: time
+									, FrontLeft: flAverage.Add(deflectionFL) * 1000
+									, FrontRight: frAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl FR")) * 1000
+									, RearLeft: rlAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RL")) * 1000
+									, RearRight: rrAverage.Add(theTelemetry.getValue(A_Index, "SuspDefl RR")) * 1000})
+			}
+
+		flAccelerations := computeAccelerations("FrontLeft", deflections)
+		frAccelerations := computeAccelerations("FrontRight", deflections)
+		rlAccelerations := computeAccelerations("RearLeft", deflections)
+		rrAccelerations := computeAccelerations("RearRight", deflections)
+
+		bottomOuts := concatenate(computeBottomOuts("Front", flAccelerations, frAccelerations)
+								, computeBottomOuts("Rear", rlAccelerations, rrAccelerations))
+
+		do(bottomOuts, (bottomOut) {
+			if (bottomOut.Acceleration > thresholds.HeavyBottomOut)
+				bottomOut.Severity := "Heavy"
+			else if (bottomOut.Acceleration > thresholds.MediumBottomOut)
+				bottomOut.Severity := "Medium"
+			else
+				bottomOut.Severity := "Light"
+		})
+
+		return createIssues(bottomOuts)
 	}
 }
 

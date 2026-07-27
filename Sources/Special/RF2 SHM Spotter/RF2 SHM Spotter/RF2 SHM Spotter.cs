@@ -1281,8 +1281,13 @@ namespace RF2SHMSpotter {
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
 					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
-							
-					telemetryFile.WriteLine(vehicle.mLocalRot.z);
+
+                    telemetryFile.Write(vehicle.mLocalRot.z + ";");
+
+                    telemetryFile.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1308,7 +1313,12 @@ namespace RF2SHMSpotter {
 
                             file.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
 							
-							file.WriteLine(vehicle.mLocalRot.z);
+							file.Write(vehicle.mLocalRot.z + ";");
+
+                            file.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                            file.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                             file.Close();
                         }

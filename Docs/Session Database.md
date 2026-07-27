@@ -205,12 +205,16 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | POS_X (3)      | Yes           | The horizontal location of the car on the track map in internal coordinates of the current simulator. |
   | POS_Y (3)      | Yes           | The vertical location of the car on the track map in internal coordinates of the current simulator. |
   | YAWRATE (4)    | No            | The car rotation in radians / sec. |
+  | SUSPDEFL_FL    | No            | The used travel of the front left shock absorber in mm. |
+  | SUSPDEFL_FR    | No            | The used travel of the front right shock absorber in mm. |
+  | SUSPDEFL_RL    | No            | The used travel of the rear left shock absorber in mm. |
+  | SUSPDEFL_RR    | No            | The used travel of the rear right shock absorber in mm. |
   
   Notes:
   
   (1) The sequence of the columns in the CSV file is not important.<br>
-  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Siimulator Controller, for example the Driving Coach.<br>
-  (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
+  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.<br>
+  (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.<br>
   (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
 
 Good to know:

@@ -3,6 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommandArguments>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Database\User\Tracks\IRC\snetterton 300.data" "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_30366.trigger"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Database\User\Tracks\IRC\snetterton 300.data" "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_30366.trigger"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommandArguments>-TrackHints "D:\Dateien\Dokumente\Simulator Controller\Database\User\Tracks\IRC\snetterton 300.data" "D:\Dateien\Dokumente\Simulator Controller\Temp\Brake_14374.trigger"</LocalDebuggerCommandArguments>

@@ -3985,6 +3985,7 @@ if kLogStartup
 #Include "Libraries\IRCIssueAnalyzer.ahk"
 #Include "Libraries\R3EIssueAnalyzer.ahk"
 #Include "Libraries\PMRIssueAnalyzer.ahk"
+#Include "Libraries\F125IssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
 #Include "Libraries\LMUSetupEditor.ahk"

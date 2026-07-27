@@ -1,36 +1,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - PMR Telemetry Analyzer          ;;;
+;;;   Modular Simulator Controller System - F125 Telemetry Collector        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include "PMRIssueCollector.ahk"
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; PMRIssueAnalyzer                                                        ;;;
+;;; F125IssueCollector                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class PMRIssueAnalyzer extends GenericIssueAnalyzer {
-	CollectorClass {
-		Get {
-			return "PMRIssueCollector"
-		}
-	}
-
-	settingAvailable(setting) {
-		if ((setting = "Wheelbase") || (setting = "TrackWidth"))
+class F125IssueCollector extends IssueCollector {
+	settingAvailable(setting, force := false) {
+		if ((setting = "SteerLock") || (setting = "SteerRatio")
+		 || (setting = "TrackWidth") || (setting = "Wheelbase"))
 			return false
 		else
-			return super.settingAvailable(setting)
+			return super.settingAvailable(setting, force)
 	}
 }

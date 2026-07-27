@@ -1997,7 +1997,8 @@ class SessionDatabase extends ConfigurationItem {
 
 			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
 								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
-								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME", "YAWRATE"]
+								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME", "YAWRATE"
+								 , "SUSPDEFL_FL", "SUSPDEFL_FR", "SUSPDEFL_RL", "SUSPDEFL_RR"]
 
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")

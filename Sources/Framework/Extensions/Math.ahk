@@ -6,6 +6,50 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                     Public Classes Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class MovingAverage {
+	iPeriod := 0
+
+	iWindow := []
+	iHead := 1
+	iCount := 0
+	iValues := 0
+
+    __New(period) {
+		if (period <= 0)
+			throw "Invalid period detected in MovingAverage.__New..."
+
+		this.iPeriod := period
+
+		loop period
+			this.iWindow.Push(0)
+	}
+
+    Add(newValue) {
+		local period := this.iPeriod
+		local head := this.iHead
+		local count := this.iCount
+
+		if (count == period)
+			this.iValues -= this.iWindow[head]
+
+		this.iWindow[head] := newValue
+		this.iValues += newValue
+
+		if (++this.iHead > period)
+			this.iHead := 1
+
+		if (count < period)
+			this.iCount += 1
+
+		return (this.iValues / this.iCount)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 

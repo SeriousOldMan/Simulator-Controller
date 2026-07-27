@@ -26,7 +26,11 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and your targeted driving style. Let's start withe first tab "Handling":
+In this dialog you can initialize the analyzer for your car and your targeted driving style.
+
+##### Handling
+
+Let's start withe first tab "Handling":
 
   1. It is absolutely crucial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
   
@@ -61,13 +65,33 @@ In this dialog you can initialize the analyzer for your car and your targeted dr
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
-On the second tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
+##### Suspension
+
+The second tab "Suspension" let you tweak the bottom out detection for the specific car and track.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%205.JPG)
+
+In general, it is not possible to detect a bootom out event directly with the data supplied by the APIs of most simulators. Therefore, a mathematical method based on the used suspension travel data is used instead:
+
+1. Collect the suspension deflection (the current travel into the suspension) for each wheel with a high sample rate.
+2. Compute the movement speed and the first derivative, the acceleration of the suspension piston.
+3. Smooth out the data and collect events, where the negative acceleration is above a given threshold, and which met certain criterias for event length and distance between them.
+4. Calculate the impulse, which is equivalent to the energy submitted into the frame.
+5. Classify the events into light, medium and heavy.
+
+In the upper group of fields, you can specifiy the acceleration thresholds for the different severity levels of a bottom out event. But only events with the specified minimum length will be considered and all events that are closer together than the specified gap will be combined into one event.
+
+The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a great influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
+
+##### Temperatures
+
+On the third tab "Temperatures" you can specify several thresholds for tyre, brake and engine temepratures:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%204.JPG)
 
 The *Ideal* temperatures are the values you want to target in average over the course of a complete lap. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
-Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far.
+Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far. You can even use the issue analyzer for "All" cars and the selected settings will be used as defaults as well. This may or may not be useful. You have been warned.
 
 Once you have dialed your settings, you can click on "Start".
 

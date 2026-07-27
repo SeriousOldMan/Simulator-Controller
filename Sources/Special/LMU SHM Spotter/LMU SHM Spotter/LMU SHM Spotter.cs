@@ -1221,6 +1221,11 @@ namespace LMUSHMSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
+		long sumReadTime = 0;
+        long sumWriteTime = 0;
+        long sumLoopTime = 0;
+        long loopCount = 0;
+		
         void collectCarTelemetry(ref LMUVehicleScoring playerScoring)
         {
             int playerID = playerScoring.mID;
@@ -1236,6 +1241,20 @@ namespace LMUSHMSpotter {
                     {
                         if (telemetryFile != null) {
                             telemetryFile.Close();
+							
+							if (true) {
+								telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".stats", false);
+							
+								telemetryFile.WriteLine(this.scoringBuffer.GetStats());
+								telemetryFile.WriteLine(this.telemetryBuffer.GetStats());
+								telemetryFile.WriteLine(this.extendedBuffer.GetStats());
+                                telemetryFile.WriteLine("Average time for data: " + (sumReadTime / loopCount) + " ms");
+                                telemetryFile.WriteLine("Average time for compute: " + (sumWriteTime / loopCount) + " ms");
+                                telemetryFile.WriteLine("Average time for loop: " + (sumLoopTime / loopCount) + " ms");
+                                telemetryFile.WriteLine("# Loops: " + loopCount);
+
+                                telemetryFile.Close();
+							}
 
                             FileInfo info = new FileInfo(telemetryDirectory + "\\Lap " + telemetryLap + ".telemetry");
 
@@ -1255,6 +1274,18 @@ namespace LMUSHMSpotter {
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 					
 					lastRunning = -1;
+
+					if (true)
+					{
+						this.scoringBuffer.ClearStats();
+						this.telemetryBuffer.ClearStats();
+						this.extendedBuffer.ClearStats();
+
+						sumReadTime = 0;
+						sumWriteTime = 0;
+						sumLoopTime = 0;
+						loopCount = 0;
+					}
                 }
 
 				if (playerScoring.mLapDist > lastRunning)
@@ -1281,8 +1312,13 @@ namespace LMUSHMSpotter {
 					telemetryFile.Write(-playerScoring.mPos.z + ";");
 
 					telemetryFile.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
-							
-					telemetryFile.WriteLine(vehicle.mLocalRot.z);
+
+                    telemetryFile.Write(vehicle.mLocalRot.z + ";");
+
+                    telemetryFile.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                    telemetryFile.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                    telemetryFile.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1306,9 +1342,14 @@ namespace LMUSHMSpotter {
                             file.Write(playerScoring.mPos.x + ";");
                             file.Write(-playerScoring.mPos.z + ";");
 
-                            file.WriteLine(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
-							
-							file.WriteLine(vehicle.mLocalRot.z);
+                            file.Write(((vehicle.mElapsedTime - vehicle.mLapStartET) * 1000) + ";");
+
+                            file.Write(vehicle.mLocalRot.z + ";");
+
+                            file.Write(vehicle.mWheels[0].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[1].mSuspensionDeflection + ";");
+                            file.Write(vehicle.mWheels[2].mSuspensionDeflection + ";");
+                            file.WriteLine(vehicle.mWheels[3].mSuspensionDeflection);
 
                             file.Close();
                         }
@@ -1386,10 +1427,16 @@ namespace LMUSHMSpotter {
 			int countdown = 4000;
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
+			long loopStart = 0;
+			long readStart = 0;
+			long writeStart = 0;
 
 			telemetryDirectory = telemetryFolder;
 
-            while (true) {
+            while (true)
+            {
+                loopStart = Environment.TickCount;
+
 				counter++;
 
 				if (!connected)
@@ -1399,9 +1446,13 @@ namespace LMUSHMSpotter {
 				{
 					try
 					{
+						readStart = Environment.TickCount;
+						
 						if (!extendedBuffer.GetMappedData(ref extended) || !scoringBuffer.GetMappedData(ref scoring)
 																	    || !telemetryBuffer.GetMappedData(ref telemetry))
 							continue;
+						
+						sumReadTime += (Environment.TickCount - readStart);
                     }
 					catch (Exception)
 					{
@@ -1443,8 +1494,13 @@ namespace LMUSHMSpotter {
 
                             if (running)
 							{
-                                if (carTelemetry)
+                                if (carTelemetry) {
+									writeStart = Environment.TickCount;
+									
                                     collectCarTelemetry(ref playerScoring);
+									
+									sumWriteTime += (Environment.TickCount - writeStart);
+								}
                                 else
                                 {
                                     if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
@@ -1511,7 +1567,10 @@ namespace LMUSHMSpotter {
 				}
 				else
 					Thread.Sleep(1000);
+
+				sumLoopTime = (Environment.TickCount - loopStart);
+                loopCount += 1;
             }
-		}
+        }
     }
 }

@@ -1092,7 +1092,7 @@ namespace PMRUDPSpotter {
 					lastRunning = -1;
                 }
 
-				if (playerVehicle.LapProgress > lastRunning)
+				if (playerVehicle.LapProgress >= lastRunning)
                 {
                     lastRunning = playerVehicle.LapProgress;
 					

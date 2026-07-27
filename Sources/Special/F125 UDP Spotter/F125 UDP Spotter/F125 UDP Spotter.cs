@@ -1196,7 +1196,7 @@ namespace F125UDPSpotter {
 					lastRunning = -1;
                 }
 
-				if (running > lastRunning)
+				if (running >= lastRunning)
                 {
                     lastRunning = running;
 					

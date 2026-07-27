@@ -1229,7 +1229,7 @@ namespace ACSHMSpotter {
 
 					float running = Math.Max(0, Math.Min(1, driver.splinePosition)) * staticInfo.TrackSPlineLength;
 
-					if (true || running > lastRunning)
+					if (running >= lastRunning)
 					{
 						telemetryFile.Write(running + ";");
 						telemetryFile.Write(physics.Gas + ";");

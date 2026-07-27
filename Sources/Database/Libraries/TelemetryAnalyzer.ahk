@@ -2076,6 +2076,7 @@ class TelemetryAnalyzer {
 					rearCount += 1
 			})
 
+			/*
 			for ignore, type in ["Suspension.Bottom.Out"]
 				for ignore, severity in ["Heavy", "Medium", "Light"] {
 					key := (type . "." . severity)
@@ -2088,6 +2089,7 @@ class TelemetryAnalyzer {
 										   , Round(100 * getMultiMapValue(issues, key, where, 0) / count))
 					}
 				}
+			*/
 
 			return issues
 		}

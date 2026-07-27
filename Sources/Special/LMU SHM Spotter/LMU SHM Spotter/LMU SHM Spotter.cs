@@ -1221,8 +1221,9 @@ namespace LMUSHMSpotter {
         int telemetryLap = -1;
 		double lastRunning = -1;
 
-		long sumReadTime = 0;
-		long allReadCount = 0;
+		int sumReadTime = 0;
+		int sumWriteTime = 0;
+		int runCount = 0;
 		
         void collectCarTelemetry(ref LMUVehicleScoring playerScoring)
         {
@@ -1251,6 +1252,11 @@ namespace LMUSHMSpotter {
 								this.scoringBuffer.ClearStats();
 								this.telemetryBuffer.ClearStats();
 								this.extendedBuffer.ClearStats();
+								
+								
+								sumReadTime = 0;
+								sumWriteTime = 0;
+								runCount = 0;
 								
 								telemetryFile.Close();
 							}
@@ -1415,6 +1421,7 @@ namespace LMUSHMSpotter {
 			long counter = 0;
 			bool carTelemetry = (telemetryFolder.Length > 0);
 			long readStart = 0;
+			long writeStart = 0;
 
 			telemetryDirectory = telemetryFolder;
 
@@ -1435,7 +1442,7 @@ namespace LMUSHMSpotter {
 							continue;
 						
 						sumReadTime += (Environment.TickCount - readStart);
-						allReadCount += 1;
+						runCount += 1;
                     }
 					catch (Exception)
 					{
@@ -1477,8 +1484,13 @@ namespace LMUSHMSpotter {
 
                             if (running)
 							{
-                                if (carTelemetry)
+                                if (carTelemetry) {
+									writeStart = Environment.TickCounut;
+									
                                     collectCarTelemetry(ref playerScoring);
+									
+									sumWriteTime += (Environment.TickCount - writeStart);
+								}
                                 else
                                 {
                                     if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&

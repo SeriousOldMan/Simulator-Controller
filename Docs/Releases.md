@@ -49,7 +49,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Bumpstop rates will be taken into account, if available.
 	- Changes to heave suspension settings will be applied more aggressively.
   - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
-  - The offline issue analysis, which uses telemetry files, can alos detect suspension issues with all files generated with this release or later.
+  - The offline issue analysis, which uses telemetry files, can alos detect suspension issues with all files generated with this release or later. However, because the sampling frequency for telemetry data is way lower than that used by the live issue analyzer, some or even all bottom out events may be missed by the detection method.
 
 # Release history
 

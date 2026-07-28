@@ -659,7 +659,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".deflections", std::ios::out);
 
 			for (const auto& deflections : suspensionDeflectionsList)
 				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
@@ -671,7 +671,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".accelerations", std::ios::out | std::ios::app);
+			output.open(dataFile + ".accelerations", std::ios::out);
 
 			if (frontLeftAccels.size() > 0)
 				for (int i = 0; i < frontLeftAccels.size(); i++)

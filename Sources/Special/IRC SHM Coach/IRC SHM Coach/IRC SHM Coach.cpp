@@ -792,24 +792,15 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".suspension", std::ios::out);
 
-			for (const auto& deflections : suspensionDeflectionsList)
-				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
-						  deflections.RearLeft << "," << deflections.RearRight << std::endl;
+			for (int i = 0; i < frontLeftAccels.size(); i++) {
+				output << suspensionDeflectionsList[i].FrontLeft << "," << suspensionDeflectionsList[i].FrontRight << "," <<
+				suspensionDeflectionsList[i].RearLeft << "," << suspensionDeflectionsList[i].RearRight << std::endl;
 
-			output.close();
-		}
-
-		{
-			std::ofstream output;
-
-			output.open(dataFile + ".accelerations", std::ios::out | std::ios::app);
-
-			if (frontLeftAccels.size() > 0)
-				for (int i = 0; i < frontLeftAccels.size(); i++)
-					output << frontLeftAccels[i].first << "," << frontRightAccels[i].first << "," <<
-							  rearLeftAccels[i].first << "," << rearRightAccels[i].first << std::endl;
+				output << frontLeftAccels[i].first << "," << frontRightAccels[i].first << "," <<
+					rearLeftAccels[i].first << "," << rearRightAccels[i].first << std::endl;
+			}
 
 			output.close();
 		}

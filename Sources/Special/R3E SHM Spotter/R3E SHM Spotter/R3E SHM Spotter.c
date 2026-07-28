@@ -1290,10 +1290,10 @@ void collectCarTelemetry(int playerID) {
 				
 				fprintf(file, "%f;", (float)map_buffer->player.local_angular_velocity.y);
 
-				fprintf(file, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT] * 1000.0);
+				fprintf(file, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT]);
 
 				fclose(file);
 			}

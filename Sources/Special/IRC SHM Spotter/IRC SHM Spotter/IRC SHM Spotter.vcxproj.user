@@ -3,5 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommandArguments>-Automation "D:\Dateien\Dokumente\Simulator Controller\Database\User\Tracks\IRC\snetterton 300.data" 1.4197 -224.1528</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>-Automation "D:\Dateien\Dokumente\Simulator Controller\Database\User\Tracks\IRC\snetterton 300.data" 1.4197 -224.1528|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>

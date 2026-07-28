@@ -371,10 +371,10 @@ struct SuspensionDeflections
 		double suspensionDeflectionFR,
 		double suspensionDeflectionRL, double suspensionDeflectionRR)
 		: CompletedLaps(completedLaps),
-		FrontLeft(suspensionDeflectionFL * 1000.0),
-		FrontRight(suspensionDeflectionFR * 1000.0),
-		RearLeft(suspensionDeflectionRL * 1000.0),
-		RearRight(suspensionDeflectionRR * 1000.0)
+		  FrontLeft(suspensionDeflectionFL * 1000.0),
+		  FrontRight(suspensionDeflectionFR * 1000.0),
+		  RearLeft(suspensionDeflectionRL * 1000.0),
+		  RearRight(suspensionDeflectionRR * 1000.0)
 	{
 		// Get current time in milliseconds since epoch
 		auto now = std::chrono::high_resolution_clock::now();
@@ -788,7 +788,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 	std::vector<std::pair<double, double>> rearRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
-	if (true) {
+	if (false) {
 		{
 			std::ofstream output;
 
@@ -804,7 +804,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".accelerations", std::ios::out | std::ios::app);
 
 			if (frontLeftAccels.size() > 0)
 				for (int i = 0; i < frontLeftAccels.size(); i++)
@@ -883,16 +883,16 @@ bool collectTelemetry(const irsdk_header* header, const char* data, std::string 
 	float rrDeflection = 0;
 
 	if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
-		lfDeflection = *((float*)rawValue) * 1000;
+		lfDeflection = *((float*)rawValue);
 
 	if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
-		rfDeflection = *((float*)rawValue) * 1000;
+		rfDeflection = *((float*)rawValue);
 
 	if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
-		lrDeflection = *((float*)rawValue) * 1000;
+		lrDeflection = *((float*)rawValue);
 
 	if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
-		rrDeflection = *((float*)rawValue) * 1000;
+		rrDeflection = *((float*)rawValue);
 
 	if ((speed > 60) && (lfDeflection > 0 || rfDeflection > 0 || lrDeflection > 0 || rrDeflection > 0))
 		suspensionDeflectionsList.push_back(SuspensionDeflections(completedLaps,

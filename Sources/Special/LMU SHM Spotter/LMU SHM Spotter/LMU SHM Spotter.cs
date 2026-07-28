@@ -1219,9 +1219,10 @@ namespace LMUSHMSpotter {
         StreamWriter telemetryFile = null;
 		int startTelemetryLap = -1;
         int telemetryLap = -1;
-		double lastRunning = -1;
+        double lastRunning = -1;
+        double lastTime = -1;
 
-		long sumReadTime = 0;
+        long sumReadTime = 0;
         long sumWriteTime = 0;
         long sumLoopTime = 0;
         long loopCount = 0;
@@ -1274,6 +1275,7 @@ namespace LMUSHMSpotter {
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 					
 					lastRunning = -1;
+					lastTime = -1;
 
 					if (false)
 					{
@@ -1288,11 +1290,12 @@ namespace LMUSHMSpotter {
 					}
                 }
 
-				if (playerScoring.mLapDist >= lastRunning)
-                {
-                    ref LMUVehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+                ref LMUVehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 
+                if ((playerScoring.mLapDist >= lastRunning) && (vehicle.mElapsedTime >= lastTime))
+                {
                     lastRunning = playerScoring.mLapDist;
+					lastTime = vehicle.mElapsedTime;
 					
 					telemetryFile.Write(playerScoring.mLapDist + ";");
 					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");

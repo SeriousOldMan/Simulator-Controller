@@ -50,6 +50,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- Changes to heave suspension settings will be applied more aggressively.
   - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
   - The resolution of telemetry data have been increased 10-fold from roughly 200 ms per sample down to 20 ms (50 Hz). This allows very detailed analysis of *fast* channels like suspension movement. But this comes for a price, of course. The file size also increased 10-fold and the processing time, for example by the Driving Coach, increased by several seconds for each lap.
+  - Telemetry is now only recorded for valid laps in some simulators. This may change again with a future release, but for the time being it was necessary.
   - The builtin telemetry viewer now offers five additional channels: Yaw rate and suspension deflection seperately for each wheel.
   - The offline issue analysis, which uses telemetry files, can alos detect suspension issues with all files generated with this release or later. However, because the sampling frequency for telemetry data is way lower than that used by the live issue analyzer, some or even all bottom out events may be missed by the detection method.
 

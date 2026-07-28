@@ -1051,6 +1051,7 @@ namespace PMRUDPSpotter {
         int telemetryLap = -1;
         DateTime startTime;
         double lastRunning = -1;
+        double lastTime = -1;
 
         void collectCarTelemetry(ref UDPParticipantRaceState playerVehicle,
 								 ref UDPVehicleTelemetry playerTelemetry)
@@ -1088,13 +1089,19 @@ namespace PMRUDPSpotter {
 					startTime = DateTime.Now;
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
-					
-					lastRunning = -1;
+
+                    lastRunning = -1;
+                    lastTime = -1;
                 }
 
-				if (playerVehicle.LapProgress >= lastRunning)
+                TimeSpan difference = DateTime.Now.Subtract(startTime);
+
+                long currentTime = (difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+
+                if ((playerVehicle.LapProgress >= lastRunning) && (currentTime >= lastTime))
                 {
                     lastRunning = playerVehicle.LapProgress;
+					lastTime = currentTime;
 					
 					telemetryFile.Write(lastRunning * trackLength + ";");
 					telemetryFile.Write((float)playerTelemetry.Input.Accelerator + ";");
@@ -1110,11 +1117,9 @@ namespace PMRUDPSpotter {
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[0] + ";");
 					telemetryFile.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-					TimeSpan difference = DateTime.Now.Subtract(startTime);
+                    telemetryFile.Write(currentTime + ";");
 
-                    telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
-
-					if (true)
+                    if (true)
 						telemetryFile.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);
 					else
 					{
@@ -1150,7 +1155,7 @@ namespace PMRUDPSpotter {
                             file.Write(playerTelemetry.Chassis.PosWS[0] + ";");
                             file.Write(playerTelemetry.Chassis.PosWS[2] + ";");
 
-                            file.Write((playerVehicle.CurrentLapTime * 1000) + ";");
+                            file.Write(currentTime + ";");
 
 							if (true)
                                 file.WriteLine(playerTelemetry.Chassis.AngularVelocityLS[2]);

@@ -655,7 +655,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 	std::vector<std::pair<double, double>> rearRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
-	if (true) {
+	if (false) {
 		{
 			std::ofstream output;
 
@@ -671,7 +671,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".accelerations", std::ios::out | std::ios::app);
 
 			if (frontLeftAccels.size() > 0)
 				for (int i = 0; i < frontLeftAccels.size(); i++)

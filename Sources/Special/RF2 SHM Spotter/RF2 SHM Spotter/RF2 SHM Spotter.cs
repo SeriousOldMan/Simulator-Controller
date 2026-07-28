@@ -1219,7 +1219,8 @@ namespace RF2SHMSpotter {
         StreamWriter telemetryFile = null;
 		int startTelemetryLap = -1;
         int telemetryLap = -1;
-		double lastRunning = -1;
+        double lastRunning = -1;
+		double lastTime = -1;
 
         void collectCarTelemetry(ref rF2VehicleScoring playerScoring)
         {
@@ -1253,15 +1254,17 @@ namespace RF2SHMSpotter {
                     telemetryLap = (playerScoring.mTotalLaps + 1);
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
-					
-					lastRunning = -1;
-                }
 
-				if (playerScoring.mLapDist >= lastRunning)
+                    lastRunning = -1;
+                    lastTime = -1;
+                }
+                ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
+
+                if ((playerScoring.mLapDist >= lastRunning) && (vehicle.mElapsedTime > lastTime))
                 {
-                    ref rF2VehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 
                     lastRunning = playerScoring.mLapDist;
+					lastTime = vehicle.mElapsedTime;
 					
 					telemetryFile.Write(playerScoring.mLapDist + ";");
 					telemetryFile.Write((float)vehicle.mFilteredThrottle + ";");

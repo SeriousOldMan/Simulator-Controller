@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.1.4.0-release]() (Changes: Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench", Fixed transfer of issues to the workarea of "Setup Workbench", Optimized recommendations for bottom out issues in "Setup Workbench", Added suspension deflection to standard telemetry files, Optimized handling of analyzer settings in "Setup Workbench".)
+[7.1.4.0-release]() (Changes: Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench", Fixed transfer of issues to the workarea of "Setup Workbench", Optimized recommendations for bottom out issues in "Setup Workbench", Added suspension deflection to standard telemetry files, Optimized handling of analyzer settings in "Setup Workbench", Fixed saving of reverted instructions.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7140) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-714) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -576,12 +576,17 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 	saveToConfiguration(configuration) {
 		local ignore, provider, reference, setting, value
-		local section, removedKeys, addedKeys, key
+		local section, removedKeys, addedKeys, key, ignore, key
 
 		super.saveToConfiguration(configuration)
 
 		setMultiMapValues(configuration, "Agent Booster", getMultiMapValues(this.Configuration, "Agent Booster"))
 		setMultiMapValues(configuration, "Conversation Booster", getMultiMapValues(this.Configuration, "Conversation Booster"))
+
+		for ignore, section in ["Agent Booster", "Conversation Booster"]
+			for key, value in getMultiMapValues(configuration, section)
+				if InStr(key, ".Instructions.")
+					removeMultiMapValue(configuration, section, key)
 
 		this.saveProviderConfiguration()
 
@@ -620,6 +625,7 @@ class AssistantBoosterEditor extends ConfiguratorPanel {
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model"]
 				setMultiMapValue(configuration, "Agent Booster", provider . "." . setting, providerConfiguration[setting])
+
 			if (provider = "LLM Runtime")
 				setMultiMapValue(configuration, "Agent Booster", provider . ".GPULayers", providerConfiguration["GPULayers"])
 		}

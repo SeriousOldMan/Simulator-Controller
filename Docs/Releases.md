@@ -38,6 +38,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed the optional acoustic feedback for handling problems in the issue analyzer of "Setup Workbench" for *Project Motor Racing* and *F1 25/26*.
   - Fixed a bug that prevented the usage of the handling thresholds applied in the issue analyzer of "Setup Workbench" when the Drivng Coach is asked about handling problems for the same car / track combination.
   - Fixed a bug introduced with the last release, which could prevent the transfer of issues detected by the telemetry-based issue analyzer to the working area of "Setup Workbench".
+  - Fixed a bug in the configuration tools, which prevented reverted LLM instructions to be saved. The non-original instructions kept being active.
   
 #### Changes
 

@@ -2828,7 +2828,10 @@ class SessionDatabase extends ConfigurationItem {
 		file := FileOpen(fileName, "w")
 
 		if file {
-			file.RawWrite(setup, size)
+			if isInstance(setup, Buffer)
+				file.RawWrite(setup, size)
+			else if isInstance(setup, String)
+				file.Write(setup)
 
 			file.Close()
 
@@ -3760,6 +3763,9 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 				if (!getMultiMapValue(info, "Setup", "Synchronized", false)
 				 || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
 					continue
+
+				car := document["Car"]
+				track := document["Track"]
 
 				try {
 					if !sessionDB.readSetupInfo(simulator, car, track

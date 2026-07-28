@@ -1288,7 +1288,7 @@ namespace LMUSHMSpotter {
 					}
                 }
 
-				if (true || playerScoring.mLapDist > lastRunning)
+				if (playerScoring.mLapDist >= lastRunning)
                 {
                     ref LMUVehicleTelemetry vehicle = ref GetPlayerTelemetry(playerID, ref telemetry);
 

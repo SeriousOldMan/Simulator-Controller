@@ -1584,7 +1584,7 @@ void collectCarTelemetry() {
 
 					// latG *= -1;
 
-					if (true || driverRunning > lastRunning) {
+					if (driverRunning >= lastRunning) {
 						telemetryFile << (driverRunning * trackLength) << ";"
 							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
 							<< (pf->brake >= 0 ? pf->brake : 0) << ";"

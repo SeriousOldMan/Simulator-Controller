@@ -1462,7 +1462,7 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
 
-		if (true || playerRunning > lastTelemetryRunning) {
+		if (playerRunning >= lastTelemetryRunning) {
 			if (getRawDataValue(rawValue, header, data, "Speed"))
 				speed = *((float*)rawValue) * 3.6;
 

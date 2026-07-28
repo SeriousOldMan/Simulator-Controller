@@ -1040,7 +1040,7 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 			lastRunning = -1;
 		}
 
-		if (true || vehicle.mCurrentLapDistance > lastRunning) {
+		if (vehicle.mCurrentLapDistance >= lastRunning) {
 			telemetryFile << vehicle.mCurrentLapDistance << ";"
 						  << sharedData->mThrottle << ";"
 						  << sharedData->mBrake << ";"

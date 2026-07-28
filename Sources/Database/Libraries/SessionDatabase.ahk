@@ -3634,7 +3634,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
-				if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Indetifier", false) != identifier))
+				if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
 					continue
 
 				car := document["Car"]
@@ -3757,7 +3757,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
-				if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Indetifier", false) != identifier))
+				if (!getMultiMapValue(info, "Setup", "Synchronized", false)
+				 || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
 					continue
 
 				try {
@@ -3880,7 +3881,7 @@ synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, last
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
-					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Indetifier", false) != identifier))
+					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
 						continue
 
 					car := document["Car"]
@@ -3993,7 +3994,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
-					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Indetifier", false) != identifier))
+					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
 						continue
 
 					car := document["Car"]

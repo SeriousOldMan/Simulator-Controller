@@ -87,7 +87,7 @@ When preparing settings for a given simulator always start with the severity thr
 
 The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a big influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
 
-Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported and *Automobilista 2* behaves a little bit unpredictable.
+Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported.
 
 As you can see, it can need some time to find good settings for a given car. The track does not play a role here and also the suspension settings in the setup do not play a role, cause the detection is based on acceleration and not on absolute suspension travel. So you can reuse the settings (as well as all other settings of the issue analyzer), once you have dialed them in.
 

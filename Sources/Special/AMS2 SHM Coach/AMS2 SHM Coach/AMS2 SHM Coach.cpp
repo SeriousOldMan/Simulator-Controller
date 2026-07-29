@@ -616,32 +616,19 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
 	if (false) {
-		{
-			std::ofstream output;
+		std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out);
+		output.open(dataFile + ".suspension", std::ios::out);
 
-			for (const auto& deflections : suspensionDeflectionsList)
-				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
-						  deflections.RearLeft << "," << deflections.RearRight << std::endl;
+		if (frontLeftAccels.size() > 0)
+			for (int i = 0; i < frontLeftAccels.size(); i++) {
+				output << suspensionDeflectionsList[i].FrontLeft << "," << suspensionDeflectionsList[i].FrontRight << "," <<
+						  suspensionDeflectionsList[i].RearLeft << "," << suspensionDeflectionsList[i].RearRight << std::endl;
+				output << frontLeftAccels[i].first << "," << frontRightAccels[i].first << "," <<
+						  rearLeftAccels[i].first << "," << rearRightAccels[i].first << std::endl;
+			}
 
-			output.close();
-		}
-
-		{
-			std::ofstream output;
-
-			output.open(dataFile + ".accelerations", std::ios::out);
-
-			if (frontLeftAccels.size() > 0)
-				for (int i = 0; i < frontLeftAccels.size(); i++)
-					output << frontLeftAccels[i].first << "," << frontRightAccels[i].first << "," <<
-							  rearLeftAccels[i].first << "," << rearRightAccels[i].first << std::endl;
-
-			output.close();
-		}
-
-		Sleep(200);
+		output.close();
 	}
 
 	std::vector<SuspensionBottomOuts> result;
@@ -667,10 +654,10 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 
 	if (lastSpeed > 60)
 		suspensionDeflectionsList.push_back(SuspensionDeflections(completedLaps,
-																  0.5 - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT],
-																  0.5 - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT],
-																  0.5 - sharedData->mSuspensionTravel[TYRE_REAR_LEFT],
-																  0.5 - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT]));
+																  - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT],
+																  - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT],
+																  - sharedData->mSuspensionTravel[TYRE_REAR_LEFT],
+																  - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT]));
 
 	pushValue(recentGLongs, acceleration);
 

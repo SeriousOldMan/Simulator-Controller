@@ -1177,10 +1177,10 @@ BottomOutArray* CreateSuspensionIssues()
 		FILE* output;
 
 		strcpy_s(fileName, 512, dataFile);
-		strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
+		strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".suspension");
 
 		/* Debug output to file */
-		if (!fopen_s(&output, fileName, "a")) {
+		if (!fopen_s(&output, fileName, "w")) {
 			fprintf(output, "----- Deflections -----\n");
 			for (int i = 0; i < suspensionDeflectionsList->size; i++) {
 				fprintf(output, "%f,%f,%f,%f\n",
@@ -1288,10 +1288,10 @@ BOOL collectTelemetry(char* soundsDirectory, BOOL calibrate) {
 	if (lastSpeed > 60)
 		DeflectionArray_Add(suspensionDeflectionsList,
 			SuspensionDeflections_Create(map_buffer->completed_laps,
-										 map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
-										 map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
-										 map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT] * 1000.0,
-										 map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT] * 1000.0));
+										 map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT],
+										 map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT],
+										 map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT],
+										 map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT]));
 
 	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 

@@ -1143,6 +1143,7 @@ namespace F125UDPSpotter {
         int telemetryLap = -1;
         DateTime startTime;
         double lastRunning = -1;
+        double lastTime = -1;
 
         void collectCarTelemetry()
         {
@@ -1192,13 +1193,18 @@ namespace F125UDPSpotter {
 					startTime = DateTime.Now;
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
-					
-					lastRunning = -1;
+
+                    lastRunning = -1;
+                    lastTime = -1;
                 }
 
-				if (running > lastRunning)
+                TimeSpan difference = DateTime.Now.Subtract(startTime);
+                double currentTime = (difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+
+                if ((running >= lastRunning) && (currentTime >= lastTime))
                 {
                     lastRunning = running;
+					lastTime = currentTime;
 					
 					float throttle = 0, brake = 0, steer = 0;
 					int gear = 0, rpm = 0;
@@ -1228,9 +1234,7 @@ namespace F125UDPSpotter {
 					telemetryFile.Write(playerMotion.WorldPositionX + ";");
 					telemetryFile.Write(playerMotion.WorldPositionZ + ";");
 
-					TimeSpan difference = DateTime.Now.Subtract(startTime);
-
-                    telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
+					telemetryFile.Write(currentTime + ";");
 
                     telemetryFile.Write(motionEx.AngularVelocityY + ";");
 
@@ -1261,7 +1265,7 @@ namespace F125UDPSpotter {
                             file.Write(playerMotion.WorldPositionX + ";");
                             file.Write(playerMotion.WorldPositionZ + ";");
 
-                            file.Write(playerLap.CurrentLapTimeInMS + ";");
+                            file.Write(currentTime + ";");
 					
 							file.Write(motionEx.AngularVelocityY + ";");
 

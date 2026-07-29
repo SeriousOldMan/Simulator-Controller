@@ -1624,6 +1624,7 @@ ofstream telemetryFile;
 int startTelemetryLap = -1;
 int telemetryLap = -1;
 float lastRunning = -1;
+float lastTime = -1;
 
 void collectCarTelemetry() {
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -1656,6 +1657,7 @@ void collectCarTelemetry() {
 							   (telemetryDirectory + "\\Lap " + to_string(telemetryLap) + ".telemetry").c_str());
 
 						lastRunning = -1;
+						lastTime = -1;
 					}
 					catch (...) {
 					}
@@ -1679,7 +1681,7 @@ void collectCarTelemetry() {
 
 					// latG *= -1;
 
-					if (driverRunning > lastRunning) {
+					if ((driverRunning >= lastRunning) && (gf->iCurrentTime >= lastTime)) {
 						telemetryFile << (driverRunning * trackLength) << ";"
 							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
 							<< (pf->brake >= 0 ? pf->brake : 0) << ";"
@@ -1727,6 +1729,7 @@ void collectCarTelemetry() {
 							catch (...) {}
 						
 						lastRunning = driverRunning;
+						lastTime = gf->iCurrentTime;
 					}
 				}
 			}

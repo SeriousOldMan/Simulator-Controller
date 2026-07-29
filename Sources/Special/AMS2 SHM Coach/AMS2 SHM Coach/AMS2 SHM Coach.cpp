@@ -615,11 +615,11 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 	std::vector<std::pair<double, double>> rearRightAccels = CalculateAccelerations(
 		ExtractDeflections([](const SuspensionDeflections& d) { return d.RearRight; }));
 
-	if (true) {
+	if (false) {
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".deflections", std::ios::out);
 
 			for (const auto& deflections : suspensionDeflectionsList)
 				output << deflections.FrontLeft << "," << deflections.FrontRight << "," <<
@@ -631,7 +631,7 @@ std::vector<SuspensionBottomOuts> CreateSuspensionIssues()
 		{
 			std::ofstream output;
 
-			output.open(dataFile + ".deflections", std::ios::out | std::ios::app);
+			output.open(dataFile + ".accelerations", std::ios::out);
 
 			if (frontLeftAccels.size() > 0)
 				for (int i = 0; i < frontLeftAccels.size(); i++)
@@ -667,10 +667,10 @@ bool collectTelemetry(const SharedMemory* sharedData, std::string soundsDirector
 
 	if (lastSpeed > 60)
 		suspensionDeflectionsList.push_back(SuspensionDeflections(completedLaps,
-																  sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] * 1000,
-																  sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] * 1000,
-																  sharedData->mSuspensionTravel[TYRE_REAR_LEFT] * 1000,
-																  sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] * 1000));
+																  0.5 - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT],
+																  0.5 - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT],
+																  0.5 - sharedData->mSuspensionTravel[TYRE_REAR_LEFT],
+																  0.5 - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT]));
 
 	pushValue(recentGLongs, acceleration);
 

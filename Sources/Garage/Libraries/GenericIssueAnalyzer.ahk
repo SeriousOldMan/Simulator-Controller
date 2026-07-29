@@ -1140,7 +1140,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		saveTemperature(name, widgets) {
-			analyzer.%name% := collect(widgets, (w) => convertUnit("Temperature", internalValue("Float", w.Text), false))
+			local values := collect(widgets, (w) => convertUnit("Temperature", internalValue("Float", w.Text), false))
+
+			analyzer.%name% := ((widgets.Length = 1) ? values[1] : values)
 		}
 
 		if analyzer.settingAvailable(setting) {

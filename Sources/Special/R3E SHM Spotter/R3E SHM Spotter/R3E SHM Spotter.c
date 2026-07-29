@@ -1144,6 +1144,7 @@ int startTelemetryLap = -1;
 r3e_float64 startTime = 0.0;
 int telemetryLap = -1;
 double lastRunning = -1;
+double lastTime = -1;
 
 inline void printNAValue(FILE* file, double value) {
 	if (value == -1)
@@ -1222,13 +1223,15 @@ void collectCarTelemetry(int playerID) {
 
 			return;
 		}
-		
+
 		lastRunning = -1;
+		lastTime = -1;
 	}
 
 	double running = map_buffer->all_drivers_data_1[index].lap_distance;
+	long currentTime = (long)round((map_buffer->player.game_simulation_time - startTime) * 1000);
 	
-	if (running > lastRunning) {
+	if ((running >= lastRunning) && (currentTime >= lastTime)) {
 		/*
 		fprintf(telemetryFile, "%f;%f;%f;%f;%d;%d;%f;%d;%d;%f;%f;%f;%f;%d\n",
 							   running, map_buffer->throttle, map_buffer->brake, map_buffer->steer_input_raw,
@@ -1252,8 +1255,7 @@ void collectCarTelemetry(int playerID) {
 																 map_buffer->all_drivers_data_1[index].position.x,
 																 -map_buffer->all_drivers_data_1[index].position.z);
 
-		fprintf(telemetryFile, "%d;%f;", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000),
-										 (float)map_buffer->player.local_angular_velocity.y);
+		fprintf(telemetryFile, "%d;%f;", currentTime, (float)map_buffer->player.local_angular_velocity.y);
 
 		fprintf(telemetryFile, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
 												map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
@@ -1288,16 +1290,17 @@ void collectCarTelemetry(int playerID) {
 				
 				fprintf(file, "%f;", (float)map_buffer->player.local_angular_velocity.y);
 
-				fprintf(file, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT] * 1000.0,
-											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT] * 1000.0);
+				fprintf(file, "%f;%f;%f;%f\n", map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_LEFT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_FRONT_RIGHT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_LEFT],
+											   map_buffer->player.suspension_deflection[R3E_TIRE_REAR_RIGHT]);
 
 				fclose(file);
 			}
 		}
 
 		lastRunning = running;
+		lastTime = currentTime;
 	}
 }
 

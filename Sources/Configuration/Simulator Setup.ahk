@@ -1256,6 +1256,8 @@ class SetupWizard extends ConfiguratorPanel {
 		local change := (step != this.Step)
 		local oldPageSwitch
 
+		logMessage(kLogDebug, "Showing page " . page . " of step " . step.Step)
+
 		this.WizardWindow.Block()
 
 		this.Control["firstPageButton"].Enabled := false
@@ -1294,6 +1296,8 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	hidePage(step, page) {
+		logMessage(kLogDebug, "Hiding page " . page . " of step " . step.Step)
+
 		try {
 			if step.hidePage(page) {
 				this.saveKnowledgeBase()

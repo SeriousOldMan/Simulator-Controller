@@ -83,11 +83,11 @@ In general, it is not possible to detect a bootom out event directly with the da
 
 In the upper group of fields, you can specifiy the acceleration thresholds for the different severity levels of a bottom out event. But only events with the specified minimum length will be considered and all events that are closer together than the specified gap will be combined into one event.
 
-When preparing settings for a given simulator always start with the severity thresholds. The derived acceleration is very sensitive to timing and therefore depends on the data rate of the simulator. Especially *iRacing* has a low data rate compared to the other simulators and therefore will need much lower settings for the thresholds.
+When preparing settings for a given simulator always start with the severity thresholds. The derived acceleration is very sensitive to timing and therefore depends on the data sample rate of the simulator. Especially *iRacing* has a low data rate compared to the other simulators and therefore may need much lower settings for the thresholds.
 
 The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a big influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
 
-Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported.
+Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported and *Automobilista 2* behaves a little bit unpredictable.
 
 Good to know: Suspension issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the severity and frequency of the detected issues may be slightly different compared to a real-time analysis.
 

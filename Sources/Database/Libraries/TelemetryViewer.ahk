@@ -1096,7 +1096,10 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Layout"))
+		viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton")
+		setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
+
+		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Layout"))
 		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
 
 		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
@@ -1117,7 +1120,7 @@ class TelemetryViewer {
 
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
-		viewerGui.Add("Text", "x468 yp+4 w80 X:Move", translate("Zoom"))
+		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Zoom"))
 		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
 		viewerGui.Add("Slider", "Center Thick15 x617 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
 

@@ -38,12 +38,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed the optional acoustic feedback for handling problems in the issue analyzer of "Setup Workbench" for *Project Motor Racing* and *F1 25/26*.
   - Fixed a bug that prevented the usage of the handling thresholds applied in the issue analyzer of "Setup Workbench" when the Drivng Coach is asked about handling problems for the same car / track combination.
   - Fixed a bug introduced with the last release, which could prevent the transfer of issues detected by the telemetry-based issue analyzer to the working area of "Setup Workbench".
-  - Fixed a bug in the configuration tools, which prevented reverted LLM instructions to be saved. The non-original instructions kept being active.
-  - Fixed a bug in "Simulator Setup", which caused the "Basic" configuration page to stay visible during initial configuration, whatever other page has been selected.
+  - Fixed a bug in the configuration tools, which prevented LLM instructions to be saved, which had been reverted to original. The previous instructions kept being active.
+  - Fixed a bug in "Simulator Setup", which caused the "Basic" configuration page to stay visible during initial configuration, independent of whatever other page has been selected.
   
 #### Changes
 
-  - Changed settings are no longer saved in the issue analyzer in "Setup Workbench" when the dialog is cancelled.
+  - Changed settings are no longer saved in the issue analyzer in "Setup Workbench" when the dialog is cancelled and the analysis run is not started.
   - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
   - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
   - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
@@ -53,7 +53,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The internal telemetry file format has been extended with information about suspension travel. The [importer for CSV files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#importing-telemetry-data) support the new information.
   - The resolution of telemetry data have been increased 10-fold from roughly 200 ms per sample down to 20 ms (50 Hz). This allows very detailed analysis of *fast* channels like suspension movement. But this comes for a price, of course. The file size also increased 10-fold and the processing time, for example by the Driving Coach, increased by several seconds for each lap.
   - Telemetry is now only recorded for valid laps in some simulators. This may change again with a future release, but for the time being it was necessary.
-  - The builtin telemetry viewer now offers five additional channels: Yaw rate and suspension deflection seperately for each wheel.
+  - The builtin telemetry viewer now offers five additional channels: Yaw rate and suspension deflection seperately for each wheel. Please note that *Automobilista 2* do not provide deflection, but remaining travel in the data. Therefore, this value is used with a reversed sign and will typically show negative values in the graphs. For all other simulators, deflection will show as positive values.
   - The [offline issue analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files), which uses telemetry files, can also detect suspension issues with all files generated with this release or later. However, because the sampling frequency for telemetry data is somewhat lower than that used by the live issue analyzer, some or even all bottom out events may be missed by the detection method.
   - The synchronization of the session database can now detect corrupt or invalid data objects and will skip them automatically.
 

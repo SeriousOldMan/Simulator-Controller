@@ -89,6 +89,8 @@ The settings in the lower group can be used to fine-tune the detection. Especial
 
 Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported and *Automobilista 2* behaves a little bit unpredictable.
 
+As you can see, it can need some time to find good settings for a given car. The track does not play a role here and also the suspension settings in the setup do not play a role, cause the detection is based on acceleration and not on absolute suspension travel. So you can reuse the settings (as well as all other settings of the issue analyzer), once you have dialed them in.
+
 Good to know: Suspension issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the severity and frequency of the detected issues may be slightly different compared to a real-time analysis.
 
 ##### Temperatures

@@ -1254,7 +1254,7 @@ class TelemetryViewer {
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
-	createTelemetry(lap) {
+	createTelemetry(simulator, track, lap) {
 		local driver, lapTime, sectorTimes, telemetry, index, section
 
 		if isNumber(lap)
@@ -1268,9 +1268,8 @@ class TelemetryViewer {
 		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 			sectorTimes := false
 
-		return TelemetryAnalyzer(this.Simulator
-							   , this.Track).createTelemetry(0, this.SelectedLap[true]
-														   , driver, lapTime, sectorTimes)
+		return TelemetryAnalyzer(simulator, track).createTelemetry(0, this.SelectedLap[true]
+																	, driver, lapTime, sectorTimes)
 	}
 
 	selectedLapChanged() {
@@ -2498,6 +2497,12 @@ class SuspensionInspector {
 		}
 	}
 
+	Simulator {
+		Get {
+			return this.iSimulator
+		}
+	}
+
 	Car {
 		Get {
 			return this.iCar
@@ -2512,9 +2517,9 @@ class SuspensionInspector {
 
 	Telemetry {
 		Get {
-			local telemetry := this.TelemetryViewer.SelectedLap[true]
+			local telemetry := this.TelemetryViewer.SelectedLap
 
-			return (telemetry ? this.TelemetryViewer.createTelemetry(telemetry) : false)
+			return (telemetry ? this.TelemetryViewer.createTelemetry(this.Simulator, this.Track, telemetry) : false)
 		}
 	}
 
@@ -2587,15 +2592,37 @@ class SuspensionInspector {
 	}
 
 	telemetryChanged() {
+		local telemetry := this.Telemetry
+
 		static cycle := 1
 
-		do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(wheel, this.Telemetry))
+		do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(telemetry, wheel))
 
 		cycle += 1
 	}
 
-	showSuspensionHistogram(wheel, telemetry) {
-		local chartArea
+	computeSuspensionSpeeds(telemetry, wheel) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeSpeeds(deflections) {
+			local speeds := []
+			local speedAverage := MovingAverage(2)
+
+			calculateSpeed(lastTime, lastDeflection, time, deflection) {
+				local dt := (time - lastTime)
+
+				return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) / dt) : 0), Delta: dt}
+			}
+
+			loop deflections.Length
+				if (A_Index > 1)
+					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
+											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			return speeds
+		}
 
 		switch wheel, false {
 			case "FrontLeft":
@@ -2608,21 +2635,105 @@ class SuspensionInspector {
 				chartArea := "RR"
 		}
 
+		loop telemetry.Data.Length {
+			time := telemetry.getValue(A_Index, "Time")
+			deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+			if ((deflection != kUndefined) && (time != kUndefined))
+				deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+		}
+
+		return computeSpeeds(deflections)
+	}
+
+	showSuspensionHistogram(telemetry, wheel) {
+		local chartArea
+
+		switch wheel, false {
+			case "FrontLeft":
+				wheel := "FL"
+			case "FrontRight":
+				wheel := "FR"
+			case "RearLeft":
+				wheel := "RL"
+			case "RearRight":
+				wheel := "RR"
+		}
+
 		chartArea := this.i%wheel%Histogram
 
 		if chartArea {
 			chartArea.document.open()
-			chartArea.document.write(this.createSuspensionHistogram(telemetry))
+			chartArea.document.write(this.createSuspensionHistogram(telemetry, wheel))
 			chartArea.document.close()
 		}
 	}
 
-	computeSuspensionSpeed(telemetry, delta) {
-		return []
-	}
+	createSuspensionHistogram(telemetry, wheel, referenceTelemetry := false, margin := 0) {
+		local drawChartFunction := "function drawChart() {"
+		local counts := []
+		local maxTime := 0
+		local maxSpeed := 0
+		local maxCount := 0
+		local before, after, speeds
 
-	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
-		local before, after
+		switch wheel, false {
+			case "FrontLeft":
+				wheel := "FL"
+			case "FrontRight":
+				wheel := "FR"
+			case "RearLeft":
+				wheel := "RL"
+			case "RearRight":
+				wheel := "RR"
+		}
+
+		speeds := this.computeSuspensionSpeeds(telemetry, wheel)
+
+		nCount := 0
+		pCount := 0
+
+		do(speeds, (s) {
+			if (s.Speed < 0)
+				nCount += 1
+			else
+				pCount += 1
+		})
+
+		loop 21
+			counts.Push(0)
+
+		do(speeds, (s) {
+			maxTime := Max(maxTime, s.Delta)
+			maxSpeed := Max(maxSpeed, Abs(s.Speed))
+		})
+
+		do(speeds, (s) {
+			local speed := (s.Speed / maxSpeed)
+
+			counts[Min(21, Max(1, (speed + 1) * 10))] += 1
+		})
+
+		do(counts, (c) => (maxCount := Max(maxCount, c)))
+
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Count") . "');")
+
+		drawChartFunction .= "`ndata.addRows(["
+
+		loop 21 {
+			drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
+
+			if (A_Index < 21)
+				drawChartFunction .= ","
+		}
+
+		drawChartFunction .= "`n]);"
+
+		drawChartFunction .= ("`nvar options = { orientation: 'vertical', legend: { position: 'none' }, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '10%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate("Speed") . "', minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}} };")
+		drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart')); chart.draw(data, options); }"
 
 		before := "
 		(
@@ -2652,12 +2763,12 @@ class SuspensionInspector {
 			</head>
 		)"
 
-		before .= "`nfunction drawChart() {};"
+		before .= drawChartFunction
 
 		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 									 , {margin: margin})
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . "Hello World!" . "</body></html>")
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . "<div id=`"chart`" </div>" . "</body></html>")
 	}
 }
 

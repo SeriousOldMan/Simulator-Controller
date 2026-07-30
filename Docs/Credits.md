@@ -35,6 +35,8 @@ Also, a big thank you goes out to @Caleidosttk for providing his excellent NAS s
 
 And another contribution must be mentioned here: Maurice Bish (@bishman) has made a tool available on [GitHub](https://github.com/mauricebish/SimControllerCreator), which makes it really easy also for beginners to create the car meta data required by the "Setup Workbench" for cars of *Assetto Corsa*.
 
+Some icons used by Simulator Controller are licensed for free from [Icons8.com](https://icons8.com) and from [Icon-Icons.com](https://icon-icons.com).
+
 ### Supporters
 
 And last, but for sure not least, I want to thank all my supporters, who bought me a coffee, paid my Azure bills or otherwise helped in developing Simulator Controller.

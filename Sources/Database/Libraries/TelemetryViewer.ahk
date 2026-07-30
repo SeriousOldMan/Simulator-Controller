@@ -407,7 +407,7 @@ class TelemetryChart {
 			index += 1
 		}
 
-		axes .= " },`nhAxes: {gridlines: {count: 0}, ticks: []}, vAxes: { "
+		axes .= " },`nhAxes: { gridlines: { count: 0 }, ticks: []}, vAxes: { "
 
 		index := 0
 
@@ -421,7 +421,7 @@ class TelemetryChart {
 					if (index > 0)
 						axes .= ", "
 
-					axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', viewWindowMode: 'maximized', gridlines: {count: 0}, ticks: []")
+					axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', viewWindowMode: 'maximized', gridlines: { count: 0 }, ticks: []")
 
 					if (minValue != kUndefined) {
 						maxValue := theChannel.MaxValue
@@ -446,7 +446,7 @@ class TelemetryChart {
 				if (index > 0)
 					axes .= ", "
 
-				axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0}, viewWindowMode: 'maximized', ticks: []")
+				axes .= (index . ": { baselineColor: '" . this.Window.AltBackColor . "', gridlines: { count: 0 }, viewWindowMode: 'maximized', ticks: []")
 
 				if (minValue != kUndefined) {
 					maxValue := theChannel.MaxValue
@@ -2589,16 +2589,21 @@ class SuspensionInspector {
 
 		for ignore, viewer in ["FL", "FR", "RL", "RR"]
 			this.i%viewer%Histogram.Resized()
+
+		this.telemetryChanged()
 	}
 
 	telemetryChanged() {
 		local telemetry := this.Telemetry
 
-		static cycle := 1
+		this.Window.DisableRedraw()
 
-		do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(telemetry, wheel))
-
-		cycle += 1
+		try {
+			do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(telemetry, wheel))
+		}
+		finally {
+			this.Window.EnableRedraw()
+		}
 	}
 
 	computeSuspensionSpeeds(telemetry, wheel) {
@@ -2613,7 +2618,7 @@ class SuspensionInspector {
 			calculateSpeed(lastTime, lastDeflection, time, deflection) {
 				local dt := (time - lastTime)
 
-				return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) / dt) : 0), Delta: dt}
+				return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
 			}
 
 			loop deflections.Length
@@ -2690,16 +2695,6 @@ class SuspensionInspector {
 
 		speeds := this.computeSuspensionSpeeds(telemetry, wheel)
 
-		nCount := 0
-		pCount := 0
-
-		do(speeds, (s) {
-			if (s.Speed < 0)
-				nCount += 1
-			else
-				pCount += 1
-		})
-
 		loop 21
 			counts.Push(0)
 
@@ -2711,15 +2706,15 @@ class SuspensionInspector {
 		do(speeds, (s) {
 			local speed := (s.Speed / maxSpeed)
 
-			counts[Min(21, Max(1, (speed + 1) * 10))] += 1
+			counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
 		})
 
 		do(counts, (c) => (maxCount := Max(maxCount, c)))
 
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Count") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
 
 		drawChartFunction .= "`ndata.addRows(["
 
@@ -2732,8 +2727,8 @@ class SuspensionInspector {
 
 		drawChartFunction .= "`n]);"
 
-		drawChartFunction .= ("`nvar options = { orientation: 'vertical', legend: { position: 'none' }, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '10%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate("Speed") . "', minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}} };")
-		drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart')); chart.draw(data, options); }"
+		drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+		drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart')); chart.draw(data, options); }"
 
 		before := "
 		(

@@ -663,7 +663,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, vAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, legend: {textStyle: {color: '" . this.Window.Theme.TextColor . "'}} };"
+				drawChartFunction := drawChartFunction . "`nvar options = { bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '30%', bottom: '10%' }, hAxis: { gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}}, vAxis: { gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "' }} };"
 				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
 			else
@@ -793,7 +793,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			if hasData {
 				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0} }, vAxis: { viewWindow: {min: " . (minPosition - 1) . ", max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: { count: 0 } }, vAxis: { viewWindow: {min: " . (minPosition - 1) . ", max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, baselineColor: '" . this.Window.AltBackColor . "', gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}
@@ -1037,7 +1037,7 @@ class RaceReportViewer extends RaceReportReader {
 				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false, color: '" . this.Window.Theme.TextColor . "'}, ")
 			}
 
-			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#" . this.Window.AltBackColor . "', legend: {textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
+			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#" . this.Window.AltBackColor . "', legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "' } }, vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: { count: 0 } }, hAxis: {title: '" . translate("Laps") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Disabled"] . "'}, gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
@@ -1143,9 +1143,9 @@ class RaceReportViewer extends RaceReportReader {
 			(
 				legend: { textStyle: { color: '%textColor%'} },
 				hAxis: { title: '%cars%', titleTextStyle: { color: '%textColor%'},
-						 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} },
+						 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} },
 				vAxis: { title: '%seconds%', titleTextStyle: { color: '%textColor%'},
-						 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} },
+						 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} },
 				lineWidth: 0,
 				series: [ { 'color': '%backColor%' } ],
 				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -1262,9 +1262,9 @@ class RaceReportViewer extends RaceReportReader {
 			(
 				legend: { textStyle: { color: '%textColor%'} },
 				hAxis: { title: '%lap%', titleTextStyle: { color: '%textColor%'},
-						 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} },
+						 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} },
 				vAxis: { title: '%seconds%', titleTextStyle: { color: '%textColor%'},
-						 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} }
+						 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} }
 			};
 			)"
 

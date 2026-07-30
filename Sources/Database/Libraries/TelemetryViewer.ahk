@@ -563,6 +563,7 @@ class TelemetryViewer {
 	iSynchronize := false
 	iSynchronizeTask := false
 
+	iSuspensionInspector := false
 	iTrackMap := false
 
 	iData := CaseInsenseMap()
@@ -728,7 +729,7 @@ class TelemetryViewer {
 		Set {
 			this.iLap := value
 
-			this.updateTelemetryChart(true)
+			this.selectedLapChanged()
 
 			return value
 		}
@@ -774,6 +775,12 @@ class TelemetryViewer {
 	SynchronizeTask {
 		Get {
 			return this.iSynchronizeTask
+		}
+	}
+
+	SuspensionInspector {
+		Get {
+			return this.iSuspensionInspector
 		}
 	}
 
@@ -977,6 +984,10 @@ class TelemetryViewer {
 			this.openTrackMap()
 		}
 
+		openSuspensionInspector(*) {
+			this.openSuspensionInspector()
+		}
+
 		selectLayout(*) {
 			local configuration := readMultiMap(kUserConfigDirectory . "Telemetry.layouts")
 
@@ -1096,7 +1107,7 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton")
+		viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
 		setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
 
 		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Layout"))
@@ -1191,6 +1202,9 @@ class TelemetryViewer {
 		if this.TrackMap
 			this.closeTrackMap()
 
+		if this.SuspensionInspector
+			this.closeSuspensionInspector()
+
 		SectionInfoViewer.closeSectionInfo()
 
 		this.Window.Destroy()
@@ -1218,9 +1232,13 @@ class TelemetryViewer {
 
 				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
 			}
+
+			this.Control["suspensionButton"].Enabled := true
 		}
-		else
+		else {
 			this.Control["saveButton"].Enabled := false
+			this.Control["suspensionButton"].Enabled := true
+		}
 
 		if this.SelectedReferenceLap {
 			this.Control["leftShiftButton"].Enabled := true
@@ -1232,6 +1250,32 @@ class TelemetryViewer {
 		}
 
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
+	}
+
+	createTelemetry(lap) {
+		local driver, lapTime, sectorTimes, telemetry, index, section
+
+		if isNumber(lap)
+			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+		else {
+			driver := lap[2]
+			lapTime := ((lap[3] != "-") ? lap[3] : false)
+			sectorTimes := lap[4]
+		}
+
+		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+			sectorTimes := false
+
+		return TelemetryAnalyzer(this.Simulator
+							   , this.Track).createTelemetry(0, this.SelectedLap[true]
+														   , driver, lapTime, sectorTimes)
+	}
+
+	selectedLapChanged() {
+		this.updateTelemetryChart(true)
+
+		if this.SuspensionInspector
+			this.SuspensionInspector.telemetryChanged()
 	}
 
 	startupCollector(simulatorOrCollector, track?, trackLength?) {
@@ -1283,6 +1327,32 @@ class TelemetryViewer {
 		}
 		else
 			this.CollectingNotifier.hide()
+	}
+
+	openSuspensionInspector() {
+		local simulator, car, track
+
+		if this.SuspensionInspector
+			activateWindow(this.SuspensionInspector.Window)
+		else {
+			this.Manager.getSessionInformation(&simulator, &car, &track)
+
+			this.iSuspensionInspector := SuspensionInspector(this, simulator, car, track)
+
+			this.SuspensionInspector.show()
+		}
+	}
+
+	closeSuspensionInspector() {
+		if this.SuspensionInspector {
+			this.SuspensionInspector.close()
+
+			this.iSuspensionInspector := false
+		}
+	}
+
+	closedSuspensionInspector() {
+		this.iSuspensionInspector := false
 	}
 
 	openTrackMap() {
@@ -1366,6 +1436,8 @@ class TelemetryViewer {
 			deleteFile(A_LoopFileFullPath)
 
 		this.loadTelemetry()
+
+		this.updateState()
 	}
 
 	loadData(fileName) {
@@ -1696,6 +1768,8 @@ class TelemetryViewer {
 
 		if (selectedReferenceLap && (inList(this.Laps, selectedReferenceLap) || inList(this.ImportedLaps, selectedReferenceLap)))
 			this.selectReferenceLap(selectedReferenceLap, true)
+
+		this.updateState()
 	}
 
 	selectLap(lap, force := false) {
@@ -2341,6 +2415,247 @@ class SectionInfoViewer {
 																			   , backColor: this.Window.AltBackColor})
 												, "\%", "%"))
 		this.InfoViewer.document.close()
+	}
+}
+
+class SuspensionInspector {
+	iTelemetryViewer := false
+
+	iWindow := false
+
+	iSimulator := false
+	iCar := false
+	iTrack := false
+
+	iFLHistogram := false
+	iFRHistogram := false
+	iRLHistogram := false
+	iRRHistogram := false
+
+	class InspectorWindow extends Window {
+		iInspector := false
+
+		__New(inspector, arguments*) {
+			this.iInspector := inspector
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			if !this.iInspector.TelemetryViewer
+				return true
+			else
+				this.iInspector.close()
+		}
+	}
+
+	class InspectorResizer extends Window.Resizer {
+		iInspector := false
+		iRedraw := false
+
+		__New(inspector, arguments*) {
+			this.iInspector := inspector
+
+			super.__New(inspector.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawInspector"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawInspector() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iInspector.windowResized()
+
+				WinRedraw(this.iInspector.Window)
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	TelemetryViewer {
+		Get {
+			return this.iTelemetryViewer
+		}
+	}
+
+	Car {
+		Get {
+			return this.iCar
+		}
+	}
+
+	Track {
+		Get {
+			return this.iTrack
+		}
+	}
+
+	Telemetry {
+		Get {
+			local telemetry := this.TelemetryViewer.SelectedLap[true]
+
+			return (telemetry ? this.TelemetryViewer.createTelemetry(telemetry) : false)
+		}
+	}
+
+	__New(telemetryViewer, simulator, car, track) {
+		this.iTelemetryViewer := telemetryViewer
+
+		this.iSimulator := simulator
+		this.iCar := car
+		this.iTrack := track
+	}
+
+	createGui() {
+		local inspectorGui
+
+		initializeViewer() {
+			local ignore, viewer
+
+			for ignore, viewer in ["FL", "FR", "RL", "RR"] {
+				viewer := this.i%viewer%Histogram
+
+				viewer.document.open()
+				viewer.document.write("<center>Data</center>")
+				viewer.document.close()
+			}
+		}
+
+		inspectorGui := SuspensionInspector.InspectorWindow(this, {Descriptor: "Telemetry Browser.Suspension Inspector"
+																 , Closeable: (this.TelemetryViewer != false)
+																 , Resizeable:  "Deferred", Scrollable: false})
+
+		this.iWindow := inspectorGui
+
+		this.iFLHistogram := inspectorGui.Add("HTMLViewer", "x16 y16 w240 h240 W:Grow(0.5) H:Grow(0.5) Border")
+		this.iFRHistogram := inspectorGui.Add("HTMLViewer", "x260 yp w240 h240 X:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
+		this.iRLHistogram := inspectorGui.Add("HTMLViewer", "x16 y260 w240 h240 Y:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
+		this.iRRHistogram := inspectorGui.Add("HTMLViewer", "x260 yp w240 h240 X:Move(0.5) Y:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
+
+		initializeViewer()
+
+		inspectorGui.Add(SuspensionInspector.InspectorResizer(this))
+	}
+
+	show() {
+		local x, y, w, h
+
+		this.createGui()
+
+		if getWindowPosition("Telemetry Browser.Suspension Inspector", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Telemetry Browser.Suspension Inspector", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+
+		this.telemetryChanged()
+	}
+
+	close() {
+		this.Window.Destroy()
+
+		this.TelemetryViewer.closedSuspensionInspector()
+	}
+
+	windowResized() {
+		local ignore, viewer
+
+		for ignore, viewer in ["FL", "FR", "RL", "RR"]
+			this.i%viewer%Histogram.Resized()
+	}
+
+	telemetryChanged() {
+		static cycle := 1
+
+		do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(wheel, this.Telemetry))
+
+		cycle += 1
+	}
+
+	showSuspensionHistogram(wheel, telemetry) {
+		local chartArea
+
+		switch wheel, false {
+			case "FrontLeft":
+				chartArea := "FL"
+			case "FrontRight":
+				chartArea := "FR"
+			case "RearLeft":
+				chartArea := "RL"
+			case "RearRight":
+				chartArea := "RR"
+		}
+
+		chartArea := this.i%wheel%Histogram
+
+		if chartArea {
+			chartArea.document.open()
+			chartArea.document.write(this.createSuspensionHistogram(telemetry))
+			chartArea.document.close()
+		}
+	}
+
+	computeSuspensionSpeed(telemetry, delta) {
+		return []
+	}
+
+	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
+		local before, after
+
+		before := "
+		(
+			<meta charset='utf-8'>
+			<head>
+				<style>
+					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+				</style>
+				%chartScript%
+				<script type="text/javascript">
+					%chartLoad%
+		)"
+
+		before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																					 , "corechart", "table", "scatter")
+											 , fontColor: this.Window.Theme.TextColor
+											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
+		after := "
+		(
+				</script>
+			</head>
+		)"
+
+		before .= "`nfunction drawChart() {};"
+
+		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
+									 , {margin: margin})
+
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . "Hello World!" . "</body></html>")
 	}
 }
 

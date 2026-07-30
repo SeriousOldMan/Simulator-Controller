@@ -56,6 +56,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The builtin telemetry viewer now offers five additional channels: Yaw rate and suspension deflection seperately for each wheel. Please note that *Automobilista 2* does not provide deflection, but remaining travel in the data. Therefore, this value is used with a reversed sign and will typically show negative values in the graphs. For all other simulators, deflection will show as positive values.
   - The [offline issue analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files), which uses telemetry files, can also detect suspension issues with all files generated with this release or later. However, because the sampling frequency for telemetry data is somewhat lower than that used by the live issue analyzer, some or even all bottom out events may be missed by the detection method.
   - The synchronization of the session database can now detect corrupt or invalid data objects and will skip them automatically.
+  - New tracks of *Le Mans Ultimate* are included.
 
 # Release history
 

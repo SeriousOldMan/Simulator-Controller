@@ -65,6 +65,8 @@ Let's start withe first tab "Handling":
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
+Good to know: Handling issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the frequency of the reported issues may be slightly different.
+
 ##### Suspension
 
 The second tab "Suspension" let you tweak the bottom out detection for the specific car and track.
@@ -81,7 +83,15 @@ In general, it is not possible to detect a bootom out event directly with the da
 
 In the upper group of fields, you can specifiy the acceleration thresholds for the different severity levels of a bottom out event. But only events with the specified minimum length will be considered and all events that are closer together than the specified gap will be combined into one event.
 
-The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a great influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
+When preparing settings for a given simulator always start with the severity thresholds. The derived acceleration is very sensitive to timing and therefore depends on the data sample rate of the simulator. Especially *iRacing* has a low data rate compared to the other simulators and therefore may need much lower settings for the thresholds.
+
+The settings in the lower group can be used to fine-tune the detection. Especially the *Deflection* and *Acceleration* windows can have a big influence. Smaller values will increase the sensitivity of the detection, but will also increease the possibility for false positives - and the other way around. However, changing these values ​​is usually unnecessary and should therefore really be the very last approach.
+
+Suspension analysis may not be available for all simulators, depending on the data and the resolution supplied by the API. At the time of this writing, *Project Motor Racing* is definitely not supported.
+
+As you can see, it can need some time to find good settings for a given car. The track does not play a role here and also the suspension settings in the setup do not play a role, cause the detection is based on acceleration and not on absolute suspension travel. So you can reuse the settings (as well as all other settings of the issue analyzer), once you have dialed them in.
+
+Good to know: Suspension issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the severity and frequency of the detected issues may be slightly different compared to a real-time analysis.
 
 ##### Temperatures
 
@@ -91,7 +101,13 @@ On the third tab "Temperatures" you can specify several thresholds for tyre, bra
 
 The *Ideal* temperatures are the values you want to target in average over the course of a complete lap. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
-Good to know: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator. Also, all values you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer. Last but not least, if you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far.
+Good to know: Temperature analysis is not available, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files).
+
+##### Running the issue analyzer
+
+It is recommended to choose a car before entering the analyzer mode, since then some of the settings for the issue analyzer will be initialized with car specific data, depending on the chosen simulator. Also, all settings you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer.
+
+Good to know: If you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far. You can even use the issue analyzer for "All" cars and the selected settings will be used as defaults as well. This may or may not be useful. You have been warned.
 
 Once you have dialed your settings, you can click on "Start".
 
@@ -111,7 +127,7 @@ Please be aware that not every handling issue is related to problems with the ca
 
 Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the handling part of the analyzer.
 
-#### Analyzing handling issues based on saved lep telemetry files
+#### Analyzing handling issues based on saved lap telemetry files
 
 Instead of analyzing telemetry data live while on the track, you can also analyze data from a recent session as long as the telemetry files are still available, because they either have been saved to the session database or they are still available in the *Simulator Controller\Temp\Sessions* folder in your user *Documents* folder, if you have used the "Solo Center" or the "Team Center". When recording the telemetry with the "Setup Workbench" itself, telemetry data will have been stored in *Simulator Controller\Temp\Setup Workbench\Telemetry* folder in your user *Documents* folder. To analyze telemetry data, click on "Telemetry..." on the first page instead of clicking on "Start". Then locate and load the telemetry file(s) you want to use using the file browser and inspect the detected issues, which will have been generated based on the telemetry data.
 

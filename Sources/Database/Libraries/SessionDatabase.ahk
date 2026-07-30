@@ -1997,7 +1997,8 @@ class SessionDatabase extends ConfigurationItem {
 
 			static csvChannels := ["DISTANCE", "THROTTLE", "BRAKE"
 								 , "STEERANGLE", "GEAR", "RPM", "SPEED"
-								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME", "YAWRATE"]
+								 , "TC", "ABS", "G_LON", "G_LAT", "POS_X", "POS_Y", "TIME", "YAWRATE"
+								 , "SUSPDEFL_FL", "SUSPDEFL_FR", "SUSPDEFL_RL", "SUSPDEFL_RR"]
 
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
@@ -2827,7 +2828,10 @@ class SessionDatabase extends ConfigurationItem {
 		file := FileOpen(fileName, "w")
 
 		if file {
-			file.RawWrite(setup, size)
+			if isInstance(setup, Buffer)
+				file.RawWrite(setup, size)
+			else if isInstance(setup, String)
+				file.Write(setup)
 
 			file.Close()
 
@@ -3633,6 +3637,9 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
+				if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
+					continue
+
 				car := document["Car"]
 				track := document["Track"]
 
@@ -3752,6 +3759,10 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
+
+				if (!getMultiMapValue(info, "Setup", "Synchronized", false)
+				 || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
+					continue
 
 				car := document["Car"]
 				track := document["Track"]
@@ -3876,6 +3887,9 @@ synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, last
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
+					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
+						continue
+
 					car := document["Car"]
 					track := document["Track"]
 
@@ -3985,6 +3999,9 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
 					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
+
+					if (!getMultiMapValue(info, "Setup", "Synchronized", false) || (getMultiMapValue(info, "Setup", "Identifier", false) != identifier))
+						continue
 
 					car := document["Car"]
 					track := document["Track"]

@@ -1584,7 +1584,7 @@ void collectCarTelemetry() {
 
 					// latG *= -1;
 
-					if (driverRunning > lastRunning) {
+					if (driverRunning >= lastRunning) {
 						telemetryFile << (driverRunning * trackLength) << ";"
 							<< (pf->gas >= 0 ? pf->gas : 0) << ";"
 							<< (pf->brake >= 0 ? pf->brake : 0) << ";"
@@ -1597,7 +1597,11 @@ void collectCarTelemetry() {
 							<< longG << ";" << latG << ";"
 							<< gf->car_coordinates[carID][0] << ";" << gf->car_coordinates[carID][2] << ";"
 							<< gf->timing_state.current_laptime << ";"
-							<< pf->localAngularVel[1] << endl;
+							<< pf->localAngularVel[1] << ";"
+							<< pf->suspensionTravel[0] << ";"
+							<< pf->suspensionTravel[1] << ";"
+							<< pf->suspensionTravel[2] << ";"
+							<< pf->suspensionTravel[3] << endl;
 
 						if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
@@ -1617,7 +1621,11 @@ void collectCarTelemetry() {
 									<< longG << ";" << latG << ";"
 									<< gf->car_coordinates[carID][0] << ";" << gf->car_coordinates[carID][2] << ";"
 									<< gf->timing_state.current_laptime << ";"
-									<< pf->localAngularVel[1] << endl;
+									<< pf->localAngularVel[1] << ";"
+									<< pf->suspensionTravel[0] << ";"
+									<< pf->suspensionTravel[1] << ";"
+									<< pf->suspensionTravel[2] << ";"
+									<< pf->suspensionTravel[3] << endl;
 
 								file.close();
 							}

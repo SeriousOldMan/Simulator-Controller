@@ -1166,7 +1166,8 @@ namespace ACSHMSpotter {
         StreamWriter telemetryFile = null;
         int startTelemetryLap = -1;
 		int telemetryLap = -1;
-		float lastRunning = -1;
+        float lastRunning = -1;
+        float lastTime = -1;
 
         void collectCarTelemetry()
         {
@@ -1202,7 +1203,8 @@ namespace ACSHMSpotter {
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
 
-					lastRunning = -1;
+                    lastRunning = -1;
+                    lastTime = -1;
                 }
 
                 double velocityX = physics.LocalVelocity[0];
@@ -1229,7 +1231,7 @@ namespace ACSHMSpotter {
 
 					float running = Math.Max(0, Math.Min(1, driver.splinePosition)) * staticInfo.TrackSPlineLength;
 
-					if (running > lastRunning)
+					if ((running >= lastRunning) && (graphics.iCurrentTime >= lastTime))
 					{
 						telemetryFile.Write(running + ";");
 						telemetryFile.Write(physics.Gas + ";");
@@ -1249,9 +1251,14 @@ namespace ACSHMSpotter {
 						
                         telemetryFile.Write(graphics.iCurrentTime + ";");
 						
-						telemetryFile.WriteLine(physics.LocalAngularVelocity[1]);
+						telemetryFile.Write(physics.LocalAngularVelocity[1] + ";");
 
-						if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
+                        telemetryFile.Write(physics.SuspensionTravel[1] + ";");
+                        telemetryFile.Write(physics.SuspensionTravel[0] + ";");
+                        telemetryFile.Write(physics.SuspensionTravel[2] + ";");
+                        telemetryFile.WriteLine(physics.SuspensionTravel[3]);
+
+                        if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
 							try {
 								StreamWriter file = new StreamWriter(telemetryDirectory + "\\Telemetry.section", true);
 
@@ -1272,14 +1279,20 @@ namespace ACSHMSpotter {
 								file.Write(cars.cars[carID].worldPosition.z + ";");
 								
 								file.Write(graphics.iCurrentTime + ";");
-						
-								file.WriteLine(physics.LocalAngularVelocity[1]);
 
-								file.Close();
+                                file.Write(physics.LocalAngularVelocity[1] + ";");
+
+                                file.Write(physics.SuspensionTravel[0] + ";");
+                                file.Write(physics.SuspensionTravel[1] + ";");
+                                file.Write(physics.SuspensionTravel[2] + ";");
+                                file.WriteLine(physics.SuspensionTravel[3]);
+
+                                file.Close();
                             }
                             catch (Exception) { }
 
                         lastRunning = running;
+						lastTime = graphics.iCurrentTime;
                     }
                 }
             }

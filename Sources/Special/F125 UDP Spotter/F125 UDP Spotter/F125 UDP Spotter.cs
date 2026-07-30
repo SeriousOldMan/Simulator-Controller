@@ -1143,6 +1143,7 @@ namespace F125UDPSpotter {
         int telemetryLap = -1;
         DateTime startTime;
         double lastRunning = -1;
+        double lastTime = -1;
 
         void collectCarTelemetry()
         {
@@ -1192,13 +1193,18 @@ namespace F125UDPSpotter {
 					startTime = DateTime.Now;
 
                     telemetryFile = new StreamWriter(telemetryDirectory + "\\Lap " + telemetryLap + ".tmp", false);
-					
-					lastRunning = -1;
+
+                    lastRunning = -1;
+                    lastTime = -1;
                 }
 
-				if (running > lastRunning)
+                TimeSpan difference = DateTime.Now.Subtract(startTime);
+                double currentTime = (difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+
+                if ((running >= lastRunning) && (currentTime >= lastTime))
                 {
                     lastRunning = running;
+					lastTime = currentTime;
 					
 					float throttle = 0, brake = 0, steer = 0;
 					int gear = 0, rpm = 0;
@@ -1228,11 +1234,14 @@ namespace F125UDPSpotter {
 					telemetryFile.Write(playerMotion.WorldPositionX + ";");
 					telemetryFile.Write(playerMotion.WorldPositionZ + ";");
 
-					TimeSpan difference = DateTime.Now.Subtract(startTime);
+					telemetryFile.Write(currentTime + ";");
 
-                    telemetryFile.Write((difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds) + ";");
-					
-					telemetryFile.WriteLine(motionEx.AngularVelocityY);
+                    telemetryFile.Write(motionEx.AngularVelocityY + ";");
+
+                    telemetryFile.Write(motionEx.SuspensionPosition[2] * 0.00025 + ";");
+                    telemetryFile.Write(motionEx.SuspensionPosition[3] * 0.00025 + ";");
+                    telemetryFile.Write(motionEx.SuspensionPosition[0] * 0.00025 + ";");
+                    telemetryFile.WriteLine(motionEx.SuspensionPosition[1] * 0.00025);
 
                     if (System.IO.File.Exists(telemetryDirectory + "\\Telemetry.cmd"))
                         try
@@ -1256,9 +1265,14 @@ namespace F125UDPSpotter {
                             file.Write(playerMotion.WorldPositionX + ";");
                             file.Write(playerMotion.WorldPositionZ + ";");
 
-                            file.Write(playerLap.CurrentLapTimeInMS + ";");
+                            file.Write(currentTime + ";");
 					
-							file.WriteLine(motionEx.AngularVelocityY);
+							file.Write(motionEx.AngularVelocityY + ";");
+
+                            file.Write(motionEx.SuspensionPosition[2] * 0.00025 + ";");
+                            file.Write(motionEx.SuspensionPosition[3] * 0.00025 + ";");
+                            file.Write(motionEx.SuspensionPosition[0] * 0.00025 + ";");
+                            file.WriteLine(motionEx.SuspensionPosition[1] * 0.00025);
 
                             file.Close();
                         }

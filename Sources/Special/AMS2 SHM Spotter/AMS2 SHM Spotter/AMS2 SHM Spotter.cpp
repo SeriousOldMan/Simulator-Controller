@@ -1013,6 +1013,7 @@ std::ofstream telemetryFile;
 int startTelemetryLap = -1;
 int telemetryLap = -1;
 double lastRunning = -1;
+double lastTime = -1;
 
 void collectCarTelemetry(const SharedMemory* sharedData) {
 	ParticipantInfo vehicle = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex];
@@ -1036,11 +1037,12 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 			telemetryLap = (vehicle.mLapsCompleted + 1);
 
 			telemetryFile.open(telemetryDirectory + "\\Lap " + std::to_string(telemetryLap) + ".tmp", std::ios::out | std::ios::trunc);
-			
+
 			lastRunning = -1;
+			lastTime = -1;
 		}
 
-		if (vehicle.mCurrentLapDistance > lastRunning) {
+		if ((vehicle.mCurrentLapDistance >= lastRunning) && (sharedData->mCurrentTime >= lastTime)) {
 			telemetryFile << vehicle.mCurrentLapDistance << ";"
 						  << sharedData->mThrottle << ";"
 						  << sharedData->mBrake << ";"
@@ -1055,7 +1057,11 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						  << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
 						  << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
 						  << round(sharedData->mCurrentTime * 1000) << ";"
-						  << sharedData->mAngularVelocity[VEC_Y] << std::endl;
+						  << sharedData->mAngularVelocity[VEC_Y] << ";"
+						  << - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] << ";"
+						  << - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] << ";"
+						  << - sharedData->mSuspensionTravel[TYRE_REAR_LEFT] << ";"
+						  << - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1077,13 +1083,18 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						 << sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_X] << ";"
 						 << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
 						 << round(sharedData->mCurrentTime * 1000) << ";"
-						 << sharedData->mAngularVelocity[VEC_Y] << std::endl;
+						 << sharedData->mAngularVelocity[VEC_Y] << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] * 1000 << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] * 1000 << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_REAR_LEFT] * 1000 << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] * 1000 << std::endl;
 
 					file.close();
 				}
 				catch (...) {}
 
 			lastRunning = vehicle.mCurrentLapDistance;
+			lastTime = sharedData->mCurrentTime;
 		}
 	}
 	catch (...) {

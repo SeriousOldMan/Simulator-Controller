@@ -601,7 +601,7 @@ class BasicStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
-		if !this.SetupWizard.Initialize
+		; if !this.SetupWizard.Initialize
 			page := 2
 
 		return super.hidePage(page)

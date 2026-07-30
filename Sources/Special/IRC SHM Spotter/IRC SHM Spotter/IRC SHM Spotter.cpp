@@ -1407,6 +1407,7 @@ int startTelemetryLap = -1;
 int telemetryLap = -1;
 double startTime = 0;
 double lastTelemetryRunning = -1;
+double lastTelemetryTime = -1;
 
 void collectCarTelemetry(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength) {
 	char buffer[60] = "";
@@ -1440,8 +1441,9 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			sprintf_s(buffer, "%d", telemetryLap);
 
 			telemetryFile.open(telemetryDirectory + "\\Lap " + buffer + ".tmp", std::ios::out | std::ios::trunc);
-			
+
 			lastTelemetryRunning = -1;
+			lastTelemetryTime = -1;
 		}
 
 		char* trackPositions;
@@ -1462,7 +1464,10 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 		if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
 			playerRunning = ((float*)trackPositions)[playerCarIndex];
 
-		if (playerRunning > lastTelemetryRunning) {
+		if (getRawDataValue(rawValue, header, data, "SessionTime"))
+			time = (long)round(((*(double*)rawValue) - startTime) * 1000);
+
+		if ((playerRunning >= lastTelemetryRunning) && (time >= lastTelemetryTime)) {
 			if (getRawDataValue(rawValue, header, data, "Speed"))
 				speed = *((float*)rawValue) * 3.6;
 
@@ -1491,9 +1496,6 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			if (getRawDataValue(rawValue, header, data, "LatAccel"))
 				latG = (*(float*)rawValue) / 9.807;
 			
-			if (getRawDataValue(rawValue, header, data, "SessionTime"))
-				time = (long)round(((*(double*)rawValue) - startTime) * 1000);
-			
 			telemetryFile << (playerRunning * trackLength) << ";"
 				<< throttle << ";"
 				<< brake << ";"
@@ -1512,7 +1514,27 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 
 			getRawDataValue(rawValue, header, data, "YawRate");
 
-			telemetryFile << *((float*)rawValue) << std::endl;
+			telemetryFile << *((float*)rawValue) << ";";
+
+			float lfDeflection = 0;
+			float rfDeflection = 0;
+			float lrDeflection = 0;
+			float rrDeflection = 0;
+
+			if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
+				lfDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
+				rfDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
+				lrDeflection = *((float*)rawValue) * 1000;
+
+			if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
+				rrDeflection = *((float*)rawValue) * 1000;
+
+			telemetryFile << lfDeflection << ";" << rfDeflection << ";"
+						  << lrDeflection << ";" << rrDeflection << std::endl;
 
 			if (fileExists(telemetryDirectory + "\\Telemetry.cmd"))
 				try {
@@ -1538,13 +1560,34 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 
 					getRawDataValue(rawValue, header, data, "YawRate");
 
-					file << *((float*)rawValue) << std::endl;
-	
+					file << *((float*)rawValue) << ";";
+
+					float lfDeflection = 0;
+					float rfDeflection = 0;
+					float lrDeflection = 0;
+					float rrDeflection = 0;
+
+					if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
+						lfDeflection = *((float*)rawValue);
+
+					if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
+						rfDeflection = *((float*)rawValue);
+
+					if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
+						lrDeflection = *((float*)rawValue);
+
+					if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
+						rrDeflection = *((float*)rawValue);
+
+					file << lfDeflection << ";" << rfDeflection << ";"
+						 << lrDeflection << ";" << rrDeflection << std::endl;
+
 					file.close();
 				}
 				catch (...) {}
 
 			lastTelemetryRunning = playerRunning;
+			lastTelemetryTime = time;
 		}
 	}
 	catch (...) {

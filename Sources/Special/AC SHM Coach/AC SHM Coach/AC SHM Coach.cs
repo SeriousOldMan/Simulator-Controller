@@ -471,6 +471,7 @@ namespace ACSHMCoach {
         static int lightBottomOutThreshold = 5;
 		static int mediumBottomOutThreshold = 10;
 		static int heavyBottomOutThreshold = 15;
+        float releaseThreshold = 0.2f;
 		int bottomOutDuration = 30;
 		int bottomOutGap = 100;
 		int samplerMinSamples = 2;
@@ -657,9 +658,9 @@ namespace ACSHMCoach {
 
         IEnumerable<SuspensionBottomOuts> createSuspensionIssues()
         {
-            List<double> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
+            List<(double, double)> CalculateAccelerations(List<(long TimeMS, double Deflection)> deflections)
             {
-                List<double> accelerations = new List<double>();
+                List<(double, double)> accelerations = new List<(double, double)>();
                 MovingAverage Acceleration = new MovingAverage(accelerationMovingAverage);
 
                 double CalculateAcceleration(long lastTime, double lastDeflection,
@@ -679,12 +680,13 @@ namespace ACSHMCoach {
                 }
 
                 for (int i = 1; i < deflections.Count - 1; i++)
-                    accelerations.Add(Acceleration.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
-                                                                             deflections[i - 1].Deflection,
-                                                                             deflections[i].TimeMS,
-                                                                             deflections[i].Deflection,
-                                                                             deflections[i + 1].TimeMS,
-                                                                             deflections[i + 1].Deflection)));
+                    accelerations.Add((Acceleration.Add(CalculateAcceleration(deflections[i - 1].TimeMS,
+                                                                              deflections[i - 1].Deflection,
+                                                                              deflections[i].TimeMS,
+                                                                              deflections[i].Deflection,
+                                                                              deflections[i + 1].TimeMS,
+                                                                              deflections[i + 1].Deflection)),
+                                       deflections[i].Deflection));
 
                 try
                 {
@@ -694,7 +696,7 @@ namespace ACSHMCoach {
 
                 try
                 {
-                    accelerations.Insert(0, accelerations[accelerations.Count - 1]);
+                    accelerations.Insert(0, accelerations[0]);
                 }
                 catch { }
 
@@ -713,13 +715,15 @@ namespace ACSHMCoach {
                 return smoothedDeflections;
             }
 
-            List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<double> leftAccelerations,
-                                                                     List<double> rightAccelerations)
+            List<SuspensionBottomOuts> CreateBottomOuts(string axle, List<(double, double)> leftAccelerations,
+                                                                     List<(double, double)> rightAccelerations)
             {
                 var events = new List<SuspensionBottomOuts>();
 
                 // Use magnitude (absolute value) of acceleration for detection
                 var combinedAccel = new double[leftAccelerations.Count];
+                var leftDeflection = new double[leftAccelerations.Count];
+                var rightDeflection = new double[rightAccelerations.Count];
                 var leftAboveThreshold = new bool[leftAccelerations.Count];
                 var rightAboveThreshold = new bool[rightAccelerations.Count];
 
@@ -799,8 +803,11 @@ namespace ACSHMCoach {
 
                 for (int i = 0; i < leftAccelerations.Count; i++)
                 {
-                    double leftMagnitude = leftAccelerations[i];
-                    double rightMagnitude = rightAccelerations[i];
+                    double leftMagnitude = leftAccelerations[i].Item1;
+                    double rightMagnitude = rightAccelerations[i].Item1;
+
+                    leftDeflection[i] = leftAccelerations[i].Item2;
+                    rightDeflection[i] = rightAccelerations[i].Item2;
 
                     if (leftMagnitude < 0 && rightMagnitude < 0)
                     {
@@ -817,11 +824,15 @@ namespace ACSHMCoach {
 
                 bool inEvent = false;
                 int eventStartIndex = 0;
+                double leftStartDeflection = 0;
+                double rightStartDeflection = 0;
                 double peakAccelInEvent = 0;
                 var accelValuesInEvent = new List<double>();
 
                 for (int i = 0; i < combinedAccel.Length; i++)
-                    if (leftAboveThreshold[i] || rightAboveThreshold[i])
+                    if (leftAboveThreshold[i] || rightAboveThreshold[i] ||
+                        (inEvent && (Math.Abs(leftDeflection[i] - leftStartDeflection) < releaseThreshold ||
+                                     Math.Abs(rightDeflection[i] - rightStartDeflection) < releaseThreshold)))
                     {
                         if (!inEvent)
                         {
@@ -829,6 +840,8 @@ namespace ACSHMCoach {
                             inEvent = true;
                             eventStartIndex = i;
                             peakAccelInEvent = 0f;
+                            leftStartDeflection = leftDeflection[i];
+                            rightStartDeflection = rightDeflection[i];
                             accelValuesInEvent.Clear();
                         }
 
@@ -889,10 +902,10 @@ namespace ACSHMCoach {
                 return MergeCloseEvents(events);
             }
 
-            List<double> frontLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontLeft));
-            List<double> frontRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontRight));
-            List<double> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearLeft));
-            List<double> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearRight));
+            List<(double, double)> frontLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontLeft));
+            List<(double, double)> frontRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.FrontRight));
+            List<(double, double)> rearLeftAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearLeft));
+            List<(double, double)> rearRightAccels = CalculateAccelerations(ExtractDeflections(suspensionDeflectionsList, d => d.RearRight));
 
             if (false)
             {
@@ -907,8 +920,8 @@ namespace ACSHMCoach {
                 output = new StreamWriter(dataFile + ".accelerations", false);
 
                 for (int i = 0; i < frontLeftAccels.Count; i++)
-                    output.WriteLine(frontLeftAccels[i] + "," + frontRightAccels[i] + "," +
-                                     rearLeftAccels[i] + "," + rearRightAccels[i]);
+                    output.WriteLine(frontLeftAccels[i].Item1 + "," + frontRightAccels[i].Item1 + "," +
+                                     rearLeftAccels[i].Item1 + "," + rearRightAccels[i].Item1);
 
                 output.Close();
             }
@@ -1449,26 +1462,27 @@ namespace ACSHMCoach {
                 lightBottomOutThreshold = int.Parse(args[13]);
 				mediumBottomOutThreshold = int.Parse(args[14]);
 				heavyBottomOutThreshold = int.Parse(args[15]);
-				bottomOutDuration = int.Parse(args[16]);
-				bottomOutGap = int.Parse(args[17]);
-				samplerMinSamples = int.Parse(args[18]);
-				deflectionMovingAverage = int.Parse(args[19]);
-				accelerationMovingAverage = int.Parse(args[20]);
+                releaseThreshold = float.Parse(args[16]);
+				bottomOutDuration = int.Parse(args[17]);
+				bottomOutGap = int.Parse(args[18]);
+				samplerMinSamples = int.Parse(args[19]);
+				deflectionMovingAverage = int.Parse(args[20]);
+				accelerationMovingAverage = int.Parse(args[21]);
 				
-                if (args.Length > 21) {
-                    soundsDirectory = args[21];
-
-                    if (args.Length > 22)
-                        audioDevice = args[22];
+                if (args.Length > 22) {
+                    soundsDirectory = args[22];
 
                     if (args.Length > 23)
-                        volume = float.Parse(args[23]);
+                        audioDevice = args[23];
 
                     if (args.Length > 24)
-                        player = args[24];
+                        volume = float.Parse(args[24]);
 
                     if (args.Length > 25)
-                        workingDirectory = args[25];
+                        player = args[25];
+
+                    if (args.Length > 26)
+                        workingDirectory = args[26];
                 }
             }
         }

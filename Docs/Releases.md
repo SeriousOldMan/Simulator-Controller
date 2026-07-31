@@ -29,13 +29,13 @@
   - The synchronization of the session database can now detect corrupt or invalid data objects and will skip them automatically.
   - New tracks of *Le Mans Ultimate* are included.
 
-## 7.1.3.0
-
 # Upcoming release
 
 Not yet planned...
 
 # Release history
+
+## 7.1.3.0
 
 #### Date: 07/24/26
 

@@ -121,8 +121,8 @@ class TelemetryChart {
 
 	createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false
 					   , distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
-		local key := (lapFileNae . referenceLapFileName . values2String(".", distanceCorrection, margin
-																		   , hScale, wScale))
+		local key := (lapFileName . referenceLapFileName . values2String(".", distanceCorrection, margin
+																		    , hScale, wScale))
 		local channelCount := choose(channels, (c) => (c != "|")).Length
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
@@ -146,12 +146,18 @@ class TelemetryChart {
 
 		if this.ChartArea {
 			if drawerCache.Has(key) {
+				if isDebug()
+					logMessage(kLogDebug, "Cache hit in TelemetryViewer.createTelemetryChart...")
+
 				chartFunctions := drawerCache[key]
 
 				chartAreas := chartFunctions[2]
 				chartFunctions := chartFunctions[1]
 			}
 			else {
+				if isDebug()
+					logMessage(kLogDebug, "Cache miss in TelemetryViewer.createTelemetryChart...")
+
 				if lapFileName
 					lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
 
@@ -1292,8 +1298,14 @@ class TelemetryViewer {
 		if !fileName
 			return false
 
-		if this.iTelemetryCache.Has(fileName)
-			return this.iTelemetryCache[fileName]
+		if this.TelemetryCache.Has(fileName) {
+			if isDebug()
+				logMessage(kLogDebug, "Cache hit in TelemetryViewer.createTelemetry...")
+
+			return this.TelemetryCache[fileName]
+		}
+		else if isDebug()
+			logMessage(kLogDebug, "Cache miss in TelemetryViewer.createTelemetryChart...")
 
 		if isNumber(lap)
 			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
@@ -1309,7 +1321,7 @@ class TelemetryViewer {
 		telemetry := TelemetryAnalyzer(simulator, track).createTelemetry(0, fileName
 																		  , driver, lapTime, sectorTimes)
 
-		this.iTelemetryCache[fileName] := telemetry
+		this.TelemetryCache[fileName] := telemetry
 
 		return telemetry
 	}
@@ -1905,12 +1917,19 @@ class TelemetryViewer {
 			if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 				sectorTimes := false
 
-			if this.iTelemetryCache.Has(this.SelectedLap[true])
-				telemetry := this.iTelemetryCache[fileName]
+			if this.TelemetryCache.Has(this.SelectedLap[true]) {
+				if isDebug()
+					logMessage(kLogDebug, "Cache hit in TelemetryViewer.showSectionInfo...")
+
+				telemetry := this.TelemetryCache[fileName]
+			}
 			else {
+				if isDebug()
+					logMessage(kLogDebug, "Cache miss in TelemetryViewer.showSectionInfo...")
+
 				telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
 
-				this.iTelemetryCache[fileName] := telemetry
+				this.TelemetryCache[fileName] := telemetry
 			}
 
 			if (analyzer.TrackSections.Length = 0) {
@@ -1920,7 +1939,7 @@ class TelemetryViewer {
 
 						telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
 
-						this.iTelemetryCache[fileName] := telemetry
+						this.TelemetryCache[fileName] := telemetry
 					})
 				})
 			}
@@ -1941,12 +1960,12 @@ class TelemetryViewer {
 
 				fileName := this.SelectedReferenceLap[true]
 
-				if this.iTelemetryCache.Has(this.SelectedLap[true])
-					referenceTelemetry := this.iTelemetryCache[fileName]
+				if this.TelemetryCache.Has(this.SelectedLap[true])
+					referenceTelemetry := this.TelemetryCache[fileName]
 				else {
 					referenceTelemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
 
-					this.iTelemetryCache[fileName] := referenceTelemetry
+					this.TelemetryCache[fileName] := referenceTelemetry
 				}
 			}
 
@@ -2710,56 +2729,72 @@ class SuspensionInspector {
 	}
 
 	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
+		local key := (ObjPtr(telemetry) . (referenceTelemetry ? ObjPtr(referenceTelemetry) : false) . margin)
 		local drawChartFunctions := []
 		local counts, maxTime, maxSpeed, maxCount, drawChartFunction, before, after, speeds
 		local ignore, wheel, w, h
 
-		for ignore, wheel in ["FL", "FR", "RL", "RR"] {
-			drawChartFunction := ("function drawChart" . wheel . "() {")
+		static drawerCache := Cache(2)
 
-			counts := []
-			maxTime := 0
-			maxSpeed := 0
-			maxCount := 0
+		if drawerCache.Has(key) {
+			if isDebug()
+				logMessage(kLogDebug, "Cache hit in SuspensionInspector.createSuspensionHistogram...")
 
-			speeds := this.computeSuspensionSpeeds(telemetry, wheel)
+			drawChartFunctions := drawerCache[key]
+		}
+		else {
+			if isDebug()
+				logMessage(kLogDebug, "Cache miss in SuspensionInspector.createSuspensionHistogram...")
 
-			loop 21
-				counts.Push(0)
+			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
+				drawChartFunction := ("function drawChart" . wheel . "() {")
 
-			do(speeds, (s) {
-				maxTime := Max(maxTime, s.Delta)
-				maxSpeed := Max(maxSpeed, Abs(s.Speed))
-			})
+				counts := []
+				maxTime := 0
+				maxSpeed := 0
+				maxCount := 0
 
-			do(speeds, (s) {
-				local speed := (s.Speed / maxSpeed)
+				speeds := this.computeSuspensionSpeeds(telemetry, wheel)
 
-				counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
-			})
+				loop 21
+					counts.Push(0)
 
-			do(counts, (c) => (maxCount := Max(maxCount, c)))
+				do(speeds, (s) {
+					maxTime := Max(maxTime, s.Delta)
+					maxSpeed := Max(maxSpeed, Abs(s.Speed))
+				})
 
-			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+				do(speeds, (s) {
+					local speed := (s.Speed / maxSpeed)
 
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
+					counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
+				})
 
-			drawChartFunction .= "`ndata.addRows(["
+				do(counts, (c) => (maxCount := Max(maxCount, c)))
 
-			loop 21 {
-				drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
+				drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
-				if (A_Index < 21)
-					drawChartFunction .= ","
+				drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
+				drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
+
+				drawChartFunction .= "`ndata.addRows(["
+
+				loop 21 {
+					drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
+
+					if (A_Index < 21)
+						drawChartFunction .= ","
+				}
+
+				drawChartFunction .= "`n]);"
+
+				drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
+
+				drawChartFunctions.Push(drawChartFunction)
 			}
 
-			drawChartFunction .= "`n]);"
-
-			drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-			drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
-
-			drawChartFunctions.Push(drawChartFunction)
+			drawerCache[key] := drawChartFunctions
 		}
 
 		before := "
@@ -3093,10 +3128,18 @@ class TrackMap {
 						if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 							sectorTimes := false
 
-						if this.TelemetryViewer.TelemetryCache.Has(fileName)
+						if this.TelemetryViewer.TelemetryCache.Has(fileName) {
+							if isDebug()
+								logMessage(kLogDebug, "Cache hit in TelemetryMap.createGui.autoSections...")
+
 							telemetry := this.TelemetryViewer.TelemetryCache[fileName]
-						else
+						}
+						else {
+							if isDebug()
+								logMessage(kLogDebug, "Cache miss in TelemetryMap.createGui.autoSections...")
+
 							telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+						}
 
 						removeMultiMapValues(this.TrackMap, "Sections")
 

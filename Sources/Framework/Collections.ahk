@@ -126,12 +126,17 @@ class Cache {
 	}
 
 	Has(key) {
+		local result := false
+
 		do(this.iValues, (entry) {
-			if (entry[1] = key)
-				return true
+			if (entry[1] = key) {
+				result := true
+
+				return
+			}
 		})
 
-		return false
+		return result
 	}
 
 	Clear() {
@@ -139,12 +144,20 @@ class Cache {
 	}
 
 	getEntry(key) {
+		local result
+
 		do(this.iValues, (entry) {
-			if (entry[1] = key)
-				return entry[2]
+			if (entry[1] = key) {
+				result := entry[2]
+
+				return
+			}
 		})
 
-		throw "Entry not found in Cache.getEntry..."
+		if isSet(result)
+			return result
+		else
+			throw "Entry not found in Cache.getEntry..."
 	}
 
 	addEntry(key, entry) {

@@ -1084,10 +1084,10 @@ void collectCarTelemetry(const SharedMemory* sharedData) {
 						 << -sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mWorldPosition[VEC_Z] << ";"
 						 << round(sharedData->mCurrentTime * 1000) << ";"
 						 << sharedData->mAngularVelocity[VEC_Y] << ";"
-						 << - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] * 1000 << ";"
-						 << - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] * 1000 << ";"
-						 << - sharedData->mSuspensionTravel[TYRE_REAR_LEFT] * 1000 << ";"
-						 << - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] * 1000 << std::endl;
+						 << - sharedData->mSuspensionTravel[TYRE_FRONT_LEFT] << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_FRONT_RIGHT] << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_REAR_LEFT] << ";"
+						 << - sharedData->mSuspensionTravel[TYRE_REAR_RIGHT] << std::endl;
 
 					file.close();
 				}

@@ -2693,9 +2693,18 @@ class SuspensionInspector {
 			local speedAverage := MovingAverage(2)
 
 			calculateSpeed(lastTime, lastDeflection, time, deflection) {
-				local dt := (time - lastTime)
+				local dt
 
-				return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
+				try {
+					dt := (time - lastTime)
+
+					return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return {Speed: 0, Delta: 0}
+				}
 			}
 
 			loop deflections.Length
@@ -2774,11 +2783,12 @@ class SuspensionInspector {
 					maxSpeed := Max(maxSpeed, Abs(s.Speed))
 				})
 
-				do(speeds, (s) {
-					local speed := (s.Speed / maxSpeed)
+				if (maxSpeed != 0)
+					do(speeds, (s) {
+						local speed := (s.Speed / maxSpeed)
 
-					counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
-				})
+						counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
+					})
 
 				do(counts, (c) => (maxCount := Max(maxCount, c)))
 

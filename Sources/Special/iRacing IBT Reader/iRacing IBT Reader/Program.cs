@@ -156,10 +156,10 @@ namespace iRacingIBTReader
                         csvFile.Write(longG + ";");
                         csvFile.Write(-latG + ";");
                         csvFile.Write(playerRunningPct + ";");
-                        csvFile.WriteLine(yawRate + ";");
-                        csvFile.WriteLine(lfShockDefl + ";");
-                        csvFile.WriteLine(rfShockDefl + ";");
-                        csvFile.WriteLine(lrShockDefl + ";");
+                        csvFile.Write(yawRate + ";");
+                        csvFile.Write(lfShockDefl + ";");
+                        csvFile.Write(rfShockDefl + ";");
+                        csvFile.Write(lrShockDefl + ";");
                         csvFile.WriteLine(rrShockDefl);
                     }
                 }

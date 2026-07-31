@@ -348,6 +348,9 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		}
 		finally {
 			browserGui.Destroy()
+
+			if ownerOrCommand
+				WinActivate(ownerOrCommand)
 		}
 	}
 }
@@ -594,6 +597,9 @@ browseSoloSessions(ownerOrCommand := false, arguments*) {
 		}
 		finally {
 			browserGui.Destroy()
+
+			if ownerOrCommand
+				WinActivate(ownerOrCommand)
 		}
 	}
 }
@@ -826,6 +832,9 @@ browseTeamSessions(ownerOrCommand := false, arguments*) {
 		}
 		finally {
 			browserGui.Destroy()
+
+			if ownerOrCommand
+				WinActivate(ownerOrCommand)
 		}
 	}
 }
@@ -1091,6 +1100,9 @@ browseStrategies(ownerOrCommand := false, arguments*) {
 		}
 		finally {
 			browserGui.Destroy()
+
+			if ownerOrCommand
+				WinActivate(ownerOrCommand)
 		}
 	}
 }

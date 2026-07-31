@@ -643,9 +643,9 @@ class PressuresEditor {
 		(
 			legend: { textStyle: { color: '%textColor%'} },
 			hAxis: { title: '%tyres%', titleTextStyle: { color: '%textColor%'},
-					 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} },
+					 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} },
 			vAxis: { title: '%pressures%', titleTextStyle: { color: '%textColor%'},
-					 gridlines: {count: 0}, textStyle: { color: '%axisColor%'} },
+					 gridlines: { count: 0 }, textStyle: { color: '%axisColor%'} },
 			lineWidth: 0,
 			series: [ { 'color': '%backColor%' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },

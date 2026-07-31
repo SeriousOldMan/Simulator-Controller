@@ -12445,7 +12445,7 @@ class TeamCenter extends ConfigurationItem {
 								. "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0} }, vAxis: { viewWindow: { min: 0 }, gridlines: {count: 0} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+		drawChartFunction .= ("]);`nvar options = { legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 } }, vAxis: { viewWindow: { min: 0 }, gridlines: { count: 0 } }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -12473,7 +12473,7 @@ class TeamCenter extends ConfigurationItem {
 		minValue := Min(0, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 		maxValue := Max(stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
-		drawChartFunction .= ("`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };")
+		drawChartFunction .= ("`nvar options = { bars: 'horizontal', legend: 'none', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '20%', top: '5%', right: '10%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, vAxis: { gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };")
 		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction
@@ -12529,7 +12529,7 @@ class TeamCenter extends ConfigurationItem {
 
 		title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: { bold: false, color: '" . this.Window.Theme.TextColor . "'}, ")
 
-		drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars', legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0}}, hAxis: {title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: {count: 0}}, chartArea: { left: '20%', top: '15%', right: '15%', bottom: '15%' } };")
+		drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars', legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 } }, hAxis: {title: '" . translate("Lap") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 } }, chartArea: { left: '20%', top: '15%', right: '15%', bottom: '15%' } };")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
@@ -13775,8 +13775,8 @@ class TeamCenter extends ConfigurationItem {
 
 		text := "
 		(
-			hAxis: { title: '%drivers%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: {count: 0} },
-			vAxis: { title: '%seconds%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: {count: 0} },
+			hAxis: { title: '%drivers%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: { count: 0 } },
+			vAxis: { title: '%seconds%', textStyle: { color: '%gridColor%'}, titleTextStyle: { color: '%titleColor%'}, gridlines: { count: 0 } },
 			lineWidth: 0,
 			series: [ { 'color': '%backColor%' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -13828,7 +13828,7 @@ class TeamCenter extends ConfigurationItem {
 		minValue := Min(0, minimum(potentialsData), minimum(raceCraftsData), minimum(speedsData), minimum(consistenciesData), minimum(carControlsData))
 		maxValue := Max(maximum(potentialsData), maximum(raceCraftsData), maximum(speedsData), maximum(consistenciesData), maximum(carControlsData))
 
-		drawChartFunction .= "`nvar options = { legend: {textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', textStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: {count: 0} }, vAxis: {gridlines: {count: 0}, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };"
+		drawChartFunction .= "`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '15%', top: '5%', right: '30%', bottom: '10%' }, hAxis: {viewWindowMode: 'explicit', textStyle: { color: '" . this.Window.Theme.TextColor . "'}, viewWindow: {min: " . minValue . ", max: " . maxValue . "}, gridlines: { count: 0 } }, vAxis: { gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor . "'}} };"
 		drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return drawChartFunction

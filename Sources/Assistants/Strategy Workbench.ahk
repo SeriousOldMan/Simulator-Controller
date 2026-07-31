@@ -2259,7 +2259,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (maxValue = kUndefined)
 				maxValue := 0
 
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', minValue: " . minValue . ", maxValue: " . maxValue . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, vAxis: {gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}} };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', minValue: " . minValue . ", maxValue: " . maxValue . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, vAxis: { gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}} };")
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {

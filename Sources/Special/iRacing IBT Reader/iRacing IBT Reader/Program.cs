@@ -138,7 +138,6 @@ namespace iRacingIBTReader
                         float longG = (float)ibtFile.getVarValue(longGIdx) / 9.807f;
                         float latG = (float)ibtFile.getVarValue(latGIdx) / 9.807f;
                         float playerRunningPct = (float)ibtFile.getVarValue(lapDistPctIdx);
-						float lfShockDefl = (float)ibtFile.getVarValue(lfShockDeflIdx);
 						float yawRate = (float)ibtFile.getVarValue(yawRateIdx);
 						float lfShockDefl = (float)ibtFile.getVarValue(lfShockDeflIdx);
 						float rfShockDefl = (float)ibtFile.getVarValue(rfShockDeflIdx);

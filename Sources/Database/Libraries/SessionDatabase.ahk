@@ -2102,6 +2102,7 @@ class SessionDatabase extends ConfigurationItem {
 			local trackFile := this.getTrackData(simulator, track)
 			local directory, name, importFileName, infoFileName, index, yawRate
 			local flSuspDefl, frSuspDefl, rlSuspDefl, rrSuspDefl
+
 			if trackFile {
 				loop Read, trackFile
 					trackData.Push(string2Values(A_Space, A_LoopReadLine))
@@ -2171,7 +2172,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		SplitPath(fileName, , , , &name)
-
+msgbox fileName
 		if InStr(fileName, ".json") {
 			if verbose {
 				withBlockedWindows(() {

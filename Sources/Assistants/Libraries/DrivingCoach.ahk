@@ -69,6 +69,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iBrakeCoaching := false
 
+	iStarted := false
 	iAvailableTelemetry := CaseInsenseMap()
 	iInstructionHints := CaseInsenseMap()
 
@@ -302,6 +303,12 @@ class DrivingCoach extends GridRaceAssistant {
 	SaveReference {
 		Get {
 			return this.iSaveReference
+		}
+	}
+
+	Started {
+		Get {
+			return this.iStarted
 		}
 	}
 
@@ -1306,6 +1313,7 @@ class DrivingCoach extends GridRaceAssistant {
 			logMessage(kLogDebug, "Telemetry collection stopped...")
 
 		this.iAvailableTelemetry := CaseInsenseMap()
+		this.iStarted := false
 
 		setMultiMapValue(state, "Coaching", "Active", false)
 
@@ -1406,10 +1414,12 @@ class DrivingCoach extends GridRaceAssistant {
 		local bestLap, bestLaptime, bestInfo, telemetries, data
 		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry, reference
 
-		if (this.AvailableTelemetry.Count = 0) {
+		if (!this.Started && this.TelemetryAnalyzer.TrackMap) {
 			if this.Speaker[false]
 				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching) ? "CoachingStart" : "CoachingReady"
 											, false, true, false, {Noise: false, Important: true})
+
+			this.iStarted := true
 
 			if (this.TelemetryAnalyzer.TrackSections.Length = 0) {
 				if isDebug()
@@ -1514,19 +1524,21 @@ class DrivingCoach extends GridRaceAssistant {
 		if isDebug()
 			logMessage(kLogDebug, this.AvailableTelemetry.Count . " lap telemetries available for coaching...")
 
-		if this.BrakeCoaching
-			this.startupBrakeCoaching()
-		else if this.OnTrackCoaching
-			this.startupTrackCoaching()
+		if this.Started {
+			if this.BrakeCoaching
+				this.startupBrakeCoaching()
+			else if this.OnTrackCoaching
+				this.startupTrackCoaching()
 
-		if this.iBrakeTriggerPID {
-			telemetry := this.getTelemetry(&reference := true)
+			if this.iBrakeTriggerPID {
+				telemetry := this.getTelemetry(&reference := true)
 
-			if !reference
-				reference := telemetry
+				if !reference
+					reference := telemetry
 
-			if reference
-				this.updateBrakeTrigger(reference)
+				if reference
+					this.updateBrakeTrigger(reference)
+			}
 		}
 	}
 

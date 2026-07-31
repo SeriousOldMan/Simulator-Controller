@@ -2613,6 +2613,7 @@ class TrackMap {
 			try {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+						local trackMap := this.TrackMap
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
 						local driver, lapTime, sectorTimes, telemetry, index, section
@@ -2630,22 +2631,22 @@ class TrackMap {
 
 						telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
 
-						removeMultiMapValues(this.TrackMap, "Sections")
+						removeMultiMapValues(trackMap, "Sections")
 
 						this.iTrackSections := analyzer.findTrackSections(telemetry)
 
 						this.updateTrackSections(false)
 
 						for index, section in this.TrackSections {
-							setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
-							setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
-							setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
-							setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
-							setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
-							setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+							setMultiMapValue(trackMap, "Sections", index . ".Index", section.Index)
+							setMultiMapValue(trackMap, "Sections", index . ".Nr", section.Nr)
+							setMultiMapValue(trackMap, "Sections", index . ".Type", section.Type)
+							setMultiMapValue(trackMap, "Sections", index . ".Active", section.Active)
+							setMultiMapValue(trackMap, "Sections", index . ".X", section.X)
+							setMultiMapValue(trackMap, "Sections", index . ".Y", section.Y)
 
 							if (section.HasProp("Name") && (Trim(section.Name) != ""))
-								setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
+								setMultiMapValue(trackMap, "Sections", index . ".Name", section.Name)
 						}
 
 						this.updateTrackMap()

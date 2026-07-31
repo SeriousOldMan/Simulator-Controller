@@ -121,6 +121,7 @@ class TelemetryChart {
 
 	createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false
 					   , distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+		local chartArea := this.ChartArea
 		local key := (lapFileName . referenceLapFileName . values2String(".", distanceCorrection, margin
 																		    , hScale, wScale))
 		local channelCount := choose(channels, (c) => (c != "|")).Length
@@ -129,7 +130,7 @@ class TelemetryChart {
 		local html := ""
 		local chartAreas := []
 		local chartFunctions := []
-		local width, height
+		local areaWidth, areaHeight, width, height
 		local clusterIndex, currentCluster, clusterChannels, drawChartFunction
 		local before, after, margins
 		local entry, index, field, running
@@ -137,14 +138,23 @@ class TelemetryChart {
 		static drawerCache := Cache(3)
 		static lastCluster := false
 		static lastChannels := false
+		static lastWidth := 0
+		static lastHeight := 0
 
-		if ((cluster != lastCluster) || (channels != lastChannels))
+		areaWidth := (chartArea ? chartArea.getWidth() : 0)
+		areaHeight := (chartArea ? chartArea.getHeight() : 0)
+
+		if ((cluster != lastCluster) || (channels != lastChannels)
+									 || (areaWidth != lastWidth)
+									 || (areaHeight != lastHeight))
 			drawerCache.Clear()
 
 		lastCluster := cluster
 		lastChannels := channels
+		lastWidth := areaWidth
+		lastHeight := areaHeight
 
-		if this.ChartArea {
+		if chartArea {
 			if drawerCache.Has(key) {
 				if isDebug()
 					logMessage(kLogDebug, "Cache hit in TelemetryViewer.createTelemetryChart...")
@@ -200,8 +210,8 @@ class TelemetryChart {
 					}), (c) => c)
 
 					if (clusterChannels.Length > 0) {
-						width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
-						height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
+						width := ((areaWidth - 4) / 100 * this.WidthZoom * wScale)
+						height := ((areaHeight - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
 
 						chartAreas.Push(this.createChannelChart(width, height, A_Index, clusterChannels
 															  , lapTelemetry, referenceLapTelemetry, &drawChartFunction))

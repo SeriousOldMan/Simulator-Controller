@@ -104,6 +104,57 @@ class CaseInsenseWeakMap extends WeakMap {
 	}
 }
 
+class Cache {
+	iValues := []
+	iSize := false
+
+	__Item[key] {
+		Get {
+			return this.getEntry(key)
+		}
+
+		Set {
+			this.addEntry(key, value)
+
+			return value
+		}
+	}
+
+
+	__New(size) {
+		this.iSize := size
+	}
+
+	Has(key) {
+		do(this.iValues, (entry) {
+			if (entry[1] = key)
+				return true
+		})
+
+		return false
+	}
+
+	Clear() {
+		this.iValues := []
+	}
+
+	getEntry(key) {
+		do(this.iValues, (entry) {
+			if (entry[1] = key)
+				return entry[2]
+		})
+
+		throw "Entry not found in Cache.getEntry..."
+	}
+
+	addEntry(key, entry) {
+		if (this.iValues.Length >= this.iSize)
+			this.iValues.RemoveAt(1)
+
+		this.iValues.Push(Values(key, entry))
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;

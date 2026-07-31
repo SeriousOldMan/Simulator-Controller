@@ -121,6 +121,8 @@ class TelemetryChart {
 
 	createTelemetryChart(cluster, channels, lapFileName, referenceLapFileName := false
 					   , distanceCorrection := 0, margin := 0, hScale := 1, wScale := 1) {
+		local key := (lapFileNae . referenceLapFileName . values2String(".", distanceCorrection, margin
+																		   , hScale, wScale))
 		local channelCount := choose(channels, (c) => (c != "|")).Length
 		local lapTelemetry := []
 		local referenceLapTelemetry := false
@@ -132,56 +134,76 @@ class TelemetryChart {
 		local before, after, margins
 		local entry, index, field, running
 
-		if lapFileName
-			lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
+		static drawerCache := Cache(3)
+		static lastCluster := false
+		static lastChannels := false
 
-		if referenceLapFileName {
-			referenceLapTelemetry := Map()
+		if ((cluster != lastCluster) || (channels != lastChannels))
+			drawerCache.Clear()
 
-			loop Read, referenceLapFileName {
-				entry := string2Values(";", A_LoopReadLine)
-
-				running := kNull
-
-				for index, value in entry {
-					if (InStr(value, ":")) {
-						value := string2Values(":", value)
-
-						value := ((value[1] * 60000) + (StrReplace(value[2], ",", ".") * 1000))
-					}
-
-					if !isNumber(value)
-						entry[index] := kNull
-					else if (index = 1)
-						running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
-				}
-
-				referenceLapTelemetry[running] := entry
-			}
-		}
+		lastCluster := cluster
+		lastChannels := channels
 
 		if this.ChartArea {
-			loop cluster {
-				currentCluster := 1
-				clusterIndex := A_index
+			if drawerCache.Has(key) {
+				chartFunctions := drawerCache[key]
 
-				clusterChannels := choose(collect(channels, (c) {
-					if (c = "|")
-						currentCluster += 1
-					else if (clusterIndex = currentCluster)
-						return c
+				chartAreas := chartFunctions[2]
+				chartFunctions := chartFunctions[1]
+			}
+			else {
+				if lapFileName
+					lapTelemetry := this.TelemetryViewer.loadData(lapFileName)
 
-					return false
-				}), (c) => c)
+				if referenceLapFileName {
+					referenceLapTelemetry := Map()
 
-				if (clusterChannels.Length > 0) {
-					width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
-					height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
+					loop Read, referenceLapFileName {
+						entry := string2Values(";", A_LoopReadLine)
 
-					chartAreas.Push(this.createChannelChart(width, height, A_Index, clusterChannels
-														  , lapTelemetry, referenceLapTelemetry, &drawChartFunction))
-					chartFunctions.Push(drawChartFunction)
+						running := kNull
+
+						for index, value in entry {
+							if (InStr(value, ":")) {
+								value := string2Values(":", value)
+
+								value := ((value[1] * 60000) + (StrReplace(value[2], ",", ".") * 1000))
+							}
+
+							if !isNumber(value)
+								entry[index] := kNull
+							else if (index = 1)
+								running := entry[index] := (Round((entry[index] + distanceCorrection) / 7.5) * 7.5)
+						}
+
+						referenceLapTelemetry[running] := entry
+					}
 				}
+
+				loop cluster {
+					currentCluster := 1
+					clusterIndex := A_index
+
+					clusterChannels := choose(collect(channels, (c) {
+						if (c = "|")
+							currentCluster += 1
+						else if (clusterIndex = currentCluster)
+							return c
+
+						return false
+					}), (c) => c)
+
+					if (clusterChannels.Length > 0) {
+						width := ((this.ChartArea.getWidth() - 4) / 100 * this.WidthZoom * wScale)
+						height := ((this.ChartArea.getHeight() - 4) / 100 * this.HeightZoom * hScale) * (clusterChannels.Length / channelCount)
+
+						chartAreas.Push(this.createChannelChart(width, height, A_Index, clusterChannels
+															  , lapTelemetry, referenceLapTelemetry, &drawChartFunction))
+						chartFunctions.Push(drawChartFunction)
+					}
+				}
+
+				drawerCache[key] := Values(chartFunctions, chartAreas)
 			}
 
 			before := "
@@ -571,6 +593,8 @@ class TelemetryViewer {
 	iLayouts := CaseInsenseMap()
 	iSelectedLayout := false
 
+	iTelemetryCache := Cache(2)
+
 	class TelemetryViewerWindow extends Window {
 		iViewer := false
 		iActivationTask := false
@@ -751,6 +775,13 @@ class TelemetryViewer {
 			this.updateTelemetryChart(true)
 
 			return value
+		}
+	}
+
+	TelemetryCache {
+		Get {
+			return this.iTelemetryCache
+
 		}
 	}
 
@@ -1255,7 +1286,14 @@ class TelemetryViewer {
 	}
 
 	createTelemetry(simulator, track, lap) {
+		local fileName := this.SelectedLap[true]
 		local driver, lapTime, sectorTimes, telemetry, index, section
+
+		if !fileName
+			return false
+
+		if this.iTelemetryCache.Has(fileName)
+			return this.iTelemetryCache[fileName]
 
 		if isNumber(lap)
 			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
@@ -1268,8 +1306,12 @@ class TelemetryViewer {
 		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 			sectorTimes := false
 
-		return TelemetryAnalyzer(simulator, track).createTelemetry(0, this.SelectedLap[true]
-																	, driver, lapTime, sectorTimes)
+		telemetry := TelemetryAnalyzer(simulator, track).createTelemetry(0, fileName
+																		  , driver, lapTime, sectorTimes)
+
+		this.iTelemetryCache[fileName] := telemetry
+
+		return telemetry
 	}
 
 	selectedLapChanged() {
@@ -1842,6 +1884,7 @@ class TelemetryViewer {
 	}
 
 	showSectionInfo(x, y, open := true) {
+		local fileName := this.SelectedLap[true]
 		local referenceTelemetry := false
 		local simulator, car, track, analyzer, telemetry, section, lap, referenceLap, driver, lapTime, sectorTimes
 
@@ -1862,14 +1905,22 @@ class TelemetryViewer {
 			if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 				sectorTimes := false
 
-			telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+			if this.iTelemetryCache.Has(this.SelectedLap[true])
+				telemetry := this.iTelemetryCache[fileName]
+			else {
+				telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+
+				this.iTelemetryCache[fileName] := telemetry
+			}
 
 			if (analyzer.TrackSections.Length = 0) {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						analyzer.requireTrackSections(telemetry)
 
-						telemetry := analyzer.createTelemetry(0, this.SelectedLap[true], driver, lapTime, sectorTimes)
+						telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+
+						this.iTelemetryCache[fileName] := telemetry
 					})
 				})
 			}
@@ -1888,7 +1939,15 @@ class TelemetryViewer {
 				if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 					sectorTimes := false
 
-				referenceTelemetry := analyzer.createTelemetry(0, this.SelectedReferenceLap[true], driver, lapTime, sectorTimes)
+				fileName := this.SelectedReferenceLap[true]
+
+				if this.iTelemetryCache.Has(this.SelectedLap[true])
+					referenceTelemetry := this.iTelemetryCache[fileName]
+				else {
+					referenceTelemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+
+					this.iTelemetryCache[fileName] := referenceTelemetry
+				}
 			}
 
 			if telemetry {
@@ -2428,10 +2487,7 @@ class SuspensionInspector {
 	iCar := false
 	iTrack := false
 
-	iFLHistogram := false
-	iFRHistogram := false
-	iRLHistogram := false
-	iRRHistogram := false
+	iSuspensionHistogram := false
 
 	class InspectorWindow extends Window {
 		iInspector := false
@@ -2534,30 +2590,30 @@ class SuspensionInspector {
 	createGui() {
 		local inspectorGui
 
-		initializeViewer() {
-			local ignore, viewer
-
-			for ignore, viewer in ["FL", "FR", "RL", "RR"] {
-				viewer := this.i%viewer%Histogram
-
-				viewer.document.open()
-				viewer.document.write("<center>Data</center>")
-				viewer.document.close()
-			}
-		}
-
 		inspectorGui := SuspensionInspector.InspectorWindow(this, {Descriptor: "Telemetry Browser.Suspension Inspector"
 																 , Closeable: (this.TelemetryViewer != false)
 																 , Resizeable:  "Deferred", Scrollable: false})
 
 		this.iWindow := inspectorGui
 
-		this.iFLHistogram := inspectorGui.Add("HTMLViewer", "x16 y16 w240 h240 W:Grow(0.5) H:Grow(0.5) Border")
-		this.iFRHistogram := inspectorGui.Add("HTMLViewer", "x260 yp w240 h240 X:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
-		this.iRLHistogram := inspectorGui.Add("HTMLViewer", "x16 y260 w240 h240 Y:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
-		this.iRRHistogram := inspectorGui.Add("HTMLViewer", "x260 yp w240 h240 X:Move(0.5) Y:Move(0.5) W:Grow(0.5) H:Grow(0.5) Border")
+		inspectorGui.SetFont("s10 Bold", "Arial")
 
-		initializeViewer()
+		inspectorGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(inspectorGui, "Telemetry Browser.Layouts"))
+
+		inspectorGui.SetFont("s9 Norm", "Arial")
+
+		inspectorGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Suspension Dynamics")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer")
+
+		inspectorGui.SetFont("s8 Norm", "Arial")
+
+		inspectorGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
+
+		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 yp+10 w480 h480 W:Grow H:Grow Border vhistogramViewer")
+
+		this.iSuspensionHistogram.document.open()
+		this.iSuspensionHistogram.document.write("")
+		this.iSuspensionHistogram.document.close()
 
 		inspectorGui.Add(SuspensionInspector.InspectorResizer(this))
 	}
@@ -2587,8 +2643,7 @@ class SuspensionInspector {
 	windowResized() {
 		local ignore, viewer
 
-		for ignore, viewer in ["FL", "FR", "RL", "RR"]
-			this.i%viewer%Histogram.Resized()
+		this.iSuspensionHistogram.Resized()
 
 		this.telemetryChanged()
 	}
@@ -2596,14 +2651,7 @@ class SuspensionInspector {
 	telemetryChanged() {
 		local telemetry := this.Telemetry
 
-		this.Window.DisableRedraw()
-
-		try {
-			do(["FL", "FR", "RL", "RR"], (wheel) => this.showSuspensionHistogram(telemetry, wheel))
-		}
-		finally {
-			this.Window.EnableRedraw()
-		}
+		this.showSuspensionHistogram(telemetry)
 	}
 
 	computeSuspensionSpeeds(telemetry, wheel) {
@@ -2651,84 +2699,68 @@ class SuspensionInspector {
 		return computeSpeeds(deflections)
 	}
 
-	showSuspensionHistogram(telemetry, wheel) {
-		local chartArea
-
-		switch wheel, false {
-			case "FrontLeft":
-				wheel := "FL"
-			case "FrontRight":
-				wheel := "FR"
-			case "RearLeft":
-				wheel := "RL"
-			case "RearRight":
-				wheel := "RR"
-		}
-
-		chartArea := this.i%wheel%Histogram
+	showSuspensionHistogram(telemetry, referenceTelemetry := false) {
+		local chartArea := this.iSuspensionHistogram
 
 		if chartArea {
 			chartArea.document.open()
-			chartArea.document.write(this.createSuspensionHistogram(telemetry, wheel))
+			chartArea.document.write(this.createSuspensionHistogram(telemetry, referenceTelemetry))
 			chartArea.document.close()
 		}
 	}
 
-	createSuspensionHistogram(telemetry, wheel, referenceTelemetry := false, margin := 0) {
-		local drawChartFunction := "function drawChart() {"
-		local counts := []
-		local maxTime := 0
-		local maxSpeed := 0
-		local maxCount := 0
-		local before, after, speeds
+	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
+		local drawChartFunctions := []
+		local counts, maxTime, maxSpeed, maxCount, drawChartFunction, before, after, speeds
+		local ignore, wheel, w, h
 
-		switch wheel, false {
-			case "FrontLeft":
-				wheel := "FL"
-			case "FrontRight":
-				wheel := "FR"
-			case "RearLeft":
-				wheel := "RL"
-			case "RearRight":
-				wheel := "RR"
+		for ignore, wheel in ["FL", "FR", "RL", "RR"] {
+			drawChartFunction := ("function drawChart" . wheel . "() {")
+
+			counts := []
+			maxTime := 0
+			maxSpeed := 0
+			maxCount := 0
+
+			speeds := this.computeSuspensionSpeeds(telemetry, wheel)
+
+			loop 21
+				counts.Push(0)
+
+			do(speeds, (s) {
+				maxTime := Max(maxTime, s.Delta)
+				maxSpeed := Max(maxSpeed, Abs(s.Speed))
+			})
+
+			do(speeds, (s) {
+				local speed := (s.Speed / maxSpeed)
+
+				counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
+			})
+
+			do(counts, (c) => (maxCount := Max(maxCount, c)))
+
+			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
+			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
+
+			drawChartFunction .= "`ndata.addRows(["
+
+			loop 21 {
+				drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
+
+				if (A_Index < 21)
+					drawChartFunction .= ","
+			}
+
+			drawChartFunction .= "`n]);"
+
+			drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+			drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
+
+			drawChartFunctions.Push(drawChartFunction)
 		}
-
-		speeds := this.computeSuspensionSpeeds(telemetry, wheel)
-
-		loop 21
-			counts.Push(0)
-
-		do(speeds, (s) {
-			maxTime := Max(maxTime, s.Delta)
-			maxSpeed := Max(maxSpeed, Abs(s.Speed))
-		})
-
-		do(speeds, (s) {
-			local speed := (s.Speed / maxSpeed)
-
-			counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
-		})
-
-		do(counts, (c) => (maxCount := Max(maxCount, c)))
-
-		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
-
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
-		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
-
-		drawChartFunction .= "`ndata.addRows(["
-
-		loop 21 {
-			drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
-
-			if (A_Index < 21)
-				drawChartFunction .= ","
-		}
-
-		drawChartFunction .= "`n]);"
-
-		drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, gridlines: { color: '" . this.Window.Theme.GridColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-		drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart')); chart.draw(data, options); }"
 
 		before := "
 		(
@@ -2758,12 +2790,18 @@ class SuspensionInspector {
 			</head>
 		)"
 
-		before .= drawChartFunction
+		before .= ("function drawChart() { drawChartFL(); drawChartFR(); drawChartRL(); drawChartRR(); } "
+				 . values2String(A_Space, drawChartFunctions*))
 
 		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 									 , {margin: margin})
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style>" . "<div id=`"chart`" </div>" . "</body></html>")
+		ControlGetPos( , , &w, &h, this.Window["histogramViewer"])
+
+		w := ((w / 2) - 10)
+		h := ((h / 2) - 10)
+
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table>" . "</body></html>")
 	}
 }
 
@@ -3024,6 +3062,8 @@ class TrackMap {
 		save(*) {
 			this.updateTrackSections(true, false)
 
+			this.TelemetryViewer.TelemetryCache.Clear()
+
 			this.close(true)
 		}
 
@@ -3037,6 +3077,7 @@ class TrackMap {
 			try {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
+						local fileName := this.TelemetryViewer.SelectedLap[true]
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local lap := this.TelemetryViewer.SelectedLap
 						local driver, lapTime, sectorTimes, telemetry, index, section
@@ -3052,7 +3093,10 @@ class TrackMap {
 						if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 							sectorTimes := false
 
-						telemetry := analyzer.createTelemetry(0, this.TelemetryViewer.SelectedLap[true], driver, lapTime, sectorTimes)
+						if this.TelemetryViewer.TelemetryCache.Has(fileName)
+							telemetry := this.TelemetryViewer.TelemetryCache[fileName]
+						else
+							telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
 
 						removeMultiMapValues(this.TrackMap, "Sections")
 

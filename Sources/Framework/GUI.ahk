@@ -3437,14 +3437,18 @@ translateSelectCancelButtons := translateMsgDlgButtons.Bind(["Select", "Cancel"]
 
 withBlockedWindows(function, arguments*) {
 	local windows := []
+	local active := false
 	local ignore, Hwnd, theWindow
 
 	for ignore, Hwnd in listWindows("ahk_exe " . A_ScriptName) {
 		theWindow := GuiFromHwnd(Hwnd)
 
 		if (isObject(theWindow) && isInstance(theWindow, Window)) {
-			if WinActive(theWindow)
+			if WinActive(theWindow) {
 				theWindow.Opt("+OwnDialogs")
+
+				active := theWindow
+			}
 
 			windows.Push(theWindow)
 		}
@@ -3459,6 +3463,9 @@ withBlockedWindows(function, arguments*) {
 	finally {
 		for ignore, theWindow in windows
 			theWindow.Unblock()
+
+		if active
+			WinActivate(active)
 	}
 }
 

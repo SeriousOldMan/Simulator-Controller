@@ -3217,7 +3217,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				else
 					date := translate("-")
 
-				lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Info", "LapTime", translate("-")))
+				lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
 			}
 
 			if (select = name) {
@@ -3242,7 +3242,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						else
 							date := translate("-")
 
-						lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Info", "LapTime", translate("-")))
+						lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
 					}
 					else {
 						date := translate("-")

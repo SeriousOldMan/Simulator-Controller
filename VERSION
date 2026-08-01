@@ -3,7 +3,7 @@ Version=7.1.5.0-dev
 Target=7.1.5.0-release
 Date=08/01/26
 Download=
-Changes=Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database
+Changes=Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
 Version=7.1.4.0-release

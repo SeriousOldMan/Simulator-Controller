@@ -218,7 +218,7 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.<br>
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.<br>
   (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
-  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
+  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
 
 Good to know:
 

@@ -2134,6 +2134,91 @@ class TelemetryAnalyzer {
 
 		return createIssues(bottomOuts)
 	}
+
+	static computeSuspensionSpeeds(telemetry, wheel) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeSpeeds(deflections) {
+			local speeds := []
+			local speedAverage := MovingAverage(2)
+
+			calculateSpeed(lastTime, lastDeflection, time, deflection) {
+				local dt
+
+				try {
+					dt := (time - lastTime)
+
+					return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return {Speed: 0, Delta: 0}
+				}
+			}
+
+			loop deflections.Length
+				if (A_Index > 1)
+					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
+											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			return speeds
+		}
+
+		switch wheel, false {
+			case "FrontLeft":
+				chartArea := "FL"
+			case "FrontRight":
+				chartArea := "FR"
+			case "RearLeft":
+				chartArea := "RL"
+			case "RearRight":
+				chartArea := "RR"
+		}
+
+		if telemetry
+			loop telemetry.Data.Length {
+				time := telemetry.getValue(A_Index, "Time")
+				deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+				if ((deflection != kUndefined) && (time != kUndefined))
+					deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+			}
+
+		return computeSpeeds(deflections)
+	}
+
+	static computeMovementDistribution(speeds, binCount, &maxTime, &maxSpeed, &maxCount) {
+		local counts := []
+
+		binCount := ((2 * binCount) + 1)
+
+		maxTime := 0
+		maxSpeed := 0
+		maxCount := 0
+
+		loop binCount
+			counts.Push(0)
+
+		do(speeds, (s) {
+			maxTime := Max(maxTime, s.Delta)
+			maxSpeed := Max(maxSpeed, Abs(s.Speed))
+		})
+
+		if (maxSpeed != 0) {
+			do(speeds, (s) {
+				local speed := (s.Speed / maxSpeed)
+
+				counts[Min(binCount, Max(1, Round((speed + 1) * Round(binCount / 2, 1))))] += 1
+			})
+		}
+
+		do(counts, (c) => (maxCount := Max(maxCount, c)))
+
+		return counts
+	}
 }
 
 

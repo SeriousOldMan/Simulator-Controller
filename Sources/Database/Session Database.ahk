@@ -2068,7 +2068,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(3)
 
-		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h363 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name", "Date"], translate))
+		this.iTelemetryListView := editorGui.Add("ListView", "x296 ys w360 h363 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name", "Lap Time", "Date"], translate))
 		this.iTelemetryListView.OnEvent("Click", chooseTelemetry)
 		this.iTelemetryListView.OnEvent("DoubleClick", openTelemetry)
 		this.iTelemetryListView.OnEvent("ItemSelect", navTelemetry)
@@ -3187,7 +3187,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadTelemetries(select := false) {
 		local window := this.Window
-		local userTelemetries, communityTelemetries, ignore, name, info, origin, date
+		local userTelemetries, communityTelemetries, ignore, name, info, origin, date, lapTime
 
 		this.TelemetryListView.Delete()
 
@@ -3203,6 +3203,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				origin := translate("User")
 
 				date := translate("-")
+				lapTime := translate("-")
 			}
 			else {
 				origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
@@ -3215,15 +3216,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					date := FormatTime(date, "ShortDate")
 				else
 					date := translate("-")
+
+				lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Info", "LapTime", translate("-")))
 			}
 
 			if (select = name) {
-				this.TelemetryListView.Add("Select Vis", origin, name, date)
+				this.TelemetryListView.Add("Select Vis", origin, name, lapTime, date)
 
 				select := this.TelemetryListView.GetCount()
 			}
 			else
-				this.TelemetryListView.Add("", origin, name, date)
+				this.TelemetryListView.Add("", origin, name, lapTime, date)
 		}
 
 		if communityTelemetries
@@ -3238,11 +3241,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							date := FormatTime(date, "ShortDate")
 						else
 							date := translate("-")
-					}
-					else
-						date := translate("-")
 
-					this.TelemetryListView.Add("", translate("Community"), name, date)
+						lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Info", "LapTime", translate("-")))
+					}
+					else {
+						date := translate("-")
+						lapTime := translate("-")
+					}
+
+					this.TelemetryListView.Add("", translate("Community"), name, lapTime, date)
 				}
 
 		this.TelemetryListView.ModifyCol()
@@ -7034,7 +7041,7 @@ lapTimeDisplayValue(lapTime) {
 	local seconds, fraction, minutes
 
 	if ((lapTime = "-") || isNull(lapTime))
-		return "-"
+		return translate("-")
 	else {
 		if isNumber(lapTime)
 			return displayValue("Time", lapTime)

@@ -432,9 +432,10 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 		updateState()
 
 		for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
-			SplitPath(fileName, , , , &databaseDirectory)
+			type := StrSplit(Trim(fileName), ".", "", 2)
 
-			type := StrSplit(Trim(fileName), ".", "", 2)[1]
+			databaseDirectory := type[2]
+			type := type[1]
 
 			if ((downloadPressures && (type = "Pressures")) || (downloadWears && (type = "Wears"))
 			 || (downloadSetups && (type = "Setups")) || (downloadStrategies && (type = "Strategies"))

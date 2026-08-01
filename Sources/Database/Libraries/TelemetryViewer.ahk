@@ -599,6 +599,8 @@ class TelemetryViewer {
 
 	iCollect := false
 	iSynchronize := false
+	iAnalyze := false
+
 	iSynchronizeTask := false
 
 	iSuspensionInspector := false
@@ -819,6 +821,12 @@ class TelemetryViewer {
 		}
 	}
 
+	Analyze {
+		Get {
+			return this.iAnalyze
+		}
+	}
+
 	SynchronizeTask {
 		Get {
 			return this.iSynchronizeTask
@@ -859,12 +867,13 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, synchronize := true, collect := true) {
+	__New(manager, directory, synchronize := true, collect := true, analyze := false) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iSynchronize := synchronize
 		this.iCollect := collect
+		this.iAnalyze := analyze
 
 		this.loadLayouts()
 	}
@@ -1156,8 +1165,10 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
-		setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
+		if this.iAnalyze {
+			viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
+			setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
+		}
 
 		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Layout"))
 		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
@@ -2518,6 +2529,10 @@ class SuspensionInspector {
 
 	iSuspensionHistogram := false
 
+	iLogarithmic := true
+	iFrontHighSpeedThreshold := 25
+	iRearHighSpeedThreshold := 25
+
 	class InspectorWindow extends Window {
 		iInspector := false
 
@@ -2608,6 +2623,43 @@ class SuspensionInspector {
 		}
 	}
 
+	Logarithmic {
+		Get {
+			return this.iLogarithmic
+		}
+
+		Set {
+			local oldValue := this.Logarithmic
+
+			this.iLogarithmic := value
+
+			if (value != oldValue)
+				this.telemetryChanged()
+
+			return value
+		}
+	}
+
+	HighSpeedThreshold[axle] {
+		Get {
+			return ((axle = "Front") ? this.iFrontHighSpeedThreshold : this.iRearHighSpeedThreshold)
+		}
+
+		Set {
+			local oldValue := this.HighSpeedThreshold[axle]
+
+			if (axle = "Front")
+				this.iFrontHighSpeedThreshold := value
+			else
+				this.iRearHighSpeedThreshold := value
+
+			if (value != oldValue)
+				this.telemetryChanged()
+
+			return value
+		}
+	}
+
 	__New(telemetryViewer, simulator, car, track) {
 		this.iTelemetryViewer := telemetryViewer
 
@@ -2618,6 +2670,11 @@ class SuspensionInspector {
 
 	createGui() {
 		local inspectorGui
+
+		validateInteger(minValue, maxValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+		}
 
 		inspectorGui := SuspensionInspector.InspectorWindow(this, {Descriptor: "Telemetry Browser.Suspension Inspector"
 																 , Closeable: (this.TelemetryViewer != false)
@@ -2638,7 +2695,36 @@ class SuspensionInspector {
 
 		inspectorGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 yp+10 w480 h480 W:Grow H:Grow Border vhistogramViewer")
+		inspectorGui.Add("Text", "x8 yp+20 w120 Section", translate("Highspeed (Front)"))
+		inspectorGui.Add("Text", "x130 yp w18", translate(">"))
+		inspectorGui.Add("Edit", "x150 yp-2 w50 Number vfrontHSThresholdEdit", 25).OnEvent("LoseFocus", (*) {
+			if !validateInteger(10, 50, inspectorGui["frontHSThresholdEdit"], "Validate"
+									  , inspectorGui["frontHSThresholdEdit"].Value)
+				inspectorGui["frontHSThresholdEdit"].Text := 25
+			else
+				this.HighspeedThreshold["Front"] := inspectorGui["frontHSThresholdEdit"].Value
+		})
+		inspectorGui.Add("UpDown", "x150 yp w50 h23 Range10-50", 25)
+		inspectorGui.Add("Text", "x202 yp+2 w40 ", translate("mm/s"))
+
+		inspectorGui.Add("Text", "x8 yp+24 w120", translate("Highspeed (Rear)"))
+		inspectorGui.Add("Text", "x130 yp w18", translate(">"))
+		inspectorGui.Add("Edit", "x150 yp-2 w50 Number vrearHSThresholdEdit", 25).OnEvent("LoseFocus", (*) {
+			if !validateInteger(10, 50, inspectorGui["rearHSThresholdEdit"], "Validate"
+									  , inspectorGui["rearHSThresholdEdit"].Value)
+				inspectorGui["rearHSThresholdEdit"].Text := 25
+			else
+				this.HighspeedThreshold["Rear"] := inspectorGui["rearHSThresholdEdit"].Value
+		})
+		inspectorGui.Add("UpDown", "x150 yp w50 h23 Range10-50", 25)
+		inspectorGui.Add("Text", "x202 yp+2 w40 ", translate("mm/s"))
+
+		inspectorGui.Add("Text", "x304 ys w80 X:Move", translate("Display"))
+		inspectorGui.Add("DropDownList", "x388 yp-4 w100 X:Move Choose1 vlayoutDropDown", collect(["Logarithmic", "Linear"], translate)).OnEvent("Change", (*) {
+			this.Logarithmic := (inspectorGui["layoutDropDown"].Value == 1)
+		})
+
+		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 ys+50 w480 h480 W:Grow H:Grow Border vhistogramViewer")
 
 		this.iSuspensionHistogram.document.open()
 		this.iSuspensionHistogram.document.write("")
@@ -2683,60 +2769,6 @@ class SuspensionInspector {
 		this.showSuspensionHistogram(telemetry)
 	}
 
-	computeSuspensionSpeeds(telemetry, wheel) {
-		local deflections := []
-		local deflAverage := MovingAverage(5)
-		local time, deflection
-
-		computeSpeeds(deflections) {
-			local speeds := []
-			local speedAverage := MovingAverage(2)
-
-			calculateSpeed(lastTime, lastDeflection, time, deflection) {
-				local dt
-
-				try {
-					dt := (time - lastTime)
-
-					return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
-				}
-				catch Any as exception {
-					logError(exception)
-
-					return {Speed: 0, Delta: 0}
-				}
-			}
-
-			loop deflections.Length
-				if (A_Index > 1)
-					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
-											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
-
-			return speeds
-		}
-
-		switch wheel, false {
-			case "FrontLeft":
-				chartArea := "FL"
-			case "FrontRight":
-				chartArea := "FR"
-			case "RearLeft":
-				chartArea := "RL"
-			case "RearRight":
-				chartArea := "RR"
-		}
-
-		loop telemetry.Data.Length {
-			time := telemetry.getValue(A_Index, "Time")
-			deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
-
-			if ((deflection != kUndefined) && (time != kUndefined))
-				deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
-		}
-
-		return computeSpeeds(deflections)
-	}
-
 	showSuspensionHistogram(telemetry, referenceTelemetry := false) {
 		local chartArea := this.iSuspensionHistogram
 
@@ -2748,12 +2780,14 @@ class SuspensionInspector {
 	}
 
 	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
-		local key := (ObjPtr(telemetry) . (referenceTelemetry ? ObjPtr(referenceTelemetry) : false) . margin)
+		local key := ((telemetry ? ObjPtr(telemetry) : false)
+					. (referenceTelemetry ? ObjPtr(referenceTelemetry) : false)
+					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"])
 		local drawChartFunctions := []
 		local counts, maxTime, maxSpeed, maxCount, drawChartFunction, before, after, speeds
-		local ignore, wheel, w, h
+		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold
 
-		static drawerCache := Cache(2)
+		static drawerCache := Cache(10)
 
 		if drawerCache.Has(key) {
 			if isDebug()
@@ -2765,50 +2799,31 @@ class SuspensionInspector {
 			if isDebug()
 				logMessage(kLogDebug, "Cache miss in SuspensionInspector.createSuspensionHistogram...")
 
+			frontHSThreshold := this.HighSpeedThreshold["Front"]
+			rearHSThreshold := this.HighSpeedThreshold["Rear"]
+
 			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
 				drawChartFunction := ("function drawChart" . wheel . "() {")
 
-				counts := []
-				maxTime := 0
-				maxSpeed := 0
-				maxCount := 0
-
-				speeds := this.computeSuspensionSpeeds(telemetry, wheel)
-
-				loop 21
-					counts.Push(0)
-
-				do(speeds, (s) {
-					maxTime := Max(maxTime, s.Delta)
-					maxSpeed := Max(maxSpeed, Abs(s.Speed))
-				})
-
-				if (maxSpeed != 0)
-					do(speeds, (s) {
-						local speed := (s.Speed / maxSpeed)
-
-						counts[Min(21, Max(1, Round((speed + 1) * 10.5)))] += 1
-					})
-
-				do(counts, (c) => (maxCount := Max(maxCount, c)))
+				speeds := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel)
+				counts := TelemetryAnalyzer.computeMovementDistribution(speeds, 10, &maxTime, &maxSpeed, &maxCount)
 
 				drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
-				drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Speed (mm/s)") . "');")
-				drawChartFunction .= ("`ndata.addColumn('number', '" . translate("log(#)") . "');")
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= "`n['" . translate("Speed (mm/s)") . "', '" . translate(this.Logarithmic ? "log(#)" : "#") . "', { role: 'style' } ]"
 
-				drawChartFunction .= "`ndata.addRows(["
+				hsThreshold := (((wheel = "FL") || (wheel = "FR")) ? frontHsThreshold : rearHSThreshold)
 
 				loop 21 {
-					drawChartFunction .= ("`n[" . (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed)) . ", " . counts[A_Index] . "]")
+					speed := (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed))
 
-					if (A_Index < 21)
-						drawChartFunction .= ","
+					drawChartFunction .= (",`n[" . speed . ", " . counts[A_Index] . ", '" . ((Abs(speed) > hsThreshold) ? "color: Blue" : "color: Green") . "']")
 				}
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { legend: { position: 'in', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { logScale: true, minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log(#)" : "#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
 
 				drawChartFunctions.Push(drawChartFunction)

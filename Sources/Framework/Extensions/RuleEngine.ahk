@@ -1736,9 +1736,6 @@ class SetComposedFactAction extends Action {
 	__New(arguments*) {
 		this.iValue := arguments.Pop()
 
-		if isInstance(this.iValue, Array)
-			MsgBox "Oops"
-
 		this.iFact := arguments
 	}
 

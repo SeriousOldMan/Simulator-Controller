@@ -2190,7 +2190,7 @@ class TelemetryAnalyzer {
 		return computeSpeeds(deflections)
 	}
 
-	static computeMovementDistribution(speeds, binCount, &maxTime, &maxSpeed, &maxCount) {
+	static computeMovementDistribution(speeds, binCount, &maxTime?, &maxSpeed?, &maxCount?, &sumCount?) {
 		local counts := []
 
 		binCount := ((2 * binCount) + 1)
@@ -2198,6 +2198,7 @@ class TelemetryAnalyzer {
 		maxTime := 0
 		maxSpeed := 0
 		maxCount := 0
+		sumCount := 0
 
 		loop binCount
 			counts.Push(0)
@@ -2215,7 +2216,10 @@ class TelemetryAnalyzer {
 			})
 		}
 
-		do(counts, (c) => (maxCount := Max(maxCount, c)))
+		do(counts, (c) {
+			maxCount := Max(maxCount, c)
+			sumCount += c
+		})
 
 		return counts
 	}

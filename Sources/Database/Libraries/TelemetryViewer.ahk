@@ -315,9 +315,9 @@ class TelemetryChart {
 
 		first := true
 
-		if (lapTelemetry.Length > 500) {
+		if (lapTelemetry.Length > 1000) {
 			count := 0
-			skip := Round(lapTelemetry.Length / 500)
+			skip := Round(lapTelemetry.Length / 1000)
 		}
 
 		for ignore, data in lapTelemetry {
@@ -2758,8 +2758,8 @@ class SuspensionInspector {
 			this.Logarithmic := (inspectorGui["layoutDropDown"].Value == 1)
 		})
 
-		inspectorGui.Add("DropDownList", "x252 yp+24 w115 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) => this.updateState())
-		inspectorGui.Add("Text", "x367 yp+2 w20 Right", translate("+/-"))
+		inspectorGui.Add("DropDownList", "x254 yp+24 w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) => this.updateState())
+		inspectorGui.Add("Text", "x367 yp+4 w20 Right", translate("+/-"))
 		inspectorGui.Add("Edit", "x388 yp-2 w40 Number vscopeRangeEdit", 100)
 		inspectorGui.Add("Text", "x430 yp+2 w58 ", translate("Meter"))
 
@@ -2840,7 +2840,7 @@ class SuspensionInspector {
 					. (referenceTelemetry ? ObjPtr(referenceTelemetry) : false)
 					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"])
 		local drawChartFunctions := []
-		local counts, maxTime, maxSpeed, maxCount, drawChartFunction, before, after, speeds
+		local counts, maxSpeed, maxCount, sumCount, drawChartFunction, before, after, speeds
 		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
 
 		static drawerCache := Cache(10)
@@ -2871,7 +2871,7 @@ class SuspensionInspector {
 				drawChartFunction := ("function drawChart" . wheel . "() {")
 
 				speeds := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel)
-				counts := TelemetryAnalyzer.computeMovementDistribution(speeds, 10, &maxTime, &maxSpeed, &maxCount)
+				counts := TelemetryAnalyzer.computeMovementDistribution(speeds, 10, , &maxSpeed, , &sumCount)
 
 				drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
@@ -2883,12 +2883,12 @@ class SuspensionInspector {
 				loop 21 {
 					speed := (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed))
 
-					drawChartFunction .= (",`n[" . speed . ", " . counts[A_Index] . ", '" . ((Abs(speed) > hsThreshold) ? ("color: " . color1) : ("color: " . color2)) . "']")
+					drawChartFunction .= (",`n[" . speed . ", " . (counts[A_Index] / sumCount * 100) . ", '" . ((Abs(speed) > hsThreshold) ? ("color: " . color1) : ("color: " . color2)) . "']")
 				}
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log(#)" : "#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: " . 0 . ", maxValue: " . maxCount . ", titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log %" : "%") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
 
 				drawChartFunctions.Push(drawChartFunction)

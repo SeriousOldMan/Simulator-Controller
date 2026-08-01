@@ -1246,7 +1246,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchTab.UseTab(1)
 
 		x := 32
-		x0 := x - 4
+		x0 := x - 2
 		x1 := x + 74
 		x2 := x1 + 32
 		x3 := x2 + 26

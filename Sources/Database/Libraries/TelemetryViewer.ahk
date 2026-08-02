@@ -2883,7 +2883,9 @@ class SuspensionInspector {
 				loop 21 {
 					speed := (- maxSpeed + ((A_Index / 21) * 2 * maxSpeed))
 
-					drawChartFunction .= (",`n[" . speed . ", " . (counts[A_Index] / sumCount * 100) . ", '" . ((Abs(speed) > hsThreshold) ? ("color: " . color1) : ("color: " . color2)) . "']")
+					drawChartFunction .= (",`n[" . speed . ", "
+												 . ((sumCount > 0) ? (counts[A_Index] / sumCount * 100) : 0) . ", '"
+												 . ("color: " . ((Abs(speed) > hsThreshold) ? color1 : color2)) . "']")
 				}
 
 				drawChartFunction .= "`n]);"

@@ -97,8 +97,13 @@ class TelemetryChart {
 								if (data.Has(row) && (data[row].Length > 11)) {
 									posX := data[row][12]
 
-									if (telemetryViewer.TrackMap && isNumber(posX))
-										telemetryViewer.TrackMap.updateTrackPosition(posX, data[row][13])
+									if isNumber(posX) {
+										if telemetryViewer.TrackMap
+											telemetryViewer.TrackMap.updateTrackPosition(posX, data[row][13])
+
+										if telemetryViewer.SuspensionInspector
+											telemetryViewer.SuspensionInspector.positionSelected(posX, data[row][13])
+									}
 								}
 							}
 						}
@@ -562,14 +567,15 @@ class TelemetryChart {
 	}
 
 	selectPosition(posX, posY, threshold := 40) {
-		local data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+		local telemetryViewer := this.TelemetryViewer
+		local data := telemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
 		local lastX := kUndefined
 		local lastY := kUndefined
 		local row := false
 		local coordX, coordY, dx, dy, deltaX, deltaY, row
 
-		if this.TelemetryViewer.TrackMap
-			threshold /= (this.TelemetryViewer.TrackMap.Window["zoomEdit"].Value / 100)
+		if telemetryViewer.TrackMap
+			threshold /= (telemetryViewer.TrackMap.Window["zoomEdit"].Value / 100)
 
 		if ((data.Length > 0) && data[1].Length > 11) {
 			loop data.Length {
@@ -592,6 +598,9 @@ class TelemetryChart {
 			if row
 				this.selectRow(row - 1)
 		}
+
+		if telemetryViewer.SuspensionInspector
+			telemetryViewer.SuspensionInspector.positionSelected(posX, posY)
 	}
 }
 
@@ -2567,6 +2576,9 @@ class SuspensionInspector {
 	iFrontHighSpeedThreshold := 25
 	iRearHighSpeedThreshold := 25
 
+	iPositionX := kUndefined
+	iPositionY := kUndefined
+
 	class InspectorWindow extends Window {
 		iInspector := false
 
@@ -2668,9 +2680,21 @@ class SuspensionInspector {
 			this.iLogarithmic := value
 
 			if (value != oldValue)
-				this.telemetryChanged()
+				this.updateHistogram()
 
 			return value
+		}
+	}
+
+	Mode {
+		Get {
+			return ((this.Window["scopeDropDown"].Value == 1) ? "Lap" : "Position")
+		}
+	}
+
+	Range {
+		Get {
+			return this.Window["scopeRangeEdit"].Text
 		}
 	}
 
@@ -2688,7 +2712,35 @@ class SuspensionInspector {
 				this.iRearHighSpeedThreshold := value
 
 			if (value != oldValue)
-				this.telemetryChanged()
+				this.updateHistogram()
+
+			return value
+		}
+	}
+
+	TrackPosition {
+		Get {
+			if (this.iPositionX != kUndefined)
+				return {X: this.iPositionX, Y: this.iPositionY}
+			else
+				return false
+		}
+
+		Set {
+			local lastX := this.iPositionX
+			local lastY := this.iPositionY
+
+			if !value {
+				this.iPositionX := kUndefined
+				this.iPositionY := kUndefined
+			}
+			else {
+				this.iPositionX := value.X
+				this.iPositionY := value.Y
+			}
+
+			if ((this.iPositionX != lastX) || (this.iPositionY != lastY))
+				this.updateHistogram()
 
 			return value
 		}
@@ -2758,10 +2810,20 @@ class SuspensionInspector {
 			this.Logarithmic := (inspectorGui["layoutDropDown"].Value == 1)
 		})
 
-		inspectorGui.Add("DropDownList", "x254 yp+24 w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) => this.updateState())
-		inspectorGui.Add("Text", "x367 yp+4 w20 Right", translate("+/-"))
-		inspectorGui.Add("Edit", "x388 yp-2 w40 Number vscopeRangeEdit", 100)
-		inspectorGui.Add("Text", "x430 yp+2 w58 ", translate("Meter"))
+		inspectorGui.Add("DropDownList", "x254 yp+24 w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) {
+			this.updateHistogram()
+			this.updateState()
+		})
+		inspectorGui.Add("Text", "x367 yp+4 w20 Right X:Move", translate("+/-"))
+		inspectorGui.Add("Edit", "x388 yp-2 w40 Number X:Move vscopeRangeEdit", 100).OnEvent("LoseFocus", (*) {
+			if !validateInteger(50, 500, inspectorGui["scopeRangeEdit"], "Validate"
+									   , inspectorGui["scopeRangeEdit"].Text)
+				inspectorGui["scopeRangeEdit"].Text := 100
+
+			this.updateHistogram()
+			this.updateState()
+		})
+		inspectorGui.Add("Text", "x430 yp+2 w58 X:Move", translate("Meter"))
 
 		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 ys+50 w480 h480 W:Grow H:Grow Border vhistogramViewer")
 
@@ -2787,7 +2849,7 @@ class SuspensionInspector {
 		if getWindowSize("Telemetry Browser.Suspension Inspector", &w, &h)
 			this.Window.Resize("Initialize", w, h)
 
-		this.telemetryChanged()
+		this.updateHistogram()
 	}
 
 	close() {
@@ -2809,20 +2871,27 @@ class SuspensionInspector {
 		}
 	}
 
-	windowResized() {
-		local ignore, viewer
+	updateHistogram() {
+		this.showSuspensionHistogram(this.Telemetry)
 
+		this.updateState()
+	}
+
+	windowResized() {
 		this.iSuspensionHistogram.Resized()
 
-		this.telemetryChanged()
+		this.updateHistogram()
 	}
 
 	telemetryChanged() {
-		local telemetry := this.Telemetry
+		this.iPositionX := kUndefined
+		this.iPositionY := kUndefined
 
-		this.showSuspensionHistogram(telemetry)
+		this.updateHistogram()
+	}
 
-		this.updateState()
+	positionSelected(posX, posY) {
+		this.TrackPosition := {X: posX, Y: posY}
 	}
 
 	showSuspensionHistogram(telemetry, referenceTelemetry := false) {
@@ -2838,10 +2907,12 @@ class SuspensionInspector {
 	createSuspensionHistogram(telemetry, referenceTelemetry := false, margin := 0) {
 		local key := ((telemetry ? ObjPtr(telemetry) : false)
 					. (referenceTelemetry ? ObjPtr(referenceTelemetry) : false)
-					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"])
+					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"]
+					. this.Mode . this.Range . this.iPositionX . this.iPositionY)
 		local drawChartFunctions := []
 		local counts, maxSpeed, maxCount, sumCount, drawChartFunction, before, after, speeds
-		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
+		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2, position
+		local startIndex, endIndex
 
 		static drawerCache := Cache(10)
 
@@ -2855,6 +2926,8 @@ class SuspensionInspector {
 			if isDebug()
 				logMessage(kLogDebug, "Cache miss in SuspensionInspector.createSuspensionHistogram...")
 
+			position := this.TrackPosition
+
 			frontHSThreshold := this.HighSpeedThreshold["Front"]
 			rearHSThreshold := this.HighSpeedThreshold["Rear"]
 
@@ -2867,10 +2940,28 @@ class SuspensionInspector {
 			color1 := SuspensionInspector.Colors[color1]
 			color2 := SuspensionInspector.Colors[color2]
 
+			if (position && (this.Mode = "Position") && telemetry) {
+				if telemetry.Data {
+					if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, this.Range
+																 , &startIndex, &endIndex) {
+						startIndex := 1
+						endIndex := telemetry.Data.Length
+					}
+				}
+				else {
+					startIndex := 1
+					endIndex := 2147483647
+				}
+			}
+			else {
+				startIndex := 1
+				endIndex := 2147483647
+			}
+
 			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
 				drawChartFunction := ("function drawChart" . wheel . "() {")
 
-				speeds := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel)
+				speeds := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel, startIndex, endIndex)
 				counts := TelemetryAnalyzer.computeMovementDistribution(speeds, 10, , &maxSpeed, , &sumCount)
 
 				drawChartFunction .= "`nvar data = new google.visualization.DataTable();"

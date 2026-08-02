@@ -31,7 +31,26 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.1.5.0
+
+#### Date: 08/07/26 (planned)
+
+#### Fixes
+
+  - A critical bug has been fixed in the synchronization process of the community database.
+  - The calculated suspension deflection has been fixed for telemtries recorded for *RaceRoom Racing Experience* and *iRacing*.
+  
+#### Changes
+
+  - A new suspension dynamics inspector is available when telemetry data is inspected in the "Setup Workbench". This inspector allows you to optimize the settings for low- and high-speed damping. See the [new documentation] for more information.
+  - The Driving Coach will try to load a track map at the beginning of each lap until success. This helps when the Coach is used on a track, that has neven been driven before.
+  - Many improvements for the telemetry system:
+    - The lap time of a recorded lap will now be displayed in the list of telemetries in the "Session Database", if available.
+	- The high resolution telemetry files implemented in the last release will now load much faster in the telemetry viewer.
+	- The IBT file importer for *iRacing* will now import suspension deflection information, if available.
+	- The Second Monitor importer and also the corresponding telemetry provider for the telemetry system will now import suspension deflection information, if available.
+  - [Internal] Handling of modal windows has been optimized so that always the window, which was on top before the modal window had been opened, will be on top again.
+  - [Internal] A caching has been implemented for loaded telemetry files to prevent to many disc requests.
 
 # Release history
 

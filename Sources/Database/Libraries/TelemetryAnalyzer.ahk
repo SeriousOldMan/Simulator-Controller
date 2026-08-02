@@ -1541,6 +1541,49 @@ class TelemetryAnalyzer {
 			return false
 	}
 
+	findTrackRange(telemetry, posX, posY, distance, &startIndex, &endIndex) {
+		local pIndex, pDistance, sDistance, eDistance, data, length
+
+		try {
+			data := telemetry.Data
+			length := data.Length
+
+			pIndex := TelemetryAnalyzer.getTelemetryCoordinateIndex(data, posX, posY)
+			pDistance := telemetry.getValue(pIndex, "Distance")
+
+			sDistance := (pDistance - distance)
+			eDistance := (pDistance + distance)
+
+			loop {
+				if ((pIndex - A_Index <= 1)
+				 || (telemetry.getValue(pIndex - A_Index, "Distance") <= sDistance)) {
+					startIndex := pIndex - A_Index
+
+					break
+				}
+			}
+
+			loop {
+				if ((pIndex + A_Index >= length)
+				 || (telemetry.getValue(pIndex + A_Index, "Distance") >= eDistance)) {
+					endIndex := pIndex + A_Index
+
+					break
+				}
+			}
+
+			startIndex := Max(1, startIndex)
+			endIndex := Min(endIndex, telemetry.Data.Length)
+
+			return true
+		}
+		catch Any as exception {
+			logError(exception)
+
+			return false
+		}
+	}
+
 	findSection(x, y, threshold := 10) {
 		local trackMap := this.TrackMap
 		local lastSection := false
@@ -2135,7 +2178,7 @@ class TelemetryAnalyzer {
 		return createIssues(bottomOuts)
 	}
 
-	static computeSuspensionSpeeds(telemetry, wheel) {
+	static computeSuspensionSpeeds(telemetry, wheel, startIndex?, endIndex?) {
 		local deflections := []
 		local deflAverage := MovingAverage(5)
 		local time, deflection
@@ -2159,8 +2202,13 @@ class TelemetryAnalyzer {
 				}
 			}
 
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := deflections.Length
+			}
+
 			loop deflections.Length
-				if (A_Index > 1)
+				if ((A_Index > 1) && (A_Index >= startIndex) && (A_Index <= endIndex))
 					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
 											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
 

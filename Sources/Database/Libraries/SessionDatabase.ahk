@@ -1812,14 +1812,16 @@ class SessionDatabase extends ConfigurationItem {
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
 
-				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
+				RunWait("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
 
+				/*
 				Sleep(500)
 
 				count := 0
 
 				while (ProcessExist(pid) && (count++ < 100))
 					Sleep(100)
+				*/
 
 				if FileExist(importFileName) {
 					info := (importFileName . ".info")

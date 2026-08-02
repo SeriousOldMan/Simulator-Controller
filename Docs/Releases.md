@@ -42,7 +42,7 @@
   
 #### Changes
 
-  - A new suspension dynamics inspector is available when telemetry data is inspected in the "Setup Workbench". This inspector allows you to optimize the settings for low- and high-speed damping. See the [new documentation] for more information.
+  - A new suspension dynamics inspector is available when telemetry data is inspected in the "Setup Workbench". This inspector allows you to optimize the settings for low- and high-speed damping. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-suspension-dynamics) for more information.
   - The Driving Coach will try to load a track map at the beginning of each lap until success. This helps when the Coach is used on a track, that has neven been driven before.
   - Many improvements for the telemetry system:
     - The lap time of a recorded lap will now be displayed in the list of telemetries in the "Session Database", if available.

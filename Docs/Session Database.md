@@ -186,6 +186,8 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
 - You can load telemetry files from Simulator Controller, for example a file that has been sent to you by a team mate.
 - You can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 - Importing IBT files from *iRacing* is also supported, as long as a track map for the currently selected track has already been created. In this case, you will first have to select the IBT file, which is then split up into individual files for each lap contained in the IBT file. After that is done, you can select the laps, which you want to import.
+
+  Please note, that the telemetry data supplied in the IBT files does **not** include the current time into the lap. This will prevent all timing related use cases like suspension dynamic analysis and the Driving Coach will not be able to give you coaching on the track.
 - And you can import telemetry files from "MoTec". They must be exported as "CSV" files and the "Distance" (meters) field must be included. And if you want to use the telemetry data also for handling analysis, include a "YawRate" (radians / sec) field as well. Since "MoTeC" uses the absolute angle for the steering information, it is beneficial to divide this value by the steer lock of the car, to make the information comparable to that of other lap telemetry data. The importer will use the information available in the "Setup Workbench" about the different cars, or you can define the [corresponding setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) in the "Session Database".
 - Finally, telemetry data can be imported from any tool, as long as an export in generic CSV format is supported. The following columns are supported:
 
@@ -216,7 +218,7 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.<br>
   (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.<br>
   (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
-  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
+  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
 
 Good to know:
 

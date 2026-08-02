@@ -1293,6 +1293,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		Sleep(200)
 
+		this.closeTelemetryViewer()
+
 		this.clearCharacteristics()
 
 		showProgress({progress: this.ProgressCount++, message: translate("Preparing Knowledgebase...")})
@@ -1488,6 +1490,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.Control["trackDropDown"].Choose(track)
 
+				this.closeTelemetryViewer()
+
 				this.updateState()
 			}
 			finally {
@@ -1543,15 +1547,6 @@ class SetupWorkbench extends ConfigurationItem {
 
 					trackLength := getMultiMapValue(readSimulator(simulator, this.SelectedCar[false], track), "Track Data", "Length", 0)
 
-					/*
-					simulatorCode := SessionDatabase.getSimulatorCode(simulator)
-
-					if (simulatorCode = "ACC")
-						trackLength := getMultiMapValue(ACCUDPProvider().acquire(), "Track Data", "Length", 0)
-					else
-						trackLength := getMultiMapValue(callSimulator(simulatorCode), "Track Data", "Length", 0)
-					*/
-
 					if (trackLength > 0) {
 						lastSimulator := simulator
 						lastTrack := track
@@ -1596,7 +1591,7 @@ class SetupWorkbench extends ConfigurationItem {
 				DirCreate(kTempDirectory . "Setup Workbench\Telemetry")
 			}
 
-			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Setup Workbench\Telemetry")
+			this.iTelemetryViewer := TelemetryViewer(this, kTempDirectory . "Setup Workbench\Telemetry", true, true, true)
 
 			this.TelemetryViewer.show()
 
@@ -1605,6 +1600,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 				PeriodicTask(startupCollector, 2000, kLowPriority).start()
 			}
+		}
+	}
+
+	closeTelemetryViewer() {
+		if this.TelemetryViewer {
+			this.TelemetryViewer.close()
+
+			this.iTelemetryViewer := false
 		}
 	}
 

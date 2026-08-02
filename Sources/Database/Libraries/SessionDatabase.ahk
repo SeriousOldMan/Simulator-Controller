@@ -2172,7 +2172,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		SplitPath(fileName, , , , &name)
-msgbox fileName
+
 		if InStr(fileName, ".json") {
 			if verbose {
 				withBlockedWindows(() {

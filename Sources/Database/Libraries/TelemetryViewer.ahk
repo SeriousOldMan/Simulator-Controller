@@ -89,10 +89,15 @@ class TelemetryChart {
 						if isNumber(row) {
 							row := (row + 1)
 
-							if telemetryViewer.Data.Has(telemetryViewer.SelectedLap[true]) {
-								this.selectRow(row)
+							data := telemetryViewer.Data
 
-								data := telemetryViewer.Data[telemetryViewer.SelectedLap[true]]
+							if data.Has(telemetryViewer.SelectedLap[true]) {
+								data := data[telemetryViewer.SelectedLap[true]]
+
+								if (data.Length > 1000)
+									row *= (Round(data.Length / 1000) + 1)
+
+								this.selectRow(row)
 
 								if (data.Has(row) && (data[row].Length > 11)) {
 									posX := data[row][12]
@@ -538,8 +543,9 @@ class TelemetryChart {
 		return ("<div id=`"chart" . cluster . "`" style=`"width: " . Round(width) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	selectRow(row) {
-		local settings, data, x
+	selectRow(row, scale := true) {
+		local data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+		local settings, x, chartRow
 
 		static htmlViewer := false
 
@@ -551,18 +557,21 @@ class TelemetryChart {
 																			  , getMultiMapValue(settings, "HTML", "Viewer", "IE11")))
 		}
 
-		if (false && (htmlViewer = "WebView2"))
-			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . row . ")", false)
+		if (scale && (data.Length > 1000))
+			chartRow := Round(row / (Round(data.Length / 1000) + 1))
 		else
-			this.ChartArea.document.parentWindow.selectTelemetry(row)
+			chartRow := row
 
-		data := this.TelemetryViewer.Data[this.TelemetryViewer.SelectedLap[true]]
+		if (false && (htmlViewer = "WebView2"))
+			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . chartRow . ")", false)
+		else
+			this.ChartArea.document.parentWindow.selectTelemetry(chartRow)
 
 		if (data.Has(row) && (data[row].Length > 11)) {
 			x := data[row][12]
 
 			if isNumber(x)
-				this.TelemetryViewer.showSectionInfo(x, data[row][13])
+				this.TelemetryViewer.showSectionInfo(x, data[row][13], true)
 		}
 	}
 

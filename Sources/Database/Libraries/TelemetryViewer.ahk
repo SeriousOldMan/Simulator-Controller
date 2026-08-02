@@ -562,8 +562,9 @@ class TelemetryChart {
 		else
 			chartRow := row
 
-		if (false && (htmlViewer = "WebView2"))
-			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . chartRow . ")", false)
+		if (htmlViewer = "WebView2") {
+			; this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . chartRow . ")", false)
+		}
 		else
 			this.ChartArea.document.parentWindow.selectTelemetry(chartRow)
 
@@ -2586,7 +2587,8 @@ class SuspensionInspector {
 	iCar := false
 	iTrack := false
 
-	iSuspensionHistogram := false
+	iVelocityHistograms := false
+	iVelocityCharts := false
 
 	iLogarithmic := true
 	iFrontHighSpeedThreshold := 25
@@ -2791,7 +2793,7 @@ class SuspensionInspector {
 		inspectorGui.SetFont("s9 Norm", "Arial")
 
 		inspectorGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Suspension Dynamics")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-suspension-dynamics")
 
 		inspectorGui.SetFont("s8 Norm", "Arial")
 
@@ -2841,11 +2843,19 @@ class SuspensionInspector {
 		})
 		inspectorGui.Add("Text", "x430 yp+2 w58 X:Move", translate("Meter"))
 
-		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 ys+50 w480 h480 W:Grow H:Grow Border vhistogramViewer")
+		tabView := inspectorGui.Add("Tab3", "x8 ys+50 w480 h480 W:Grow H:Grow Section", collect(["Histogram", "Velocity"], translate))
 
-		this.iSuspensionHistogram.document.open()
-		this.iSuspensionHistogram.document.write("")
-		this.iSuspensionHistogram.document.close()
+		tabView.UseTab(1)
+
+		this.iVelocityHistograms := inspectorGui.Add("HTMLViewer", "x16 ys+30 w464 h440 W:Grow H:Grow vhistogramViewer")
+
+		tabView.UseTab(2)
+
+		this.iVelocityCharts := inspectorGui.Add("HTMLViewer", "x16 ys+30 w464 h440 W:Grow H:Grow vchartsViewer")
+
+		this.iVelocityHistograms.document.open()
+		this.iVelocityHistograms.document.write("")
+		this.iVelocityHistograms.document.close()
 
 		inspectorGui.Add(SuspensionInspector.InspectorResizer(this))
 
@@ -2894,7 +2904,7 @@ class SuspensionInspector {
 	}
 
 	windowResized() {
-		this.iSuspensionHistogram.Resized()
+		this.iVelocityHistograms.Resized()
 
 		this.updateHistogram()
 	}
@@ -2911,7 +2921,7 @@ class SuspensionInspector {
 	}
 
 	showSuspensionHistogram(telemetry, referenceTelemetry := false) {
-		local chartArea := this.iSuspensionHistogram
+		local chartArea := this.iVelocityHistograms
 
 		if chartArea {
 			chartArea.document.open()
@@ -3042,8 +3052,8 @@ class SuspensionInspector {
 
 		ControlGetPos( , , &w, &h, this.Window["histogramViewer"])
 
-		w := ((w / 2) - 10)
-		h := ((h / 2) - 10)
+		w := ((w / 2) - 8)
+		h := ((h / 2) - 8)
 
 		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table>" . "</body></html>")
 	}

@@ -1591,7 +1591,7 @@ class RaceAssistant extends ConfigurationItem {
 										   , "Remaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0)) . volumeUnit)
 										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
 
-					if knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined)
+					if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined) != kUndefined)
 						knowledge["Energy"] := Map("Remaining", knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining") . " %")
 				}
 				catch Any as exception {

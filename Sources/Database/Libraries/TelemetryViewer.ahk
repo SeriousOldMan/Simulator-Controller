@@ -655,18 +655,25 @@ class TelemetryViewer {
 			this.iActivationTask := PeriodicTask(() {
 										local ignore, button
 
-										for ignore, button in ["LButton", "MButton", "RButton"]
-											if GetKeyState(button) {
-												lastButton := A_TickCount
+										try {
+											for ignore, button in ["LButton", "MButton", "RButton"]
+												if GetKeyState(button) {
+													lastButton := A_TickCount
 
-												return
+													return
+												}
+
+											if (WinActive(this) && (A_TickCount > (lastButton + 5000)))
+												if (A_TickCount > (lastActivation + 2000)) {
+													lastActivation := A_TickCount
+
+													Task.startTask(() => SectionInfoViewer.bringToFront())
+												}
 											}
+											catch Any as exception {
+												logError(exception)
 
-										if (WinActive(this) && (A_TickCount > (lastButton + 5000)))
-											if (A_TickCount > (lastActivation + 2000)) {
-												lastActivation := A_TickCount
-
-												Task.startTask(() => SectionInfoViewer.bringToFront())
+												this.iActivationTask.stop()
 											}
 									}, 50, kInterruptPriority)
 

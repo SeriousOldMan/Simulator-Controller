@@ -1293,6 +1293,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		Sleep(200)
 
+		this.closeTelemetryViewer()
+
 		this.clearCharacteristics()
 
 		showProgress({progress: this.ProgressCount++, message: translate("Preparing Knowledgebase...")})
@@ -1488,6 +1490,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.Control["trackDropDown"].Choose(track)
 
+				this.closeTelemetryViewer()
+
 				this.updateState()
 			}
 			finally {
@@ -1596,6 +1600,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 				PeriodicTask(startupCollector, 2000, kLowPriority).start()
 			}
+		}
+	}
+
+	closeTelemetryViewer() {
+		if this.TelemetryViewer {
+			this.TelemetryViewer.close()
+
+			this.iTelemetryViewer := false
 		}
 	}
 

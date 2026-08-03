@@ -562,8 +562,9 @@ class TelemetryChart {
 		else
 			chartRow := row
 
-		if (false && (htmlViewer = "WebView2"))
-			this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . chartRow . ")", false)
+		if (htmlViewer = "WebView2") {
+			; this.ChartArea.HTMLViewer.WebView2.Core().ExecuteScript("selectTelemetry(" . chartRow . ")", false)
+		}
 		else
 			this.ChartArea.document.parentWindow.selectTelemetry(chartRow)
 
@@ -728,8 +729,8 @@ class TelemetryViewer {
 
 					Task.startTask(ObjBindMethod(this.iTelemetryViewer, "updateTelemetryChart", true))
 				}
-				catch Any as exception {
-					logError(exception)
+				catch Any {
+					return false
 				}
 				finally {
 					this.iRedraw := false
@@ -2577,6 +2578,13 @@ class SuspensionInspector {
 					, "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707"
 					, "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e"
 					, "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"]
+	static WheelTypes := CaseInsenseMap("FrontLeft", "FL", "FrontRight", "FR"
+									  , "RearLeft", "RL", "RearRight", "RR"
+									  , "Front Left", "FL", "Front Right", "FR"
+									  , "Rear Left", "RL", "Rear Right", "RR"
+									  , "FL", "Front Left", "FR", "Front Right"
+									  , "RL", "Rear Left", "RR", "Rear Right"
+									  , "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR")
 
 	iTelemetryViewer := false
 
@@ -2586,11 +2594,15 @@ class SuspensionInspector {
 	iCar := false
 	iTrack := false
 
-	iSuspensionHistogram := false
+	iVelocityHistograms := false
+	iDetailsChart := false
 
 	iLogarithmic := true
 	iFrontHighSpeedThreshold := 25
 	iRearHighSpeedThreshold := 25
+
+	iWheels := ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+	iChartType := "Velocity"
 
 	iPositionX := kUndefined
 	iPositionY := kUndefined
@@ -2640,7 +2652,12 @@ class SuspensionInspector {
 
 				this.iInspector.windowResized()
 
-				WinRedraw(this.iInspector.Window)
+				try {
+					WinRedraw(this.iInspector.Window)
+				}
+				catch Any {
+					return false
+				}
 			}
 
 			return Task.CurrentTask
@@ -2696,7 +2713,7 @@ class SuspensionInspector {
 			this.iLogarithmic := value
 
 			if (value != oldValue)
-				this.updateHistogram()
+				this.updateCharts()
 
 			return value
 		}
@@ -2714,6 +2731,18 @@ class SuspensionInspector {
 		}
 	}
 
+	Wheels {
+		Get {
+			return this.iWheels
+		}
+	}
+
+	ChartType {
+		Get {
+			return this.iChartType
+		}
+	}
+
 	HighSpeedThreshold[axle] {
 		Get {
 			return ((axle = "Front") ? this.iFrontHighSpeedThreshold : this.iRearHighSpeedThreshold)
@@ -2728,7 +2757,7 @@ class SuspensionInspector {
 				this.iRearHighSpeedThreshold := value
 
 			if (value != oldValue)
-				this.updateHistogram()
+				this.updateCharts()
 
 			return value
 		}
@@ -2756,7 +2785,7 @@ class SuspensionInspector {
 			}
 
 			if ((this.iPositionX != lastX) || (this.iPositionY != lastY))
-				this.updateHistogram()
+				this.updateCharts()
 
 			return value
 		}
@@ -2771,7 +2800,7 @@ class SuspensionInspector {
 	}
 
 	createGui() {
-		local inspectorGui
+		local inspectorGui, tabView
 
 		validateInteger(minValue, maxValue, field, operation, value?) {
 			if (operation = "Validate")
@@ -2791,7 +2820,7 @@ class SuspensionInspector {
 		inspectorGui.SetFont("s9 Norm", "Arial")
 
 		inspectorGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Suspension Dynamics")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-suspension-dynamics")
 
 		inspectorGui.SetFont("s8 Norm", "Arial")
 
@@ -2821,31 +2850,73 @@ class SuspensionInspector {
 		inspectorGui.Add("UpDown", "x130 yp w50 h23 Range10-100", 25)
 		inspectorGui.Add("Text", "x182 yp+2 w40 ", translate("mm/s"))
 
-		inspectorGui.Add("Text", "x256 ys w120 X:Move", translate("Display"))
-		inspectorGui.Add("DropDownList", "x388 yp-4 w100 X:Move Choose1 vlayoutDropDown", collect(["Logarithmic", "Linear"], translate)).OnEvent("Change", (*) {
-			this.Logarithmic := (inspectorGui["layoutDropDown"].Value == 1)
-		})
-
-		inspectorGui.Add("DropDownList", "x254 yp+24 w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) {
-			this.updateHistogram()
+		inspectorGui.Add("DropDownList", "x254 ys w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) {
 			this.updateState()
+
+			this.updateCharts()
 		})
-		inspectorGui.Add("Text", "x367 yp+4 w20 Right X:Move", translate("+/-"))
+		inspectorGui.Add("Text", "x367 yp+2 w20 Right X:Move", translate("+/-"))
 		inspectorGui.Add("Edit", "x388 yp-2 w40 Number X:Move vscopeRangeEdit", 100).OnEvent("LoseFocus", (*) {
 			if !validateInteger(50, 500, inspectorGui["scopeRangeEdit"], "Validate"
 									   , inspectorGui["scopeRangeEdit"].Text)
 				inspectorGui["scopeRangeEdit"].Text := 100
 
-			this.updateHistogram()
+			this.updateCharts()
+
 			this.updateState()
 		})
 		inspectorGui.Add("Text", "x430 yp+2 w58 X:Move", translate("Meter"))
 
-		this.iSuspensionHistogram := inspectorGui.Add("HTMLViewer", "x8 ys+50 w480 h480 W:Grow H:Grow Border vhistogramViewer")
+		tabView := inspectorGui.Add("Tab3", "x8 ys+50 w480 h480 W:Grow H:Grow Section", collect(["Histogram", "Details"], translate))
 
-		this.iSuspensionHistogram.document.open()
-		this.iSuspensionHistogram.document.write("")
-		this.iSuspensionHistogram.document.close()
+		tabView.UseTab(1)
+
+		inspectorGui.Add("Text", "x300 ys+30 w80 X:Move", translate("Scale"))
+		inspectorGui.Add("DropDownList", "x380 yp-4 w100 X:Move Choose1 vlayoutDropDown", collect(["Logarithmic", "Linear"], translate)).OnEvent("Change", (*) {
+			this.Logarithmic := (inspectorGui["layoutDropDown"].Value == 1)
+		})
+
+		this.iVelocityHistograms := inspectorGui.Add("HTMLViewer", "x16 yp+26 w464 h414 W:Grow H:Grow Border vhistogramViewer")
+
+		this.iVelocityHistograms.document.open()
+		this.iVelocityHistograms.document.write("")
+		this.iVelocityHistograms.document.close()
+
+		tabView.UseTab(2)
+
+		inspectorGui.Add("Text", "x16 ys+30 w80", translate("Wheel(s)"))
+		inspectorGui.Add("DropDownList", "x98 yp-4 w100 Choose1 vwheelsDropDown", collect(["All", "Front", "Rear", "Front Left", "Front Right", "Rear Left", "Rear Right"], translate)).OnEvent("Change", (*) {
+			local chosen := inspectorGui["wheelsDropDown"].Value
+
+			if (chosen == 1)
+				this.iWheels := ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+			else if (chosen == 2)
+				this.iWheels := ["Front Left", "Front Right"]
+			else if (chosen == 3)
+				this.iWheels := ["Rear Left", "Rear Right"]
+			else
+				this.iWheels := [["Front Left"], ["Front Right"], ["Rear Left"], ["Rear Right"]][chosen - 3]
+
+			this.updateDetails()
+
+			this.updateState()
+		})
+
+		inspectorGui.Add("Text", "x300 ys+30 w80 X:Move", translate("Display"))
+		inspectorGui.Add("DropDownList", "x380 yp-4 w100 X:Move Choose2 vDisplayDropDown", collect(["Deflection", "Velocity", "Acceleration", "H-Speed/L-Speed"], translate)).OnEvent("Change", (*) {
+			this.iChartType := ["Deflection", "Velocity"
+							  , "Acceleration", "H-Speed/L-Speed"][inspectorGui["displayDropDown"].Value]
+
+			this.updateDetails()
+
+			this.updateState()
+		})
+
+		this.iDetailsChart := inspectorGui.Add("HTMLViewer", "x16 yp+26 w464 h414 W:Grow H:Grow Border vdetailsViewer")
+
+		this.iDetailsChart.document.open()
+		this.iDetailsChart.document.write("")
+		this.iDetailsChart.document.close()
 
 		inspectorGui.Add(SuspensionInspector.InspectorResizer(this))
 
@@ -2865,13 +2936,14 @@ class SuspensionInspector {
 		if getWindowSize("Telemetry Browser.Suspension Inspector", &w, &h)
 			this.Window.Resize("Initialize", w, h)
 
-		this.updateHistogram()
+		this.updateCharts()
 	}
 
 	close() {
-		this.Window.Destroy()
+		if this.TelemetryViewer
+			this.TelemetryViewer.closedSuspensionInspector()
 
-		this.TelemetryViewer.closedSuspensionInspector()
+		this.Window.Destroy()
 	}
 
 	updateState() {
@@ -2887,23 +2959,34 @@ class SuspensionInspector {
 		}
 	}
 
+	updateCharts() {
+		this.updateHistogram()
+		this.updateDetails()
+	}
+
 	updateHistogram() {
 		this.showSuspensionHistogram(this.Telemetry)
 
 		this.updateState()
 	}
 
-	windowResized() {
-		this.iSuspensionHistogram.Resized()
+	updateDetails() {
+		this.showSuspensionDetails(this.Telemetry)
 
-		this.updateHistogram()
+		this.updateState()
+	}
+
+	windowResized() {
+		this.iVelocityHistograms.Resized()
+
+		this.updateCharts()
 	}
 
 	telemetryChanged() {
 		this.iPositionX := kUndefined
 		this.iPositionY := kUndefined
 
-		this.updateHistogram()
+		this.updateCharts()
 	}
 
 	positionSelected(posX, posY) {
@@ -2911,11 +2994,21 @@ class SuspensionInspector {
 	}
 
 	showSuspensionHistogram(telemetry, referenceTelemetry := false) {
-		local chartArea := this.iSuspensionHistogram
+		local chartArea := this.iVelocityHistograms
 
 		if chartArea {
 			chartArea.document.open()
 			chartArea.document.write(this.createSuspensionHistogram(telemetry, referenceTelemetry))
+			chartArea.document.close()
+		}
+	}
+
+	showSuspensionDetails(telemetry, referenceTelemetry := false) {
+		local chartArea := this.iDetailsChart
+
+		if chartArea {
+			chartArea.document.open()
+			chartArea.document.write(this.createSuspensionDetails(telemetry, referenceTelemetry))
 			chartArea.document.close()
 		}
 	}
@@ -2928,7 +3021,7 @@ class SuspensionInspector {
 		local drawChartFunctions := []
 		local counts, maxSpeed, maxCount, sumCount, drawChartFunction, before, after, speeds
 		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2, position
-		local startIndex, endIndex
+		local position, startIndex, endIndex
 
 		static drawerCache := Cache(10)
 
@@ -2942,8 +3035,6 @@ class SuspensionInspector {
 			if isDebug()
 				logMessage(kLogDebug, "Cache miss in SuspensionInspector.createSuspensionHistogram...")
 
-			position := this.TrackPosition
-
 			frontHSThreshold := this.HighSpeedThreshold["Front"]
 			rearHSThreshold := this.HighSpeedThreshold["Rear"]
 
@@ -2956,34 +3047,32 @@ class SuspensionInspector {
 			color1 := SuspensionInspector.Colors[color1]
 			color2 := SuspensionInspector.Colors[color2]
 
+			position := this.TrackPosition
+
 			if (position && (this.Mode = "Position") && telemetry) {
-				if telemetry.Data {
-					if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, this.Range
-																 , &startIndex, &endIndex) {
-						startIndex := 1
-						endIndex := telemetry.Data.Length
-					}
-				}
-				else {
+				if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, this.Range
+															 , &startIndex, &endIndex) {
 					startIndex := 1
-					endIndex := 2147483647
+					endIndex := telemetry.Data.Length
 				}
 			}
-			else {
+			else if telemetry {
 				startIndex := 1
-				endIndex := 2147483647
+				endIndex := telemetry.Data.Length
+			}
+			else {
+				startIndex := 0
+				endIndex := 0
 			}
 
 			for ignore, wheel in ["FL", "FR", "RL", "RR"] {
 				drawChartFunction := ("function drawChart" . wheel . "() {")
 
-				speeds := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel, startIndex, endIndex)
+				speeds := TelemetryAnalyzer.computeSuspensionSpeedDeltas(telemetry, wheel, startIndex, endIndex)
 				counts := TelemetryAnalyzer.computeMovementDistribution(speeds, 10, , &maxSpeed, , &sumCount)
 
-				drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
-
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-				drawChartFunction .= "`n['" . translate("Speed (mm/s)") . "', '" . translate(this.Logarithmic ? "log(#)" : "#") . "', { role: 'style' } ]"
+				drawChartFunction .= "`n['" . translate("Speed (mm/s)") . "', '" . translate(this.Logarithmic ? "log #" : "#") . "', { role: 'style' } ]"
 
 				hsThreshold := (((wheel = "FL") || (wheel = "FR")) ? frontHsThreshold : rearHSThreshold)
 
@@ -2997,7 +3086,7 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log %" : "%") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log %" : "%") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
 
 				drawChartFunctions.Push(drawChartFunction)
@@ -3042,10 +3131,285 @@ class SuspensionInspector {
 
 		ControlGetPos( , , &w, &h, this.Window["histogramViewer"])
 
-		w := ((w / 2) - 10)
-		h := ((h / 2) - 10)
+		w := Round((w / 2) - 8)
+		h := Round((h / 2) - 8)
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table>" . "</body></html>")
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table></body></html>")
+	}
+
+	createSuspensionDetails(telemetry, referenceTelemetry := false, margin := 0) {
+		local key := ((telemetry ? ObjPtr(telemetry) : false)
+					. (referenceTelemetry ? ObjPtr(referenceTelemetry) : false)
+					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"]
+					. this.Mode . this.Range . this.iPositionX . this.iPositionY
+					. values2String(".", this.Wheels*) . this.ChartType)
+		local drawChartFunction, before, after, values, series, speed
+		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
+		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, startDistance, count, skip
+		local flLSCount, flHSCount, frLSCount, frHSCount, rlLSCount, rlHSCount, rrLSCount, rrHSCount
+
+		static valueTypes := CaseInsenseMap("Deflection", "mm", "Velocity", "mm/s", "Acceleration", "m/s²")
+		static drawerCache := Cache(10)
+
+		if drawerCache.Has(key) {
+			if isDebug()
+				logMessage(kLogDebug, "Cache hit in SuspensionInspector.createSuspensionDetails...")
+
+			drawChartFunction := drawerCache[key]
+		}
+		else {
+			if isDebug()
+				logMessage(kLogDebug, "Cache miss in SuspensionInspector.createSuspensionDetails...")
+
+			frontHSThreshold := this.HighSpeedThreshold["Front"]
+			rearHSThreshold := this.HighSpeedThreshold["Rear"]
+
+			color1 := Random(1, SuspensionInspector.Colors.Length)
+
+			loop
+				color2 := Random(1, SuspensionInspector.Colors.Length)
+			until (color1 != color2)
+
+			color1 := SuspensionInspector.Colors[color1]
+			color2 := SuspensionInspector.Colors[color2]
+
+			position := this.TrackPosition
+
+			if (position && (this.Mode = "Position") && telemetry) {
+				if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, this.Range
+															 , &startIndex, &endIndex) {
+					startIndex := 1
+					endIndex := telemetry.Data.Length
+				}
+			}
+			else if telemetry {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+			else {
+				startIndex := 0
+				endIndex := 0
+			}
+
+			if (this.ChartType = "H-Speed/L-Speed") {
+				drawChartFunction .= "function drawChart() {"
+
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= ("`n['" . translate("Meter") . "','" . translate("Highspeed") . "','" . translate("Lowspeed") . "']")
+
+				series := []
+				flLSCount := 0
+				flHSCount := 0
+				frLSCount := 0
+				frHSCount := 0
+				rlLSCount := 0
+				rlHSCount := 0
+				rrLSCount := 0
+				rrHSCount := 0
+
+				for ignore, wheel in this.Wheels
+					series.Push(TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel, startIndex, endIndex))
+
+				if (telemetry && (telemetry.Data.Length > 0) && (telemetry.getValue(1, "Distance") != kUndefined)) {
+					index := startIndex - 1
+
+					count := 0
+					skip := Round(telemetry.Data.Length / 250)
+
+					loop (endIndex - startIndex) {
+						index += 1
+
+						for ignore, wheel in this.Wheels {
+							wheel := SuspensionInspector.WheelTypes[wheel]
+							speed := series[A_Index][index]
+
+							try {
+							if inList(["FL", "FR"], wheel) {
+								if (speed > frontHSThreshold)
+									%wheel%HSCount += 1
+								else
+									%wheel%LSCount += 1
+							}
+							else {
+								if (speed > rearHSThreshold)
+									%wheel%HSCount += 1
+								else
+									%wheel%LSCount += 1
+							}
+							}
+							catch Any as exception {
+								a := 1
+							}
+						}
+
+						if (isSet(count) && (++count != 1)) {
+							if (count > skip)
+								count := 0
+
+							continue
+						}
+
+						drawChartFunction .= (",`n[" . telemetry.getValue(index, "Distance") . ","
+													 . (flHSCount + frHSCount + rlHSCount + rrHSCount) . ","
+													 . (flLSCount + frLSCount + rlLSCount + rrLSCount) . "]")
+
+						flLSCount := 0
+						flHSCount := 0
+						frLSCount := 0
+						frHSCount := 0
+						rlLSCount := 0
+						rlHSCount := 0
+						rrLSCount := 0
+						rrHSCount := 0
+					}
+				}
+				else {
+					values := []
+
+					for ignore, wheel in this.Wheels
+						values.Push(0)
+
+					drawChartFunction .= (",`n[0,0,0]")
+				}
+
+				drawChartFunction .= "`n]);"
+
+				drawChartFunction .= ("`nvar options = { isStacked: true, curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.ColumChart(document.getElementById('chart')); chart.draw(data, options); }"
+			}
+			else {
+				drawChartFunction .= "function drawChart() {"
+
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= ("`n['" . translate("Meter") . "'")
+
+				for ignore, wheel in this.Wheels
+					drawChartFunction .= (", '" . translate(SuspensionInspector.WheelTypes[wheel]) . "'")
+
+				drawChartFunction .= "]"
+
+				series := []
+
+				for ignore, wheel in this.Wheels {
+					switch this.ChartType, false {
+						case "Deflection":
+							values := TelemetryAnalyzer.computeSuspensionDeflections(telemetry, wheel, startIndex, endIndex)
+						case "Velocity":
+							values := TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel, startIndex, endIndex)
+						case "Acceleration":
+							values := TelemetryAnalyzer.computeSuspensionAccelerations(telemetry, wheel, startIndex, endIndex)
+					}
+
+					series.Push(values)
+				}
+
+				if (telemetry && (telemetry.Data.Length > 0) && (telemetry.getValue(1, "Distance") != kUndefined)) {
+					index := startIndex - 1
+					lastDistance := 0
+
+					if (telemetry.Data.Length > 1000) {
+						count := 0
+						skip := Round(telemetry.Data.Length / 2000)
+					}
+
+					startDistance := kUndefined
+
+					loop (endIndex - startIndex) {
+						index += 1
+
+						if (isSet(count) && (++count != 1)) {
+							if (count > skip)
+								count := 0
+
+							continue
+						}
+
+						distance := telemetry.getValue(index, "Distance")
+
+						if (startDistance == kUndefined)
+							startDistance := distance
+
+						if (distance > lastDistance) {
+							rowIndex := A_Index
+							values := []
+
+							for ignore, wheel in this.Wheels
+								try {
+									values.Push(series[A_Index][rowIndex])
+								}
+								catch Any {
+									values.Push(kNull)
+								}
+
+							if exist(values, (v) => ((v = kNull) || (v = 0)))
+								continue
+
+							drawChartFunction .= (",`n[" . distance . "," . values2String(", ", values*) . "]")
+
+							lastDistance := distance
+						}
+					}
+				}
+				else {
+					values := []
+
+					for ignore, wheel in this.Wheels
+						values.Push(0)
+
+					drawChartFunction .= (",`n[" . 0 . "," . values2String(", ", values*) . "]")
+				}
+
+				drawChartFunction .= "`n]);"
+
+				if (startDistance == kUndefined)
+					startDistance := 0
+
+				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
+			}
+
+			drawerCache[key] := drawChartFunction
+		}
+
+		before := "
+		(
+			<meta charset='utf-8'>
+			<head>
+				<style>
+					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+					.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+					.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+				</style>
+				%chartScript%
+				<script type="text/javascript">
+					%chartLoad%
+		)"
+
+		before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+											 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																					 , "corechart", "table", "scatter")
+											 , fontColor: this.Window.Theme.TextColor
+											 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+											 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+											 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
+
+		after := "
+		(
+				</script>
+			</head>
+		)"
+
+		before .= drawChartFunction
+
+		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
+									 , {margin: margin})
+
+		ControlGetPos( , , &w, &h, this.Window["detailsViewer"])
+
+		w := w - 8
+		h := h - 8
+
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div id=`"chart`" style=`"width: " . w . "; height: " . h . "`"></div></body></html>")
 	}
 }
 
@@ -3118,7 +3482,12 @@ class TrackMap {
 
 				this.iTrackMap.updateTrackMap()
 
-				WinRedraw(this.iTrackMap.Window)
+				try {
+					WinRedraw(this.iTrackMap.Window)
+				}
+				catch Any {
+					return false
+				}
 			}
 
 			return Task.CurrentTask

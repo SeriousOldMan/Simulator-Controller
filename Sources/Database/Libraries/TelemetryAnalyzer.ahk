@@ -1305,6 +1305,14 @@ class Telemetry {
 }
 
 class TelemetryAnalyzer {
+	static WheelTypes := CaseInsenseMap("FrontLeft", "FL", "FrontRight", "FR"
+									  , "RearLeft", "RL", "RearRight", "RR"
+									  , "Front Left", "FL", "Front Right", "FR"
+									  , "Rear Left", "RL", "Rear Right", "RR"
+									  , "FL", "Front Left", "FR", "Front Right"
+									  , "RL", "Rear Left", "RR", "Rear Right"
+									  , "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR")
+
 	static sSchema := false
 
 	static sTCActivationsThreshold := 20
@@ -1986,22 +1994,13 @@ class TelemetryAnalyzer {
 			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
 				local dt1 := (time - lastTime)
 				local dt2 := (nextTime - time)
-				local factor := 1 ; (Round(((log(Abs(dt1)) + log(Abs(dt2))) / 2) / 10) * 10)
 				local term1, term2
-
-				/*
-				while (Abs(dt1) > 100)
-					dt1 /= 10
-
-				while (Abs(dt2) > 100)
-					dt2 /= 10
-				*/
 
 				if ((dt1 <= 0) || (dt2 <= 0))
 					return 0
 
-				term1 := (((nextDeflection - deflection) / dt2) * factor)
-				term2 := (((deflection - lastDeflection) / dt1) * factor)
+				term1 := ((nextDeflection - deflection) / dt2)
+				term2 := ((deflection - lastDeflection) / dt1)
 
 				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
 			}
@@ -2178,7 +2177,166 @@ class TelemetryAnalyzer {
 		return createIssues(bottomOuts)
 	}
 
+	static computeSuspensionDeflections(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local deflection
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if (deflection != kUndefined)
+						deflections.Push(deflAverage.Add(deflection))
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return deflections
+	}
+
 	static computeSuspensionSpeeds(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeSpeeds(deflections) {
+			local speeds := []
+			local speedAverage := MovingAverage(2)
+
+			calculateSpeed(lastTime, lastDeflection, time, deflection) {
+				local dt
+
+				try {
+					dt := (time - lastTime)
+
+					return ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return 0
+				}
+			}
+
+			loop deflections.Length
+				if (A_Index > 1)
+					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
+											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			if (speeds.Length > 1)
+				speeds.InsertAt(1, speeds[1])
+
+			return speeds
+		}
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return computeSpeeds(deflections)
+	}
+
+	static computeSuspensionAccelerations(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeAccelerations(deflections) {
+			local accelerations := []
+			local accAverage := MovingAverage(5)
+			local length := deflections.Length
+			local ignore, deflection
+
+			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
+				local dt1 := (time - lastTime)
+				local dt2 := (nextTime - time)
+				local term1, term2
+
+				if ((dt1 <= 0) || (dt2 <= 0))
+					return 0
+
+				term1 := ((nextDeflection - deflection) / dt2)
+				term2 := ((deflection - lastDeflection) / dt1)
+
+				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
+			}
+
+			loop length
+				if ((A_Index > 1) && (A_Index < length))
+					accelerations.Push(accAverage.Add(calculateAcceleration(deflections[A_Index - 1].Time
+																		  , deflections[A_Index - 1].Deflection
+																		  , deflections[A_Index].Time
+																		  , deflections[A_Index].Deflection
+																		  , deflections[A_Index + 1].Time
+																		  , deflections[A_Index + 1].Deflection)))
+
+			if (accelerations.Length > 0) {
+				accelerations.Push(accelerations[accelerations.Length])
+				accelerations.InsertAt(1, accelerations[1])
+			}
+
+			return accelerations
+		}
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return computeAccelerations(deflections)
+	}
+
+	static computeSuspensionSpeedDeltas(telemetry, wheel, startIndex?, endIndex?) {
 		local deflections := []
 		local deflAverage := MovingAverage(5)
 		local time, deflection
@@ -2202,38 +2360,39 @@ class TelemetryAnalyzer {
 				}
 			}
 
-			if !isSet(startIndex) {
-				startIndex := 1
-				endIndex := deflections.Length
-			}
-
 			loop deflections.Length
-				if ((A_Index > 1) && (A_Index >= startIndex) && (A_Index <= endIndex))
+				if (A_Index > 1)
 					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
 											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			if (speeds.Length > 1)
+				speeds.InsertAt(1, speeds[1])
 
 			return speeds
 		}
 
-		switch wheel, false {
-			case "FrontLeft":
-				chartArea := "FL"
-			case "FrontRight":
-				chartArea := "FR"
-			case "RearLeft":
-				chartArea := "RL"
-			case "RearRight":
-				chartArea := "RR"
-		}
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
 
-		if telemetry
-			loop telemetry.Data.Length {
-				time := telemetry.getValue(A_Index, "Time")
-				deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
-
-				if ((deflection != kUndefined) && (time != kUndefined))
-					deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
 			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
 
 		return computeSpeeds(deflections)
 	}

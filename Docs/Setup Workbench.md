@@ -181,9 +181,11 @@ In addition to the functionality which is available in all applications that use
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Suspension%20Inspector.JPG)
 
-The graph can show you either the suspension velocity histogram either for the whole lap or for a section of the track specified by the currently selected position in the telemetry graph or on the track map. Depending on the car and the track, you may want to change velocity threshold where the damper knee is located between low speed and high speed damping.
+The graph on the first tab can show you the suspension velocity histogram either for the whole lap or for a section of the track specified by the currently selected position in the telemetry graph or on the track map. Depending on the car and the track, you may want to change velocity threshold where the damper knee is located between low speed and high speed damping.
 
 The target is always a Gauss curve, with the compression in the positive value range and with rebound showing negative suspension movement velocity, with over 50% of the suspension movement in the low speed damping area. If that is not a case in your specific setup, apply more or less damping accordingly.
+
+If you want to go more into the details, use the graphs on the second tab. There you can create specialized reports for the suspension movement, also for either the whole lap or a selected part of the track.
 
 #### Choosing the telemetry provider
 

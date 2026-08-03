@@ -2855,7 +2855,7 @@ class SuspensionInspector {
 
 			this.updateCharts()
 		})
-		inspectorGui.Add("Text", "x367 yp+4 w20 Right X:Move", translate("+/-"))
+		inspectorGui.Add("Text", "x367 yp+2 w20 Right X:Move", translate("+/-"))
 		inspectorGui.Add("Edit", "x388 yp-2 w40 Number X:Move vscopeRangeEdit", 100).OnEvent("LoseFocus", (*) {
 			if !validateInteger(50, 500, inspectorGui["scopeRangeEdit"], "Validate"
 									   , inspectorGui["scopeRangeEdit"].Text)
@@ -3143,7 +3143,7 @@ class SuspensionInspector {
 					. margin . this.Logarithmic . this.HighSpeedThreshold["Front"] . this.HighSpeedThreshold["Rear"]
 					. this.Mode . this.Range . this.iPositionX . this.iPositionY
 					. values2String(".", this.Wheels*) . this.ChartType)
-		local drawChartFunction, before, after, values, series
+		local drawChartFunction, before, after, values, series, speed
 		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
 		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, startDistance, count, skip
 		local flLSCount, flHSCount, frLSCount, frHSCount, rlLSCount, rlHSCount, rrLSCount, rrHSCount
@@ -3219,22 +3219,27 @@ class SuspensionInspector {
 					loop (endIndex - startIndex) {
 						index += 1
 
-						for ignore, wheel in ["FL", "FR"] {
+						for ignore, wheel in this.Wheels {
+							wheel := SuspensionInspector.WheelTypes[wheel]
 							speed := series[A_Index][index]
 
-							if (speed > frontHSThreshold)
-								%wheel%HSCount += 1
-							else
-								%wheel%LSCount += 1
-						}
-
-						for ignore, wheel in ["RL", "RR"] {
-							speed := series[A_Index][index]
-
-							if (speed > rearHSThreshold)
-								%wheel%HSCount += 1
-							else
-								%wheel%LSCount += 1
+							try {
+							if inList(["FL", "FR"], wheel) {
+								if (speed > frontHSThreshold)
+									%wheel%HSCount += 1
+								else
+									%wheel%LSCount += 1
+							}
+							else {
+								if (speed > rearHSThreshold)
+									%wheel%HSCount += 1
+								else
+									%wheel%LSCount += 1
+							}
+							}
+							catch Any as exception {
+								a := 1
+							}
 						}
 
 						if (isSet(count) && (++count != 1)) {
@@ -3269,7 +3274,7 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { isStacked: true, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { isStacked: true, curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.ColumChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 			else {
@@ -3359,8 +3364,8 @@ class SuspensionInspector {
 				if (startDistance == kUndefined)
 					startDistance := 0
 
-				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chartDetails')); chart.draw(data, options); }"
+				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 
 			drawerCache[key] := drawChartFunction

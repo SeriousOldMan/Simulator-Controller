@@ -2851,9 +2851,9 @@ class SuspensionInspector {
 		inspectorGui.Add("Text", "x182 yp+2 w40 ", translate("mm/s"))
 
 		inspectorGui.Add("DropDownList", "x254 ys w113 X:Move Choose1 vscopeDropDown", collect(["Full Lap", "Track Position"], translate)).OnEvent("Change", (*) {
-			this.updateCharts()
-
 			this.updateState()
+
+			this.updateCharts()
 		})
 		inspectorGui.Add("Text", "x367 yp+4 w20 Right X:Move", translate("+/-"))
 		inspectorGui.Add("Edit", "x388 yp-2 w40 Number X:Move vscopeRangeEdit", 100).OnEvent("LoseFocus", (*) {
@@ -3145,7 +3145,7 @@ class SuspensionInspector {
 					. values2String(".", this.Wheels*) . this.ChartType)
 		local drawChartFunction, before, after, values, series
 		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
-		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, count, skip
+		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, startDistance, count, skip
 		local flLSCount, flHSCount, frLSCount, frHSCount, rlLSCount, rlHSCount, rrLSCount, rrHSCount
 
 		static valueTypes := CaseInsenseMap("Deflection", "mm", "Velocity", "mm/s", "Acceleration", "m/s²")
@@ -3307,6 +3307,8 @@ class SuspensionInspector {
 						skip := Round(telemetry.Data.Length / 2000)
 					}
 
+					startDistance := kUndefined
+
 					loop (endIndex - startIndex) {
 						index += 1
 
@@ -3318,6 +3320,9 @@ class SuspensionInspector {
 						}
 
 						distance := telemetry.getValue(index, "Distance")
+
+						if (startDistance == kUndefined)
+							startDistance := distance
 
 						if (distance > lastDistance) {
 							rowIndex := A_Index
@@ -3351,8 +3356,11 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
+				if (startDistance == kUndefined)
+					startDistance := 0
+
+				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chartDetails')); chart.draw(data, options); }"
 			}
 
 			drawerCache[key] := drawChartFunction

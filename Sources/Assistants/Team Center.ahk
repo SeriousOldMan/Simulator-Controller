@@ -362,6 +362,8 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					return false
 				}
 				finally {
 					this.iRedraw := false
@@ -424,6 +426,8 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception, true)
+					
+					return false
 				}
 				finally {
 					this.iRedraw := false

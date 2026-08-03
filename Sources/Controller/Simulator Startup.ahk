@@ -147,6 +147,8 @@ class NewsResizer extends Window.Resizer {
 			}
 			catch Any as exception {
 				logError(exception)
+				
+				return false
 			}
 			finally {
 				this.iRedraw := false

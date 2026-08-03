@@ -179,8 +179,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.iSettingsViewer.Resized()
 
-				try
+				try {
 					this.Window.Workbench.updateRecommendations(true, false)
+				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
+				}
 			}
 
 			return Task.CurrentTask

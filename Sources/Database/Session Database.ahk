@@ -210,10 +210,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if ((editor.SelectedModule = "Track") && editor.TrackMap)
-					editor.updateTrackMap()
+				try {
+					if ((editor.SelectedModule = "Track") && editor.TrackMap)
+						editor.updateTrackMap()
 
-				WinRedraw(this.Window)
+					WinRedraw(this.Window)
+				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
+				}
 			}
 
 			return Task.CurrentTask

@@ -326,6 +326,8 @@ class SoloCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
+					
+					return false
 				}
 				finally {
 					this.iRedraw := false
@@ -388,6 +390,8 @@ class SoloCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
+					
+					return false
 				}
 				finally {
 					this.iRedraw := false

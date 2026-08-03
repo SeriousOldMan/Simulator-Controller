@@ -2940,9 +2940,10 @@ class SuspensionInspector {
 	}
 
 	close() {
-		this.Window.Destroy()
+		if this.TelemetryViewer
+			this.TelemetryViewer.closedSuspensionInspector()
 
-		this.TelemetryViewer.closedSuspensionInspector()
+		this.Window.Destroy()
 	}
 
 	updateState() {
@@ -3085,7 +3086,7 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log %" : "%") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { title: '" . translate(this.Logarithmic ? "log %" : "%") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, legend: 'none', backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { " . (this.Logarithmic ? "logScale: true, " : "") . "minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . -maxSpeed . ", maxValue: " . maxSpeed . ", gridlines: { count: 5, color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, title: '" . translate("Speed (mm/s)") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.ColumnChart(document.getElementById('chart" . wheel . "')); chart.draw(data, options); }"
 
 				drawChartFunctions.Push(drawChartFunction)
@@ -3133,7 +3134,7 @@ class SuspensionInspector {
 		w := Round((w / 2) - 8)
 		h := Round((h / 2) - 8)
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table>" . "</body></html>")
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chartFL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartFR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr><tr><td><div id=`"chartRL`" style=`"width: " . w . "; height: " . h . "`"></div></td><td><div id=`"chartRR`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table></body></html>")
 	}
 
 	createSuspensionDetails(telemetry, referenceTelemetry := false, margin := 0) {
@@ -3148,11 +3149,6 @@ class SuspensionInspector {
 
 		static valueTypes := CaseInsenseMap("Deflection", "mm", "Velocity", "mm/s", "Acceleration", "m/s²")
 		static drawerCache := Cache(10)
-
-		ControlGetPos( , , &w, &h, this.Window["detailsViewer"])
-
-		w := Round((w / 2) - 8)
-		h := Round((h / 2) - 8)
 
 		if drawerCache.Has(key) {
 			if isDebug()
@@ -3224,15 +3220,17 @@ class SuspensionInspector {
 				}
 
 				if (telemetry && (telemetry.Data.Length > 0) && (telemetry.getValue(1, "Distance") != kUndefined)) {
-					index := startIndex
+					index := startIndex - 1
 					lastDistance := 0
 
 					if (telemetry.Data.Length > 1000) {
 						count := 0
-						skip := Round(telemetry.Data.Length / 1000)
+						skip := Round(telemetry.Data.Length / 2000)
 					}
 
 					loop (endIndex - startIndex) {
+						index += 1
+
 						if (isSet(count) && (++count != 1)) {
 							if (count > skip)
 								count := 0
@@ -3240,7 +3238,7 @@ class SuspensionInspector {
 							continue
 						}
 
-						distance := telemetry.getValue(index++, "Distance")
+						distance := telemetry.getValue(index, "Distance")
 
 						if (distance > lastDistance) {
 							rowIndex := A_Index
@@ -3274,8 +3272,8 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%', width: " . w . ", height: " . h . " }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
+				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chartDetails')); chart.draw(data, options); }"
 			}
 
 			drawerCache[key] := drawChartFunction
@@ -3314,7 +3312,12 @@ class SuspensionInspector {
 		margins := substituteVariables("style='overflow: auto' leftmargin='%margin%' topmargin='%margin%' rightmargin='%margin%' bottommargin='%margin%'"
 									 , {margin: margin})
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><table><tr><td><div id=`"chart`" style=`"width: " . w . "; height: " . h . "`"></div></td></tr></table></body></html>")
+		ControlGetPos( , , &w, &h, this.Window["detailsViewer"])
+
+		w := w - 8
+		h := h - 8
+
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div id=`"chartDetails`" style=`"width: " . w . "; height: " . h . "`"></div></body></html>")
 	}
 }
 

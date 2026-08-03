@@ -729,7 +729,9 @@ class TelemetryViewer {
 
 					Task.startTask(ObjBindMethod(this.iTelemetryViewer, "updateTelemetryChart", true))
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception)
+
 					return false
 				}
 				finally {
@@ -2655,7 +2657,9 @@ class SuspensionInspector {
 				try {
 					WinRedraw(this.iInspector.Window)
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception)
+
 					return false
 				}
 			}
@@ -3214,16 +3218,19 @@ class SuspensionInspector {
 					index := startIndex - 1
 
 					count := 0
-					skip := Round(telemetry.Data.Length / 250)
+					skip := Round(telemetry.Data.Length / 500)
+
+					startDistance := kUndefined
 
 					loop (endIndex - startIndex) {
 						index += 1
 
+						rowIndex := A_Index
+
 						for ignore, wheel in this.Wheels {
 							wheel := SuspensionInspector.WheelTypes[wheel]
-							speed := series[A_Index][index]
+							speed := series[A_Index][rowIndex]
 
-							try {
 							if inList(["FL", "FR"], wheel) {
 								if (speed > frontHSThreshold)
 									%wheel%HSCount += 1
@@ -3236,10 +3243,6 @@ class SuspensionInspector {
 								else
 									%wheel%LSCount += 1
 							}
-							}
-							catch Any as exception {
-								a := 1
-							}
 						}
 
 						if (isSet(count) && (++count != 1)) {
@@ -3249,7 +3252,12 @@ class SuspensionInspector {
 							continue
 						}
 
-						drawChartFunction .= (",`n[" . telemetry.getValue(index, "Distance") . ","
+						distance := telemetry.getValue(index, "Distance")
+
+						if (startDistance == kUndefined)
+							startDistance := distance
+
+						drawChartFunction .= (",`n[" . distance . ","
 													 . (flHSCount + frHSCount + rlHSCount + rrHSCount) . ","
 													 . (flLSCount + frLSCount + rlLSCount + rrLSCount) . "]")
 
@@ -3274,7 +3282,7 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 			else {
@@ -3485,7 +3493,9 @@ class TrackMap {
 				try {
 					WinRedraw(this.iTrackMap.Window)
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception)
+
 					return false
 				}
 			}

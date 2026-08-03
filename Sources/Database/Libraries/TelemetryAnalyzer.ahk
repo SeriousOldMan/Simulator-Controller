@@ -2195,7 +2195,7 @@ class TelemetryAnalyzer {
 					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
 
 					if (deflection != kUndefined)
-						deflections.Push(deflAverage.Add(deflection))
+						deflections.Push(deflAverage.Add(deflection * 1000))
 					else {
 						deflections := []
 

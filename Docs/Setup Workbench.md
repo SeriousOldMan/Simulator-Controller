@@ -187,6 +187,8 @@ The target is always a Gauss curve, with the compression in the positive value r
 
 If you want to go more into the details, use the graphs on the second tab. There you can create specialized reports for the suspension movement, also for either the whole lap or a selected part of the track.
 
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Suspension%20Inspector%202.JPG)
+
 #### Choosing the telemetry provider
 
 The Telemetry Viewer supports two different sources for telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two to three laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.

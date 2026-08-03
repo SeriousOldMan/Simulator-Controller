@@ -3148,7 +3148,7 @@ class SuspensionInspector {
 					. this.Mode . this.Range . this.iPositionX . this.iPositionY
 					. values2String(".", this.Wheels*) . this.ChartType)
 		local drawChartFunction, before, after, values, series, speed
-		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
+		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2, range
 		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, startDistance, count, skip
 		local flLSCount, flHSCount, frLSCount, frHSCount, rlLSCount, rlHSCount, rrLSCount, rrHSCount
 
@@ -3178,9 +3178,12 @@ class SuspensionInspector {
 			color2 := SuspensionInspector.Colors[color2]
 
 			position := this.TrackPosition
+			range := false
 
 			if (position && (this.Mode = "Position") && telemetry) {
-				if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, this.Range
+				range := this.Range
+
+				if !telemetry.TelemetryAnalyzer.findTrackRange(telemetry, position.X, position.Y, range
 															 , &startIndex, &endIndex) {
 					startIndex := 1
 					endIndex := telemetry.Data.Length
@@ -3257,7 +3260,7 @@ class SuspensionInspector {
 						if (startDistance == kUndefined)
 							startDistance := distance
 
-						drawChartFunction .= (",`n[" . distance . ","
+						drawChartFunction .= (",`n[" . (range ? (distance - startDistance - range) : distance) . ","
 													 . (flHSCount + frHSCount + rlHSCount + rrHSCount) . ","
 													 . (flLSCount + frLSCount + rlLSCount + rrLSCount) . "]")
 
@@ -3285,7 +3288,7 @@ class SuspensionInspector {
 				if (startDistance == kUndefined)
 					startDistance := 0
 
-				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { " . (!range ? ("minValue: " . startDistance . ",") : "") . " gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 			else {
@@ -3355,7 +3358,8 @@ class SuspensionInspector {
 							if exist(values, (v) => ((v = kNull) || (v = 0)))
 								continue
 
-							drawChartFunction .= (",`n[" . distance . "," . values2String(", ", values*) . "]")
+							drawChartFunction .= (",`n[" . (range ? (distance - startDistance - range) : distance) . ","
+														 . values2String(", ", values*) . "]")
 
 							lastDistance := distance
 						}
@@ -3375,7 +3379,7 @@ class SuspensionInspector {
 				if (startDistance == kUndefined)
 					startDistance := 0
 
-				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: " . startDistance . ", gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= ("`nvar options = { legend: {position: 'right', textStyle: { color: '" . this.Window.Theme.TextColor . "'}}, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { " . (!range ? ("minValue: " . startDistance . ",") : "") . "gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
 				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 

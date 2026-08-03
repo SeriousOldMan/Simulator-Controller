@@ -3146,6 +3146,7 @@ class SuspensionInspector {
 		local drawChartFunction, before, after, values, series
 		local ignore, wheel, w, h, hsThreshold, frontHSThreshold, rearHSThreshold, color1, color2
 		local position, index, rowIndex, startIndex, endIndex, distance, lastDistance, count, skip
+		local flLSCount, flHSCount, frLSCount, frHSCount, rlLSCount, rlHSCount, rrLSCount, rrHSCount
 
 		static valueTypes := CaseInsenseMap("Deflection", "mm", "Velocity", "mm/s", "Acceleration", "m/s²")
 		static drawerCache := Cache(10)
@@ -3191,7 +3192,85 @@ class SuspensionInspector {
 			}
 
 			if (this.ChartType = "H-Speed/L-Speed") {
-				drawChartFunction .= "function drawChart() {}"
+				drawChartFunction .= "function drawChart() {"
+
+				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+				drawChartFunction .= ("`n['" . translate("Meter") . "','" . translate("Highspeed") . "','" . translate("Lowspeed") . "']")
+
+				series := []
+				flLSCount := 0
+				flHSCount := 0
+				frLSCount := 0
+				frHSCount := 0
+				rlLSCount := 0
+				rlHSCount := 0
+				rrLSCount := 0
+				rrHSCount := 0
+
+				for ignore, wheel in this.Wheels
+					series.Push(TelemetryAnalyzer.computeSuspensionSpeeds(telemetry, wheel, startIndex, endIndex))
+
+				if (telemetry && (telemetry.Data.Length > 0) && (telemetry.getValue(1, "Distance") != kUndefined)) {
+					index := startIndex - 1
+
+					count := 0
+					skip := Round(telemetry.Data.Length / 250)
+
+					loop (endIndex - startIndex) {
+						index += 1
+
+						for ignore, wheel in ["FL", "FR"] {
+							speed := series[A_Index][index]
+
+							if (speed > frontHSThreshold)
+								%wheel%HSCount += 1
+							else
+								%wheel%LSCount += 1
+						}
+
+						for ignore, wheel in ["RL", "RR"] {
+							speed := series[A_Index][index]
+
+							if (speed > rearHSThreshold)
+								%wheel%HSCount += 1
+							else
+								%wheel%LSCount += 1
+						}
+
+						if (isSet(count) && (++count != 1)) {
+							if (count > skip)
+								count := 0
+
+							continue
+						}
+
+						drawChartFunction .= (",`n[" . telemetry.getValue(index, "Distance") . ","
+													 . (flHSCount + frHSCount + rlHSCount + rrHSCount) . ","
+													 . (flLSCount + frLSCount + rlLSCount + rrLSCount) . "]")
+
+						flLSCount := 0
+						flHSCount := 0
+						frLSCount := 0
+						frHSCount := 0
+						rlLSCount := 0
+						rlHSCount := 0
+						rrLSCount := 0
+						rrHSCount := 0
+					}
+				}
+				else {
+					values := []
+
+					for ignore, wheel in this.Wheels
+						values.Push(0)
+
+					drawChartFunction .= (",`n[0,0,0]")
+				}
+
+				drawChartFunction .= "`n]);"
+
+				drawChartFunction .= ("`nvar options = { isStacked: true, curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.ColumChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 			else {
 				drawChartFunction .= "function drawChart() {"
@@ -3273,7 +3352,7 @@ class SuspensionInspector {
 				drawChartFunction .= "`n]);"
 
 				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate(valueTypes[this.ChartType]) . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '10%', right: '20%', top: '10%', bottom: '10%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chartDetails')); chart.draw(data, options); }"
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 
 			drawerCache[key] := drawChartFunction
@@ -3317,7 +3396,7 @@ class SuspensionInspector {
 		w := w - 8
 		h := h - 8
 
-		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div id=`"chartDetails`" style=`"width: " . w . "; height: " . h . "`"></div></body></html>")
+		return ("<html>" . before . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div id=`"chart`" style=`"width: " . w . "; height: " . h . "`"></div></body></html>")
 	}
 }
 

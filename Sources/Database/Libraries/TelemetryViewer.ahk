@@ -2903,9 +2903,9 @@ class SuspensionInspector {
 		})
 
 		inspectorGui.Add("Text", "x300 ys+30 w80 X:Move", translate("Display"))
-		inspectorGui.Add("DropDownList", "x380 yp-4 w100 X:Move Choose2 vDisplayDropDown", collect(["Deflection", "Velocity", "Acceleration", "H-Speed/L-Speed"], translate)).OnEvent("Change", (*) {
+		inspectorGui.Add("DropDownList", "x380 yp-4 w100 X:Move Choose2 vDisplayDropDown", collect(["Deflection", "Velocity", "Acceleration", "HS / LS"], translate)).OnEvent("Change", (*) {
 			this.iChartType := ["Deflection", "Velocity"
-							  , "Acceleration", "H-Speed/L-Speed"][inspectorGui["displayDropDown"].Value]
+							  , "Acceleration", "HS / LS"][inspectorGui["displayDropDown"].Value]
 
 			this.updateDetails()
 
@@ -3191,11 +3191,11 @@ class SuspensionInspector {
 				endIndex := 0
 			}
 
-			if (this.ChartType = "H-Speed/L-Speed") {
+			if (this.ChartType = "HS / LS") {
 				drawChartFunction .= "function drawChart() {"
 
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-				drawChartFunction .= ("`n['" . translate("Meter") . "','" . translate("Highspeed") . "','" . translate("Lowspeed") . "']")
+				drawChartFunction .= ("`n['" . translate("Meter") . "','" . translate("HS") . "','" . translate("LS") . "']")
 
 				series := []
 				flLSCount := 0
@@ -3274,8 +3274,8 @@ class SuspensionInspector {
 
 				drawChartFunction .= "`n]);"
 
-				drawChartFunction .= ("`nvar options = { isStacked: true, curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
-				drawChartFunction .= "`nvar chart = new google.visualization.ColumChart(document.getElementById('chart')); chart.draw(data, options); }"
+				drawChartFunction .= ("`nvar options = { curveType: 'function', title: '" . translate("#") . "', titlePosition: 'in', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "', bold: false }, backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: { minValue: 0, titleTextStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}, gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, hAxis: { minValue: 0, gridlines: { color: '#" . this.Window.Theme.GridColor . "', textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, chartArea: { left: '0%', right: '20%', top: '0%', bottom: '0%' }, title: '" . translate("Meter") . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "' }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "' } } };")
+				drawChartFunction .= "`nvar chart = new google.visualization.LineChart(document.getElementById('chart')); chart.draw(data, options); }"
 			}
 			else {
 				drawChartFunction .= "function drawChart() {"

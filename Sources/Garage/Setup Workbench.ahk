@@ -46,6 +46,8 @@
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "..\Configuration\Libraries\ConfigurationEditor.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
+#Include "..\Database\Libraries\TelemetryCollector.ahk"
+#Include "..\Database\Libraries\TelemetryAnalyzer.ahk"
 ; #Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
 
 
@@ -186,7 +188,7 @@ class SetupWorkbench extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -3899,6 +3901,7 @@ class FileSetupComparator extends SetupComparator {
 
 class SetupEngineer extends ConfigurationItem {
 	iSetupWorkbench := false
+	iOptions := CaseInsenseMap()
 
 	iConnector := false
 	iConnectionState := "Active"
@@ -3907,7 +3910,9 @@ class SetupEngineer extends ConfigurationItem {
 
 	iInstructions := CaseInsenseWeakMap()
 
-	iTranscript := false
+	iDiary := false
+
+	iIncludeHandling := false
 
 	SetupWorkbench {
 		Get {
@@ -3921,6 +3926,16 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
+	Options[key?] {
+		Get {
+			return (isSet(key) ? this.iOptions[key] : this.iOptions)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iOptions[key] := value) : (this.iOptions := value))
+		}
+	}
+
 	Templates[language?] {
 		Get {
 			local templates, fileName, code, ignore
@@ -3929,18 +3944,18 @@ class SetupEngineer extends ConfigurationItem {
 				templates := CaseInsenseMap()
 
 				for code, ignore in availableLanguages() {
-					fileName := getFileName("Setup Engineer.instructions." . code, kResourcesDirectory . "Instructions\")
+					fileName := getFileName("Setup Workbench.instructions." . code, kResourcesDirectory . "Instructions\")
 
 					if FileExist(fileName) {
 						templates[code] := readMultiMap(fileName)
 
-						fileName := getFileName("Setup Engineer.instructions." . code, kUserHomeDirectory . "Instructions\")
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
 
 						if FileExist(fileName)
 							addMultiMapValues(templates[code], readMultiMap(fileName))
 					}
 					else {
-						fileName := getFileName("Setup Engineer.instructions." . code, kUserHomeDirectory . "Instructions\")
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
 
 						if FileExist(fileName)
 							templates[code] := readMultiMap(fileName)
@@ -3959,14 +3974,22 @@ class SetupEngineer extends ConfigurationItem {
 
 	Instructions[type?] {
 		Get {
+			local instructions
+
 			if isSet(type) {
-				if (type == true)
-					return ["Character", "Simulation", "Handling"]
+				if (type == true) {
+					instructions := ["Character", "Simulation", "Handling"]
+
+					if !this.iIncludeHandling
+						instructions := remove(instructions, "Handling")
+				}
 				else
-					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
+					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
 			else
-				return this.iInstructions
+				instructions := this.iInstructions
+
+			return instructions
 		}
 
 		Set {
@@ -3990,9 +4013,9 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	Transcript {
+	Diary {
 		Get {
-			return this.iTranscript
+			return this.iDiary
 		}
 	}
 
@@ -4004,7 +4027,7 @@ class SetupEngineer extends ConfigurationItem {
 		this.loadInstructions(configuration)
 
 		try {
-			DirCreate(this.Options["Setup Engineeer.Archive"])
+			DirCreate(this.Options["Setup Workbench.Diary"])
 		}
 		catch Any as exception {
 			logError(exception)
@@ -4018,10 +4041,10 @@ class SetupEngineer extends ConfigurationItem {
 
 		options := this.Options
 
-		options["Setup Engineer.Archive"] := getMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", kTempDirectory . "Conversations")
+		options["Setup Workbench.Diary"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", kTempDirectory . "Diary")
 
-		if (!options["Setup Engineer.Archive"] || (Trim(options["Setup Engineer.Archive"]) = ""))
-			options["Setup Engineer.Archive"] := (kTempDirectory . "Conversations")
+		if (!options["Setup Workbench.Diary"] || (Trim(options["Setup Workbench.Diary"]) = ""))
+			options["Setup Workbench.Diary"] := (kTempDirectory . "Diary")
 
 		options["Setup Engineer.Service"] := getMultiMapValue(configuration, "Setup Engineer Service", "Service", getMultiMapValue(configuration, "Setup Engineer", "Service", false))
 		options["Setup Engineer.Model"] := getMultiMapValue(configuration, "Setup Engineer Service", "Model", false)
@@ -4041,7 +4064,7 @@ class SetupEngineer extends ConfigurationItem {
 			if (getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, kUndefined) != kUndefined)
 				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, false)
 			else
-				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(this.Templates[this.VoiceManager.Language["Original"]], "Instructions", instruction)
+				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(this.Templates[getLanguage()], "Instructions", instruction)
 	}
 
 	connectorState(state, reason := false, arguments*) {
@@ -4062,19 +4085,12 @@ class SetupEngineer extends ConfigurationItem {
 
 		switch category, false {
 			case "Character":
-				return substituteVariables(this.Instructions["Character"], {name: this.VoiceManager.Name})
+				return this.Instructions["Character"]
 			case "Simulation":
-				if knowledgeBase {
-					simulator := knowledgeBase.getValue("Session.Simulator")
-					car := knowledgeBase.getValue("Session.Car")
-					track := knowledgeBase.getValue("Session.Track")
-
-					if (simulator && car && track)
-						return substituteVariables(this.Instructions["Simulation"]
-												 , {simulator: SessionDatabase.getSimulatorName(simulator)
-												  , car: SessionDatabase.getCarName(simulator, car)
-												  , track: SessionDatabase.getTrackName(simulator, track)})
-				}
+				return substituteVariables(this.Instructions["Simulation"]
+										 , {simulator: SessionDatabase.getSimulatorName(simulator)
+										  , car: SessionDatabase.getCarName(simulator, car)
+										  , track: SessionDatabase.getTrackName(simulator, track)})
 			case "Handling":
 				MsgBox "Not yet implemented..."
 		}
@@ -4087,21 +4103,25 @@ class SetupEngineer extends ConfigurationItem {
 					, (instruction) => (instruction && (Trim(instruction) != "")))
 	}
 
-	startConversation() {
+	getTools() {
+		return []
+	}
+
+	startInteraction() {
 		local service := this.Options["Setup Engineer.Service"]
 		local ignore, instruction
 
-		this.iTranscript := (normalizeDirectoryPath(this.Options["Setup Engineer.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
+		this.iDiary := (normalizeDirectoryPath(this.Options["Setup Workbench.Diary"]) . "\" . translate("Diary ") . A_Now . ".txt")
 
 		if service {
 			service := string2Values("|", service, 3)
 
 			if !inList(this.Providers, service[1])
-				throw "Unsupported service detected in DrivingCoach.startConversation..."
+				throw "Unsupported service detected in SetupEngineer.startInteraction..."
 
 			try {
 				if (!this.Options["Setup Engineer.Model"] || (Trim(this.Options["Setup Engineer.Model"]) = ""))
-					throw "Empty model detected in DrivingCoach.startConversation..."
+					throw "Empty model detected in SetupEngineer.startInteraction..."
 				else if (service[1] = "LLM Runtime")
 					this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Setup Engineer.Model"]
 																			, this.Options["Setup Engineer.GPULayers"])
@@ -4147,84 +4167,77 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	restartConversation() {
+	restartInteraction() {
 		if this.Connector
 			this.Connector.Restart()
 	}
 
-	/*
-	handleVoiceText(grammar, text, reportError := true, originalText := false) {
+	createTelemetry(telemetry) {
+		local fileName := temporaryFileName("Telemetry", "CSV")
+		local columns := []
+		local lastDistance := 0
+		local lastTime := 0
+		local columnNr, distance, time
+
+		loop telemetry.Data[1].Length {
+			columnNr := A_Index
+
+			for ignore, channel in kTelemetryChannels
+				if ((channel.Indices.Length = 1) && (channel.Indices[1] == columnNr)) {
+					columns.Push(channel.Name)
+
+					break
+				}
+
+			if (columns.Length < columnNr)
+				columns.Push("Unknown")
+		}
+
+		FileAppend(values2String(";", columns*) . "`n", fileName)
+
+		loop telemetry.Data.Length {
+			distance := telemetry.getValue(A_Index, "Distance")
+			time := telemetry.getValue(A_Index, "Time")
+
+			if (distance != lastDistance) { ; || (time != lastTime)) {
+				FileAppend(values2String(";", telemetry.Data[A_Index]*) . "`n", fileName)
+
+				lastDistance := distance
+				lastTime := time
+			}
+		}
+
+		return FileRead(fileName)
+	}
+
+	reviewTelemetry(telemetry, includeHandling := false) {
 		local answer := false
-		local ignore, part, telemetry, reference, folder
 
 		static report := true
-		static conversationNr := 1
 
-		normalizeAnswer(answer) {
-			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), "`t`r`n")
+		lapTimeDisplayValue(lapTime) {
+			local seconds, fraction, minutes
 
-			while InStr(answer, "\n", , -2)
-				answer := SubStr(answer, 1, StrLen(answer) - 2)
-
-			return answer
+			if ((lapTime = "-") || isNull(lapTime))
+				return "-"
+			else if isNumber(lapTime)
+				return ((lapTime = 0) ? "-" : displayValue("Time", lapTime))
+			else
+				return lapTime
 		}
 
 		try {
-			if (this.Speaker && this.Options["Setup Engineer.Confirmation"]
-							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
-				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
+			this.iIncludeHandling := includeHandling
 
-			if (this.Conneco3or || this.startConversation()) {
-				answer := this.Connector.Ask(text)
+			if (this.Connector || this.startInteraction()) {
+				answer := this.Connector.Ask(this.createTelemetry(telemetry))
 
-				if answer {
-					answer := normalizeAnswer(answer)
-
+				if answer
 					report := true
-
-					if (this.CoachingActive && !InStr(kVersion, "-release")) {
-						if !FileExist(kTempDirectory . "Setup Engineer\Conversations")
-							conversationNr := 1
-
-						DirCreate(kTempDirectory . "Setup Engineer\Conversations")
-
-						folder := (kTempDirectory . "Setup Engineer\Conversations\" . Format("{:03}", conversationNr) . "\")
-
-						DirCreate(folder)
-
-						telemetry := telemetry := this.getTelemetry(&reference := true)
-
-						if telemetry {
-							FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
-
-							if reference
-								FileAppend(reference.JSON, folder . "Reference.JSON")
-						}
-
-						FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
-
-						conversationNr += 1
-					}
-				}
-				else if (this.Speaker && report) {
-					if reportError
-						this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
-
-					report := false
-				}
-			}
-			else if (this.Speaker && report) {
-				if reportError
-					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
-
-				report := false
 			}
 		}
 		catch Any as exception {
 			if report {
-				if (this.Speaker && reportError)
-					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
-
 				report := false
 
 				logError(exception, true)
@@ -4240,34 +4253,17 @@ class SetupEngineer extends ConfigurationItem {
 		}
 
 		if answer {
-			answer := StrReplace(answer, "*", "")
-
-			if this.Speaker
-				if this.VoiceManager.UseTalking
-					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
-				else if InStr(answer, "。") {
-					for ignore, part in string2Values("。", answer)
-						if (Trim(part) != "")
-							this.getSpeaker().speak(part . "。", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
-				}
-				else if InStr(answer, translate(". ")) {
-					for ignore, part in string2Values(translate(". "), answer)
-						if (Trim(part) != "")
-							this.getSpeaker().speak(part . translate("."), false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
-				}
-				else
-					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
-
-			if (this.Transcript && (this.Mode != "Coaching"))
+			if this.Diary
 				try {
-					FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+					FileAppend(translate("-- Review --------") . "`n`n" . translate("Lap:") . A_Space . telemetry.Lap . "`n`n" . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n" . answer . "`n`n", this.Diary, "UTF-16")
 				}
 				catch Any as exception {
 					logError(exception)
 				}
 		}
+
+		return answer
 	}
-	*/
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -4410,17 +4406,17 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		chooseConversationsPath(*) {
+		chooseDiaryPath(*) {
 			local directory
 
 			editorGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(FileSelect, "D1", editorGui["conversationsPathEdit"].Text, translate("Select Conversations Folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", editorGui["diaryPathEdit"].Text, translate("Select Diary Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
-				editorGui["conversationsPathEdit"].Text := directory
+				editorGui["diaryPathEdit"].Text := directory
 		}
 
 		chooseModelPath(field, *) {
@@ -4514,9 +4510,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w120 h23 +0x200", translate("Conversations Folder"))
-		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VconversationsPathEdit")
-		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseConversationsPath)
+		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w120 h23 +0x200", translate("Diary Folder"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdiaryPathEdit")
+		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseDiaryPath)
 
 		editorGui.SetFont("Italic", "Arial")
 		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Service "))
@@ -4675,7 +4671,7 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 		super.loadFromConfiguration(configuration)
 
-		this.Value["ConversationsPath"] := getMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", "")
+		this.Value["DiaryPath"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", "")
 
 		service := getMultiMapValue(configuration, "Setup Engineer Service", "Service", false)
 
@@ -4737,9 +4733,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 		super.saveToConfiguration(configuration)
 
-		value := this.Control["conversationsPathEdit"].Text
+		value := this.Control["diaryPathEdit"].Text
 
-		setMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", (Trim(value) != "") ? Trim(value) : false)
+		setMultiMapValue(configuration, "Setup Workbench", "Diary", (Trim(value) != "") ? Trim(value) : false)
 
 		this.saveProviderConfiguration()
 
@@ -4878,7 +4874,7 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 	loadConfigurator(configuration, simulators := false) {
 		this.loadFromConfiguration(configuration)
 
-		this.Control["conversationsPathEdit"].Text := (this.Value["ConversationsPath"] ? this.Value["ConversationsPath"] : "")
+		this.Control["diaryPathEdit"].Text := (this.Value["DiaryPath"] ? this.Value["DiaryPath"] : "")
 
 		this.loadProviderConfiguration(this.iCurrentProvider)
 

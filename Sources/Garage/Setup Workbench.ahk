@@ -130,9 +130,6 @@ class SetupWorkbench extends ConfigurationItem {
 
 	iKnowledgeBase := false
 
-	iInstructions := newMultiMap()
-	iTemplates := false
-
 	class WorkbenchWindow extends Window {
 		iWorkbench := false
 
@@ -354,48 +351,6 @@ class SetupWorkbench extends ConfigurationItem {
 	KnowledgeBase {
 		Get {
 			return this.iKnowledgeBase
-		}
-	}
-
-	Instructions[qualified := true] {
-		Get {
-			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Handling"]
-			else
-				return ["Character", "Simulation", "Handling"]
-		}
-	}
-
-	Templates[language?] {
-		Get {
-			local templates, fileName, code, ignore
-
-			if !this.iTemplates {
-				templates := CaseInsenseMap()
-
-				for code, ignore in availableLanguages() {
-					fileName := getFileName("Setup Workbench.instructions." . code, kResourcesDirectory . "Instructions\")
-
-					if FileExist(fileName) {
-						templates[code] := readMultiMap(fileName)
-
-						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
-
-						if FileExist(fileName)
-							addMultiMapValues(templates[code], readMultiMap(fileName))
-					}
-					else {
-						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
-
-						if FileExist(fileName)
-							templates[code] := readMultiMap(fileName)
-					}
-				}
-
-				this.iTemplates := templates
-			}
-
-			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
 		}
 	}
 
@@ -3930,6 +3885,383 @@ class FileSetupComparator extends SetupComparator {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SetupEngineer                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SetupEngineer extends ConfigurationItem {
+	iSetupWorkbench := false
+
+	iConnector := false
+	iConnectionState := "Active"
+
+	iTemplates := false
+
+	iInstructions := CaseInsenseWeakMap()
+
+	iTranscript := false
+
+	SetupWorkbench {
+		Get {
+			return this.iSetupWorkbench
+		}
+	}
+
+	Providers {
+		Get {
+			return LLMConnector.Providers
+		}
+	}
+
+	Templates[language?] {
+		Get {
+			local templates, fileName, code, ignore
+
+			if !this.iTemplates {
+				templates := CaseInsenseMap()
+
+				for code, ignore in availableLanguages() {
+					fileName := getFileName("Setup Engineer.instructions." . code, kResourcesDirectory . "Instructions\")
+
+					if FileExist(fileName) {
+						templates[code] := readMultiMap(fileName)
+
+						fileName := getFileName("Setup Engineer.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							addMultiMapValues(templates[code], readMultiMap(fileName))
+					}
+					else {
+						fileName := getFileName("Setup Engineer.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							templates[code] := readMultiMap(fileName)
+					}
+				}
+
+				this.iTemplates := templates
+			}
+
+			if (isSet(language) && !this.iTemplates.Has(language))
+				language := "en"
+
+			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
+		}
+	}
+
+	Instructions[type?] {
+		Get {
+			if isSet(type) {
+				if (type == true)
+					return ["Character", "Simulation", "Handling"]
+				else
+					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
+			}
+			else
+				return this.iInstructions
+		}
+
+		Set {
+			return (isSet(type) ? (this.iInstructions[type] := value) : (this.iInstructions := value))
+		}
+	}
+
+	Connector {
+		Get {
+			return this.iConnector
+		}
+	}
+
+	ConnectionState {
+		Get {
+			return this.iConnectionState
+		}
+
+		Set {
+			return (this.iConnectionState := value)
+		}
+	}
+
+	Transcript {
+		Get {
+			return this.iTranscript
+		}
+	}
+
+	__New(setupWorkbench, configuration) {
+		this.iSetupWorkbench := setupWorkbench
+
+		super.__New(configuration)
+
+		this.loadInstructions(configuration)
+
+		try {
+			DirCreate(this.Options["Setup Engineeer.Archive"])
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local options
+
+		super.loadFromConfiguration(configuration)
+
+		options := this.Options
+
+		options["Setup Engineer.Archive"] := getMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", kTempDirectory . "Conversations")
+
+		if (!options["Setup Engineer.Archive"] || (Trim(options["Setup Engineer.Archive"]) = ""))
+			options["Setup Engineer.Archive"] := (kTempDirectory . "Conversations")
+
+		options["Setup Engineer.Service"] := getMultiMapValue(configuration, "Setup Engineer Service", "Service", getMultiMapValue(configuration, "Setup Engineer", "Service", false))
+		options["Setup Engineer.Model"] := getMultiMapValue(configuration, "Setup Engineer Service", "Model", false)
+		options["Setup Engineer.MaxTokens"] := getMultiMapValue(configuration, "Setup Engineer Service", "MaxTokens", 2048)
+		options["Setup Engineer.Temperature"] := getMultiMapValue(configuration, "Setup Engineer Personality", "Temperature", 0.5)
+
+		if (string2Values("|", options["Setup Engineer.Service"], 2)[1] = "LLM Runtime")
+			options["Setup Engineer.GPULayers"] := getMultiMapValue(configuration, "Setup Engineer Service", "GPULayers", 0)
+	}
+
+	loadInstructions(configuration) {
+		local options, laps, ignore, instruction
+
+		options := this.Options
+
+		for ignore, instruction in this.Instructions[true]
+			if (getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, kUndefined) != kUndefined)
+				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, false)
+			else
+				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(this.Templates[this.VoiceManager.Language["Original"]], "Instructions", instruction)
+	}
+
+	connectorState(state, reason := false, arguments*) {
+		local oldState := this.ConnectionState
+
+		if (state = "Active")
+			this.ConnectionState := state
+		else if (state = "Error")
+			this.ConnectionState := (state . (reason ? (":" . reason) : ""))
+		else
+			this.ConnectionState := "Unknown"
+	}
+
+	getInstruction(category) {
+		local simulator := this.SetupWorkbench.SelectedSimulator
+		local car := this.SetupWorkbench.SelectedCar
+		local track := this.SetupWorkbench.SelectedTrack
+
+		switch category, false {
+			case "Character":
+				return substituteVariables(this.Instructions["Character"], {name: this.VoiceManager.Name})
+			case "Simulation":
+				if knowledgeBase {
+					simulator := knowledgeBase.getValue("Session.Simulator")
+					car := knowledgeBase.getValue("Session.Car")
+					track := knowledgeBase.getValue("Session.Track")
+
+					if (simulator && car && track)
+						return substituteVariables(this.Instructions["Simulation"]
+												 , {simulator: SessionDatabase.getSimulatorName(simulator)
+												  , car: SessionDatabase.getCarName(simulator, car)
+												  , track: SessionDatabase.getTrackName(simulator, track)})
+				}
+			case "Handling":
+				MsgBox "Not yet implemented..."
+		}
+
+		return false
+	}
+
+	getInstructions() {
+		return choose(collect(this.Instructions[true], ObjBindMethod(this, "getInstruction"))
+					, (instruction) => (instruction && (Trim(instruction) != "")))
+	}
+
+	startConversation() {
+		local service := this.Options["Setup Engineer.Service"]
+		local ignore, instruction
+
+		this.iTranscript := (normalizeDirectoryPath(this.Options["Setup Engineer.Archive"]) . "\" . translate("Conversation ") . A_Now . ".txt")
+
+		if service {
+			service := string2Values("|", service, 3)
+
+			if !inList(this.Providers, service[1])
+				throw "Unsupported service detected in DrivingCoach.startConversation..."
+
+			try {
+				if (!this.Options["Setup Engineer.Model"] || (Trim(this.Options["Setup Engineer.Model"]) = ""))
+					throw "Empty model detected in DrivingCoach.startConversation..."
+				else if (service[1] = "LLM Runtime")
+					this.iConnector := LLMConnector.LLMRuntimeConnector(this, this.Options["Setup Engineer.Model"]
+																			, this.Options["Setup Engineer.GPULayers"])
+				else {
+					try {
+						this.iConnector := LLMConnector.%StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Setup Engineer.Model"])
+					}
+					catch Any {
+						this.iConnector := %StrReplace(service[1], A_Space, "")%Connector(this, this.Options["Setup Engineer.Model"])
+					}
+
+					this.Connector.Connect(service[2], service[3])
+
+					this.connectorState("Active")
+				}
+			}
+			catch Any as exception {
+				logError(exception)
+
+				this.iConnector := false
+
+				this.connectorState("Error", "Configuration")
+
+				return false
+			}
+
+			this.Connector.MaxTokens := this.Options["Setup Engineer.MaxTokens"]
+			this.Connector.Temperature := this.Options["Setup Engineer.Temperature"]
+
+			for ignore, instruction in this.Instructions[true] {
+				this.Instructions[instruction] := this.Options["Setup Engineer.Instructions." . instruction]
+
+				if !this.Instructions[instruction]
+					this.Instructions[instruction] := ""
+			}
+
+			return true
+		}
+		else {
+			this.connectorState("Error", "Configuration")
+
+			return false
+		}
+	}
+
+	restartConversation() {
+		if this.Connector
+			this.Connector.Restart()
+	}
+
+	/*
+	handleVoiceText(grammar, text, reportError := true, originalText := false) {
+		local answer := false
+		local ignore, part, telemetry, reference, folder
+
+		static report := true
+		static conversationNr := 1
+
+		normalizeAnswer(answer) {
+			answer := Trim(StrReplace(StrReplace(answer, "*", ""), "|||", ""), "`t`r`n")
+
+			while InStr(answer, "\n", , -2)
+				answer := SubStr(answer, 1, StrLen(answer) - 2)
+
+			return answer
+		}
+
+		try {
+			if (this.Speaker && this.Options["Setup Engineer.Confirmation"]
+							 && (this.ConnectionState = "Active") && (this.Mode != "Coaching"))
+				this.getSpeaker().speakPhrase("Confirm", false, false, false, {Noise: false})
+
+			if (this.Conneco3or || this.startConversation()) {
+				answer := this.Connector.Ask(text)
+
+				if answer {
+					answer := normalizeAnswer(answer)
+
+					report := true
+
+					if (this.CoachingActive && !InStr(kVersion, "-release")) {
+						if !FileExist(kTempDirectory . "Setup Engineer\Conversations")
+							conversationNr := 1
+
+						DirCreate(kTempDirectory . "Setup Engineer\Conversations")
+
+						folder := (kTempDirectory . "Setup Engineer\Conversations\" . Format("{:03}", conversationNr) . "\")
+
+						DirCreate(folder)
+
+						telemetry := telemetry := this.getTelemetry(&reference := true)
+
+						if telemetry {
+							FileAppend(telemetry.JSON, folder . "Telemetry.JSON")
+
+							if reference
+								FileAppend(reference.JSON, folder . "Reference.JSON")
+						}
+
+						FileAppend(translate("-- Driver --------") . "`n`n" . text . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", folder . "Conversation.txt", "UTF-16")
+
+						conversationNr += 1
+					}
+				}
+				else if (this.Speaker && report) {
+					if reportError
+						this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+
+					report := false
+				}
+			}
+			else if (this.Speaker && report) {
+				if reportError
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+
+				report := false
+			}
+		}
+		catch Any as exception {
+			if report {
+				if (this.Speaker && reportError)
+					this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
+
+				report := false
+
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+														   , {service: this.Options["Setup Engineer.Service"]}))
+
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+												  , {service: this.Options["Setup Engineer.Service"]})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+
+		if answer {
+			answer := StrReplace(answer, "*", "")
+
+			if this.Speaker
+				if this.VoiceManager.UseTalking
+					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
+				else if InStr(answer, "。") {
+					for ignore, part in string2Values("。", answer)
+						if (Trim(part) != "")
+							this.getSpeaker().speak(part . "。", false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+				}
+				else if InStr(answer, translate(". ")) {
+					for ignore, part in string2Values(translate(". "), answer)
+						if (Trim(part) != "")
+							this.getSpeaker().speak(part . translate("."), false, false, {Noise: false, Rephrase: false, Click: (A_Index = 1)})
+				}
+				else
+					this.getSpeaker().speak(answer, false, false, {Noise: false, Rephrase: false})
+
+			if (this.Transcript && (this.Mode != "Coaching"))
+				try {
+					FileAppend(translate("-- Driver --------") . "`n`n" . (originalText ? originalText : text) . "`n`n" . translate("-- Coach ---------") . "`n`n" . answer . "`n`n", this.Transcript, "UTF-16")
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+		}
+	}
+	*/
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; WorkbenchSettingsEditor                                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
@@ -3942,6 +4274,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 	iProviderConfigurations := CaseInsenseMap()
 	iCurrentProvider := false
+
+	iInstructions := newMultiMap()
+	iTemplates := false
 
 	SetupWorkbench {
 		Get {
@@ -3979,13 +4314,43 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 	Instructions[qualified := true] {
 		Get {
-			return this.SetupWorkbench.Instructions[qualified]
+			if qualified
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Handling"]
+			else
+				return ["Character", "Simulation", "Handling"]
 		}
 	}
 
 	Templates[language?] {
 		Get {
-			return this.SetupWorkbench.Templates[language?]
+			local templates, fileName, code, ignore
+
+			if !this.iTemplates {
+				templates := CaseInsenseMap()
+
+				for code, ignore in availableLanguages() {
+					fileName := getFileName("Setup Workbench.instructions." . code, kResourcesDirectory . "Instructions\")
+
+					if FileExist(fileName) {
+						templates[code] := readMultiMap(fileName)
+
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							addMultiMapValues(templates[code], readMultiMap(fileName))
+					}
+					else {
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							templates[code] := readMultiMap(fileName)
+					}
+				}
+
+				this.iTemplates := templates
+			}
+
+			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
 		}
 	}
 
@@ -4567,144 +4932,6 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 			window.Destroy()
 		}
 	}
-
-	/*
-	getOriginalInstruction(language, type, key) {
-		if (type = "Agent")
-			return getMultiMapValue(this.getInstructions(type, true), "Agent Booster", "Instructions." . type . "." . key . "." . language, "")
-		else
-			return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
-	}
-
-	getInstructions(type, original := false) {
-		local instructions, reference, key, value, ignore, directory, configuration, language
-
-		if (type = this.Assistant) {
-			if original
-				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kResourcesDirectory . "Instructions\"))
-			else
-				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserHomeDirectory . "Instructions\", kResourcesDirectory . "Instructions\"))
-		}
-		else {
-			instructions := newMultiMap()
-			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
-
-			for ignore, directory in [kResourcesDirectory . "Instructions\", kUserHomeDirectory . "Instructions\"]
-				loop Files (directory . reference . ".instructions.*") {
-					SplitPath A_LoopFilePath, , , &language
-
-					for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
-						setMultiMapValue(instructions, reference, "Instructions." . type . "." . key . "." . language, value)
-				}
-
-			if !original
-				for ignore, configuration in [this.Configuration, this.iInstructions]
-					for key, value in getMultiMapValues(configuration, reference)
-						if (InStr(key, this.Assistant . ".Instructions." . type) = 1) {
-							key := StrReplace(key, this.Assistant . ".", "")
-
-							setMultiMapValue(instructions, reference, key, value)
-						}
-						else if (InStr(key, "Instructions." . type) = 1)
-							setMultiMapValue(instructions, reference, key, value)
-		}
-
-		return instructions
-	}
-
-	setInstructions(type, instructions) {
-		if (type = this.Assistant) {
-			if (printMultiMap(instructions) = printMultiMap(this.getInstructions(type, true))) {
-				deleteFile(kTempDirectory . this.Assistant . ".instructions.en")
-
-				FileAppend("Delete", kTempDirectory . this.Assistant . ".instructions.en")
-			}
-			else
-				writeMultiMap(kTempDirectory . this.Assistant . ".instructions.en", instructions)
-		}
-		else
-			addMultiMapValues(this.iInstructions, instructions)
-	}
-
-	editInstructions(type, title) {
-		local window := this.Window
-		local instructions
-
-		window.Block()
-
-		try {
-			instructions := editInstructions(this, type, title, this.getInstructions(type), window)
-
-			if instructions
-				this.setInstructions(type, instructions)
-		}
-		finally {
-			window.Unblock()
-		}
-	}
-
-	editFilter(type, booster, provider, title) {
-		local window := this.Window
-		local filter, fileName
-
-		window.Block()
-
-		try {
-			fileName := (kUserHomeDirectory . "Scripts\Booster\" . type . "." . booster . "." . provider . ".script")
-			filter := (FileExist(fileName) ? FileRead(fileName) : "")
-
-			filter := editFilter(this, title, filter, window)
-
-			if (filter != false) {
-				deleteFile(fileName)
-
-				if (filter != "") {
-					DirCreate(kUserHomeDirectory . "Scripts\Booster")
-
-					FileAppend(filter, fileName, "UTF-8")
-				}
-			}
-		}
-		finally {
-			window.Unblock()
-		}
-	}
-
-	editEvents(assistant, title) {
-		local window := this.Window
-
-		window.Block()
-
-		try {
-			return EventsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Events" : "Agent.LLM.Events"
-									, title
-									, (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
-																			  : ["Custom"]).editEvents(window)
-		}
-		finally {
-			window.Unblock()
-		}
-	}
-
-	editActions(assistant, type, title) {
-		local window := this.Window
-
-		window.Block()
-
-		try {
-			if (type = "Agent")
-				return ActionsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Actions" : "Agent.LLM.Actions"
-										 , title
-										 , (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
-																				   : ["Custom"]).editActions(window)
-			else
-				return ActionsEditor(this, "Conversation.Actions", title, ["Builtin", "Custom"]).editActions(window)
-		}
-		finally {
-			window.Unblock()
-		}
-	}
-	*/
 }
 
 

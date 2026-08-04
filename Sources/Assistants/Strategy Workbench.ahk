@@ -145,18 +145,26 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				workbench.StrategyViewer.StrategyViewer.Resized()
-				workbench.ChartViewer.Resized()
+				try {
+					workbench.StrategyViewer.StrategyViewer.Resized()
+					workbench.ChartViewer.Resized()
 
-				workbench.showStrategyInfo(workbench.SelectedStrategy, false)
+					workbench.showStrategyInfo(workbench.SelectedStrategy, false)
 
-				if (workbench.Control["chartSourceDropDown"].Value = 1)
-					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
-				else {
-					workbench.ChartViewer.document.open()
-					workbench.ChartViewer.document.write((workbench.Control["chartSourceDropDown"].Value = 2) ? workbench.iStrategyChartHTML : workbench.iComparisonChartHTML)
-					workbench.ChartViewer.document.close()
+					if (workbench.Control["chartSourceDropDown"].Value = 1)
+						workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
+					else {
+						workbench.ChartViewer.document.open()
+						workbench.ChartViewer.document.write((workbench.Control["chartSourceDropDown"].Value = 2) ? workbench.iStrategyChartHTML : workbench.iComparisonChartHTML)
+						workbench.ChartViewer.document.close()
+					}
 				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
+				}
+					
 			}
 
 			return Task.CurrentTask
@@ -1246,7 +1254,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchTab.UseTab(1)
 
 		x := 32
-		x0 := x - 4
+		x0 := x - 2
 		x1 := x + 74
 		x2 := x1 + 32
 		x3 := x2 + 26

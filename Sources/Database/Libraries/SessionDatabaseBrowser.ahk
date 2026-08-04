@@ -65,6 +65,19 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 			browseLapTelemetries("ChooseSource", ["User", "Community"][browserGui["sourceTypeDropDown"].Value])
 	}
 
+	lapTimeDisplayValue(lapTime) {
+		local seconds, fraction, minutes
+
+		if ((lapTime = "-") || isNull(lapTime))
+			return translate("-")
+		else {
+			if isNumber(lapTime)
+				return displayValue("Time", lapTime)
+			else
+				return lapTime
+		}
+	}
+
 	if ((ownerOrCommand == kOk) || (ownerOrCommand == kCancel))
 		result := ownerOrCommand
 	else if (ownerOrCommand == "Load") {
@@ -187,10 +200,18 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 					for ignore, name in userTelemetries {
 						info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
-						if getMultiMapValue(info, "Telemetry", "Driver", false)
-							driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-						else
+						if info {
+							if getMultiMapValue(info, "Telemetry", "Driver", false)
+								driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+							else
+								driverName := false
+
+							lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+						}
+						else {
 							driverName := false
+							lapTime := translate("-")
+						}
 
 						if !driverName
 							driverName := getMultiMapValue(info, "Telemetry", "Driver")
@@ -199,6 +220,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 							driverName := SessionDatabase.getName("Creator")
 
 						browserGui["telemetryListView"].Add("", name, driverName
+															  , lapTimeDisplayValue(lapTime)
 															  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
 															  . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
 					}
@@ -207,8 +229,17 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 					sessionDB.getTelemetryNames(simulator, car, track, &userTelemetries := true, &communityTelemetries := true)
 
 					for ignore, name in communityTelemetries
-						if !inList(userTelemetries, name)
-							browserGui["telemetryListView"].Add("", name, translate("Community"), translate("-"))
+						if !inList(userTelemetries, name) {
+							info := sessionDB.readTelemetryInfo(simulator, car, track, name, "Community")
+
+							if info
+								lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+							else
+								lapTime := translate("-")
+
+							browserGui["telemetryListView"].Add("", name, translate("Community")
+																  , lapTimeDisplayValue(lapTime), translate("-"))
+						}
 				}
 
 				if (browserGui["telemetryListView"].GetCount() > 1)
@@ -260,7 +291,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		browserGui.Add("Text", "x8 yp+30 w70 h23 +0x200", translate("Source"))
 		browserGui.Add("DropDownList", "x90 yp w275 Choose1 vsourceTypeDropDown", collect(["User", "Community"], translate)).OnEvent("Change", selectSource)
 
-		browserGui.Add("ListView", "x8 yp+30 w357 h335 +Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Date"], translate))
+		browserGui.Add("ListView", "x8 yp+30 w357 h335 +Multi -LV0x10 AltSubmit vtelemetryListView", collect(["Telemetry", "Driver", "Lap Time", "Date"], translate))
 		browserGui["telemetryListView"].OnEvent("DoubleClick", browseLapTelemetries.Bind(kOk))
 
 		browserGui.Add("Button", "x8 yp+345 w80 h23 vopenButton", translate("Open...")).OnEvent("Click", browseLapTelemetries.Bind("Load"))

@@ -100,8 +100,15 @@ class SystemMonitorResizer extends Window.Resizer {
 
 			this.iRedraw := false
 
-			for ignore, viewer in this.iViewer
-				viewer.Resized()
+			try {
+				for ignore, viewer in this.iViewer
+					viewer.Resized()
+			}
+			catch Any as exception {
+				logError(exception)
+				
+				return false
+			}
 		}
 
 		return Task.CurrentTask

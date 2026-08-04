@@ -171,13 +171,29 @@ Another valuable tool to improve your lap times is the integrated Telemetry View
 
 As long as the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder.
+Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder.
+
+When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+
+#### Analyzing suspension dynamics
+
+In addition to the functionality which is available in all applications that use the Telemetry Viewer, a very important additional function is available, when telemetry is recorded while working with the "Setup Workbench". If you click on the big button with the suspension icon, a special inspector for the damper system of the car appears.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Suspension%20Inspector.JPG)
+
+The graph on the first tab can show you the suspension velocity histogram either for the whole lap or for a section of the track specified by the currently selected position in the telemetry graph or on the track map. Depending on the car and the track, you may want to change velocity threshold where the damper knee is located between low speed and high speed damping.
+
+The target is always a Gauss curve, with the compression in the positive value range and with rebound showing negative suspension movement velocity, with over 50% of the suspension movement in the low speed damping area. If that is not a case in your specific setup, apply more or less damping accordingly.
+
+If you want to go more into the details, use the graphs on the second tab. There you can create specialized reports for the suspension movement, also for either the whole lap or a selected part of the track.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Suspension%20Inspector%202.JPG)
+
+Specialized graphs for suspension movement (deflection), velocity, acceleration and also the distribution of highspeed vs. lowspeed dampening are available and you can focus on any wheel, if required. Very useful is the fuunction to zoom in on the currently selected track position in the main telemetry window.
 
 #### Choosing the telemetry provider
 
-The Telemetry Viewer supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
-
-When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
+The Telemetry Viewer supports two different sources for telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two to three laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
 
 ##### Notes
 

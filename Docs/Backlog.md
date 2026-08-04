@@ -16,7 +16,6 @@
   3. Configurable priority for voice output between Spotter and other Assistants
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
-  6. Driving Coach must check every lap for an available track map
   
 #### Session Database
   1. Tyre wear viewer and calculator

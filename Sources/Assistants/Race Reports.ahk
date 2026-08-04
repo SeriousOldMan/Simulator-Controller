@@ -97,10 +97,17 @@ class RaceReports extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				reports.ReportViewer.ChartViewer.Resized()
-				reports.ReportViewer.InfoViewer.Resized()
+				try {
+					reports.ReportViewer.ChartViewer.Resized()
+					reports.ReportViewer.InfoViewer.Resized()
 
-				reports.loadReport(RaceReports.Instance.SelectedReport, true)
+					reports.loadReport(RaceReports.Instance.SelectedReport, true)
+				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
+				}
 			}
 
 			return Task.CurrentTask

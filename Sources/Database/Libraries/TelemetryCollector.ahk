@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\HTTP.ahk"
+#Include "..\..\Framework\Extensions\JSON.ahk"
 #Include "..\..\Plugins\Simulator Providers.ahk"
 #Include "SessionDatabase.ahk"
 

@@ -1305,6 +1305,14 @@ class Telemetry {
 }
 
 class TelemetryAnalyzer {
+	static WheelTypes := CaseInsenseMap("FrontLeft", "FL", "FrontRight", "FR"
+									  , "RearLeft", "RL", "RearRight", "RR"
+									  , "Front Left", "FL", "Front Right", "FR"
+									  , "Rear Left", "RL", "Rear Right", "RR"
+									  , "FL", "Front Left", "FR", "Front Right"
+									  , "RL", "Rear Left", "RR", "Rear Right"
+									  , "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR")
+
 	static sSchema := false
 
 	static sTCActivationsThreshold := 20
@@ -1345,18 +1353,17 @@ class TelemetryAnalyzer {
 
 	TrackMap {
 		Get {
+			if !this.iTrackMap
+				this.iTrackMap := SessionDatabase().getTrackMap(this.Simulator, this.Track)
+
 			return this.iTrackMap
 		}
 	}
 
 	TrackSections {
 		Get {
-			if (this.iTrackSections.Length = 0) {
-				this.iTrackMap := SessionDatabase().getTrackMap(this.Simulator, this.Track)
-
-				if this.TrackMap
-					this.iTrackSections := this.createTrackSections()
-			}
+			if ((this.iTrackSections.Length = 0) && this.TrackMap)
+				this.iTrackSections := this.createTrackSections()
 
 			return this.iTrackSections
 		}
@@ -1542,6 +1549,49 @@ class TelemetryAnalyzer {
 			return false
 	}
 
+	findTrackRange(telemetry, posX, posY, distance, &startIndex, &endIndex) {
+		local pIndex, pDistance, sDistance, eDistance, data, length
+
+		try {
+			data := telemetry.Data
+			length := data.Length
+
+			pIndex := TelemetryAnalyzer.getTelemetryCoordinateIndex(data, posX, posY)
+			pDistance := telemetry.getValue(pIndex, "Distance")
+
+			sDistance := (pDistance - distance)
+			eDistance := (pDistance + distance)
+
+			loop {
+				if ((pIndex - A_Index <= 1)
+				 || (telemetry.getValue(pIndex - A_Index, "Distance") <= sDistance)) {
+					startIndex := pIndex - A_Index
+
+					break
+				}
+			}
+
+			loop {
+				if ((pIndex + A_Index >= length)
+				 || (telemetry.getValue(pIndex + A_Index, "Distance") >= eDistance)) {
+					endIndex := pIndex + A_Index
+
+					break
+				}
+			}
+
+			startIndex := Max(1, startIndex)
+			endIndex := Min(endIndex, telemetry.Data.Length)
+
+			return true
+		}
+		catch Any as exception {
+			logError(exception)
+
+			return false
+		}
+	}
+
 	findSection(x, y, threshold := 10) {
 		local trackMap := this.TrackMap
 		local lastSection := false
@@ -1629,21 +1679,22 @@ class TelemetryAnalyzer {
 	}
 
 	requireTrackSections(telemetry) {
+		local trackMap := this.TrackMap
 		local index, section
 
-		if (this.TrackSections.Length = 0) {
+		if (trackMap && (this.TrackSections.Length = 0)) {
 			this.iTrackSections := this.findTrackSections(telemetry)
 
 			for index, section in this.TrackSections {
-				setMultiMapValue(this.TrackMap, "Sections", index . ".Index", section.Index)
-				setMultiMapValue(this.TrackMap, "Sections", index . ".Nr", section.Nr)
-				setMultiMapValue(this.TrackMap, "Sections", index . ".Type", section.Type)
-				setMultiMapValue(this.TrackMap, "Sections", index . ".Active", section.Active)
-				setMultiMapValue(this.TrackMap, "Sections", index . ".X", section.X)
-				setMultiMapValue(this.TrackMap, "Sections", index . ".Y", section.Y)
+				setMultiMapValue(trackMap, "Sections", index . ".Index", section.Index)
+				setMultiMapValue(trackMap, "Sections", index . ".Nr", section.Nr)
+				setMultiMapValue(trackMap, "Sections", index . ".Type", section.Type)
+				setMultiMapValue(trackMap, "Sections", index . ".Active", section.Active)
+				setMultiMapValue(trackMap, "Sections", index . ".X", section.X)
+				setMultiMapValue(trackMap, "Sections", index . ".Y", section.Y)
 
 				if (section.HasProp("Name") && (Trim(section.Name) != ""))
-					setMultiMapValue(this.TrackMap, "Sections", index . ".Name", section.Name)
+					setMultiMapValue(trackMap, "Sections", index . ".Name", section.Name)
 			}
 		}
 	}
@@ -1716,20 +1767,22 @@ class TelemetryAnalyzer {
 		local sections := []
 		local index, section
 
-		loop getMultiMapValue(trackMap, "Sections", "Count") {
-			sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
-						 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
-						 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
-						 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
-						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
-						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
+		if trackMap {
+			loop getMultiMapValue(trackMap, "Sections", "Count") {
+				sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
+							 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
+							 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
+							 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
+							 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
+							 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
-			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
-				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+				if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+					sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
+			}
+
+			for index, section in sections
+				section.Length := computeSectionLength(trackMap, sections, index, section)
 		}
-
-		for index, section in sections
-			section.Length := computeSectionLength(trackMap, sections, index, section)
 
 		return sections
 	}
@@ -1941,22 +1994,13 @@ class TelemetryAnalyzer {
 			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
 				local dt1 := (time - lastTime)
 				local dt2 := (nextTime - time)
-				local factor := 1 ; (Round(((log(Abs(dt1)) + log(Abs(dt2))) / 2) / 10) * 10)
 				local term1, term2
-
-				/*
-				while (Abs(dt1) > 100)
-					dt1 /= 10
-
-				while (Abs(dt2) > 100)
-					dt2 /= 10
-				*/
 
 				if ((dt1 <= 0) || (dt2 <= 0))
 					return 0
 
-				term1 := (((nextDeflection - deflection) / dt2) * factor)
-				term2 := (((deflection - lastDeflection) / dt1) * factor)
+				term1 := ((nextDeflection - deflection) / dt2)
+				term2 := ((deflection - lastDeflection) / dt1)
 
 				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
 			}
@@ -2131,6 +2175,260 @@ class TelemetryAnalyzer {
 		})
 
 		return createIssues(bottomOuts)
+	}
+
+	static computeSuspensionDeflections(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local deflection
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if (deflection != kUndefined)
+						deflections.Push(deflAverage.Add(deflection * 1000))
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return deflections
+	}
+
+	static computeSuspensionSpeeds(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeSpeeds(deflections) {
+			local speeds := []
+			local speedAverage := MovingAverage(2)
+
+			calculateSpeed(lastTime, lastDeflection, time, deflection) {
+				local dt
+
+				try {
+					dt := (time - lastTime)
+
+					return ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return 0
+				}
+			}
+
+			loop deflections.Length
+				if (A_Index > 1)
+					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
+											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			if (speeds.Length > 1)
+				speeds.InsertAt(1, speeds[1])
+
+			return speeds
+		}
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return computeSpeeds(deflections)
+	}
+
+	static computeSuspensionAccelerations(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeAccelerations(deflections) {
+			local accelerations := []
+			local accAverage := MovingAverage(5)
+			local length := deflections.Length
+			local ignore, deflection
+
+			calculateAcceleration(lastTime, lastDeflection, time, deflection, nextTime, nextDeflection) {
+				local dt1 := (time - lastTime)
+				local dt2 := (nextTime - time)
+				local term1, term2
+
+				if ((dt1 <= 0) || (dt2 <= 0))
+					return 0
+
+				term1 := ((nextDeflection - deflection) / dt2)
+				term2 := ((deflection - lastDeflection) / dt1)
+
+				return (2 * (term1 - term2) / ((dt1 + dt2) / 1000))
+			}
+
+			loop length
+				if ((A_Index > 1) && (A_Index < length))
+					accelerations.Push(accAverage.Add(calculateAcceleration(deflections[A_Index - 1].Time
+																		  , deflections[A_Index - 1].Deflection
+																		  , deflections[A_Index].Time
+																		  , deflections[A_Index].Deflection
+																		  , deflections[A_Index + 1].Time
+																		  , deflections[A_Index + 1].Deflection)))
+
+			if (accelerations.Length > 0) {
+				accelerations.Push(accelerations[accelerations.Length])
+				accelerations.InsertAt(1, accelerations[1])
+			}
+
+			return accelerations
+		}
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return computeAccelerations(deflections)
+	}
+
+	static computeSuspensionSpeedDeltas(telemetry, wheel, startIndex?, endIndex?) {
+		local deflections := []
+		local deflAverage := MovingAverage(5)
+		local time, deflection
+
+		computeSpeeds(deflections) {
+			local speeds := []
+			local speedAverage := MovingAverage(2)
+
+			calculateSpeed(lastTime, lastDeflection, time, deflection) {
+				local dt
+
+				try {
+					dt := (time - lastTime)
+
+					return {Speed: ((dt > 0) ? speedAverage.Add((deflection - lastDeflection) * 1000 / dt) : 0), Delta: dt}
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return {Speed: 0, Delta: 0}
+				}
+			}
+
+			loop deflections.Length
+				if (A_Index > 1)
+					speeds.Push(calculateSpeed(deflections[A_Index - 1].Time, deflections[A_Index - 1].Deflection
+											 , deflections[A_Index].Time, deflections[A_Index].Deflection))
+
+			if (speeds.Length > 1)
+				speeds.InsertAt(1, speeds[1])
+
+			return speeds
+		}
+
+		if telemetry {
+			wheel := TelemetryAnalyzer.WheelTypes[wheel]
+
+			if !isSet(startIndex) {
+				startIndex := 1
+				endIndex := telemetry.Data.Length
+			}
+
+			loop telemetry.Data.Length
+				if ((A_Index >= startIndex) && (A_Index <= endIndex)) {
+					time := telemetry.getValue(A_Index, "Time")
+					deflection := telemetry.getValue(A_Index, "SuspDefl " . wheel)
+
+					if ((deflection != kUndefined) && (time != kUndefined))
+						deflections.Push({Time: time, Deflection: deflAverage.Add(deflection) * 1000})
+					else {
+						deflections := []
+
+						break
+					}
+				}
+		}
+
+		return computeSpeeds(deflections)
+	}
+
+	static computeMovementDistribution(speeds, binCount, &maxTime?, &maxSpeed?, &maxCount?, &sumCount?) {
+		local counts := []
+
+		binCount := ((2 * binCount) + 1)
+
+		maxTime := 0
+		maxSpeed := 0
+		maxCount := 0
+		sumCount := 0
+
+		loop binCount
+			counts.Push(0)
+
+		do(speeds, (s) {
+			maxTime := Max(maxTime, s.Delta)
+			maxSpeed := Max(maxSpeed, Abs(s.Speed))
+		})
+
+		if (maxSpeed != 0) {
+			do(speeds, (s) {
+				local speed := (s.Speed / maxSpeed)
+
+				counts[Min(binCount, Max(1, Round((speed + 1) * Round(binCount / 2, 1))))] += 1
+			})
+		}
+
+		do(counts, (c) {
+			maxCount := Max(maxCount, c)
+			sumCount += c
+		})
+
+		return counts
 	}
 }
 

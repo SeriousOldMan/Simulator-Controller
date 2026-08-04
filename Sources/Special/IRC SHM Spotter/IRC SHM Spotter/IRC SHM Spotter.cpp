@@ -1522,16 +1522,16 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 			float rrDeflection = 0;
 
 			if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
-				lfDeflection = *((float*)rawValue) * 1000;
+				lfDeflection = *((float*)rawValue);
 
 			if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
-				rfDeflection = *((float*)rawValue) * 1000;
+				rfDeflection = *((float*)rawValue);
 
 			if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
-				lrDeflection = *((float*)rawValue) * 1000;
+				lrDeflection = *((float*)rawValue);
 
 			if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
-				rrDeflection = *((float*)rawValue) * 1000;
+				rrDeflection = *((float*)rawValue);
 
 			telemetryFile << lfDeflection << ";" << rfDeflection << ";"
 						  << lrDeflection << ";" << rrDeflection << std::endl;
@@ -1561,23 +1561,6 @@ void collectCarTelemetry(const irsdk_header* header, const char* data, const int
 					getRawDataValue(rawValue, header, data, "YawRate");
 
 					file << *((float*)rawValue) << ";";
-
-					float lfDeflection = 0;
-					float rfDeflection = 0;
-					float lrDeflection = 0;
-					float rrDeflection = 0;
-
-					if (getRawDataValue(rawValue, header, data, "LFshockDefl"))
-						lfDeflection = *((float*)rawValue);
-
-					if (getRawDataValue(rawValue, header, data, "RFshockDefl"))
-						rfDeflection = *((float*)rawValue);
-
-					if (getRawDataValue(rawValue, header, data, "LRshockDefl"))
-						lrDeflection = *((float*)rawValue);
-
-					if (getRawDataValue(rawValue, header, data, "RRshockDefl"))
-						rrDeflection = *((float*)rawValue);
 
 					file << lfDeflection << ";" << rfDeflection << ";"
 						 << lrDeflection << ";" << rrDeflection << std::endl;

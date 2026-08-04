@@ -29,6 +29,15 @@ static class Program
     static float sector2Time = 0.0f;
     static float sector3Time = 0.0f;
 
+	static float yawRate = 0.0f;
+	
+	static float flSuspDefl = 0.0f;
+	static float frSuspDefl = 0.0f;
+	static float rlSuspDefl = 0.0f;
+	static float rrSuspDefl = 0.0f;
+	
+	static bool invertedDefl = false;
+
     static void skipObject(JsonTextReader reader)
     {
         while (reader.Read())
@@ -104,6 +113,37 @@ static class Program
                 readPoint(reader);
     }
 
+    static void readTelemetryInfo(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.Value != null)
+                if (reader.Value.ToString() == "IsSuspensionTravelInverted")
+                {
+                    reader.Read();
+                    invertedDefl = (String.Compare(reader.Value.ToString(), "true", comparisonType: StringComparison.OrdinalIgnoreCase) == 0);
+                }
+    }
+
+    static void readSimulationSourceInfo(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                if (reader.Value.ToString() == "TelemetryInfo")
+                    readTelemetryInfo(reader);
+    }
+
     static void readPoint(JsonTextReader reader)
     {
         running = 0.0f;
@@ -118,6 +158,14 @@ static class Program
         longG = 0.0f;
         latG = 0.0f;
         int time = 0;
+		int lastTime = 0;
+
+        yawRate = -1;
+
+        flSuspDefl = -1;
+        frSuspDefl = -1;
+        rlSuspDefl = -1;
+        rrSuspDefl = -1;
 
         while (reader.Read())
         {
@@ -158,10 +206,13 @@ static class Program
                         reader.Read();
                         speed = float.Parse(reader.Value.ToString());
                         break;
+                    case "SimulationSourceInfo":
+                        readSimulationSourceInfo(reader);
+                        break;
                 }
         }
 
-        if (running > lastRunning)
+        if ((running > lastRunning) || (time > lastTime))
         {
             outStream.Write(running + ";");
             outStream.Write(throttle + ";");
@@ -176,10 +227,23 @@ static class Program
             outStream.Write(latG + ";");
             outStream.Write(posX + ";");
             outStream.Write(posY + ";");
-            outStream.WriteLine(time);
+            outStream.Write(time + ";");
+
+            if (flSuspDefl >= 0)
+            {
+                outStream.Write("null" + ";"); // yawRate
+                outStream.Write((invertedDefl ? -flSuspDefl : flSuspDefl) + ";");
+                outStream.Write((invertedDefl ? -frSuspDefl : frSuspDefl) + ";");
+                outStream.Write((invertedDefl ? -rlSuspDefl : rlSuspDefl) + ";");
+                outStream.WriteLine((invertedDefl ? -rrSuspDefl : rrSuspDefl));
+            }
+            else
+                outStream.Write("null"); // yawRate
 
             lastRunning = running;
         }
+		
+		lastTime = time;
     }
 
     static void readDriverInput(JsonTextReader reader)
@@ -257,6 +321,9 @@ static class Program
             else if (reader.Value != null)
                 switch (reader.Value.ToString())
                 {
+					case "WheelsInfo":
+						readWheelsInfo(reader);
+                        break;
                     case "CurrentGear":
                         goto case "currentGear";
                     case "currentGear":
@@ -361,6 +428,72 @@ static class Program
                     case "zinM":
                         reader.Read();
                         posY = float.Parse(reader.Value.ToString());
+                        break;
+                }
+    }
+
+    static void readWheelInfo(JsonTextReader reader, string wheel)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+                    case "SuspensionTravel":
+                        reader.Read();
+                        reader.Read();
+                        reader.Read();
+                        switch (wheel) {
+							case "FL":
+								flSuspDefl = float.Parse(reader.Value.ToString());
+                                break;
+							case "FR":
+								frSuspDefl = float.Parse(reader.Value.ToString());
+                                break;
+                            case "RL":
+								rlSuspDefl = float.Parse(reader.Value.ToString());
+                                break;
+                            case "RR":
+								rrSuspDefl = float.Parse(reader.Value.ToString());
+                                break;
+                        }
+                        reader.Read();
+                        break;
+                }
+    }
+	
+	static void readWheelsInfo(JsonTextReader reader)
+    {
+        reader.Read();
+
+        while (reader.Read())
+            if (reader.TokenType == JsonToken.EndObject)
+                break;
+            else if (reader.TokenType == JsonToken.StartObject)
+                skipObject(reader);
+            else if (reader.TokenType == JsonToken.StartArray)
+                skipArray(reader);
+            else if (reader.Value != null)
+                switch (reader.Value.ToString())
+                {
+					case "FrontLeft":
+						readWheelInfo(reader, "FL");
+                        break;
+                    case "FrontRight":
+						readWheelInfo(reader, "FR");
+                        break;
+                    case "RearLeft":
+						readWheelInfo(reader, "RL");
+                        break;
+                    case "RearRight":
+						readWheelInfo(reader, "RR");
                         break;
                 }
     }

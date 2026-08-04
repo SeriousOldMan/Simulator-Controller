@@ -248,12 +248,19 @@ class SetupWizard extends ConfiguratorPanel {
 
 				this.iRedraw := false
 
-				for ignore, viewer in this.HTMLViewer
-					if viewer.Visible
-						if viewer.HasProp("Resized")
-							viewer.Resized()
-						else
-							viewer.Value.document.location.reload()
+				try {
+					for ignore, viewer in this.HTMLViewer
+						if viewer.Visible
+							if viewer.HasProp("Resized")
+								viewer.Resized()
+							else
+								viewer.Value.document.location.reload()
+				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
+				}
 			}
 
 			return Task.CurrentTask
@@ -2816,23 +2823,30 @@ class StartStepWizard extends StepWizard {
 
 				this.iRedraw := false
 
-				if ((this.iWizard.SetupWizard.Step = this.iWizard) && (this.iWizard.SetupWizard.Page = 1)) {
-					audio := substituteVariables(getMultiMapValue(this.iWizard.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
+				try {
+					if ((this.iWizard.SetupWizard.Step = this.iWizard) && (this.iWizard.SetupWizard.Page = 1)) {
+						audio := substituteVariables(getMultiMapValue(this.iWizard.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 
-					if audio {
-						volume := fadeOut(20)
+						if audio {
+							volume := fadeOut(20)
 
-						try {
-							SoundPlay("NonExistent.avi")
+							try {
+								SoundPlay("NonExistent.avi")
+							}
+							catch Any as exception {
+								logError(exception, false, false)
+							}
+
+							resetVolume(volume)
+
+							SoundPlay(audio)
 						}
-						catch Any as exception {
-							logError(exception, false, false)
-						}
-
-						resetVolume(volume)
-
-						SoundPlay(audio)
 					}
+				}
+				catch Any as exception {
+					logError(exception)
+					
+					return false
 				}
 			}
 

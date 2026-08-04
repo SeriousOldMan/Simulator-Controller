@@ -1812,14 +1812,16 @@ class SessionDatabase extends ConfigurationItem {
 			try {
 				importFileName := temporaryFileName("Import", "telemetry")
 
-				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
+				RunWait("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . fileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
 
+				/*
 				Sleep(500)
 
 				count := 0
 
 				while (ProcessExist(pid) && (count++ < 100))
 					Sleep(100)
+				*/
 
 				if FileExist(importFileName) {
 					info := (importFileName . ".info")
@@ -2101,6 +2103,7 @@ class SessionDatabase extends ConfigurationItem {
 			local trackData := []
 			local trackFile := this.getTrackData(simulator, track)
 			local directory, name, importFileName, infoFileName, index, yawRate
+			local flSuspDefl, frSuspDefl, rlSuspDefl, rrSuspDefl
 
 			if trackFile {
 				loop Read, trackFile
@@ -2124,8 +2127,20 @@ class SessionDatabase extends ConfigurationItem {
 							line := string2Values(";", A_LoopReadLine)
 
 							index := Max(1, Min(1000, Round(line[12] * 1000)))
-							yawRate := line[13]
 
+							yawRate := line[13]
+							line.RemoveAt(13)
+
+							flSuspDefl := line[13]
+							line.RemoveAt(13)
+
+							frSuspDefl := line[13]
+							line.RemoveAt(13)
+
+							rlSuspDefl := line[13]
+							line.RemoveAt(13)
+
+							rrSuspDefl := line[13]
 							line.RemoveAt(13)
 
 							running := (index / 1000)
@@ -2134,6 +2149,10 @@ class SessionDatabase extends ConfigurationItem {
 							line.Push(trackData[index][2])
 							line.Push(kNull) 					; Time into current lap not available in IBT file
 							line.Push(yawRate)
+							line.Push(flSuspDefl)
+							line.Push(frSuspDefl)
+							line.Push(rlSuspDefl)
+							line.Push(rrSuspDefl)
 
 							FileAppend(values2String(";", line*) . "`n", importFileName)
 						}

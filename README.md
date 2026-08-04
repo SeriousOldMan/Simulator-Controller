@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.1.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/9wxXUODY/Releases/Simulator%20Controller%207.1.5.0-dev.zip) (Early build for 7.1.5. Changes: Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7150) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-715) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

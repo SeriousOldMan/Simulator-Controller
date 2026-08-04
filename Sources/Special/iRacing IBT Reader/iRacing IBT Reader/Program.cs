@@ -47,6 +47,11 @@ namespace iRacingIBTReader
 			int lapTimeIdx = 0;
 			
 			int yawRateIdx = 0;
+			
+			int lfShockDeflIdx = 0;
+			int rfShockDeflIdx = 0;
+			int lrShockDeflIdx = 0;
+			int rrShockDeflIdx = 0;
 
             for (int i = 0; i < ibtFile.getNumVars(); i++)
             {
@@ -80,6 +85,14 @@ namespace iRacingIBTReader
 					lapTimeIdx = i;
                 else if (name == "YawRate")
 					yawRateIdx = i;
+                else if (name == "LFshockDefl")
+					lfShockDeflIdx = i;
+                else if (name == "RFshockDefl")
+					rfShockDeflIdx = i;
+                else if (name == "LRshockDefl")
+					lrShockDeflIdx = i;
+                else if (name == "RRshockDefl")
+					rrShockDeflIdx = i;
             }
 
             while (true)
@@ -126,6 +139,10 @@ namespace iRacingIBTReader
                         float latG = (float)ibtFile.getVarValue(latGIdx) / 9.807f;
                         float playerRunningPct = (float)ibtFile.getVarValue(lapDistPctIdx);
 						float yawRate = (float)ibtFile.getVarValue(yawRateIdx);
+						float lfShockDefl = (float)ibtFile.getVarValue(lfShockDeflIdx);
+						float rfShockDefl = (float)ibtFile.getVarValue(rfShockDeflIdx);
+						float lrShockDefl = (float)ibtFile.getVarValue(lrShockDeflIdx);
+						float rrShockDefl = (float)ibtFile.getVarValue(rrShockDeflIdx);
 
                         csvFile.Write(playerRunning + ";");
                         csvFile.Write(throttle + ";");
@@ -139,7 +156,11 @@ namespace iRacingIBTReader
                         csvFile.Write(longG + ";");
                         csvFile.Write(-latG + ";");
                         csvFile.Write(playerRunningPct + ";");
-                        csvFile.WriteLine(yawRate);
+                        csvFile.Write(yawRate + ";");
+                        csvFile.Write(lfShockDefl + ";");
+                        csvFile.Write(rfShockDefl + ";");
+                        csvFile.Write(lrShockDefl + ";");
+                        csvFile.WriteLine(rrShockDefl);
                     }
                 }
                 else

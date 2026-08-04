@@ -119,6 +119,7 @@ Setup Workbench Configuration.4=%kResourcesDirectory%Garage\Definitions\Cars\ <-
 Setup Workbench Configuration.5=%kResourcesDirectory%Garage\Rules\ <- %kSourcesDirectory%Garage\Rules\*.rules
 Setup Workbench Configuration.6=%kResourcesDirectory%Garage\Rules\Cars\ <- %kSourcesDirectory%Garage\Rules\Cars\*.rules
 Setup Workbench Configuration.7=%kResourcesDirectory%Garage\Scripts\ <- %kSourcesDirectory%Garage\Scripts\*.script
+Setup Workbench Configuration.8=%kResourcesDirectory%Instructions\ <- %kSourcesDirectory%Garage\Instructions\*.*
 Setup Configuration.1=%kResourcesDirectory%Setup\Simulator Setup.ini <- %kSourcesDirectory%Configuration\Simulator Setup.ini
 Setup Configuration.2=%kResourcesDirectory%Setup\Simulator Setup.rules <- %kSourcesDirectory%Configuration\Simulator Setup.rules
 Setup Configuration.3=%kResourcesDirectory%Setup\Definitions\ <- %kSourcesDirectory%Configuration\Definitions\*.ini

@@ -41,8 +41,10 @@
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
+#Include "..\Framework\Extensions\LLMConnector.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
+#Include "..\Configuration\Libraries\ConfigurationEditor.ahk"
 #Include "..\Plugins\Libraries\SimulatorProvider.ahk"
 ; #Include "..\Plugins\Libraries\ACCUDPProvider.ahk"
 
@@ -127,6 +129,9 @@ class SetupWorkbench extends ConfigurationItem {
 	iSetup := false
 
 	iKnowledgeBase := false
+
+	iInstructions := newMultiMap()
+	iTemplates := false
 
 	class WorkbenchWindow extends Window {
 		iWorkbench := false
@@ -352,6 +357,48 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
+	Instructions[qualified := true] {
+		Get {
+			if qualified
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Handling"]
+			else
+				return ["Character", "Simulation", "Handling"]
+		}
+	}
+
+	Templates[language?] {
+		Get {
+			local templates, fileName, code, ignore
+
+			if !this.iTemplates {
+				templates := CaseInsenseMap()
+
+				for code, ignore in availableLanguages() {
+					fileName := getFileName("Setup Workbench.instructions." . code, kResourcesDirectory . "Instructions\")
+
+					if FileExist(fileName) {
+						templates[code] := readMultiMap(fileName)
+
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							addMultiMapValues(templates[code], readMultiMap(fileName))
+					}
+					else {
+						fileName := getFileName("Setup Workbench.instructions." . code, kUserHomeDirectory . "Instructions\")
+
+						if FileExist(fileName)
+							templates[code] := readMultiMap(fileName)
+					}
+				}
+
+				this.iTemplates := templates
+			}
+
+			return (isSet(language) ? this.iTemplates[language] : this.iTemplates)
+		}
+	}
+
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
 		local definition, ignore, fileName
@@ -469,7 +516,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Documentation", "x488 YP+20 w224 Center H:Center", translate("Setup Workbench")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench")
 
-		workbenchGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
+		workbenchGui.Add("Text", "x8 yp+30 w1196 W:Grow 0x10 Section")
 
 		workbenchGui.SetFont("Norm")
 		workbenchGui.SetFont("s10 Bold", "Arial")
@@ -553,9 +600,13 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Assistant.ico"))
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
+		button := workbenchGui.Add("Button", "x1172 yp+6 w23 h23 X:Move")
+		button.OnEvent("Click", (*) => this.editSettings())
+		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
+
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer")
+		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+24 w775 h621 W:Grow H:Grow Border vsettingsViewer")
 
 		this.showSettingsChart(false)
 
@@ -1839,6 +1890,12 @@ class SetupWorkbench extends ConfigurationItem {
 				characteristicsMenu.Disable(label)
 		}
 
+		label := translate("Engineer...")
+
+		characteristicsMenu.Add(label, (*) => false)
+
+		characteristicsMenu.Disable(label)
+
 		characteristicsMenu.Show()
 	}
 
@@ -1910,6 +1967,25 @@ class SetupWorkbench extends ConfigurationItem {
 
 		if editorClass
 			%editorClass%(this).editSetup(this.Setup)
+	}
+
+	editSettings() {
+		local window := this.Window
+		local configuration
+
+		window.Block()
+
+		try {
+			configuration := WorkbenchSettingsEditor(this
+												   , readMultiMap(kUserConfigDirectory
+																. "Setup Workbench.ini")).editSettings(window)
+
+			if configuration
+				writeMultiMap(kUserConfigDirectory . "Setup Workbench.ini", configuration)
+		}
+		finally {
+			window.Unblock()
+		}
 	}
 }
 
@@ -3851,6 +3927,784 @@ class FileSetupComparator extends SetupComparator {
 		if this.SetupAB
 			this.SetupAB.FileName[false] := setupA.FileName[false]
 	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; WorkbenchSettingsEditor                                                 ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class WorkbenchSettingsEditor extends ConfiguratorPanel {
+	iSetupWorkbench := false
+
+	iResult := false
+
+	iWindow := false
+
+	iProviderConfigurations := CaseInsenseMap()
+	iCurrentProvider := false
+
+	SetupWorkbench {
+		Get {
+			return this.iSetupWorkbench
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Providers {
+		Get {
+			return LLMConnector.Providers
+		}
+	}
+
+	Models[provider] {
+		Get {
+			try {
+				return LLMConnector.%StrReplace(provider, A_Space, "")%Connector.Models
+			}
+			catch Any {
+				try {
+					return %StrReplace(provider, A_Space, "")%Connector.Models
+				}
+				catch Any {
+					return []
+				}
+			}
+		}
+	}
+
+	Instructions[qualified := true] {
+		Get {
+			return this.SetupWorkbench.Instructions[qualified]
+		}
+	}
+
+	Templates[language?] {
+		Get {
+			return this.SetupWorkbench.Templates[language?]
+		}
+	}
+
+	__New(setupWorkbench, configuration := false) {
+		this.iSetupWorkbench := setupWorkbench
+
+		super.__New(configuration)
+	}
+
+	createGui(configuration) {
+		local choices := []
+		local chosen := 0
+		local x := 8
+		local width := 460
+		local editorGui, x0, x1, x2, w1, w2, x3, w3, x4, w4
+		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, lineX, lineW, button
+
+		validateTemperature(field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 0) && (value <= 100))
+		}
+
+		validateInteger(minValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue))
+		}
+
+		validatePercentage(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				try {
+					return (isInteger(value) && (value >= 0) && (value <= 100))
+				}
+				finally {
+					Task.startTask(() => this.updateState(), 100)
+				}
+		}
+
+		validateTokens(fieldName, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= 32))
+		}
+
+		chooseProvider(*) {
+			this.saveProviderConfiguration()
+
+			this.loadProviderConfiguration(editorGui["providerDropDown"].Text)
+
+			this.updateState()
+		}
+
+		chooseConversationsPath(*) {
+			local directory
+
+			editorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSelectCancelButtons)
+			directory := withBlockedWindows(FileSelect, "D1", editorGui["conversationsPathEdit"].Text, translate("Select Conversations Folder..."))
+			OnMessage(0x44, translateSelectCancelButtons, 0)
+
+			if (directory != "")
+				editorGui["conversationsPathEdit"].Text := directory
+		}
+
+		chooseModelPath(field, *) {
+			local fileName
+
+			editorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSelectCancelButtons)
+			fileName := withBlockedWindows(FileSelect, 1, "", translate("Select model file..."), "GGUF (*.GGUF)")
+			OnMessage(0x44, translateSelectCancelButtons, 0)
+
+			if (fileName != "")
+				editorGui[field].Text := fileName
+		}
+
+		chooseInstructions(*) {
+			local value := this.Value[this.Instructions[true][editorGui["instructionsDropDown"].Value]]
+
+			editorGui["instructionsEdit"].Value := ((value != false) ? value : "")
+
+			this.updateState()
+		}
+
+		updateInstructions(*) {
+			this.Value[this.Instructions[true][editorGui["instructionsDropDown"].Value]] := ((Trim(editorGui["instructionsEdit"].Value) != "") ? editorGui["instructionsEdit"].Value : false)
+		}
+
+		reloadInstructions(*) {
+			local chosenSetting := this.Instructions[true][editorGui["instructionsDropDown"].Value]
+			local setting, oldValue
+
+			for ignore, setting in (GetKeyState("Ctrl") ? this.Instructions[true] : [chosenSetting]) {
+				oldValue := this.Value[setting]
+
+				this.Value[setting] := ""
+
+				if (this.iCurrentProvider = "LLM Runtime")
+					this.initializeInstructions(this.iCurrentProvider, editorGui["llmRTModelEdit"].Text, setting, true)
+				else
+					this.initializeInstructions(this.iCurrentProvider, editorGui["modelDropDown"].Text, setting, true)
+
+				if (setting = chosenSetting)
+					editorGui["instructionsEdit"].Value := ((this.Value[setting] != false) ? this.Value[setting] : "")
+			}
+		}
+
+		loadModels(*) {
+			local provider := this.iCurrentProvider
+			local configuration
+
+			if provider {
+				configuration := this.iProviderConfigurations[provider]
+
+				this.loadModels(provider, this.Control["serviceURLEdit"].Text
+										, this.Control["serviceKeyEdit"].Text
+										, this.Control[(provider = "LLM Runtime") ? ("modelEdit")
+																				  : ("modelDropDown")].Text)
+			}
+			else
+				this.loadModels(false)
+		}
+
+		editorGui := Window({Descriptor: "Setup Workbench.Settings Editor", Options: "0x400000"})
+
+		this.iWindow := editorGui
+
+		editorGui.SetFont("Bold", "Arial")
+
+		editorGui.Add("Text", "w468 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Workbench.Settings Editor"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Documentation", "x158 YP+20 w168 H:Center Center", translate("Settings")
+					, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings")
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x8 yp+30 w468 W:Grow 0x10")
+
+		x0 := x + 16
+		x1 := x + 132
+		x2 := x + 172
+		x3 := x + 176
+
+		w1 := width - (x1 - x + 8)
+		w3 := width - (x3 - x + 16) + 10
+
+		w2 := w1 - 24
+		x4 := x1 + w2 + 1
+
+		w4 := w1 - 24
+		x6 := x1 + w4 + 1
+
+		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w120 h23 +0x200", translate("Conversations Folder"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VconversationsPathEdit")
+		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseConversationsPath)
+
+		editorGui.SetFont("Italic", "Arial")
+		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Service "))
+		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x" . x0 . " yp+20 w110 h23 +0x200 vproviderLabel", translate("Provider / URL"))
+
+		editorGui.Add("DropDownList", "x" . x1 . " yp w100 Choose1 vproviderDropDown", concatenate([translate("Disabled")], this.Providers)).OnEvent("Change", chooseProvider)
+
+		editorGui.Add("Edit", "x" . (x1 + 102) . " yp w" . (w1 - 102) . " h23 vserviceURLEdit").OnEvent("Change", loadModels)
+
+		editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 Section vserviceKeyLabel", translate("Service Key"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h23 Password vserviceKeyEdit").OnEvent("Change", loadModels)
+
+		editorGui.Add("Text", "x" . x0 . " yp+30 w110 h23 +0x200 vmodelLabel", translate("Model / # Tokens"))
+		editorGui.Add("ComboBox", "x" . x1 . " yp w" . (w1 - 64) . " vmodelDropDown")
+		editorGui.Add("Edit", "x" . (x1 + (w1 - 60)) . " yp-1 w60 h23 Number vmaxTokensEdit").OnValidate("LoseFocus", validateTokens.Bind("maxTokensEdit"))
+		editorGui.Add("UpDown", "x" . (x1 + (w1 - 60)) . " yp w60 h23 0x80 Range32-131072 vmaxTokensRange")
+
+		editorGui.Add("Text", "x" . x0 . " ys+6 w110 h23 +0x200 vllmRTModelLabel Hidden", translate("Model"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . (w1 - 24) . " vllmRTModelEdit Hidden")
+		editorGui.Add("Button", "x" . (x1 + (w1 - 23)) . " yp h23 w23 vllmRTModelButton Hidden", translate("...")).OnEvent("Click", chooseModelPath.Bind("llmRTModelEdit"))
+
+		editorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 vllmRTTokensLabel Hidden", translate("# Tokens / # GPULayers"))
+		editorGui.Add("Edit", "x" . x1 . " yp-1 w60 h23 Number vllmRTMaxTokensEdit Hidden").OnValidate("LoseFocus", validateTokens.Bind("llmRTMaxTokensEdit"))
+		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 0x80 Range32-131072 vllmRTMaxTokensRange Hidden")
+		editorGui.Add("Edit", "x" . (x1 + 62) . " yp w60 h23 Number Limit2 vllmRTGPULayersEdit Hidden").OnValidate("LoseFocus", validateInteger.Bind(0))
+		editorGui.Add("UpDown", "x" . (x1 + 62) . " yp w60 h23 Range0-99 vllmRTGPULayersRange Hidden")
+
+		editorGui.SetFont("Italic", "Arial")
+		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Personality"))
+		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x" . (x + 16) . " yp+20 w112 h23 +0x200", translate("Creativity"))
+		editorGui.Add("Edit", "x" . x1 . " yp w60 Number Limit3 vtemperatureEdit").OnValidate("LoseFocus", validateTemperature)
+		editorGui.Add("UpDown", "x" . x1 . " yp w60 h23 Range0-100")
+		editorGui.Add("Text", "x" . (x1 + 65) . " yp w100 h23 +0x200", translate("%"))
+
+		editorGui.Add("Text", "x" . (x + 16) . " yp+24 w112 h23 +0x200", translate("Instructions"))
+
+		editorGui.Add("DropDownList", "x" . x1 . " yp w180 vinstructionsDropDown", collect(this.Instructions[false], translate)).OnEvent("Change", chooseInstructions)
+
+		height := 190
+
+		editorGui.Add("Edit", "x" . x1 . " yp+24 w" . w1 . " h" . height . " Section Multi H:Grow W:Grow vinstructionsEdit").OnEvent("Change", updateInstructions)
+
+		button := editorGui.Add("Button", "x" . (x1 + w1 - 23) . " yp-25 w23 h23 X:Move")
+		button.OnEvent("Click", reloadInstructions)
+		setButtonIcon(button, kIconsDirectory . "Renew.ico", 1)
+
+		editorGui.Add("Text", "x8 ys+200 w468 W:Grow 0x10")
+
+		editorGui.Add("Button", "x160 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", (*) => this.iResult := kOk)
+		editorGui.Add("Button", "x246 yp w80 h23", translate("&Cancel")).OnEvent("Click", (*) => this.iResult := kCancel)
+	}
+
+	loadModels(provider, serviceURL, serviceKey, model) {
+		local connector, index, models
+
+		if !model
+			model := ""
+
+		if (provider = "LLM Runtime")
+			this.Control["llmRTModelEdit"].Text := model
+		else {
+			if provider {
+				try {
+					connector := LLMConnector.%StrReplace(provider, A_Space, "")%Connector(this, model)
+
+					if isInstance(connector, LLMConnector.APIConnector) {
+						connector.Connect(serviceURL, serviceKey)
+
+						models := connector.Models
+					}
+					else
+						models := this.Models[provider]
+				}
+				catch Any as exception {
+					models := this.Models[provider]
+				}
+			}
+			else
+				models := []
+
+			if model {
+				index := inList(models, model)
+
+				if !index {
+					index := inList(models, StrReplace(model, A_Space, "-"))
+
+					if index
+						model := models[index]
+				}
+
+				if !index
+					models := concatenate(models, [model])
+			}
+
+			this.Control["modelDropDown"].Delete()
+			this.Control["modelDropDown"].Add(models)
+
+			if model
+				this.Control["modelDropDown"].Choose(inList(models, model))
+			else
+				this.Control["modelDropDown"].Choose((models.Length > 0) ? 1 : 0)
+		}
+	}
+
+	initializeInstructions(provider, model, setting, edit := false) {
+		local providerConfiguration := this.iProviderConfigurations[provider]
+		local language, value, instructions, configuration, thePlugin, translated
+
+		value := (edit ? this.Value[setting] : providerConfiguration[setting])
+
+		if (value = "") {
+			language := getLanguage()
+
+			if edit
+				this.Value[setting] := getMultiMapValue(this.Templates[this.Templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
+			else
+				providerConfiguration[setting] := getMultiMapValue(this.Templates[this.Templates.Has(language) ? language : "EN"], "Instructions", StrReplace(setting, "Instructions.", ""))
+		}
+	}
+
+	normalizeConfiguration(configuration) {
+		local language, ignore, provider, setting, providerConfiguration, template
+
+		language := getLanguage()
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := this.iProviderConfigurations[provider]
+
+			for ignore, setting in this.Instructions {
+				template := this.Templates[this.Templates.Has(language) ? language : "EN"]
+
+				if (getMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting)
+				  = getMultiMapValue(template, "Instructions", StrReplace(setting, "Instructions.", "")))
+					removeMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting)
+
+				if (provider = this.iCurrentProvider)
+					if (getMultiMapValue(configuration, "Setup Engineer Personality", setting)
+					  = getMultiMapValue(template, "Instructions", StrReplace(setting, "Instructions.", "")))
+						removeMultiMapValue(configuration, "Setup Engineer Personality", setting)
+			}
+		}
+	}
+
+	loadFromConfiguration(configuration) {
+		local service, ignore, provider, setting, providerConfiguration
+		local serviceURL, serviceKey, model
+
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 4096
+											, "Temperature", 0.5, "GPULayers", 0)
+
+		super.loadFromConfiguration(configuration)
+
+		this.Value["ConversationsPath"] := getMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", "")
+
+		service := getMultiMapValue(configuration, "Setup Engineer Service", "Service", false)
+
+		if !service
+			this.iCurrentProvider := "OpenAI"
+		else
+			this.iCurrentProvider := string2Values("|", service)[1]
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := CaseInsenseMap()
+
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
+				providerConfiguration[setting] := getMultiMapValue(configuration, "Setup Engineer Service", provider . "." . setting, defaults[setting])
+
+			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+				providerConfiguration["MaxTokens"] := 2048
+
+			if (provider = "LLM Runtime")
+				providerConfiguration["GPULayers"] := getMultiMapValue(configuration, "Setup Engineer Service", provider . ".GPULayers", defaults["GPULayers"])
+
+			try {
+				try {
+					LLMConnector.%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				}
+				catch Any {
+					%StrReplace(provider, A_Space, "")%Connector.GetDefaults(&serviceURL, &serviceKey, &model)
+				}
+			}
+			catch Any {
+				serviceURL := ""
+				serviceKey := ""
+				model := ""
+			}
+
+			if !providerConfiguration["ServiceURL"]
+				providerConfiguration["ServiceURL"] := serviceURL
+
+			if !providerConfiguration["ServiceKey"]
+				providerConfiguration["ServiceKey"] := serviceKey
+
+			if (providerConfiguration["Model"] = "")
+				providerConfiguration["Model"] := model
+
+			for ignore, setting in concatenate(["Temperature"], this.Instructions)
+				if getMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting . ".Active", true)
+					providerConfiguration[setting] := getMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting, defaults[setting])
+				else
+					providerConfiguration[setting] := false
+
+			this.iProviderConfigurations[provider] := providerConfiguration
+
+			for ignore, setting in this.Instructions
+				this.initializeInstructions(provider, providerConfiguration["Model"], setting)
+		}
+	}
+
+	saveToConfiguration(configuration) {
+		local provider, value
+
+		super.saveToConfiguration(configuration)
+
+		value := this.Control["conversationsPathEdit"].Text
+
+		setMultiMapValue(configuration, "Setup Engineer Conversations", "Archive", (Trim(value) != "") ? Trim(value) : false)
+
+		this.saveProviderConfiguration()
+
+		for ignore, provider in this.Providers {
+			providerConfiguration := this.iProviderConfigurations[provider]
+
+			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
+				providerConfiguration["MaxTokens"] := 4096
+
+			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
+				setMultiMapValue(configuration, "Setup Engineer Service", provider . "." . setting, providerConfiguration[setting])
+
+			if (provider = "LLM Runtime") {
+				setMultiMapValue(configuration, "Setup Engineer Service", provider . ".GPULayers", providerConfiguration["GPULayers"])
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Setup Engineer Service", "GPULayers", providerConfiguration["GPULayers"])
+			}
+
+			for ignore, setting in ["Temperature"] {
+				setMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting, providerConfiguration[setting])
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Setup Engineer Personality", setting, providerConfiguration[setting])
+			}
+
+			for ignore, setting in this.Instructions {
+				setMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting, (providerConfiguration[setting] != false) ? providerConfiguration[setting] : "")
+				setMultiMapValue(configuration, "Setup Engineer Personality", provider . "." . setting . ".Active", (Trim(providerConfiguration[setting]) != false))
+
+				if (provider = this.iCurrentProvider)
+					setMultiMapValue(configuration, "Setup Engineer Personality", setting, providerConfiguration[setting])
+			}
+		}
+
+		provider := this.iCurrentProvider
+		providerConfiguration := this.iProviderConfigurations[provider]
+
+		for ignore, setting in ["Model", "MaxTokens"]
+			setMultiMapValue(configuration, "Setup Engineer Service", setting, providerConfiguration[setting])
+
+		if (provider = "LLM Runtime") {
+			setMultiMapValue(configuration, "Setup Engineer Service", "Service", provider)
+			setMultiMapValue(configuration, "Setup Engineer Service", "GPULayers", providerConfiguration["GPULayers"])
+		}
+		else
+			setMultiMapValue(configuration, "Setup Engineer Service", "Service"
+										  , values2String("|", provider, Trim(providerConfiguration["ServiceURL"])
+																	   , Trim(providerConfiguration["ServiceKey"])))
+
+		this.normalizeConfiguration(configuration)
+	}
+
+	loadProviderConfiguration(provider := false) {
+		local configuration
+
+		if !provider
+			provider := this.Control["providerDropDown"].Text
+
+		this.iCurrentProvider := provider
+
+		if !this.iProviderConfigurations.Has(this.iCurrentProvider) {
+			this.iCurrentProvider := this.Providers[1]
+
+			provider := this.iCurrentProvider
+		}
+
+		if provider {
+			this.Control["providerDropDown"].Delete()
+			this.Control["providerDropDown"].Add(this.Providers)
+			this.Control["providerDropDown"].Choose(inList(this.Providers, provider))
+
+			configuration := this.iProviderConfigurations[this.iCurrentProvider]
+
+			for ignore, setting in ["ServiceURL", "ServiceKey"]
+				this.Control[setting . "Edit"].Text := configuration[setting]
+
+			if (provider = "LLM Runtime") {
+				this.Control["llmRTGPULayersEdit"].Text := configuration["GPULayers"]
+				this.Control["llmRTMaxTokensEdit"].Text := configuration["MaxTokens"]
+			}
+			else
+				this.Control["maxTokensEdit"].Text := configuration["MaxTokens"]
+
+			if ((provider = "GPT4All") && (Trim(this.Control["serviceKeyEdit"].Text) = ""))
+				this.Control["serviceKeyEdit"].Text := "Any text will do the job"
+
+			if ((provider = "Ollama") && (Trim(this.Control["serviceKeyEdit"].Text) = ""))
+				this.Control["serviceKeyEdit"].Text := "Ollama"
+
+			this.Control["temperatureEdit"].Text := Round(configuration["Temperature"] * 100)
+
+			this.loadModels(this.iCurrentProvider, configuration["ServiceURL"]
+												 , configuration["ServiceKey"]
+												 , configuration["Model"])
+
+			this.Control["instructionsDropDown"].Choose(1)
+			this.Control["instructionsEdit"].Value := ((configuration["Instructions.Character"] != false) ? configuration["Instructions.Character"] : "")
+
+			for ignore, setting in this.Instructions
+				this.Value[setting] := configuration[setting]
+		}
+	}
+
+	saveProviderConfiguration() {
+		local providerConfiguration, value, ignore, setting
+
+		if this.iProviderConfigurations.Has(this.iCurrentProvider) {
+			providerConfiguration := this.iProviderConfigurations[this.iCurrentProvider]
+
+			providerConfiguration["ServiceURL"] := Trim(this.Control["serviceURLEdit"].Text)
+			providerConfiguration["ServiceKey"] := Trim(this.Control["serviceKeyEdit"].Text)
+
+			if (this.iCurrentProvider = "LLM Runtime")
+				value := this.Control["llmRTModelEdit"].Text
+			else
+				value := this.Control["modelDropDown"].Text
+
+			providerConfiguration["Model"] := ((Trim(value) != "") ? Trim(value) : false)
+
+			if (this.iCurrentProvider = "LLM Runtime")
+				providerConfiguration["MaxTokens"] := this.Control["llmRTMaxTokensEdit"].Text
+			else
+				providerConfiguration["MaxTokens"] := this.Control["maxTokensEdit"].Text
+
+			if (this.iCurrentProvider = "LLM Runtime")
+				providerConfiguration["GPULayers"] := this.Control["llmRTGPULayersEdit"].Text
+
+			providerConfiguration["Temperature"] := Round(this.Control["temperatureEdit"].Text / 100, 2)
+
+			for ignore, setting in this.Instructions
+				providerConfiguration[setting] := ((Trim(this.Value[setting]) != "") ? this.Value[setting] : false)
+		}
+	}
+
+	loadConfigurator(configuration, simulators := false) {
+		this.loadFromConfiguration(configuration)
+
+		this.Control["conversationsPathEdit"].Text := (this.Value["ConversationsPath"] ? this.Value["ConversationsPath"] : "")
+
+		this.loadProviderConfiguration(this.iCurrentProvider)
+
+		this.updateState()
+	}
+
+	updateState() {
+		local ignore, field, llmRuntime
+
+		this.Control["serviceURLEdit"].Enabled := (this.Control["providerDropDown"].Text != "LLM Runtime")
+		this.Control["serviceKeyEdit"].Enabled := !inList(["GPT4All", "Ollama", "LLM Runtime"], this.Control["providerDropDown"].Text)
+
+		llmRuntime := (this.iCurrentProvider = "LLM Runtime")
+
+		for ignore, field in ["serviceKeyLabel", "serviceKeyEdit", "modelLabel", "modelDropDown"
+							, "serviceURLEdit", "maxTokensEdit", "maxTokensRange"]
+			this.Control[field].Visible := !llmRuntime
+
+		this.Control["providerLabel"].Text := (llmRuntime ? translate("Provider") : translate("Provider / URL"))
+
+		for ignore, field in ["llmRTModelLabel", "llmRTModelEdit", "llmRTModelButton"
+							, "llmRTTokensLabel", "llmRTMaxTokensEdit", "llmRTMaxTokensRange"
+							, "llmRTGPULayersEdit", "llmRTGPULayersRange"]
+			this.Control[field].Visible := llmRuntime
+	}
+
+	editSettings(owner := false) {
+		local window, x, y, w, h, configuration
+
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Setup Workbench.Settings", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		this.loadConfigurator(this.Configuration)
+
+		loop
+			Sleep(200)
+		until this.iResult
+
+		try {
+			if (this.iResult = kOk) {
+				configuration := newMultiMap()
+
+				this.saveToConfiguration(configuration)
+
+				return configuration
+			}
+			else
+				return false
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	/*
+	getOriginalInstruction(language, type, key) {
+		if (type = "Agent")
+			return getMultiMapValue(this.getInstructions(type, true), "Agent Booster", "Instructions." . type . "." . key . "." . language, "")
+		else
+			return getMultiMapValue(this.getInstructions(type, true), "Conversation Booster", "Instructions." . type . "." . key . "." . language, "")
+	}
+
+	getInstructions(type, original := false) {
+		local instructions, reference, key, value, ignore, directory, configuration, language
+
+		if (type = this.Assistant) {
+			if original
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kResourcesDirectory . "Instructions\"))
+			else
+				instructions := readMultiMap(getFileName(this.Assistant . ".instructions.en", kTempDirectory, kUserHomeDirectory . "Instructions\", kResourcesDirectory . "Instructions\"))
+		}
+		else {
+			instructions := newMultiMap()
+			reference := ((type = "Agent") ? "Agent Booster" : "Conversation Booster")
+
+			for ignore, directory in [kResourcesDirectory . "Instructions\", kUserHomeDirectory . "Instructions\"]
+				loop Files (directory . reference . ".instructions.*") {
+					SplitPath A_LoopFilePath, , , &language
+
+					for key, value in getMultiMapValues(readMultiMap(A_LoopFilePath), type . ".Instructions")
+						setMultiMapValue(instructions, reference, "Instructions." . type . "." . key . "." . language, value)
+				}
+
+			if !original
+				for ignore, configuration in [this.Configuration, this.iInstructions]
+					for key, value in getMultiMapValues(configuration, reference)
+						if (InStr(key, this.Assistant . ".Instructions." . type) = 1) {
+							key := StrReplace(key, this.Assistant . ".", "")
+
+							setMultiMapValue(instructions, reference, key, value)
+						}
+						else if (InStr(key, "Instructions." . type) = 1)
+							setMultiMapValue(instructions, reference, key, value)
+		}
+
+		return instructions
+	}
+
+	setInstructions(type, instructions) {
+		if (type = this.Assistant) {
+			if (printMultiMap(instructions) = printMultiMap(this.getInstructions(type, true))) {
+				deleteFile(kTempDirectory . this.Assistant . ".instructions.en")
+
+				FileAppend("Delete", kTempDirectory . this.Assistant . ".instructions.en")
+			}
+			else
+				writeMultiMap(kTempDirectory . this.Assistant . ".instructions.en", instructions)
+		}
+		else
+			addMultiMapValues(this.iInstructions, instructions)
+	}
+
+	editInstructions(type, title) {
+		local window := this.Window
+		local instructions
+
+		window.Block()
+
+		try {
+			instructions := editInstructions(this, type, title, this.getInstructions(type), window)
+
+			if instructions
+				this.setInstructions(type, instructions)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editFilter(type, booster, provider, title) {
+		local window := this.Window
+		local filter, fileName
+
+		window.Block()
+
+		try {
+			fileName := (kUserHomeDirectory . "Scripts\Booster\" . type . "." . booster . "." . provider . ".script")
+			filter := (FileExist(fileName) ? FileRead(fileName) : "")
+
+			filter := editFilter(this, title, filter, window)
+
+			if (filter != false) {
+				deleteFile(fileName)
+
+				if (filter != "") {
+					DirCreate(kUserHomeDirectory . "Scripts\Booster")
+
+					FileAppend(filter, fileName, "UTF-8")
+				}
+			}
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editEvents(assistant, title) {
+		local window := this.Window
+
+		window.Block()
+
+		try {
+			return EventsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Events" : "Agent.LLM.Events"
+									, title
+									, (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
+																			  : ["Custom"]).editEvents(window)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+
+	editActions(assistant, type, title) {
+		local window := this.Window
+
+		window.Block()
+
+		try {
+			if (type = "Agent")
+				return ActionsEditor(this, (this.iCurrentAgentProvider = "Rules") ? "Agent.Rules.Actions" : "Agent.LLM.Actions"
+										 , title
+										 , (this.iCurrentAgentProvider != "Rules") ? ["Builtin", "Custom"]
+																				   : ["Custom"]).editActions(window)
+			else
+				return ActionsEditor(this, "Conversation.Actions", title, ["Builtin", "Custom"]).editActions(window)
+		}
+		finally {
+			window.Unblock()
+		}
+	}
+	*/
 }
 
 

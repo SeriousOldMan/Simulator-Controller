@@ -4236,15 +4236,15 @@ class SetupEngineer extends ConfigurationItem {
 		this.iTelemetriesListView.OnEvent("ItemSelect", selectTelemetry)
 
 		engineerGui.Add("Text", "x16 yp+130 w120 Y:Move(0.1) Section", translate("Analyze Issues"))
-		engineerGui.Add("DropDownList", "x130 yp-2 w50 Y:Move(0.1) Choose2 vissuesDropDown", [translate("Yes"), translate("No")]).OnEvent("Change", (*) {
+		engineerGui.Add("DropDownList", "x130 yp-4 w50 Y:Move(0.1) Choose2 vissuesDropDown", [translate("Yes"), translate("No")]).OnEvent("Change", (*) {
 			this.iIssues := (engineerGui["issuesDropDown"].Value == 1)
 		})
 
-		engineerGui.Add("Text", "x16 yp+26 w120 Y:Move(0.1)", translate("Resolution"))
-		engineerGui.Add("DropDownList", "x130 yp-2 w50 Y:Move(0.1) Choose2 vresolutionDropDown", [500, 1000, 2000, 4000]).OnEvent("Change", (*) {
+		engineerGui.Add("Text", "x16 yp+28 w120 Y:Move(0.1)", translate("Resolution"))
+		engineerGui.Add("DropDownList", "x130 yp-4 w50 Y:Move(0.1) Choose2 vresolutionDropDown", [500, 1000, 2000, 4000]).OnEvent("Change", (*) {
 			this.iResolution := [500, 1000, 2000, 4000][engineerGui["resolutionDropDown"].Value]
 		})
-		engineerGui.Add("Text", "x182 yp+2 w80 Y:Move(0.1)", translate("Samples"))
+		engineerGui.Add("Text", "x184 yp+4 w80 Y:Move(0.1)", translate("Samples"))
 
 		engineerGui.Add("Button", "x432 ys w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
 		setButtonIcon(engineerGui["analyzeButton"], kIconsDirectory . "Assistant.ico", 1, "W42 H42")
@@ -4528,23 +4528,24 @@ class SetupEngineer extends ConfigurationItem {
 
 			script := "
 			(
-				table th td {
+				table, th, td {
 					border-collapse: collapse;
 					padding: .3em .5em;
 				}
 
-				th td {
-					text-align: center;
+				th, td {
 					color: #%textColor%;
 				}
 
-				th caption {
+				th, caption {
+					font-size: 12px;
 					background-color: #%headerBackColor%;
 					color: #%textColor%;
 					border: thin solid #%frameColor%;
 				}
 
 				td {
+					font-size: 12px;
 					border-left: thin solid #%frameColor%;
 					border-right: thin solid #%frameColor%;
 				}
@@ -4567,8 +4568,9 @@ class SetupEngineer extends ConfigurationItem {
 					background-color: #%evenRowColor%;
 				}
 
-				h1 h2 h3 h4 h5 p {
+				h1, h2, h3, h4, h5, p, ul, ol {
 					font-family: Arial;
+					color: #%textColor%;
 				}
 			)"
 

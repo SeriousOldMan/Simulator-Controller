@@ -127,6 +127,7 @@ class SetupWorkbench extends ConfigurationItem {
 	iSettingsViewer := false
 
 	iTelemetryViewer := false
+	iSetupEngineer := false
 
 	iSetup := false
 
@@ -353,6 +354,12 @@ class SetupWorkbench extends ConfigurationItem {
 	TelemetryViewer {
 		Get {
 			return this.iTelemetryViewer
+		}
+	}
+
+	SetupEngineer {
+		Get {
+			return this.iSetupEngineer
 		}
 	}
 
@@ -1019,6 +1026,9 @@ class SetupWorkbench extends ConfigurationItem {
 			this.Control["analyzerButton"].Enabled := false
 		else
 			this.Control["analyzerButton"].Enabled := true
+
+		if this.SetupEngineer
+			this.SetupEngineer.updateState()
 	}
 
 	compileRules(fileName, &productions, &reductions, &includes) {
@@ -1629,6 +1639,28 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iTelemetryViewer := false
 	}
 
+	openSetupEngineer() {
+		if this.SetupEngineer
+			activateWindow(this.SetupEngineer.Window)
+		else {
+			this.iSetupEngineer := SetupEngineer(this, readMultiMap(kUserConfigDirectory . "Setup Workbench.ini"))
+
+			this.SetupEngineer.show()
+		}
+	}
+
+	closeSetupEngineer() {
+		if this.SetupEngineer {
+			this.SetupEngineer.close()
+
+			this.iSetupEngineer := false
+		}
+	}
+
+	closedSetupEngineer() {
+		this.iSetupEngineer := false
+	}
+
 	getSessionInformation(&simulator, &car, &track) {
 		simulator := this.SelectedSimulator
 
@@ -1858,9 +1890,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		label := translate("Engineer...")
 
-		characteristicsMenu.Add(label, (*) => false)
+		characteristicsMenu.Add(label, (*) => this.openSetupEngineer())
 
-		characteristicsMenu.Disable(label)
+		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
+			characteristicsMenu.Disable(label)
 
 		characteristicsMenu.Show()
 	}
@@ -3901,6 +3934,16 @@ class FileSetupComparator extends SetupComparator {
 
 class SetupEngineer extends ConfigurationItem {
 	iSetupWorkbench := false
+
+	iWindow := false
+
+	iTelemetriesListView := false
+	iReviewViewer := false
+
+	iUpdateTask := false
+
+	iContent := ""
+
 	iOptions := CaseInsenseMap()
 
 	iConnector := false
@@ -3914,9 +3957,103 @@ class SetupEngineer extends ConfigurationItem {
 
 	iIncludeHandling := false
 
+	class EngineerWindow extends Window {
+		iEngineer := false
+
+		__New(engineer, arguments*) {
+			this.iEngineer := engineer
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iEngineer.close()
+		}
+	}
+
+	class EngineerResizer extends Window.Resizer {
+		iEngineer := false
+		iRedraw := false
+
+		__New(engineer, arguments*) {
+			this.iEngineer := engineer
+
+			super.__New(engineer.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawEngineer"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawEngineer() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iEngineer.ReviewViewer.Resized()
+
+				this.iEngineer.windowResized()
+
+				try {
+					WinRedraw(this.iEngineer.Window)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
 	SetupWorkbench {
 		Get {
 			return this.iSetupWorkbench
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	TelemetriesListView {
+		Get {
+			return this.iTelemetriesListView
+		}
+	}
+
+	ReviewViewer {
+		Get {
+			return this.iReviewViewer
+		}
+	}
+
+	Simulator {
+		Get {
+			return this.SetupWorkbench.SelectedSimulator[false]
+		}
+	}
+
+	Car {
+		Get {
+			return this.SetupWorkbench.SelectedCar[false]
+		}
+	}
+
+	Track {
+		Get {
+			return this.SetupWorkbench.SelectedTrack[false]
 		}
 	}
 
@@ -4055,6 +4192,136 @@ class SetupEngineer extends ConfigurationItem {
 			options["Setup Engineer.GPULayers"] := getMultiMapValue(configuration, "Setup Engineer Service", "GPULayers", 0)
 	}
 
+	createGui() {
+		local engineerGui
+
+		validateInteger(minValue, maxValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+		}
+
+		selectTelemetry := (*) => this.updateState()
+
+		engineerGui := SetupEngineer.EngineerWindow(this, {Descriptor: "Setup Workbench.Setup Engineer"
+														 , Resizeable:  "Deferred", Scrollable: false}
+														, translate("Setup Engineer"))
+
+		this.iWindow := engineerGui
+
+		engineerGui.SetFont("s10 Bold", "Arial")
+
+		engineerGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(engineerGui, "Setup Workbench.Setup Engineer"))
+
+		engineerGui.SetFont("s9 Norm", "Arial")
+
+		engineerGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Setup Engineer")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer")
+
+		engineerGui.SetFont("s8 Norm", "Arial")
+
+		engineerGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
+
+		this.iTelemetriesListView := engineerGui.Add("ListView", "x16 yp+10 w464 h120 H:Grow(0.1) W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Lap Time"], translate))
+		this.iTelemetriesListView.OnEvent("Click", selectTelemetry)
+		this.iTelemetriesListView.OnEvent("DoubleClick", selectTelemetry)
+		this.iTelemetriesListView.OnEvent("ItemSelect", selectTelemetry)
+
+		engineerGui.Add("Button", "x208 yp+130 w80 h23 X:Move(0.5) Y:Move(0.1) vanalyzeButton", translate("Analyze...")).OnEvent("Click", (*) => this.analyzeTelemetry())
+
+		engineerGui.Add("Text", "x8 yp+30 w480 0x10 Y:Move(0.1) W:Grow")
+
+		this.iReviewViewer := engineerGui.Add("HTMLViewer", "x16 yp+10 w464 h400 W:Grow Y:Move(0.1) H:Grow(0.9) Border vreviewViewer")
+
+		engineerGui.Add(SetupEngineer.EngineerResizer(this))
+
+		this.updateState()
+	}
+
+	show() {
+		local x, y, w, h
+
+		this.createGui()
+
+		if getWindowPosition("Setup Workbench.Setup Engineer", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
+		else
+			this.Window.Show()
+
+		if getWindowSize("Setup Workbench.Setup Engineer", &w, &h)
+			this.Window.Resize("Initialize", w, h)
+
+		this.iUpdateTask := PeriodicTask(() => this.updateTelemetries(), 1000, kLowPriority)
+
+		this.iUpdateTask.start()
+
+		this.showReview(translate("Choose a lap for a detailed analysis."), false)
+	}
+
+	close() {
+		if this.iUpdateTask
+			this.iUpdateTask.stop()
+
+		if this.SetupWorkbench
+			this.SetupWorkbench.closedSetupEngineer()
+
+		this.Window.Destroy()
+	}
+
+	updateState() {
+		if ((this.Simulator == true) || (this.Car == true) || (this.Track == true))
+			this.Window["analyzeButton"].Enabled := false
+		else
+			this.Window["analyzeButton"].Enabled := true
+
+		if !this.TelemetriesListView.GetNext(0)
+			this.Window["analyzeButton"].Enabled := false
+	}
+
+	updateTelemetries() {
+		local selected := this.TelemetriesListView.GetNext(0)
+		local info, lapTime, name
+
+		if selected
+			selected := this.TelemetriesListView.GetText(selected)
+
+		this.TelemetriesListView.Delete()
+
+		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F" {
+			SplitPath(A_LoopFileName, , , , &name)
+
+			this.TelemetriesListView.Opt("-Redraw")
+
+			try {
+				if FileExist(A_LoopFileFullPath . ".info") {
+					info := readMultiMap(A_LoopFileFullPath . ".info")
+
+					lapTime := getMultiMapValue(info, "Lap", "LapTime", translate("-"))
+				}
+				else {
+					info := false
+
+					lapTime := translate("-")
+				}
+
+				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, lapTimeDisplayValue(lapTime))
+
+				this.TelemetriesListView.ModifyCol()
+
+				this.TelemetriesListView.ModifyCol(1, "AutoHdr")
+				this.TelemetriesListView.ModifyCol(2, "AutoHdr")
+			}
+			finally {
+				this.TelemetriesListView.Opt("+Redraw")
+			}
+		}
+
+		this.updateState()
+	}
+
+	windowResized() {
+		this.showReview(this.iContent, InStr(this.iContent, "`n"))
+	}
+
 	loadInstructions(configuration) {
 		local options, laps, ignore, instruction
 
@@ -4079,9 +4346,9 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	getInstruction(category) {
-		local simulator := this.SetupWorkbench.SelectedSimulator
-		local car := this.SetupWorkbench.SelectedCar
-		local track := this.SetupWorkbench.SelectedTrack
+		local simulator := this.Simulator
+		local car := this.Car
+		local track := this.Track
 
 		switch category, false {
 			case "Character":
@@ -4210,21 +4477,99 @@ class SetupEngineer extends ConfigurationItem {
 		return FileRead(fileName)
 	}
 
+	showReview(content, review := false) {
+		local width := this.ReviewViewer.getWidth() - 4
+		local height := (this.ReviewViewer.getHeight() - 4)
+		local html := ""
+		local document
+
+		this.iContent := content
+
+		if !review
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<style> table, p, div { color: #%fontColor% } </style>
+					<div style="width: %width%px; height: %height%px; text-align: center">
+						<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
+							<br>
+							<br>
+							<br>
+							<br>
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+		else
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<div style="width: %width%px">
+						<p style="font-family: Arial; font-size: 12px; margin: auto">
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+
+		content := StrReplace(content, "%", "\%")
+
+		this.ReviewViewer.document.open()
+		this.ReviewViewer.document.write(substituteVariables(document, {fontColor: this.Window.Theme.TextColor
+																	  , width: width, height: height, html: content
+																	  , backColor: this.Window.AltBackColor}))
+		this.ReviewViewer.document.close()
+	}
+
+	analyzeTelemetry() {
+		local selected := this.TelemetriesListView.GetNext(0)
+		local review := false
+		local fileName
+
+		if selected
+			selected := this.TelemetriesListView.GetText(selected)
+
+		if selected {
+			fileName := (kTempDirectory . "Setup Workbench\Telemetry\" . selected . ".telemetry")
+
+			this.Window.Block()
+
+			try {
+				withBlockedWindows(() {
+					withTask(ProgressTask(StrReplace(translate("Analyzing lap..."), "...", "")), () {
+						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
+						local telemetry := analyzer.createTelemetry(0, fileName)
+
+						review := this.reviewTelemetry(telemetry)
+					})
+				})
+
+				if review
+					this.showReview(review, true)
+				else
+					this.showReview(translate("No detailed review available."), false)
+			}
+			finally {
+				this.Window.Unblock()
+			}
+		}
+	}
+
 	reviewTelemetry(telemetry, includeHandling := false) {
 		local answer := false
 
 		static report := true
-
-		lapTimeDisplayValue(lapTime) {
-			local seconds, fraction, minutes
-
-			if ((lapTime = "-") || isNull(lapTime))
-				return "-"
-			else if isNumber(lapTime)
-				return ((lapTime = 0) ? "-" : displayValue("Time", lapTime))
-			else
-				return lapTime
-		}
 
 		try {
 			this.iIncludeHandling := includeHandling
@@ -4666,7 +5011,7 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		local service, ignore, provider, setting, providerConfiguration
 		local serviceURL, serviceKey, model
 
-		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 4096
+		static defaults := CaseInsenseWeakMap("ServiceURL", false, "Model", "", "MaxTokens", 8192
 											, "Temperature", 0.5, "GPULayers", 0)
 
 		super.loadFromConfiguration(configuration)
@@ -4743,7 +5088,7 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 			providerConfiguration := this.iProviderConfigurations[provider]
 
 			if (!providerConfiguration["MaxTokens"] || (Trim(providerConfiguration["MaxTokens"]) = ""))
-				providerConfiguration["MaxTokens"] := 4096
+				providerConfiguration["MaxTokens"] := 8192
 
 			for ignore, setting in ["ServiceURL", "ServiceKey", "Model", "MaxTokens"]
 				setMultiMapValue(configuration, "Setup Engineer Service", provider . "." . setting, providerConfiguration[setting])
@@ -4943,6 +5288,17 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+lapTimeDisplayValue(lapTime) {
+	local seconds, fraction, minutes
+
+	if ((lapTime = "-") || isNull(lapTime))
+		return "-"
+	else if isNumber(lapTime)
+		return ((lapTime = 0) ? "-" : displayValue("Time", lapTime))
+	else
+		return lapTime
+}
 
 closeSetupWorkbench(*) {
 	if GetKeyState("Ctrl")

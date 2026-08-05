@@ -4116,7 +4116,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			if isSet(type) {
 				if (type == true)
-					instructions := ["Character", "Simulation", "Handling"]
+					instructions := ["Character", "Simulation", "Handling", "Review"]
 				else
 					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -4187,10 +4187,10 @@ class SetupEngineer extends ConfigurationItem {
 
 		options := this.Options
 
-		options["Setup Workbench.Diary"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", kTempDirectory . "Diary")
+		options["Setup Workbench.Diary"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
 
 		if (!options["Setup Workbench.Diary"] || (Trim(options["Setup Workbench.Diary"]) = ""))
-			options["Setup Workbench.Diary"] := (kTempDirectory . "Diary")
+			options["Setup Workbench.Diary"] := (kTempDirectory . "Setup Workench\Diary")
 
 		options["Setup Engineer.Service"] := getMultiMapValue(configuration, "Setup Engineer Service", "Service", getMultiMapValue(configuration, "Setup Engineer", "Service", false))
 		options["Setup Engineer.Model"] := getMultiMapValue(configuration, "Setup Engineer Service", "Model", false)
@@ -4397,6 +4397,8 @@ class SetupEngineer extends ConfigurationItem {
 
 					return substituteVariables(this.Instructions["Handling"], {handling: JSON.print(issues, "  ")})
 				}
+			case "Review":
+				return this.Instructions["Review"]
 		}
 
 		return false
@@ -4777,9 +4779,10 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Handling"]
+				return ["Instructions.Character", "Instructions.Simulation"
+					  , "Instructions.Handling", "Instructions.Review"]
 			else
-				return ["Character", "Simulation", "Handling"]
+				return ["Character", "Simulation", "Handling", "Review"]
 		}
 	}
 

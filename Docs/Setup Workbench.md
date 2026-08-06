@@ -263,7 +263,7 @@ The structure, content and quality of the review strongly depends on the configu
 
 #### Applying setup changes
 
-For the time being setup changes that are mentioned in the lap review created by the Setup Engineer must be applied manually. This will change with a future release.
+If the Setup Engineer identified reasonable changes to the car setup, you can of course apply them manually. But you can also ask the Setup Engineer to do it for you. For this, you have to open a [*Setup Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups) (exactly one) and then you click on the button with the tools in the Setup Engineer window. The LLM, which is required to handle tool calling properly, is then asked to apply its own recommendations to the setup currently loaded in the *Setup Editor*. But always double check the result, only the most capable LLMs will manage to do this without any errors.
 
 ## Understanding the Recommendations
 

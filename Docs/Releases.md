@@ -23,7 +23,17 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.0.0
+
+#### Date: 08/14/26 (planned)
+
+#### Fixes
+
+  - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
+  
+#### Changes
+
+  - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated Setup Engineer can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
 
 # Release history
 

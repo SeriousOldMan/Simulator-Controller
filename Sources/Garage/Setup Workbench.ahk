@@ -2921,7 +2921,7 @@ class SetupEditor extends ConfigurationItem {
 		local settings := []
 		local setup := this.Setup
 		local ignore, setting
-msgbox 1
+
 		for ignore, setting in this.Workbench.Settings
 			if (setup.valueAvailable(setting, true) && setup.valueAvailable(setting, false))
 				settings.Push(setting)
@@ -4470,6 +4470,9 @@ class SetupEngineer extends ConfigurationItem {
 						return substituteVariables(this.Instructions["Optimize"]
 												 , {settings: values2String("`n", setupEditor.getSettings()*)})
 					}
+					catch Any as exception {
+						logError(exception)
+					}
 				}
 		}
 
@@ -4483,7 +4486,15 @@ class SetupEngineer extends ConfigurationItem {
 
 	getTools() {
 		if (this.Mode = "Optimize")
-			return []
+			return [LLMTool.Function("change_setting"
+								   , "Call this function to change the value of a setting in the car setup."
+								   , [LLMTool.Function.Parameter("name"
+															   , "The name of the setting that should be altered."
+															   , "String")
+									, LLMTool.Function.Parameter("increment"
+															   , "The relative increment to the setting by so called clicks. +1 corresponds to an increase of one click and -1 to the decrease of the setting by one click."
+															   , "Integer")]
+								   , ObjBindMethod(this, "changeSetting"))]
 		else
 			return []
 	}
@@ -4776,13 +4787,34 @@ class SetupEngineer extends ConfigurationItem {
 			setupEditor := this.Workbench.SetupEditors[1]
 
 			withBlockedWindows(() {
-				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Optimizing Setup..."), "...", "")), () {
 					this.updateSettings(this.Review)
 
 					WinActivate(setupEditor.Window)
 				})
 			})
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
 
+	changeSetting(arguments*) {
+		local setupEditor, name, increment
+
+		try {
+			name := arguments[1]
+			increment := arguments[2]
+
+			setupEditor := this.Workbench.SetupEditors[1]
+
+			if (increment < 0) {
+				loop Abs(increment)
+					setupEditor.decreaseSetting(name)
+			}
+			else
+				loop Abs(increment)
+					setupEditor.increaseSetting(name)
 		}
 		catch Any as exception {
 			logError(exception)
